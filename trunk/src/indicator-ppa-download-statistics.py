@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from builtins import None
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -74,7 +73,7 @@ gi.require_version( "Gtk", "3.0" )
 
 from copy import deepcopy
 from gi.repository import Gtk
-from ppa import PPA, PublishedBinary
+from ppa import Filters, PPA, PublishedBinary
 from urllib.request import urlopen
 
 import concurrent.futures, indicatorbase, json, locale, operator, tempfile, webbrowser
@@ -341,13 +340,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
 
             filterText = ""
-            for filter in self.filters:
-                if filter.getUser() == ppa.getUser() and \
-                   filter.getName() == ppa.getName() and \
-                   filter.getSeries() == ppa.getSeries() and \
-                   filter.getArchitecture() == ppa.getArchitecture():
-                    filterText = filter.getFilterText()
-                    break
+            if self.filters.hasFilter( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getSeries() ):
+                filterText = self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getSeries() )
 
             self.getPublishedBinaries( ppa, filterText )
             if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
@@ -438,7 +432,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # PPAs.
         grid = self.createGrid()
 
-        ppaStore = Gtk.ListStore( str, str, str, str ) # PPA User, PPA Name, Series, Architecture.
+        ppaStore = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
         ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
         for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
@@ -480,10 +474,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # Filters.
         grid = self.createGrid()
 
-        filterStore = Gtk.ListStore( str, str ) # 'PPA User | PPA Name | Series | Architecture', filter text.
+        filterStore = Gtk.ListStore( str, str, str, str, str ) # PPA user, name, series, architecture, filter text.
         filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-        for filter in self.filters:
-            filterStore.append( [ filter.getUser() + " | " + filter.getName() + " | " + filter.getSeries() + " | " + filter.getArchitecture(), filter.getFilterText() ] )
+        for user, name, series, architecture in self.filters.getUserNameSeriesArchitecture():
+            filterText = self.filters.getFilterText( user, name, series, architecture )
+            filterStore.append( [ user, name, series, architecture, filterText ] )
 
         filterTree = Gtk.TreeView( filterStore )
         filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
@@ -630,13 +625,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.ppas.sort( key = operator.methodcaller( "getKey" ) )
 
-#TODO Maybe use a class for storing all filters, not just one filter?
+#TODO Test/check!
             self.filters = [ ]
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
-                self.filters.append( Filter( filterStore[ treeiter ][ 0 ], filterStore[ treeiter ][ 1 ], filterStore[ treeiter ][ 2 ], filterStore[ treeiter ][ 3 ] ) )
-
-                self.filters[ filterStore[ treeiter ][ 0 ] ] = filterStore[ treeiter ][ 1 ].split()
+                self.filters.addFilter( filterStore[ treeiter ][ 0 ], filterStore[ treeiter ][ 1 ], filterStore[ treeiter ][ 2 ], filterStore[ treeiter ][ 3 ], filterStore[ treeiter ][ 4 ] )
                 treeiter = filterStore.iter_next( treeiter )
 
         return responseType
@@ -943,22 +936,26 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-#TODO If/when the filters change from dict to list, need a transition from the old way to the new for existing release?        
-#TODO When reading in the filters (after the hack for dict to list) read in filter text too!
         self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
-#         self.filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, { } ) #TODO May/will need to be an empty list.
         self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
         self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
         self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
         self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
         self.ppas = [ ]
+        self.filters = Filters()
         if config:
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
             self.ppas.sort( key = operator.methodcaller( "getKey" ) ) 
+
+#TODO Need a transition from the old way to the new of filters.
+#Example entry in .json for testing:   "filters": {}
+            filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] ) #TODO Test when no filters present.
+            for filter in filters:
+                self.filters.addFilter( filter[ 0 ], filter[ 1 ], filter[ 2 ], filter[ 3 ], filter[ 4 ] )
 
         else:
             self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
@@ -973,8 +970,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-tide",
                 "indicator-virtual-box" ]
 
-            self.filters = [ ]
-            self.filters.append( Filter( "thebernmeister", "ppa", "bionic", "amd64", filterText ) )
+            self.filters.addFilter( "thebernmeister", "ppa", "bionic", "amd64", filterText )
 
 
     def saveConfig( self ):
@@ -982,10 +978,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
-#TODO Not quite done here...need to save off the filter text!
+#TODO Test!
         filters = [ ]
-        for filter in self.filters:
-            filters.append( [ filter.getUser(), filter.getName(), filter.getSeries(), filter.getArchitecture() ] )
+        for user, name, series, architecture in self.filters.getUserNameSeriesArchitecture():
+            filterText = self.filters.getFilterText( user, name, series, architecture )
+            filters.append( [ user, name, series, architecture, filterText ] )
 
         return {
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,

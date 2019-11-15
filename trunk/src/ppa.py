@@ -145,6 +145,53 @@ class PublishedBinary( object ):
     def __repr__( self ): return self.__str__()
 
 
+class Filters( object ):
+
+    def __init__( self ):
+        self.filters = { }
+
+
+    def addFilter( self, user, name, series, architecture, text = [ ] ): self.filters[ self.__getKey( user, name, series, architecture ) ] = text
+
+
+#TODO May not be needed.
+#     def removeFilter( self, user, name, series, architecture ): del self.filters[ self.__getKey( user, name, series, architecture ) ]
+
+
+#     def getFilterKeys( self ): return self.filters.keys()
+
+
+#     def getUserNameSeriesArchitecture( self, key ):
+#         keyComponents = key.split( " | " )
+#         return keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
+
+
+    def getFilterText( self, user, name, series, architecture ): return self.filters[ self.__getKey( user, name, series, architecture ) ]
+
+
+    def hasFilter( self, user, name, series, architecture ): return self.__getKey( user, name, series, architecture ) in self.filters
+
+
+    def getUserNameSeriesArchitecture( self ):
+        for key in self.filters.keys():
+            keyComponents = key.split( " | " )
+            yield keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
+
+    
+    def __getKey( self, user, name, series, architecture ): return user + " | " + name + " | " + series + " | " + architecture
+
+
+    def __str__( self ): return str( self.__dict__ )
+
+
+    def __repr__( self ): return self.__str__()
+
+
+    def __eq__( self, other ): return self.__dict__ == other.__dict__
+
+
+
+#TODO Remove if not needed.
 class Filter( object ):
 
     def __init__( self, user, name, series, architecture, filterText = [ ] ):
@@ -170,7 +217,7 @@ class Filter( object ):
     def getFilterText( self ): return self.filterText
 
 
-    def getKey( self ): return self.user + " | " + self.name
+    def __getKey( self ): return self.user + " | " + self.name
 
 
     def __str__( self ):
