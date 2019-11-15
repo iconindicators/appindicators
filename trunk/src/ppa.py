@@ -102,8 +102,8 @@ class PPA( object ):
     def __str__( self ):
         return self.user + " | " + \
                self.name + " | " + \
-               self.series + " | " + \
-               self.architecture + " | " + \
+               str( self.series ) + " | " + \
+               str( self.architecture ) + " | " + \
                self.publishedBinaries
 
 
@@ -139,7 +139,7 @@ class PublishedBinary( object ):
 
     def __str__( self ):
         return self.packageName + " | " + \
-               self.packageVersion + " | " + \
+               str( self.packageVersion ) + " | " + \
                str( self.downloadCount ) + " | " + \
                str( self.architectureSpecific )
 
