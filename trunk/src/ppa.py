@@ -154,10 +154,10 @@ class Filters( object ):
     def addFilter( self, user, name, series, architecture, text = [ ] ): self.filters[ self.__getKey( user, name, series, architecture ) ] = text
 
 
-    def getFilterText( self, user, name, series, architecture ): return self.filters[ self.__getKey( user, name, series, architecture ) ]
-
-
     def hasFilter( self, user, name, series, architecture ): return self.__getKey( user, name, series, architecture ) in self.filters
+
+
+    def getFilterText( self, user, name, series, architecture ): return self.filters[ self.__getKey( user, name, series, architecture ) ]
 
 
     def getUserNameSeriesArchitecture( self ):
