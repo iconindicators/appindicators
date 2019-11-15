@@ -433,12 +433,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
-        ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Maybe need to sort by more than one column?
         for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
         ppaTree = Gtk.TreeView( ppaStore )
-        ppaTree.set_hexpand( True )
         ppaTree.set_vexpand( True )
         ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
         ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
@@ -475,17 +474,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         filterStore = Gtk.ListStore( str, str, str, str, str ) # PPA user, name, series, architecture, filter text.
-        filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Maybe need to sort by more than one column?
         for user, name, series, architecture in self.filters.getUserNameSeriesArchitecture():
             filterText = self.filters.getFilterText( user, name, series, architecture )
-            filterStore.append( [ user, name, series, architecture, filterText ] )
+            filterStore.append( [ user, name, series, architecture, "\n".join( filterText ) ] )
 
         filterTree = Gtk.TreeView( filterStore )
-        filterTree.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
         filterTree.set_hexpand( True )
         filterTree.set_vexpand( True )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "PPA" ), Gtk.CellRendererText(), text = 0 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "Filter" ), Gtk.CellRendererText(), text = 1 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
+        filterTree.append_column( Gtk.TreeViewColumn( _( "Filter" ), Gtk.CellRendererText(), text = 4 ) )
         filterTree.set_tooltip_text( _( "Double click to edit a filter." ) )
         filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
@@ -629,6 +630,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.filters = [ ]
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
+#TODO Probably need to split or combine the filter text back into a list...
+# see the released version of the indicator in /usr/share/indicator-ppa...                
                 self.filters.addFilter( filterStore[ treeiter ][ 0 ], filterStore[ treeiter ][ 1 ], filterStore[ treeiter ][ 2 ], filterStore[ treeiter ][ 3 ], filterStore[ treeiter ][ 4 ] )
                 treeiter = filterStore.iter_next( treeiter )
 
@@ -972,6 +975,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters.addFilter( "thebernmeister", "ppa", "bionic", "amd64", filterText )
 
+        self.filters.addFilter( "thebernmeister", "ppa", "uncle", "amd64", [ "filterText", "mpore", "yehd" ] )
 
     def saveConfig( self ):
         ppas = [ ]
