@@ -394,6 +394,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # PPAs.
         grid = self.createGrid()
 
+#TODO When no .config, open the preferences and the default filter causes the dialog to stretch horizontally...
+#...but the first tab table is not stretching.
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
         ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Maybe need to sort by more than one column?
         for ppa in self.ppas:
@@ -589,11 +591,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas.sort( key = operator.methodcaller( "getDescriptor" ) )
 
 #TODO Test/check!
-            self.filters = [ ]
+            self.filters = Filters()
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
 #TODO Probably need to split or combine the filter text back into a list...
 # see the released version of the indicator in /usr/share/indicator-ppa...                
+#Start with no config, add in a PPA (NOT a filter) and save. Open dialog and the filter text is screwed.
                 self.filters.addFilter( filterStore[ treeiter ][ 0 ], filterStore[ treeiter ][ 1 ], filterStore[ treeiter ][ 2 ], filterStore[ treeiter ][ 3 ], filterStore[ treeiter ][ 4 ] )
                 treeiter = filterStore.iter_next( treeiter )
 
@@ -951,7 +954,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         return {
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
-            IndicatorPPADownloadStatistics.CONFIG_FILTERS: self.filters,
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS: filters,
             IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
             IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
             IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,
