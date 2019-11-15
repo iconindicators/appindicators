@@ -975,7 +975,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters.addFilter( "thebernmeister", "ppa", "bionic", "amd64", filterText )
 
-        self.filters.addFilter( "thebernmeister", "ppa", "uncle", "amd64", [ "filterText", "mpore", "yehd" ] )
 
     def saveConfig( self ):
         ppas = [ ]
