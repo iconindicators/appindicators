@@ -165,7 +165,7 @@ class Filters( object ):
             keyComponents = key.split( " | " )
             yield keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
 
-    
+
     def __getKey( self, user, name, series, architecture ): return user + " | " + name + " | " + series + " | " + architecture
 
 
@@ -176,44 +176,3 @@ class Filters( object ):
 
 
     def __eq__( self, other ): return self.__dict__ == other.__dict__
-
-
-
-#TODO Remove if not needed.
-class Filter( object ):
-
-    def __init__( self, user, name, series, architecture, filterText = [ ] ):
-        self.user = user
-        self.name = name
-        self.series = series
-        self.architecture = architecture
-        self.filterText = filterText
-
-
-    def getUser( self ): return self.user
-
-
-    def getName( self ): return self.name
-
-
-    def getSeries( self ): return self.series
-
-
-    def getArchitecture( self ): return self.architecture
-
-
-    def getFilterText( self ): return self.filterText
-
-
-    def __getKey( self ): return self.user + " | " + self.name
-
-
-    def __str__( self ):
-        return str( self.user ) + " | " + \
-               str( self.name ) + " | " + \
-               str( self.series ) + " | " + \
-               str( self.architecture ) + " | " + \
-               str( self.filterText )
-
-
-    def __repr__( self ): return self.__str__()
