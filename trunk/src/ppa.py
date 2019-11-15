@@ -55,6 +55,7 @@ class PPA( object ):
             self.publishedBinaries = [ ]
 
 
+#TODO Can these four functions be combined into one and return a tuple?
     def getUser( self ): return self.user
 
 
@@ -68,6 +69,7 @@ class PPA( object ):
 
 
     # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
+#TODO Rethink exposing the key.  If the outside world wants a format using the |, they can implement it!
     def getKey( self ):
         if self.series is None or self.architecture is None:
             key = str( self.user ) + " | " + str( self.name )
