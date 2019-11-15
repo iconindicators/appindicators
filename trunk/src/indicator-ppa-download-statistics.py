@@ -148,7 +148,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if self.showSubmenu:
             indent = self.indent( 0, 1 )
             for ppa in ppas:
-                menuItem = Gtk.MenuItem( ppa.getKey() )
+                menuItem = Gtk.MenuItem( ppa.getDescriptor() )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 if ppa.getStatus() == PPA.Status.OK:
@@ -164,9 +164,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         else:
             indent = self.indent( 1, 1 )
             for ppa in ppas:
-                menuItem = Gtk.MenuItem( ppa.getKey() )
+                menuItem = Gtk.MenuItem( ppa.getDescriptor() )
                 menu.append( menuItem )
-                menuItem.set_name( ppa.getKey() )
+                menuItem.set_name( ppa.getDescriptor() )
                 menuItem.connect( "activate", self.onPPA )
                 if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries( True )
@@ -190,7 +190,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
         menuItem = Gtk.MenuItem( label )
-        menuItem.set_name( ppa.getKey() )
+        menuItem.set_name( ppa.getDescriptor() )
         menuItem.connect( "activate", self.onPPA )
         menu.append( menuItem )
 
@@ -273,7 +273,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 for key in temp:
                     ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
-        ppas.sort( key = operator.methodcaller( "getKey" ) )
+        ppas.sort( key = operator.methodcaller( "getDescriptor" ) )
         return ppas
 
 
@@ -624,7 +624,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
-            self.ppas.sort( key = operator.methodcaller( "getKey" ) )
+            self.ppas.sort( key = operator.methodcaller( "getDescriptor" ) )
 
 #TODO Test/check!
             self.filters = [ ]
@@ -952,7 +952,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
-            self.ppas.sort( key = operator.methodcaller( "getKey" ) ) 
+            self.ppas.sort( key = operator.methodcaller( "getDescriptor" ) ) 
 
 #TODO Need a transition from the old way to the new of filters.
 #Example entry in .json for testing:   "filters": {}

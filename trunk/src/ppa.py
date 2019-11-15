@@ -68,16 +68,16 @@ class PPA( object ):
     def getArchitecture( self ): return self.architecture
 
 
-    # Returns a key of the form 'PPA User | PPA Name | Series | Architecture' or 'PPA User | PPA Name' if series/architecture are undefined. 
-#TODO Rethink exposing the key.  If the outside world wants a format using the |, they can implement it!
-    def getKey( self ):
+    # Returns a string description of the PPA of the form 'user | name | series | architecture'
+    # or 'user | name' if series/architecture are undefined.
+    def getDescriptor( self ):
         if self.series is None or self.architecture is None:
-            key = self.user + " | " + self.name
+            descriptor = self.user + " | " + self.name
 
         else:
-            key = self.user + " | " + self.name + " | " + self.series + " | " + self.architecture
+            descriptor = self.user + " | " + self.name + " | " + self.series + " | " + self.architecture
 
-        return key
+        return descriptor
 
 
     def addPublishedBinary( self, publishedBinary ): self.publishedBinaries.append( publishedBinary )
@@ -140,8 +140,8 @@ class PublishedBinary( object ):
     def __str__( self ):
         return self.packageName + " | " + \
                self.packageVersion + " | " + \
-               self.downloadCount + " | " + \
-               self.architectureSpecific
+               str( self.downloadCount ) + " | " + \
+               str( self.architectureSpecific )
 
 
     def __repr__( self ): return self.__str__()
