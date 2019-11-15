@@ -50,12 +50,10 @@ class PPA( object ):
 
     def setStatus( self, status ):
         self.status = status
-
         if not ( status == PPA.Status.OK ): # Any other status implies the underlying published binaries are reset.
             self.publishedBinaries = [ ]
 
 
-#TODO Can these four functions be combined into one and return a tuple?
     def getUser( self ): return self.user
 
 
