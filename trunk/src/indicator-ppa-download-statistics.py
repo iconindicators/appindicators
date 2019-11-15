@@ -23,45 +23,7 @@
 
 #TODO Test with no .json file.
 
-#TODO Test using focal as a series...maybe remove it until released?
-
 #TODO Test with a ppa (testing/ trusty) that is known to have no published binaries.
-
-
-
-
-
-
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689752?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689261?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689255?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689243?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689237?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130689231?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/130688721?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/129985504?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/118581709?ws.op=getDownloadCount
-# 
-# 
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/amd64&status=Published&exact_match=false&ordered=false&binary_name=
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/133389298?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512672?ws.op=getDownloadCount
-# 
-# 
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/bionic/i386&status=Published&exact_match=false&ordered=false&binary_name=
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/133389301?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512671?ws.op=getDownloadCount
-# 
-# 
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/amd64&status=Published&exact_match=false&ordered=false&binary_name=
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132674510?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512674?ws.op=getDownloadCount
-# 
-# 
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/xenial/i386&status=Published&exact_match=false&ordered=false&binary_name=
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132674513?ws.op=getDownloadCount
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/testing/+binarypub/132512673?ws.op=getDownloadCount
 
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
