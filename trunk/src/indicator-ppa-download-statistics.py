@@ -19,11 +19,7 @@
 # Application indicator which displays PPA download statistics.
 
 
-#TODO For GNOME Shell, how to handle when scrolling off the edge/bottom?
-
 #TODO Test with no .json file.
-
-#TODO Test with a ppa (testing/ trusty) that is known to have no published binaries.
 
 
 INDICATOR_NAME = "indicator-ppa-download-statistics"
