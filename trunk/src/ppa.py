@@ -78,10 +78,12 @@ class PPA( object ):
         return descriptor
 
 
-    def addPublishedBinary( self, publishedBinary ): self.publishedBinaries.append( publishedBinary )
+    def addPublishedBinary( self, publishedBinary ):
+        self.publishedBinaries.append( publishedBinary )
 
 
-    def addPublishedBinaries( self, publishedBinaries ): self.publishedBinaries.extend( publishedBinaries )
+    def addPublishedBinaries( self, publishedBinaries ):
+        self.publishedBinaries.extend( publishedBinaries )
 
 
     def getPublishedBinaries( self, sort = False ):
@@ -151,13 +153,16 @@ class Filters( object ):
         self.filters = { }
 
 
-    def addFilter( self, user, name, series, architecture, text = [ ] ): self.filters[ self.__getKey( user, name, series, architecture ) ] = text
+    def addFilter( self, user, name, series, architecture, text = [ ] ):
+        self.filters[ self.__getKey( user, name, series, architecture ) ] = text
 
 
-    def hasFilter( self, user, name, series, architecture ): return self.__getKey( user, name, series, architecture ) in self.filters
+    def hasFilter( self, user, name, series, architecture ):
+        return self.__getKey( user, name, series, architecture ) in self.filters
 
 
-    def getFilterText( self, user, name, series, architecture ): return self.filters[ self.__getKey( user, name, series, architecture ) ]
+    def getFilterText( self, user, name, series, architecture ):
+        return self.filters[ self.__getKey( user, name, series, architecture ) ]
 
 
     def getUserNameSeriesArchitecture( self ):
@@ -166,7 +171,8 @@ class Filters( object ):
             yield keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
 
 
-    def __getKey( self, user, name, series, architecture ): return user + " | " + name + " | " + series + " | " + architecture
+    def __getKey( self, user, name, series, architecture ):
+        return user + " | " + name + " | " + series + " | " + architecture
 
 
     def __str__( self ): return str( self.__dict__ )
