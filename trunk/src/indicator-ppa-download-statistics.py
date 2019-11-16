@@ -322,8 +322,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #    https://pymotw.com/3/concurrent.futures
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def getPublishedBinaries( self, ppa, filterText ):
-        url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + ppa.getArchitecture() + "&status=Published" + \
+        url = "https://api.launchpad.net/1.0/~" + \
+              ppa.getUser() + "/+archive/" + \
+              ppa.getName() + "?ws.op=getPublishedBinaries" + \
+              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
+              ppa.getArchitecture() + "&status=Published" + \
               "&exact_match=false&ordered=false&binary_name=" + filterText # A filterText of "" equates to no filterText.
 
         pageNumber = 1
@@ -365,7 +368,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             try:
                 indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-                url = "https://api.launchpad.net/1.0/~" + ppa.getUser() + "/+archive/" + ppa.getName() + "/+binarypub/" + packageId + "?ws.op=getDownloadCount"
+                url = "https://api.launchpad.net/1.0/~" + \
+                      ppa.getUser() + "/+archive/" + \
+                      ppa.getName() + "/+binarypub/" + \
+                      packageId + "?ws.op=getDownloadCount"
 
                 downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
@@ -390,14 +396,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # PPAs.
         grid = self.createGrid()
 
-#TODO When no .config, open the preferences and the default filter causes the dialog to stretch horizontally...
-#...but the first tab table is not stretching.
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
         ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Maybe need to sort by more than one column?
         for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
         ppaTree = Gtk.TreeView( ppaStore )
+        ppaTree.set_hexpand( True )
         ppaTree.set_vexpand( True )
         ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
         ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
@@ -581,19 +586,25 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas = [ ]
             treeiter = ppaStore.get_iter_first()
             while treeiter != None:
-                self.ppas.append( PPA( ppaStore[ treeiter ][ 0 ], ppaStore[ treeiter ][ 1 ], ppaStore[ treeiter ][ 2 ], ppaStore[ treeiter ][ 3 ] ) )
+                self.ppas.append(
+                    PPA( 
+                        ppaStore[ treeiter ][ 0 ], 
+                        ppaStore[ treeiter ][ 1 ], 
+                        ppaStore[ treeiter ][ 2 ], 
+                        ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
             self.ppas.sort( key = operator.methodcaller( "getDescriptor" ) )
 
-#TODO Test/check!
             self.filters = Filters()
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
-#TODO Probably need to split or combine the filter text back into a list...
-# see the released version of the indicator in /usr/share/indicator-ppa...                
-#Start with no config, add in a PPA (NOT a filter) and save. Open dialog and the filter text is screwed.
-                self.filters.addFilter( filterStore[ treeiter ][ 0 ], filterStore[ treeiter ][ 1 ], filterStore[ treeiter ][ 2 ], filterStore[ treeiter ][ 3 ], filterStore[ treeiter ][ 4 ] )
+                self.filters.addFilter(
+                    filterStore[ treeiter ][ 0 ], 
+                    filterStore[ treeiter ][ 1 ], 
+                    filterStore[ treeiter ][ 2 ], 
+                    filterStore[ treeiter ][ 3 ], 
+                    filterStore[ treeiter ][ 4 ].split() )
                 treeiter = filterStore.iter_next( treeiter )
 
         return responseType
