@@ -925,18 +925,21 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             PPA.sort( self.ppas )
 
-#TODO Need a transition from the old way to the new of filters.
-#Example entry in .json for testing:   "filters": {}
-#Also filters were only ppa user/name...need to increase that to series/arch...but how to guess what the series/arch are?
-#Maybe check what PPAs are in place?
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
 
 #TODO Start of temporary hack...
 # Format of filters has changed from a dict to a list.
             if isinstance( filters, dict ):
-                #TODO Convert from dict to list incorporating series/arch.  Then do a save.
-                pass
+                filtersNew = [ ]
+                for filter in filters:
+                    filterUser = filter.split( ' | ' )[ 0 ]
+                    filterName = filter.split( ' | ' )[ 1 ]
+                    for ppa in self.ppas:
+                        if ppa.getUser() == filterUser and ppa.getName() == filterName:
+                            filtersNew.append( [ filterUser, filterName, ppa.getSeries(), ppa.getArchitecture(), filters[ filter ] ] )
+                
+                filters = filtersNew
 # End of hack!
 
             for filter in filters:
