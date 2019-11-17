@@ -34,7 +34,7 @@ from gi.repository import Gtk
 from ppa import Filters, PPA, PublishedBinary
 from urllib.request import urlopen
 
-import concurrent.futures, indicatorbase, json, locale, operator, tempfile, webbrowser
+import concurrent.futures, indicatorbase, json, locale, tempfile, webbrowser
 
 
 class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
@@ -231,7 +231,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 for key in temp:
                     ppas[ -1 ].addPublishedBinary( temp[ key ] )
 
-        ppas.sort( key = operator.methodcaller( "getDescriptor" ) )
+        PPA.sort( self.ppas )
         return ppas
 
 
@@ -594,7 +594,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                         ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
-            self.ppas.sort( key = operator.methodcaller( "getDescriptor" ) )
+            PPA.sort( self.ppas )
 
             self.filters = Filters()
             treeiter = filterStore.get_iter_first()
@@ -924,7 +924,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
 
-            self.ppas.sort( key = operator.methodcaller( "getDescriptor" ) ) 
+            PPA.sort( self.ppas )
 
 #TODO Need a transition from the old way to the new of filters.
 #Example entry in .json for testing:   "filters": {}

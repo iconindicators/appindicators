@@ -99,6 +99,11 @@ class PPA( object ):
             del self.publishedBinaries[ clipAmount : ]
 
 
+    @staticmethod
+    def sort( listOfPPAs ):
+        listOfPPAs.sort( key = operator.methodcaller( "getDescriptor" ) )
+
+
     def __str__( self ):
         return self.user + " | " + \
                self.name + " | " + \
