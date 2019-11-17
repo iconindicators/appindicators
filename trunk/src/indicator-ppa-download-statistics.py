@@ -917,9 +917,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
         self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
-        self.ppas = [ ]
-        self.filters = Filters()
         if config:
+            self.ppas = [ ]
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
@@ -928,12 +927,30 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 #TODO Need a transition from the old way to the new of filters.
 #Example entry in .json for testing:   "filters": {}
-            filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] ) #TODO Test when no filters present.
+#Also filters were only ppa user/name...need to increase that to series/arch...but how to guess what the series/arch are?
+#Maybe check what PPAs are in place?
+            self.filters = Filters()
+            filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
+
+#TODO Start of temporary hack...
+# Format of filters has changed from a dict to a list.
+            if isinstance( filters, dict ):
+                #TODO Convert from dict to list incorporating series/arch.  Then do a save.
+                pass
+# End of hack!
+
             for filter in filters:
                 self.filters.addFilter( filter[ 0 ], filter[ 1 ], filter[ 2 ], filter[ 3 ], filter[ 4 ] )
 
+#TODO Start of temporary hack...
+# Save the filters back out in the new format.
+            self.saveConfig()
+# End of hack!
+
         else:
+            self.ppas = [ ]
             self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
+
             filterText = [
                 "indicator-fortune",
                 "indicator-lunar",
@@ -945,6 +962,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-tide",
                 "indicator-virtual-box" ]
 
+            self.filters = Filters()
             self.filters.addFilter( "thebernmeister", "ppa", "bionic", "amd64", filterText )
 
 
@@ -953,7 +971,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
-#TODO Test!
         filters = [ ]
         for user, name, series, architecture in self.filters.getUserNameSeriesArchitecture():
             filterText = self.filters.getFilterText( user, name, series, architecture )
