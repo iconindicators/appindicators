@@ -297,9 +297,33 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
 
+            if self.filters.hasFilter( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
+                for filter in self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
+                    self.getPublishedBinaries( ppa, filter )
+                    if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
+                        break
+
+            else:
+                self.getPublishedBinaries( ppa, "" )
+
+            if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                ppa.setStatus( PPA.Status.OK )
+
+            else:
+                if filters:
+                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+
+                else:
+                    ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
+
+
+    def downloadPPAStatisticsORIG( self ):
+        for ppa in self.ppas:
+            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
+
             filterText = ""
-            if self.filters.hasFilter( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getSeries() ):
-                filterText = self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getSeries() )
+            if self.filters.hasFilter( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
+                filterText = self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() )
 
             self.getPublishedBinaries( ppa, filterText )
             if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
@@ -947,7 +971,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 #TODO Start of temporary hack...
 # Save the filters back out in the new format.
-            self.saveConfig()
+#             self.saveConfig()
 # End of hack!
 
         else:
