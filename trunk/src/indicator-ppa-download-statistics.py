@@ -58,7 +58,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     ARCHITECTURES = [ "amd64", "i386" ]
 
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
-    MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = _( "(multiple messages - uncombine PPAs)" )
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
     MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED = _( "(no published binaries and/or completely filtered)" )
     MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
@@ -157,7 +156,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
-#TODO Can we instead check if there are filters for this ppa and only write out either filtered or no pub binaries, rather than a mix of both?
         elif ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED
 
@@ -959,6 +957,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
+
+
+#TODO Old filters testing.
+# "filters": {"thebernmeister | ppa": ["fortune", "stardate"]}, 
 
 #TODO Start of temporary hack...
 # Format of filters has changed from a dict to a list.
