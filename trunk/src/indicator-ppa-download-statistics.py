@@ -163,6 +163,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         elif ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
 
+#TODO Can we instead check if there are filters for this ppa and only write out either filtered or no pub binaries, rather than a mix of both?
         elif ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
@@ -308,7 +309,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                             break # No point continuing with each filter.
 
                     if not( ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA ):
-                        if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                        if ppa.getPublishedBinaries():
                             ppa.setStatus( PPA.Status.OK )
 
                         else:
@@ -1001,6 +1002,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 #TODO Start of temporary hack...
 # Save the filters back out in the new format.
+#TODO Put this back!
 #             self.saveConfig()
 # End of hack!
 
