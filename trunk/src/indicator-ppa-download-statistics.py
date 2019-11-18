@@ -306,21 +306,16 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     for filter in self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
                         self.getPublishedBinaries( ppa, filter )
                         if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
-                            break
+                            break  #TODO Break is good, but then we need to avoid the code below.
+
+                    if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                        ppa.setStatus( PPA.Status.OK )
+
+                    else:
+                        ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
                     ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
-
-
-                if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
-                    ppa.setStatus( PPA.Status.OK )
-
-                else:
-                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-                    #TODO It is possible that there no published binaries to begin with
-                    # and the filtering was incidental...so really should handle this....but how?
-                    # Or maybe this is not actually an issue at all?
-                    # Maybe do a download first without filters (outside the filter loop) to get the download count.
 
             else:
                 self.getPublishedBinaries( ppa, "" )
