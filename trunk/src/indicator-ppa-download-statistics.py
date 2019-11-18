@@ -300,19 +300,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 hasPublishedBinaries = self.hasPublishedBinaries( ppa )
                 if hasPublishedBinaries is None:
                     ppa.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
-                    continue
 
-                if hasPublishedBinaries:
+                elif hasPublishedBinaries:
                     for filter in self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
                         self.getPublishedBinaries( ppa, filter )
                         if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
-                            break  #TODO Break is good, but then we need to avoid the code below.
+                            break # No point continuing with each filter.
 
-                    if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
-                        ppa.setStatus( PPA.Status.OK )
+                    if not( ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA ):
+                        if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                            ppa.setStatus( PPA.Status.OK )
 
-                    else:
-                        ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                        else:
+                            ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
                     ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
