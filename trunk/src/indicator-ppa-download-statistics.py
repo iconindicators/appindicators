@@ -157,13 +157,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
+#TODO Can we instead check if there are filters for this ppa and only write out either filtered or no pub binaries, rather than a mix of both?
         elif ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED
 
         elif ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
 
-#TODO Can we instead check if there are filters for this ppa and only write out either filtered or no pub binaries, rather than a mix of both?
         elif ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
@@ -172,7 +172,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def combine( self, ppas ):
-        print( "Combining") #TODO Remove
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
         combinedPPAs = { }
         for ppa in ppas:
