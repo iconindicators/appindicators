@@ -379,8 +379,7 @@ class IndicatorBase:
         return grid
 
 
-    # Provides indent spacing for menu items,
-    # given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
+    # Menu item indent spacing, given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
     def indent( self, indentUnity, indentGnomeShell ):
         INDENT = "      "
         if self.isUbuntu1604():
