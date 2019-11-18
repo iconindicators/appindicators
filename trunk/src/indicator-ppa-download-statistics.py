@@ -59,8 +59,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
     MESSAGE_MULTIPLE_MESSAGES_UNCOMBINE = _( "(multiple messages - uncombine PPAs)" )
-    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries and/or completely filtered)" )
-    MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED = _( "(no published binaries)" )
+    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
+    MESSAGE_NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED = _( "(no published binaries and/or completely filtered)" )
     MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
 
 
@@ -172,6 +172,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def combine( self, ppas ):
+        print( "Combining") #TODO Remove
         # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
         combinedPPAs = { }
         for ppa in ppas:
@@ -321,7 +322,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             else:
                 self.getPublishedBinaries( ppa, "" )
                 if not ( ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA ):
-                    if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                    if ppa.getPublishedBinaries():
                         ppa.setStatus( PPA.Status.OK )
 
                     else:
