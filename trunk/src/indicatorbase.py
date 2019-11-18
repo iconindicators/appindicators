@@ -422,26 +422,6 @@ class IndicatorBase:
             logging.exception( e )
 
 
-#TODO Maybe move these two functions into indicator lunar for now?
-    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-
-
-    def getThemeColour( self, iconName ):
-        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + iconName + ".svg"
-        try:
-            with open( iconFilenameForCurrentTheme, "r" ) as file:
-                data = file.read()
-                index = data.find( "style=\"fill:#" )
-                themeColour = data[ index + 13 : index + 19 ]
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
-            themeColour = "fff200" # Default to hicolor.
-
-        return themeColour
-
-
     def getLogging( self ): return logging
 
 
