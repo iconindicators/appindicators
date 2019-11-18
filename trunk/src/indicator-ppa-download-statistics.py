@@ -328,29 +328,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                         ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
 
 
-    def downloadPPAStatisticsORIG( self ):
-        for ppa in self.ppas:
-            ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
-
-            filterText = ""
-            if self.filters.hasFilter( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
-                filterText = self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() )
-
-            self.getPublishedBinaries( ppa, filterText )
-            if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
-                continue
-
-            if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
-                ppa.setStatus( PPA.Status.OK )
-
-            else:
-                if filterText:
-                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
-
-                else:
-                    ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
-
-
     def hasPublishedBinaries( self, ppa ):
         url = "https://api.launchpad.net/1.0/~" + \
               ppa.getUser() + "/+archive/" + \
