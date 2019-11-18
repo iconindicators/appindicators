@@ -296,25 +296,29 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def downloadPPAStatistics( self ):
         for ppa in self.ppas:
             ppa.setStatus( PPA.Status.NEEDS_DOWNLOAD )
-
             if self.filters.hasFilter( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
                 for filter in self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
                     self.getPublishedBinaries( ppa, filter )
                     if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                         break
 
-            else:
-                self.getPublishedBinaries( ppa, "" )
-
-            if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
-                ppa.setStatus( PPA.Status.OK )
-
-            else:
-                if filters:
-                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                    ppa.setStatus( PPA.Status.OK )
 
                 else:
-                    ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
+                    ppa.setStatus( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                    #TODO It is possible that there no published binaries to begin with
+                    # and the filtering was incidental...so really should handle this....but how?
+                    # Or maybe this is not actually an issue at all?
+                    # Maybe do a download first without filters (outside the filter loop) to get the download count.
+            else:
+                self.getPublishedBinaries( ppa, "" )
+                if not ( ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA ):
+                    if ppa.getPublishedBinaries(): #TODO Verify this only passes when we have a non-zero length of data.
+                        ppa.setStatus( PPA.Status.OK )
+
+                    else:
+                        ppa.setStatus( PPA.Status.NO_PUBLISHED_BINARIES )
 
 
     def downloadPPAStatisticsORIG( self ):
