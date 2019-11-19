@@ -64,7 +64,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.requestMouseWheelScrollEvents()
 
 
-
     def update( self, menu ):
         if self.autoStartRequired and self.isVBoxManageInstalled():
             self.autoStartRequired = False
