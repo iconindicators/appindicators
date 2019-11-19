@@ -45,7 +45,8 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             version = "1.0.38",
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
-            creditz = [ _( "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main." ) ] )
+            creditz = [ _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
+                        _( "Wikipedia::Stardate" "http://en.wikipedia.org/wiki/Stardate" ) ] )
 
         self.requestMouseWheelScrollEvents()
         self.saveConfigTimerID = None
@@ -121,8 +122,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
         showClassicCheckbox.set_active( self.showClassic )
         showClassicCheckbox.set_tooltip_text( _(
             "If checked, show stardate 'classic' based on\n\n" + \
-            "\tSTARDATES IN STAR TREK FAQ V1.6\n\n" + \
-            "by Andrew Main.\n\n" + \
+            "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
             "Otherwise show stardate '2009 revised' based on\n\n" + \
             "\thttp://en.wikipedia.org/wiki/Stardate" ) )
         grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
