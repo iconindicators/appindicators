@@ -38,7 +38,8 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
   * Update debian/compat to 9.
-  * TODO ------------------------------------------------------------------------------------->>>>>>>>>> When the PPA Archive is sorted, put in a note here.
+  * Created an archive PPA to hold a version of each indicator prior to the
+    switch over: https://launchpad.net/~thebernmeister/+archive/ubuntu/archive
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 2 May 2019 19:11:30 +1000
 
