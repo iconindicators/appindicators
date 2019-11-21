@@ -257,36 +257,36 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     # From that extract the ID for each binary which is then used to get the download count for each binary.
     # The ID is the number at the end of self_link.
     # The published binary object looks like this...
-    #{
-    #    "total_size": 4, 
-    #    "start": 0, 
-    #    "entries": [
-    #    {
-    #        "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386", 
-    #        "removal_comment": null, 
-    #        "display_name": "indicator-lunar 1.0.9-1 in precise i386", 
-    #        "date_made_pending": null, 
-    #        "date_superseded": null, 
-    #        "priority_name": "OPTIONAL", 
-    #        "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"", 
-    #        "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302", 
-    #        "binary_package_version": "1.0.9-1", 
-    #        "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history", 
-    #        "component_name": "main", 
-    #        "status": "Published", 
-    #        "date_removed": null, 
-    #        "pocket": "Release", 
-    #        "date_published": "2012-08-09T10:30:49.572656+00:00", 
-    #        "removed_by_link": null, "section_name": "python", 
-    #        "date_created": "2012-08-09T10:27:31.762212+00:00", 
-    #        "binary_package_name": "indicator-lunar", 
-    #        "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa", 
-    #        "architecture_specific": false, 
-    #        "scheduled_deletion_date": null
-    #    }
-    #    {
-    #    ,... 
-    #}
+    # {
+    #     "total_size": 4, 
+    #     "start": 0, 
+    #     "entries": [
+    #     {
+    #         "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386", 
+    #         "removal_comment": null, 
+    #         "display_name": "indicator-lunar 1.0.9-1 in precise i386", 
+    #         "date_made_pending": null, 
+    #         "date_superseded": null, 
+    #         "priority_name": "OPTIONAL", 
+    #         "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"", 
+    #         "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302", 
+    #         "binary_package_version": "1.0.9-1", 
+    #         "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history", 
+    #         "component_name": "main", 
+    #         "status": "Published", 
+    #         "date_removed": null, 
+    #         "pocket": "Release", 
+    #         "date_published": "2012-08-09T10:30:49.572656+00:00", 
+    #         "removed_by_link": null, "section_name": "python", 
+    #         "date_created": "2012-08-09T10:27:31.762212+00:00", 
+    #         "binary_package_name": "indicator-lunar", 
+    #         "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa", 
+    #         "architecture_specific": false, 
+    #         "scheduled_deletion_date": null
+    #     }
+    #     {
+    #     ,... 
+    # }
     #
     # References:
     #     http://launchpad.net/+apidoc
