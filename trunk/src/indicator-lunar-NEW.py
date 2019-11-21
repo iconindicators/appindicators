@@ -2090,7 +2090,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 self.satellites = tmp
 
-        self.saveConfig() #TODO Need to do a request here to save.
+        self.requestSaveConfig() #TODO Need to do a request here to save.
 # End of hack!
 
 
