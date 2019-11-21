@@ -972,7 +972,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     for ppa in self.ppas:
                         if ppa.getUser() == filterUser and ppa.getName() == filterName:
                             filtersNew.append( [ filterUser, filterName, ppa.getSeries(), ppa.getArchitecture(), filters[ filter ] ] )
-                
+
                 filters = filtersNew
 # End of hack!
 
@@ -981,8 +981,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 #TODO Start of temporary hack...
 # Save the filters back out in the new format.
-#TODO Put this back!
-#             self.saveConfig()
+            self.requestSaveConfig()
 # End of hack!
 
         else:
