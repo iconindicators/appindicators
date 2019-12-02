@@ -230,7 +230,6 @@ class IndicatorBase:
             GLib.idle_add( self.__update )
 
         elif self.nextUpdateTime: # User cancelled and there is a next update time present...
-#TODO Need to somehow test this!
             secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.utcnow() ).total_seconds()
             if secondsToNextUpdate > 10: # Scheduled update is still in the future (10 seconds or more), so reschedule...
                 GLib.timeout_add_seconds( int( secondsToNextUpdate ), self.__update )
@@ -239,9 +238,6 @@ class IndicatorBase:
                 GLib.idle_add( self.__update )
 
 
-#TODO In Punycode, when items are disabled,
-# convert is enabled...should I really disable all menu items?
-# Best check every indicator!
     def __setCommonMenuSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
