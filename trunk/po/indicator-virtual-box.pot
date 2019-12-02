@@ -17,15 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicator-virtual-box.py:60
+#: indicator-virtual-box.py:57
 msgid "Shows VirtualBox™ virtual machines and allows them to be started."
 msgstr ""
 
-#: indicator-virtual-box.py:74
+#: indicator-virtual-box.py:76
 msgid "(VirtualBox™ is not installed)"
 msgstr ""
 
-#: indicator-virtual-box.py:85
+#: indicator-virtual-box.py:84
 msgid "(no virtual machines exist)"
 msgstr ""
 
@@ -33,13 +33,13 @@ msgstr ""
 msgid "Launch VirtualBox™ Manager"
 msgstr ""
 
-#: indicator-virtual-box.py:151
+#: indicator-virtual-box.py:152
 msgid ""
 "The virtual machine could not be found - perhaps it has been renamed or "
 "deleted.  The list of virtual machines has been refreshed - please try again."
 msgstr ""
 
-#: indicator-virtual-box.py:152
+#: indicator-virtual-box.py:153
 msgid "Error"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgstr ""
 msgid "Virtual Machine"
 msgstr ""
 
-#: indicator-virtual-box.py:441 indicator-virtual-box.py:558
+#: indicator-virtual-box.py:441 indicator-virtual-box.py:557
 msgid "Start Command"
 msgstr ""
 
@@ -116,11 +116,11 @@ msgid ""
 "the next."
 msgstr ""
 
-#: indicator-virtual-box.py:518
+#: indicator-virtual-box.py:515
 msgid "General"
 msgstr ""
 
-#: indicator-virtual-box.py:569
+#: indicator-virtual-box.py:568
 msgid ""
 "The terminal command to start the virtual machine such as\n"
 "\n"
@@ -129,19 +129,19 @@ msgid ""
 "\tVBoxHeadless --startvm %VM% --vrde off"
 msgstr ""
 
-#: indicator-virtual-box.py:577
+#: indicator-virtual-box.py:576
 msgid "Run the virtual machine when the indicator starts."
 msgstr ""
 
-#: indicator-virtual-box.py:581
+#: indicator-virtual-box.py:580
 msgid "Virtual Machine Properties"
 msgstr ""
 
-#: indicator-virtual-box.py:589
+#: indicator-virtual-box.py:588
 msgid "The start command cannot be empty."
 msgstr ""
 
-#: indicator-virtual-box.py:594
+#: indicator-virtual-box.py:593
 msgid ""
 "The start command must contain %VM% which is substituted for the virtual "
 "machine name/id."

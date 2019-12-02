@@ -72,7 +72,7 @@ msgstr ""
 msgid "Virtual Machine"
 msgstr "Виртуальная машина"
 
-#: indicator-virtual-box.py:441 indicator-virtual-box.py:558
+#: indicator-virtual-box.py:441 indicator-virtual-box.py:557
 msgid "Start Command"
 msgstr "Команда запуска"
 
