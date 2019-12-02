@@ -34,7 +34,7 @@ msgstr "В этот день..."
 msgid "Calendar"
 msgstr "Календарь"
 
-#: indicator-on-this-day.py:190 indicator-on-this-day.py:408
+#: indicator-on-this-day.py:190 indicator-on-this-day.py:407
 msgid "Enabled"
 msgstr "Включен"
 
@@ -139,19 +139,19 @@ msgstr ""
 "При запуске или сохранении настроек показывать\n"
 "уведомление о всех событиях текущего дня."
 
-#: indicator-on-this-day.py:300
+#: indicator-on-this-day.py:297
 msgid "General"
 msgstr "Общие"
 
-#: indicator-on-this-day.py:340
+#: indicator-on-this-day.py:339
 msgid "Reset calendars to factory default?"
 msgstr "Сбросить календари к начальным настройкам?"
 
-#: indicator-on-this-day.py:354
+#: indicator-on-this-day.py:353
 msgid "No calendar has been selected."
 msgstr "Ни один календарь не выбран."
 
-#: indicator-on-this-day.py:357
+#: indicator-on-this-day.py:356
 msgid ""
 "This calendar is part of your system\n"
 "and cannot be removed."
@@ -159,23 +159,23 @@ msgstr ""
 "Этот календарь является системным\n"
 "и не может быть удалён."
 
-#: indicator-on-this-day.py:359
+#: indicator-on-this-day.py:358
 msgid "Remove the selected calendar?"
 msgstr "Удалить выбранный календарь?"
 
-#: indicator-on-this-day.py:379
+#: indicator-on-this-day.py:378
 msgid "Calendar file"
 msgstr "Файл календаря"
 
-#: indicator-on-this-day.py:388
+#: indicator-on-this-day.py:387
 msgid "The path to a calendar file."
 msgstr "Путь к файлу календаря."
 
-#: indicator-on-this-day.py:391
+#: indicator-on-this-day.py:390
 msgid "Browse"
 msgstr "Обзор"
 
-#: indicator-on-this-day.py:395
+#: indicator-on-this-day.py:394
 msgid ""
 "This calendar is part of your\n"
 "system and cannot be modified."
@@ -183,7 +183,7 @@ msgstr ""
 "Этот календарь является системным\n"
 "и не может быть изменён."
 
-#: indicator-on-this-day.py:400
+#: indicator-on-this-day.py:399
 msgid ""
 "Choose a calendar file.\n"
 "\n"
@@ -197,27 +197,27 @@ msgstr ""
 "правильный формат, запустив его\n"
 "с помощью команды 'calendar' в терминале."
 
-#: indicator-on-this-day.py:417
+#: indicator-on-this-day.py:416
 msgid "Add Calendar"
 msgstr "Добавить календарь"
 
-#: indicator-on-this-day.py:419
+#: indicator-on-this-day.py:418
 msgid "Edit Calendar"
 msgstr "Изменить календарь"
 
-#: indicator-on-this-day.py:431
+#: indicator-on-this-day.py:430
 msgid "The calendar path cannot be empty."
 msgstr "Путь к файлу календаря не может быть пустым."
 
-#: indicator-on-this-day.py:436
+#: indicator-on-this-day.py:435
 msgid "The calendar path does not exist."
 msgstr "Путь к календарю не существует."
 
-#: indicator-on-this-day.py:452
+#: indicator-on-this-day.py:451
 msgid "Choose a calendar file"
 msgstr "Выберите файл календаря"
 
-#: indicator-on-this-day.py:459
+#: indicator-on-this-day.py:458
 msgid ""
 "The calendar is part of your system\n"
 "and is already included."
