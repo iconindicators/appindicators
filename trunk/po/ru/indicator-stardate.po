@@ -23,20 +23,25 @@ msgid "Shows the current Star Trek™ stardate."
 msgstr "Показывает текущую звёздную дату \"Звёздного пути\"."
 
 #: indicator-stardate.py:48
-msgid "Based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main."
-msgstr "Основано на \"STARDATES IN STAR TREK FAQ V1.6\", автор Andrew Main."
+msgid ""
+"STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-"
+"trek/stardates"
+msgstr ""
 
-#: indicator-stardate.py:119
+#: indicator-stardate.py:49
+msgid "Wikipedia::Stardatehttp://en.wikipedia.org/wiki/Stardate"
+msgstr ""
+
+#: indicator-stardate.py:121
 msgid "Show stardate 'classic'"
 msgstr "Показывать \"классическую\" звёздную дату"
 
-#: indicator-stardate.py:122
+#: indicator-stardate.py:124
+#, fuzzy
 msgid ""
 "If checked, show stardate 'classic' based on\n"
 "\n"
-"\tSTARDATES IN STAR TREK FAQ V1.6\n"
-"\n"
-"by Andrew Main.\n"
+"\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n"
 "\n"
 "Otherwise show stardate '2009 revised' based on\n"
 "\n"
@@ -49,18 +54,18 @@ msgstr ""
 "Иначе показываются звёздные даты \"ревизии 2009 года\"\n"
 "http://en.wikipedia.org/wiki/Stardate"
 
-#: indicator-stardate.py:129
+#: indicator-stardate.py:130
 msgid "Show ISSUE"
 msgstr "Показывать ВЫПУСК"
 
-#: indicator-stardate.py:133
+#: indicator-stardate.py:134
 msgid "Show the ISSUE of the stardate 'classic'."
 msgstr "Показывать ВЫПУСК \"классической\" звёздной даты."
 
-#: indicator-stardate.py:136
+#: indicator-stardate.py:137
 msgid "Pad INTEGER"
 msgstr "Выравнивать целую часть"
 
-#: indicator-stardate.py:140
+#: indicator-stardate.py:141
 msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr "Дополнять нулями целую часть \"классической\" звёздной даты."
