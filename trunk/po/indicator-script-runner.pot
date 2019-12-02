@@ -25,8 +25,8 @@ msgstr ""
 msgid "Run a terminal command or script from an indicator."
 msgstr ""
 
-#: indicator-script-runner.py:126 indicator-script-runner.py:364
-#: indicator-script-runner.py:475
+#: indicator-script-runner.py:126 indicator-script-runner.py:363
+#: indicator-script-runner.py:474
 msgid "Group"
 msgstr ""
 
@@ -47,8 +47,8 @@ msgid ""
 "that script will be initially selected."
 msgstr ""
 
-#: indicator-script-runner.py:152 indicator-script-runner.py:384
-#: indicator-script-runner.py:498
+#: indicator-script-runner.py:152 indicator-script-runner.py:383
+#: indicator-script-runner.py:497
 msgid "Name"
 msgstr ""
 
@@ -68,19 +68,19 @@ msgstr ""
 msgid "Default"
 msgstr ""
 
-#: indicator-script-runner.py:182 indicator-script-runner.py:511
+#: indicator-script-runner.py:182 indicator-script-runner.py:510
 msgid "Directory"
 msgstr ""
 
-#: indicator-script-runner.py:185 indicator-script-runner.py:515
+#: indicator-script-runner.py:185 indicator-script-runner.py:514
 msgid "The directory from which the script/command is executed."
 msgstr ""
 
-#: indicator-script-runner.py:195 indicator-script-runner.py:524
+#: indicator-script-runner.py:195 indicator-script-runner.py:523
 msgid "Command"
 msgstr ""
 
-#: indicator-script-runner.py:200 indicator-script-runner.py:529
+#: indicator-script-runner.py:200 indicator-script-runner.py:528
 msgid "The terminal script/command, along with any arguments."
 msgstr ""
 
@@ -151,71 +151,71 @@ msgid ""
 "Otherwise, script names are indented within each group."
 msgstr ""
 
-#: indicator-script-runner.py:279
+#: indicator-script-runner.py:276
 msgid "General"
 msgstr ""
 
-#: indicator-script-runner.py:369 indicator-script-runner.py:479
+#: indicator-script-runner.py:368 indicator-script-runner.py:478
 msgid ""
 "The group to which the script belongs.\n"
 "\n"
 "Choose an existing group or enter a new one."
 msgstr ""
 
-#: indicator-script-runner.py:387 indicator-script-runner.py:501
+#: indicator-script-runner.py:386 indicator-script-runner.py:500
 msgid "The name of the script."
 msgstr ""
 
-#: indicator-script-runner.py:393
+#: indicator-script-runner.py:392
 msgid "Copy Script"
 msgstr ""
 
-#: indicator-script-runner.py:398 indicator-script-runner.py:577
+#: indicator-script-runner.py:397 indicator-script-runner.py:576
 msgid "The group cannot be empty."
 msgstr ""
 
-#: indicator-script-runner.py:403 indicator-script-runner.py:582
+#: indicator-script-runner.py:402 indicator-script-runner.py:581
 msgid "The name cannot be empty."
 msgstr ""
 
-#: indicator-script-runner.py:408 indicator-script-runner.py:593
-#: indicator-script-runner.py:613
+#: indicator-script-runner.py:407 indicator-script-runner.py:592
+#: indicator-script-runner.py:612
 msgid "A script of the same group and name already exists."
 msgstr ""
 
-#: indicator-script-runner.py:435
+#: indicator-script-runner.py:434
 msgid "Remove the selected script?"
 msgstr ""
 
-#: indicator-script-runner.py:541
+#: indicator-script-runner.py:540
 msgid "Leave terminal open"
 msgstr ""
 
-#: indicator-script-runner.py:542
+#: indicator-script-runner.py:541
 msgid "Leave the terminal open after the script completes."
 msgstr ""
 
-#: indicator-script-runner.py:547
+#: indicator-script-runner.py:546
 msgid "Play sound"
 msgstr ""
 
-#: indicator-script-runner.py:548
+#: indicator-script-runner.py:547
 msgid "Play a beep on script completion."
 msgstr ""
 
-#: indicator-script-runner.py:553
+#: indicator-script-runner.py:552
 msgid "Show notification"
 msgstr ""
 
-#: indicator-script-runner.py:554
+#: indicator-script-runner.py:553
 msgid "Show a notification on script completion."
 msgstr ""
 
-#: indicator-script-runner.py:559
+#: indicator-script-runner.py:558
 msgid "Default script"
 msgstr ""
 
-#: indicator-script-runner.py:562
+#: indicator-script-runner.py:561
 msgid ""
 "If checked, this script will be run on a\n"
 "middle mouse click of the indicator icon.\n"
@@ -223,14 +223,14 @@ msgid ""
 "Only one script can be the default."
 msgstr ""
 
-#: indicator-script-runner.py:568
+#: indicator-script-runner.py:567
 msgid "Edit Script"
 msgstr ""
 
-#: indicator-script-runner.py:570
+#: indicator-script-runner.py:569
 msgid "Add Script"
 msgstr ""
 
-#: indicator-script-runner.py:587
+#: indicator-script-runner.py:586
 msgid "The command cannot be empty."
 msgstr ""
