@@ -33,23 +33,6 @@ from gi.repository import Gdk, Gtk, Notify
 import indicatorbase, os
 
 
-#TODO Revisit the issue
-#
-#     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
-#
-# in which characters/glyphs not rendering in the OSD.
-# Requires finding a fortune which presents this problem!
-# Initial investigations can be found at
-#
-#     http://192.168.0.9/indicator-fortune/trunk/src/indicator-fortune.py?p=140
-#
-# Possible helpful stuff/solutions:
-#     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports/19438403#19438403
-#     https://stackoverflow.com/questions/36344711/python3-check-if-unicode-character-is-not-present?noredirect=1&lq=1
-#     https://stackoverflow.com/questions/51418976/could-not-install-harf-buzz-text-shaping-engine
-#     https://stackoverflow.com/questions/56501666/harfbuzz-language-from-string-python-introspection-method-doesnt-accept-str
-
-
 class IndicatorFortune( indicatorbase.IndicatorBase ):
 
     CONFIG_FORTUNES = "fortunes"
@@ -77,21 +60,37 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
-        #TODO Testing fonts et al...
-        def fontTesting():        
-            # https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
-            # https://askubuntu.com/questions/530486/how-to-locate-font-files-given-the-font-family-name
-            # https://askubuntu.com/questions/552979/how-can-i-determine-which-fonts-are-installed-from-the-command-line-and-what-is
-            # https://unix.stackexchange.com/questions/42228/how-to-find-out-how-fc-match-matches
-            # https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports
-            # https://eev.ee/blog/2015/05/20/i-stared-into-the-fontconfig-and-the-fontconfig-stared-back-at-me/
-            # https://repolinux.wordpress.com/2013/03/10/find-out-fallback-font-used-by-fontconfig-for-a-certain-character/
-            
+        #TODO Perhaps revisit the issue
+        #
+        #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+        #
+        # in which characters/glyphs not rendering in the OSD.
+        # Requires finding a fortune which presents this problem.
+        # Initial investigations can be found at
+        #
+        #     http://192.168.0.9/indicator-fortune/trunk/src/indicator-fortune.py?p=140
+        #
+        # Possible helpful stuff/solutions:
+        #     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports/19438403#19438403
+        #     https://stackoverflow.com/questions/36344711/python3-check-if-unicode-character-is-not-present?noredirect=1&lq=1
+        #     https://stackoverflow.com/questions/51418976/could-not-install-harf-buzz-text-shaping-engine
+        #     https://stackoverflow.com/questions/56501666/harfbuzz-language-from-string-python-introspection-method-doesnt-accept-str
+        #
+        # Other information:
+        #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+        #     https://askubuntu.com/questions/530486/how-to-locate-font-files-given-the-font-family-name
+        #     https://askubuntu.com/questions/552979/how-can-i-determine-which-fonts-are-installed-from-the-command-line-and-what-is
+        #     https://unix.stackexchange.com/questions/42228/how-to-find-out-how-fc-match-matches
+        #     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports
+        #     https://eev.ee/blog/2015/05/20/i-stared-into-the-fontconfig-and-the-fontconfig-stared-back-at-me/
+        #     https://repolinux.wordpress.com/2013/03/10/find-out-fallback-font-used-by-fontconfig-for-a-certain-character/
+        def fontTesting():
+
             from gi.repository import Gio
             fontName = Gio.Settings( "org.gnome.desktop.interface" ).get_string( "font-name" )
             print( "Font name:", fontName )
 
-        fontTesting()
+#         fontTesting()
 
 
     def update( self, menu ):
