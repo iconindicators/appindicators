@@ -464,7 +464,9 @@ class IndicatorBase:
         return executionFlag
 
 
-    def requestSaveConfig( self, delay = 0 ): return GLib.timeout_add_seconds( delay, self.__saveConfig )
+    def requestSaveConfig( self, delay = 0 ): 
+        print( "request save config") #TODO Testing
+        return GLib.timeout_add_seconds( 1, self.__saveConfig )
 
 
     # Read a dictionary of configuration from a JSON text file.
