@@ -953,10 +953,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
 
-
-#TODO Old filters testing.
-# "filters": {"thebernmeister | ppa": ["fortune", "stardate"]}, 
-
 #TODO Start of temporary hack...
 # Format of filters has changed from a dict to a list.
             if isinstance( filters, dict ):
