@@ -19,9 +19,6 @@
 # Application indicator which displays PPA download statistics.
 
 
-#TODO Test with no .json file.
-
-
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
