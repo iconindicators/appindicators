@@ -936,7 +936,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-        print( "load config start") #TODO Testing
         self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
         self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
         self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
@@ -977,7 +976,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 #TODO Start of temporary hack...
 # Save the filters back out in the new format.
-            self.requestSaveConfig()   #TODO This is resulting for some reason in repeated calls to saveConfig...why?
+            self.requestSaveConfig()
 # End of hack!
 
         else:
@@ -997,11 +996,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters = Filters()
             self.filters.addFilter( "thebernmeister", "ppa", "bionic", "amd64", filterText )
-        print( "load config end") #TODO Testing
 
 
     def saveConfig( self ):
-        print( "save config start") #TODO Testing
         ppas = [ ]
         for ppa in self.ppas:
             ppas.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
@@ -1011,8 +1008,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             filterText = self.filters.getFilterText( user, name, series, architecture )
             filters.append( [ user, name, series, architecture, filterText ] )
 
-        print( "save config end") #TODO Testing
-    
         return {
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
             IndicatorPPADownloadStatistics.CONFIG_FILTERS: filters,
