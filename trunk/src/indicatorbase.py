@@ -464,9 +464,7 @@ class IndicatorBase:
         return executionFlag
 
 
-    def requestSaveConfig( self, delay = 0 ): 
-        print( "request save config") #TODO Testing
-        return GLib.timeout_add_seconds( 1, self.__saveConfig )
+    def requestSaveConfig( self, delay = 0 ):  GLib.timeout_add_seconds( delay, self.__saveConfig, False )
 
 
     # Read a dictionary of configuration from a JSON text file.
@@ -487,7 +485,10 @@ class IndicatorBase:
 
 
     # Write a dictionary of user configuration to a JSON text file.
-    def __saveConfig( self ):
+    #
+    # returnStatus If True, will return a boolean indicating success/failure.
+    #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
+    def __saveConfig( self, returnStatus = True ):
         config = self.saveConfig() # Call to implementation in indicator.
         configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
         success = True
@@ -500,7 +501,8 @@ class IndicatorBase:
             logging.error( "Error writing configuration: " + configFile )
             success = False
 
-        return success
+        if returnStatus:
+            return success
 
 
     # Return the full directory path to the user config directory for the current indicator.
