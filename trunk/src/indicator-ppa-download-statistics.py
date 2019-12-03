@@ -383,7 +383,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 3 ) as executor:
                 {
                     executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ):
                         i for i in range( numberPublishedBinariesCurrentPage )
