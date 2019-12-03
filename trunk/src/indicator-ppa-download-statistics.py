@@ -427,7 +427,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
-        ppaStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Maybe need to sort by more than one column?
         for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
@@ -469,7 +468,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         filterStore = Gtk.ListStore( str, str, str, str, str ) # PPA user, name, series, architecture, filter text.
-        filterStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Maybe need to sort by more than one column?
         for user, name, series, architecture in self.filters.getUserNameSeriesArchitecture():
             filterText = self.filters.getFilterText( user, name, series, architecture )
             filterStore.append( [ user, name, series, architecture, "\n".join( filterText ) ] )
