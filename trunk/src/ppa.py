@@ -171,7 +171,7 @@ class Filters( object ):
 
 
     def getUserNameSeriesArchitecture( self ):
-        for key in self.filters.keys():
+        for key in sorted( self.filters.keys() ):
             keyComponents = key.split( " | " )
             yield keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
 
