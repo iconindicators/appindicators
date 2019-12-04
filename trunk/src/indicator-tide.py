@@ -384,6 +384,15 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             if not tidalReadings:
                 tidalReadings = None
 
+        # Ensure the port ID is the same as that in the cached data.
+        if tidalReadings:
+            for tidalReading in list( tidalReadings ):
+                if portID != tidalReading.getPortID():
+                    tidalReadings.remove( tidalReading )
+
+            if not tidalReadings:
+                tidalReadings = None
+
         if tidalReadings is None: # There was no cached version or the cached version was stale; either way, need to do a download.
             tidalReadings = self.removeTidalReadingsPriorToToday( self.__getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
             if tidalReadings:
