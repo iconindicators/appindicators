@@ -377,14 +377,14 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                 tidalReadings = None
 
         if tidalReadings is None: # There was no cached version or the cached version was stale; either way, need to do a download.
-            tidalReadings = self.removeTidalReadingsPriorToToday( self.getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
+            tidalReadings = self.removeTidalReadingsPriorToToday( self.__getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
             if tidalReadings:
                 self.writeCacheBinary( tidalReadings, IndicatorTide.CACHE_BASENAME )
 
         return tidalReadings
 
 
-    def getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
+    def __getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
         if portID[ -1 ].isalpha():
             portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
 
