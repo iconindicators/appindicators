@@ -18,9 +18,6 @@
 
 # Application indicator which displays tidal information.
 
-#TODO Find a port which only has dates (so should show time in local port time).
-# What happens to the time format ([TYPE]    %I:%M %p    [LEVEL])?
-
 
 #TODO How to reset any format preference to default? 
 
