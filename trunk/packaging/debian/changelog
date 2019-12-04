@@ -1,5 +1,6 @@
 indicator-tide (1.0.17-1) xenial; urgency=low
 
+  * Now able to reset date/tide formatting to factory default.
   * Now uses a base class to share functionality amongst indicators.
   * Whilst starting up, a single menu item "Initialising..." is displayed.
     Once fully initialised, the menu proper is shown.

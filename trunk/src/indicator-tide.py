@@ -19,10 +19,6 @@
 # Application indicator which displays tidal information.
 
 
-#TODO How to reset any format preference to default? 
-# Maybe have a tooltip for each item such that if the item is left empty, the default is inserted.
- 
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -269,7 +265,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         dateFormat.set_hexpand( True )
         dateFormat.set_tooltip_text( _(
             "Formatting options for the date:\n\n" + \
-            "    http://docs.python.org/3/library/datetime.html" ) )
+            "    http://docs.python.org/3/library/datetime.html\n\n" + \
+            "Leave empty to reset back to default." ) )
 
         box.pack_start( dateFormat, True, True, 0 )
 
@@ -294,7 +291,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             "    {0} - the tide is high or low.\n" + \
             "    {1} - the tide level, measured in metres.\n\n" + \
             "Formatting options for the time:\n\n" + \
-            "    http://docs.python.org/3/library/datetime.html" ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
+            "    http://docs.python.org/3/library/datetime.html\n\n" + \
+            "Leave empty to reset back to default." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
         box.pack_start( tideFormat, True, True, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
@@ -312,7 +310,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             "    {0} - the tide is high or low.\n" + \
             "    {1} - the tide level, measured in metres.\n\n" + \
             "This format is used when there is no time\n" + \
-            "component in a tide reading." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
+            "component in a tide reading.\n\n" + \
+            "Leave empty to reset back to default." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
         box.pack_start( tideFormatSansTime, True, True, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )
@@ -333,9 +332,26 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
             self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
-            self.menuItemDateFormat = dateFormat.get_text()
-            self.menuItemTideFormat = tideFormat.get_text()
-            self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
+            
+            if dateFormat.get_text():
+                self.menuItemDateFormat = dateFormat.get_text()
+
+            else:
+                self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
+
+
+            if tideFormat.get_text():
+                self.menuItemTideFormat = tideFormat.get_text()
+
+            else:
+                self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
+
+            if tideFormatSansTime.get_text():
+                self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
+
+            else:
+                self.menuItemTideFormatSansTime = IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME
+
             self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
