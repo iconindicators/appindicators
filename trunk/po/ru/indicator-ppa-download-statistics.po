@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-ppa-download-statistics 1.0.67\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-21 00:24+1100\n"
-"PO-Revision-Date: 2019-10-21 00:24+1100\n"
+"POT-Creation-Date: 2019-11-21 22:42+1100\n"
+"PO-Revision-Date: 2019-12-04 15:50+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -27,9 +27,9 @@ msgid "(no published binaries)"
 msgstr "(нет опубликованных двоичных файлов)"
 
 #: indicator-ppa-download-statistics.py:62
-#, fuzzy
 msgid "(no published binaries and/or completely filtered)"
-msgstr "(двоичные файлы полностью отфильтрованы)"
+msgstr ""
+"(нет опубликованных двоичных файлов, либо они полностью отфильтрованы)"
 
 #: indicator-ppa-download-statistics.py:63
 msgid "(published binaries completely filtered)"
@@ -37,7 +37,7 @@ msgstr "(двоичные файлы полностью отфильтрован
 
 #: indicator-ppa-download-statistics.py:71
 msgid "Display the total downloads of PPAs."
-msgstr "Показывает статистику закачек из персональных архивов пакетов (PPA)."
+msgstr "Показать статистику закачек из персональных архивов пакетов (PPA)."
 
 #: indicator-ppa-download-statistics.py:437
 #: indicator-ppa-download-statistics.py:480
