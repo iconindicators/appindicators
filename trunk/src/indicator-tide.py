@@ -86,23 +86,20 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             self.getLogging().warning( message )
 
 
+#TODO Do we need the notifications?  
+# If the data is shown in the user's local time zone, then no...
+# but only show if shown in port local...and that is also not the user's local!
     def update( self, menu ):
         tidalReadings = self.getTidalData( self.portID )
         if tidalReadings:
             self.buildMenu( menu, tidalReadings )
-
-        else:
-            menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
-
-#TODO Do we need these notifications?  If the data is shown in the user's local time zone, then no...
-# but only show if shown in port local...and that is also not the user's local!
-        if tidalReadings:
             summary = _( "Tidal data ready" )
             message = _( "Tidal data is presented in the time zone of the port." )
             if self.tidalReadingsAreAllDateTimes( tidalReadings ):
                 message = _( "Tidal data is presented in your local time zone." )
 
         else:
+            menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
             summary = _( "Error" )
             message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
             self.getLogging().error( message )
