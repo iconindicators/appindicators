@@ -53,7 +53,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.5",
+            version = "1.0.6",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
@@ -65,7 +65,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         now = datetime.now()
         justAfterMidnight = ( now + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
         fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
-        self.updateTimerID = GLib.timeout_add_seconds( fiveSecondsAfterMidnight, self.update )
+        self.requestUpdate( delay = fiveSecondsAfterMidnight )
 
         if self.notify:
             today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
