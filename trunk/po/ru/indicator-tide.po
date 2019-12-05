@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-17 09:48+1100\n"
-"PO-Revision-Date: 2019-10-17 09:48+1100\n"
+"POT-Creation-Date: 2019-12-05 10:13+1100\n"
+"PO-Revision-Date: 2019-12-05 10:10+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -19,7 +19,6 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicator-tide.py:61
-#, python-brace-format
 msgid ""
 "Displays tidal information.\n"
 "Port data is licensed and will expire after {0}."
@@ -58,100 +57,101 @@ msgstr ""
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: indicator-tide.py:80 indicator-tide.py:90
-#, python-brace-format
-msgid "No tidal data available for {0}!"
-msgstr "Данные о приливах для {0} недоступны!"
-
-#: indicator-tide.py:83
+#: indicator-tide.py:78
 msgid "Tidal data ready"
 msgstr "Данные о приливах получены"
 
-#: indicator-tide.py:84
+#: indicator-tide.py:79
 msgid "Tidal data is presented in the time zone of the port."
 msgstr "Данные о приливах соответствуют часовому поясу порта."
 
-#: indicator-tide.py:86
+#: indicator-tide.py:81
 msgid "Tidal data is presented in your local time zone."
 msgstr "Данные о приливах соответствуют местному времени."
 
-#: indicator-tide.py:89
+#: indicator-tide.py:84 indicator-tide.py:86
+msgid "No tidal data available for {0}!"
+msgstr "Данные о приливах для {0} недоступны!"
+
+#: indicator-tide.py:85
 msgid "Error"
 msgstr "Ошибка"
 
-#: indicator-tide.py:99
-#, python-brace-format
+#: indicator-tide.py:95
 msgid "{0}, {1}"
 msgstr "{0}, {1}"
 
-#: indicator-tide.py:137
+#: indicator-tide.py:133
 msgid "H"
 msgstr "П"
 
-#: indicator-tide.py:140
+#: indicator-tide.py:136
 msgid "L"
 msgstr "О"
 
-#: indicator-tide.py:210
+#: indicator-tide.py:206
 msgid "Country"
 msgstr "Страна"
 
-#: indicator-tide.py:213
+#: indicator-tide.py:209
 msgid "Choose your country."
 msgstr "Выберите вашу страну."
 
-#: indicator-tide.py:226
+#: indicator-tide.py:222
 msgid "Choose your port."
 msgstr "Выберите ваш порт."
 
-#: indicator-tide.py:229
+#: indicator-tide.py:225
 msgid "Port"
 msgstr "Порт"
 
-#: indicator-tide.py:241
+#: indicator-tide.py:237
 msgid "Ports"
 msgstr "Порты"
 
-#: indicator-tide.py:246
+#: indicator-tide.py:242
 msgid "Show as submenus"
 msgstr "Отображать подменю"
 
-#: indicator-tide.py:248
+#: indicator-tide.py:244
 msgid "Show each day's tides in a submenu."
 msgstr "Отображать приливы каждого дня в виде подменю."
 
-#: indicator-tide.py:252
+#: indicator-tide.py:248
 msgid "Except first day"
 msgstr "Кроме первого дня"
 
-#: indicator-tide.py:256
+#: indicator-tide.py:252
 msgid "Show the first day's tide in full."
 msgstr "Отображать приливы первого дня полностью."
 
-#: indicator-tide.py:265
+#: indicator-tide.py:261
 msgid "Date format"
 msgstr "Формат даты"
 
-#: indicator-tide.py:271
+#: indicator-tide.py:267
 msgid ""
 "Formatting options for the date:\n"
 "\n"
-"    http://docs.python.org/3/library/datetime.html"
+"    http://docs.python.org/3/library/datetime.html\n"
+"\n"
+"Leave empty to reset back to default."
 msgstr ""
 "Варианты формата даты:\n"
 "\n"
-"    http://docs.python.org/3/library/datetime.html"
+"    http://docs.python.org/3/library/datetime.html\n"
+"\n"
+"Для сброса в настройку по умолчанию очистите поле."
 
-#: indicator-tide.py:278
+#: indicator-tide.py:275
 msgid "Tide format"
 msgstr "Формат приливных данных"
 
-#: indicator-tide.py:287
+#: indicator-tide.py:284
 msgid "Default"
 msgstr "Формат по умолчанию"
 
-#: indicator-tide.py:293
-#, python-brace-format
+#: indicator-tide.py:290
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -160,7 +160,9 @@ msgid ""
 "\n"
 "Formatting options for the time:\n"
 "\n"
-"    http://docs.python.org/3/library/datetime.html"
+"    http://docs.python.org/3/library/datetime.html\n"
+"\n"
+"Leave empty to reset back to default."
 msgstr ""
 "Информация о приливах задаётся с помощью меток:\n"
 "\n"
@@ -169,14 +171,15 @@ msgstr ""
 "\n"
 "Варианты формата времени:\n"
 "\n"
-"    http://docs.python.org/3/library/datetime.html"
+"    http://docs.python.org/3/library/datetime.html\n"
+"\n"
+"Для сброса в настройку по умолчанию очистите поле."
 
-#: indicator-tide.py:305
+#: indicator-tide.py:303
 msgid "Missing time"
 msgstr "Формат данных без времени"
 
-#: indicator-tide.py:311
-#, python-brace-format
+#: indicator-tide.py:309
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -184,7 +187,9 @@ msgid ""
 "    {1} - the tide level, measured in metres.\n"
 "\n"
 "This format is used when there is no time\n"
-"component in a tide reading."
+"component in a tide reading.\n"
+"\n"
+"Leave empty to reset back to default."
 msgstr ""
 "Информация о приливах задаётся с помощью меток:\n"
 "\n"
@@ -192,8 +197,10 @@ msgstr ""
 "    {1} - уровень поверхности воды в метрах.\n"
 "\n"
 "Этот формат используется в том случае, если в данных\n"
-"о приливах отсутствует компонент времени."
+"о приливах отсутствует компонент времени.\n"
+"\n"
+"Для сброса в настройку по умолчанию очистите поле."
 
-#: indicator-tide.py:326
+#: indicator-tide.py:322
 msgid "General"
 msgstr "Общие"
