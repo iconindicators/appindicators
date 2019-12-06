@@ -19,6 +19,12 @@
 # Application indicator which displays tidal information.
 
 
+#TODO Can we adjust the onclick URL for UKHO (which is located in the data download function)
+# to take into account the local DST offset (assuming all tidal data has date and time)?
+# Test to see what the URL needs by going to the UKHO site and using their tool first (not the print friendly version)
+# and see if the DST parameter in the URL is in minutes or hours).
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
