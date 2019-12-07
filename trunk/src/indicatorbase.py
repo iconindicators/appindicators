@@ -49,7 +49,7 @@ class IndicatorBase:
     # Public
     INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
-    URL_TIMEOUT_IN_SECONDS = 2
+    URL_TIMEOUT_IN_SECONDS = 5 #TODO This was 2...consider changing to 5 (for PPA).  Might also be useful if an indicator starts on computer starr and the network is flooded.
 
 
     def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None ):
