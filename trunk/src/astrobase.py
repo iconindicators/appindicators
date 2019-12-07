@@ -172,9 +172,9 @@ STARS = [
     "ELECTRA", 
     "ELNATH", 
     "ENIF", 
-    "ETAMIN", 
+    "ELTANIN", #ETAMIN
     "FOMALHAUT", 
-    "GIENAH CORVI", 
+    "GIENAH CORVI",  #TODO Figure this out.  Not fully sure of the name via wikipedia...and maybe skyfield does not have it. 
     "HADAR", #AGENA
     "HAMAL", 
     "IZAR", 
@@ -221,7 +221,7 @@ STARS = [
     "TAYGETA", 
     "THUBAN", 
     "UNUKALHAI", 
-    "VEGA", 
+    "VEGA",
     "VINDEMIATRIX", 
     "WEZEN", 
     "ZAURAK" ]
