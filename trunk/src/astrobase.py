@@ -132,10 +132,9 @@ PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SA
 # At the API we accept capitalised star names, but internally we title them to satisfy Pyephem.
 STARS = [
     "ACHERNAR", 
-    "ADARA", 
-    "AGENA", # HADAR
-    "ALBEREO", 
-    "ALCAID", 
+    "ADHARA", #ADARA 
+    "ALBIREO", #ALBEREO 
+    "ALKAID", #ALCAID 
     "ALCOR", 
     "ALCYONE", 
     "ALDEBARAN", 
@@ -176,6 +175,7 @@ STARS = [
     "ETAMIN", 
     "FOMALHAUT", 
     "GIENAH CORVI", 
+    "HADAR", #AGENA
     "HAMAL", 
     "IZAR", 
     "KAUS AUSTRALIS", 
