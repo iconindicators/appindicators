@@ -21,9 +21,14 @@
 
 
 #TODO Can this be an enum as per the PPA class?
+class EngineType: PyEphem, Skyfield = range( 2 )
+
+
+#TODO Can this be an enum as per the PPA class?
 class BodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
 
 
+#TODO Need a comment.
 DATA_ALTITUDE = "ALTITUDE"
 DATA_AZIMUTH = "AZIMUTH"
 DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -108,11 +113,14 @@ DATA_SUN = [
     DATA_SET_DATE_TIME,
     DATA_SOLSTICE ]
 
+
+#TODO Need a description
 NAME_TAG_CITY = "CITY"
 NAME_TAG_MOON = "MOON"
 NAME_TAG_SUN = "SUN"
 
 
+#TODO Need a description
 PLANET_MERCURY = "MERCURY"
 PLANET_VENUS = "VENUS"
 PLANET_MARS = "MARS"
@@ -126,112 +134,20 @@ PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SA
 
 
 
-
-#TODO DOuble check against the original list from pyephem.
-# Data is adapted from the version of the Hipparcos star catalog at:
-# ftp://adc.gsfc.nasa.gov/pub/adc/archives/catalogs/1/1239/hip_main.dat.gz
-# Of the thousand brighest Hipparcos stars, those with proper names
-# registered at http://simbad.u-strasbg.fr/simbad/ were chosen.
-# """
+#TODO Want something like this...
 # 
-# Achernar
-# Adara
-# Agena   #TODO Not in my list, why?
-# Albereo
-# Alcaid
-# Alcor
-# Alcyone
-# Aldebaran
-# Alderamin
-# Alfirk
-# Algenib
-# Algieba
-# Algol
-# Alhena
-# Alioth
-# Almach
-# Alnair
-# Alnilam
-# Alnitak
-# Alphard
-# Alphecca
-# Alshain
-# Altair
-# Antares
-# Arcturus
-# Arkab Posterior
-# Arkab Prior
-# Arneb
-# Atlas
-# Bellatrix
-# Betelgeuse
-# Canopus
-# Capella
-# Caph
-# Castor
-# Cebalrai
-# Deneb
-# Denebola
-# Dubhe
-# Electra
-# Elnath
-# Enif
-# Etamin  #TODO Is really eltanin
-# Fomalhaut
-# Gienah Corvi
-# Hamal
-# Izar
-# Kaus Australis
-# Kochab
-# Maia
-# Markab
-# Megrez
-# Menkalinan
-# Menkar
-# Merak
-# Merope
-# Mimosa
-# Minkar
-# Mintaka
-# Mirach
-# Mirzam
-# Mizar
-# Naos
-# Nihal
-# Nunki
-# Peacock
-# Phecda
-# Polaris
-# Pollux
-# Procyon
-# Rasalgethi
-# Rasalhague
-# Regulus
-# Rigel
-# Rukbat
-# Sadalmelik
-# Sadr
-# Saiph
-# Scheat
-# Schedar
-# Shaula
-# Sheliak
-# Sirius
-# Sirrah
-# Spica
-# Sulafat
-# Tarazed
-# Taygeta
-# Thuban
-# Unukalhai
-# Vega
-# Vindemiatrix
-# Wezen
-# Zaurak
+# If engineType == EngineType.PyEphem:
+#     STARS = STARS_PYEPHEM
+# 
+# Else:
+#     STARS = STARS_SKYFIELD
+#
+# May need to instead use a function; not sure if we can have code here.
 
 
-# Sourced from ephem/stars.py and tidied up for duplication and official names.
-STARS = [
+# Sourced from ephem/stars.py
+# Duplications removed and official names used.
+__STARS_PYEPHEM = [
     "ACHERNAR",
     "ADHARA",
     "ALBIREO",
@@ -252,7 +168,7 @@ STARS = [
     "ALNITAK", 
     "ALPHARD", 
     "ALPHECCA", 
-    "ALPHERATZ", # SIRRAH in Pyephem.
+    "ALPHERATZ", # SIRRAH.
     "ALSHAIN", 
     "ALTAIR", 
     "ANTARES", 
@@ -277,7 +193,7 @@ STARS = [
     "ELTANIN",
     "FOMALHAUT", 
     "GIENAH CORVI", 
-    "HADAR", #AGENA in Pyephem.
+    "HADAR", #AGENA.
     "HAMAL", 
     "IZAR", 
     "KAUS AUSTRALIS", 
@@ -327,6 +243,129 @@ STARS = [
     "WEZEN", 
     "ZAURAK" ]
 
+
+# Sourced from skyfield/named_stars.py
+# Duplications removed and official names used.
+__STARS_SKYFIELD = [
+    "ACHERNAR",
+    "ACRUX",
+    "ADHARA",
+    "AGENA",
+    "ALBIREO",
+    "ALCOR",
+    "ALDEBARAN",
+    "ALDERAMIN",
+    "ALGENIB",
+    "ALGIEBA",
+    "ALGOL",
+    "ALHENA",
+    "ALIOTH",
+    "ALKAID",
+    "ALMACH",
+    "ALNAIR",
+    "ALNILAM",
+    "ALNITAK",
+    "ALPHARD",
+    "ALPHECCA",
+    "ALPHERATZ",
+    "ALTAIR",
+    "ALUDRA",
+    "ANKAA",
+    "ANTARES",
+    "ARCTURUS",
+    "ARIDED",
+    "ARIDIF",
+    "ASPIDISKE",
+    "ATRIA",
+    "AVIOR",
+    "BECRUX",
+    "BELLATRIX",
+    "BENETNASH",
+    "BETELGEUSE",
+    "BIRDUN",
+    "CANOPUS",
+    "CAPELLA",
+    "CAPH",
+    "CASTOR",
+    "DENEB",
+    "DENEB KAITOS",
+    "DENEBOLA",
+    "DIPHDA",
+    "DSCHUBBA",
+    "DUBHE",
+    "DURRE MENTHOR",
+    "ELNATH",
+    "ENIF",
+    "ETAMIN",
+    "FOMALHAUT",
+    "FORAMEN",
+    "GACRUX",
+    "GEMMA",
+    "GIENAH",
+    "GIRTAB",
+    "GRUID",
+    "HADAR",
+    "HAMAL",
+    "HERSCHEL'S GARNET STAR",
+    "IZAR",
+    "KAUS AUSTRALIS",
+    "KOCHAB",
+    "KOO SHE",
+    "MARCHAB",
+    "MARFIKENT",
+    "MARKAB",
+    "MEGREZ",
+    "MEN",
+    "MENKALINAN",
+    "MENKENT",
+    "MERAK",
+    "MIAPLACIDUS",
+    "MIMOSA",
+    "MINTAKA",
+    "MIRA",
+    "MIRACH",
+    "MIRFAK",
+    "MIRZAM",
+    "MIZAR",
+    "MUHLIFEIN",
+    "MURZIM",
+    "NAOS",
+    "NUNKI",
+    "PEACOCK",
+    "PHAD",
+    "PHECDA",
+    "POLARIS",
+    "POLLUX",
+    "PROCYON",
+    "RAS ALHAGUE",
+    "RASALHAGUE",
+    "REGOR",
+    "REGULUS",
+    "RIGEL",
+    "RIGEL KENT",
+    "RIGIL KENTAURUS",
+    "SABIK",
+    "SADIRA",
+    "SADR",
+    "SAIPH",
+    "SARGAS",
+    "SCHEAT",
+    "SCHEDAR",
+    "SCUTULUM",
+    "SHAULA",
+    "SIRIUS",
+    "SIRRAH",
+    "SOUTH STAR",
+    "SPICA",
+    "SUHAIL",
+    "THUBAN",
+    "TOLIMAN",
+    "TSEEN SHE",
+    "TSIH",
+    "TURAIS",
+    "VEGA",
+    "WEI",
+    "WEZEN" ]
 
 
 #TODO From skyfield...many stars here do not appear in the Pyephem list.
