@@ -136,7 +136,7 @@ PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SA
 # 
 # Achernar
 # Adara
-# Agena
+# Agena   #TODO Not in my list, why?
 # Albereo
 # Alcaid
 # Alcor
@@ -176,7 +176,7 @@ PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SA
 # Electra
 # Elnath
 # Enif
-# Etamin
+# Etamin  #TODO Is really eltanin
 # Fomalhaut
 # Gienah Corvi
 # Hamal
@@ -230,21 +230,19 @@ PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SA
 # Zaurak
 
 
-# From ephem/stars.py
-# Star names are capitalised, whereas Pyephem uses titled strings.
-# At the API we accept capitalised star names, but internally we title them to satisfy Pyephem.
+# Sourced from ephem/stars.py and tidied up for duplication and official names.
 STARS = [
-    "ACHERNAR", 
-    "ADHARA", #ADARA 
-    "ALBIREO", #ALBEREO 
-    "ALKAID", #ALCAID 
-    "ALCOR", 
-    "ALCYONE", 
-    "ALDEBARAN", 
-    "ALDERAMIN", 
-    "ALFIRK", 
-    "ALGENIB", 
-    "ALGIEBA", 
+    "ACHERNAR",
+    "ADHARA",
+    "ALBIREO",
+    "ALKAID",
+    "ALCOR",
+    "ALCYONE",
+    "ALDEBARAN",
+    "ALDERAMIN",
+    "ALFIRK",
+    "ALGENIB",
+    "ALGIEBA",
     "ALGOL", 
     "ALHENA", 
     "ALIOTH", 
@@ -254,6 +252,7 @@ STARS = [
     "ALNITAK", 
     "ALPHARD", 
     "ALPHECCA", 
+    "ALPHERATZ", # SIRRAH in Pyephem.
     "ALSHAIN", 
     "ALTAIR", 
     "ANTARES", 
@@ -275,10 +274,10 @@ STARS = [
     "ELECTRA", 
     "ELNATH", 
     "ENIF", 
-    "ELTANIN", #ETAMIN
+    "ELTANIN",
     "FOMALHAUT", 
-    "GIENAH CORVI",  #TODO Figure this out.  Not fully sure of the name via wikipedia...and maybe skyfield does not have it. 
-    "HADAR", #AGENA
+    "GIENAH CORVI", 
+    "HADAR", #AGENA in Pyephem.
     "HAMAL", 
     "IZAR", 
     "KAUS AUSTRALIS", 
@@ -317,7 +316,6 @@ STARS = [
     "SHAULA", 
     "SHELIAK", 
     "SIRIUS", 
-    "SIRRAH", # ALPHERATZ
     "SPICA", 
     "SULAFAT", 
     "TARAZED", 
