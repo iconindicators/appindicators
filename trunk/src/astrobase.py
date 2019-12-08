@@ -127,6 +127,7 @@ PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SA
 
 
 
+#TODO DOuble check against the original list from pyephem.
 # From ephem/stars.py
 # Star names are capitalised, whereas Pyephem uses titled strings.
 # At the API we accept capitalised star names, but internally we title them to satisfy Pyephem.
