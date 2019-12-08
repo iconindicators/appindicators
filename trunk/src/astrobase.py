@@ -333,6 +333,10 @@ STARS = [
 #So what to do with those stars?  Can't use them whilst we have Pyephem as the backend.
 #If/when we move to skyfield, then modify the list to handle the Skyfield stars.
 #But this will prevent (if need be) from switching to Pyephem for testing...think about this. 
+# Maybe have a list of stars that are common to both Pyephem and Skyfield and either each backend 
+# appends to that list of stars?  Or the common list of stars has the pyephem or skyfield specific stars
+# appended by this base class...just not sure how to do that at run time (that is, how do we know
+# if we are running a pyephem or skyfield?  Need a flag I suppose).
 #
 #This list was seeded from
 #https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
