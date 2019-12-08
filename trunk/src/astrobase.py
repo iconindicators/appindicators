@@ -235,7 +235,6 @@ STARS = [
     "ACHERNAR",
     "ADHARA",
     "ALBIREO",
-    "ALKAID",
     "ALCOR",
     "ALCYONE",
     "ALDEBARAN",
@@ -246,6 +245,7 @@ STARS = [
     "ALGOL", 
     "ALHENA", 
     "ALIOTH", 
+    "ALKAID",
     "ALMACH", 
     "ALNAIR", 
     "ALNILAM", 
@@ -329,7 +329,11 @@ STARS = [
 
 
 
-#TODO From skyfield:
+#TODO From skyfield...many stars here do not appear in the Pyephem list.
+#So what to do with those stars?  Can't use them whilst we have Pyephem as the backend.
+#If/when we move to skyfield, then modify the list to handle the Skyfield stars.
+#But this will prevent (if need be) from switching to Pyephem for testing...think about this. 
+#
 #This list was seeded from
 #https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
 named_star_dict= {
