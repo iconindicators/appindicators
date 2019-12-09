@@ -197,7 +197,7 @@ class AstroBase:
     #    nextFullMoonDate The date of the next full moon.
     #    nextNewMoonDate The date of the next new moon.
     @staticmethod
-    def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
+    def getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
             # Between a new moon and a full moon...
@@ -238,7 +238,7 @@ class AstroBase:
 
     # Retrieve the next eclipse for either the Sun or Moon.
     @staticmethod
-    def __calculateEclipse( utcNow, data, bodyType, dataTag ):
+    def calculateEclipse( utcNow, data, bodyType, dataTag ):
         eclipseInformation = eclipse.getEclipseForUTC( utcNow, bodyType == BodyType.MOON )
         key = ( bodyType, dataTag )
         data[ key + ( AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
@@ -248,4 +248,4 @@ class AstroBase:
 
 
     @staticmethod
-    def __toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+    def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
