@@ -19,9 +19,9 @@
 # Calculate astronomical information using PyEphem.
 
 
-import eclipse, ephem, locale, math, orbitalelement, twolineelement
-
 from ephem.cities import _city_data
+
+import astrobase, eclipse, ephem, locale, math, orbitalelement, twolineelement
 
 
 #TODO If we test with Pyephem and select some stars, then switch to Skyfield,
@@ -35,9 +35,6 @@ from ephem.cities import _city_data
 
 #TODO Maybe include twilight if astroSkyfield can do it?
 # https://github.com/skyfielders/python-skyfield/issues/225
-
-
-import astrobase
 
 
 class AstroPyephem( astrobase.AstroBase ):
@@ -146,9 +143,6 @@ class AstroPyephem( astrobase.AstroBase ):
         "ZAURAK" ]
 
 
-DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
-
-
 # Returns a dictionary with astronomical information:
 #     Key is a tuple of BodyType, a name tag and a data tag.
 #     Value is the data as a string.
@@ -182,8 +176,8 @@ def getAstronomicalInformation( utcNow,
     __calculateSun( ephemNow, data, hideIfBelowHorizon )
     __calculatePlanets( ephemNow, data, planets, magnitude, hideIfBelowHorizon )
     __calculateStars( ephemNow, data, stars, magnitude, hideIfBelowHorizon )
-    __calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.Comet, comets, cometData, magnitude, hideIfBelowHorizon )
-    __calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitude, hideIfBelowHorizon )
+    __calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.COMET, comets, cometData, magnitude, hideIfBelowHorizon )
+    __calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitude, hideIfBelowHorizon )
     __calculateSatellites( ephemNow, data, satellites, satelliteData )
 
     del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LATITUDE ) ]
@@ -201,6 +195,7 @@ def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
                                                   float( _city_data.get( city )[ 1 ] ), \
                                                   _city_data.get( city )[ 2 ]
+
 
 # Takes a dictionary of orbital element data (for comets or minor planets),
 # in which the key is the body name and value is the orbital element data.
@@ -228,14 +223,14 @@ def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
 # http://www.geoastro.de/sundata/index.html
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateMoon( ephemNow, data, hideIfBelowHorizon ):
-    key = ( astrobase.BodyType.Moon, astrobase.AstroBase.NAME_TAG_MOON )
-    hidden = __calculateCommon( ephemNow, data, ephem.Moon(), astrobase.BodyType.Moon, astrobase.AstroBase.NAME_TAG_MOON, hideIfBelowHorizon )
+    key = ( astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+    hidden = __calculateCommon( ephemNow, data, ephem.Moon(), astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, hideIfBelowHorizon )
     if not hidden:
-        data[ key + ( astrobase.AstroBase.DATA_FIRST_QUARTER, ) ] = __toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_FULL, ) ] = __toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_THIRD_QUARTER, ) ] = __toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_NEW, ) ] = __toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
-        __calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.Moon, astrobase.AstroBase.NAME_TAG_MOON )
+        data[ key + ( astrobase.AstroBase.DATA_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( astrobase.AstroBase.DATA_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
+        data[ key + ( astrobase.AstroBase.DATA_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+        data[ key + ( astrobase.AstroBase.DATA_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+        __calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
     # Used for internal processing; indirectly presented to the user.
     moon = ephem.Moon()
@@ -331,21 +326,21 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 # http://futureboy.us/fsp/sun.fsp
 # http://www.satellite-calculations.com/Satellite/suncalc.htm
 def __calculateSun( ephemNow, data, hideIfBelowHorizon ):
-    hidden = __calculateCommon( ephemNow, data, ephem.Sun(), astrobase.BodyType.Sun, astrobase.AstroBase.NAME_TAG_SUN, hideIfBelowHorizon )
+    hidden = __calculateCommon( ephemNow, data, ephem.Sun(), astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, hideIfBelowHorizon )
     if not hidden:
-        __calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.Sun, astrobase.AstroBase.NAME_TAG_SUN )
+        __calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
-        key = ( astrobase.BodyType.Sun, astrobase.AstroBase.NAME_TAG_SUN )
+        key = ( astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
         equinox = ephem.next_equinox( ephemNow )
         solstice = ephem.next_solstice( ephemNow )
-        data[ key + ( astrobase.AstroBase.DATA_EQUINOX, ) ] = __toDateTimeString( equinox.datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_SOLSTICE, ) ] = __toDateTimeString( solstice.datetime() )
+        data[ key + ( astrobase.AstroBase.DATA_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
+        data[ key + ( astrobase.AstroBase.DATA_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
 
 
 # Calculate next eclipse for either the Sun or Moon.
 def __calculateEclipse( utcNow, data, bodyType, dataTag ):
-    eclipseInformation = eclipse.getEclipseForUTC( utcNow, bodyType == astrobase.BodyType.Moon )
+    eclipseInformation = eclipse.getEclipseForUTC( utcNow, bodyType == astrobase.BodyType.MOON )
     key = ( bodyType, dataTag )
     data[ key + ( astrobase.AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
     data[ key + ( astrobase.AstroBase.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
@@ -360,7 +355,7 @@ def __calculatePlanets( ephemNow, data, planets, magnitude, hideIfBelowHorizon )
         planetObject = getattr( ephem, planet.title() )()
         planetObject.compute( __getCity( data, ephemNow ) )
         if planetObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and planetObject.mag <= magnitude:
-            __calculateCommon( ephemNow, data, planetObject, astrobase.BodyType.Planet, planet, hideIfBelowHorizon )
+            __calculateCommon( ephemNow, data, planetObject, astrobase.BodyType.PLANET, planet, hideIfBelowHorizon )
 
 
 # http://aa.usno.navy.mil/data/docs/mrst.php
@@ -369,7 +364,7 @@ def __calculateStars( ephemNow, data, stars, magnitude, hideIfBelowHorizon ):
         starObject = ephem.star( star.title() )
         starObject.compute( __getCity( data, ephemNow ) )
         if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitude:
-            __calculateCommon( ephemNow, data, starObject, astrobase.BodyType.Star, star, hideIfBelowHorizon )
+            __calculateCommon( ephemNow, data, starObject, astrobase.BodyType.STAR, star, hideIfBelowHorizon )
 
 
 # Compute data for comets or minor planets.
@@ -400,7 +395,7 @@ def __calculateCommon( ephemNow, data, body, bodyType, nameTag, hideIfBelowHoriz
         setting = city.next_setting( body )
 
         if rising > setting: # Above the horizon.
-            data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = __toDateTimeString( setting.datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
             body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( astrobase.AstroBase.DATA_AZIMUTH, ) ] = str( repr( body.az ) )
             data[ key + ( astrobase.AstroBase.DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
@@ -409,7 +404,7 @@ def __calculateCommon( ephemNow, data, body, bodyType, nameTag, hideIfBelowHoriz
             if hideIfBelowHorizon:
                 dropped = True
             else:
-                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( rising.datetime() )
+                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rising.datetime() )
 
     except ephem.AlwaysUpError:
         body.compute( __getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
@@ -458,7 +453,7 @@ def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
 #So something is wrong...perhaps in the string comparison of dates (might have to use datetime rather than dates).
 #Maybe this error was due to setting a dodgy date/time in the past (for testing) but using a TLE data file newer than the test time? 
 def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
-    key = ( astrobase.BodyType.Satellite, key )
+    key = ( astrobase.BodyType.SATELLITE, key )
     currentDateTime = ephemNow
     endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
     while currentDateTime < endDateTime:
@@ -495,14 +490,14 @@ def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         # If a satellite is in transit or will rise within five minutes of now, then show all information...
         if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ):
 #             print( "transit" )#TODO
-            data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 0 ].datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
             data[ key + ( astrobase.AstroBase.DATA_RISE_AZIMUTH, ) ] = str( repr( nextPass[ 1 ] ) )
-            data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 4 ].datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
             data[ key + ( astrobase.AstroBase.DATA_SET_AZIMUTH, ) ] = str( repr( nextPass[ 5 ] ) )
 
         else: # Satellite will rise later, so only add rise time.
 #             print( "below horizon" )#TODO
-            data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = __toDateTimeString( nextPass[ 0 ].datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
 
         break
 
@@ -566,9 +561,6 @@ def __isSatellitePassVisible( data, passDateTime, satellite ):
     return satellite.eclipsed is False and \
            sun.alt > ephem.degrees( "-18" ) and \
            sun.alt < ephem.degrees( "-6" )
-
-
-def __toDateTimeString( dateTime ): return dateTime.strftime( DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
 
 def __getCity( data, date ):
