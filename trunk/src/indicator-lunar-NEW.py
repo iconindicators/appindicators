@@ -99,7 +99,7 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import GLib, Gtk, Notify
-import astroPyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
+import astrobase, astroPyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
@@ -137,46 +137,46 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
 
     DATA_TAGS_TRANSLATIONS = {
-        astroPyephem.DATA_ALTITUDE             : _( "ALTITUDE" ),
-        astroPyephem.DATA_AZIMUTH              : _( "AZIMUTH" ),
-        astroPyephem.DATA_ECLIPSE_DATE_TIME    : _( "ECLIPSE DATE TIME" ),
-        astroPyephem.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
-        astroPyephem.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
-        astroPyephem.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
-        astroPyephem.DATA_EQUINOX              : _( "EQUINOX" ),
-        astroPyephem.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
-        astroPyephem.DATA_FULL                 : _( "FULL" ),
-        astroPyephem.DATA_NEW                  : _( "NEW" ),
-        astroPyephem.DATA_PHASE                : _( "PHASE" ),
-        astroPyephem.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
-        astroPyephem.DATA_RISE_DATE_TIME       : _( "RISE DATE TIME" ),
-        astroPyephem.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
-        astroPyephem.DATA_SET_DATE_TIME        : _( "SET DATE TIME" ),
-        astroPyephem.DATA_SOLSTICE             : _( "SOLSTICE" ),
-        astroPyephem.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
+        astrobase.AstroBase.DATA_ALTITUDE             : _( "ALTITUDE" ),
+        astrobase.AstroBase.DATA_AZIMUTH              : _( "AZIMUTH" ),
+        astrobase.AstroBase.DATA_ECLIPSE_DATE_TIME    : _( "ECLIPSE DATE TIME" ),
+        astrobase.AstroBase.DATA_ECLIPSE_LATITUDE     : _( "ECLIPSE LATITUDE" ),
+        astrobase.AstroBase.DATA_ECLIPSE_LONGITUDE    : _( "ECLIPSE LONGITUDE" ),
+        astrobase.AstroBase.DATA_ECLIPSE_TYPE         : _( "ECLIPSE TYPE" ),
+        astrobase.AstroBase.DATA_EQUINOX              : _( "EQUINOX" ),
+        astrobase.AstroBase.DATA_FIRST_QUARTER        : _( "FIRST QUARTER" ),
+        astrobase.AstroBase.DATA_FULL                 : _( "FULL" ),
+        astrobase.AstroBase.DATA_NEW                  : _( "NEW" ),
+        astrobase.AstroBase.DATA_PHASE                : _( "PHASE" ),
+        astrobase.AstroBase.DATA_RISE_AZIMUTH         : _( "RISE AZIMUTH" ),
+        astrobase.AstroBase.DATA_RISE_DATE_TIME       : _( "RISE DATE TIME" ),
+        astrobase.AstroBase.DATA_SET_AZIMUTH          : _( "SET AZIMUTH" ),
+        astrobase.AstroBase.DATA_SET_DATE_TIME        : _( "SET DATE TIME" ),
+        astrobase.AstroBase.DATA_SOLSTICE             : _( "SOLSTICE" ),
+        astrobase.AstroBase.DATA_THIRD_QUARTER        : _( "THIRD QUARTER" ) }
 
-    MOON_TAG_TRANSLATION = { astroPyephem.NAME_TAG_MOON : _( "MOON" ) }
-    SUN_TAG_TRANSLATION = { astroPyephem.NAME_TAG_SUN : _( "SUN" ) }
+    MOON_TAG_TRANSLATION = { astrobase.AstroBase.NAME_TAG_MOON : _( "MOON" ) }
+    SUN_TAG_TRANSLATION = { astrobase.AstroBase.NAME_TAG_SUN : _( "SUN" ) }
 
     PLANET_NAMES_TRANSLATIONS = {
-        astroPyephem.PLANET_MERCURY    : _( "Mercury" ),
-        astroPyephem.PLANET_VENUS      : _( "Venus" ),
-        astroPyephem.PLANET_MARS       : _( "Mars" ),
-        astroPyephem.PLANET_JUPITER    : _( "Jupiter" ),
-        astroPyephem.PLANET_SATURN     : _( "Saturn" ),
-        astroPyephem.PLANET_URANUS     : _( "Uranus" ),
-        astroPyephem.PLANET_NEPTUNE    : _( "Neptune" ),
+        astrobase.AstroBase.PLANET_MERCURY    : _( "Mercury" ),
+        astrobase.AstroBase.PLANET_VENUS      : _( "Venus" ),
+        astrobase.AstroBase.PLANET_MARS       : _( "Mars" ),
+        astrobase.AstroBase.PLANET_JUPITER    : _( "Jupiter" ),
+        astrobase.AstroBase.PLANET_SATURN     : _( "Saturn" ),
+        astrobase.AstroBase.PLANET_URANUS     : _( "Uranus" ),
+        astrobase.AstroBase.PLANET_NEPTUNE    : _( "Neptune" ),
         astroPyephem.PLANET_PLUTO      : _( "Pluto" ) }
 
     PLANET_TAGS_TRANSLATIONS = {
-        astroPyephem.PLANET_MERCURY    : _( "MERCURY" ),
-        astroPyephem.PLANET_VENUS      : _( "VENUS" ),
-        astroPyephem.PLANET_MARS       : _( "MARS" ),
-        astroPyephem.PLANET_JUPITER    : _( "JUPITER" ),
-        astroPyephem.PLANET_SATURN     : _( "SATURN" ),
-        astroPyephem.PLANET_URANUS     : _( "URANUS" ),
-        astroPyephem.PLANET_NEPTUNE    : _( "NEPTUNE" ),
-        astroPyephem.PLANET_PLUTO      : _( "PLUTO" ) }
+        astrobase.AstroBase.PLANET_MERCURY    : _( "MERCURY" ),
+        astrobase.AstroBase.PLANET_VENUS      : _( "VENUS" ),
+        astrobase.AstroBase.PLANET_MARS       : _( "MARS" ),
+        astrobase.AstroBase.PLANET_JUPITER    : _( "JUPITER" ),
+        astrobase.AstroBase.PLANET_SATURN     : _( "SATURN" ),
+        astrobase.AstroBase.PLANET_URANUS     : _( "URANUS" ),
+        astrobase.AstroBase.PLANET_NEPTUNE    : _( "NEPTUNE" ),
+        astrobase.AstroBase.PLANET_PLUTO      : _( "PLUTO" ) }
 
     STAR_NAMES_TRANSLATIONS = {
         astroPyephem.STARS[ 0 ]     : _( "Achernar" ),

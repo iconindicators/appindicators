@@ -31,7 +31,8 @@ class BodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 
 
 class AstroBase:
 
-    #TODO Need a comment.
+#TODO Need a comment.
+#TODO Ensure both backends use all tags.
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
     DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -145,13 +146,14 @@ class AstroBase:
     LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
+
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
-    DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
+#Where is this used?
+#     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 
 
-    @staticmethod
     # Returns a dictionary with astronomical information:
     #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
     #     Value is the data as a string.
@@ -162,6 +164,7 @@ class AstroBase:
     # If the body is above the horizon, set date/time and azimuth/altitude are added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
+    @staticmethod
     def getAstronomicalInformation( utcNow,
                                     latitude, longitude, elevation,
                                     planets,
@@ -175,18 +178,17 @@ class AstroBase:
         return { }
 
 
-
-    @staticmethod
     # Return a list of cities, sorted alphabetically, sensitive to locale.
+    @staticmethod
     def getCities(): return [ ]
 
 
-    @staticmethod
     # Get the lunar phase for the given date/time and illumination percentage.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
     #    nextFullMoonDate The date of the next full moon.
     #    nextNewMoonDate The date of the next new moon.
+    @staticmethod
     def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
         phase = None
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
@@ -225,8 +227,8 @@ class AstroBase:
 
         return phase
 
-    @staticmethod
     # Calculate next eclipse for either the Sun or Moon.
+    @staticmethod
     def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
         eclipseInformation = eclipse.getEclipseForUTC( utcNow, astronomicalBodyType == AstronomicalBodyType.Moon )
         key = ( astronomicalBodyType, dataTag )
