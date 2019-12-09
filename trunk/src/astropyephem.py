@@ -21,7 +21,7 @@
 
 from ephem.cities import _city_data
 
-import astrobase, eclipse, ephem, locale, math, orbitalelement, twolineelement
+import astrobase, ephem, locale, math, orbitalelement, twolineelement
 
 
 #TODO If we test with Pyephem and select some stars, then switch to Skyfield,
@@ -230,7 +230,7 @@ def __calculateMoon( ephemNow, data, hideIfBelowHorizon ):
         data[ key + ( astrobase.AstroBase.DATA_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
         data[ key + ( astrobase.AstroBase.DATA_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
         data[ key + ( astrobase.AstroBase.DATA_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
-        __calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+        astrobase.calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
     # Used for internal processing; indirectly presented to the user.
     moon = ephem.Moon()
@@ -283,41 +283,6 @@ def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
     return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
-# Get the lunar phase for the given date/time and illumination percentage.
-#
-#    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
-#    nextFullMoonDate The date of the next full moon.
-#    nextNewMoonDate The date of the next new moon.
-def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
-    phase = None
-    if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
-        # Between a new moon and a full moon...
-        if( illuminationPercentage > 99 ):
-            phase = astrobase.AstroBase.LUNAR_PHASE_FULL_MOON
-        elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-            phase = astrobase.AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
-        elif illuminationPercentage == 50:
-            phase = astrobase.AstroBase.LUNAR_PHASE_FIRST_QUARTER
-        elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-            phase = astrobase.AstroBase.LUNAR_PHASE_WAXING_CRESCENT
-        else: # illuminationPercentage < 1
-            phase = astrobase.AstroBase.LUNAR_PHASE_NEW_MOON
-    else:
-        # Between a full moon and the next new moon...
-        if( illuminationPercentage > 99 ):
-            phase = astrobase.AstroBase.LUNAR_PHASE_FULL_MOON
-        elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-            phase = astrobase.AstroBase.LUNAR_PHASE_WANING_GIBBOUS
-        elif illuminationPercentage == 50:
-            phase = astrobase.AstroBase.LUNAR_PHASE_THIRD_QUARTER
-        elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-            phase = astrobase.AstroBase.LUNAR_PHASE_WANING_CRESCENT
-        else: # illuminationPercentage < 1
-            phase = astrobase.AstroBase.LUNAR_PHASE_NEW_MOON
-
-    return phase
-
-
 # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
 # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
 # http://www.geoastro.de/elevaz/index.htm
@@ -328,7 +293,7 @@ def __getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate )
 def __calculateSun( ephemNow, data, hideIfBelowHorizon ):
     hidden = __calculateCommon( ephemNow, data, ephem.Sun(), astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, hideIfBelowHorizon )
     if not hidden:
-        __calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+        astrobase.calculateEclipse( ephemNow.datetime(), data, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
         key = ( astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
@@ -336,16 +301,6 @@ def __calculateSun( ephemNow, data, hideIfBelowHorizon ):
         solstice = ephem.next_solstice( ephemNow )
         data[ key + ( astrobase.AstroBase.DATA_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
         data[ key + ( astrobase.AstroBase.DATA_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
-
-
-# Calculate next eclipse for either the Sun or Moon.
-def __calculateEclipse( utcNow, data, bodyType, dataTag ):
-    eclipseInformation = eclipse.getEclipseForUTC( utcNow, bodyType == astrobase.BodyType.MOON )
-    key = ( bodyType, dataTag )
-    data[ key + ( astrobase.AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
-    data[ key + ( astrobase.AstroBase.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-    data[ key + ( astrobase.AstroBase.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
-    data[ key + ( astrobase.AstroBase.DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
 # http://www.geoastro.de/planets/index.html
