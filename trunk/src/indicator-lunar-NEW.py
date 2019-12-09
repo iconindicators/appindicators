@@ -99,7 +99,7 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import GLib, Gtk, Notify
-import astrobase, astroPyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
+import astrobase, astropyephem, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
