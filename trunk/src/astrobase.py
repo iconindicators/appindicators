@@ -20,13 +20,20 @@
 # Calculate astronomical information using PyEphem.
 
 
-#TODO Can this be an enum as per the PPA class?
-#TODO This may not even be needed.
-# class EngineType: PyEphem, Skyfield = range( 2 )
+from enum import Enum
+
+import eclipse
 
 
-#TODO Can this be an enum as per the PPA class?
-class BodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
+#TODO Where these were used prior to being an Enum, check as Moon is now MOON (ditto for the others).
+class BodyType( Enum ):
+    COMET = 0
+    MINOR_PLANET = 1,
+    MOON = 2
+    PLANET = 3,
+    SATELLITE = 4,
+    STAR = 5,
+    SUN = 6
 
 
 class AstroBase:
@@ -119,6 +126,7 @@ class AstroBase:
 
 
 #TODO Need a description
+#TODO Remove TAG?  Data tags don't have TAG in them.
     NAME_TAG_CITY = "CITY"
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
@@ -150,8 +158,8 @@ class AstroBase:
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
-#Where is this used?
-#     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
+
+    DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 
 
     # Returns a dictionary with astronomical information:
@@ -194,49 +202,50 @@ class AstroBase:
         if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
             # Between a new moon and a full moon...
             if( illuminationPercentage > 99 ):
-                phase = LUNAR_PHASE_FULL_MOON
+                phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
             elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                phase = LUNAR_PHASE_WAXING_GIBBOUS
+                phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
             
             elif illuminationPercentage == 50:
-                phase = LUNAR_PHASE_FIRST_QUARTER
+                phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
             
             elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                phase = LUNAR_PHASE_WAXING_CRESCENT
+                phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
             
             else: # illuminationPercentage < 1
-                phase = LUNAR_PHASE_NEW_MOON
+                phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         else:
             # Between a full moon and the next new moon...
             if( illuminationPercentage > 99 ):
-                phase = LUNAR_PHASE_FULL_MOON
+                phase = AstroBase.LUNAR_PHASE_FULL_MOON
             
             elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                phase = LUNAR_PHASE_WANING_GIBBOUS
+                phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
             
             elif illuminationPercentage == 50:
-                phase = LUNAR_PHASE_THIRD_QUARTER
+                phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
             
             elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                phase = LUNAR_PHASE_WANING_CRESCENT
+                phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
             
             else: # illuminationPercentage < 1
-                phase = LUNAR_PHASE_NEW_MOON
+                phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         return phase
 
-    # Calculate next eclipse for either the Sun or Moon.
+
+    # Retrieve the next eclipse for either the Sun or Moon.
     @staticmethod
-    def __calculateEclipse( utcNow, data, astronomicalBodyType, dataTag ):
-        eclipseInformation = eclipse.getEclipseForUTC( utcNow, astronomicalBodyType == AstronomicalBodyType.Moon )
-        key = ( astronomicalBodyType, dataTag )
-        data[ key + ( DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
-        data[ key + ( DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-        data[ key + ( DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
-        data[ key + ( DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+    def __calculateEclipse( utcNow, data, bodyType, dataTag ):
+        eclipseInformation = eclipse.getEclipseForUTC( utcNow, bodyType == BodyType.MOON )
+        key = ( bodyType, dataTag )
+        data[ key + ( AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
+        data[ key + ( AstroBase.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+        data[ key + ( AstroBase.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+        data[ key + ( AstroBase.DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
     @staticmethod
-    def __toDateTimeString( dateTime ): return dateTime.strftime( DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+    def __toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
