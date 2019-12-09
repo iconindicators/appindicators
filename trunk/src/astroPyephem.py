@@ -24,10 +24,6 @@ import eclipse, ephem, locale, math, orbitalelement, twolineelement
 from ephem.cities import _city_data
 
 
-#TODO Can this be an enum as per the PPA class?
-class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
-
-
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
 
@@ -35,222 +31,114 @@ class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, S
 # https://github.com/skyfielders/python-skyfield/issues/225
 
 
-DATA_ALTITUDE = "ALTITUDE"
-DATA_AZIMUTH = "AZIMUTH"
-DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
-DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
-DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
-DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
-DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-DATA_ELEVATION = "ELEVATION" # Internally used for city.
-DATA_EQUINOX = "EQUINOX"
-DATA_FIRST_QUARTER = "FIRST QUARTER"
-DATA_FULL = "FULL"
-DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-DATA_LATITUDE = "LATITUDE" # Internally used for city.
-DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
-DATA_NEW = "NEW"
-DATA_PHASE = "PHASE"
-DATA_RISE_AZIMUTH = "RISE AZIMUTH"
-DATA_RISE_DATE_TIME = "RISE DATE TIME"
-DATA_SET_AZIMUTH = "SET AZIMUTH"
-DATA_SET_DATE_TIME = "SET DATE TIME"
-DATA_SOLSTICE = "SOLSTICE"
-DATA_THIRD_QUARTER = "THIRD QUARTER"
-
-DATA_INTERNAL = [
-    DATA_BRIGHT_LIMB,
-    DATA_ILLUMINATION ]
-
-DATA_COMET = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-DATA_MINOR_PLANET = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-DATA_MOON = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_ECLIPSE_DATE_TIME,
-    DATA_ECLIPSE_LATITUDE,
-    DATA_ECLIPSE_LONGITUDE,
-    DATA_ECLIPSE_TYPE,
-    DATA_FIRST_QUARTER,
-    DATA_FULL,
-    DATA_NEW,
-    DATA_PHASE,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME,
-    DATA_THIRD_QUARTER ]
-
-DATA_PLANET = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-DATA_SATELLITE = [
-    DATA_RISE_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_AZIMUTH,
-    DATA_SET_DATE_TIME ]
-
-DATA_STAR = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-DATA_SUN = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_ECLIPSE_DATE_TIME,
-    DATA_ECLIPSE_LATITUDE,
-    DATA_ECLIPSE_LONGITUDE,
-    DATA_ECLIPSE_TYPE,
-    DATA_EQUINOX,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME,
-    DATA_SOLSTICE ]
-
-NAME_TAG_CITY = "CITY"
-NAME_TAG_MOON = "MOON"
-NAME_TAG_SUN = "SUN"
-
-#TODO Can we somehow unify the planets between Pyephem and Skyfield to make it simpler for the indicator to switch between the two?
+import astrobase
 
 
+class AstroPyephem( astrobase.AstroBase ):
+
+
+#TODO Need this comment?
 # Planet names are capitalised, whereas Pyephem uses titled strings.
 # At the API we accept capitalised planet names, but internally we title them to satisfy Pyephem.
-PLANET_MERCURY = "MERCURY"
-PLANET_VENUS = "VENUS"
-PLANET_MARS = "MARS"
-PLANET_JUPITER = "JUPITER"
-PLANET_SATURN = "SATURN"
-PLANET_URANUS = "URANUS"
-PLANET_NEPTUNE = "NEPTUNE"
-PLANET_PLUTO = "PLUTO"
 
-PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
-#TODO Can we somehow unify the stars between Pyephem and Skyfield to make it simpler for the indicator to switch between the two?
+    # Taken from ephem/stars.py
+    STARS = [
+        "ACHERNAR",
+        "ADARA",
+        "AGENA",
+        "ALBEREO",
+        "ALCAID",
+        "ALCOR",
+        "ALCYONE",
+        "ALDEBARAN",
+        "ALDERAMIN",
+        "ALFIRK",
+        "ALGENIB",
+        "ALGIEBA",
+        "ALGOL",
+        "ALHENA",
+        "ALIOTH",
+        "ALMACH",
+        "ALNAIR",
+        "ALNILAM",
+        "ALNITAK",
+        "ALPHARD",
+        "ALPHECCA",
+        "ALSHAIN",
+        "ALTAIR",
+        "ANTARES",
+        "ARCTURUS",
+        "ARKAB POSTERIOR",
+        "ARKAB PRIOR",
+        "ARNEB",
+        "ATLAS",
+        "BELLATRIX",
+        "BETELGEUSE",
+        "CANOPUS",
+        "CAPELLA",
+        "CAPH",
+        "CASTOR",
+        "CEBALRAI",
+        "DENEB",
+        "DENEBOLA",
+        "DUBHE",
+        "ELECTRA",
+        "ELNATH",
+        "ENIF",
+        "ETAMIN",
+        "FOMALHAUT",
+        "GIENAH CORVI",
+        "HAMAL",
+        "IZAR",
+        "KAUS AUSTRALIS",
+        "KOCHAB",
+        "MAIA",
+        "MARKAB",
+        "MEGREZ",
+        "MENKALINAN",
+        "MENKAR",
+        "MERAK",
+        "MEROPE",
+        "MIMOSA",
+        "MINKAR",
+        "MINTAKA",
+        "MIRACH",
+        "MIRZAM",
+        "MIZAR",
+        "NAOS",
+        "NIHAL",
+        "NUNKI",
+        "PEACOCK",
+        "PHECDA",
+        "POLARIS",
+        "POLLUX",
+        "PROCYON",
+        "RASALGETHI",
+        "RASALHAGUE",
+        "REGULUS",
+        "RIGEL",
+        "RUKBAT",
+        "SADALMELIK",
+        "SADR",
+        "SAIPH",
+        "SCHEAT",
+        "SCHEDAR",
+        "SHAULA",
+        "SHELIAK",
+        "SIRIUS",
+        "SIRRAH",
+        "SPICA",
+        "SULAFAT",
+        "TARAZED",
+        "TAYGETA",
+        "THUBAN",
+        "UNUKALHAI",
+        "VEGA",
+        "VINDEMIATRIX",
+        "WEZEN",
+        "ZAURAK" ]
 
-# From ephem/stars.py
-# Star names are capitalised, whereas Pyephem uses titled strings.
-# At the API we accept capitalised star names, but internally we title them to satisfy Pyephem.
-STARS = [
-    "ACHERNAR", 
-    "ADARA", 
-    "AGENA", # HADAR
-    "ALBEREO", 
-    "ALCAID", 
-    "ALCOR", 
-    "ALCYONE", 
-    "ALDEBARAN", 
-    "ALDERAMIN", 
-    "ALFIRK", 
-    "ALGENIB", 
-    "ALGIEBA", 
-    "ALGOL", 
-    "ALHENA", 
-    "ALIOTH", 
-    "ALMACH", 
-    "ALNAIR", 
-    "ALNILAM", 
-    "ALNITAK", 
-    "ALPHARD", 
-    "ALPHECCA", 
-    "ALSHAIN", 
-    "ALTAIR", 
-    "ANTARES", 
-    "ARCTURUS", 
-    "ARKAB POSTERIOR", 
-    "ARKAB PRIOR", 
-    "ARNEB", 
-    "ATLAS", 
-    "BELLATRIX", 
-    "BETELGEUSE", 
-    "CANOPUS", 
-    "CAPELLA", 
-    "CAPH", 
-    "CASTOR", 
-    "CEBALRAI", 
-    "DENEB", 
-    "DENEBOLA", 
-    "DUBHE", 
-    "ELECTRA", 
-    "ELNATH", 
-    "ENIF", 
-    "ETAMIN", 
-    "FOMALHAUT", 
-    "GIENAH CORVI", 
-    "HAMAL", 
-    "IZAR", 
-    "KAUS AUSTRALIS", 
-    "KOCHAB", 
-    "MAIA", 
-    "MARKAB", 
-    "MEGREZ", 
-    "MENKALINAN", 
-    "MENKAR", 
-    "MERAK", 
-    "MEROPE", 
-    "MIMOSA", 
-    "MINKAR", 
-    "MINTAKA", 
-    "MIRACH", 
-    "MIRZAM", 
-    "MIZAR", 
-    "NAOS", 
-    "NIHAL", 
-    "NUNKI", 
-    "PEACOCK", 
-    "PHECDA", 
-    "POLARIS", 
-    "POLLUX", 
-    "PROCYON", 
-    "RASALGETHI", 
-    "RASALHAGUE", 
-    "REGULUS", 
-    "RIGEL", 
-    "RUKBAT", 
-    "SADALMELIK", 
-    "SADR", 
-    "SAIPH", 
-    "SCHEAT", 
-    "SCHEDAR", 
-    "SHAULA", 
-    "SHELIAK", 
-    "SIRIUS", 
-    "SIRRAH", # ALPHERATZ
-    "SPICA", 
-    "SULAFAT", 
-    "TARAZED", 
-    "TAYGETA", 
-    "THUBAN", 
-    "UNUKALHAI", 
-    "VEGA", 
-    "VINDEMIATRIX", 
-    "WEZEN", 
-    "ZAURAK" ]
-
-LUNAR_PHASE_FULL_MOON = "FULL_MOON"
-LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
-LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
-LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
-LUNAR_PHASE_NEW_MOON = "NEW_MOON"
-LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
-LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
-LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
-
-MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
-MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
 DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 

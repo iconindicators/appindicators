@@ -41,102 +41,285 @@ from skyfield.nutationlib import iau2000b
 import eclipse, gzip, math, pytz, orbitalelement, twolineelement
 
 
-class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
+# class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
 
 
-DATA_ALTITUDE = "ALTITUDE"
-DATA_AZIMUTH = "AZIMUTH"
-DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
-DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
-DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
-DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
-DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-DATA_FIRST_QUARTER = "FIRST QUARTER"
-DATA_FULL = "FULL"
-DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-DATA_NEW = "NEW"
-DATA_PHASE = "PHASE"
-DATA_RISE_AZIMUTH = "RISE AZIMUTH"
-DATA_RISE_DATE_TIME = "RISE DATE TIME"
-DATA_SET_AZIMUTH = "SET AZIMUTH"
-DATA_SET_DATE_TIME = "SET DATE TIME"
-DATA_THIRD_QUARTER = "THIRD QUARTER"
+import astrobase
 
-DATA_INTERNAL = [
-    DATA_BRIGHT_LIMB,
-    DATA_ILLUMINATION ]
 
-DATA_COMET = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
+class AstroSkyfield( astrobase.AstroBase ):
 
-DATA_MINOR_PLANET = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
 
-DATA_MOON = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_ECLIPSE_DATE_TIME,
-    DATA_ECLIPSE_LATITUDE,
-    DATA_ECLIPSE_LONGITUDE,
-    DATA_ECLIPSE_TYPE,
-    DATA_FIRST_QUARTER,
-    DATA_FULL,
-    DATA_NEW,
-    DATA_PHASE,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME,
-    DATA_THIRD_QUARTER ]
-
-DATA_PLANET = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-DATA_SATELLITE = [
-    DATA_RISE_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_AZIMUTH,
-    DATA_SET_DATE_TIME ]
-
-DATA_STAR = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-DATA_SUN = [
-    DATA_ALTITUDE,
-    DATA_AZIMUTH,
-    DATA_ECLIPSE_DATE_TIME,
-    DATA_ECLIPSE_LATITUDE,
-    DATA_ECLIPSE_LONGITUDE,
-    DATA_ECLIPSE_TYPE,
-    DATA_RISE_DATE_TIME,
-    DATA_SET_DATE_TIME ]
-
-NAME_TAG_CITY = "CITY"
-NAME_TAG_MOON = "MOON"
-NAME_TAG_SUN = "SUN"
-
+#TODO Need to map internally the planet names.
 #TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
-PLANET_MERCURY = "MERCURY BARYCENTER"
-PLANET_EARTH = "EARTH"
-PLANET_VENUS = "VENUS BARYCENTER"
-PLANET_MARS = "MARS BARYCENTER"
-PLANET_JUPITER = "JUPITER BARYCENTER"
-PLANET_SATURN = "SATURN BARYCENTER"
-PLANET_URANUS = "URANUS BARYCENTER"
-PLANET_NEPTUNE = "NEPTUNE BARYCENTER"
-PLANET_PLUTO = "PLUTO BARYCENTER"
+# PLANET_MERCURY = "MERCURY BARYCENTER"
+# PLANET_EARTH = "EARTH"
+# PLANET_VENUS = "VENUS BARYCENTER"
+# PLANET_MARS = "MARS BARYCENTER"
+# PLANET_JUPITER = "JUPITER BARYCENTER"
+# PLANET_SATURN = "SATURN BARYCENTER"
+# PLANET_URANUS = "URANUS BARYCENTER"
+# PLANET_NEPTUNE = "NEPTUNE BARYCENTER"
+# PLANET_PLUTO = "PLUTO BARYCENTER"
 
-PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
+
+    # Sourced from skyfield/named_stars.py
+    STARS = [
+        "ACHERNAR",
+        "ACRUX",
+        "ADHARA",
+        "AGENA",
+        "ALBIREO",
+        "ALCOR",
+        "ALDEBARAN",
+        "ALDERAMIN",
+        "ALGENIB",
+        "ALGIEBA",
+        "ALGOL",
+        "ALHENA",
+        "ALIOTH",
+        "ALKAID",
+        "ALMACH",
+        "ALNAIR",
+        "ALNILAM",
+        "ALNITAK",
+        "ALPHARD",
+        "ALPHECCA",
+        "ALPHERATZ",
+        "ALTAIR",
+        "ALUDRA",
+        "ANKAA",
+        "ANTARES",
+        "ARCTURUS",
+        "ARIDED",
+        "ARIDIF",
+        "ASPIDISKE",
+        "ATRIA",
+        "AVIOR",
+        "BECRUX",
+        "BELLATRIX",
+        "BENETNASH",
+        "BETELGEUSE",
+        "BIRDUN",
+        "CANOPUS",
+        "CAPELLA",
+        "CAPH",
+        "CASTOR",
+        "DENEB KAITOS",
+        "DENEB",
+        "DENEBOLA",
+        "DIPHDA",
+        "DSCHUBBA",
+        "DUBHE",
+        "DURRE MENTHOR",
+        "ELNATH",
+        "ENIF",
+        "ETAMIN",
+        "FOMALHAUT",
+        "FORAMEN",
+        "GACRUX",
+        "GEMMA",
+        "GIENAH",
+        "GIRTAB",
+        "GRUID",
+        "HADAR",
+        "HAMAL",
+        "HERSCHEL'S GARNET STAR",
+        "IZAR",
+        "KAUS AUSTRALIS",
+        "KOCHAB",
+        "KOO SHE",
+        "MARCHAB",
+        "MARFIKENT",
+        "MARKAB",
+        "MEGREZ",
+        "MEN",
+        "MENKALINAN",
+        "MENKENT",
+        "MERAK",
+        "MIAPLACIDUS",
+        "MIMOSA",
+        "MINTAKA",
+        "MIRA",
+        "MIRACH",
+        "MIRFAK",
+        "MIRZAM",
+        "MIZAR",
+        "MUHLIFEIN",
+        "MURZIM",
+        "NAOS",
+        "NUNKI",
+        "PEACOCK",
+        "PHAD",
+        "PHECDA",
+        "POLARIS",
+        "POLLUX",
+        "PROCYON",
+        "RAS ALHAGUE",
+        "RASALHAGUE",
+        "REGOR",
+        "REGULUS",
+        "RIGEL KENT",
+        "RIGEL",
+        "RIGIL KENTAURUS",
+        "SABIK",
+        "SADIRA",
+        "SADR",
+        "SAIPH",
+        "SARGAS",
+        "SCHEAT",
+        "SCHEDAR",
+        "SCUTULUM",
+        "SHAULA",
+        "SIRIUS",
+        "SIRRAH",
+        "SOUTH STAR",
+        "SPICA",
+        "SUHAIL",
+        "THUBAN",
+        "TOLIMAN",
+        "TSEEN SHE",
+        "TSIH",
+        "TURAIS",
+        "VEGA",
+        "WEI",
+        "WEZEN" ]
+
+
+#TODO This list and the one below need to do an internal mapping...maybe start with a fresh version from Skyfield.
+#TODO From skyfield...many stars here do not appear in the Pyephem list.
+#So what to do with those stars?  Can't use them whilst we have Pyephem as the backend.
+#If/when we move to skyfield, then modify the list to handle the Skyfield stars.
+#But this will prevent (if need be) from switching to Pyephem for testing...think about this. 
+# Maybe have a list of stars that are common to both Pyephem and Skyfield and either each backend 
+# appends to that list of stars?  Or the common list of stars has the pyephem or skyfield specific stars
+# appended by this base class...just not sure how to do that at run time (that is, how do we know
+# if we are running a pyephem or skyfield?  Need a flag I suppose).
+#
+#This list was seeded from
+#https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
+named_star_dict= {
+ 'Achernar': 7588,
+ 'Acrux': 60718,
+ 'Adhara': 33579,
+ 'Agena': 68702,
+ 'Albireo': 95947,
+ 'Alcor': 65477,
+ 'Aldebaran': 21421,
+ 'Alderamin': 105199,
+ 'Algenib': 15863,
+ 'Algieba': 50583,
+ 'Algol': 14576,
+ 'Alhena': 31681,
+ 'Alioth': 62956,
+ 'Alkaid': 67301,
+ 'Almach': 9640,
+ 'Alnair': 109268,
+ 'Alnilam': 26311,
+ 'Alnitak': 26727,
+ 'Alphard': 46390,
+ 'Alphecca': 76267,
+ 'Alpheratz': 677,
+ 'Altair': 97649,
+ 'Aludra': 35904,
+ 'Ankaa': 2081,
+ 'Antares': 80763,
+ 'Arcturus': 69673,
+ 'Arided': 102098,
+ 'Aridif': 102098,
+ 'Aspidiske': 45556,
+ 'Atria': 82273,
+ 'Avior': 41037,
+ 'Becrux': 62434,
+ 'Bellatrix': 25336,
+ 'Benetnash': 67301,
+ 'Betelgeuse': 27989,
+ 'Birdun': 66657,
+ 'Canopus': 30438,
+ 'Capella': 24608,
+ 'Caph': 746,
+ 'Castor': 36850,
+ 'Deneb': 102098,
+ 'Deneb Kaitos': 3419,
+ 'Denebola': 57632,
+ 'Diphda': 3419,
+ 'Dschubba': 78401,
+ 'Dubhe': 54061,
+ 'Durre Menthor': 8102,
+ 'Elnath': 25428,
+ 'Enif': 107315,
+ 'Etamin': 87833,
+ 'Fomalhaut': 113368,
+ 'Foramen': 93308,
+ 'Gacrux': 61084,
+ 'Gemma': 76267,
+ 'Gienah': 102488,
+ 'Girtab': 86228,
+ 'Gruid': 112122,
+ 'Hadar': 68702,
+ 'Hamal': 9884,
+ "Herschel's Garnet Star": 107259,
+ 'Izar': 72105,
+ 'Kaus Australis': 90185,
+ 'Kochab': 72607,
+ 'Koo She': 42913,
+ 'Marchab': 113963,
+ 'Marfikent': 71352,
+ 'Markab': 45941,
+ 'Megrez': 59774,
+ 'Men': 71860,
+ 'Menkalinan': 28360,
+ 'Menkent': 68933,
+ 'Merak': 53910,
+ 'Miaplacidus': 45238,
+ 'Mimosa': 62434,
+ 'Mintaka': 25930,
+ 'Mira': 10826,
+ 'Mirach': 5447,
+ 'Mirfak': 15863,
+ 'Mirzam': 30324,
+ 'Mizar': 65378,
+ 'Muhlifein': 61932,
+ 'Murzim': 30324,
+ 'Naos': 39429,
+ 'Nunki': 92855,
+ 'Peacock': 100751,
+ 'Phad': 58001,
+ 'Phecda': 58001,
+ 'Polaris': 11767,
+ 'Pollux': 37826,
+ 'Procyon': 37279,
+ 'Ras Alhague': 86032,
+ 'Rasalhague': 86032,
+ 'Regor': 39953,
+ 'Regulus': 49669,
+ 'Rigel': 24436,
+ 'Rigel Kent': 71683,
+ 'Rigil Kentaurus': 71683,
+ 'Sabik': 84012,
+ 'Sadira': 16537,
+ 'Sadr': 100453,
+ 'Saiph': 27366,
+ 'Sargas': 86228,
+ 'Scheat': 113881,
+ 'Schedar': 3179,
+ 'Scutulum': 45556,
+ 'Shaula': 85927,
+ 'Sirius': 32349,
+ 'Sirrah': 677,
+ 'South Star': 104382,
+ 'Spica': 65474,
+ 'Suhail': 44816,
+ 'Thuban': 68756,
+ 'Toliman': 71683,
+ 'Tseen She': 93308,
+ 'Tsih': 4427,
+ 'Turais': 45556,
+ 'Vega': 91262,
+ 'Wei': 82396,
+ 'Wezen': 34444
+
+
 
 #TODO The indicator frontend expects just the star names, capitalised similar to pyephem...can we internally here have a mapping?
 # https://www.cosmos.esa.int/web/hipparcos/common-star-names
@@ -239,17 +422,12 @@ STARS = {
     "Zaurak"            : 18543,
     "3C 273"            : 60936 }
 
+
+
+
 EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
-LUNAR_PHASE_FULL_MOON = "FULL_MOON"
-LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
-LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
-LUNAR_PHASE_WANING_CRESCENT = "WANING_CRESCENT"
-LUNAR_PHASE_NEW_MOON = "NEW_MOON"
-LUNAR_PHASE_WAXING_CRESCENT = "WAXING_CRESCENT"
-LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
-LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
 # ...not sure if skyfield will/could have the same problem.
