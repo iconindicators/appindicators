@@ -155,6 +155,9 @@ class AstroBase:
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
 
+#TODO Need to make it obvious this is abstract...how?
+    STARS = [ ]
+
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
@@ -188,6 +191,7 @@ class AstroBase:
 
     # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
+#TODO How to enforce/highlight this function is abstract and must/should be implemented?  Look up base class stuff for python.
     def getCities(): return [ ]
 
 

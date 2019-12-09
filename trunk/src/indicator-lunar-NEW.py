@@ -89,6 +89,10 @@
 #             self.data = astroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
 
 
+#TODO Given we now use an Enum for bodytype, Moon becomes MOON.
+#So may need a hack for this release to read in user icon text and fix any body tags present.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )

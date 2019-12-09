@@ -38,13 +38,7 @@ from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-import eclipse, gzip, math, pytz, orbitalelement, twolineelement
-
-
-# class AstronomicalBodyType: Comet, MinorPlanet, Moon, Planet, Satellite, Star, Sun = range( 7 )
-
-
-import astrobase
+import astrobase, eclipse, gzip, math, pytz, orbitalelement, twolineelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
