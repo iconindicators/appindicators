@@ -236,7 +236,7 @@ def __calculateMoon( ephemNow, data, hideIfBelowHorizon ):
     moon = ephem.Moon()
     moon.compute( __getCity( data, ephemNow ) )
     data[ key + ( astrobase.AstroBase.DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-    data[ key + ( astrobase.AstroBase.DATA_PHASE, ) ] = __getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+    data[ key + ( astrobase.AstroBase.DATA_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
     data[ key + ( astrobase.AstroBase.DATA_BRIGHT_LIMB, ) ] = str( __getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
 
 
