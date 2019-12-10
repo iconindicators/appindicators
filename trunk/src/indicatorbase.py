@@ -36,7 +36,7 @@ from gi.repository import AppIndicator3, GLib, Gtk, Notify
 import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 
-class IndicatorBase:
+class IndicatorBase( object ):
 
     # Private
     __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
