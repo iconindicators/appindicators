@@ -20,6 +20,7 @@
 # Calculate astronomical information using PyEphem.
 
 
+from abc import abstractmethod
 from enum import Enum
 
 import eclipse
@@ -36,7 +37,7 @@ class BodyType( Enum ):
     SUN = 6
 
 
-class AstroBase:
+class AstroBase( object ):
 
 #TODO Need a comment.
 #TODO Ensure both backends use all tags.
@@ -158,6 +159,7 @@ class AstroBase:
 #TODO Need to make it obvious this is abstract...how?
     STARS = [ ]
 
+
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
@@ -184,15 +186,21 @@ class AstroBase:
                                     comets, cometData,
                                     minorPlanets, minorPlanetData,
                                     magnitude,
-                                    hideIfBelowHorizon ):
-
-        return { }
+                                    hideIfBelowHorizon ): return { }
 
 
     # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
-#TODO How to enforce/highlight this function is abstract and must/should be implemented?  Look up base class stuff for python.
     def getCities(): return [ ]
+
+
+    # Takes a dictionary of orbital element data (for comets or minor planets),
+    # in which the key is the body name and value is the orbital element data.
+    #
+    # Returns a dictionary in which each item has a magnitude less than or equal to the maximum magnitude.
+    # May be empty.
+    @staticmethod
+    def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ): return { }
 
 
     # Get the lunar phase for the given date/time and illumination percentage.
@@ -203,8 +211,7 @@ class AstroBase:
     @staticmethod
     def getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
         phase = None
-        if nextFullMoonDate < nextNewMoonDate: # No need for these dates to be localised...just need to know which date is before the other.
-            # Between a new moon and a full moon...
+        if nextFullMoonDate < nextNewMoonDate: # Between a new moon and a full moon...
             if( illuminationPercentage > 99 ):
                 phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
@@ -220,8 +227,7 @@ class AstroBase:
             else: # illuminationPercentage < 1
                 phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
-        else:
-            # Between a full moon and the next new moon...
+        else: # Between a full moon and the next new moon...
             if( illuminationPercentage > 99 ):
                 phase = AstroBase.LUNAR_PHASE_FULL_MOON
             

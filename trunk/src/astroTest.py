@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import astropyephem, astroskyfield, datetime, indicatorbase, logging, orbitalelement, twolineelement
+import astrobase, astropyephem, astroskyfield, datetime, indicatorbase, logging, orbitalelement, twolineelement
 
 
 def compareResults( resultsPyephem, resultsSkyfield, astronomicalBodyType, nameTagPyephem, nameTagSkyfield, dataTagsPyephem, dataTagsSkyfield ):
@@ -55,24 +55,25 @@ satellites = [ ]
 for key in tleData:
     satellites.append( key )
 
-print( "Running Skyfield..." )
-resultsSkyfield = astroskyfield.getAstronomicalInformation(
-    utcNow,
-    latitude, longitude, elevation,
-    astroskyfield.PLANETS,
-    astroskyfield.STARS,
-    [], [], #satellites, tleData,
-    [], [],
-    [], [],
-    magnitude,
-    hideIfBelowHorizon )
+# print( "Running Skyfield..." )
+resultsSkyfield = { }
+# resultsSkyfield = astroskyfield.getAstronomicalInformation(
+#     utcNow,
+#     latitude, longitude, elevation,
+#     astroskyfield.PLANETS,
+#     astroskyfield.STARS,
+#     [], [], #satellites, tleData,
+#     [], [],
+#     [], [],
+#     magnitude,
+#     hideIfBelowHorizon )
 
 print( "Running Pyephem..." )
-resultsPyephem = astropyephem.getAstronomicalInformation( 
+resultsPyephem = astropyephem.AstroPyephem.getAstronomicalInformation( 
     utcNow,
     latitude, longitude, elevation,
-    astropyephem.PLANETS,
-    astropyephem.STARS,
+    astrobase.AstroBase.PLANETS,
+    astrobase.AstroBase.STARS,
     satellites, tleData,
     [], [],
     [], [],
