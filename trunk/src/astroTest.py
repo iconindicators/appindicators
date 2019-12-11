@@ -57,23 +57,23 @@ for key in tleData:
 
 # print( "Running Skyfield..." )
 resultsSkyfield = { }
-# resultsSkyfield = astroskyfield.getAstronomicalInformation(
-#     utcNow,
-#     latitude, longitude, elevation,
-#     astroskyfield.PLANETS,
-#     astroskyfield.STARS,
-#     [], [], #satellites, tleData,
-#     [], [],
-#     [], [],
-#     magnitude,
-#     hideIfBelowHorizon )
+resultsSkyfield = astroskyfield.AstroSkyfield.getAstronomicalInformation(
+    utcNow,
+    latitude, longitude, elevation,
+    astroskyfield.AstroSkyfield.PLANETS,
+    astroskyfield.AstroSkyfield.STARS,
+    [], [], #satellites, tleData,
+    [], [],
+    [], [],
+    magnitude,
+    hideIfBelowHorizon )
 
 print( "Running Pyephem..." )
 resultsPyephem = astropyephem.AstroPyephem.getAstronomicalInformation( 
     utcNow,
     latitude, longitude, elevation,
-    astrobase.AstroBase.PLANETS,
-    astrobase.AstroBase.STARS,
+    astropyephem.AstroPyephem.PLANETS,
+    astropyephem.AstroPyephem.STARS,
     satellites, tleData,
     [], [],
     [], [],

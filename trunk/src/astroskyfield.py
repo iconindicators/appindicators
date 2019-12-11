@@ -44,6 +44,8 @@ import astrobase, gzip, math, pytz, orbitalelement, twolineelement
 class AstroSkyfield( astrobase.AstroBase ):
 
 
+    EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
+
 #TODO Need to map internally the planet names.
 #TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
 # PLANET_MERCURY = "MERCURY BARYCENTER"
@@ -57,6 +59,9 @@ class AstroSkyfield( astrobase.AstroBase ):
 # PLANET_PLUTO = "PLUTO BARYCENTER"
 
 
+    EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
+
+#TODO Check the function at the end which creates the hip data...it should use this list as the source for the star names.
     # Sourced from skyfield/named_stars.py
     STARS = [
         "ACHERNAR",
@@ -182,21 +187,21 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     __STARS_TO_HIP = {
         "ACHERNAR" :               588,
-        "ACRUX" :                  0718,
+        "ACRUX" :                  718,
         "ADHARA" :                 3579,
         "AGENA" :                  8702,
         "ALBIREO" :                5947,
         "ALCOR" :                  5477,
         "ALDEBARAN" :              1421,
-        "ALDERAMIN" :              05199,
+        "ALDERAMIN" :              5199,
         "ALGENIB" :                5863,
-        "ALGIEBA" :                0583,
+        "ALGIEBA" :                583,
         "ALGOL" :                  4576,
         "ALHENA" :                 1681,
         "ALIOTH" :                 2956,
         "ALKAID" :                 7301,
         "ALMACH" :                 640,
-        "ALNAIR" :                 09268,
+        "ALNAIR" :                 9268,
         "ALNILAM" :                6311,
         "ALNITAK" :                6727,
         "ALPHARD" :                6390,
@@ -204,11 +209,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         "ALPHERATZ" :              77,
         "ALTAIR" :                 7649,
         "ALUDRA" :                 5904,
-        "ANKAA" :                  081,
-        "ANTARES" :                0763,
+        "ANKAA" :                  81,
+        "ANTARES" :                763,
         "ARCTURUS" :               9673,
-        "ARIDED" :                 02098,
-        "ARIDIF" :                 02098,
+        "ARIDED" :                 2098,
+        "ARIDIF" :                 2098,
         "ASPIDISKE" :              5556,
         "ATRIA" :                  2273,
         "AVIOR" :                  1037,
@@ -217,11 +222,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         "BENETNASH" :              7301,
         "BETELGEUSE" :             7989,
         "BIRDUN" :                 6657,
-        "CANOPUS" :                0438,
+        "CANOPUS" :                438,
         "CAPELLA" :                4608,
         "CAPH" :                   46,
         "CASTOR" :                 6850,
-        "DENEB" :                  02098,
+        "DENEB" :                  2098,
         "DENEB KAITOS" :           419,
         "DENEBOLA" :               7632,
         "DIPHDA" :                 419,
@@ -229,20 +234,20 @@ class AstroSkyfield( astrobase.AstroBase ):
         "DUBHE" :                  4061,
         "DURRE MENTHOR" :          102,
         "ELNATH" :                 5428,
-        "ENIF" :                   07315,
+        "ENIF" :                   7315,
         "ETAMIN" :                 7833,
         "FOMALHAUT" :              13368,
         "FORAMEN" :                3308,
         "GACRUX" :                 1084,
         "GEMMA" :                  6267,
-        "GIENAH" :                 02488,
+        "GIENAH" :                 2488,
         "GIRTAB" :                 6228,
         "GRUID" :                  12122,
         "HADAR" :                  8702,
         "HAMAL" :                  884,
-        "HERSCHEL'S GARNET STAR" : 07259,
+        "HERSCHEL'S GARNET STAR" : 7259,
         "IZAR" :                   2105,
-        "KAUS AUSTRALIS" :         0185,
+        "KAUS AUSTRALIS" :         185,
         "KOCHAB" :                 2607,
         "KOO SHE" :                2913,
         "MARCHAB" :                13963,
@@ -256,16 +261,16 @@ class AstroSkyfield( astrobase.AstroBase ):
         "MIAPLACIDUS" :            5238,
         "MIMOSA" :                 2434,
         "MINTAKA" :                5930,
-        "MIRA" :                   0826,
+        "MIRA" :                   826,
         "MIRACH" :                 447,
         "MIRFAK" :                 5863,
-        "MIRZAM" :                 0324,
+        "MIRZAM" :                 324,
         "MIZAR" :                  5378,
         "MUHLIFEIN" :              1932,
-        "MURZIM" :                 0324,
+        "MURZIM" :                 324,
         "NAOS" :                   9429,
         "NUNKI" :                  2855,
-        "PEACOCK" :                00751,
+        "PEACOCK" :                751,
         "PHAD" :                   8001,
         "PHECDA" :                 8001,
         "POLARIS" :                1767,
@@ -280,7 +285,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "RIGIL KENTAURUS" :        1683,
         "SABIK" :                  4012,
         "SADIRA" :                 6537,
-        "SADR" :                   00453,
+        "SADR" :                   453,
         "SAIPH" :                  7366,
         "SARGAS" :                 6228,
         "SCHEAT" :                 13881,
@@ -289,7 +294,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "SHAULA" :                 5927,
         "SIRIUS" :                 2349,
         "SIRRAH" :                 77,
-        "SOUTH STAR" :             04382,
+        "SOUTH STAR" :             4382,
         "SPICA" :                  5474,
         "SUHAIL" :                 4816,
         "THUBAN" :                 8756,
@@ -300,10 +305,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         "VEGA" :                   1262,
         "WEI" :                    2396,
         "WEZEN" :                  4444 }
-
-
-EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
-EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
 
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
@@ -331,8 +332,8 @@ EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
         data = { }
         timeScale = load.timescale()
         utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
-        ephemerisPlanets = load( EPHEMERIS_PLANETS )
-        observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
+        ephemerisPlanets = load( AstroSkyfield.EPHEMERIS_PLANETS )
+        observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
 
         __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
         __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
@@ -534,6 +535,7 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
 
 
     #TODO Only called in one place...and if so, just move the code in place and delete this function.
+#TODO Rename to getObserver.
     @staticmethod
     def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
         return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
