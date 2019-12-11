@@ -159,6 +159,7 @@ class AstroBase( ABC ):
 
 
 #TODO Need to make it obvious this is abstract...how?
+#TODO Comment how teh star names should be fully capitalised.
     STARS = [ ]
 
 

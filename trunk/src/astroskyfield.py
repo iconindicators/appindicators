@@ -490,7 +490,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         for star in stars:
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
 #TODO Not sure which below is correct...need to change star name to HIP?
-            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
+#             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
+            hip = AstroSkyfield.__STARS_TO_HIP[ star ]
+            s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] )
             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] ), astrobase.BodyType.STAR, star )
 
 
@@ -708,37 +710,37 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #            sun.alt < ephem.degrees( "-6" )
 
 
-# If all stars in the Skyfield catalogue were included, up to a limit of magnitude 15,
-# there would be over 100,000 stars and is impractical.
-#
-# Instead, present the user with the "common name" stars, see link below.
-#
-# Load the Skyfield catalogue of stars and filter out those not listed as "common name".
-# The final list of stars range in magnitude up to around 12.
-#
-# Common name stars:
-#     https://www.cosmos.esa.int/web/hipparcos/common-star-names
-#
-# Format of Skyfield catalogue:
-#     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
-@staticmethod
-def createListOfCommonNamedStars():
-    import os.path
-    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
-    if not os.path.isfile( catalogue ):
-        print( "Downloading star catalogue..." )
-        load.open( hipparcos.URL )
+    # If all stars in the Skyfield catalogue were included, up to a limit of magnitude 15,
+    # there would be over 100,000 stars and is impractical.
+    #
+    # Instead, present the user with the "common name" stars, see link below.
+    #
+    # Load the Skyfield catalogue of stars and filter out those not listed as "common name".
+    # The final list of stars range in magnitude up to around 12.
+    #
+    # Common name stars:
+    #     https://www.cosmos.esa.int/web/hipparcos/common-star-names
+    #
+    # Format of Skyfield catalogue:
+    #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
+    @staticmethod
+    def createListOfCommonNamedStars():
+        import os.path
+        catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
+        if not os.path.isfile( catalogue ):
+            print( "Downloading star catalogue..." )
+            load.open( hipparcos.URL )
+            print( "Done" )
+
+        print( "Creating list of common-named stars..." )
+        hipparcosIdentifiers = list( AstroSkyfield.__STARS_TO_HIP.values() )
+        with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.EPHEMERIS_STARS, "wb" ) as outFile:
+            for line in inFile:
+                hip = int( line.decode()[ 8 : 14 ].strip() )
+                if hip in hipparcosIdentifiers:
+    #                 magnitude = float( line.decode()[ 42 : 46 ].strip() )
+                    outFile.write( line )
+
         print( "Done" )
 
-    print( "Creating list of common-named stars..." )
-    hipparcosIdentifiers = list( STARS.values() )
-    with gzip.open( catalogue, "rb" ) as inFile, gzip.open( EPHEMERIS_STARS, "wb" ) as outFile:
-        for line in inFile:
-            hip = int( line.decode()[ 8 : 14 ].strip() )
-            if hip in hipparcosIdentifiers:
-#                 magnitude = float( line.decode()[ 42 : 46 ].strip() )
-                outFile.write( line )
-
-    print( "Done" )
-
-#createListOfCommonNamedStars() # Uncomment to create list of stars.
+AstroSkyfield.createListOfCommonNamedStars() # Uncomment to create list of stars.
