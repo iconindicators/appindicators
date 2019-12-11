@@ -39,7 +39,6 @@ import astrobase, ephem, locale, math, orbitalelement, twolineelement
 
 class AstroPyephem( astrobase.AstroBase ):
 
-
 #TODO Need this comment?
 # Planet names are capitalised, whereas Pyephem uses titled strings.
 # At the API we accept capitalised planet names, but internally we title them to satisfy Pyephem.
@@ -151,7 +150,7 @@ class AstroPyephem( astrobase.AstroBase ):
                                     satellites, satelliteData,
                                     comets, cometData,
                                     minorPlanets, minorPlanetData,
-                                    magnitude,
+                                    magnitudeMaximum,
                                     hideIfBelowHorizon ):
 
         data = { }
@@ -165,10 +164,10 @@ class AstroPyephem( astrobase.AstroBase ):
 
         AstroPyephem.__calculateMoon( ephemNow, data, hideIfBelowHorizon )
         AstroPyephem.__calculateSun( ephemNow, data, hideIfBelowHorizon )
-        AstroPyephem.__calculatePlanets( ephemNow, data, planets, magnitude, hideIfBelowHorizon )
-        AstroPyephem.__calculateStars( ephemNow, data, stars, magnitude, hideIfBelowHorizon )
-        AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.COMET, comets, cometData, magnitude, hideIfBelowHorizon )
-        AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitude, hideIfBelowHorizon )
+        AstroPyephem.__calculatePlanets( ephemNow, data, planets, magnitudeMaximum, hideIfBelowHorizon )
+        AstroPyephem.__calculateStars( ephemNow, data, stars, magnitudeMaximum, hideIfBelowHorizon )
+        AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.COMET, comets, cometData, magnitudeMaximum, hideIfBelowHorizon )
+        AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum, hideIfBelowHorizon )
         AstroPyephem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
 
         del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LATITUDE ) ]
@@ -185,9 +184,10 @@ class AstroPyephem( astrobase.AstroBase ):
     # Returns the latitude, longitude and elevation for the PyEphem city.
 #TODO May need to be in the base class and abstract so both pyephem and skyfield implement their own versions.
     @staticmethod
-    def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
-                                                      float( _city_data.get( city )[ 1 ] ), \
-                                                      _city_data.get( city )[ 2 ]
+    def getLatitudeLongitudeElevation( city ):
+        return float( _city_data.get( city )[ 0 ] ), \
+               float( _city_data.get( city )[ 1 ] ), \
+               _city_data.get( city )[ 2 ]
 
 
     @staticmethod
@@ -299,33 +299,33 @@ class AstroPyephem( astrobase.AstroBase ):
     # http://www.geoastro.de/planets/index.html
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
-    def __calculatePlanets( ephemNow, data, planets, magnitude, hideIfBelowHorizon ):
+    def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum, hideIfBelowHorizon ):
         for planet in planets:
             planetObject = getattr( ephem, planet.title() )()
             planetObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
-            if planetObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and planetObject.mag <= magnitude:
+            if planetObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and planetObject.mag <= magnitudeMaximum:
                 AstroPyephem.__calculateCommon( ephemNow, data, planetObject, astrobase.BodyType.PLANET, planet, hideIfBelowHorizon )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
-    def __calculateStars( ephemNow, data, stars, magnitude, hideIfBelowHorizon ):
+    def __calculateStars( ephemNow, data, stars, magnitudeMaximum, hideIfBelowHorizon ):
         for star in stars:
             starObject = ephem.star( star.title() )
             starObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
-            if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitude:
+            if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitudeMaximum:
                 AstroPyephem.__calculateCommon( ephemNow, data, starObject, astrobase.BodyType.STAR, star, hideIfBelowHorizon )
 
 
     # Compute data for comets or minor planets.
     @staticmethod
-    def __calculateCometsOrMinorPlanets( ephemNow, data, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitude, hideIfBelowHorizon ):
+    def __calculateCometsOrMinorPlanets( ephemNow, data, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum, hideIfBelowHorizon ):
         for key in cometsOrMinorPlanets:
             if key in cometOrMinorPlanetData:
                 body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-                if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitude:
+                if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitudeMaximum:
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key, hideIfBelowHorizon )
 
 

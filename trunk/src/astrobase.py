@@ -20,7 +20,7 @@
 # Calculate astronomical information using PyEphem.
 
 
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from enum import Enum
 
 import eclipse
@@ -37,7 +37,7 @@ class BodyType( Enum ):
     SUN = 6
 
 
-class AstroBase( object ):
+class AstroBase( ABC ):
 
 #TODO Need a comment.
 #TODO Ensure both backends use all tags.
@@ -177,6 +177,7 @@ class AstroBase( object ):
     # If the body is above the horizon, set date/time and azimuth/altitude are added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
+    @abstractmethod
     @staticmethod
     def getAstronomicalInformation( utcNow,
                                     latitude, longitude, elevation,
@@ -185,11 +186,12 @@ class AstroBase( object ):
                                     satellites, satelliteData,
                                     comets, cometData,
                                     minorPlanets, minorPlanetData,
-                                    magnitude,
+                                    magnitudeMaximum,
                                     hideIfBelowHorizon ): return { }
 
 
     # Return a list of cities, sorted alphabetically, sensitive to locale.
+    @abstractmethod
     @staticmethod
     def getCities(): return [ ]
 
@@ -199,6 +201,7 @@ class AstroBase( object ):
     #
     # Returns a dictionary in which each item has a magnitude less than or equal to the maximum magnitude.
     # May be empty.
+    @abstractmethod
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ): return { }
 
