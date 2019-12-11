@@ -38,14 +38,16 @@ from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-import astrobase, gzip, math, pytz, orbitalelement, twolineelement
+import astrobase, datetime, gzip, math, os, pytz, orbitalelement, subprocess, twolineelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
 
 
 #TODO Some of these definitions are private...maybe prefix with __ ?
-    EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
+    EPHEMERIS_PLANETS = "planets.bsp" 
+    # TODO Refer to https://github.com/skyfielders/python-skyfield/issues/123
+    # Still need all the naif...tls stuff and spkmerge stuff now that we use jplephem?
 
 
     PLANET_EARTH = "EARTH"
@@ -63,6 +65,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
+#TODO Perhaps just call this stars.dat.gz?
     EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 
 #TODO Check the function at the end which creates the hip data...it should use this list as the source for the star names.
@@ -189,7 +192,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "WEZEN" ]
 
 
-    __STARS_TO_HIP = {
+    STARS_TO_HIP = {
         "ACHERNAR" :               588,
         "ACRUX" :                  718,
         "ADHARA" :                 3579,
@@ -491,8 +494,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
 #TODO Not sure which below is correct...need to change star name to HIP?
 #             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
-            hip = AstroSkyfield.__STARS_TO_HIP[ star ]
-            s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] )
+            hip = AstroSkyfield.STARS_TO_HIP[ star ]
+            s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] )
             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] ), astrobase.BodyType.STAR, star )
 
 
@@ -710,37 +713,55 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #            sun.alt < ephem.degrees( "-6" )
 
 
-    # If all stars in the Skyfield catalogue were included, up to a limit of magnitude 15,
-    # there would be over 100,000 stars and is impractical.
-    #
-    # Instead, present the user with the "common name" stars, see link below.
-    #
-    # Load the Skyfield catalogue of stars and filter out those not listed as "common name".
-    # The final list of stars range in magnitude up to around 12.
-    #
-    # Common name stars:
-    #     https://www.cosmos.esa.int/web/hipparcos/common-star-names
-    #
-    # Format of Skyfield catalogue:
-    #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
-    @staticmethod
-    def createListOfCommonNamedStars():
-        import os.path
-        catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
-        if not os.path.isfile( catalogue ):
-            print( "Downloading star catalogue..." )
-            load.open( hipparcos.URL )
-            print( "Done" )
+# If all stars in the Skyfield catalogue were included, up to a limit of magnitude 15,
+# there would be over 100,000 stars and is impractical.
+#
+# Instead, present the user with the "common name" stars, see link below.
+#
+# Load the Skyfield catalogue of stars and filter out those not listed as "common name".
+# The final list of stars range in magnitude up to around 12.
+#
+# Common name stars:
+#     https://www.cosmos.esa.int/web/hipparcos/common-star-names
+#
+# Format of Skyfield catalogue:
+#     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
+def createListOfCommonNamedStars():
+    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
+    if not os.path.isfile( catalogue ):
+        print( "Downloading star catalogue..." )
+        load.open( hipparcos.URL )
 
-        print( "Creating list of common-named stars..." )
-        hipparcosIdentifiers = list( AstroSkyfield.__STARS_TO_HIP.values() )
-        with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.EPHEMERIS_STARS, "wb" ) as outFile:
-            for line in inFile:
-                hip = int( line.decode()[ 8 : 14 ].strip() )
-                if hip in hipparcosIdentifiers:
-    #                 magnitude = float( line.decode()[ 42 : 46 ].strip() )
-                    outFile.write( line )
+    print( "Creating list of common-named stars..." )
+    hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
+    with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.EPHEMERIS_STARS, "wb" ) as outFile:
+        for line in inFile:
+            hip = int( line.decode()[ 8 : 14 ].strip() )
+            if hip in hipparcosIdentifiers:
+#                 magnitude = float( line.decode()[ 42 : 46 ].strip() )
+                outFile.write( line )
 
-        print( "Done" )
+    print( "Done" )
 
-AstroSkyfield.createListOfCommonNamedStars() # Uncomment to create list of stars.
+
+def createPlanetEphemeris():
+    today = datetime.date.today()
+    firstOfThisMonth = datetime.date( today.year, today.month, 1 )
+    oneYearFromNow = datetime.date( today.year + 1, today.month, 1 )
+    command = "python3 -m jplephem excerpt " + \
+              firstOfThisMonth.strftime( "%Y/%m/%d" ) + " " + \
+              oneYearFromNow.strftime( "%Y/%m/%d" ) + " " + \
+              "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp " + \
+              "planets.bsp"
+
+    print( "Downloading planet ephemeris..." )
+    try:
+        subprocess.call( command, shell = True )
+        print( "Done" ) #TODO This prints even if an error/exception occurs...
+
+    except subprocess.CalledProcessError as e:
+        print( e )
+
+
+# createListOfCommonNamedStars() # Create ephemeris for stars.
+# createPlanetEphemeris() # Create ephemeris for planets.
