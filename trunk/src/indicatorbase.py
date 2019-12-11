@@ -36,6 +36,9 @@ from gi.repository import AppIndicator3, GLib, Gtk, Notify
 import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 
+#TODO Look at astrobase and how it implements abstract stuff...
+#...may need to change things here
+#...and in all indicators.
 class IndicatorBase( object ):
 
     # Private
