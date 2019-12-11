@@ -41,6 +41,7 @@ class AstroBase( ABC ):
 
 #TODO Need a comment.
 #TODO Ensure both backends use all tags.
+#TODO For the tags for moon phases, see if they are used other than for the moon/phase.  Maybe add to each tag "PHASE_" to make it obvious the use of the tag.
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
     DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -187,7 +188,7 @@ class AstroBase( ABC ):
                                     comets, cometData,
                                     minorPlanets, minorPlanetData,
                                     magnitudeMaximum,
-                                    hideIfBelowHorizon ): pass
+                                    hideIfBelowHorizon ): return { }
 
 
     # Return a list of cities, sorted alphabetically, sensitive to locale.
@@ -252,7 +253,7 @@ class AstroBase( ABC ):
     # Retrieve the next eclipse for either the Sun or Moon.
     @staticmethod
     def calculateEclipse( utcNow, data, bodyType, dataTag ):
-        eclipseInformation = eclipse.getEclipseForUTC( utcNow, bodyType == BodyType.MOON )
+        eclipseInformation = eclipse.getEclipse( utcNow, bodyType == BodyType.MOON )
         key = ( bodyType, dataTag )
         data[ key + ( AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
         data[ key + ( AstroBase.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]

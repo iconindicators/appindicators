@@ -41,7 +41,7 @@ ECLIPSE_TYPE_TOTAL = "T"
 #    eclipseType ("A" = Annular, "H" = Hybrid, "N" = Penumbral, "P" = Partial, "T" = Total)
 #    latitude (south is negative)
 #    longitude (east is negative).
-def getEclipseForUTC( dateTimeUTC, isLunar ):
+def getEclipse( dateTimeUTC, isLunar ):
     if isLunar:
         eclipseData = __lunarEclipseData
 
