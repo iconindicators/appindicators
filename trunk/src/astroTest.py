@@ -80,15 +80,17 @@ resultsPyephem = astropyephem.AstroPyephem.getAstronomicalInformation(
     magnitude,
     hideIfBelowHorizon )
 
-print( "Crunching results..." )
-compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Moon, astropyephem.NAME_TAG_MOON, astroskyfield.NAME_TAG_MOON, astropyephem.DATA_MOON, astroskyfield.DATA_MOON )
-compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Sun, astropyephem.NAME_TAG_SUN, astroskyfield.NAME_TAG_SUN, astropyephem.DATA_SUN, astroskyfield.DATA_SUN )
+print( resultsPyephem )
 
-for ( planetPyephem, planetSkyfield ) in zip( astropyephem.PLANETS, astroskyfield.PLANETS ):
-    compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
+# print( "Crunching results..." )
+# compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Moon, astropyephem.NAME_TAG_MOON, astroskyfield.NAME_TAG_MOON, astropyephem.DATA_MOON, astroskyfield.DATA_MOON )
+# compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Sun, astropyephem.NAME_TAG_SUN, astroskyfield.NAME_TAG_SUN, astropyephem.DATA_SUN, astroskyfield.DATA_SUN )
+
+# for ( planetPyephem, planetSkyfield ) in zip( astropyephem.PLANETS, astroskyfield.PLANETS ):
+#     compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
 
 # The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars common to both...
-starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
-starsSkyfield = [ "Achernar", "Algol", "Izar", "Saiph" ]
-for ( starPyephem, starSkyfield ) in zip( starsPyephem, starsSkyfield ):
-    compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astropyephem.DATA_STAR, astroskyfield.DATA_STAR )
+# starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
+# starsSkyfield = [ "Achernar", "Algol", "Izar", "Saiph" ]
+# for ( starPyephem, starSkyfield ) in zip( starsPyephem, starsSkyfield ):
+#     compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astropyephem.DATA_STAR, astroskyfield.DATA_STAR )

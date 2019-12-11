@@ -177,8 +177,8 @@ class AstroBase( ABC ):
     # If the body is above the horizon, set date/time and azimuth/altitude are added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def getAstronomicalInformation( utcNow,
                                     latitude, longitude, elevation,
                                     planets,
@@ -187,12 +187,12 @@ class AstroBase( ABC ):
                                     comets, cometData,
                                     minorPlanets, minorPlanetData,
                                     magnitudeMaximum,
-                                    hideIfBelowHorizon ): return { }
+                                    hideIfBelowHorizon ): pass
 
 
     # Return a list of cities, sorted alphabetically, sensitive to locale.
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def getCities(): return [ ]
 
 
@@ -201,8 +201,8 @@ class AstroBase( ABC ):
     #
     # Returns a dictionary in which each item has a magnitude less than or equal to the maximum magnitude.
     # May be empty.
-    @abstractmethod
     @staticmethod
+    @abstractmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ): return { }
 
 
