@@ -84,8 +84,8 @@ print( "Crunching results..." )
 compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_MOON, astrobase.AstroBase.DATA_MOON )
 compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_SUN, astrobase.AstroBase.DATA_SUN )
 
-for ( planetPyephem, planetSkyfield ) in zip( astropyephem.PLANETS, astrobase.AstroBase.PLANETS ):
-    compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
+for ( planetPyephem, planetSkyfield ) in zip( astrobase.AstroBase.PLANETS, astrobase.AstroBase.PLANETS ):
+    compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
 
 # The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars common to both...
 starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
