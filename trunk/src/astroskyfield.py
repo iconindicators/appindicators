@@ -52,7 +52,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
 #TODO Explain this...maybe choose a better name?
-    __PLANET_MAPPINGSS = {
+    __PLANET_MAPPINGS = {
         astrobase.AstroBase.PLANET_MERCURY : "MERCURY BARYCENTER",
         astrobase.AstroBase.PLANET_VENUS   : "VENUS BARYCENTER",
         astrobase.AstroBase.PLANET_MARS    : "MARS BARYCENTER",
@@ -466,7 +466,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
         sun = ephemeris[ "SUN" ]
-        neverUp = astrobase.AstroBase.__calculateCommon( utcNow, data, timeScale, observer, sun, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+        neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, sun, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
         if not neverUp:
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
 # https://github.com/skyfielders/python-skyfield/issues/225
@@ -476,7 +476,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets, hideIfBelowHorizon ):
         for planet in planets:
-            astrobase.AstroBase.__calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], astrobase.BodyType.PLANET, planet )
+            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, ephemeris[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.BodyType.PLANET, planet )
 
 
     #TODO According to 
@@ -489,7 +489,9 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, hideIfBelowHorizon ):
         for star in stars:
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-            astrobase.AstroBase.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
+#TODO Not sure which below is correct...need to change star name to HIP?
+            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
+            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] ), astrobase.BodyType.STAR, star )
 
 
     #TODO  
@@ -500,7 +502,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         pass
     #     for star in stars:
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-    #         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+    #         AstroSkyfield__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
 
 
     @staticmethod
