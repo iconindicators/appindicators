@@ -38,7 +38,7 @@ from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-import astrobase, eclipse, gzip, math, pytz, orbitalelement, twolineelement
+import astrobase, gzip, math, pytz, orbitalelement, twolineelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -181,125 +181,125 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     __STARS_TO_HIP = {
-        "ACHERNAR" :                7588,
-        "ACRUX" :                   60718,
-        "ADHARA" :                  33579,
-        "AGENA" :                   68702,
-        "ALBIREO" :                 95947,
-        "ALCOR" :                   65477,
-        "ALDEBARAN" :               21421,
-        "ALDERAMIN" :               105199,
-        "ALGENIB" :                 15863,
-        "ALGIEBA" :                 50583,
-        "ALGOL" :                   14576,
-        "ALHENA" :                  31681,
-        "ALIOTH" :                  62956,
-        "ALKAID" :                  67301,
-        "ALMACH" :                  9640,
-        "ALNAIR" :                  109268,
-        "ALNILAM" :                 26311,
-        "ALNITAK" :                 26727,
-        "ALPHARD" :                 46390,
-        "ALPHECCA" :                76267,
-        "ALPHERATZ" :               677,
-        "ALTAIR" :                  97649,
-        "ALUDRA" :                  35904,
-        "ANKAA" :                   2081,
-        "ANTARES" :                 80763,
-        "ARCTURUS" :                69673,
-        "ARIDED" :                  102098,
-        "ARIDIF" :                  102098,
-        "ASPIDISKE" :               45556,
-        "ATRIA" :                   82273,
-        "AVIOR" :                   41037,
-        "BECRUX" :                  62434,
-        "BELLATRIX" :               25336,
-        "BENETNASH" :               67301,
-        "BETELGEUSE" :              27989,
-        "BIRDUN" :                  66657,
-        "CANOPUS" :                 30438,
-        "CAPELLA" :                 24608,
-        "CAPH" :                    746,
-        "CASTOR" :                  36850,
-        "DENEB" :                   102098,
-        "DENEB KAITOS" :            3419,
-        "DENEBOLA" :                57632,
-        "DIPHDA" :                  3419,
-        "DSCHUBBA" :                78401,
-        "DUBHE" :                   54061,
-        "DURRE MENTHOR" :           8102,
-        "ELNATH" :                  25428,
-        "ENIF" :                    107315,
-        "ETAMIN" :                  87833,
-        "FOMALHAUT" :               113368,
-        "FORAMEN" :                 93308,
-        "GACRUX" :                  61084,
-        "GEMMA" :                   76267,
-        "GIENAH" :                  102488,
-        "GIRTAB" :                  86228,
-        "GRUID" :                   112122,
-        "HADAR" :                   68702,
-        "HAMAL" :                   9884,
-        "HERSCHEL'S GARNET STAR" :  107259,
-        "IZAR" :                    72105,
-        "KAUS AUSTRALIS" :          90185,
-        "KOCHAB" :                  72607,
-        "KOO SHE" :                 42913,
-        "MARCHAB" :                 113963,
-        "MARFIKENT" :               71352,
-        "MARKAB" :                  45941,
-        "MEGREZ" :                  59774,
-        "MEN" :                     71860,
-        "MENKALINAN" :              28360,
-        "MENKENT" :                 68933,
-        "MERAK" :                   53910,
-        "MIAPLACIDUS" :             45238,
-        "MIMOSA" :                  62434,
-        "MINTAKA" :                 25930,
-        "MIRA" :                    10826,
-        "MIRACH" :                  5447,
-        "MIRFAK" :                  15863,
-        "MIRZAM" :                  30324,
-        "MIZAR" :                   65378,
-        "MUHLIFEIN" :               61932,
-        "MURZIM" :                  30324,
-        "NAOS" :                    39429,
-        "NUNKI" :                   92855,
-        "PEACOCK" :                 100751,
-        "PHAD" :                    58001,
-        "PHECDA" :                  58001,
-        "POLARIS" :                 11767,
-        "POLLUX" :                  37826,
-        "PROCYON" :                 37279,
-        "RAS ALHAGUE" :             86032,
-        "RASALHAGUE" :              86032,
-        "REGOR" :                   39953,
-        "REGULUS" :                 49669,
-        "RIGEL" :                   24436,
-        "RIGEL KENT" :              71683,
-        "RIGIL KENTAURUS" :         71683,
-        "SABIK" :                   84012,
-        "SADIRA" :                  16537,
-        "SADR" :                    100453,
-        "SAIPH" :                   27366,
-        "SARGAS" :                  86228,
-        "SCHEAT" :                  113881,
-        "SCHEDAR" :                 3179,
-        "SCUTULUM" :                45556,
-        "SHAULA" :                  85927,
-        "SIRIUS" :                  32349,
-        "SIRRAH" :                  677,
-        "SOUTH STAR" :              104382,
-        "SPICA" :                   65474,
-        "SUHAIL" :                  44816,
-        "THUBAN" :                  68756,
-        "TOLIMAN" :                 71683,
-        "TSEEN SHE" :               93308,
-        "TSIH" :                    4427,
-        "TURAIS" :                  45556,
-        "VEGA" :                    91262,
-        "WEI" :                     82396,
-        "WEZEN" :                   34444 }
+        "ACHERNAR" :               588,
+        "ACRUX" :                  0718,
+        "ADHARA" :                 3579,
+        "AGENA" :                  8702,
+        "ALBIREO" :                5947,
+        "ALCOR" :                  5477,
+        "ALDEBARAN" :              1421,
+        "ALDERAMIN" :              05199,
+        "ALGENIB" :                5863,
+        "ALGIEBA" :                0583,
+        "ALGOL" :                  4576,
+        "ALHENA" :                 1681,
+        "ALIOTH" :                 2956,
+        "ALKAID" :                 7301,
+        "ALMACH" :                 640,
+        "ALNAIR" :                 09268,
+        "ALNILAM" :                6311,
+        "ALNITAK" :                6727,
+        "ALPHARD" :                6390,
+        "ALPHECCA" :               6267,
+        "ALPHERATZ" :              77,
+        "ALTAIR" :                 7649,
+        "ALUDRA" :                 5904,
+        "ANKAA" :                  081,
+        "ANTARES" :                0763,
+        "ARCTURUS" :               9673,
+        "ARIDED" :                 02098,
+        "ARIDIF" :                 02098,
+        "ASPIDISKE" :              5556,
+        "ATRIA" :                  2273,
+        "AVIOR" :                  1037,
+        "BECRUX" :                 2434,
+        "BELLATRIX" :              5336,
+        "BENETNASH" :              7301,
+        "BETELGEUSE" :             7989,
+        "BIRDUN" :                 6657,
+        "CANOPUS" :                0438,
+        "CAPELLA" :                4608,
+        "CAPH" :                   46,
+        "CASTOR" :                 6850,
+        "DENEB" :                  02098,
+        "DENEB KAITOS" :           419,
+        "DENEBOLA" :               7632,
+        "DIPHDA" :                 419,
+        "DSCHUBBA" :               8401,
+        "DUBHE" :                  4061,
+        "DURRE MENTHOR" :          102,
+        "ELNATH" :                 5428,
+        "ENIF" :                   07315,
+        "ETAMIN" :                 7833,
+        "FOMALHAUT" :              13368,
+        "FORAMEN" :                3308,
+        "GACRUX" :                 1084,
+        "GEMMA" :                  6267,
+        "GIENAH" :                 02488,
+        "GIRTAB" :                 6228,
+        "GRUID" :                  12122,
+        "HADAR" :                  8702,
+        "HAMAL" :                  884,
+        "HERSCHEL'S GARNET STAR" : 07259,
+        "IZAR" :                   2105,
+        "KAUS AUSTRALIS" :         0185,
+        "KOCHAB" :                 2607,
+        "KOO SHE" :                2913,
+        "MARCHAB" :                13963,
+        "MARFIKENT" :              1352,
+        "MARKAB" :                 5941,
+        "MEGREZ" :                 9774,
+        "MEN" :                    1860,
+        "MENKALINAN" :             8360,
+        "MENKENT" :                8933,
+        "MERAK" :                  3910,
+        "MIAPLACIDUS" :            5238,
+        "MIMOSA" :                 2434,
+        "MINTAKA" :                5930,
+        "MIRA" :                   0826,
+        "MIRACH" :                 447,
+        "MIRFAK" :                 5863,
+        "MIRZAM" :                 0324,
+        "MIZAR" :                  5378,
+        "MUHLIFEIN" :              1932,
+        "MURZIM" :                 0324,
+        "NAOS" :                   9429,
+        "NUNKI" :                  2855,
+        "PEACOCK" :                00751,
+        "PHAD" :                   8001,
+        "PHECDA" :                 8001,
+        "POLARIS" :                1767,
+        "POLLUX" :                 7826,
+        "PROCYON" :                7279,
+        "RAS ALHAGUE" :            6032,
+        "RASALHAGUE" :             6032,
+        "REGOR" :                  9953,
+        "REGULUS" :                9669,
+        "RIGEL" :                  4436,
+        "RIGEL KENT" :             1683,
+        "RIGIL KENTAURUS" :        1683,
+        "SABIK" :                  4012,
+        "SADIRA" :                 6537,
+        "SADR" :                   00453,
+        "SAIPH" :                  7366,
+        "SARGAS" :                 6228,
+        "SCHEAT" :                 13881,
+        "SCHEDAR" :                179,
+        "SCUTULUM" :               5556,
+        "SHAULA" :                 5927,
+        "SIRIUS" :                 2349,
+        "SIRRAH" :                 77,
+        "SOUTH STAR" :             04382,
+        "SPICA" :                  5474,
+        "SUHAIL" :                 4816,
+        "THUBAN" :                 8756,
+        "TOLIMAN" :                1683,
+        "TSEEN SHE" :              3308,
+        "TSIH" :                   427,
+        "TURAIS" :                 5556,
+        "VEGA" :                   1262,
+        "WEI" :                    2396,
+        "WEZEN" :                  4444 }
 
 
 EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
@@ -317,29 +317,30 @@ EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
 # TODO Use
 #    https://ssd.jpl.nasa.gov/horizons.cgi
 # to verify results.
-def getAstronomicalInformation( utcNow,
-                                latitude, longitude, elevation,
-                                planets,
-                                stars,
-                                satellites, satelliteData,
-                                comets, cometData,
-                                minorPlanets, minorPlanetData,
-                                magnitudeMaximum,
-                                hideIfBelowHorizon ):
+    @staticmethod
+    def getAstronomicalInformation( utcNow,
+                                    latitude, longitude, elevation,
+                                    planets,
+                                    stars,
+                                    satellites, satelliteData,
+                                    comets, cometData,
+                                    minorPlanets, minorPlanetData,
+                                    magnitudeMaximum,
+                                    hideIfBelowHorizon ):
 
-    data = { }
-    timeScale = load.timescale()
-    utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
-    ephemerisPlanets = load( EPHEMERIS_PLANETS )
-    observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
+        data = { }
+        timeScale = load.timescale()
+        utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
+        ephemerisPlanets = load( EPHEMERIS_PLANETS )
+        observer = __getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
 
-    __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
-    __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
-    __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
-    with load.open( EPHEMERIS_STARS ) as f:
-        ephemerisStars = hipparcos.load_dataframe( f )
+        __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
+        __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
+        __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
+        with load.open( EPHEMERIS_STARS ) as f:
+            ephemerisStars = hipparcos.load_dataframe( f )
 
-    __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
+        __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     utcNow = datetime.datetime.utcnow()
@@ -351,55 +352,56 @@ def getAstronomicalInformation( utcNow,
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
 #     utcNow = datetime.datetime.utcnow()
-    __calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
+        __calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
 #     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
-    return data
+        return data
 
 
-# http://www.ga.gov.au/geodesy/astro/moonrise.jsp
-# http://futureboy.us/fsp/moon.fsp
-# http://www.geoastro.de/moondata/index.html
-# http://www.geoastro.de/SME/index.htm
-# http://www.geoastro.de/elevazmoon/index.htm
-# http://www.geoastro.de/altazsunmoon/index.htm
-# http://www.geoastro.de/sundata/index.html
-# http://www.satellite-calculations.com/Satellite/suncalc.htm
-def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
-    key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
-    moon = ephemeris[ "MOON" ]
-    neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+    # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+    # http://futureboy.us/fsp/moon.fsp
+    # http://www.geoastro.de/moondata/index.html
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/elevazmoon/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://www.geoastro.de/sundata/index.html
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
+    @staticmethod
+    def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
+        key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
+        moon = ephemeris[ "MOON" ]
+        neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
-    illumination = str( int( almanac.fraction_illuminated( ephemeris, "MOON", utcNow ) * 100 ) ) # Needed for icon.
-    data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+        illumination = str( int( almanac.fraction_illuminated( ephemeris, "MOON", utcNow ) * 100 ) ) # Needed for icon.
+        data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-    utcNowDateTime = utcNow.utc_datetime()
-    t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
-    t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
+        utcNowDateTime = utcNow.utc_datetime()
+        t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
+        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
 #TODO Test the above line for Feb.
 # https://rhodesmill.org/skyfield/almanac.html
-    t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
-    moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
-    moonPhaseDateTimes = t.utc_datetime()
-    nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
-    nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
-    data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
+        t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
+        moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
+        moonPhaseDateTimes = t.utc_datetime()
+        nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+        nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
+        data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-    data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ "SUN" ], moon ) ) ) ) # Needed for icon.
+        data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ "SUN" ], moon ) ) ) ) # Needed for icon.
 
-    if not neverUp:
-        moonPhaseDateTimes = t.utc_iso()
-        nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
-        nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
-        nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
-        nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
+        if not neverUp:
+            moonPhaseDateTimes = t.utc_iso()
+            nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+            nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
+            nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
+            nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
 
-        data[ key + ( DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
-        data[ key + ( DATA_FULL, ) ] = nextFullMoonISO
-        data[ key + ( DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
-        data[ key + ( DATA_NEW, ) ] = nextNewMoonISO
+            data[ key + ( DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
+            data[ key + ( DATA_FULL, ) ] = nextFullMoonISO
+            data[ key + ( DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
+            data[ key + ( DATA_NEW, ) ] = nextNewMoonISO
 
-        __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+            __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
 
 
 # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -421,6 +423,7 @@ def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHo
 #  https://github.com/brandon-rhodes/pyephem/issues/24
 #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
 #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+#TODO Somehow make this generic and put into base class.
 def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
 
     # Get the latitude/longitude...there has to be a Topos object in the observer, because that is how Skyfield works!
@@ -454,79 +457,86 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
     return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
-def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
-    sun = ephemeris[ "SUN" ]
-    neverUp = __calculateCommon( utcNow, data, timeScale, observer, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
-    if not neverUp:
+    @staticmethod
+    def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
+        sun = ephemeris[ "SUN" ]
+        neverUp = __calculateCommon( utcNow, data, timeScale, observer, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+        if not neverUp:
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
 # https://github.com/skyfielders/python-skyfield/issues/225
-        __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+            __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
 
 
-def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets, hideIfBelowHorizon ):
-    for planet in planets:
-        __calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
+    @staticmethod
+    def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets, hideIfBelowHorizon ):
+        for planet in planets:
+            __calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
 
 
-#TODO According to 
-#     https://github.com/skyfielders/python-skyfield/issues/39
-#     https://github.com/skyfielders/python-skyfield/pull/40
-# skyfield might support somehow star names out of the box...
-# ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
-# See revision 999 for code to filter ephemerisStars by magnitude.
-def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, hideIfBelowHorizon ):
-    for star in stars:
-#         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-        __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+    #TODO According to 
+    #     https://github.com/skyfielders/python-skyfield/issues/39
+    #     https://github.com/skyfielders/python-skyfield/pull/40
+    # skyfield might support somehow star names out of the box...
+    # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
+    # See revision 999 for code to filter ephemerisStars by magnitude.
+    @staticmethod
+    def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, hideIfBelowHorizon ):
+        for star in stars:
+    #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
+            __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
 
 
-#TODO  
-# https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
-# The MPC might provide comet / minor planet data in a different format which Skyfield can read.
-def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum, hideIfBelowHorizon ):
-    pass
-#     for star in stars:
-#         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-#         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+    #TODO  
+    # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
+    # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
+    @staticmethod
+    def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum, hideIfBelowHorizon ):
+        pass
+    #     for star in stars:
+    #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
+    #         __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
 
 
-def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBodyType, nameTag ):
-    neverUp = False
-    key = ( astronomicalBodyType, nameTag )
+    @staticmethod
+    def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBodyType, nameTag ):
+        neverUp = False
+        key = ( astronomicalBodyType, nameTag )
 
-    utcNowDateTime = utcNow.utc_datetime()
-    t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
-    t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
+        utcNowDateTime = utcNow.utc_datetime()
+        t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
+        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
 
-    t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
-    if t:
-        t = t.utc_iso( delimiter = ' ' )
-        if y[ 0 ]:
-            data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-            data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+        t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
+        if t:
+            t = t.utc_iso( delimiter = ' ' )
+            if y[ 0 ]:
+                data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+                data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+
+            else:
+                data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+                data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
         else:
-            data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
-            data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+            if __bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
+                pass # Body is up (and so always up).
 
-    else:
-        if __bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
-            pass # Body is up (and so always up).
-        else:
-            neverUp = True # Body is down (and so never up). 
+            else:
+                neverUp = True # Body is down (and so never up). 
 
-    if not neverUp:
-        apparent = observer.at( utcNow ).observe( body ).apparent()
-        alt, az, bodyDistance = apparent.altaz()
-        data[ key + ( DATA_AZIMUTH, ) ] = str( az.radians )
-        data[ key + ( DATA_ALTITUDE, ) ] = str( alt.radians )
+        if not neverUp:
+            apparent = observer.at( utcNow ).observe( body ).apparent()
+            alt, az, bodyDistance = apparent.altaz()
+            data[ key + ( DATA_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( DATA_ALTITUDE, ) ] = str( alt.radians )
 
-    return neverUp
+        return neverUp
 
 
-#TODO Only called in one place...and if so, just move the code in place and delete this function.
-def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
-    return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+    #TODO Only called in one place...and if so, just move the code in place and delete this function.
+    @staticmethod
+    def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
+        return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
 #TODO Not used...delete?
@@ -534,51 +544,53 @@ def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
 #     return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
-#TODO Have copied the code from skyfield/almanac.py as per
-# https://github.com/skyfielders/python-skyfield/issues/226
-# to compute rise/set for any body.
-#
-# Returns true if the body is up at the time give; false if down.
-def __bodyrise_bodyset( observer, body ):
+    #TODO Have copied the code from skyfield/almanac.py as per
+    # https://github.com/skyfielders/python-skyfield/issues/226
+    # to compute rise/set for any body.
+    #
+    # Returns true if the body is up at the time give; false if down.
+    @staticmethod
+    def __bodyrise_bodyset( observer, body ):
 
-    def is_body_up_at( t ):
-        t._nutation_angles = iau2000b( t.tt )
-        return observer.at( t ).observe( body ).apparent().altaz()[ 0 ].degrees > -0.8333
+        def is_body_up_at( t ):
+            t._nutation_angles = iau2000b( t.tt )
+            return observer.at( t ).observe( body ).apparent().altaz()[ 0 ].degrees > -0.8333
 
-    is_body_up_at.rough_period = 0.5
+        is_body_up_at.rough_period = 0.5
 
-    return is_body_up_at
+        return is_body_up_at
 
 
 #TODO Might be useful:https://github.com/skyfielders/python-skyfield/issues/242
 
-# Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
-#
-# Other sources/background:
-#   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
-#   http://spotthestation.nasa.gov/sightings
-#   http://www.n2yo.com
-#   http://www.heavens-above.com
-#   http://in-the-sky.org
-#
-# For planets/stars, the immediate next rise/set time is shown.
-# If already above the horizon, the set time is shown followed by the rise time for the following pass.
-# This makes sense as planets/stars are slow moving.
-#
-# However, as satellites are faster moving and pass several times a day, a different approach is used.
-# When a notification is displayed indicating a satellite is now passing overhead,
-# the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
-#
-# Therefore...
-#    If a satellite is yet to rise, show the upcoming rise/set time.
-#    If a satellite is currently passing over, show the rise/set time for that pass.
-#
-# This allows the user to see the rise/set time for the current pass as it is happening.
-# When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
-def __calculateSatellites( utcNow, data, timeScale, satellites, satelliteData ):
-    for key in satellites:
-        if key in satelliteData:
-            __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteData[ key ] )
+    # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
+    #
+    # Other sources/background:
+    #   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+    #   http://spotthestation.nasa.gov/sightings
+    #   http://www.n2yo.com
+    #   http://www.heavens-above.com
+    #   http://in-the-sky.org
+    #
+    # For planets/stars, the immediate next rise/set time is shown.
+    # If already above the horizon, the set time is shown followed by the rise time for the following pass.
+    # This makes sense as planets/stars are slow moving.
+    #
+    # However, as satellites are faster moving and pass several times a day, a different approach is used.
+    # When a notification is displayed indicating a satellite is now passing overhead,
+    # the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
+    #
+    # Therefore...
+    #    If a satellite is yet to rise, show the upcoming rise/set time.
+    #    If a satellite is currently passing over, show the rise/set time for that pass.
+    #
+    # This allows the user to see the rise/set time for the current pass as it is happening.
+    # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
+    @staticmethod
+    def __calculateSatellites( utcNow, data, timeScale, satellites, satelliteData ):
+        for key in satellites:
+            if key in satelliteData:
+                __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteData[ key ] )
 
 
 def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
@@ -700,6 +712,7 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #
 # Format of Skyfield catalogue:
 #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
+@staticmethod
 def createListOfCommonNamedStars():
     import os.path
     catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
