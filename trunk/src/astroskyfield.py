@@ -66,9 +66,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
 #TODO Perhaps just call this stars.dat.gz?
-    EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
+    EPHEMERIS_STARS = "stars.dat.gz"
 
 #TODO Check the function at the end which creates the hip data...it should use this list as the source for the star names.
+#TODO In the file named_stars, the function at the bottom is deprecated...so are these named stars defunct?  Raise issue with Skyfield.
     # Sourced from skyfield/named_stars.py
     STARS = [
         "ACHERNAR",
