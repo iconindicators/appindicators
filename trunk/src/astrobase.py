@@ -262,4 +262,5 @@ class AstroBase( ABC ):
 
 
     @staticmethod
+#TODO This works for pyephem...but does it work for skyfield (that is, does skyfield have a different format)?
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
