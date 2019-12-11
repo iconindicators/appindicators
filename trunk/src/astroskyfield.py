@@ -496,7 +496,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
             hip = AstroSkyfield.STARS_TO_HIP[ star ]
             s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] )
-            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] ), astrobase.BodyType.STAR, star )
+            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] ), astrobase.BodyType.STAR, star )
 
 
     #TODO  

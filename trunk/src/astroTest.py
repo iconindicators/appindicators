@@ -55,7 +55,7 @@ satellites = [ ]
 for key in tleData:
     satellites.append( key )
 
-# print( "Running Skyfield..." )
+print( "Running Skyfield..." )
 resultsSkyfield = { }
 resultsSkyfield = astroskyfield.AstroSkyfield.getAstronomicalInformation(
     utcNow,
@@ -68,7 +68,7 @@ resultsSkyfield = astroskyfield.AstroSkyfield.getAstronomicalInformation(
     magnitude,
     hideIfBelowHorizon )
 
-print( "Running Pyephem..." )
+print( "Running PyEphem..." )
 resultsPyephem = astropyephem.AstroPyephem.getAstronomicalInformation( 
     utcNow,
     latitude, longitude, elevation,
@@ -80,17 +80,15 @@ resultsPyephem = astropyephem.AstroPyephem.getAstronomicalInformation(
     magnitude,
     hideIfBelowHorizon )
 
-print( resultsPyephem )
+print( "Crunching results..." )
+compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_MOON, astrobase.AstroBase.DATA_MOON )
+compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_SUN, astrobase.AstroBase.DATA_SUN )
 
-# print( "Crunching results..." )
-# compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Moon, astropyephem.NAME_TAG_MOON, astroskyfield.NAME_TAG_MOON, astropyephem.DATA_MOON, astroskyfield.DATA_MOON )
-# compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Sun, astropyephem.NAME_TAG_SUN, astroskyfield.NAME_TAG_SUN, astropyephem.DATA_SUN, astroskyfield.DATA_SUN )
-
-# for ( planetPyephem, planetSkyfield ) in zip( astropyephem.PLANETS, astroskyfield.PLANETS ):
-#     compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
+for ( planetPyephem, planetSkyfield ) in zip( astropyephem.PLANETS, astrobase.AstroBase.PLANETS ):
+    compareResults( resultsPyephem, resultsSkyfield, astroskyfield.AstronomicalBodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
 
 # The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars common to both...
-# starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
-# starsSkyfield = [ "Achernar", "Algol", "Izar", "Saiph" ]
-# for ( starPyephem, starSkyfield ) in zip( starsPyephem, starsSkyfield ):
-#     compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astropyephem.DATA_STAR, astroskyfield.DATA_STAR )
+starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
+starsSkyfield = [ "Achernar", "Algol", "Izar", "Saiph" ]
+for ( starPyephem, starSkyfield ) in zip( starsPyephem, starsSkyfield ):
+    compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astropyephem.DATA_STAR, astroskyfield.DATA_STAR )
