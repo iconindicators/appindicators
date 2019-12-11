@@ -27,6 +27,7 @@ import eclipse
 
 
 #TODO Where these were used prior to being an Enum, check as Moon is now MOON (ditto for the others).
+#TODO Maybe move this within the class of AstroBase?
 class BodyType( Enum ):
     COMET = 0
     MINOR_PLANET = 1,

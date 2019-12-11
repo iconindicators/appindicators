@@ -44,19 +44,23 @@ import astrobase, gzip, math, pytz, orbitalelement, twolineelement
 class AstroSkyfield( astrobase.AstroBase ):
 
 
+#TODO Some of these definitions are private...maybe prefix with __ ?
     EPHEMERIS_PLANETS = "de438_2019-2023.bsp" # Refer to https://github.com/skyfielders/python-skyfield/issues/123
 
-#TODO Need to map internally the planet names.
+
+    PLANET_EARTH = "EARTH"
+
 #TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
-# PLANET_MERCURY = "MERCURY BARYCENTER"
-# PLANET_EARTH = "EARTH"
-# PLANET_VENUS = "VENUS BARYCENTER"
-# PLANET_MARS = "MARS BARYCENTER"
-# PLANET_JUPITER = "JUPITER BARYCENTER"
-# PLANET_SATURN = "SATURN BARYCENTER"
-# PLANET_URANUS = "URANUS BARYCENTER"
-# PLANET_NEPTUNE = "NEPTUNE BARYCENTER"
-# PLANET_PLUTO = "PLUTO BARYCENTER"
+#TODO Explain this...maybe choose a better name?
+    __PLANET_MAPPINGSS = {
+        astrobase.AstroBase.PLANET_MERCURY : "MERCURY BARYCENTER",
+        astrobase.AstroBase.PLANET_VENUS   : "VENUS BARYCENTER",
+        astrobase.AstroBase.PLANET_MARS    : "MARS BARYCENTER",
+        astrobase.AstroBase.PLANET_JUPITER : "JUPITER BARYCENTER",
+        astrobase.AstroBase.PLANET_SATURN  : "SATURN BARYCENTER",
+        astrobase.AstroBase.PLANET_URANUS  : "URANUS BARYCENTER",
+        astrobase.AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
+        astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
     EPHEMERIS_STARS = "hip_common_name_stars.dat.gz"
@@ -333,15 +337,15 @@ class AstroSkyfield( astrobase.AstroBase ):
         timeScale = load.timescale()
         utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
         ephemerisPlanets = load( AstroSkyfield.EPHEMERIS_PLANETS )
-        observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ PLANET_EARTH ] )
+        observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ AstroSkyfield.PLANET_EARTH ] )
 
-        __calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
-        __calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
-        __calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
-        with load.open( EPHEMERIS_STARS ) as f:
+        AstroSkyfield.__calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
+        AstroSkyfield.__calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
+        AstroSkyfield.__calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
+        with load.open( AstroSkyfield.EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
 
-        __calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
+        AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     utcNow = datetime.datetime.utcnow()
@@ -353,7 +357,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
 #     utcNow = datetime.datetime.utcnow()
-        __calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
+        AstroSkyfield.__calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
 #     print( "updateSatellites:", ( datetime.datetime.utcnow() - utcNow ) )
 
         return data
@@ -369,12 +373,12 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
-        key = ( AstronomicalBodyType.Moon, NAME_TAG_MOON )
+        key = ( astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         moon = ephemeris[ "MOON" ]
-        neverUp = __calculateCommon( utcNow, data, timeScale, observer, moon, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+        neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, moon, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
         illumination = str( int( almanac.fraction_illuminated( ephemeris, "MOON", utcNow ) * 100 ) ) # Needed for icon.
-        data[ key + ( DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
@@ -386,9 +390,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         moonPhaseDateTimes = t.utc_datetime()
         nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
         nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
-        data[ key + ( DATA_PHASE, ) ] = __getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
+        data[ key + ( astrobase.AstroBase.DATA_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-        data[ key + ( DATA_BRIGHT_LIMB, ) ] = str( int( round( __getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ "SUN" ], moon ) ) ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ "SUN" ], moon ) ) ) ) # Needed for icon.
 
         if not neverUp:
             moonPhaseDateTimes = t.utc_iso()
@@ -397,81 +401,82 @@ class AstroSkyfield( astrobase.AstroBase ):
             nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
             nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
 
-            data[ key + ( DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
-            data[ key + ( DATA_FULL, ) ] = nextFullMoonISO
-            data[ key + ( DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
-            data[ key + ( DATA_NEW, ) ] = nextNewMoonISO
+            data[ key + ( astrobase.AstroBase.DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
+            data[ key + ( astrobase.AstroBase.DATA_FULL, ) ] = nextFullMoonISO
+            data[ key + ( astrobase.AstroBase.DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
+            data[ key + ( astrobase.AstroBase.DATA_NEW, ) ] = nextNewMoonISO
 
-            __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Moon, NAME_TAG_MOON )
+            astrobase.AstroBase.calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
 
-# Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-# Measured in degrees counter clockwise from a positive y axis.
-#
-# References:
-#  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-#  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-#  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-#  http://www.geoastro.de/SME/
-#  http://futureboy.us/fsp/moon.fsp
-#  http://www.timeanddate.com/moon/australia/sydney
-#  https://www.calsky.com/cs.cgi?cha=6&sec=1
-#
-# Other references...
-#  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-#  https://sites.google.com/site/astronomicalalgorithms
-#  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-#  https://github.com/brandon-rhodes/pyephem/issues/24
-#  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-#  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-#TODO Somehow make this generic and put into base class.
-def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
+    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
+    # Measured in degrees counter clockwise from a positive y axis.
+    #
+    # References:
+    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
+    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+    #  http://www.geoastro.de/SME/
+    #  http://futureboy.us/fsp/moon.fsp
+    #  http://www.timeanddate.com/moon/australia/sydney
+    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
+    #
+    # Other references...
+    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+    #  https://sites.google.com/site/astronomicalalgorithms
+    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+    #  https://github.com/brandon-rhodes/pyephem/issues/24
+    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
+    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+    #TODO Somehow make this generic and put into base class.
+    @staticmethod
+    def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
 
-    # Get the latitude/longitude...there has to be a Topos object in the observer, because that is how Skyfield works!
-    for thing in observer.positives:
-        if isinstance( thing, Topos ):
-            latitude = thing.latitude
-            longitude = thing.longitude
-            break
+        # Get the latitude/longitude...there has to be a Topos object in the observer, because that is how Skyfield works!
+        for thing in observer.positives:
+            if isinstance( thing, Topos ):
+                latitude = thing.latitude
+                longitude = thing.longitude
+                break
 
-    sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( sun ).apparent().radec()
-    bodyRA, bodyDec, earthDistance = observer.at( utcNow ).observe( body ).apparent().radec()
+        sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( sun ).apparent().radec()
+        bodyRA, bodyDec, earthDistance = observer.at( utcNow ).observe( body ).apparent().radec()
 
-    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-    y = math.cos( sunDec.radians ) * math.sin( sunRA.radians - bodyRA.radians )
-    x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
-    positionAngleOfBrightLimb = math.atan2( y, x )
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+        y = math.cos( sunDec.radians ) * math.sin( sunRA.radians - bodyRA.radians )
+        x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
+        positionAngleOfBrightLimb = math.atan2( y, x )
 
-#TODO Are the comments below still valid?
-    # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-    # https://tycho.usno.navy.mil/sidereal.html
-    # http://www.wwu.edu/skywise/skymobile/skywatch.html
-    # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-    observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + longitude.radians # From skyfield.earthlib.py
-    hourAngle = observerSiderealTime - bodyRA.radians
+    #TODO Are the comments below still valid?
+        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
+        # https://tycho.usno.navy.mil/sidereal.html
+        # http://www.wwu.edu/skywise/skymobile/skywatch.html
+        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+        observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + longitude.radians # From skyfield.earthlib.py
+        hourAngle = observerSiderealTime - bodyRA.radians
 
-    # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-    y = math.sin( hourAngle )
-    x = math.tan( latitude.radians ) * math.cos( bodyDec.radians ) - math.sin( bodyDec.radians ) * math.cos( hourAngle )
-    parallacticAngle = math.atan2( y, x )
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        y = math.sin( hourAngle )
+        x = math.tan( latitude.radians ) * math.cos( bodyDec.radians ) - math.sin( bodyDec.radians ) * math.cos( hourAngle )
+        parallacticAngle = math.atan2( y, x )
 
-    return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
+        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
         sun = ephemeris[ "SUN" ]
-        neverUp = __calculateCommon( utcNow, data, timeScale, observer, sun, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+        neverUp = astrobase.AstroBase.__calculateCommon( utcNow, data, timeScale, observer, sun, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
         if not neverUp:
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
 # https://github.com/skyfielders/python-skyfield/issues/225
-            __calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, AstronomicalBodyType.Sun, NAME_TAG_SUN )
+            astrobase.AstroBase.calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
     @staticmethod
     def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets, hideIfBelowHorizon ):
         for planet in planets:
-            __calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], AstronomicalBodyType.Planet, planet )
+            astrobase.AstroBase.__calculateCommon( utcNow, data, timeScale, observer, ephemeris[ planet ], astrobase.BodyType.PLANET, planet )
 
 
     #TODO According to 
@@ -484,7 +489,7 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
     def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, hideIfBelowHorizon ):
         for star in stars:
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-            __calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ STARS[ star ] ] ), AstronomicalBodyType.Star, star )
+            astrobase.AstroBase.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
 
 
     #TODO  
@@ -507,19 +512,19 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
         t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
 
-        t, y = almanac.find_discrete( t0, t1, __bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
+        t, y = almanac.find_discrete( t0, t1, AstroSkyfield.__bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
         if t:
             t = t.utc_iso( delimiter = ' ' )
             if y[ 0 ]:
-                data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-                data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
 
             else:
-                data[ key + ( DATA_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
-                data[ key + ( DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
         else:
-            if __bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
+            if AstroSkyfield.__bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
                 pass # Body is up (and so always up).
 
             else:
@@ -528,8 +533,8 @@ def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
         if not neverUp:
             apparent = observer.at( utcNow ).observe( body ).apparent()
             alt, az, bodyDistance = apparent.altaz()
-            data[ key + ( DATA_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( DATA_ALTITUDE, ) ] = str( alt.radians )
+            data[ key + ( astrobase.AstroBase.DATA_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( astrobase.AstroBase.DATA_ALTITUDE, ) ] = str( alt.radians )
 
         return neverUp
 
