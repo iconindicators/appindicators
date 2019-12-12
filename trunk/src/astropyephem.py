@@ -344,7 +344,6 @@ class AstroPyephem( astrobase.AstroBase ):
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-#TODO Make this a generic function and pass in az/alt of the various bodies (so no longer a pyephem or skyfield function)?    
     @staticmethod
     def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
         city = AstroPyephem.__getCity( data, ephemNow )

@@ -23,7 +23,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-import eclipse, math
+import eclipse
 
 
 class AstroBase( ABC ):
@@ -47,13 +47,13 @@ class AstroBase( ABC ):
     DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
     DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
     DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-    DATA_ELEVATION = "ELEVATION" # Internally used for city.
+    DATA_ELEVATION = "ELEVATION" # Internally used for city in astropyephem.
     DATA_EQUINOX = "EQUINOX"
     DATA_FIRST_QUARTER = "FIRST QUARTER"
     DATA_FULL = "FULL"
     DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-    DATA_LATITUDE = "LATITUDE" # Internally used for city.
-    DATA_LONGITUDE = "LONGITUDE" # Internally used for city.
+    DATA_LATITUDE = "LATITUDE" # Internally used for city in astropyephem.
+    DATA_LONGITUDE = "LONGITUDE" # Internally used for city in astropyephem.
     DATA_NEW = "NEW"
     DATA_PHASE = "PHASE"
     DATA_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -163,13 +163,12 @@ class AstroBase( ABC ):
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
-
     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 
 
     # Returns a dictionary with astronomical information:
     #     Key is a tuple of BodyType, a name tag and a data tag.
-    #     Value is the data as a string.
+    #     Value is the calculated astronomical information as a string.
     #
     # If a body is never up, no data is added.
     # If a body is always up, azimuth/altitude are added.
@@ -196,7 +195,7 @@ class AstroBase( ABC ):
     def getCities(): return [ ]
 
 
-    # Returns the latitude, longitude and elevation for the city.
+    # Returns a tuple of floats of the latitude, longitude and elevation for the city.
     @staticmethod
     @abstractmethod
     def getLatitudeLongitudeElevation( city ): return 0.0, 0.0, 0.0
@@ -269,46 +268,3 @@ class AstroBase( ABC ):
     @staticmethod
 #TODO This works for pyephem...but does it work for skyfield (that is, does skyfield have a different format)?
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
-
-
-#TODO In progress...
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in radians counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    @staticmethod
-    def getZenithAngleOfBrightLimb( utcNow, observerLatitude, observerLongitude, sunRA, sunDec, bodyRA, bodyDec ):
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
-        x = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-        # https://tycho.usno.navy.mil/sidereal.html
-        # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        DEG2RAD = 0.017453292519943296 #TODO This came from skyfield/constants.py (sort out how to use it).
-        observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + observerLongitude # From skyfield.earthlib.py
-        hourAngle = observerSiderealTime - bodyRA
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( observerLatitude ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )

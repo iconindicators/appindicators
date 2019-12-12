@@ -445,7 +445,6 @@ class AstroSkyfield( astrobase.AstroBase ):
     #  https://github.com/brandon-rhodes/pyephem/issues/24
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    #TODO Somehow make this generic and put into base class.
     @staticmethod
     def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
 
