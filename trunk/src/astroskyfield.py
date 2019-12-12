@@ -19,6 +19,13 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO Possible ways to have PIP stuff installed with the DEB/PPA:
+# https://unix.stackexchange.com/questions/347649/how-to-add-a-python-package-dependance-to-a-debian-package
+# https://www.debian.org/doc/manuals/maint-guide/dreq.en.html#control
+# https://askubuntu.com/questions/327543/how-can-a-debian-package-install-python-modules-from-pypi
+# https://wiki.debian.org/Python/Pybuild
+
+
 #TODO Can pip3 be run from the install?
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
