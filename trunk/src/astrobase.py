@@ -40,7 +40,6 @@ class AstroBase( ABC ):
 
 #TODO Need a comment.
 #TODO Ensure both backends use all tags.
-#TODO For the tags for moon phases, see if they are used other than for the moon/phase.  Maybe add to each tag "PHASE_" to make it obvious the use of the tag.
     DATA_ALTITUDE = "ALTITUDE"
     DATA_AZIMUTH = "AZIMUTH"
     DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -195,6 +194,12 @@ class AstroBase( ABC ):
     @staticmethod
     @abstractmethod
     def getCities(): return [ ]
+
+
+    # Returns the latitude, longitude and elevation for the city.
+    @staticmethod
+    @abstractmethod
+    def getLatitudeLongitudeElevation( city ): return 0.0, 0.0, 0.0
 
 
     # Takes a dictionary of orbital element data (for comets or minor planets),

@@ -202,7 +202,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "WEZEN" ]
 
 
-    __STARS_TO_HIP = {
+    STARS_TO_HIP = {
         "ACHERNAR" :               588,
         "ACRUX" :                  718,
         "ADHARA" :                 3579,
@@ -504,9 +504,9 @@ class AstroSkyfield( astrobase.AstroBase ):
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
 #TODO Not sure which below is correct...need to change star name to HIP?
 #             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
-            hip = AstroSkyfield.__STARS_TO_HIP[ star ]
-            s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] )
-            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.__STARS_TO_HIP[ star ] ] ), astrobase.AstroBase.BodyType.STAR, star )
+            hip = AstroSkyfield.STARS_TO_HIP[ star ]
+            s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] )
+            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] ), astrobase.AstroBase.BodyType.STAR, star )
 
 
     #TODO  
@@ -741,7 +741,7 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
             load.open( hipparcos.URL )
 
         print( "Creating list of common-named stars..." )
-        hipparcosIdentifiers = list( AstroSkyfield.__STARS_TO_HIP.values() )
+        hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
         with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at columns indices [ 42 : 46 ].
