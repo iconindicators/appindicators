@@ -24,6 +24,10 @@
 # https://www.debian.org/doc/manuals/maint-guide/dreq.en.html#control
 # https://askubuntu.com/questions/327543/how-can-a-debian-package-install-python-modules-from-pypi
 # https://wiki.debian.org/Python/Pybuild
+#
+# Alternatively, maybe put in a note at the top of the PPA page and/or
+# when the indicator runs, do some sort of check to see if the stuff is installed and correct versions
+# and if not, fire off a notification to the user and log the install sequence in the log.
 
 
 #TODO Can pip3 be run from the install?
