@@ -268,6 +268,7 @@ class AstroBase( ABC ):
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
 
+#TODO In progress...
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
     # Measured in radians counter clockwise from a positive y axis.
     #
@@ -294,118 +295,17 @@ class AstroBase( ABC ):
         x = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
         positionAngleOfBrightLimb = math.atan2( y, x )
 
-    #TODO Are the comments below still valid?
         # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
         # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-#         hourAngle = city.sidereal_time() - bodyRA       
-        DEG2RAD = 0.017453292519943296 #TODO This came from skyfield/constants.py
+        DEG2RAD = 0.017453292519943296 #TODO This came from skyfield/constants.py (sort out how to use it).
         observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + observerLongitude # From skyfield.earthlib.py
-        hourAngle = observerSiderealTime - bodyRA.radians
+        hourAngle = observerSiderealTime - bodyRA
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hourAngle )
         x = math.tan( observerLatitude ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
-
-
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in radians counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-#TODO Make this a generic function and pass in az/alt of the various bodies (so no longer a pyephem or skyfield function)?    
-    @staticmethod
-    def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
-        city = AstroPyephem.__getCity( data, ephemNow )
-        sun = ephem.Sun( city )
-        body.compute( city )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-        x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-        # https://tycho.usno.navy.mil/sidereal.html
-        # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        hourAngle = city.sidereal_time() - body.ra
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
-
-
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in degrees counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    #TODO Somehow make this generic and put into base class.
-    @staticmethod
-    def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
-
-        # Get the latitude/longitude...there has to be a Topos object in the observer, because that is how Skyfield works!
-        for thing in observer.positives:
-            if isinstance( thing, Topos ):
-                latitude = thing.latitude
-                longitude = thing.longitude
-                break
-
-        sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( sun ).apparent().radec()
-        bodyRA, bodyDec, earthDistance = observer.at( utcNow ).observe( body ).apparent().radec()
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sunDec.radians ) * math.sin( sunRA.radians - bodyRA.radians )
-        x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-    #TODO Are the comments below still valid?
-        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-        # https://tycho.usno.navy.mil/sidereal.html
-        # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + longitude.radians # From skyfield.earthlib.py
-        hourAngle = observerSiderealTime - bodyRA.radians
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( latitude.radians ) * math.cos( bodyDec.radians ) - math.sin( bodyDec.radians ) * math.cos( hourAngle )
         parallacticAngle = math.atan2( y, x )
 
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
