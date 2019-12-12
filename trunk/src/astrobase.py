@@ -26,19 +26,17 @@ from enum import Enum
 import eclipse, math
 
 
-#TODO Where these were used prior to being an Enum, check as Moon is now MOON (ditto for the others).
-#TODO Maybe move this within the class of AstroBase?
-class BodyType( Enum ):
-    COMET = 0
-    MINOR_PLANET = 1,
-    MOON = 2
-    PLANET = 3,
-    SATELLITE = 4,
-    STAR = 5,
-    SUN = 6
-
-
 class AstroBase( ABC ):
+
+    class BodyType( Enum ):
+        COMET = 0
+        MINOR_PLANET = 1,
+        MOON = 2
+        PLANET = 3,
+        SATELLITE = 4,
+        STAR = 5,
+        SUN = 6
+
 
 #TODO Need a comment.
 #TODO Ensure both backends use all tags.
@@ -171,7 +169,7 @@ class AstroBase( ABC ):
 
 
     # Returns a dictionary with astronomical information:
-    #     Key is a tuple of AstronomicalBodyType, a name tag and a data tag.
+    #     Key is a tuple of BodyType, a name tag and a data tag.
     #     Value is the data as a string.
     #
     # If a body is never up, no data is added.
@@ -255,7 +253,7 @@ class AstroBase( ABC ):
     # Retrieve the next eclipse for either the Sun or Moon.
     @staticmethod
     def calculateEclipse( utcNow, data, bodyType, dataTag ):
-        eclipseInformation = eclipse.getEclipse( utcNow, bodyType == BodyType.MOON )
+        eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
         key = ( bodyType, dataTag )
         data[ key + ( AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
         data[ key + ( AstroBase.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
