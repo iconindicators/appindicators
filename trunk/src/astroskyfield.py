@@ -49,8 +49,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # TODO Refer to https://github.com/skyfielders/python-skyfield/issues/123
     # Still need all the naif...tls stuff and spkmerge stuff now that we use jplephem?
 
-
-    PLANET_EARTH = "EARTH"
+    __PLANET_EARTH = "EARTH"
 
 #TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
 #TODO Explain this...maybe choose a better name?
@@ -63,6 +62,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_URANUS  : "URANUS BARYCENTER",
         astrobase.AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
+
+    __MOON = "MOON"
+    __SUN = "SUN"
 
 
 #TODO Perhaps just call this stars.dat.gz?
@@ -341,7 +343,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         timeScale = load.timescale()
         utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
         ephemerisPlanets = load( AstroSkyfield.EPHEMERIS_PLANETS )
-        observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ AstroSkyfield.PLANET_EARTH ] )
+        observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] )
 
         AstroSkyfield.__calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
         AstroSkyfield.__calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
@@ -378,10 +380,10 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
         key = ( astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-        moon = ephemeris[ "MOON" ]
+        moon = ephemeris[ AstroSkyfield.__MOON ]
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, moon, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
-        illumination = str( int( almanac.fraction_illuminated( ephemeris, "MOON", utcNow ) * 100 ) ) # Needed for icon.
+        illumination = str( int( almanac.fraction_illuminated( ephemeris, AstroSkyfield.__MOON, utcNow ) * 100 ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         utcNowDateTime = utcNow.utc_datetime()
@@ -392,15 +394,15 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
-        nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+        nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ] #TODO SHould not have text here...figure out the correct way to do it.
         nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
         data[ key + ( astrobase.AstroBase.DATA_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-        data[ key + ( astrobase.AstroBase.DATA_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ "SUN" ], moon ) ) ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) ) ) # Needed for icon.
 
         if not neverUp:
             moonPhaseDateTimes = t.utc_iso()
-            nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ]
+            nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ] #TODO See above TODO about having text here.
             nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
             nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
             nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
@@ -469,7 +471,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
-        sun = ephemeris[ "SUN" ]
+        sun = ephemeris[ AstroSkyfield.__SUN ]
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, sun, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
         if not neverUp:
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
@@ -609,7 +611,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
 def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
-    key = ( AstronomicalBodyType.Satellite, " ".join( key ) )
+    key = ( astrobase.BodyType.Satellite, " ".join( key ) )
     currentDateTime = utcNow.J
     endDateTime = timeScale.utc( ( utcNow.utc_datetime() + timedelta( days = 24 * 2 ) ).replace( tzinfo = pytz.UTC ) ).J #TODO Maybe pass this in as it won't change per satellite.
 
@@ -714,6 +716,7 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #            sun.alt < ephem.degrees( "-6" )
 
 
+#TODO Check the comments here.
 # If all stars in the Skyfield catalogue were included, up to a limit of magnitude 15,
 # there would be over 100,000 stars and is impractical.
 #
@@ -727,36 +730,43 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 #
 # Format of Skyfield catalogue:
 #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
-def createListOfCommonNamedStars():
-    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ] # First time Skyfield is run, the catalogue is downloaded.
+def createStarEphemeris():
+    catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
     if not os.path.isfile( catalogue ):
         print( "Downloading star catalogue..." )
         load.open( hipparcos.URL )
 
     print( "Creating list of common-named stars..." )
+#TODO Maybe make these two functions (stars/planets) part of the class.
+#Then we can make STARS_TO_HIP private by prepending __).
     hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
     with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.EPHEMERIS_STARS, "wb" ) as outFile:
         for line in inFile:
+#TODO Put in a link/reference for the column numbers.  Maybe then also mention the magnitude and so we can ditch the magnitude line below.
             hip = int( line.decode()[ 8 : 14 ].strip() )
             if hip in hipparcosIdentifiers:
-#                 magnitude = float( line.decode()[ 42 : 46 ].strip() )
+                magnitude = float( line.decode()[ 42 : 46 ].strip() )
                 outFile.write( line )
 
     print( "Done" )
 
 
+#TODO Need comments in header.
 def createPlanetEphemeris():
     today = datetime.date.today()
-    firstOfThisMonth = datetime.date( today.year, today.month, 1 )
-    oneYearFromNow = datetime.date( today.year + 1, today.month, 1 )
-    command = "python3 -m jplephem excerpt " + \
-              firstOfThisMonth.strftime( "%Y/%m/%d" ) + " " + \
-              oneYearFromNow.strftime( "%Y/%m/%d" ) + " " + \
-              "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp " + \
-              "planets.bsp"
+    dateFormat = "%Y/%m/%d"
+    firstOfThisMonth = datetime.date( today.year, today.month, 1 ).strftime( dateFormat )
+    oneYearFromNow = datetime.date( today.year + 1, today.month + 1, 1 ).strftime( dateFormat )
+#TODO Test for month = 12 and ensure that the year/month roll over correctly (to year + 1 and January).
 
-    print( "Downloading planet ephemeris..." )
+#TODO URL reference for this ... from the skyfield docs?
+    planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
+    outputEphemeris = "planets.bsp"
+
+    command = "python3 -m jplephem excerpt " + firstOfThisMonth + " " + oneYearFromNow + " " + planetEphemeris + " " + outputEphemeris
+
     try:
+        print( "Creating planet ephemeris..." )
         subprocess.call( command, shell = True )
         print( "Done" ) #TODO This prints even if an error/exception occurs...
 
@@ -764,5 +774,5 @@ def createPlanetEphemeris():
         print( e )
 
 
-# createListOfCommonNamedStars() # Create ephemeris for stars.
-# createPlanetEphemeris() # Create ephemeris for planets.
+# createStarEphemeris()
+# createPlanetEphemeris()
