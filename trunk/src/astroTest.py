@@ -81,14 +81,14 @@ resultsPyephem = astropyephem.AstroPyephem.getAstronomicalInformation(
     hideIfBelowHorizon )
 
 print( "Crunching results..." )
-compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_MOON, astrobase.AstroBase.DATA_MOON )
-compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_SUN, astrobase.AstroBase.DATA_SUN )
+compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON, astrobase.AstroBase.DATA_TAGS_MOON )
+compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN, astrobase.AstroBase.DATA_TAGS_SUN )
 
 for ( planetPyephem, planetSkyfield ) in zip( astrobase.AstroBase.PLANETS, astrobase.AstroBase.PLANETS ):
-    compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_PLANET, astroskyfield.DATA_PLANET )
+    compareResults( resultsPyephem, resultsSkyfield, astrobase.BodyType.Planet, planetPyephem, planetSkyfield, astropyephem.DATA_TAGS_PLANET, astroskyfield.DATA_TAGS_PLANET )
 
 # The list of stars between Pyephem and Skyfield do not match 100%, so choose a handful of stars common to both...
 starsPyephem = [ "ACHERNAR", "ALGOL", "IZAR", "SAIPH" ]
 starsSkyfield = [ "Achernar", "Algol", "Izar", "Saiph" ]
 for ( starPyephem, starSkyfield ) in zip( starsPyephem, starsSkyfield ):
-    compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astropyephem.DATA_STAR, astroskyfield.DATA_STAR )
+    compareResults( resultsPyephem, resultsSkyfield, astroSkyfield.AstronomicalBodyType.Star, starPyephem, starSkyfield, astropyephem.DATA_TAGS_STAR, astroskyfield.DATA_TAGS_STAR )

@@ -395,7 +395,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, moon, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
         illumination = str( int( almanac.fraction_illuminated( ephemeris, AstroSkyfield.__MOON, utcNow ) * 100 ) ) # Needed for icon.
-        data[ key + ( astrobase.AstroBase.DATA_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
@@ -407,9 +407,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         moonPhaseDateTimes = t.utc_datetime()
         nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ] #TODO SHould not have text here...figure out the correct way to do it.
         nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
-        data[ key + ( astrobase.AstroBase.DATA_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-        data[ key + ( astrobase.AstroBase.DATA_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) ) ) # Needed for icon.
 
         if not neverUp:
             moonPhaseDateTimes = t.utc_iso()
@@ -418,10 +418,10 @@ class AstroSkyfield( astrobase.AstroBase ):
             nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
             nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
 
-            data[ key + ( astrobase.AstroBase.DATA_FIRST_QUARTER, ) ] = nextFirstQuarterISO
-            data[ key + ( astrobase.AstroBase.DATA_FULL, ) ] = nextFullMoonISO
-            data[ key + ( astrobase.AstroBase.DATA_THIRD_QUARTER, ) ] = nextThirdQuarterISO
-            data[ key + ( astrobase.AstroBase.DATA_NEW, ) ] = nextNewMoonISO
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = nextFirstQuarterISO
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = nextFullMoonISO
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = nextThirdQuarterISO
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = nextNewMoonISO
 
             astrobase.AstroBase.calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
@@ -536,12 +536,12 @@ class AstroSkyfield( astrobase.AstroBase ):
         if t:
             t = t.utc_iso( delimiter = ' ' )
             if y[ 0 ]:
-                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-                data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
 
             else:
-                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
-                data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
 
         else:
             if AstroSkyfield.__bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
@@ -553,8 +553,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         if not neverUp:
             apparent = observer.at( utcNow ).observe( body ).apparent()
             alt, az, bodyDistance = apparent.altaz()
-            data[ key + ( astrobase.AstroBase.DATA_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( astrobase.AstroBase.DATA_ALTITUDE, ) ] = str( alt.radians )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         return neverUp
 

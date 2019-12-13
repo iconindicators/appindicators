@@ -253,9 +253,9 @@ class AstroPyephem( astrobase.AstroBase ):
         data = { }
 
         # Used internally to create the observer/city...removed before passing back to the caller.
-        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LATITUDE ) ] = str( latitude )
-        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LONGITUDE ) ] = str( longitude )
-        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_ELEVATION ) ] = str( elevation )
+        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LATITUDE ) ] = str( latitude )
+        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LONGITUDE ) ] = str( longitude )
+        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_ELEVATION ) ] = str( elevation )
 
         ephemNow = ephem.Date( utcNow )
 
@@ -267,9 +267,9 @@ class AstroPyephem( astrobase.AstroBase ):
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum, hideIfBelowHorizon )
         AstroPyephem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
 
-        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LATITUDE ) ]
-        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LONGITUDE ) ]
-        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_ELEVATION ) ]
+        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LATITUDE ) ]
+        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LONGITUDE ) ]
+        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_ELEVATION ) ]
 
         return data
 
@@ -311,18 +311,18 @@ class AstroPyephem( astrobase.AstroBase ):
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         hidden = AstroPyephem.__calculateCommon( ephemNow, data, ephem.Moon(), astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, hideIfBelowHorizon )
         if not hidden:
-            data[ key + ( astrobase.AstroBase.DATA_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
             astrobase.AstroBase.calculateEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
         # Used for internal processing; indirectly presented to the user.
         moon = ephem.Moon()
         moon.compute( AstroPyephem.__getCity( data, ephemNow ) )
-        data[ key + ( astrobase.AstroBase.DATA_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-        data[ key + ( astrobase.AstroBase.DATA_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-        data[ key + ( astrobase.AstroBase.DATA_BRIGHT_LIMB, ) ] = str( AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -386,8 +386,8 @@ class AstroPyephem( astrobase.AstroBase ):
 
             equinox = ephem.next_equinox( ephemNow )
             solstice = ephem.next_solstice( ephemNow )
-            data[ key + ( astrobase.AstroBase.DATA_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
 
 
     # http://www.geoastro.de/planets/index.html
@@ -441,22 +441,22 @@ class AstroPyephem( astrobase.AstroBase ):
             setting = city.next_setting( body )
 
             if rising > setting: # Above the horizon.
-                data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-                data[ key + ( astrobase.AstroBase.DATA_AZIMUTH, ) ] = str( repr( body.az ) )
-                data[ key + ( astrobase.AstroBase.DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( repr( body.az ) )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( repr( body.alt ) )
 
             else: # Below the horizon.
                 if hideIfBelowHorizon:
                     dropped = True
 
                 else:
-                    data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rising.datetime() )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rising.datetime() )
 
         except ephem.AlwaysUpError:
             body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-            data[ key + ( astrobase.AstroBase.DATA_AZIMUTH, ) ] = str( repr( body.az ) )
-            data[ key + ( astrobase.AstroBase.DATA_ALTITUDE, ) ] = str( repr( body.alt ) )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( repr( body.az ) )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( repr( body.alt ) )
 
         except ephem.NeverUpError:
             dropped = True
@@ -515,8 +515,8 @@ class AstroPyephem( astrobase.AstroBase ):
             except ValueError:
                 if satellite.circumpolar:
 #                 print( "circumpolar" )#TODO
-                    data[ key + ( astrobase.AstroBase.DATA_AZIMUTH, ) ] = str( str( repr( satellite.az ) ) )
-                    data[ key + ( astrobase.AstroBase.DATA_ALTITUDE, ) ] = str( satellite.alt )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( str( repr( satellite.az ) ) )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( satellite.alt )
                 break
 
             if not AstroPyephem.__isSatellitePassValid( nextPass ):
@@ -539,14 +539,14 @@ class AstroPyephem( astrobase.AstroBase ):
             # If a satellite is in transit or will rise within five minutes of now, then show all information...
             if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ):
 #             print( "transit" )#TODO
-                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-                data[ key + ( astrobase.AstroBase.DATA_RISE_AZIMUTH, ) ] = str( repr( nextPass[ 1 ] ) )
-                data[ key + ( astrobase.AstroBase.DATA_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
-                data[ key + ( astrobase.AstroBase.DATA_SET_AZIMUTH, ) ] = str( repr( nextPass[ 5 ] ) )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( repr( nextPass[ 1 ] ) )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( repr( nextPass[ 5 ] ) )
 
             else: # Satellite will rise later, so only add rise time.
 #             print( "below horizon" )#TODO
-                data[ key + ( astrobase.AstroBase.DATA_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
 
             break
 
@@ -619,8 +619,8 @@ class AstroPyephem( astrobase.AstroBase ):
     def __getCity( data, date ):
         city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
         city.date = date
-        city.lat = data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LATITUDE ) ]
-        city.lon = data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_LONGITUDE ) ]
-        city.elev = float( data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_ELEVATION ) ] )
+        city.lat = data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LATITUDE ) ]
+        city.lon = data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LONGITUDE ) ]
+        city.elev = float( data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_ELEVATION ) ] )
 
         return city

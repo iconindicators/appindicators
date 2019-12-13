@@ -40,89 +40,90 @@ class AstroBase( ABC ):
 
 #TODO Need a comment.
 #TODO Ensure both backends use all tags.
-    DATA_ALTITUDE = "ALTITUDE"
-    DATA_AZIMUTH = "AZIMUTH"
-    DATA_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
-    DATA_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
-    DATA_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
-    DATA_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
-    DATA_ECLIPSE_TYPE = "ECLIPSE TYPE"
-    DATA_ELEVATION = "ELEVATION" # Internally used for city in astropyephem.
-    DATA_EQUINOX = "EQUINOX"
-    DATA_FIRST_QUARTER = "FIRST QUARTER"
-    DATA_FULL = "FULL"
-    DATA_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-    DATA_LATITUDE = "LATITUDE" # Internally used for city in astropyephem.
-    DATA_LONGITUDE = "LONGITUDE" # Internally used for city in astropyephem.
-    DATA_NEW = "NEW"
-    DATA_PHASE = "PHASE"
-    DATA_RISE_AZIMUTH = "RISE AZIMUTH"
-    DATA_RISE_DATE_TIME = "RISE DATE TIME"
-    DATA_SET_AZIMUTH = "SET AZIMUTH"
-    DATA_SET_DATE_TIME = "SET DATE TIME"
-    DATA_SOLSTICE = "SOLSTICE"
-    DATA_THIRD_QUARTER = "THIRD QUARTER"
+#TODO Maybe rename to DATA_TAG_...?  Need to do it here and in indicator and astorpyephem and astroskyfield.
+    DATA_TAG_ALTITUDE = "ALTITUDE"
+    DATA_TAG_AZIMUTH = "AZIMUTH"
+    DATA_TAG_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
+    DATA_TAG_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
+    DATA_TAG_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
+    DATA_TAG_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
+    DATA_TAG_ECLIPSE_TYPE = "ECLIPSE TYPE"
+    DATA_TAG_ELEVATION = "ELEVATION" # Internally used for city in astropyephem.
+    DATA_TAG_EQUINOX = "EQUINOX"
+    DATA_TAG_FIRST_QUARTER = "FIRST QUARTER"
+    DATA_TAG_FULL = "FULL"
+    DATA_TAG_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
+    DATA_TAG_LATITUDE = "LATITUDE" # Internally used for city in astropyephem.
+    DATA_TAG_LONGITUDE = "LONGITUDE" # Internally used for city in astropyephem.
+    DATA_TAG_NEW = "NEW"
+    DATA_TAG_PHASE = "PHASE"
+    DATA_TAG_RISE_AZIMUTH = "RISE AZIMUTH"
+    DATA_TAG_RISE_DATE_TIME = "RISE DATE TIME"
+    DATA_TAG_SET_AZIMUTH = "SET AZIMUTH"
+    DATA_TAG_SET_DATE_TIME = "SET DATE TIME"
+    DATA_TAG_SOLSTICE = "SOLSTICE"
+    DATA_TAG_THIRD_QUARTER = "THIRD QUARTER"
 
-    DATA_INTERNAL = [
-        DATA_BRIGHT_LIMB,
-        DATA_ILLUMINATION ]
+    DATA_TAGS_INTERNAL = [
+        DATA_TAG_BRIGHT_LIMB,
+        DATA_TAG_ILLUMINATION ]
 
-    DATA_COMET = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_DATE_TIME ]
+    DATA_TAGS_COMET = [
+        DATA_TAG_ALTITUDE,
+        DATA_TAG_AZIMUTH,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_DATE_TIME ]
 
-    DATA_MINOR_PLANET = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_DATE_TIME ]
+    DATA_TAGS_MINOR_PLANET = [
+        DATA_TAG_ALTITUDE,
+        DATA_TAG_AZIMUTH,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_DATE_TIME ]
 
-    DATA_MOON = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_ECLIPSE_DATE_TIME,
-        DATA_ECLIPSE_LATITUDE,
-        DATA_ECLIPSE_LONGITUDE,
-        DATA_ECLIPSE_TYPE,
-        DATA_FIRST_QUARTER,
-        DATA_FULL,
-        DATA_NEW,
-        DATA_PHASE,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_DATE_TIME,
-        DATA_THIRD_QUARTER ]
+    DATA_TAGS_MOON = [
+        DATA_TAG_ALTITUDE,
+        DATA_TAG_AZIMUTH,
+        DATA_TAG_ECLIPSE_DATE_TIME,
+        DATA_TAG_ECLIPSE_LATITUDE,
+        DATA_TAG_ECLIPSE_LONGITUDE,
+        DATA_TAG_ECLIPSE_TYPE,
+        DATA_TAG_FIRST_QUARTER,
+        DATA_TAG_FULL,
+        DATA_TAG_NEW,
+        DATA_TAG_PHASE,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_DATE_TIME,
+        DATA_TAG_THIRD_QUARTER ]
 
-    DATA_PLANET = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_DATE_TIME ]
+    DATA_TAGS_PLANET = [
+        DATA_TAG_ALTITUDE,
+        DATA_TAG_AZIMUTH,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_DATE_TIME ]
 
-    DATA_SATELLITE = [
-        DATA_RISE_AZIMUTH,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_AZIMUTH,
-        DATA_SET_DATE_TIME ]
+    DATA_TAGS_SATELLITE = [
+        DATA_TAG_RISE_AZIMUTH,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_AZIMUTH,
+        DATA_TAG_SET_DATE_TIME ]
 
-    DATA_STAR = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_DATE_TIME ]
+    DATA_TAGS_STAR = [
+        DATA_TAG_ALTITUDE,
+        DATA_TAG_AZIMUTH,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_DATE_TIME ]
 
-    DATA_SUN = [
-        DATA_ALTITUDE,
-        DATA_AZIMUTH,
-        DATA_ECLIPSE_DATE_TIME,
-        DATA_ECLIPSE_LATITUDE,
-        DATA_ECLIPSE_LONGITUDE,
-        DATA_ECLIPSE_TYPE,
-        DATA_EQUINOX,
-        DATA_RISE_DATE_TIME,
-        DATA_SET_DATE_TIME,
-        DATA_SOLSTICE ]
+    DATA_TAGS_SUN = [
+        DATA_TAG_ALTITUDE,
+        DATA_TAG_AZIMUTH,
+        DATA_TAG_ECLIPSE_DATE_TIME,
+        DATA_TAG_ECLIPSE_LATITUDE,
+        DATA_TAG_ECLIPSE_LONGITUDE,
+        DATA_TAG_ECLIPSE_TYPE,
+        DATA_TAG_EQUINOX,
+        DATA_TAG_RISE_DATE_TIME,
+        DATA_TAG_SET_DATE_TIME,
+        DATA_TAG_SOLSTICE ]
 
 
 #TODO Need a description
@@ -259,10 +260,10 @@ class AstroBase( ABC ):
     def calculateEclipse( utcNow, data, bodyType, dataTag ):
         eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
         key = ( bodyType, dataTag )
-        data[ key + ( AstroBase.DATA_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
-        data[ key + ( AstroBase.DATA_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-        data[ key + ( AstroBase.DATA_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
-        data[ key + ( AstroBase.DATA_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
     @staticmethod
