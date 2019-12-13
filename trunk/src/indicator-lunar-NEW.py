@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays lunar, solar, planetary, star, comet and satellite information.
+# Application indicator which displays lunar, solar, planetary, star,
+# comet, minor planet and satellite information.
 
 
 #In the notifications preferences, there is a tooltip for each the summary and message about formatting.
