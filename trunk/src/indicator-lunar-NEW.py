@@ -1694,7 +1694,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         # Populate the display store using current data.
         for key in self.data.keys():
-            if key[ 2 ] not in astrobase.AstroBase.DATA_TAG_INTERNAL:
+            if key[ 2 ] not in astrobase.AstroBase.DATA_TAGS_INTERNAL:
 
                 bodyType = key[ 0 ]
                 bodyTag = key[ 1 ]
@@ -1716,8 +1716,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         # Add in bodyTags/dataTags which are not present in the current data.
-        items = [ [ astrobase.AstroBase.BodyType.COMET, self.cometData, astrobase.AstroBase.DATA_TAG_COMET ],
-                  [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAG_MINOR_PLANET ] ]
+        items = [ [ astrobase.AstroBase.BodyType.COMET, self.cometData, astrobase.AstroBase.DATA_TAGS_COMET ],
+                  [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAGS_MINOR_PLANET ] ]
 
         for item in items:
             bodyType = item[ 0 ]
@@ -1731,15 +1731,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         bodyType = astrobase.AstroBase.BodyType.SATELLITE
         for bodyTag in self.satelliteData:
-            for dataTag in astrobase.AstroBase.DATA_TAG_SATELLITE:
+            for dataTag in astrobase.AstroBase.DATA_TAGS_SATELLITE:
                 if not ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag ) in self.data:
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
                     translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
-        items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAG_MOON ],
-                  [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAG_SUN ] ]
+        items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
+                  [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
 
         for item in items:
             bodyType = item[ 0 ]
@@ -1750,8 +1750,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
-        items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAG_PLANET ],
-                  [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAG_STAR ] ]
+        items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAGS_PLANET ],
+                  [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAGS_STAR ] ]
 
         for item in items:
             bodyType = item[ 0 ]
