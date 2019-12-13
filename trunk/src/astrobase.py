@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# Base class for calculating astronomical information.
+# Base class for calculating astronomical information for use with Indicator Lunar.
 
 
 from abc import ABC, abstractmethod
