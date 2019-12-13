@@ -19,7 +19,8 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO Possible ways to have PIP stuff installed with the DEB/PPA:
+#TODO Can pip3 be run from the install?
+# Possible ways to have PIP stuff installed with the DEB/PPA:
 # https://unix.stackexchange.com/questions/347649/how-to-add-a-python-package-dependance-to-a-debian-package
 # https://www.debian.org/doc/manuals/maint-guide/dreq.en.html#control
 # https://askubuntu.com/questions/327543/how-can-a-debian-package-install-python-modules-from-pypi
@@ -28,17 +29,12 @@
 # Alternatively, maybe put in a note at the top of the PPA page and/or
 # when the indicator runs, do some sort of check to see if the stuff is installed and correct versions
 # and if not, fire off a notification to the user and log the install sequence in the log.
-
-
-#TODO Can pip3 be run from the install?
+#
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
 #     sudo pip3 install --upgrade pytz
 #     sudo pip3 install --upgrade pandas
-
-#TODO Maybe include twilight?
-# https://github.com/skyfielders/python-skyfield/issues/225
 
 
 from datetime import timedelta
@@ -54,16 +50,17 @@ import astrobase, datetime, gzip, math, os, pytz, orbitalelement, subprocess, tw
 
 class AstroSkyfield( astrobase.AstroBase ):
 
+    # Ephemerides
+    __EPHEMERIS_PLANETS = "planets.bsp" 
+    __EPHEMERIS_STARS = "stars.dat.gz"
 
-#TODO Some of these definitions are private...maybe prefix with __ ?
-    EPHEMERIS_PLANETS = "planets.bsp" 
-    # TODO Refer to https://github.com/skyfielders/python-skyfield/issues/123
-    # Still need all the naif...tls stuff and spkmerge stuff now that we use jplephem?
+
+    # Name tags for bodies.
+    __MOON = "MOON"
+    __SUN = "SUN"
 
     __PLANET_EARTH = "EARTH"
 
-#TODO The indicator frontend expects just the planet names, capitalised similar to pyephem...can we internally here have a mapping?
-#TODO Explain this...maybe choose a better name?
     __PLANET_MAPPINGS = {
         astrobase.AstroBase.PLANET_MERCURY : "MERCURY BARYCENTER",
         astrobase.AstroBase.PLANET_VENUS   : "VENUS BARYCENTER",
@@ -74,15 +71,10 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
-    __MOON = "MOON"
-    __SUN = "SUN"
-
-
-#TODO Perhaps just call this stars.dat.gz?
-    EPHEMERIS_STARS = "stars.dat.gz"
 
 #TODO Check the function at the end which creates the hip data...it should use this list as the source for the star names.
-#TODO In the file named_stars, the function at the bottom is deprecated...so are these named stars defunct?  Raise issue with Skyfield.
+#TODO In the file named_stars, the function at the bottom is deprecated...so are these named stars defunct?
+# https://github.com/skyfielders/python-skyfield/issues/304
     # Sourced from skyfield/named_stars.py
     STARS = [
         "ACHERNAR",
@@ -334,11 +326,11 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO Might need to cache deltat.data and deltat.preds as the backend website was down and I couldn't get them except at a backup site.
 # What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  Be careful...this file expires!
+#Seems skyfield has changed the way data is loaded with a tag to say not to do a download (use old file).
+#There is a ticket about this...but cannot find it right now.
 
 
-# TODO Use
-#    https://ssd.jpl.nasa.gov/horizons.cgi
-# to verify results.
+# TODO Verify results: https://ssd.jpl.nasa.gov/horizons.cgi
     @staticmethod
     def getAstronomicalInformation( utcNow,
                                     latitude, longitude, elevation,
@@ -353,13 +345,13 @@ class AstroSkyfield( astrobase.AstroBase ):
         data = { }
         timeScale = load.timescale()
         utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
-        ephemerisPlanets = load( AstroSkyfield.EPHEMERIS_PLANETS )
+        ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] )
 
         AstroSkyfield.__calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
         AstroSkyfield.__calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
         AstroSkyfield.__calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
-        with load.open( AstroSkyfield.EPHEMERIS_STARS ) as f:
+        with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
 
         AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
@@ -566,17 +558,13 @@ class AstroSkyfield( astrobase.AstroBase ):
         return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
-#TODO Not used...delete?
-# def __getSkyfieldTopos( latitude, longitude, elevation ):
-#     return Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
-
-
     #TODO Have copied the code from skyfield/almanac.py as per
     # https://github.com/skyfielders/python-skyfield/issues/226
     # to compute rise/set for any body.
     #
     # Returns true if the body is up at the time give; false if down.
     @staticmethod
+#TODO I believe skyfield now provides this function...so this could eventually go.
     def __bodyrise_bodyset( observer, body ):
 
         def is_body_up_at( t ):
@@ -745,7 +733,7 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 
         print( "Creating list of common-named stars..." )
         hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
-        with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.EPHEMERIS_STARS, "wb" ) as outFile:
+        with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at columns indices [ 42 : 46 ].
                 if hip in hipparcosIdentifiers:
@@ -755,6 +743,8 @@ def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
 
 
 #TODO Need header.
+# TODO Refer to https://github.com/skyfielders/python-skyfield/issues/123
+# Still need all the naif...tls stuff and spkmerge stuff now that we use jplephem?
     def createPlanetEphemeris():
         today = datetime.date.today()
         dateFormat = "%Y/%m/%d"

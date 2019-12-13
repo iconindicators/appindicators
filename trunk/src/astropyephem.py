@@ -24,6 +24,10 @@ from ephem.cities import _city_data
 import astrobase, ephem, locale, math, orbitalelement, twolineelement
 
 
+#TODO If we read in a list of comets or stars or planets, and that comet/star/planet is missing
+# (would happen with comets more than anything else) how is this handled?
+
+
 #TODO If we test with Pyephem and select some stars, then switch to Skyfield,
 #what happens if a star is in pyephem but not skyfield?
 #Each star function needs to guard against this?
@@ -33,16 +37,7 @@ import astrobase, ephem, locale, math, orbitalelement, twolineelement
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
 
-#TODO Maybe include twilight if astroSkyfield can do it?
-# https://github.com/skyfielders/python-skyfield/issues/225
-
-
 class AstroPyephem( astrobase.AstroBase ):
-
-#TODO Need this comment?
-# Planet names are capitalised, whereas Pyephem uses titled strings.
-# At the API we accept capitalised planet names, but internally we title them to satisfy Pyephem.
-
 
     # Taken from ephem/stars.py
     STARS = [
