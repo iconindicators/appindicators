@@ -16,8 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#TODO Better description.
-# Calculate astronomical information using PyEphem.
+# Base class for calculating astronomical information.
 
 
 from abc import ABC, abstractmethod
@@ -38,9 +37,9 @@ class AstroBase( ABC ):
         SUN = 6
 
 
-#TODO Need a comment.
 #TODO Ensure both backends use all tags.
 #TODO Maybe rename to DATA_TAG_...?  Need to do it here and in indicator and astorpyephem and astroskyfield.
+    # Data tags representing each of the pieces of calculated astronomical information.
     DATA_TAG_ALTITUDE = "ALTITUDE"
     DATA_TAG_AZIMUTH = "AZIMUTH"
     DATA_TAG_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
@@ -126,14 +125,12 @@ class AstroBase( ABC ):
         DATA_TAG_SOLSTICE ]
 
 
-#TODO Need a description
-#TODO Remove TAG?  Data tags don't have TAG in them.
+    # Tags used to uniquely name particular objects/items.
     NAME_TAG_CITY = "CITY"
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
 
-
-#TODO Need a description
+    # Each of the planets, used as name tags.
     PLANET_MERCURY = "MERCURY"
     PLANET_VENUS = "VENUS"
     PLANET_MARS = "MARS"
@@ -146,6 +143,7 @@ class AstroBase( ABC ):
     PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
 
+    # Lunar phases.
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
     LUNAR_PHASE_THIRD_QUARTER = "THIRD_QUARTER"
@@ -161,10 +159,10 @@ class AstroBase( ABC ):
     STARS = [ ]
 
 
+    # Miscellaneous.
+    DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
-
-    DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
 
 
     # Returns a dictionary with astronomical information:
@@ -266,6 +264,6 @@ class AstroBase( ABC ):
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
-    @staticmethod
 #TODO This works for pyephem...but does it work for skyfield (that is, does skyfield have a different format)?
+    @staticmethod
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
