@@ -508,7 +508,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.  Returned object is a dictionary:
-        #    Key is a tuple of AstronomicalBodyType, a name tag and data tag.
+        #    Key is a tuple of bodyType, a name tag and data tag.
         #    Value is the calculated astronomical data as a string.
         self.data = astropyephem.AstroPyephem.getAstronomicalInformation(
             datetime.datetime.utcnow(),
@@ -763,8 +763,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
-    def updateEclipseMenu( self, menu, astronomicalBodyType, nameTag ):
-        key = ( astronomicalBodyType, nameTag )
+    def updateEclipseMenu( self, menu, bodyType, nameTag ):
+        key = ( bodyType, nameTag )
         menu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Eclipse" ) ) )
         menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ) ) )
         latitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) )
@@ -819,23 +819,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 child.connect( "activate", self.onMenuItemClick )
 
 
-    def updateMenuCometsMinorPlanets( self, menu, astronomicalBodyType ):
+    def updateMenuCometsMinorPlanets( self, menu, bodyType ):
         bodies = [ ]
-        for body in self.comets if astronomicalBodyType == astrobase.AstroBase.BodyType.COMET else self.minorPlanets:
-            if self.display( astronomicalBodyType, body ):
+        for body in self.comets if bodyType == astrobase.AstroBase.BodyType.COMET else self.minorPlanets:
+            if self.display( bodyType, body ):
                 bodies.append( body )
 
         if bodies:
-            menuItem = Gtk.MenuItem( _( "Comets" ) if astronomicalBodyType == astrobase.AstroBase.BodyType.COMET else _( "Minor Planets" ) )
+            menuItem = Gtk.MenuItem( _( "Comets" ) if bodyType == astrobase.AstroBase.BodyType.COMET else _( "Minor Planets" ) )
             menu.append( menuItem )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
-                url = self.getCometMinorPlanetOnClickURL( name, astronomicalBodyType )
+                url = self.getCometMinorPlanetOnClickURL( name, bodyType )
                 menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + name )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
-                self.updateCommonMenu( subMenu, astronomicalBodyType, name, 1, 2, url )
+                self.updateCommonMenu( subMenu, bodyType, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator ) 
 
@@ -847,8 +847,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # https://www.iau.org/public/themes/naming
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
-    def getCometMinorPlanetOnClickURL( self, name, astronomicalBodyType ):
-        if astronomicalBodyType == astrobase.AstroBase.BodyType.COMET:
+    def getCometMinorPlanetOnClickURL( self, name, bodyType ):
+        if bodyType == astrobase.AstroBase.BodyType.COMET:
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
                 id = name[ : name.find( "(" ) ].strip()
 
@@ -877,8 +877,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
-    def updateCommonMenu( self, menu, astronomicalBodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
-        key = ( astronomicalBodyType, nameTag )
+    def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
+        key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
 
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
@@ -976,16 +976,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def createMenuItem( self, label, onClickURL, menu ):
         menuItem = Gtk.MenuItem( label )
-        if onClickURL: menuItem.set_name( onClickURL )
         menu.append( menuItem )
+        if onClickURL:
+            menuItem.set_name( onClickURL )
 
 
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
-    def display( self, astronomicalBodyType, nameTag ):
-        return ( astronomicalBodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
-               ( astronomicalBodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data
+    def display( self, bodyType, nameTag ):
+        return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
+               ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data
 
 
     def getDisplayData( self, key, dateTimeFormat = None ):
@@ -1694,16 +1695,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for key in self.data.keys():
             if key[ 2 ] not in astrobase.AstroBase.DATA_TAG_INTERNAL:
 
-                astronomicalBodyType = key[ 0 ]
+                bodyType = key[ 0 ]
                 bodyTag = key[ 1 ]
                 dataTag = key[ 2 ]
                 value = self.getDisplayData( key )
 
-                if astronomicalBodyType == astrobase.AstroBase.BodyType.COMET or \
-                   astronomicalBodyType == astrobase.AstroBase.BodyType.MINOR_PLANET: # Don't translate the names.
+                if bodyType == astrobase.AstroBase.BodyType.COMET or \
+                   bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET: # Don't translate the names.
                     translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
-                elif astronomicalBodyType == astrobase.AstroBase.BodyType.SATELLITE: # Don't translate names; add in name/designator.
+                elif bodyType == astrobase.AstroBase.BodyType.SATELLITE: # Don't translate names; add in name/designator.
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
                     translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
@@ -1718,16 +1719,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAG_MINOR_PLANET ] ]
 
         for item in items:
-            astronomicalBodyType = item[ 0 ]
+            bodyType = item[ 0 ]
             bodyTags = item[ 1 ]
             dataTags = item[ 2 ]
             for bodyTag in bodyTags:
                 for dataTag in dataTags:
-                    if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
+                    if not ( bodyType, bodyTag, dataTag ) in self.data:
                         translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
-        astronomicalBodyType = astrobase.AstroBase.BodyType.SATELLITE
+        bodyType = astrobase.AstroBase.BodyType.SATELLITE
         for bodyTag in self.satelliteData:
             for dataTag in astrobase.AstroBase.DATA_TAG_SATELLITE:
                 if not ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag ) in self.data:
@@ -1740,11 +1741,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAG_SUN ] ]
 
         for item in items:
-            astronomicalBodyType = item[ 0 ]
+            bodyType = item[ 0 ]
             bodyTag = item[ 1 ]
             dataTags = item[ 2 ]
             for dataTag in dataTags:
-                if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
+                if not ( bodyType, bodyTag, dataTag ) in self.data:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
@@ -1752,12 +1753,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAG_STAR ] ]
 
         for item in items:
-            astronomicalBodyType = item[ 0 ]
+            bodyType = item[ 0 ]
             bodyTags = item[ 1 ]
             dataTags = item[ 2 ]
             for bodyTag in bodyTags:
                 for dataTag in dataTags:
-                    if not ( astronomicalBodyType, bodyTag, dataTag ) in self.data:
+                    if not ( bodyType, bodyTag, dataTag ) in self.data:
                         translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
@@ -1817,8 +1818,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return scrolledWindow
 
 
-    def onCheckbox( self, widget, row, dataStore, sortStore = None, astronomicalBodyType = None ):
-        if astronomicalBodyType == astrobase.AstroBase.BodyType.SATELLITE:
+    def onCheckbox( self, widget, row, dataStore, sortStore = None, bodyType = None ):
+        if bodyType == astrobase.AstroBase.BodyType.SATELLITE:
             actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
             dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
 
