@@ -38,7 +38,6 @@ class AstroBase( ABC ):
 
 
 #TODO Ensure both backends use all tags.
-#TODO Maybe rename to DATA_TAG_...?  Need to do it here and in indicator and astorpyephem and astroskyfield.
     # Data tags representing each of the pieces of calculated astronomical information.
     DATA_TAG_ALTITUDE = "ALTITUDE"
     DATA_TAG_AZIMUTH = "AZIMUTH"
@@ -154,8 +153,7 @@ class AstroBase( ABC ):
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
 
-#TODO Need to make it obvious this is abstract...how?
-#TODO Comment how teh star names should be fully capitalised.
+    # Capitalised names of stars.
     STARS = [ ]
 
 
