@@ -20,7 +20,13 @@
 # comet, minor planet and satellite information.
 
 
-#In the notifications preferences, there is a tooltip for each the summary and message about formatting.
+#TODO Each reference to astropyephem.AstroPyephem or just astropyephem means we have to change it 
+# if/when using skyfield.
+# Can we just use astrobase or maybe use a dynamic way of calling by setting a single flag/variable to
+# either astropyephem.AstroPyephem or astroskyfield.AstroSkyfield?
+
+
+#TODO In the notifications preferences, there is a tooltip for each the summary and message about formatting.
 # Why is this mentioned?  Did the tags (say moon phase) originally get parsed in the notifications?
 
 
@@ -807,6 +813,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
                 url = IndicatorLunar.STAR_SEARCH_URL + str( astropyephem.AstroPyephem.STARS_TO_HIP[ name ] )
+#TODO This refers to pyephem...maybe need an empty declaration in the base class (astrobase) and then refer to that?
+#Will python automatically insert the correct engine (pyephem or skyfield)?                
                 menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
@@ -1548,6 +1556,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
 
+#TODO Can we just call the astrobase version?
         cities = astropyephem.AstroPyephem.getCities()
         if self.city not in cities:
             cities.append( self.city )
