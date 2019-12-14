@@ -116,6 +116,14 @@ import astrobase, astropyephem, datetime, eclipse, indicatorbase, glob, locale, 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
+    # Allowing easy switching between backends (eventually looking to move to Skyfield).
+    class Backend( Enum ):
+        PYEPHEM = 0
+        SKYFIELD = 1
+
+    BACKEND = Backend.PYEPHEM
+
+
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
@@ -190,6 +198,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astrobase.AstroBase.PLANET_NEPTUNE : _( "NEPTUNE" ),
         astrobase.AstroBase.PLANET_PLUTO   : _( "PLUTO" ) }
 
+
+#TODO Given all this is not easy to make generic, maybe ditch the switch for pyephem versus skyfield.
+#If I want to test skyfield, do a find/replace!
     STAR_NAMES_TRANSLATIONS = {
         astropyephem.AstroPyephem.STARS[ 0 ]  : _( "Achernar" ),
         astropyephem.AstroPyephem.STARS[ 1 ]  : _( "Adara" ), 
@@ -517,7 +528,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update backend.  Returned object is a dictionary:
         #    Key is a tuple of bodyType, a name tag and data tag.
         #    Value is the calculated astronomical data as a string.
-        self.data = astropyephem.AstroPyephem.getAstronomicalInformation(
+
+#         self.data = astrobase.AstroBase.getAstronomicalInformation(
+        if IndicatorLunar.BACKEND == IndicatorLunar.Backend.PYEPHEM:
+            getAstronomicalInformationFunction = getattr( astropyephem.AstroPyephem, "getAstronomicalInformation" )
+
+        else:
+            raise NotImplementedError( "Only PyEphem backend available!" )
+
+        self.data = getAstronomicalInformationFunction(
             datetime.datetime.utcnow(),
             self.latitude, self.longitude, self.elevation,
             self.planets,

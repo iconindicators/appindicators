@@ -29,11 +29,11 @@ class AstroBase( ABC ):
 
     class BodyType( Enum ):
         COMET = 0
-        MINOR_PLANET = 1,
+        MINOR_PLANET = 1
         MOON = 2
-        PLANET = 3,
-        SATELLITE = 4,
-        STAR = 5,
+        PLANET = 3
+        SATELLITE = 4
+        STAR = 5
         SUN = 6
 
 
@@ -183,7 +183,8 @@ class AstroBase( ABC ):
                                     comets, cometData,
                                     minorPlanets, minorPlanetData,
                                     magnitudeMaximum,
-                                    hideIfBelowHorizon ): return { }
+                                    hideIfBelowHorizon ): 
+        return { }
 
 
     # Return a list of cities, sorted alphabetically, sensitive to locale.
