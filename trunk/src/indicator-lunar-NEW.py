@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from src import astropyephem
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -20,12 +21,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Each reference to astropyephem.AstroPyephem or just astropyephem means we have to change it 
-# if/when using skyfield.
-# Can we just use astrobase or maybe use a dynamic way of calling by setting a single flag/variable to
-# either astropyephem.AstroPyephem or astroskyfield.AstroSkyfield?
-
-
 #TODO In the notifications preferences, there is a tooltip for each the summary and message about formatting.
 # Why is this mentioned?  Did the tags (say moon phase) originally get parsed in the notifications?
 
@@ -42,7 +37,6 @@
 #     https://unix.stackexchange.com/questions/116539/how-to-detect-the-desktop-environment-in-a-bash-script
 #     https://www.howtogeek.com/351361/how-to-check-which-version-of-ubuntu-you-have-installed/
 #     https://itsfoss.com/how-to-know-ubuntu-unity-version/
-
 
 
 #TODO In indicatorbase for the function
@@ -525,18 +519,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
-        # Update backend.  Returned object is a dictionary:
-        #    Key is a tuple of bodyType, a name tag and data tag.
-        #    Value is the calculated astronomical data as a string.
-
-#         self.data = astrobase.AstroBase.getAstronomicalInformation(
-        if IndicatorLunar.BACKEND == IndicatorLunar.Backend.PYEPHEM:
-            getAstronomicalInformationFunction = getattr( astropyephem.AstroPyephem, "getAstronomicalInformation" )
-
-        else:
-            raise NotImplementedError( "Only PyEphem backend available!" )
-
-        self.data = getAstronomicalInformationFunction(
+        self.data = astropyephem.AstroPyephem.getAstronomicalInformation(
             datetime.datetime.utcnow(),
             self.latitude, self.longitude, self.elevation,
             self.planets,
@@ -1402,7 +1385,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 "data was available from the source." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, satelliteStore, satelliteStoreSort, astrobase.AstroBase.BodyType.SATELLITE)
+        renderer_toggle.connect( "toggled", self.onCheckbox, satelliteStore, satelliteStoreSort, astrobase.AstroBase.BodyType.SATELLITE )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore )
