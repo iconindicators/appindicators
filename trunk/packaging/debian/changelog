@@ -13,8 +13,6 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Removed date/time format from preferences; uses ISO 8601 without seconds.
   * TLE/OE data files are no longer configurable; the code was becoming too
     difficult to manage and the defaults are more than adequate.
-  * On startup, the indicator shows the single menu item "Initialising...".
-    Once the indicator is ready, the full menu is displayed.
   * Bodies which are 'never up' are not displayed.
   * Bodies which are 'always up' only display azimuth/altitude.
   * Bodies below the horizon display the rise date/time.
