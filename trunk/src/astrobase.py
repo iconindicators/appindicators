@@ -156,6 +156,8 @@ class AstroBase( ABC ):
     # Capitalised names of stars.
     STARS = [ ]
 
+    STARS_TO_HIP = { }
+
 
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"

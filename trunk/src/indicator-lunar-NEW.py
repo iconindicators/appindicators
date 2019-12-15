@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from src import astropyephem
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -111,11 +110,7 @@ import astrobase, astropyephem, datetime, eclipse, indicatorbase, glob, locale, 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allowing easy switching between backends (eventually looking to move to Skyfield).
-    class Backend( Enum ):
-        PYEPHEM = 0
-        SKYFIELD = 1
-
-    BACKEND = Backend.PYEPHEM
+    astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
 
 
     CONFIG_CITY_ELEVATION = "cityElevation"
@@ -182,6 +177,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astrobase.AstroBase.PLANET_NEPTUNE : _( "Neptune" ),
         astrobase.AstroBase.PLANET_PLUTO   : _( "Pluto" ) }
 
+#TODO Should astrobase translations live in the that file?
+# If we move the pyephem stuff there, then why not.
     PLANET_TAGS_TRANSLATIONS = {
         astrobase.AstroBase.PLANET_MERCURY : _( "MERCURY" ),
         astrobase.AstroBase.PLANET_VENUS   : _( "VENUS" ),
@@ -192,9 +189,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astrobase.AstroBase.PLANET_NEPTUNE : _( "NEPTUNE" ),
         astrobase.AstroBase.PLANET_PLUTO   : _( "PLUTO" ) }
 
-
-#TODO Given all this is not easy to make generic, maybe ditch the switch for pyephem versus skyfield.
-#If I want to test skyfield, do a find/replace!
+#TODO This list of stars is specific to pyephem.
+# Skyfield has/will its own set of stars (with a reasonable crossover).
+# So cannot use the backend trick here.
+# Better to move this list into pyephem.
+# How do the translation pot/po files then work.  
+#Are they just extra files added to the install?  Ask Oleg.
     STAR_NAMES_TRANSLATIONS = {
         astropyephem.AstroPyephem.STARS[ 0 ]  : _( "Achernar" ),
         astropyephem.AstroPyephem.STARS[ 1 ]  : _( "Adara" ), 
@@ -501,13 +501,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         utcNow = datetime.datetime.utcnow()
 
         # Update comet, minor planet and satellite data.
-        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, astropyephem.AstroPyephem.getOrbitalElementsLessThanMagnitude )
+        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         self.minorPlanetData = { }
         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
-            minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, astropyephem.AstroPyephem.getOrbitalElementsLessThanMagnitude )
+            minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
             for key in minorPlanetData:
                 if key not in self.minorPlanetData:
                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
@@ -517,9 +517,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
         if self.satellitesAddNew:
-            self.addNewBodies( self.satelliteData, self.satellites )
+            self.addNewBodies( self.sateIndicatorLunar.astrobackends )
 
-        self.data = astropyephem.AstroPyephem.getAstronomicalInformation(
+        self.data = IndicatorLunar.astrobackend.getAstronomicalInformation(
             datetime.datetime.utcnow(),
             self.latitude, self.longitude, self.elevation,
             self.planets,
@@ -814,7 +814,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
-                url = IndicatorLunar.STAR_SEARCH_URL + str( astropyephem.AstroPyephem.STARS_TO_HIP[ name ] )
+                url = IndicatorLunar.STAR_SEARCH_URL + str( IndicatorLunar.astrobackend.STARS_TO_HIP[ name ] )
 #TODO This refers to pyephem...maybe need an empty declaration in the base class (astrobase) and then refer to that?
 #Will python automatically insert the correct engine (pyephem or skyfield)?                
                 menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
@@ -1172,7 +1172,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
 #         for key in self.data.keys():
-#             if key[ 2 ] not in astropyephem.AstroPyephem.DATA_INTERNAL:
+#             if key[ 2 ] not in IndicatorLunar.astrobackend.DATA_INTERNAL:
 #TODO Need to handle satellite tags...
 #When to remove the satellite name from the tag?  Here or at render time or when?
 #                 tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
@@ -1559,7 +1559,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "Or, add in your own city name." ) )
 
 #TODO Can we just call the astrobase version?
-        cities = astropyephem.AstroPyephem.getCities()
+        cities = IndicatorLunar.astrobackend.getCities()
         if self.city not in cities:
             cities.append( self.city )
             cities = sorted( cities, key = locale.strxfrm )
@@ -1912,8 +1912,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
-        if city in astropyephem.AstroPyephem.getCities(): 
-            theLatitude, theLongitude, theElevation = astropyephem.AstroPyephem.getLatitudeLongitudeElevation( city )
+        if city in IndicatorLunar.astrobackend.getCities(): 
+            theLatitude, theLongitude, theElevation = IndicatorLunar.astrobackend.getLatitudeLongitudeElevation( city )
             latitude.set_text( str( theLatitude ) )
             longitude.set_text( str( theLongitude ) )
             elevation.set_text( str( theElevation ) )
@@ -1929,7 +1929,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         try:
             timezone = self.processGet( "cat /etc/timezone" )
             theCity = None
-            cities = astropyephem.AstroPyephem.getCities()
+            cities = IndicatorLunar.astrobackend.getCities()
             for city in cities:
                 if city in timezone:
                     theCity = city
@@ -1950,7 +1950,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
         if self.city is None:
             self.city = self.getDefaultCity()
-            self.latitude, self.longitude, self.elevation = astropyephem.AstroPyephem.getLatitudeLongitudeElevation( self.city )
+            self.latitude, self.longitude, self.elevation = IndicatorLunar.astrobackend.getLatitudeLongitudeElevation( self.city )
 
         else:
             self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION )
