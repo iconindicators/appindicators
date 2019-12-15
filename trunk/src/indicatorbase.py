@@ -155,6 +155,11 @@ class IndicatorBase( object ):
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
+#TODO Open the changelog via the about dialog.
+# Then close the about dialog.
+# Verify the changlog gets deleted from the file system (user .cache directory).
+# Also verify if we reopen the about dialog and click on the changelog link...what happens?
+
     def __onAbout( self, widget ):
         self.__setCommonMenuSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
