@@ -30,6 +30,8 @@
 # when the indicator runs, do some sort of check to see if the stuff is installed and correct versions
 # and if not, fire off a notification to the user and log the install sequence in the log.
 #
+# Also can put information in the AskUbuntu page.
+#
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade skyfield
