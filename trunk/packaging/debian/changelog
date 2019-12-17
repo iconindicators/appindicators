@@ -1,3 +1,11 @@
+indicator-ppa-download-statistics (1.0.68-1) xenial; urgency=low
+
+  * Removal of hack to bridge filter format change between versions.
+  * Added TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO  to the list of series.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2019 14:27:19 +1000
+
+
 indicator-ppa-download-statistics (1.0.67-1) xenial; urgency=low
 
   * Bug fix: When no config was present, some variables were not initialised.

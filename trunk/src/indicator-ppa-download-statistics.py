@@ -63,7 +63,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.67",
+            version = "1.0.68",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 
@@ -952,28 +952,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
-
-#TODO Start of temporary hack...
-# Format of filters has changed from a dict to a list.
-            if isinstance( filters, dict ):
-                filtersNew = [ ]
-                for filter in filters:
-                    filterUser = filter.split( ' | ' )[ 0 ]
-                    filterName = filter.split( ' | ' )[ 1 ]
-                    for ppa in self.ppas:
-                        if ppa.getUser() == filterUser and ppa.getName() == filterName:
-                            filtersNew.append( [ filterUser, filterName, ppa.getSeries(), ppa.getArchitecture(), filters[ filter ] ] )
-
-                filters = filtersNew
-# End of hack!
-
             for filter in filters:
                 self.filters.addFilter( filter[ 0 ], filter[ 1 ], filter[ 2 ], filter[ 3 ], filter[ 4 ] )
-
-#TODO Start of temporary hack...
-# Save the filters back out in the new format.
-            self.requestSaveConfig()
-# End of hack!
 
         else:
             self.ppas = [ ]

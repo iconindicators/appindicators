@@ -6,7 +6,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-ppa-download-statistics 1.0.67\n"
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.68\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2019-11-21 22:42+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
