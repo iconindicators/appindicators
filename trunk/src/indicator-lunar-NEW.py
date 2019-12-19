@@ -195,6 +195,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Better to move this list into pyephem.
 # How do the translation pot/po files then work.  
 #Are they just extra files added to the install?  Ask Oleg.
+#
+# Need to think about all of this...do we make one POT file for all the .py files
+# or a POT file per .py file?
+#
+# https://docs.python.org/3.5/library/gettext.html
+# https://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
+# https://phrase.com/blog/posts/translate-python-gnu-gettext/
+# https://stackoverflow.com/questions/8872229/how-do-i-use-multiple-mo-files-simultaneously-for-gettext-translation
+# https://www.mattlayman.com/blog/2015/i18n/
     STAR_NAMES_TRANSLATIONS = {
         astropyephem.AstroPyephem.STARS[ 0 ]  : _( "Achernar" ),
         astropyephem.AstroPyephem.STARS[ 1 ]  : _( "Adara" ), 
