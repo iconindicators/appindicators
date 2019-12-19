@@ -204,6 +204,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # https://phrase.com/blog/posts/translate-python-gnu-gettext/
 # https://stackoverflow.com/questions/8872229/how-do-i-use-multiple-mo-files-simultaneously-for-gettext-translation
 # https://www.mattlayman.com/blog/2015/i18n/
+#
+# Using the command to make a POT file, the input file specifies the input .py files
+# which puts all string from all .py files into one output file.
+# So need to then test or figure out how each .py file pulls the strings from the one POT file.
+# Is this something to do with domain which is what is passed to gettext.install()?
     STAR_NAMES_TRANSLATIONS = {
         astropyephem.AstroPyephem.STARS[ 0 ]  : _( "Achernar" ),
         astropyephem.AstroPyephem.STARS[ 1 ]  : _( "Adara" ), 
