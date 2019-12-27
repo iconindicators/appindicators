@@ -153,9 +153,11 @@ class AstroBase( ABC ):
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
 
+#TODO Put in comment about how this should be implemented/populated by the implementing class.
     # Capitalised names of stars.
     STARS = [ ]
 
+#TODO Put in comment about how this should be implemented/populated by the implementing class.
     STARS_TO_HIP = { }
 
 

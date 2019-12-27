@@ -305,6 +305,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astropyephem.AstroPyephem.STARS[ 92 ] : _( "Wezen" ), 
         astropyephem.AstroPyephem.STARS[ 93 ] : _( "Zaurak" ) }
 
+#TODO Can this list be somehow dynamically created?
+#Probably, but how does that affect translations?
     STAR_TAGS_TRANSLATIONS = {
         astropyephem.AstroPyephem.STARS[ 0 ]  : _( "ACHERNAR" ),
         astropyephem.AstroPyephem.STARS[ 1 ]  : _( "ADARA" ),
