@@ -1499,7 +1499,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
 
-    def translateTags( self, tagsStore, originalToLocal, text ):
+    def translateTags( self, tagsListStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (additional columns are ignored).
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
@@ -1515,15 +1515,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         translatedText = text
         tags = re.findall( "\[([^\[^\]]+)\]", translatedText )
         for tag in tags:
-            iter = tagsStore.get_iter_first()
+            iter = tagsListStore.get_iter_first()
             while iter:
-                row = tagsStore[ iter ]
+                row = tagsListStore[ iter ]
                 if row[ i ] == tag:
                     translatedText = translatedText.replace( "[" + tag + "]", "[" + row[ j ] + "]" )
                     iter = None # Break and move on to next tag.
 
                 else:
-                    iter = tagsStore.iter_next( iter )
+                    iter = tagsListStore.iter_next( iter )
 
         return translatedText
 
