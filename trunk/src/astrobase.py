@@ -143,6 +143,7 @@ class AstroBase( ABC ):
         DATA_TAG_SOLSTICE          : _( "SOLSTICE" ),
         DATA_TAG_THIRD_QUARTER     : _( "THIRD QUARTER" ) }
 
+
     # Tags used to uniquely name particular objects/items.
     NAME_TAG_CITY = "CITY" #TODO Only used in astropyephem...so maybe move out of here?
     NAME_TAG_MOON = "MOON"
@@ -151,6 +152,7 @@ class AstroBase( ABC ):
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
     NAME_TAG_MOON_TRANSLATION = { NAME_TAG_MOON : _( "MOON" ) }
     NAME_TAG_SUN_TRANSLATION = { NAME_TAG_SUN : _( "SUN" ) }
+
 
     # Each of the planets, used as name tags.
     PLANET_MERCURY = "MERCURY"
@@ -185,6 +187,7 @@ class AstroBase( ABC ):
         PLANET_NEPTUNE : _( "NEPTUNE" ),
         PLANET_PLUTO   : _( "PLUTO" ) }
 
+
     # Lunar phases.
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
     LUNAR_PHASE_WANING_GIBBOUS = "WANING_GIBBOUS"
@@ -206,12 +209,25 @@ class AstroBase( ABC ):
         LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
 
+
 #TODO Put in comment about how this should be implemented/populated by the implementing class.
     # Capitalised names of stars.
     STARS = [ ]
 
 #TODO Put in comment about how this should be implemented/populated by the implementing class.
     STARS_TO_HIP = { }
+
+    STAR_NAMES_TRANSLATIONS = { }
+
+    STAR_TAGS_TRANSLATIONS = { }
+
+
+    BODY_TAGS_TRANSLATIONS = dict(
+        list( NAME_TAG_MOON_TRANSLATION.items() ) +
+        list( PLANET_TAGS_TRANSLATIONS.items() ) +
+        list( STAR_TAGS_TRANSLATIONS.items() ) +
+        list( NAME_TAG_SUN_TRANSLATION.items() ) )
+
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -241,6 +257,7 @@ class AstroBase( ABC ):
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
+
 
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"

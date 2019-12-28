@@ -145,224 +145,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
 
-#TODO This list of stars is specific to pyephem.
-# Skyfield has/will its own set of stars (with a reasonable crossover).
-# So cannot use the backend trick here.
-# Better to move this list into pyephem.
-# How do the translation pot/po files then work.  
-#Are they just extra files added to the install?  Ask Oleg.
-#
-# Need to think about all of this...do we make one POT file for all the .py files
-# or a POT file per .py file?
-#
-# https://docs.python.org/3.5/library/gettext.html
-# https://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
-# https://phrase.com/blog/posts/translate-python-gnu-gettext/
-# https://stackoverflow.com/questions/8872229/how-do-i-use-multiple-mo-files-simultaneously-for-gettext-translation
-# https://www.mattlayman.com/blog/2015/i18n/
-#
-# Using the command to make a POT file, the input file specifies the input .py files
-# which puts all string from all .py files into one output file.
-# So need to then test or figure out how each .py file pulls the strings from the one POT file.
-# Is this something to do with domain which is what is passed to gettext.install()?
-    STAR_NAMES_TRANSLATIONS = {
-        astropyephem.AstroPyephem.STARS[ 0 ]  : _( "Achernar" ),
-        astropyephem.AstroPyephem.STARS[ 1 ]  : _( "Adara" ), 
-        astropyephem.AstroPyephem.STARS[ 2 ]  : _( "Agena" ), 
-        astropyephem.AstroPyephem.STARS[ 3 ]  : _( "Albereo" ), 
-        astropyephem.AstroPyephem.STARS[ 4 ]  : _( "Alcaid" ),
-        astropyephem.AstroPyephem.STARS[ 5 ]  : _( "Alcor" ), 
-        astropyephem.AstroPyephem.STARS[ 6 ]  : _( "Alcyone" ), 
-        astropyephem.AstroPyephem.STARS[ 7 ]  : _( "Aldebaran" ), 
-        astropyephem.AstroPyephem.STARS[ 8 ]  : _( "Alderamin" ), 
-        astropyephem.AstroPyephem.STARS[ 9 ]  : _( "Alfirk" ),
-        astropyephem.AstroPyephem.STARS[ 10 ] : _( "Algenib" ), 
-        astropyephem.AstroPyephem.STARS[ 11 ] : _( "Algieba" ), 
-        astropyephem.AstroPyephem.STARS[ 12 ] : _( "Algol" ), 
-        astropyephem.AstroPyephem.STARS[ 13 ] : _( "Alhena" ),
-        astropyephem.AstroPyephem.STARS[ 14 ] : _( "Alioth" ),
-        astropyephem.AstroPyephem.STARS[ 15 ] : _( "Almach" ),
-        astropyephem.AstroPyephem.STARS[ 16 ] : _( "Alnair" ),
-        astropyephem.AstroPyephem.STARS[ 17 ] : _( "Alnilam" ), 
-        astropyephem.AstroPyephem.STARS[ 18 ] : _( "Alnitak" ), 
-        astropyephem.AstroPyephem.STARS[ 19 ] : _( "Alphard" ), 
-        astropyephem.AstroPyephem.STARS[ 20 ] : _( "Alphecca" ),
-        astropyephem.AstroPyephem.STARS[ 21 ] : _( "Alshain" ), 
-        astropyephem.AstroPyephem.STARS[ 22 ] : _( "Altair" ),
-        astropyephem.AstroPyephem.STARS[ 23 ] : _( "Antares" ), 
-        astropyephem.AstroPyephem.STARS[ 24 ] : _( "Arcturus" ),
-        astropyephem.AstroPyephem.STARS[ 25 ] : _( "Arkab Posterior" ), 
-        astropyephem.AstroPyephem.STARS[ 26 ] : _( "Arkab Prior" ), 
-        astropyephem.AstroPyephem.STARS[ 27 ] : _( "Arneb" ), 
-        astropyephem.AstroPyephem.STARS[ 28 ] : _( "Atlas" ), 
-        astropyephem.AstroPyephem.STARS[ 29 ] : _( "Bellatrix" ), 
-        astropyephem.AstroPyephem.STARS[ 30 ] : _( "Betelgeuse" ),
-        astropyephem.AstroPyephem.STARS[ 31 ] : _( "Canopus" ), 
-        astropyephem.AstroPyephem.STARS[ 32 ] : _( "Capella" ), 
-        astropyephem.AstroPyephem.STARS[ 33 ] : _( "Caph" ),
-        astropyephem.AstroPyephem.STARS[ 34 ] : _( "Castor" ),
-        astropyephem.AstroPyephem.STARS[ 35 ] : _( "Cebalrai" ),
-        astropyephem.AstroPyephem.STARS[ 36 ] : _( "Deneb" ), 
-        astropyephem.AstroPyephem.STARS[ 37 ] : _( "Denebola" ),
-        astropyephem.AstroPyephem.STARS[ 38 ] : _( "Dubhe" ), 
-        astropyephem.AstroPyephem.STARS[ 39 ] : _( "Electra" ), 
-        astropyephem.AstroPyephem.STARS[ 40 ] : _( "Elnath" ),
-        astropyephem.AstroPyephem.STARS[ 41 ] : _( "Enif" ),
-        astropyephem.AstroPyephem.STARS[ 42 ] : _( "Etamin" ),
-        astropyephem.AstroPyephem.STARS[ 43 ] : _( "Fomalhaut" ), 
-        astropyephem.AstroPyephem.STARS[ 44 ] : _( "Gienah Corvi" ),
-        astropyephem.AstroPyephem.STARS[ 45 ] : _( "Hamal" ), 
-        astropyephem.AstroPyephem.STARS[ 46 ] : _( "Izar" ),
-        astropyephem.AstroPyephem.STARS[ 47 ] : _( "Kaus Australis" ),
-        astropyephem.AstroPyephem.STARS[ 48 ] : _( "Kochab" ),
-        astropyephem.AstroPyephem.STARS[ 49 ] : _( "Maia" ),
-        astropyephem.AstroPyephem.STARS[ 50 ] : _( "Markab" ),
-        astropyephem.AstroPyephem.STARS[ 51 ] : _( "Megrez" ),
-        astropyephem.AstroPyephem.STARS[ 52 ] : _( "Menkalinan" ),
-        astropyephem.AstroPyephem.STARS[ 53 ] : _( "Menkar" ),
-        astropyephem.AstroPyephem.STARS[ 54 ] : _( "Merak" ), 
-        astropyephem.AstroPyephem.STARS[ 55 ] : _( "Merope" ),
-        astropyephem.AstroPyephem.STARS[ 56 ] : _( "Mimosa" ),
-        astropyephem.AstroPyephem.STARS[ 57 ] : _( "Minkar" ),
-        astropyephem.AstroPyephem.STARS[ 58 ] : _( "Mintaka" ), 
-        astropyephem.AstroPyephem.STARS[ 59 ] : _( "Mirach" ),
-        astropyephem.AstroPyephem.STARS[ 60 ] : _( "Mirzam" ),
-        astropyephem.AstroPyephem.STARS[ 61 ] : _( "Mizar" ), 
-        astropyephem.AstroPyephem.STARS[ 62 ] : _( "Naos" ),
-        astropyephem.AstroPyephem.STARS[ 63 ] : _( "Nihal" ), 
-        astropyephem.AstroPyephem.STARS[ 64 ] : _( "Nunki" ), 
-        astropyephem.AstroPyephem.STARS[ 65 ] : _( "Peacock" ), 
-        astropyephem.AstroPyephem.STARS[ 66 ] : _( "Phecda" ),
-        astropyephem.AstroPyephem.STARS[ 67 ] : _( "Polaris" ), 
-        astropyephem.AstroPyephem.STARS[ 68 ] : _( "Pollux" ),
-        astropyephem.AstroPyephem.STARS[ 69 ] : _( "Procyon" ), 
-        astropyephem.AstroPyephem.STARS[ 70 ] : _( "Rasalgethi" ),
-        astropyephem.AstroPyephem.STARS[ 71 ] : _( "Rasalhague" ),
-        astropyephem.AstroPyephem.STARS[ 72 ] : _( "Regulus" ), 
-        astropyephem.AstroPyephem.STARS[ 73 ] : _( "Rigel" ), 
-        astropyephem.AstroPyephem.STARS[ 74 ] : _( "Rukbat" ),
-        astropyephem.AstroPyephem.STARS[ 75 ] : _( "Sadalmelik" ),
-        astropyephem.AstroPyephem.STARS[ 76 ] : _( "Sadr" ),
-        astropyephem.AstroPyephem.STARS[ 77 ] : _( "Saiph" ), 
-        astropyephem.AstroPyephem.STARS[ 78 ] : _( "Scheat" ),
-        astropyephem.AstroPyephem.STARS[ 79 ] : _( "Schedar" ), 
-        astropyephem.AstroPyephem.STARS[ 80 ] : _( "Shaula" ),
-        astropyephem.AstroPyephem.STARS[ 81 ] : _( "Sheliak" ), 
-        astropyephem.AstroPyephem.STARS[ 82 ] : _( "Sirius" ),
-        astropyephem.AstroPyephem.STARS[ 83 ] : _( "Sirrah" ),
-        astropyephem.AstroPyephem.STARS[ 84 ] : _( "Spica" ), 
-        astropyephem.AstroPyephem.STARS[ 85 ] : _( "Sulafat" ), 
-        astropyephem.AstroPyephem.STARS[ 86 ] : _( "Tarazed" ), 
-        astropyephem.AstroPyephem.STARS[ 87 ] : _( "Taygeta" ), 
-        astropyephem.AstroPyephem.STARS[ 88 ] : _( "Thuban" ),
-        astropyephem.AstroPyephem.STARS[ 89 ] : _( "Unukalhai" ), 
-        astropyephem.AstroPyephem.STARS[ 90 ] : _( "Vega" ),
-        astropyephem.AstroPyephem.STARS[ 91 ] : _( "Vindemiatrix" ),
-        astropyephem.AstroPyephem.STARS[ 92 ] : _( "Wezen" ), 
-        astropyephem.AstroPyephem.STARS[ 93 ] : _( "Zaurak" ) }
-
-#TODO Can this list be somehow dynamically created?
-#Probably, but how does that affect translations?
-    STAR_TAGS_TRANSLATIONS = {
-        astropyephem.AstroPyephem.STARS[ 0 ]  : _( "ACHERNAR" ),
-        astropyephem.AstroPyephem.STARS[ 1 ]  : _( "ADARA" ),
-        astropyephem.AstroPyephem.STARS[ 2 ]  : _( "AGENA" ),
-        astropyephem.AstroPyephem.STARS[ 3 ]  : _( "ALBEREO" ),
-        astropyephem.AstroPyephem.STARS[ 4 ]  : _( "ALCAID" ),
-        astropyephem.AstroPyephem.STARS[ 5 ]  : _( "ALCOR" ),
-        astropyephem.AstroPyephem.STARS[ 6 ]  : _( "ALCYONE" ),
-        astropyephem.AstroPyephem.STARS[ 7 ]  : _( "ALDEBARAN" ),
-        astropyephem.AstroPyephem.STARS[ 8 ]  : _( "ALDERAMIN" ),
-        astropyephem.AstroPyephem.STARS[ 9 ]  : _( "ALFIRK" ),
-        astropyephem.AstroPyephem.STARS[ 10 ] : _( "ALGENIB" ),
-        astropyephem.AstroPyephem.STARS[ 11 ] : _( "ALGIEBA" ),
-        astropyephem.AstroPyephem.STARS[ 12 ] : _( "ALGOL" ),
-        astropyephem.AstroPyephem.STARS[ 13 ] : _( "ALHENA" ),
-        astropyephem.AstroPyephem.STARS[ 14 ] : _( "ALIOTH" ),
-        astropyephem.AstroPyephem.STARS[ 15 ] : _( "ALMACH" ),
-        astropyephem.AstroPyephem.STARS[ 16 ] : _( "ALNAIR" ),
-        astropyephem.AstroPyephem.STARS[ 17 ] : _( "ALNILAM" ),
-        astropyephem.AstroPyephem.STARS[ 18 ] : _( "ALNITAK" ),
-        astropyephem.AstroPyephem.STARS[ 19 ] : _( "ALPHARD" ),
-        astropyephem.AstroPyephem.STARS[ 20 ] : _( "ALPHECCA" ),
-        astropyephem.AstroPyephem.STARS[ 21 ] : _( "ALSHAIN" ),
-        astropyephem.AstroPyephem.STARS[ 22 ] : _( "ALTAIR" ),
-        astropyephem.AstroPyephem.STARS[ 23 ] : _( "ANTARES" ),
-        astropyephem.AstroPyephem.STARS[ 24 ] : _( "ARCTURUS" ),
-        astropyephem.AstroPyephem.STARS[ 25 ] : _( "ARKABPOSTERIOR" ),
-        astropyephem.AstroPyephem.STARS[ 26 ] : _( "ARKABPRIOR" ),
-        astropyephem.AstroPyephem.STARS[ 27 ] : _( "ARNEB" ),
-        astropyephem.AstroPyephem.STARS[ 28 ] : _( "ATLAS" ),
-        astropyephem.AstroPyephem.STARS[ 29 ] : _( "BELLATRIX" ),
-        astropyephem.AstroPyephem.STARS[ 30 ] : _( "BETELGEUSE" ),
-        astropyephem.AstroPyephem.STARS[ 31 ] : _( "CANOPUS" ),
-        astropyephem.AstroPyephem.STARS[ 32 ] : _( "CAPELLA" ),
-        astropyephem.AstroPyephem.STARS[ 33 ] : _( "CAPH" ),
-        astropyephem.AstroPyephem.STARS[ 34 ] : _( "CASTOR" ),
-        astropyephem.AstroPyephem.STARS[ 35 ] : _( "CEBALRAI" ),
-        astropyephem.AstroPyephem.STARS[ 36 ] : _( "DENEB" ),
-        astropyephem.AstroPyephem.STARS[ 37 ] : _( "DENEBOLA" ),
-        astropyephem.AstroPyephem.STARS[ 38 ] : _( "DUBHE" ),
-        astropyephem.AstroPyephem.STARS[ 39 ] : _( "ELECTRA" ),
-        astropyephem.AstroPyephem.STARS[ 40 ] : _( "ELNATH" ),
-        astropyephem.AstroPyephem.STARS[ 41 ] : _( "ENIF" ),
-        astropyephem.AstroPyephem.STARS[ 42 ] : _( "ETAMIN" ),
-        astropyephem.AstroPyephem.STARS[ 43 ] : _( "FOMALHAUT" ),
-        astropyephem.AstroPyephem.STARS[ 44 ] : _( "GIENAHCORVI" ),
-        astropyephem.AstroPyephem.STARS[ 45 ] : _( "HAMAL" ),
-        astropyephem.AstroPyephem.STARS[ 46 ] : _( "IZAR" ),
-        astropyephem.AstroPyephem.STARS[ 47 ] : _( "KAUSAUSTRALIS" ),
-        astropyephem.AstroPyephem.STARS[ 48 ] : _( "KOCHAB" ),
-        astropyephem.AstroPyephem.STARS[ 49 ] : _( "MAIA" ),
-        astropyephem.AstroPyephem.STARS[ 50 ] : _( "MARKAB" ),
-        astropyephem.AstroPyephem.STARS[ 51 ] : _( "MEGREZ" ),
-        astropyephem.AstroPyephem.STARS[ 52 ] : _( "MENKALINAN" ),
-        astropyephem.AstroPyephem.STARS[ 53 ] : _( "MENKAR" ),
-        astropyephem.AstroPyephem.STARS[ 54 ] : _( "MERAK" ),
-        astropyephem.AstroPyephem.STARS[ 55 ] : _( "MEROPE" ),
-        astropyephem.AstroPyephem.STARS[ 56 ] : _( "MIMOSA" ),
-        astropyephem.AstroPyephem.STARS[ 57 ] : _( "MINKAR" ),
-        astropyephem.AstroPyephem.STARS[ 58 ] : _( "MINTAKA" ),
-        astropyephem.AstroPyephem.STARS[ 59 ] : _( "MIRACH" ),
-        astropyephem.AstroPyephem.STARS[ 60 ] : _( "MIRZAM" ),
-        astropyephem.AstroPyephem.STARS[ 61 ] : _( "MIZAR" ),
-        astropyephem.AstroPyephem.STARS[ 62 ] : _( "NAOS" ),
-        astropyephem.AstroPyephem.STARS[ 63 ] : _( "NIHAL" ),
-        astropyephem.AstroPyephem.STARS[ 64 ] : _( "NUNKI" ),
-        astropyephem.AstroPyephem.STARS[ 65 ] : _( "PEACOCK" ),
-        astropyephem.AstroPyephem.STARS[ 66 ] : _( "PHECDA" ),
-        astropyephem.AstroPyephem.STARS[ 67 ] : _( "POLARIS" ),
-        astropyephem.AstroPyephem.STARS[ 68 ] : _( "POLLUX" ),
-        astropyephem.AstroPyephem.STARS[ 69 ] : _( "PROCYON" ),
-        astropyephem.AstroPyephem.STARS[ 70 ] : _( "RASALGETHI" ),
-        astropyephem.AstroPyephem.STARS[ 71 ] : _( "RASALHAGUE" ),
-        astropyephem.AstroPyephem.STARS[ 72 ] : _( "REGULUS" ),
-        astropyephem.AstroPyephem.STARS[ 73 ] : _( "RIGEL" ),
-        astropyephem.AstroPyephem.STARS[ 74 ] : _( "RUKBAT" ),
-        astropyephem.AstroPyephem.STARS[ 75 ] : _( "SADALMELIK" ),
-        astropyephem.AstroPyephem.STARS[ 76 ] : _( "SADR" ),
-        astropyephem.AstroPyephem.STARS[ 77 ] : _( "SAIPH" ),
-        astropyephem.AstroPyephem.STARS[ 78 ] : _( "SCHEAT" ),
-        astropyephem.AstroPyephem.STARS[ 79 ] : _( "SCHEDAR" ),
-        astropyephem.AstroPyephem.STARS[ 80 ] : _( "SHAULA" ),
-        astropyephem.AstroPyephem.STARS[ 81 ] : _( "SHELIAK" ),
-        astropyephem.AstroPyephem.STARS[ 82 ] : _( "SIRIUS" ),
-        astropyephem.AstroPyephem.STARS[ 83 ] : _( "SIRRAH" ),
-        astropyephem.AstroPyephem.STARS[ 84 ] : _( "SPICA" ),
-        astropyephem.AstroPyephem.STARS[ 85 ] : _( "SULAFAT" ),
-        astropyephem.AstroPyephem.STARS[ 86 ] : _( "TARAZED" ),
-        astropyephem.AstroPyephem.STARS[ 87 ] : _( "TAYGETA" ),
-        astropyephem.AstroPyephem.STARS[ 88 ] : _( "THUBAN" ),
-        astropyephem.AstroPyephem.STARS[ 89 ] : _( "UNUKALHAI" ),
-        astropyephem.AstroPyephem.STARS[ 90 ] : _( "VEGA" ),
-        astropyephem.AstroPyephem.STARS[ 91 ] : _( "VINDEMIATRIX" ),
-        astropyephem.AstroPyephem.STARS[ 92 ] : _( "WEZEN" ),
-        astropyephem.AstroPyephem.STARS[ 93 ] : _( "ZAURAK" ) }
-
+#TODO I think this has to stay here and cannot go into the base class because stars are initialised later.
     BODY_TAGS_TRANSLATIONS = dict(
         list( astrobase.AstroBase.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astrobase.AstroBase.PLANET_TAGS_TRANSLATIONS.items() ) +
-        list( STAR_TAGS_TRANSLATIONS.items() ) +
+        list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     COMET_CACHE_BASENAME = "comet-oe-"
@@ -743,7 +530,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         stars = [ ]
         for star in self.stars:
             if self.display( astrobase.AstroBase.BodyType.STAR, star ):
-                stars.append( [ star, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ star ] ] )
+                stars.append( [ star, astrobase.AstroBase.STAR_NAMES_TRANSLATIONS[ star ] ] )
 
         if stars:
             menuItem = Gtk.MenuItem( _( "Stars" ) )
@@ -1238,8 +1025,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( self.createTable( planetStore, toolTipText, _( "Planet" ), 2 ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
-        for starName in IndicatorLunar.STAR_NAMES_TRANSLATIONS.keys():
-            stars.append( [ starName in self.stars, starName, IndicatorLunar.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+        for starName in astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.keys():
+            stars.append( [ starName in self.stars, starName, astrobase.AstroBase.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         stars = sorted( stars, key = lambda x: ( x[ 2 ] ) )
         starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
