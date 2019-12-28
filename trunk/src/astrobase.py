@@ -123,11 +123,34 @@ class AstroBase( ABC ):
         DATA_TAG_SET_DATE_TIME,
         DATA_TAG_SOLSTICE ]
 
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    DATA_TAGS_TRANSLATIONS = {
+        DATA_TAG_ALTITUDE          : _( "ALTITUDE" ),
+        DATA_TAG_AZIMUTH           : _( "AZIMUTH" ),
+        DATA_TAG_ECLIPSE_DATE_TIME : _( "ECLIPSE DATE TIME" ),
+        DATA_TAG_ECLIPSE_LATITUDE  : _( "ECLIPSE LATITUDE" ),
+        DATA_TAG_ECLIPSE_LONGITUDE : _( "ECLIPSE LONGITUDE" ),
+        DATA_TAG_ECLIPSE_TYPE      : _( "ECLIPSE TYPE" ),
+        DATA_TAG_EQUINOX           : _( "EQUINOX" ),
+        DATA_TAG_FIRST_QUARTER     : _( "FIRST QUARTER" ),
+        DATA_TAG_FULL              : _( "FULL" ),
+        DATA_TAG_NEW               : _( "NEW" ),
+        DATA_TAG_PHASE             : _( "PHASE" ),
+        DATA_TAG_RISE_AZIMUTH      : _( "RISE AZIMUTH" ),
+        DATA_TAG_RISE_DATE_TIME    : _( "RISE DATE TIME" ),
+        DATA_TAG_SET_AZIMUTH       : _( "SET AZIMUTH" ),
+        DATA_TAG_SET_DATE_TIME     : _( "SET DATE TIME" ),
+        DATA_TAG_SOLSTICE          : _( "SOLSTICE" ),
+        DATA_TAG_THIRD_QUARTER     : _( "THIRD QUARTER" ) }
 
     # Tags used to uniquely name particular objects/items.
-    NAME_TAG_CITY = "CITY"
+    NAME_TAG_CITY = "CITY" #TODO Only used in astropyephem...so maybe move out of here?
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
+
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    NAME_TAG_MOON_TRANSLATION = { NAME_TAG_MOON : _( "MOON" ) }
+    NAME_TAG_SUN_TRANSLATION = { NAME_TAG_SUN : _( "SUN" ) }
 
     # Each of the planets, used as name tags.
     PLANET_MERCURY = "MERCURY"
@@ -141,6 +164,26 @@ class AstroBase( ABC ):
 
     PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
+    PLANET_NAMES_TRANSLATIONS = {
+        PLANET_MERCURY : _( "Mercury" ),
+        PLANET_VENUS   : _( "Venus" ),
+        PLANET_MARS    : _( "Mars" ),
+        PLANET_JUPITER : _( "Jupiter" ),
+        PLANET_SATURN  : _( "Saturn" ),
+        PLANET_URANUS  : _( "Uranus" ),
+        PLANET_NEPTUNE : _( "Neptune" ),
+        PLANET_PLUTO   : _( "Pluto" ) }
+
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    PLANET_TAGS_TRANSLATIONS = {
+        PLANET_MERCURY : _( "MERCURY" ),
+        PLANET_VENUS   : _( "VENUS" ),
+        PLANET_MARS    : _( "MARS" ),
+        PLANET_JUPITER : _( "JUPITER" ),
+        PLANET_SATURN  : _( "SATURN" ),
+        PLANET_URANUS  : _( "URANUS" ),
+        PLANET_NEPTUNE : _( "NEPTUNE" ),
+        PLANET_PLUTO   : _( "PLUTO" ) }
 
     # Lunar phases.
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
@@ -152,6 +195,16 @@ class AstroBase( ABC ):
     LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    LUNAR_PHASE_NAMES_TRANSLATIONS = {
+        LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
+        LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
+        LUNAR_PHASE_THIRD_QUARTER   : _( "Third Quarter" ),
+        LUNAR_PHASE_WANING_CRESCENT : _( "Waning Crescent" ),
+        LUNAR_PHASE_NEW_MOON        : _( "New Moon" ),
+        LUNAR_PHASE_WAXING_CRESCENT : _( "Waxing Crescent" ),
+        LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
+        LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
 
 #TODO Put in comment about how this should be implemented/populated by the implementing class.
     # Capitalised names of stars.
@@ -160,6 +213,34 @@ class AstroBase( ABC ):
 #TODO Put in comment about how this should be implemented/populated by the implementing class.
     STARS_TO_HIP = { }
 
+    SATELLITE_TAG_NAME = "[NAME]"
+    SATELLITE_TAG_NUMBER = "[NUMBER]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
+    SATELLITE_TAG_RISE_AZIMUTH = "[RISE AZIMUTH]"
+    SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
+    SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
+    SATELLITE_TAG_SET_TIME = "[SET TIME]"
+
+    SATELLITE_TAG_NAME_TRANSLATION = "[" + _( "NAME" ) + "]"
+    SATELLITE_TAG_NUMBER_TRANSLATION = "[" + _( "NUMBER" ) + "]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = "[" + _( "INTERNATIONAL DESIGNATOR" ) + "]"
+    SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION = "[" + _( "RISE AZIMUTH" ) + "]"
+    SATELLITE_TAG_RISE_TIME_TRANSLATION = "[" + _( "RISE TIME" ) + "]"
+    SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = "[" + _( "SET AZIMUTH" ) + "]"
+    SATELLITE_TAG_SET_TIME_TRANSLATION = "[" + _( "SET TIME" ) + "]"
+
+    #TODO Prefer not to import Gtk at this level, only in the indicator.  
+    # What else can be used?  
+    # If we have to use Gtk, don't forget to add a gi.require_version.
+    from gi.repository import Gtk
+    SATELLITE_TAG_TRANSLATIONS = Gtk.ListStore( str, str ) # Tag, translated tag.
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NAME.strip( "[]" ), SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NUMBER.strip( "[]" ), SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_INTERNATIONAL_DESIGNATOR.strip( "[]" ), SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_AZIMUTH.strip( "[]" ), SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
 
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"

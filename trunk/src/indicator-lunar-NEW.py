@@ -145,50 +145,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
 
-    DATA_TAGS_TRANSLATIONS = {
-        astrobase.AstroBase.DATA_TAG_ALTITUDE          : _( "ALTITUDE" ),
-        astrobase.AstroBase.DATA_TAG_AZIMUTH           : _( "AZIMUTH" ),
-        astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME : _( "ECLIPSE DATE TIME" ),
-        astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE  : _( "ECLIPSE LATITUDE" ),
-        astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE : _( "ECLIPSE LONGITUDE" ),
-        astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE      : _( "ECLIPSE TYPE" ),
-        astrobase.AstroBase.DATA_TAG_EQUINOX           : _( "EQUINOX" ),
-        astrobase.AstroBase.DATA_TAG_FIRST_QUARTER     : _( "FIRST QUARTER" ),
-        astrobase.AstroBase.DATA_TAG_FULL              : _( "FULL" ),
-        astrobase.AstroBase.DATA_TAG_NEW               : _( "NEW" ),
-        astrobase.AstroBase.DATA_TAG_PHASE             : _( "PHASE" ),
-        astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH      : _( "RISE AZIMUTH" ),
-        astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME    : _( "RISE DATE TIME" ),
-        astrobase.AstroBase.DATA_TAG_SET_AZIMUTH       : _( "SET AZIMUTH" ),
-        astrobase.AstroBase.DATA_TAG_SET_DATE_TIME     : _( "SET DATE TIME" ),
-        astrobase.AstroBase.DATA_TAG_SOLSTICE          : _( "SOLSTICE" ),
-        astrobase.AstroBase.DATA_TAG_THIRD_QUARTER     : _( "THIRD QUARTER" ) }
-
-    NAME_TAG_MOON_TRANSLATION = { astrobase.AstroBase.NAME_TAG_MOON : _( "MOON" ) }
-    NAME_TAG_SUN_TRANSLATION = { astrobase.AstroBase.NAME_TAG_SUN : _( "SUN" ) }
-
-    PLANET_NAMES_TRANSLATIONS = {
-        astrobase.AstroBase.PLANET_MERCURY : _( "Mercury" ),
-        astrobase.AstroBase.PLANET_VENUS   : _( "Venus" ),
-        astrobase.AstroBase.PLANET_MARS    : _( "Mars" ),
-        astrobase.AstroBase.PLANET_JUPITER : _( "Jupiter" ),
-        astrobase.AstroBase.PLANET_SATURN  : _( "Saturn" ),
-        astrobase.AstroBase.PLANET_URANUS  : _( "Uranus" ),
-        astrobase.AstroBase.PLANET_NEPTUNE : _( "Neptune" ),
-        astrobase.AstroBase.PLANET_PLUTO   : _( "Pluto" ) }
-
-#TODO Should astrobase translations live in the that file?
-# If we move the pyephem stuff there, then why not.
-    PLANET_TAGS_TRANSLATIONS = {
-        astrobase.AstroBase.PLANET_MERCURY : _( "MERCURY" ),
-        astrobase.AstroBase.PLANET_VENUS   : _( "VENUS" ),
-        astrobase.AstroBase.PLANET_MARS    : _( "MARS" ),
-        astrobase.AstroBase.PLANET_JUPITER : _( "JUPITER" ),
-        astrobase.AstroBase.PLANET_SATURN  : _( "SATURN" ),
-        astrobase.AstroBase.PLANET_URANUS  : _( "URANUS" ),
-        astrobase.AstroBase.PLANET_NEPTUNE : _( "NEPTUNE" ),
-        astrobase.AstroBase.PLANET_PLUTO   : _( "PLUTO" ) }
-
 #TODO This list of stars is specific to pyephem.
 # Skyfield has/will its own set of stars (with a reasonable crossover).
 # So cannot use the backend trick here.
@@ -404,20 +360,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astropyephem.AstroPyephem.STARS[ 93 ] : _( "ZAURAK" ) }
 
     BODY_TAGS_TRANSLATIONS = dict(
-        list( NAME_TAG_MOON_TRANSLATION.items() ) +
-        list( PLANET_TAGS_TRANSLATIONS.items() ) +
+        list( astrobase.AstroBase.NAME_TAG_MOON_TRANSLATION.items() ) +
+        list( astrobase.AstroBase.PLANET_TAGS_TRANSLATIONS.items() ) +
         list( STAR_TAGS_TRANSLATIONS.items() ) +
-        list( NAME_TAG_SUN_TRANSLATION.items() ) )
-
-    LUNAR_PHASE_NAMES_TRANSLATIONS = {
-        astrobase.AstroBase.LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
-        astrobase.AstroBase.LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
-        astrobase.AstroBase.LUNAR_PHASE_THIRD_QUARTER   : _( "Third Quarter" ),
-        astrobase.AstroBase.LUNAR_PHASE_WANING_CRESCENT : _( "Waning Crescent" ),
-        astrobase.AstroBase.LUNAR_PHASE_NEW_MOON        : _( "New Moon" ),
-        astrobase.AstroBase.LUNAR_PHASE_WAXING_CRESCENT : _( "Waxing Crescent" ),
-        astrobase.AstroBase.LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
-        astrobase.AstroBase.LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
+        list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24
@@ -435,44 +381,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     MINOR_PLANET_CENTER_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" # Used to search for minor planets and comets.
 
-    SATELLITE_TAG_NAME = "[NAME]"
-    SATELLITE_TAG_NUMBER = "[NUMBER]"
-    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
-    SATELLITE_TAG_RISE_AZIMUTH = "[RISE AZIMUTH]"
-    SATELLITE_TAG_RISE_TIME = "[RISE TIME]"
-    SATELLITE_TAG_SET_AZIMUTH = "[SET AZIMUTH]"
-    SATELLITE_TAG_SET_TIME = "[SET TIME]"
-
-    SATELLITE_TAG_NAME_TRANSLATION = "[" + _( "NAME" ) + "]"
-    SATELLITE_TAG_NUMBER_TRANSLATION = "[" + _( "NUMBER" ) + "]"
-    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = "[" + _( "INTERNATIONAL DESIGNATOR" ) + "]"
-    SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION = "[" + _( "RISE AZIMUTH" ) + "]"
-    SATELLITE_TAG_RISE_TIME_TRANSLATION = "[" + _( "RISE TIME" ) + "]"
-    SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = "[" + _( "SET AZIMUTH" ) + "]"
-    SATELLITE_TAG_SET_TIME_TRANSLATION = "[" + _( "SET TIME" ) + "]"
-
-    SATELLITE_TAG_TRANSLATIONS = Gtk.ListStore( str, str ) # Tag, translated tag.
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NAME.strip( "[]" ), SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NUMBER.strip( "[]" ), SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_INTERNATIONAL_DESIGNATOR.strip( "[]" ), SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_AZIMUTH.strip( "[]" ), SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
-
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 12
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
-    SATELLITE_MENU_TEXT = SATELLITE_TAG_NAME + " : " + SATELLITE_TAG_NUMBER + " : " + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
+    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        _( "Number: " ) + SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
-        _( "International Designator: " ) + SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n" + \
-        _( "Rise Time: " ) + SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
-        _( "Rise Azimuth: " ) + SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
-        _( "Set Time: " ) + SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
-        _( "Set Azimuth: " ) + SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = SATELLITE_TAG_NAME + _( " now rising..." )
-    SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + SATELLITE_TAG_NUMBER
+        _( "Number: " ) + astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
+        _( "International Designator: " ) + astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n" + \
+        _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
+        _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
+        _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
+        _( "Set Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + _( " now rising..." )
+    SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + astrobase.AstroBase.SATELLITE_TAG_NUMBER
 
     STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
 
@@ -726,24 +647,24 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             tle = self.satelliteData[ ( satelliteName, satelliteNumber ) ]
 
             summary = self.satelliteNotificationSummary. \
-                      replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
+                      replace( astrobase.AstroBase.SATELLITE_TAG_NAME, tle.getName() ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME, riseTime ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME, setTime )
             if summary == "":
                 summary = " " # The notification summary text must not be empty (at least on Unity).
 
             message = self.satelliteNotificationMessage. \
-                      replace( IndicatorLunar.SATELLITE_TAG_NAME, tle.getName() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                      replace( IndicatorLunar.SATELLITE_TAG_SET_TIME, setTime )
+                      replace( astrobase.AstroBase.SATELLITE_TAG_NAME, tle.getName() ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME, riseTime ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
@@ -802,7 +723,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         planets = [ ]
         for planet in self.planets:
             if self.display( astrobase.AstroBase.BodyType.PLANET, planet ):
-                planets.append( [ planet, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
+                planets.append( [ planet, astrobase.AstroBase.PLANET_NAMES_TRANSLATIONS[ planet ] ] )
 
         if planets:
             menuItem = Gtk.MenuItem( _( "Planets" ) )
@@ -963,14 +884,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
         for number, name, riseDateTime in satellites:
-            menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( IndicatorLunar.SATELLITE_TAG_NAME, name ) \
-                                                         .replace( IndicatorLunar.SATELLITE_TAG_NUMBER, number ) \
-                                                         .replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
+            menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( astrobase.AstroBase.SATELLITE_TAG_NAME, name ) \
+                                                         .replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number ) \
+                                                         .replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
 
             url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
-                  replace( IndicatorLunar.SATELLITE_TAG_NAME, name ). \
-                  replace( IndicatorLunar.SATELLITE_TAG_NUMBER, number ). \
-                  replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
+                  replace( astrobase.AstroBase.SATELLITE_TAG_NAME, name ). \
+                  replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number ). \
+                  replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
 
             menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + menuText )
             menuItem.set_name( url )
@@ -1073,7 +994,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 displayData = _( "Total" )
 
         elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_PHASE:
-            displayData = IndicatorLunar.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
+            displayData = astrobase.AstroBase.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
         if displayData is None:
             displayData = "" # Better to show nothing than let None slip through and crash.
@@ -1307,7 +1228,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planetName in astrobase.AstroBase.PLANETS:
-            planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
+            planetStore.append( [ planetName in self.planets, planetName, astrobase.AstroBase.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
 
         toolTipText = _(
             "Check a planet to display in the menu.\n\n" + \
@@ -1444,18 +1365,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationSummaryText = Gtk.Entry()
-        satelliteNotificationSummaryText.set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
+        satelliteNotificationSummaryText.set_text( self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_tooltip_text( _(
             "The summary for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" ) + \
-            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
             _( notifyOSDInformation ) )
 
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
@@ -1472,7 +1393,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationMessageText = Gtk.TextView()
-        satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
+        satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
         satelliteNotificationMessageText.set_tooltip_text( _(
             "The message for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" ) + \
@@ -1696,8 +1617,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.satellites.append( satellite[ 2 ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-            self.satelliteNotificationSummary = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
-            self.satelliteNotificationMessage = self.translateTags( IndicatorLunar.SATELLITE_TAG_TRANSLATIONS, False, self.getTextViewText( satelliteNotificationMessageText ) )
+            self.satelliteNotificationSummary = self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
+            self.satelliteNotificationMessage = self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, False, self.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningSummary = werewolfNotificationSummaryText.get_text()
@@ -1730,15 +1651,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 if bodyType == astrobase.AstroBase.BodyType.COMET or \
                    bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET: # Don't translate the names.
-                    translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
                 elif bodyType == astrobase.AstroBase.BodyType.SATELLITE: # Don't translate names; add in name/designator.
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
                 else:
-                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
                 displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
@@ -1753,7 +1674,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for bodyTag in bodyTags:
                 for dataTag in dataTags:
                     if not ( bodyType, bodyTag, dataTag ) in self.data:
-                        translatedTag = bodyTag + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                        translatedTag = bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         bodyType = astrobase.AstroBase.BodyType.SATELLITE
@@ -1762,7 +1683,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if not ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag ) in self.data:
                     satelliteName = self.satelliteData[ bodyTag ].getName()
                     satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
@@ -1774,7 +1695,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             dataTags = item[ 2 ]
             for dataTag in dataTags:
                 if not ( bodyType, bodyTag, dataTag ) in self.data:
-                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAGS_PLANET ],
@@ -1787,7 +1708,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for bodyTag in bodyTags:
                 for dataTag in dataTags:
                     if not ( bodyType, bodyTag, dataTag ) in self.data:
-                        translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + IndicatorLunar.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                        translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
 
@@ -1900,22 +1821,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             # Mock data...
             summary = summary. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
+                replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
+                replace( Indicatorastrobase.AstroBaseLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
             message = message. \
-                replace( IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
+                replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
