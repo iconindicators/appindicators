@@ -1499,6 +1499,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
 
+#TODO There is a TODO in astrobase to not use Gtk.ListStore.
+#What else can we use instead?  A list/array with tuple pairs?
     def translateTags( self, tagsStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (additional columns are ignored).
         # First column contains the original/untranslated tags.
