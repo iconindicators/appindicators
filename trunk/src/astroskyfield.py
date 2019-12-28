@@ -78,7 +78,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO In the file named_stars, the function at the bottom is deprecated...so are these named stars defunct?
 # https://github.com/skyfielders/python-skyfield/issues/304
     # Sourced from skyfield/named_stars.py
-    STARS = [
+    astrobase.AstroBase.STARS.extend( [
         "ACHERNAR",
         "ACRUX",
         "ADHARA",
@@ -197,10 +197,10 @@ class AstroSkyfield( astrobase.AstroBase ):
         "TURAIS",
         "VEGA",
         "WEI",
-        "WEZEN" ]
+        "WEZEN" ] )
 
 
-    STARS_TO_HIP = {
+    astrobase.AstroBase.STARS_TO_HIP.update( STARS_TO_HIP = {
         "ACHERNAR" :               588,
         "ACRUX" :                  718,
         "ADHARA" :                 3579,
@@ -319,7 +319,18 @@ class AstroSkyfield( astrobase.AstroBase ):
         "TURAIS" :                 5556,
         "VEGA" :                   1262,
         "WEI" :                    2396,
-        "WEZEN" :                  4444 }
+        "WEZEN" :                  4444 } )
+
+#TODO Finish this!
+    astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.update( {
+        astrobase.AstroBase.STARS[ 0 ]  : _( "Achernar" )
+        } )
+
+#TODO Finish this!
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
+        astrobase.AstroBase.STARS[ 0 ]  : _( "ACHERNAR" )
+        } )
 
 
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
