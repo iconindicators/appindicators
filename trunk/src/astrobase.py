@@ -248,6 +248,7 @@ class AstroBase( ABC ):
     #TODO Prefer not to import Gtk at this level, only in the indicator.  
     # What else can be used?  
     # If we have to use Gtk, don't forget to add a gi.require_version.
+    # Maybe store as a list of tuples...but then need to convert to liststore when passed to translatetags in the indicator code.
     from gi.repository import Gtk
     SATELLITE_TAG_TRANSLATIONS = Gtk.ListStore( str, str ) # Tag, translated tag.
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NAME.strip( "[]" ), SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
