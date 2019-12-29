@@ -26,7 +26,6 @@
 
 
 import gi
-from gi.overrides.Gtk import ListStore
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
