@@ -1152,7 +1152,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationSummaryText = Gtk.Entry()
-        satelliteTagTranslations = indicatorbase.IndicatorBase.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
+        satelliteTagTranslations = self.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
         satelliteNotificationSummaryText.set_text( self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationSummary ) )
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_tooltip_text( _(
@@ -1185,13 +1185,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satelliteNotificationMessageText.set_tooltip_text( _(
             "The message for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" ) + \
-            IndicatorLunar.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-            IndicatorLunar.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+            astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
             _( notifyOSDInformation ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1406,7 +1406,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
 
-            satelliteTagTranslations = indicatorbase.IndicatorBase.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
+            satelliteTagTranslations = self.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
             self.satelliteNotificationSummary = self.translateTags( satelliteTagTranslations, False, satelliteNotificationSummaryText.get_text() )
             self.satelliteNotificationMessage = self.translateTags( satelliteTagTranslations, False, self.getTextViewText( satelliteNotificationMessageText ) )
 
