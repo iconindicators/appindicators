@@ -24,8 +24,8 @@ from ephem.cities import _city_data
 import astrobase, ephem, locale, math, orbitalelement, twolineelement
 
 
-#TODO If we read in a list of comets or stars or planets, and that comet/star/planet is missing
-# (would happen with comets more than anything else) how is this handled?
+#TODO If we read in a list of comets/stars/planets/satellites, 
+# and that comet/star/planet/satellite is missing how is this handled?
 
 
 #TODO If we test with Pyephem and select some stars, then switch to Skyfield,
