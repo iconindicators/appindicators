@@ -206,15 +206,16 @@ class AstroBase( ABC ):
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
 
 
-#TODO Put in comment about how this should be implemented/populated by the implementing class.
-    # Capitalised names of stars.
+    # Capitalised names of stars to be populated by implementing class.
     STARS = [ ]
 
-#TODO Put in comment about how this should be implemented/populated by the implementing class.
+    # Capitalised names of stars and associated HIP numbers to be populated by implementing class.
     STARS_TO_HIP = { }
 
+    # Names of stars (from STARS) and associated English string encapsulated as _( "" ) to be populated by implementing class.
     STAR_NAMES_TRANSLATIONS = { }
 
+    # Names of stars (from STARS) and associated capitalised English string encapsulated as _( "" ) to be populated by implementing class.
     STAR_TAGS_TRANSLATIONS = { }
 
 
