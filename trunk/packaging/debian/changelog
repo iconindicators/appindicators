@@ -1,3 +1,11 @@
+indicator-tide (1.0.18-1) xenial; urgency=low
+
+  * Bug fix: Rollover year to year was incrementing the year for each reading.
+  * Bug fix: Removed spurious hard coded string throwing out readings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 29 Dec 2019 17:35:19 +1000
+
+
 indicator-tide (1.0.17-1) xenial; urgency=low
 
   * Now able to reset date/tide formatting to factory default.

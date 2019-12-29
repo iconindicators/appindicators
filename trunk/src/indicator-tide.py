@@ -19,12 +19,6 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Can we adjust the onclick URL for UKHO (which is located in the data download function)
-# to take into account the local DST offset (assuming all tidal data has date and time)?
-# Test to see what the URL needs by going to the UKHO site and using their tool first (not the print friendly version)
-# and see if the DST parameter in the URL is in minutes or hours).
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -62,7 +56,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.17",
+            version = "1.0.18",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" ),
@@ -464,7 +458,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                 if "PredictionSummary1_lblPredictionStart" in line:
                     startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
                     year = startDate[ 3 ] # 2017
-                    startMonth = str( datetime.datetime.strptime( "March", "%B" ).month ) # 7
+                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
 
                 if "HWLWTableHeaderCell" in line:
                     date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
@@ -472,6 +466,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                     month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
                     if month == "1" and startMonth == "12": # Account for the year change when rolling from December to January.
                         year = str( int( year ) + 1 )
+                        startMonth = 1 # Set to January to stop the year from incrementing on each subsequent iteration.
 
                     types = [ ]
                     line = lines[ index + 2 ]
