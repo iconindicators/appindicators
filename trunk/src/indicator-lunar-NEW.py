@@ -1152,7 +1152,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationSummaryText = Gtk.Entry()
-        satelliteNotificationSummaryText.set_text( self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationSummary ) )
+        satelliteTagTranslations = indicatorbase.IndicatorBase.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
+        satelliteNotificationSummaryText.set_text( self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationSummary ) )
         satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_tooltip_text( _(
             "The summary for the satellite rise notification.\n\n" + \
@@ -1180,7 +1181,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationMessageText = Gtk.TextView()
-        satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, True, self.satelliteNotificationMessage ) )
+        satelliteNotificationMessageText.get_buffer().set_text( self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationMessage ) )
         satelliteNotificationMessageText.set_tooltip_text( _(
             "The message for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" ) + \
@@ -1404,8 +1405,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.satellites.append( satellite[ 2 ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-            self.satelliteNotificationSummary = self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, False, satelliteNotificationSummaryText.get_text() )
-            self.satelliteNotificationMessage = self.translateTags( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS, False, self.getTextViewText( satelliteNotificationMessageText ) )
+
+            satelliteTagTranslations = indicatorbase.IndicatorBase.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
+            self.satelliteNotificationSummary = self.translateTags( satelliteTagTranslations, False, satelliteNotificationSummaryText.get_text() )
+            self.satelliteNotificationMessage = self.translateTags( satelliteTagTranslations, False, self.getTextViewText( satelliteNotificationMessageText ) )
 
             self.showWerewolfWarning = showWerewolfWarningCheckbox.get_active()
             self.werewolfWarningSummary = werewolfNotificationSummaryText.get_text()
