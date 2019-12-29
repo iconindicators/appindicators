@@ -26,6 +26,7 @@
 
 
 import gi
+from gi.overrides.Gtk import ListStore
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
@@ -470,6 +471,19 @@ class IndicatorBase( object ):
                 executionFlag = "-x"
 
         return executionFlag
+
+
+    def listOfListsToListStore( self, listofLists ):
+        types = [ ]
+        for item in listofLists[ 0 ]:
+            types.append( type( item[ 0 ] ) )
+
+        listStore = Gtk.ListStore()
+        listStore.set_column_types( types )
+        for item in listofLists:
+            listStore.append( item )
+
+        return listStore
 
 
     def requestSaveConfig( self, delay = 0 ):  GLib.timeout_add_seconds( delay, self.__saveConfig, False )
