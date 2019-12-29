@@ -450,9 +450,9 @@ class AstroPyephem( astrobase.AstroBase ):
         data = { }
 
         # Used internally; removed before passing back to the caller.
-        data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LATITUDE ) ] = str( latitude )
-        data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LONGITUDE ) ] = str( longitude )
-        data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_ELEVATION ) ] = str( elevation )
+        data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LATITUDE ) ] = str( latitude )
+        data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LONGITUDE ) ] = str( longitude )
+        data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_ELEVATION ) ] = str( elevation )
 
         ephemNow = ephem.Date( utcNow )
 
@@ -464,9 +464,9 @@ class AstroPyephem( astrobase.AstroBase ):
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum, hideIfBelowHorizon )
         AstroPyephem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
 
-        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LATITUDE ) ]
-        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LONGITUDE ) ]
-        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_ELEVATION ) ]
+        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LATITUDE ) ]
+        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LONGITUDE ) ]
+        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_ELEVATION ) ]
 
         return data
 
@@ -816,8 +816,8 @@ class AstroPyephem( astrobase.AstroBase ):
     def __getCity( data, date ):
         city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
         city.date = date
-        city.lat = data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LATITUDE ) ]
-        city.lon = data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LONGITUDE ) ]
-        city.elev = float( data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_ELEVATION ) ] )
+        city.lat = data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LATITUDE ) ]
+        city.lon = data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LONGITUDE ) ]
+        city.elev = float( data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_ELEVATION ) ] )
 
         return city
