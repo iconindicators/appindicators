@@ -426,6 +426,16 @@ class AstroPyephem( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 93 ] : _( "ZAURAK" ) } )
 
 
+    # Internally used for city.
+    __DATA_TAG_ELEVATION = "ELEVATION"
+    __DATA_TAG_LATITUDE = "LATITUDE"
+    __DATA_TAG_LONGITUDE = "LONGITUDE"
+
+
+    # Internally used for city.
+    __NAME_TAG_CITY = "CITY"
+
+    
     @staticmethod
     def getAstronomicalInformation( utcNow,
                                     latitude, longitude, elevation,
@@ -439,10 +449,10 @@ class AstroPyephem( astrobase.AstroBase ):
 
         data = { }
 
-        # Used internally to create the observer/city...removed before passing back to the caller.
-        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LATITUDE ) ] = str( latitude )
-        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LONGITUDE ) ] = str( longitude )
-        data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_ELEVATION ) ] = str( elevation )
+        # Used internally; removed before passing back to the caller.
+        data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LATITUDE ) ] = str( latitude )
+        data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LONGITUDE ) ] = str( longitude )
+        data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_ELEVATION ) ] = str( elevation )
 
         ephemNow = ephem.Date( utcNow )
 
@@ -454,9 +464,9 @@ class AstroPyephem( astrobase.AstroBase ):
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum, hideIfBelowHorizon )
         AstroPyephem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
 
-        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LATITUDE ) ]
-        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LONGITUDE ) ]
-        del data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_ELEVATION ) ]
+        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LATITUDE ) ]
+        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LONGITUDE ) ]
+        del data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_ELEVATION ) ]
 
         return data
 
@@ -806,8 +816,8 @@ class AstroPyephem( astrobase.AstroBase ):
     def __getCity( data, date ):
         city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
         city.date = date
-        city.lat = data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LATITUDE ) ]
-        city.lon = data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_LONGITUDE ) ]
-        city.elev = float( data[ ( None, astrobase.AstroBase.NAME_TAG_CITY, astrobase.AstroBase.DATA_TAG_ELEVATION ) ] )
+        city.lat = data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LATITUDE ) ]
+        city.lon = data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_LONGITUDE ) ]
+        city.elev = float( data[ ( None, AstroPyephem.__NAME_TAG_CITY, astrobase.AstroBase.__DATA_TAG_ELEVATION ) ] )
 
         return city

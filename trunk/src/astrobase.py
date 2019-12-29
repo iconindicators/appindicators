@@ -46,13 +46,10 @@ class AstroBase( ABC ):
     DATA_TAG_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
     DATA_TAG_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
     DATA_TAG_ECLIPSE_TYPE = "ECLIPSE TYPE"
-    DATA_TAG_ELEVATION = "ELEVATION" # Internally used for city in astropyephem.
     DATA_TAG_EQUINOX = "EQUINOX"
     DATA_TAG_FIRST_QUARTER = "FIRST QUARTER"
     DATA_TAG_FULL = "FULL"
     DATA_TAG_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
-    DATA_TAG_LATITUDE = "LATITUDE" # Internally used for city in astropyephem.
-    DATA_TAG_LONGITUDE = "LONGITUDE" # Internally used for city in astropyephem.
     DATA_TAG_NEW = "NEW"
     DATA_TAG_PHASE = "PHASE"
     DATA_TAG_RISE_AZIMUTH = "RISE AZIMUTH"
@@ -145,7 +142,6 @@ class AstroBase( ABC ):
 
 
     # Tags used to uniquely name particular objects/items.
-    NAME_TAG_CITY = "CITY" #TODO Only used in astropyephem...so maybe move out of here?
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
 
