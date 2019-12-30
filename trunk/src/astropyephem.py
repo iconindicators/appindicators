@@ -506,6 +506,7 @@ class AstroPyephem( astrobase.AstroBase ):
     @staticmethod
 #TODO Wondering if the parameter hide if below the horizon should ever be passed in to the backend.
 # Does it make a difference in speed of calculations?
+# How much data is produced if we have this option on versus off?
 # Having it here does make the code a little messy.  Would the front end be a better/simpler option?    
     def __calculateMoon( ephemNow, data, hideIfBelowHorizon ):
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
