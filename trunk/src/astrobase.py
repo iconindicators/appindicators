@@ -263,15 +263,15 @@ class AstroBase( ABC ):
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
     @staticmethod
     @abstractmethod
-    def getAstronomicalInformation( utcNow,
-                                    latitude, longitude, elevation,
-                                    planets,
-                                    stars,
-                                    satellites, satelliteData,
-                                    comets, cometData,
-                                    minorPlanets, minorPlanetData,
-                                    magnitudeMaximum,
-                                    hideIfBelowHorizon ): 
+    def calculate( utcNow,
+                   latitude, longitude, elevation,
+                   planets,
+                   stars,
+                   satellites, satelliteData,
+                   comets, cometData,
+                   minorPlanets, minorPlanetData,
+                   magnitudeMaximum,
+                   hideIfBelowHorizon ): 
         return { }
 
 

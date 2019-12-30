@@ -345,15 +345,15 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 # TODO Verify results: https://ssd.jpl.nasa.gov/horizons.cgi
     @staticmethod
-    def getAstronomicalInformation( utcNow,
-                                    latitude, longitude, elevation,
-                                    planets,
-                                    stars,
-                                    satellites, satelliteData,
-                                    comets, cometData,
-                                    minorPlanets, minorPlanetData,
-                                    magnitudeMaximum,
-                                    hideIfBelowHorizon ):
+    def calculate( utcNow,
+                   latitude, longitude, elevation,
+                   planets,
+                   stars,
+                   satellites, satelliteData,
+                   comets, cometData,
+                   minorPlanets, minorPlanetData,
+                   magnitudeMaximum,
+                   hideIfBelowHorizon ):
 
         data = { }
         timeScale = load.timescale()

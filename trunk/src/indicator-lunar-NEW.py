@@ -247,7 +247,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.satellitesAddNew:
             self.addNewBodies( self.sateIndicatorLunar.astrobackends )
 
-        self.data = IndicatorLunar.astrobackend.getAstronomicalInformation(
+        self.data = IndicatorLunar.astrobackend.calculate(
             datetime.datetime.utcnow(),
             self.latitude, self.longitude, self.elevation,
             self.planets,
