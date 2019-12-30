@@ -723,6 +723,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
+#TODO If we move the hide body if below the horizon from the backend,
+# then likely need to add it to the test here in the return statement.
     def display( self, bodyType, nameTag ):
         return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
                ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data
