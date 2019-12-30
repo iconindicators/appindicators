@@ -19,18 +19,6 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Can we adjust the onclick URL for UKHO (which is located in the data download function)
-# to take into account the local DST offset (assuming all tidal data has date and time)?
-# Test to see what the URL needs by going to the UKHO site and using their tool first (not the print friendly version)
-# and see if the DST parameter in the URL is in minutes or hours).
-# 
-#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
-#               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-#
-# For DST, need to add a value of 60 for the offset for a one hour DST or 120 for two hours.
-
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -42,7 +30,7 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 from urllib.request import urlopen
 
-import datetime, indicatorbase, locale, ports, re, tide, webbrowser
+import datetime, indicatorbase, locale, ports, re, tide, time, webbrowser
 
 
 class IndicatorTide( indicatorbase.IndicatorBase ):
@@ -68,7 +56,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.18",
+            version = "1.0.19",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" ),
@@ -110,6 +98,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         previousMonth = -1
         previousDay = -1
         firstTidalReading = True # Used for subMenu build.
+#TODO This is difficult to read...can it be written again, maybe separating the subMenu and non-subMenu stuff?
         for tidalReading in tidalReadings:
             if allDateTimes:
                 tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
@@ -173,7 +162,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         if url:
             menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
-            menuItem.set_name( url )
+            daylightSavingsOffset = str( int( ( time.localtime().tm_gmtoff - -time.timezone ) / 60 ) )
+            menuItem.set_name( url.replace( "DaylightSavingOffset=0", "DaylightSavingOffset=" + daylightSavingsOffset ) )
 
         return menuItem
 

@@ -1,3 +1,10 @@
+indicator-tide (1.0.19-1) xenial; urgency=low
+
+  * On-click URL now takes into account daylight savings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 30 Dec 2019 18:11:31 +1000
+
+
 indicator-tide (1.0.18-1) xenial; urgency=low
 
   * Bug fix: Rollover year to year was incrementing the year for each reading.
