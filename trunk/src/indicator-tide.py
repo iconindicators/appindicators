@@ -23,6 +23,12 @@
 # to take into account the local DST offset (assuming all tidal data has date and time)?
 # Test to see what the URL needs by going to the UKHO site and using their tool first (not the print friendly version)
 # and see if the DST parameter in the URL is in minutes or hours).
+# 
+#         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
+#               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+#
+# For DST, need to add a value of 60 for the offset for a one hour DST or 120 for two hours.
+
 
 
 INDICATOR_NAME = "indicator-tide"
