@@ -352,8 +352,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                    satellites, satelliteData,
                    comets, cometData,
                    minorPlanets, minorPlanetData,
-                   magnitudeMaximum,
-                   hideIfBelowHorizon ):
+                   magnitudeMaximum ):
 
         data = { }
         timeScale = load.timescale()
@@ -361,20 +360,20 @@ class AstroSkyfield( astrobase.AstroBase ):
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] )
 
-        AstroSkyfield.__calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
-        AstroSkyfield.__calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, hideIfBelowHorizon )
-        AstroSkyfield.__calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets, hideIfBelowHorizon )
+        AstroSkyfield.__calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
+        AstroSkyfield.__calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
+        AstroSkyfield.__calculatePlanets( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets, planets )
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
 
-        AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, hideIfBelowHorizon )
+        AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars )
 
 #     Comet https://github.com/skyfielders/python-skyfield/issues/196
 #     utcNow = datetime.datetime.utcnow()
-#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitudeMaximum, hideIfBelowHorizon )
+#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitudeMaximum )
 #     print( "updateComets:", ( datetime.datetime.utcnow() - utcNow ) )
 #     utcNow = datetime.datetime.utcnow()
-#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitudeMaximum, hideIfBelowHorizon )
+#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitudeMaximum )
 #     print( "updateMinorPlanets:", ( datetime.datetime.utcnow() - utcNow ) )
 
 #     Satellite https://github.com/skyfielders/python-skyfield/issues/115
@@ -394,7 +393,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.geoastro.de/sundata/index.html
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
-    def __calculateMoon( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
+    def __calculateMoon( utcNow, data, timeScale, observer, ephemeris ):
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         moon = ephemeris[ AstroSkyfield.__MOON ]
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, moon, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
@@ -485,7 +484,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateSun( utcNow, data, timeScale, observer, ephemeris, hideIfBelowHorizon ):
+    def __calculateSun( utcNow, data, timeScale, observer, ephemeris ):
         sun = ephemeris[ AstroSkyfield.__SUN ]
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, sun, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
         if not neverUp:
@@ -495,7 +494,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets, hideIfBelowHorizon ):
+    def __calculatePlanets( utcNow, data, timeScale, observer, ephemeris, planets ):
         for planet in planets:
             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, ephemeris[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
 
@@ -507,7 +506,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
     # See revision 999 for code to filter ephemerisStars by magnitude.
     @staticmethod
-    def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, hideIfBelowHorizon ):
+    def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
         for star in stars:
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
 #TODO Not sure which below is correct...need to change star name to HIP?
@@ -521,7 +520,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
     # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
     @staticmethod
-    def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum, hideIfBelowHorizon ):
+    def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
         pass
     #     for star in stars:
     #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
@@ -529,6 +528,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
+#TODO Double check this as we removed the parameter hideIfBelowTheHorizon.    
     def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBodyType, nameTag ):
         neverUp = False
         key = ( astronomicalBodyType, nameTag )

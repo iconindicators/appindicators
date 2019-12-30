@@ -255,8 +255,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satellites, self.satelliteData,
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
-            self.magnitude,
-            self.hideBodiesBelowHorizon )
+            self.magnitude )
 
         # Update frontend.
         self.updateMenu( menu )
@@ -543,8 +542,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
                 url = IndicatorLunar.STAR_SEARCH_URL + str( IndicatorLunar.astrobackend.STARS_TO_HIP[ name ] )
-#TODO This refers to pyephem...maybe need an empty declaration in the base class (astrobase) and then refer to that?
-#Will python automatically insert the correct engine (pyephem or skyfield)?                
                 menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
@@ -727,7 +724,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # then likely need to add it to the test here in the return statement.
     def display( self, bodyType, nameTag ):
         return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
-               ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data
+               ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
 
 
     def getDisplayData( self, key, dateTimeFormat = None ):

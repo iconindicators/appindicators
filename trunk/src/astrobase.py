@@ -270,8 +270,7 @@ class AstroBase( ABC ):
                    satellites, satelliteData,
                    comets, cometData,
                    minorPlanets, minorPlanetData,
-                   magnitudeMaximum,
-                   hideIfBelowHorizon ): 
+                   magnitudeMaximum ): 
         return { }
 
 
