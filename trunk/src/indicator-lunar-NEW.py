@@ -20,6 +20,10 @@
 # comet, minor planet and satellite information.
 
 
+#TODO With Starlink satellites being launched, potentially thousands or more,
+# is it feasible to include the TLE data for these?
+
+
 #TODO In the notifications preferences, there is a tooltip for each the summary and message about formatting.
 # Why is this mentioned?  Did the tags (say moon phase) originally get parsed in the notifications?
 
