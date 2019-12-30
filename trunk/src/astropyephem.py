@@ -691,12 +691,7 @@ class AstroPyephem( astrobase.AstroBase ):
                 AstroPyephem.__calculateNextSatellitePass( ephemNow, data, key, satelliteData[ key ] )
 
 
-#TODO On Sep 1st I ran the indicator at 3pm and noticed that there were
-# satellites currently in transit with a rise date/time of Aug 29 18:40
-# and then satellites to rise Aug 30 4:52.
-# The TLE cache file had filename of satellite-tle-20190901045141
-#So something is wrong...perhaps in the string comparison of dates (might have to use datetime rather than dates).
-#Maybe this error was due to setting a dodgy date/time in the past (for testing) but using a TLE data file newer than the test time? 
+#TODO Verify satellite stuff!
     @staticmethod
     def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         key = ( astrobase.AstroBase.BodyType.SATELLITE, key )
@@ -752,6 +747,9 @@ class AstroPyephem( astrobase.AstroBase ):
 # GitHub issue #63: 
 # The rise, culminate, and set returned by next_pass() are now consecutive values for a single pass. 
 # Pass singlepass=False to return the original next_rise, next_culminate, next_set even if next_set < next_rise (the satellite is already up).
+# If testing to see if we ALWAYS get consecutive rise/transit/set values for the new pyephem,
+# perhaps change the code to look for all satellite passes, not just visible ones,
+# then run the indicator over the course of days and check each pass as it is computed.
     @staticmethod
     def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
         currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
@@ -780,6 +778,8 @@ class AstroPyephem( astrobase.AstroBase ):
 
 
     @staticmethod
+#TODO Is this method still needed?
+# Run for a day or two showing all satellite passes and see what happens without calling this method.        
     def __isSatellitePassValid( satellitePass ):
         return \
             satellitePass and \
