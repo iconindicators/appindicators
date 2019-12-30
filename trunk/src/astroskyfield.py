@@ -428,7 +428,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = nextThirdQuarterISO
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = nextNewMoonISO
 
-            astrobase.AstroBase.calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+            astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -491,7 +491,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         if not neverUp:
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
 # https://github.com/skyfielders/python-skyfield/issues/225
-            astrobase.AstroBase.calculateEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
     @staticmethod

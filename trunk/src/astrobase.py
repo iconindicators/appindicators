@@ -342,7 +342,7 @@ class AstroBase( ABC ):
 
     # Retrieve the next eclipse for either the Sun or Moon.
     @staticmethod
-    def calculateEclipse( utcNow, data, bodyType, dataTag ):
+    def getEclipse( utcNow, data, bodyType, dataTag ):
         eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
         key = ( bodyType, dataTag )
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
