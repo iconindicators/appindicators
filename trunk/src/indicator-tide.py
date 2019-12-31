@@ -95,13 +95,37 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
         self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
 
-        dateChangeIndices = [ ]
-        currentMonthDay = str( tidalReadings[ 0 ].getDateTime().month ) + '-' + str( tidalReadings[ 0 ].getDateTime().day )
+        tidalReadingsByDate = { }
+        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
+#TODO Best to put in the keys as local date time.
         for tidalReading in tidalReadings:
-            tidalDateTimeLocal = tidalReading.getDateTime()
-            print( tidalDateTimeLocal.month, tidalDateTimeLocal.day )
+            tidalReadingDate = tidalReading.getDateTime().date()
+            if tidalReadingDate not in tidalReadingsByDate:
+                tidalReadingsByDate[ tidalReadingDate ] = [ ]
+
+            tidalReadingsByDate[ tidalReadingDate ].append( tidalReading )
+
+        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
+        if self.showAsSubMenus:
+            pass
+
+        else:
+            for tidalReadingDate in sorted( tidalReadingsByDate ):
+                tidalReading = tidalReadingsByDate[ tidalReadingDate ][ 0 ]
+                if allDateTimes:
+                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
+
+                else:
+                    tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
+
+                menuItemText = self.indent( 1, 1 ) + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
 
         return
+
+
+
+
 
 
         allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
@@ -452,8 +476,10 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
     def getTidalData( self, portID ):
         tidalReadings = [ ]
-        self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
+#         self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS ) #TODO Uncomment
         tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
+
+        return# TODO Uncomment
         if tidalReadings:
             tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
             if not tidalReadings:
