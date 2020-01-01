@@ -111,7 +111,6 @@ _INDEX_PORT_COUNTRY = 2
 #
 # Port ID. port name, country.
 _ports = [
-    [ "6037", "Fort Denison", "Australia" ], #TODO Remove!
     [ "1", "St. Mary's", "England" ],
     [ "2", "Penzance (Newlyn)", "England" ],
     [ "2A", "Porthleven", "England" ],
