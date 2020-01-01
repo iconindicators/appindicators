@@ -95,31 +95,26 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
         self.createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
 
-        tidalReadingsByDate = { }
-        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
-#TODO Best to put in the keys as local date time.
-        for tidalReading in tidalReadings:
-            tidalReadingDate = tidalReading.getDateTime().date()
-            if tidalReadingDate not in tidalReadingsByDate:
-                tidalReadingsByDate[ tidalReadingDate ] = [ ]
-
-            tidalReadingsByDate[ tidalReadingDate ].append( tidalReading )
-
-        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
-        if self.showAsSubMenus:
-            pass
-
-        else:
-            for tidalReadingDate in sorted( tidalReadingsByDate ):
-                tidalReading = tidalReadingsByDate[ tidalReadingDate ][ 0 ]
-                if allDateTimes:
-                    tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
+        menuItemTexts = self.createMenuItemTexts( tidalReadings )
+        url = tidalReadings[ 0 ].getURL()
+        if not self.showAsSubMenus: #TODO Remember to remove the not!!!!
+            for item in menuItemTexts:
+                if isinstance( item, str ):
+                    subMenu = Gtk.Menu()
+                    self.createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, None ).set_submenu( subMenu )
 
                 else:
-                    tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
+                    for menuItemText in item:
+                        self.createAndAppendMenuItem( subMenu, self.indent( 0, 2 ) + menuItemText, url )
 
-                menuItemText = self.indent( 1, 1 ) + tidalDateTimeLocal.strftime( self.menuItemDateFormat )
-                self.createAndAppendMenuItem( menu, menuItemText, tidalReading.getURL() )
+        else:
+            for item in menuItemTexts:
+                if isinstance( item, str ):
+                    self.createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, url )
+
+                else:
+                    for menuItemText in item:
+                        self.createAndAppendMenuItem( menu, self.indent( 2, 2 ) + menuItemText, url )
 
         return
 
@@ -187,6 +182,46 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
             previousMonth = tidalDateTimeLocal.month
             previousDay = tidalDateTimeLocal.day
+
+
+    def createMenuItemTexts( self, tidalReadings ):
+        menuItemTexts = [ ]
+        allDateTimes = self.tidalReadingsAreAllDateTimes( tidalReadings )
+        previousDate = datetime.datetime.utcnow().date().replace( year = 1900 ) # Set bogus year in the past.
+        for tidalReading in tidalReadings:
+            if allDateTimes:
+                tidalDateTimeLocal = tidalReading.getDateTime().astimezone() # Date/time now in local time zone.
+
+            else:
+                tidalDateTimeLocal = tidalReading.getDateTime() # There may or may not be a time component; the result will be in port local.
+
+            if tidalDateTimeLocal.date() != previousDate:
+                menuItemText = tidalDateTimeLocal.strftime( self.menuItemDateFormat )
+                menuItemTexts.append( menuItemText )
+                previousDate = tidalDateTimeLocal.date()
+                menuItemTexts.append( [ ] ) # Will hold the menu item text for each tidal reading for the current date.
+
+            if isinstance( tidalDateTimeLocal, datetime.datetime ):
+                menuItemText = tidalDateTimeLocal.strftime( self.menuItemTideFormat )
+
+            else:
+                menuItemText = self.menuItemTideFormatSansTime
+
+            if tidalReading.getType() == tide.Type.H:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "H" ) )
+
+            else: # The type must be either H or L - cannot be anything else.
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, _( "L" ) )
+
+            if tidalReading.getLevelInMetres() is None:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, "" )
+
+            else:
+                menuItemText = menuItemText.replace( IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG, str( tidalReading.getLevelInMetres() ) + " m" )
+
+            menuItemTexts[ -1 ].append( menuItemText )
+
+        return menuItemTexts
 
 
     def buildMenuORIGINAL( self, menu, tidalReadings ):
@@ -479,7 +514,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 #         self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS ) #TODO Uncomment
         tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
 
-        return# TODO Uncomment
+        return tidalReadings# TODO Uncomment
         if tidalReadings:
             tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
             if not tidalReadings:
