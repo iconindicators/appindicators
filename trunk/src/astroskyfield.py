@@ -450,6 +450,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
     @staticmethod
+#TODO Can this method be made to be generic so that pyephem can use it?
+#The only sticking point here is utcNow.gast which is a skyfield thing...need to be able to compute the hour angle and/or sidereal time.
     def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
 
         # Get the latitude/longitude...there has to be a Topos object in the observer, because that is how Skyfield works!
