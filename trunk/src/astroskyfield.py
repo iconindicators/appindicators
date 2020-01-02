@@ -493,6 +493,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Skyfield does not calculate dawn/dusk, but there is a workaround
 # https://github.com/skyfielders/python-skyfield/issues/225
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+#TODO What about solstice/equinox?            
 
 
     @staticmethod
