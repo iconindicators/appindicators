@@ -136,6 +136,7 @@ class AstroPyephem( astrobase.AstroBase ):
         "WEZEN",
         "ZAURAK" ] )
 
+#TODO DOuble check.
     astrobase.AstroBase.STARS_TO_HIP.update( {
         "ACHERNAR"        : 7588,
         "ADARA"           : 33579,
