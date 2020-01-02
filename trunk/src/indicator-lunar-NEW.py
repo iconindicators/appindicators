@@ -646,16 +646,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     satellitesCircumpolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
 
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-            satellitesCircumpolar = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+            satellitesCircumpolar = sorted( satellitesCircumpolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
 
         else:
-#TODO Sort by name needs to be by name, not number.
             for number in self.satellites:
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
                 if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data or key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data:
                     satellites.append( [ number, self.satelliteData[ number ].getName(), None ] )
 
-            satellites = sorted( satellites, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
+            satellites = sorted( satellites, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
 
         if satellites:
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
