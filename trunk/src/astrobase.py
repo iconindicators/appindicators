@@ -37,7 +37,6 @@ class AstroBase( ABC ):
         SUN = 6
 
 
-#TODO Ensure both backends use all tags.
     # Data tags representing each of the pieces of calculated astronomical information.
     DATA_TAG_ALTITUDE = "ALTITUDE"
     DATA_TAG_AZIMUTH = "AZIMUTH"
