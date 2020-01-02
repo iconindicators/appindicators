@@ -200,11 +200,12 @@ class AstroSkyfield( astrobase.AstroBase ):
         "WEI",
         "WEZEN" ] )
 
-    astrobase.AstroBase.STARS_TO_HIP.update( STARS_TO_HIP = {
-        "ACHERNAR" :               588,
+#TODO Need to correct all the HIP numbers!!!
+    astrobase.AstroBase.STARS_TO_HIP.update( {
+        "ACHERNAR" :               7588,
         "ACRUX" :                  718,
         "ADHARA" :                 3579,
-        "AGENA" :                  8702,
+        "AGENA" :                  68702,
         "ALBIREO" :                5947,
         "ALCOR" :                  5477,
         "ALDEBARAN" :              1421,
@@ -718,11 +719,11 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, observer, ephemeris ):
-        sun = ephemeris[ AstroSkyfield.__SUN ]
-        neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, sun, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
-        if not neverUp:
+        if not AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, ephemeris[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ):
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 #TODO What about solstice/equinox?            
+# https://rhodesmill.org/skyfield/almanac.html
+# https://github.com/skyfielders/python-skyfield/issues/223
 
 
     @staticmethod
@@ -740,12 +741,14 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
         for star in stars:
-    #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
+#TODO Guard against unknown stars...will occur when switching between backends.
+#For now, do this check here...but really is this the best place or maybe it is the only place?
+            if star in astrobase.AstroBase.STARS:
+#         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
 #TODO Not sure which below is correct...need to change star name to HIP?
 #             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
-            hip = AstroSkyfield.STARS_TO_HIP[ star ]
-            s = Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] )
-            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ AstroSkyfield.STARS_TO_HIP[ star ] ] ), astrobase.AstroBase.BodyType.STAR, star )
+                AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ] ), astrobase.AstroBase.BodyType.STAR, star )
+                break
 
 
     #TODO  
@@ -855,9 +858,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
-        key = ( astrobase.AstroBase.BodyType.Satellite, " ".join( key ) )
-        currentDateTime = utcNow.J
-        endDateTime = timeScale.utc( ( utcNow.utc_datetime() + timedelta( days = 24 * 2 ) ).replace( tzinfo = pytz.UTC ) ).J #TODO Maybe pass this in as it won't change per satellite.
+        pass
+#         key = ( astrobase.AstroBase.BodyType.Satellite, " ".join( key ) )
+#         currentDateTime = utcNow.J
+#         endDateTime = timeScale.utc( ( utcNow.utc_datetime() + timedelta( days = 24 * 2 ) ).replace( tzinfo = pytz.UTC ) ).J #TODO Maybe pass this in as it won't change per satellite.
 #TODO rise/set not yet implemented in Skyfield
 # https://github.com/skyfielders/python-skyfield/issues/115
 
