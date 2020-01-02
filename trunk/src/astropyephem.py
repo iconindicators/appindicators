@@ -659,21 +659,10 @@ class AstroPyephem( astrobase.AstroBase ):
     #   http://www.heavens-above.com
     #   http://in-the-sky.org
     #
-    # For planets/stars, the immediate next rise/set time is shown.
-    # If already above the horizon, the set time is shown followed by the rise time for the following pass.
-    # This makes sense as planets/stars are slow moving.
-    #
-    # However, as satellites are faster moving and pass several times a day, a different approach is used.
-    # When a notification is displayed indicating a satellite is now passing overhead,
-    # the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
-    #
-    # Therefore...
-    #    If a satellite is yet to rise, show the upcoming rise/set time.
-    #    If a satellite is currently passing over, show the rise/set time for that pass.
-    #
-    # This allows the user to see the rise/set time for the current pass as it is happening.
-    # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
+    # If a satellite is yet to rise, show the rise/set time for the upcoming visible pass.
+    # If a satellite is currently passing over (and is a visible pass), show the rise/set time for that pass.
     @staticmethod
+#TODO Verify satellite stuff!
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
         for key in satellites:
             if key in satelliteData:
@@ -687,8 +676,7 @@ class AstroPyephem( astrobase.AstroBase ):
 # Therefore need to check the version
 #    print( ephem.__version__ )
 # and handle according to the version currently running.
-#
-#TODO Verify satellite stuff!
+#https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
     def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
         key = ( astrobase.AstroBase.BodyType.SATELLITE, key )
@@ -699,13 +687,19 @@ class AstroPyephem( astrobase.AstroBase ):
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
             try:
-                nextPass = city.next_pass( satellite )
+                # Due to a fix between PyEphem version 3.7.6.0 and 3.7.7.0, need to check for pass differently.
+                # https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
+                if ephem.__version__ == "3.7.6.0":
+                    nextPass = city.next_pass( satellite )
+
+                else:
+                    nextPass = city.next_pass( satellite, singlepass = False )
 
             except ValueError:
-                if satellite.circumpolar:
-#                 print( "circumpolar" )#TODO
+                if satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
                     data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( str( repr( satellite.az ) ) )
                     data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( satellite.alt )
+
                 break
 
             if not AstroPyephem.__isSatellitePassValid( nextPass ):
@@ -775,8 +769,7 @@ class AstroPyephem( astrobase.AstroBase ):
 
 
     @staticmethod
-#TODO Is this method still needed?
-# Run for a day or two showing all satellite passes and see what happens without calling this method.        
+    # Guard against bad TLE data causing spurious results.
     def __isSatellitePassValid( satellitePass ):
         return \
             satellitePass and \
