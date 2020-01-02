@@ -616,10 +616,9 @@ class AstroPyephem( astrobase.AstroBase ):
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
 
+#TODO In Skyfield we still return a flag if the body is never up.
+#Do this here too?  If so, need to handle this for the moon/sun...but moon might need to still calculate bright limb and other stuff.
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
-    #
-    # If hideIfBelowHorzion is True, if a body is below the horizon (but will rise), that body is dropped (no data stored).
-    # Otherwise the body will be included.
     #
     # Returns True if the body was dropped:
     #    The body is below the horizon and hideIfBelowHorizon is True.
