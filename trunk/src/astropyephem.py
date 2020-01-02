@@ -748,8 +748,8 @@ class AstroPyephem( astrobase.AstroBase ):
         return nextPass
 
 
-    @staticmethod
     # Guard against bad TLE data causing spurious results.
+    @staticmethod
     def __isSatellitePassIsValid( satellitePass ):
         return satellitePass and \
                len( satellitePass ) == 6 and \
