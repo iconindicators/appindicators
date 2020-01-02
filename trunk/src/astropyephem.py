@@ -504,20 +504,20 @@ class AstroPyephem( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateMoon( ephemNow, data ):
-        AstroPyephem.__calculateCommon( ephemNow, data, ephem.Moon(), astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-        key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
-        astrobase.AstroBase.getEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-
         # Used for internal processing; indirectly presented to the user.
+        key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         moon = ephem.Moon()
         moon.compute( AstroPyephem.__getCity( data, ephemNow ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
+
+        if not AstroPyephem.__calculateCommon( ephemNow, data, ephem.Moon(), astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ):
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+            astrobase.AstroBase.getEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -573,14 +573,14 @@ class AstroPyephem( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( ephemNow, data ):
-        AstroPyephem.__calculateCommon( ephemNow, data, ephem.Sun(), astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
-        astrobase.AstroBase.getEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+        if not AstroPyephem.__calculateCommon( ephemNow, data, ephem.Sun(), astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ):
+            astrobase.AstroBase.getEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
-        equinox = ephem.next_equinox( ephemNow )
-        solstice = ephem.next_solstice( ephemNow )
-        key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
+            equinox = ephem.next_equinox( ephemNow )
+            solstice = ephem.next_solstice( ephemNow )
+            key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
 
 
     # http://www.geoastro.de/planets/index.html
@@ -616,15 +616,12 @@ class AstroPyephem( astrobase.AstroBase ):
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
 
-#TODO In Skyfield we still return a flag if the body is never up.
-#Do this here too?  If so, need to handle this for the moon/sun...but moon might need to still calculate bright limb and other stuff.
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
     #
-    # Returns True if the body was dropped:
-    #    The body is below the horizon and hideIfBelowHorizon is True.
-    #    The body is never up.
+    # Returns True if the body is never up; false otherwise.
     @staticmethod
     def __calculateCommon( ephemNow, data, body, bodyType, nameTag ):
+        neverUp = False
         key = ( bodyType, nameTag )
         try:
             city = AstroPyephem.__getCity( data, ephemNow )
@@ -646,7 +643,9 @@ class AstroPyephem( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( repr( body.alt ) )
 
         except ephem.NeverUpError:
-            pass
+            neverUp = True
+
+        return neverUp
 
 
     # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
