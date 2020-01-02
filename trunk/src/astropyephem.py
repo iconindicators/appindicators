@@ -680,6 +680,14 @@ class AstroPyephem( astrobase.AstroBase ):
                 AstroPyephem.__calculateNextSatellitePass( ephemNow, data, key, satelliteData[ key ] )
 
 
+#TODO Between version 3.7.6.0 and 3.7.7.0 of PyEphem, a change was made to the satellite pass code.
+# Refer to https://rhodesmill.org/pyephem/CHANGELOG#version-3-7-7-0-2019-august-18
+# In short, there is no need to ensure a satellite pass contains a rise/transit/set in increasing date/time order.
+# However, Ubuntu 16.04/18.04 only have version 3.7.6.0, whereas future versions have 3.7.7.0
+# Therefore need to check the version
+#    print( ephem.__version__ )
+# and handle according to the version currently running.
+#
 #TODO Verify satellite stuff!
     @staticmethod
     def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
