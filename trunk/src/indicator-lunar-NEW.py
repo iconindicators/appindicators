@@ -245,7 +245,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
         if self.satellitesAddNew:
-            self.addNewBodies( self.sateIndicatorLunar.astrobackends )
+            self.addNewBodies( self.satelliteData, self.satellites )
 
         self.data = IndicatorLunar.astrobackend.calculate(
             datetime.datetime.utcnow(),
@@ -632,6 +632,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
+#
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
@@ -648,6 +649,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             satellitesCircumpolar = sorted( satellitesCircumpolar, key = lambda x: ( x[ 0 ], x[ 1 ] ) )
 
         else:
+#TODO Sort by name needs to be by name, not number.
             for number in self.satellites:
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
                 if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data or key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data:
