@@ -649,15 +649,15 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         if not neverUp:
             moonPhaseDateTimes = t.utc_datetime()
-            nextNewMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ] #TODO See above TODO about having text here.
+            nextNewMoonISO = moonPhaseDateTimes[ ( moonPhases.index( "New Moon" ) ) ] #TODO See above TODO about having text here.
             nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
             nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
-            nextFullMoonISO = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
-
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = nextFirstQuarterISO
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = nextFullMoonISO
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = nextThirdQuarterISO
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = nextNewMoonISO
+            nextFullMoonISO = moonPhaseDateTimes[ ( moonPhases.index( "Full Moon" ) ) ]
+# utc_strftime
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( nextFirstQuarterISO )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( nextFullMoonISO )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( nextThirdQuarterISO )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( nextNewMoonISO )
 
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
             #TODO the date/time format does not match that in the indicator.
@@ -727,6 +727,9 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO What about solstice/equinox?            
 # https://rhodesmill.org/skyfield/almanac.html
 # https://github.com/skyfielders/python-skyfield/issues/223
+            key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() ) #TODO Hack to get the indicator running.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() ) #TODO As above.
 
 
     @staticmethod

@@ -114,8 +114,8 @@ import astrobase, datetime, eclipse, indicatorbase, glob, locale, math, orbitale
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allowing easy switching between backends (eventually looking to move to Skyfield).
-#     astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
-    astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
+    astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
+#     astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
 
 
     CONFIG_CITY_ELEVATION = "cityElevation"
@@ -327,6 +327,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
+        menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) ) #TODO Debugging.
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
