@@ -683,9 +683,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Can this method be made to be generic so that pyephem can use it?
 #The only sticking point here is utcNow.gast which is a skyfield thing...need to be able to compute the hour angle and/or sidereal time.
     def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
-
-        # Get the latitude/longitude...there has to be a Topos object in the observer, because that is how Skyfield works!
-        for thing in observer.positives:
+        for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
             if isinstance( thing, Topos ):
                 latitude = thing.latitude
                 longitude = thing.longitude
@@ -819,6 +817,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO Might be useful:
 # https://github.com/skyfielders/python-skyfield/issues/242
+# https://rhodesmill.org/skyfield/earth-satellites.html
+# https://rhodesmill.org/skyfield/api-satellites.html
     # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
     #
     # Other sources/background:
