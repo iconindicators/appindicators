@@ -114,8 +114,8 @@ import astrobase, datetime, eclipse, indicatorbase, glob, locale, math, orbitale
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allowing easy switching between backends (eventually looking to move to Skyfield).
-    astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
-#     astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
+#     astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
+    astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
 
 
     CONFIG_CITY_ELEVATION = "cityElevation"
@@ -357,7 +357,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
         iconFilename = IndicatorLunar.ICON_BASE_NAME + "-" + str( datetime.datetime.utcnow().strftime( "%Y%m%d%H%M%S" ) ) + ".svg"
-
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
