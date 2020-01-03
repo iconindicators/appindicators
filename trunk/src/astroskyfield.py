@@ -729,33 +729,14 @@ class AstroSkyfield( astrobase.AstroBase ):
             t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
             t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7, utcNowDateTime.day, utcNowDateTime.hour ) # Look seven months ahead.
             t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemeris ) )
-            if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]: #TODO Not sure if this logic is correct!
-                data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] ) #TODO This line and the 3 below break!
+            t = t.utc_datetime()
+            if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
             else:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
-            
-            
-            for yi, ti in zip( y, t ):
-                print( yi, almanac.SEASON_EVENTS[ yi ], ti.utc_iso( ' ' ) )
-
-            print()
-            for yi, ti in zip( y, t ):
-                print( yi, almanac.SEASON_EVENTS_NEUTRAL[ yi ], ti.utc_iso( ' ' ) )
-
-            print()
-# 0 Vernal Equinox 2020-03-20 03:49:37Z
-# 1 Summer Solstice 2020-06-20 21:43:41Z
-# 2 Autumnal Equinox 2020-09-22 13:30:39Z
-# 3 Winter Solstice 2020-12-21 10:02:20Z
-# 
-# 0 March Equinox 2020-03-20 03:49:37Z
-# 1 June Solstice 2020-06-20 21:43:41Z
-# 2 September Equinox 2020-09-22 13:30:39Z
-# 3 December Solstice 2020-12-21 10:02:20Z
-
 
 
     @staticmethod
