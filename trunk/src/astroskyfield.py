@@ -640,8 +640,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) # Needed for icon.
 
         utcNowDateTime = utcNow.utc_datetime()
-        t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
-        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
+        t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
+        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
 #TODO Test the above line for Feb.
 # https://rhodesmill.org/skyfield/almanac.html
         t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
@@ -658,10 +658,6 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "New Moon" ) ) ] )
 
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-            #TODO the date/time format does not match that in the indicator.
-            #WHat does pyephem do?  Pass in string or a datetime?
-            #####IS THIS STILL RELEVENT?  I think it was to do with the toDateTimeString function not being called at the time of writing this TODO.
-# ValueError: time data '2020-01-03T04:45:25Z' does not match format '%Y-%m-%d %H:%M:%S'
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -726,8 +722,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             utcNowDateTime = utcNow.utc_datetime()
-            t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
-            t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7, utcNowDateTime.day, utcNowDateTime.hour ) # Look seven months ahead.
+            t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
+            t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Look seven months ahead.
             t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemeris ) )
             t = t.utc_datetime()
             if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]:
@@ -774,8 +770,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         neverUp = False
         key = ( astronomicalBodyType, nameTag )
         utcNowDateTime = utcNow.utc_datetime()
-        t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
-        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
+        t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
+        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Look two days ahead as one day ahead may miss the next rise or set.
         t, y = almanac.find_discrete( t0, t1, AstroSkyfield.__bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
         if t:
             t = t.utc_datetime()
