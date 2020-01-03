@@ -39,6 +39,10 @@
 #     sudo pip3 install --upgrade pandas
 
 
+# Uncomment the lines below when needing to run the planet/star ephemeris creation functions at the end.
+# import gettext
+# gettext.install( "astroskyfield" )
+
 from datetime import timedelta
 
 from skyfield import almanac
@@ -48,7 +52,6 @@ from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
 import astrobase, datetime, gzip, math, os, pytz, orbitalelement, subprocess, twolineelement
-from builtins import staticmethod
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -591,7 +594,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         timeScale = load.timescale()
         utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
-        observer = AstroSkyfield.__getSkyfieldObserver( latitude, longitude, elevation, ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] )
+        observer = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + \
+                   Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
         AstroSkyfield.__calculateMoon( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
         AstroSkyfield.__calculateSun( utcNowSkyfield, data, timeScale, observer, ephemerisPlanets )
@@ -633,6 +637,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = str( int( almanac.fraction_illuminated( ephemeris, AstroSkyfield.__MOON, utcNow ) * 100 ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
+#TODO Icon bright limb angle does not match that for pyephem...why?
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) ) ) # Needed for icon.
+
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
         t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, 1 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
@@ -645,19 +652,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) ) ) # Needed for icon.
-
         if not neverUp:
-            moonPhaseDateTimes = t.utc_datetime()
-            nextNewMoonISO = moonPhaseDateTimes[ ( moonPhases.index( "New Moon" ) ) ] #TODO See above TODO about having text here.
-            nextFirstQuarterISO = moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ]
-            nextThirdQuarterISO = moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ]
-            nextFullMoonISO = moonPhaseDateTimes[ ( moonPhases.index( "Full Moon" ) ) ]
-# utc_strftime
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( nextFirstQuarterISO )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( nextFullMoonISO )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( nextThirdQuarterISO )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( nextNewMoonISO )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "Full Moon" ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "New Moon" ) ) ] )
 
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
             #TODO the date/time format does not match that in the indicator.
@@ -748,13 +747,11 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
         for star in stars:
 #TODO Guard against unknown stars...will occur when switching between backends.
-#For now, do this check here...but really is this the best place or maybe it is the only place?
+#For now, do this check here...but really is this the best place or maybe it is the only possible place?
+#Maybe the indicator needs to handle this...?   But the indicator should not be expected to expect a change in the list of stars.
             if star in astrobase.AstroBase.STARS:
 #         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-#TODO Not sure which below is correct...need to change star name to HIP?
-#             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS[ star ] ] ), astrobase.BodyType.STAR, star )
                 AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ] ), astrobase.AstroBase.BodyType.STAR, star )
-                break
 
 
     #TODO  
@@ -773,43 +770,34 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculateCommon( utcNow, data, timeScale, observer, body, astronomicalBodyType, nameTag ):
         neverUp = False
         key = ( astronomicalBodyType, nameTag )
-
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour )
         t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour ) # Look two days ahead as one day ahead may miss the next rise or set.
-
         t, y = almanac.find_discrete( t0, t1, AstroSkyfield.__bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
         if t:
-            t = t.utc_iso( delimiter = ' ' )
+            t = t.utc_datetime()
             if y[ 0 ]:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
 
             else:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = str( t[ 1 ][ : -1 ] )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = str( t[ 0 ][ : -1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+                apparent = observer.at( utcNow ).observe( body ).apparent()
+                alt, az, bodyDistance = apparent.altaz()
+                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
             if AstroSkyfield.__bodyrise_bodyset( observer, body )( t0 ): # Taken and modified from Skyfield almanac.find_discrete.
-                pass # Body is up (and so always up).
+                # Body is up (and so always up).
+                apparent = observer.at( utcNow ).observe( body ).apparent()
+                alt, az, bodyDistance = apparent.altaz()
+                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
             else:
                 neverUp = True # Body is down (and so never up). 
 
-        if not neverUp:
-            apparent = observer.at( utcNow ).observe( body ).apparent()
-            alt, az, bodyDistance = apparent.altaz()
-            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
-
         return neverUp
-
-
-    #TODO Only called in one place...and if so, just move the code in place and delete this function.
-#TODO Rename to getObserver.
-    @staticmethod
-    def __getSkyfieldObserver( latitude, longitude, elevation, earth ):
-        return earth + Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
 
 
     #TODO Have copied the code from skyfield/almanac.py as per
@@ -830,8 +818,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         return is_body_up_at
 
 
-#TODO Might be useful:https://github.com/skyfielders/python-skyfield/issues/242
-
+#TODO Might be useful:
+# https://github.com/skyfielders/python-skyfield/issues/242
     # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
     #
     # Other sources/background:
@@ -928,5 +916,5 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( e )
 
 
-# createStarEphemeris()
-# createPlanetEphemeris()
+# AstroSkyfield.createStarEphemeris()
+# AstroSkyfield.createPlanetEphemeris()

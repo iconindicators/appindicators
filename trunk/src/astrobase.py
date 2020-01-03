@@ -250,6 +250,8 @@ class AstroBase( ABC ):
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
 
+#TODO Need a comment or change variable of lat/long to indicate decimal degress (or whatever the units are) and str or int.
+#TOOO Need a comment or change of variable for elev to indicate metres and str or int.
     # Returns a dictionary with astronomical information:
     #     Key is a tuple of BodyType, a name tag and a data tag.
     #     Value is the calculated astronomical information as a string.
@@ -309,29 +311,29 @@ class AstroBase( ABC ):
 
             elif illuminationPercentage <= 99 and illuminationPercentage > 50:
                 phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
-            
+
             elif illuminationPercentage == 50:
                 phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
-            
+
             elif illuminationPercentage < 50 and illuminationPercentage >= 1:
                 phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
-            
+
             else: # illuminationPercentage < 1
                 phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         else: # Between a full moon and the next new moon...
             if( illuminationPercentage > 99 ):
                 phase = AstroBase.LUNAR_PHASE_FULL_MOON
-            
+
             elif illuminationPercentage <= 99 and illuminationPercentage > 50:
                 phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
-            
+
             elif illuminationPercentage == 50:
                 phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
-            
+
             elif illuminationPercentage < 50 and illuminationPercentage >= 1:
                 phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
-            
+
             else: # illuminationPercentage < 1
                 phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
@@ -349,6 +351,5 @@ class AstroBase( ABC ):
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
-#TODO This works for pyephem...but does it work for skyfield (that is, does skyfield have a different format)?
     @staticmethod
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )

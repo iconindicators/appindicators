@@ -598,10 +598,14 @@ class AstroPyephem( astrobase.AstroBase ):
     @staticmethod
     def __calculateStars( ephemNow, data, stars, magnitudeMaximum ):
         for star in stars:
-            starObject = ephem.star( star.title() )
-            starObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
-            if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitudeMaximum:
-                AstroPyephem.__calculateCommon( ephemNow, data, starObject, astrobase.AstroBase.BodyType.STAR, star )
+#TODO Guard against unknown stars...will occur when switching between backends.
+#For now, do this check here...but really is this the best place or maybe it is the only possible place?
+#Maybe the indicator needs to handle this...?   But the indicator should not be expected to expect a change in the list of stars.
+            if star in astrobase.AstroBase.STARS:
+                starObject = ephem.star( star.title() )
+                starObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
+                if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitudeMaximum:
+                    AstroPyephem.__calculateCommon( ephemNow, data, starObject, astrobase.AstroBase.BodyType.STAR, star )
 
 
     # Compute data for comets or minor planets.
