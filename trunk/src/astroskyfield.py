@@ -637,8 +637,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = str( int( almanac.fraction_illuminated( ephemeris, AstroSkyfield.__MOON, utcNow ) * 100 ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-#TODO Icon bright limb angle does not match that for pyephem...why?
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( int( round( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) # Needed for icon.
 
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day )
@@ -661,6 +660,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
             #TODO the date/time format does not match that in the indicator.
             #WHat does pyephem do?  Pass in string or a datetime?
+            #####IS THIS STILL RELEVENT?  I think it was to do with the toDateTimeString function not being called at the time of writing this TODO.
 # ValueError: time data '2020-01-03T04:45:25Z' does not match format '%Y-%m-%d %H:%M:%S'
 
 
@@ -703,7 +703,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
         positionAngleOfBrightLimb = math.atan2( y, x )
 
-    #TODO Are the comments below still valid?
+#TODO Are the comments below still valid?
         # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
