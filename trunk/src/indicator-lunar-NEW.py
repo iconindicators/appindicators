@@ -158,14 +158,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 30
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 30
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
@@ -174,7 +174,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     MINOR_PLANET_CENTER_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" # Used to search for minor planets and comets.
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 30
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
