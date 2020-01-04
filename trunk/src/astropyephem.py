@@ -510,7 +510,19 @@ class AstroPyephem( astrobase.AstroBase ):
         moon.compute( AstroPyephem.__getCity( data, ephemNow ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
+#         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
+
+        
+        
+        brightLimbOriginal = AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() )
+
+        city = AstroPyephem.__getCity( data, ephemNow )
+        sun = ephem.Sun( city )
+        moon = ephem.Moon()
+        moon.compute( city )
+        brightLimbNew = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimbNew ) # Needed for icon.
+
 
         if not AstroPyephem.__calculateCommon( ephemNow, data, ephem.Moon(), astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -558,14 +570,15 @@ class AstroPyephem( astrobase.AstroBase ):
 
         citySiderealTime = city.sidereal_time()
         citySiderealTimeFloat = float( citySiderealTime )
-        bodyRAFloat = float( body.ra )
-        localSiderealTime = astrobase.AstroBase.getSiderealTime( ephemNow.datetime(), math.degrees( float( city.lon ) ) )
-        localSiderealTimeRadians = math.radians( localSiderealTime )
-        julianDateNow = ephem.julian_date( ephemNow )
-        hourAngleA = localSiderealTime - body.ra
-        hourAngleB = localSiderealTime - math.degrees( body.ra )
-        hourAngleC = localSiderealTime - math.degrees( float( body.ra ) )
-        hourAngleD = localSiderealTime - float( body.ra )
+#         bodyRAFloat = float( body.ra )
+        localSiderealTime = math.radians( astrobase.AstroBase.getSiderealTime( ephemNow.datetime(), math.degrees( float( city.lon ) ) ) * 15 )
+#         localSiderealTimeDegrees = localSiderealTime * 15
+#         localSiderealTimeRadians = math.radians( localSiderealTimeDegrees )
+#         julianDateNow = ephem.julian_date( ephemNow )
+        hourAngleNEW = localSiderealTime - body.ra
+#         hourAngleB = localSiderealTime - math.degrees( body.ra )
+#         hourAngleC = localSiderealTime - math.degrees( float( body.ra ) )
+#         hourAngleD = localSiderealTime - float( body.ra )
 #         z = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), ephem.degrees( sun.ra ), ephem.degrees( sun.dec ), ephem.degrees( body.ra ), ephem.degrees( body.dec ), ephem.degrees( city.lat ), ephem.degrees( city.lon ) )
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1

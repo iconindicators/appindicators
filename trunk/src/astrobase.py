@@ -358,7 +358,7 @@ class AstroBase( ABC ):
 #TODO Add header.
 #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
     @staticmethod
-    def getSiderealTime( utcNow, longitudeInDegrees ):
+    def getSiderealTime( utcNow, longitude ):
         # Find the Julian date.  Section 4 of the reference.
         # Assume the date is always later than 15th October, 1582.
         y = utcNow.year
@@ -382,7 +382,6 @@ class AstroBase( ABC ):
         C = int( 365.25 * yPrime )
         D = int( 30.6001 * ( mPrime + 1 ) )
         julianDate = B + C + D + d + 1720994.5
-        print( "Julian date", julianDate )
 
         # Find universal time.  Section 12 of the reference. 
         S = julianDate - 2451545.0
@@ -391,14 +390,11 @@ class AstroBase( ABC ):
         universalTimeDecimal = ( ( ( utcNow.second / 60 ) + utcNow.minute ) / 60 ) + utcNow.hour
         A = universalTimeDecimal * 1.002737909
         greenwichSiderealTimeDecimal = ( A + T0 ) % 24
-        print( "Greenwich sidereal time", greenwichSiderealTimeDecimal )
 
         # Find local sidereal time.  Section 14 of the reference.
-        longitudeInHours = longitudeInDegrees / 15
-        print( "Longitude in degrees", longitudeInDegrees )
-        print( "Longitude in hours", longitudeInHours )
+        longitudeInHours = math.degrees( longitude ) / 15
 
-        return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal.
+        return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal time.
     
     
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -431,7 +427,7 @@ class AstroBase( ABC ):
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
         # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        localSiderealTime = AstroBase.getSiderealTime( utcNow, math.degrees( bodyLong ) )
+        localSiderealTime = math.radians( AstroBase.getSiderealTime( utcNow, bodyLong ) * 15 ) # Multiply by 15 to convert from decimal time to decimal degrees.  Section 22 of reference.
         hourAngle = localSiderealTime - bodyRA
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
