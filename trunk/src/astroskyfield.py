@@ -639,6 +639,19 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) # Needed for icon.
 
+
+        sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( ephemeris[ AstroSkyfield.__SUN ] ).apparent().radec()
+        moonRA, moonDec, earthDistance = observer.at( utcNow ).observe( moon ).apparent().radec()
+        for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
+            if isinstance( thing, Topos ):
+                latitude = thing.latitude
+                longitude = thing.longitude
+                break
+
+        brightLimbNew = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), sunRA.radians, sunDec.radians, moonRA.radians, moonDec.radians, latitude.radians, longitude.radians )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimbNew ) # Needed for icon.
+
+
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
         t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
