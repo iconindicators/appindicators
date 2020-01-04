@@ -639,15 +639,9 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) # Needed for icon.
 
-
         sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( ephemeris[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = observer.at( utcNow ).observe( moon ).apparent().radec()
-        for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
-            if isinstance( thing, Topos ):
-                latitude = thing.latitude
-                longitude = thing.longitude
-                break
-
+        latitude, longitude = AstroSkyfield.__getLatitudeLongitude( observer )
         brightLimbNew = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), sunRA.radians, sunDec.radians, moonRA.radians, moonDec.radians, latitude.radians, longitude.radians )
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimbNew ) # Needed for icon.
 
@@ -909,6 +903,17 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO rise/set not yet implemented in Skyfield
 # https://github.com/skyfielders/python-skyfield/issues/115
 
+
+#TODO Header comment
+    @staticmethod
+    def __getLatitudeLongitude( observer ):
+        for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
+            if isinstance( thing, Topos ):
+                latitude = thing.latitude
+                longitude = thing.longitude
+                break
+
+        return latitude, longitude
 
 
     # If all stars in the Hipparcos catalogue were included, capped to magnitude 15,
