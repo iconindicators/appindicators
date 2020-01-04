@@ -702,6 +702,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
         # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+#         AstroSkyfield.__observerSiderealTime( utcNow, observer )
+        localSiderealTime = astrobase.AstroBase.getSiderealTime( utcNow.utc_datetime(), longitude.degrees )
         observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + longitude.radians # From skyfield.earthlib.py
         hourAngle = observerSiderealTime - bodyRA.radians
 
@@ -711,6 +713,42 @@ class AstroSkyfield( astrobase.AstroBase ):
         parallacticAngle = math.atan2( y, x )
 
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
+
+
+    @staticmethod
+    def __observerSiderealTime( utcNow, observerLongitude ):
+        y = utcNow.year
+        m = utcNow.month
+        d = utcNow.day + \
+            ( utcNow.hour / 24 ) + \
+            ( utcNow.minute / ( 60 * 24 ) ) + \
+            ( utcNow.second / ( 60 * 60 * 24 ) ) + \
+            ( utcNow.microsecond / ( 60 * 60 * 24 * 1000 ) )
+
+        if m == 1:
+            yDash = y - 1
+            mDash = m + 12
+
+        else:
+            yDash = y
+            mDash = m
+
+        # Assumed the date is later than 15th October, 1582.
+        A = int( yDash / 100 )
+        B = 2 - A + int( A / 4 )
+        C = int( 365.25 * yDash )
+        D = int( 30.6001 * ( mDash + 1 ) )
+        julianDate = B + C + D + d + 1720994.5
+        S = julianDate - 2451545.0
+        T = S / 36525.0
+        T0 = ( 6.697374558 + ( 2400.051336 * T ) + ( 0.000025862 * T * T ) ) % 24
+
+        universalTimeDecimal = ( ( ( utcNow.second / 60 ) + utcNow.minute ) / 60 ) + utcNow.hour
+        A = universalTimeDecimal * 1.002737909
+        greenwichSiderealTimeDecimal = ( A + T0 ) % 24
+        longitudeInHours = observerLongitude / 15
+
+        return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal.
 
 
     @staticmethod

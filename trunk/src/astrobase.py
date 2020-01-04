@@ -22,7 +22,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-import eclipse
+import eclipse, math
 
 
 class AstroBase( ABC ):
@@ -353,3 +353,90 @@ class AstroBase( ABC ):
 
     @staticmethod
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+
+
+#TODO Add header.
+#  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
+    @staticmethod
+    def getSiderealTime( utcNow, longitudeInDegrees ):
+        # Find the Julian date.  Section 4 of the reference.
+        # Assume the date is always later than 15th October, 1582.
+        y = utcNow.year
+        m = utcNow.month
+        d = utcNow.day + \
+            ( utcNow.hour / 24 ) + \
+            ( utcNow.minute / ( 60 * 24 ) ) + \
+            ( utcNow.second / ( 60 * 60 * 24 ) ) + \
+            ( utcNow.microsecond / ( 60 * 60 * 24 * 1000 ) )
+
+        if m == 1 or m == 2:
+            yPrime = y - 1
+            mPrime = m + 12
+
+        else:
+            yPrime = y
+            mPrime = m
+
+        A = int( yPrime / 100 )
+        B = 2 - A + int( A / 4 )
+        C = int( 365.25 * yPrime )
+        D = int( 30.6001 * ( mPrime + 1 ) )
+        julianDate = B + C + D + d + 1720994.5
+        print( "Julian date", julianDate )
+
+        # Find universal time.  Section 12 of the reference. 
+        S = julianDate - 2451545.0
+        T = S / 36525.0
+        T0 = ( 6.697374558 + ( 2400.051336 * T ) + ( 0.000025862 * T * T ) ) % 24
+        universalTimeDecimal = ( ( ( utcNow.second / 60 ) + utcNow.minute ) / 60 ) + utcNow.hour
+        A = universalTimeDecimal * 1.002737909
+        greenwichSiderealTimeDecimal = ( A + T0 ) % 24
+        print( "Greenwich sidereal time", greenwichSiderealTimeDecimal )
+
+        # Find local sidereal time.  Section 14 of the reference.
+        longitudeInHours = longitudeInDegrees / 15
+        print( "Longitude in degrees", longitudeInDegrees )
+        print( "Longitude in hours", longitudeInHours )
+
+        return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal.
+    
+    
+    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
+    # Measured in radians counter clockwise from a positive y axis.
+    #
+    # References:
+    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
+    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+    #  http://www.geoastro.de/SME/
+    #  http://futureboy.us/fsp/moon.fsp
+    #  http://www.timeanddate.com/moon/australia/sydney
+    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
+    #
+    # Other references...
+    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+    #  https://sites.google.com/site/astronomicalalgorithms
+    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+    #  https://github.com/brandon-rhodes/pyephem/issues/24
+    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitudeInDegrees/13425515#13425515
+    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+    @staticmethod
+    def getZenithAngleOfBrightLimb( utcNow, sunRA, sunDec, bodyRA, bodyDec, bodyLat, bodyLong ):
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
+        y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
+        x = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
+        positionAngleOfBrightLimb = math.atan2( y, x )
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
+        # https://tycho.usno.navy.mil/sidereal.html
+        # http://www.wwu.edu/skywise/skymobile/skywatch.html
+        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+        localSiderealTime = AstroBase.getSiderealTime( utcNow, math.degrees( bodyLong ) )
+        hourAngle = localSiderealTime - bodyRA
+
+        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
+        y = math.sin( hourAngle )
+        x = math.tan( bodyLat ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
+        parallacticAngle = math.atan2( y, x )
+
+        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )

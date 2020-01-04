@@ -556,6 +556,18 @@ class AstroPyephem( astrobase.AstroBase ):
         # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
         hourAngle = city.sidereal_time() - body.ra
 
+        citySiderealTime = city.sidereal_time()
+        citySiderealTimeFloat = float( citySiderealTime )
+        bodyRAFloat = float( body.ra )
+        localSiderealTime = astrobase.AstroBase.getSiderealTime( ephemNow.datetime(), math.degrees( float( city.lon ) ) )
+        localSiderealTimeRadians = math.radians( localSiderealTime )
+        julianDateNow = ephem.julian_date( ephemNow )
+        hourAngleA = localSiderealTime - body.ra
+        hourAngleB = localSiderealTime - math.degrees( body.ra )
+        hourAngleC = localSiderealTime - math.degrees( float( body.ra ) )
+        hourAngleD = localSiderealTime - float( body.ra )
+#         z = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), ephem.degrees( sun.ra ), ephem.degrees( sun.dec ), ephem.degrees( body.ra ), ephem.degrees( body.dec ), ephem.degrees( city.lat ), ephem.degrees( city.lon ) )
+
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hourAngle )
         x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
