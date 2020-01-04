@@ -510,19 +510,13 @@ class AstroPyephem( astrobase.AstroBase ):
         moon.compute( AstroPyephem.__getCity( data, ephemNow ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-#         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() ) ) # Needed for icon.
-
-        
-        
-        brightLimbOriginal = AstroPyephem.__getZenithAngleOfBrightLimb( ephemNow, data, ephem.Moon() )
 
         city = AstroPyephem.__getCity( data, ephemNow )
         sun = ephem.Sun( city )
         moon = ephem.Moon()
         moon.compute( city )
-        brightLimbNew = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimbNew ) # Needed for icon.
-
+        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         if not AstroPyephem.__calculateCommon( ephemNow, data, ephem.Moon(), astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
@@ -530,63 +524,6 @@ class AstroPyephem( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
             astrobase.AstroBase.getEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-
-
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in radians counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    @staticmethod
-    def __getZenithAngleOfBrightLimb( ephemNow, data, body ):
-        city = AstroPyephem.__getCity( data, ephemNow )
-        sun = ephem.Sun( city )
-        body.compute( city )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sun.dec ) * math.sin( sun.ra - body.ra )
-        x = math.sin( sun.dec ) * math.cos( body.dec ) - math.cos( sun.dec ) * math.sin( body.dec ) * math.cos( sun.ra - body.ra )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-        # https://tycho.usno.navy.mil/sidereal.html
-        # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        hourAngle = city.sidereal_time() - body.ra
-
-        citySiderealTime = city.sidereal_time()
-        citySiderealTimeFloat = float( citySiderealTime )
-#         bodyRAFloat = float( body.ra )
-        localSiderealTime = math.radians( astrobase.AstroBase.getSiderealTime( ephemNow.datetime(), math.degrees( float( city.lon ) ) ) * 15 )
-#         localSiderealTimeDegrees = localSiderealTime * 15
-#         localSiderealTimeRadians = math.radians( localSiderealTimeDegrees )
-#         julianDateNow = ephem.julian_date( ephemNow )
-        hourAngleNEW = localSiderealTime - body.ra
-#         hourAngleB = localSiderealTime - math.degrees( body.ra )
-#         hourAngleC = localSiderealTime - math.degrees( float( body.ra ) )
-#         hourAngleD = localSiderealTime - float( body.ra )
-#         z = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), ephem.degrees( sun.ra ), ephem.degrees( sun.dec ), ephem.degrees( body.ra ), ephem.degrees( body.dec ), ephem.degrees( city.lat ), ephem.degrees( city.lon ) )
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( city.lat ) * math.cos( body.dec ) - math.sin( body.dec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html

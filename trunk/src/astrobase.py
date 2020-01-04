@@ -397,6 +397,8 @@ class AstroBase( ABC ):
         return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal time.
     
     
+#TODO Update header comment...inputs are all radians.    
+#TODO Check all urls in header and body.
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
     # Measured in radians counter clockwise from a positive y axis.
     #

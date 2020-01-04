@@ -637,14 +637,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = str( int( almanac.fraction_illuminated( ephemeris, AstroSkyfield.__MOON, utcNow ) * 100 ) ) # Needed for icon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( AstroSkyfield.__getZenithAngleOfBrightLimb( utcNow, observer, ephemeris[ AstroSkyfield.__SUN ], moon ) ) # Needed for icon.
-
         sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( ephemeris[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = observer.at( utcNow ).observe( moon ).apparent().radec()
         latitude, longitude = AstroSkyfield.__getLatitudeLongitude( observer )
-        brightLimbNew = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), sunRA.radians, sunDec.radians, moonRA.radians, moonDec.radians, latitude.radians, longitude.radians )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimbNew ) # Needed for icon.
-
+        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), sunRA.radians, sunDec.radians, moonRA.radians, moonDec.radians, latitude.radians, longitude.radians )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
@@ -665,97 +662,6 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "New Moon" ) ) ] )
 
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-
-
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in degrees counter clockwise from a positive y axis.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith (chapters 59 and 68).
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitude/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
-    @staticmethod
-#TODO Can this method be made to be generic so that pyephem can use it?
-#The only sticking point here is utcNow.gast which is a skyfield thing...need to be able to compute the hour angle and/or sidereal time.
-    def __getZenithAngleOfBrightLimb( utcNow, observer, sun, body ):
-        for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
-            if isinstance( thing, Topos ):
-                latitude = thing.latitude
-                longitude = thing.longitude
-                break
-
-        sunRA, sunDec, earthDistance = observer.at( utcNow ).observe( sun ).apparent().radec()
-        bodyRA, bodyDec, earthDistance = observer.at( utcNow ).observe( body ).apparent().radec()
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sunDec.radians ) * math.sin( sunRA.radians - bodyRA.radians )
-        x = math.sin( sunDec.radians ) * math.cos( bodyDec.radians ) - math.cos( sunDec.radians ) * math.sin( bodyDec.radians ) * math.cos( sunRA.radians - bodyRA.radians )
-        positionAngleOfBrightLimb = math.atan2( y, x )
-
-#TODO Are the comments below still valid?
-        # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
-        # https://tycho.usno.navy.mil/sidereal.html
-        # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-#         AstroSkyfield.__observerSiderealTime( utcNow, observer )
-        localSiderealTime = astrobase.AstroBase.getSiderealTime( utcNow.utc_datetime(), longitude.degrees )
-        observerSiderealTime = 15.0 * DEG2RAD * utcNow.gast + longitude.radians # From skyfield.earthlib.py
-        hourAngle = observerSiderealTime - bodyRA.radians
-
-        # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( latitude.radians ) * math.cos( bodyDec.radians ) - math.sin( bodyDec.radians ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
-
-        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
-
-
-    @staticmethod
-    def __observerSiderealTime( utcNow, observerLongitude ):
-        y = utcNow.year
-        m = utcNow.month
-        d = utcNow.day + \
-            ( utcNow.hour / 24 ) + \
-            ( utcNow.minute / ( 60 * 24 ) ) + \
-            ( utcNow.second / ( 60 * 60 * 24 ) ) + \
-            ( utcNow.microsecond / ( 60 * 60 * 24 * 1000 ) )
-
-        if m == 1:
-            yDash = y - 1
-            mDash = m + 12
-
-        else:
-            yDash = y
-            mDash = m
-
-        # Assumed the date is later than 15th October, 1582.
-        A = int( yDash / 100 )
-        B = 2 - A + int( A / 4 )
-        C = int( 365.25 * yDash )
-        D = int( 30.6001 * ( mDash + 1 ) )
-        julianDate = B + C + D + d + 1720994.5
-        S = julianDate - 2451545.0
-        T = S / 36525.0
-        T0 = ( 6.697374558 + ( 2400.051336 * T ) + ( 0.000025862 * T * T ) ) % 24
-
-        universalTimeDecimal = ( ( ( utcNow.second / 60 ) + utcNow.minute ) / 60 ) + utcNow.hour
-        A = universalTimeDecimal * 1.002737909
-        greenwichSiderealTimeDecimal = ( A + T0 ) % 24
-        longitudeInHours = observerLongitude / 15
-
-        return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal.
 
 
     @staticmethod
