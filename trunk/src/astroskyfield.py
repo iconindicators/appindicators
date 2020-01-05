@@ -572,8 +572,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 118 ] : _( "WEZEN" ) } )                   
 
 
-    # Taken from ephem/cities.py
-    #TODO Waiting on the resolution of  
+    # Taken from ephem/cities.py as Skyfield will not provide a list of cities.
     #    https://github.com/skyfielders/python-skyfield/issues/316 
     _city_data = {
         "Abu Dhabi" :        ( 24.4666667, 54.3666667, 6.296038 ),              

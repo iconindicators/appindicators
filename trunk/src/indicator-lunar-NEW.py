@@ -113,9 +113,9 @@ import astrobase, datetime, eclipse, indicatorbase, glob, locale, math, orbitale
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allowing easy switching between backends (eventually looking to move to Skyfield).
-    astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
-#     astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
+    # Allowing easy switching between alternate backends (eventually looking to move to Skyfield).
+#     astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
+    astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
 
 
     CONFIG_CITY_ELEVATION = "cityElevation"
@@ -248,6 +248,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
+        # Update backend.
+        now = datetime.datetime.utcnow()#TODO Testing
         self.data = IndicatorLunar.astrobackend.calculate(
             datetime.datetime.utcnow(),
             self.latitude, self.longitude, self.elevation,
@@ -257,9 +259,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
+        print( "Backend:", datetime.datetime.utcnow() - now )#TODO Testing
 
         # Update frontend.
+        now = datetime.datetime.utcnow()#TODO Testing
         self.updateMenu( menu )
+        print( "Frontend:", datetime.datetime.utcnow() - now )#TODO Testing
         self.updateIconAndLabel()
 
         if self.showWerewolfWarning:
@@ -1288,7 +1293,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
 
-#TODO Can we just call the astrobase version?
         cities = IndicatorLunar.astrobackend.getCities()
         if self.city not in cities:
             cities.append( self.city )
@@ -1636,7 +1640,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
 
-#TODO Hit test for werewolf warning and all good.
+#TODO I hit the "test for werewolf warning" and all was good.
 #Did it a second time and got an error that svgFile was invalid.
 # local variable 'svgFile' referenced before assignment
         Notify.Notification.new( summary, message, svgFile ).show()
