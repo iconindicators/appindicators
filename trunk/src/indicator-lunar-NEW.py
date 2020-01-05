@@ -323,6 +323,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
         utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
+#TODO Are these all the date/time based tags of concern?  Any missed or any should not be here?
         for key in self.data:
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -334,6 +335,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
 
+#TODO Double check this logic!  Ensure we have sufficient buffer.
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
@@ -402,6 +404,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Verify
+#TODO Maybe if there are multiple satellites for this notification, then combine into one notification?  Ask Oleg.
     def notificationSatellites( self ):
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
@@ -430,7 +433,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
                 if overlap:
                     continue
-
 
             # Ensure the current time is within the rise/set...
             # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
@@ -493,7 +495,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ], _( "Full: " ), key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ], _( "New: " ), key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] )
-
             nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
             indent = self.indent( 1, 2 )
             for dateTime, displayText, key in nextPhases:
@@ -648,7 +649,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
-#
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesCircumpolar = [ ]
@@ -884,8 +884,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             themeColour = "fff200" # Default to hicolor.
 
         return themeColour
-
-
 
 
     def onPreferences( self, dialog ):
