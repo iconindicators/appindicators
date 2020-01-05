@@ -24,16 +24,6 @@ from ephem.cities import _city_data
 import astrobase, ephem, locale, math, orbitalelement, twolineelement
 
 
-#TODO If we read in a list of comets/stars/planets/satellites, 
-# and that comet/star/planet/satellite is missing how is this handled?
-
-
-#TODO If we test with Pyephem and select some stars, then switch to Skyfield,
-#what happens if a star is in pyephem but not skyfield?
-#Each star function needs to guard against this?
-#What about comets and other stuff?
-
-
 #TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
 
 
@@ -559,10 +549,7 @@ class AstroPyephem( astrobase.AstroBase ):
     @staticmethod
     def __calculateStars( ephemNow, data, stars, magnitudeMaximum ):
         for star in stars:
-#TODO Guard against unknown stars...will occur when switching between backends.
-#For now, do this check here...but really is this the best place or maybe it is the only possible place?
-#Maybe the indicator needs to handle this...?   But the indicator should not be expected to expect a change in the list of stars.
-            if star in astrobase.AstroBase.STARS:
+            if star in astrobase.AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
                 starObject = ephem.star( star.title() )
                 starObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
                 if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitudeMaximum:
