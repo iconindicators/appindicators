@@ -250,11 +250,12 @@ class AstroBase( ABC ):
     MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
 
 
-#TODO Need a comment or change variable of lat/long to indicate decimal degress (or whatever the units are) and str or int.
-#TOOO Need a comment or change of variable for elev to indicate metres and str or int.
     # Returns a dictionary with astronomical information:
     #     Key is a tuple of BodyType, a name tag and a data tag.
     #     Value is the calculated astronomical information as a string.
+    #
+    # Latitude, longitude are floating point numbers representing decimal degrees.
+    # Elevation is a floating point number representing metres above sea level.
     #
     # If a body is never up, no data is added.
     # If a body is always up, azimuth/altitude are added.
@@ -355,8 +356,10 @@ class AstroBase( ABC ):
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
 
-#TODO Add header.
-#  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
+    # Compute the sidereal time for the given longitude (floating point radians) as a decimal time.
+    #
+    # Reference:
+    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
     @staticmethod
     def getSiderealTime( utcNow, longitude ):
         # Find the Julian date.  Section 4 of the reference.
@@ -397,10 +400,10 @@ class AstroBase( ABC ):
         return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal time.
     
     
-#TODO Update header comment...inputs are all radians.    
-#TODO Check all urls in header and body.
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
     # Measured in radians counter clockwise from a positive y axis.
+    #
+    # Right ascension, declination, latitude and longitude are floating point radians.
     #
     # References:
     #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
@@ -425,11 +428,13 @@ class AstroBase( ABC ):
         x = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
         positionAngleOfBrightLimb = math.atan2( y, x )
 
+        # Multiply by 15 to convert from decimal time to decimal degrees; section 22 of Practical Astronomy with Your Calculator.
+        localSiderealTime = math.radians( AstroBase.getSiderealTime( utcNow, bodyLong ) * 15 )
+
         # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
         # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        localSiderealTime = math.radians( AstroBase.getSiderealTime( utcNow, bodyLong ) * 15 ) # Multiply by 15 to convert from decimal time to decimal degrees.  Section 22 of reference.
         hourAngle = localSiderealTime - bodyRA
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
