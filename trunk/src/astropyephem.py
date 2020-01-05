@@ -475,10 +475,9 @@ class AstroPyephem( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getLatitudeLongitudeElevation( city ):
-        return float( _city_data.get( city )[ 0 ] ), \
-               float( _city_data.get( city )[ 1 ] ), \
-               _city_data.get( city )[ 2 ]
+    def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
+                                                      float( _city_data.get( city )[ 1 ] ), \
+                                                      _city_data.get( city )[ 2 ]
 
 
     @staticmethod
