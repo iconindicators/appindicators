@@ -18,6 +18,7 @@
 
 # Calculate astronomical information using Skyfield.
 
+
 #TODO If/when we get skyfield up and running, need to add to creditz of the super for the indicator
 #(and remove pyephem)
 
@@ -84,7 +85,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Check the function at the end which creates the hip data...it should use this list as the source for the star names.
 #TODO In the file named_stars, the function at the bottom is deprecated...so are these named stars defunct?
 # https://github.com/skyfielders/python-skyfield/issues/304
-    # Sourced from skyfield/named_stars.py
+    # Taken from skyfield/named_stars.py
     astrobase.AstroBase.STARS.extend( [
         "ACHERNAR",
         "ACRUX",
