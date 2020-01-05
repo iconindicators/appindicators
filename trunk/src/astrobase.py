@@ -263,6 +263,8 @@ class AstroBase( ABC ):
     # If the body is above the horizon, set date/time and azimuth/altitude are added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
+    #
+    # Results can be verified using Verify results: https://ssd.jpl.nasa.gov/horizons.cgi
     @staticmethod
     @abstractmethod
     def calculate( utcNow,
