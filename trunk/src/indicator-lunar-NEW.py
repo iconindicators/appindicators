@@ -20,6 +20,16 @@
 # comet, minor planet and satellite information.
 
 
+#TODO If the menu build takes too long, perhaps add in the following to each of the top level menu items (moon, sun, planets, etc):
+#
+#    menuitem.connect( "activate", self.buildSubMenu, menuItem )
+#
+#    def buildSubMenu( self, widget, menuItem ): ...build the submenu.
+#
+# This might work and will speed up initial menu build, but may take too long to build the submenu.
+# Needs testing and thinking.  Only do this if the menu build currently takes way too long.
+
+
 #TODO With Starlink satellites being launched, potentially thousands or more,
 # is it feasible to include the TLE data for these?
 
