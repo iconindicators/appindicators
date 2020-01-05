@@ -82,9 +82,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
-#TODO Check the function at the end which creates the hip data...it should use this list as the source for the star names.
-#TODO In the file named_stars, the function at the bottom is deprecated...so are these named stars defunct?
-# https://github.com/skyfielders/python-skyfield/issues/304
     # Taken from skyfield/named_stars.py
     astrobase.AstroBase.STARS.extend( [
         "ACHERNAR",
@@ -207,7 +204,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         "WEI",
         "WEZEN" ] )
 
-#TODO Tidy up.
     astrobase.AstroBase.STARS_TO_HIP.update( {
         "ACHERNAR":               7588,
         "ACRUX":                  60718,
@@ -710,7 +706,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 #There is a ticket about this...but cannot find it right now.
 
 
-# TODO Verify results: https://ssd.jpl.nasa.gov/horizons.cgi
     @staticmethod
     def calculate( utcNow,
                    latitude, longitude, elevation,
@@ -973,11 +968,12 @@ class AstroSkyfield( astrobase.AstroBase ):
     # If all stars in the Hipparcos catalogue were included, capped to magnitude 15,
     # there would be over 100,000 stars which is impractical.
     #
-    # Instead, present the user with the "common name" stars,
+    # Instead, could use a list of "common name" stars, referred to in
     #     https://www.cosmos.esa.int/web/hipparcos/common-star-names.
     #
-    # Load the Hipparcos catalogue and filter out those not "common name".
-    # The final list of stars range in magnitude up to around 12.
+    # However, Skyfield also has an internal list of named stars so use that for now.
+    #
+    # Load the Hipparcos catalogue and filter out stars that are not on our list (common name or named).
     #
     # Format of Hipparcos catalogue:
     #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
@@ -988,7 +984,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( "Downloading star catalogue..." )
             load.open( hipparcos.URL )
 
-        print( "Creating list of common-named stars..." )
+        print( "Creating list of stars..." )
         hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
         with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
@@ -996,30 +992,27 @@ class AstroSkyfield( astrobase.AstroBase ):
                 if hip in hipparcosIdentifiers:
                     outFile.write( line )
 
-        print( "Done" )
+        print( "Created", outFile )
 
 
-#TODO Need header.
-# TODO Refer to https://github.com/skyfielders/python-skyfield/issues/123
-# Still need all the naif...tls stuff and spkmerge stuff now that we use jplephem?
+    # Create the planet ephemeris from online source.
+    #     https://github.com/skyfielders/python-skyfield/issues/123
+    # 
+    # The ephemeris will last from the date of creation to one year ahead.
     @staticmethod
     def createPlanetEphemeris():
         today = datetime.date.today()
         dateFormat = "%Y/%m/%d"
         firstOfThisMonth = datetime.date( today.year, today.month, 1 ).strftime( dateFormat )
-        oneYearFromNow = datetime.date( today.year + 1, today.month + 1, 1 ).strftime( dateFormat )
-#TODO Test for month = 12 and ensure that the year/month roll over correctly (to year + 1 and January).
-
-#TODO URL reference for this ... from the skyfield docs?
+        oneYearFromNow = datetime.date( today.year + 1, today.month + 1, 1 ).strftime( dateFormat ) #TODO Test for month = 12 and ensure that the year/month roll over correctly (to year + 1 and January).
         planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
         outputEphemeris = "planets.bsp"
-
         command = "python3 -m jplephem excerpt " + firstOfThisMonth + " " + oneYearFromNow + " " + planetEphemeris + " " + outputEphemeris
 
         try:
             print( "Creating planet ephemeris..." )
             subprocess.call( command, shell = True )
-            print( "Done" ) #TODO This prints even if an error/exception occurs...
+            print( "Created", outputEphemeris ) #TODO This prints even if an error/exception occurs...
 
         except subprocess.CalledProcessError as e:
             print( e )
