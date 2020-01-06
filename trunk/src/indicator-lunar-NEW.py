@@ -869,8 +869,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 themeColour = data[ index + 13 : index + 19 ]
 
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
             themeColour = "fff200" # Default to hicolor.
 
         return themeColour
