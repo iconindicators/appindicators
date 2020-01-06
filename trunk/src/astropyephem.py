@@ -629,11 +629,38 @@ class AstroPyephem( astrobase.AstroBase ):
                         # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
                         # https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
                         if ephem.__version__ == "3.7.6.0":
+                            print( "3.7.6.0" ) #TODO Testing
                             nextPass = city.next_pass( satellite )
 
                         else:
+                            print( "3.7.7.0" )#TODO Testing
                             nextPass = city.next_pass( satellite, singlepass = False ) #TODO When eventually testing on 3.7.7.0, test with and without the singlepass = False...
                                                                                        # maybe we can get away without have to pass in single pass...which means no checking for version!
+ 
+                        if AstroPyephem.__isSatellitePassIsValid( nextPass ) and AstroPyephem.__isSatellitePassVisible( data, nextPass[ 2 ], satellite ):
+                            if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+                                setTime = nextPass[ 4 ]
+                                nextPass = AstroPyephem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle ) #TODO Verify this method starts back in time, say 30 minutes.
+                                if nextPass is None:
+                                    currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
+                                    continue
+                                #TODO At this point we have a pass for which the rise is less than the set (because we looked back in time).
+                                # How do we know this is the pass we calculated above?  Really should compare the set times?
+
+                            # Satellite is yet to rise or is in transit...
+                            if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
+                                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
+                                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
+                                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
+                                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
+
+                            else: # Satellite will rise later, so only add rise time.
+                                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
+
+                            break
+
+                        else:
+                            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
 
                     except ValueError:
                         if satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
@@ -641,31 +668,6 @@ class AstroPyephem( astrobase.AstroBase ):
                             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( satellite.alt )
 
                         break
-
-                    if AstroPyephem.__isSatellitePassIsValid( nextPass ) and AstroPyephem.__isSatellitePassVisible( data, nextPass[ 2 ], satellite ):
-                        if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-                            setTime = nextPass[ 4 ]
-                            nextPass = AstroPyephem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle ) #TODO Verify this method starts back in time, say 30 minutes.
-                            if nextPass is None:
-                                currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
-                                continue
-                            #TODO At this point we have a pass for which the rise is less than the set (because we looked back in time).
-                            # How do we know this is the pass we calculated above?  Really should compare the set times?
-
-                        # Satellite is yet to rise or is in transit...
-                        if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
-
-                        else: # Satellite will rise later, so only add rise time.
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-
-                        break
-
-                    else:
-                        currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
 
 
     @staticmethod
@@ -715,6 +717,7 @@ class AstroPyephem( astrobase.AstroBase ):
     #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
+        return True #TODO Testing
         city = AstroPyephem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
