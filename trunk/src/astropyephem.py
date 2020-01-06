@@ -693,7 +693,7 @@ class AstroPyephem( astrobase.AstroBase ):
 
             except:
                 nextPass = None
-                break # This should never happen as the satellite has a rise and set (is not circumpolar or never up).
+                break # This should never happen as the satellite has a rise and set (is not circumpolar nor never up).
 
         return nextPass
 

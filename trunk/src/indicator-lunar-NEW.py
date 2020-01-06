@@ -345,6 +345,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateMenu( self, menu ):
         menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) ) #TODO Debugging.
+        menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) ) #TODO Debugging.
+        menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) ) #TODO Debugging.
+        menu.append( Gtk.SeparatorMenuItem() )
+
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
@@ -598,6 +602,26 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 child.connect( "activate", self.onMenuItemClick )
 
 
+    def display( self, bodyType, nameTag ):
+        return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
+               ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
+
+
+    def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
+        key = ( bodyType, nameTag )
+        indent = self.indent( indentUnity, indentGnomeShell )
+
+        if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
+            self.createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), onClickURL, menu )
+
+        else:
+            if key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) in self.data:
+                self.createMenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), onClickURL, menu )
+
+            self.createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), onClickURL, menu )
+            self.createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL, menu )
+
+
     # https://www.iau.org/public/themes/naming
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
     def getCometMinorPlanetOnClickURL( self, name, bodyType ):
@@ -630,23 +654,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
-    def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
-        key = ( bodyType, nameTag )
-        indent = self.indent( indentUnity, indentGnomeShell )
-
-        if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
-            self.createMenuItem( indent + _( "Rise: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), onClickURL, menu )
-
-        else:
-            if key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) in self.data:
-                self.createMenuItem( indent + _( "Set: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), onClickURL, menu )
-
-            self.createMenuItem( indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), onClickURL, menu )
-            self.createMenuItem( indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL, menu )
-
-
 #TODO Test each clause...will have to adjust date/time and lat/long.
-# Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
     def updateMenuSatellites( self, menu ):
@@ -676,11 +684,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
         if satellitesCircumpolar:
-            self.__updateMenuSatellites( menu, _( "Satellites (Circumpolar)" ), satellitesCircumpolar )
+            self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesCircumpolar )
 
 
 #TODO Test each clause...will have to adjust date/time and lat/long.
-# Circumpolar: Az/Alt
 # Yet to rise (more than 5 minutes away): rise date/time
 # Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
     def __updateMenuSatellites( self, menu, label, satellites ):
@@ -735,13 +742,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
-
-
-#TODO If we move the hide body if below the horizon from the backend,
-# then likely need to add it to the test here in the return statement.
-    def display( self, bodyType, nameTag ):
-        return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
-               ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
 
 
     def getDisplayData( self, key, dateTimeFormat = None ):
@@ -1757,6 +1757,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.requestSaveConfig() #TODO Need to do a request here to save.
 # End of hack!
+
+
+
+        #TODO Remove...testing for satellites.
+#         Sydney Latitude: -33.8,
+#         Sydney Longitude: 151.2
+# 
+        self.longitude = 151.2
+        self.latitude = -33.8
+#         self.latitude = -85.0
+#         self.latitude = -45.0
+#         self.latitude = -1.0
+#         self.latitude = -60.0
+#         self.latitude = 33.8
+#         self.latitude = 85.0
 
 
     def saveConfig( self ):
