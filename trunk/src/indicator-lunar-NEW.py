@@ -30,10 +30,6 @@
 # Needs testing and thinking.  Only do this if the menu build currently takes way too long.
 
 
-#TODO With Starlink satellites being launched, potentially thousands or more,
-# is it feasible to include the TLE data for these?
-
-
 #TODO In the notifications preferences, there is a tooltip for each the summary and message about formatting.
 # Why is this mentioned?  Did the tags (say moon phase) originally get parsed in the notifications?
 
@@ -93,14 +89,6 @@
 #     with open( iconFilenameForCurrentTheme, "r" ) as file:
 # FileNotFoundError: [Errno 2] No such file or directory: '/usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg'
 # 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
-
-
-#TODO Test with very high latitudes (north and south) to force circumpolar satellites and never up.
-
-
-#TODO Test during dusk/evening to see satellite passes in the menu.
-#             from datetime import timezone #TODO Testing for satellites
-#             self.data = astropyephem.AstroPyephem.getAstronomicalInformation( datetime.datetime( 2019, 8, 29, 9, 0, 0, 0, tzinfo = timezone.utc ),
 
 
 #TODO Given we now use an Enum for bodytype, Moon becomes MOON.
@@ -344,10 +332,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
-        menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) ) #TODO Debugging.
-        menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) ) #TODO Debugging.
-        menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) ) #TODO Debugging.
+        #TODO Debugging.
+        menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) ) 
+        menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
+        menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
         menu.append( Gtk.SeparatorMenuItem() )
+        # End debugging.
 
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
