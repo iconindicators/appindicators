@@ -47,15 +47,12 @@
 # import gettext
 # gettext.install( "astroskyfield" )
 
-from datetime import timedelta
-
 from skyfield import almanac
 from skyfield.api import EarthSatellite, load, Star, Topos
-from skyfield.constants import DEG2RAD
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
-import astrobase, datetime, gzip, locale, math, os, pytz, orbitalelement, subprocess, twolineelement
+import astrobase, datetime, gzip, locale, os, pytz, orbitalelement, subprocess, twolineelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -698,12 +695,15 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
 # ...not sure if skyfield will/could have the same problem.
+#How were the fractional seconds removed in PyEphem?  Using a formatter?
 
 
 #TODO Might need to cache deltat.data and deltat.preds as the backend website was down and I couldn't get them except at a backup site.
-# What other files are downloaded?  Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  Be careful...this file expires!
+# What other files are downloaded?  
+#Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  
+#Be careful...this file expires!
 #Seems skyfield has changed the way data is loaded with a tag to say not to do a download (use old file).
-#There is a ticket about this...but cannot find it right now.
+#There is a ticket about this...but cannot find it right now.  Seems an API call somewhere/somehow turns caching on/off.
 
 
     @staticmethod
@@ -730,7 +730,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
 
-        AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars )
+        AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, magnitudeMaximum )
 
 #TODO
 # https://github.com/skyfielders/python-skyfield/issues/11
@@ -740,7 +740,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitudeMaximum )
 #     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitudeMaximum )
 
-#TODO https://github.com/skyfielders/python-skyfield/issues/115
+#TODO 
+# https://github.com/skyfielders/python-skyfield/issues/115
         AstroSkyfield.__calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
 
         return data
@@ -758,8 +759,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-        results = { } #TODO Implement me! 
-        return results
+        return { } #TODO Implement me! 
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -817,7 +817,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Look seven months ahead.
             t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemeris ) )
             t = t.utc_datetime()
-            if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]:
+            if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]: #TODO See above in moon for text...should somehow refer to the text from Skyfield.
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
@@ -832,21 +832,19 @@ class AstroSkyfield( astrobase.AstroBase ):
             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, ephemeris[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
 
 
-    #TODO According to 
-    #     https://github.com/skyfielders/python-skyfield/issues/39
-    #     https://github.com/skyfielders/python-skyfield/pull/40
-    # skyfield might support somehow star names out of the box...
-    # ...so that means taking the data, selecting only ephemerisStars of magnitude 2.5 or so and keep those.
-    # See revision 999 for code to filter ephemerisStars by magnitude.
+#TODO According to 
+#     https://github.com/skyfielders/python-skyfield/issues/39
+#     https://github.com/skyfielders/python-skyfield/pull/40
+# skyfield might support somehow star names out of the box...
+# ...how, if at all, does this conflict with the list from named_stars.py currently in play?
+    # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
-    def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars ):
+    def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, magnitudeMaximum ):
         for star in stars:
-#TODO Guard against unknown stars...will occur when switching between backends.
-#For now, do this check here...but really is this the best place or maybe it is the only possible place?
-#Maybe the indicator needs to handle this...?   But the indicator should not be expected to expect a change in the list of stars.
             if star in astrobase.AstroBase.STARS:
-#         mag = ephemeris.loc[ STARS[ star ] ].magnitude #TODO Leave here as we may need to compute the magnitude for the front end to submenu by mag.
-                AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( ephemeris.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ] ), astrobase.AstroBase.BodyType.STAR, star )
+                theStar = ephemeris.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ]
+                if theStar.magnitude <= magnitudeMaximum:
+                    AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
 
 
     # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
@@ -940,15 +938,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculateSatellites( utcNow, data, timeScale, satellites, satelliteData ):
         for key in satellites:
             if key in satelliteData:
-                AstroSkyfield.__calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteData[ key ] )
-
-
-    @staticmethod
-    def __calculateNextSatellitePass( utcNow, data, timeScale, key, satelliteTLE ):
-        pass
-#         key = ( astrobase.AstroBase.BodyType.Satellite, " ".join( key ) )
-#         currentDateTime = utcNow.J
-#         endDateTime = timeScale.utc( ( utcNow.utc_datetime() + timedelta( days = 24 * 2 ) ).replace( tzinfo = pytz.UTC ) ).J #TODO Maybe pass this in as it won't change per satellite.
+                tle = satelliteData[ key ]
 #TODO rise/set not yet implemented in Skyfield
 # https://github.com/skyfielders/python-skyfield/issues/115
 
@@ -984,8 +974,11 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( "Downloading star catalogue..." )
             load.open( hipparcos.URL )
 
-        print( "Creating list of stars..." )
         hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
+        if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS ):
+            os.remove( AstroSkyfield.__EPHEMERIS_STARS )
+
+        print( "Creating list of stars..." )
         with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at columns indices [ 42 : 46 ].

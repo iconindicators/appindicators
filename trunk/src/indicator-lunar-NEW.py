@@ -112,8 +112,8 @@ import astrobase, datetime, eclipse, indicatorbase, glob, locale, math, orbitale
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allowing easy switching between alternate backends (eventually looking to move to Skyfield).
-    astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
-#     astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
+#     astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
+    astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
 
 
     CONFIG_CITY_ELEVATION = "cityElevation"
@@ -993,8 +993,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
         spinnerMagnitude.set_tooltip_text( _(
-            "Planets, stars, comets and minor planets with a\n" + \
-            "magnitude greater than that specified are hidden." ) )
+            "Stars, comets and minor planets exceeding\n" + \
+            "the magnitude will be hidden." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )

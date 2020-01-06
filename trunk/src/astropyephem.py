@@ -447,7 +447,7 @@ class AstroPyephem( astrobase.AstroBase ):
 
         AstroPyephem.__calculateMoon( ephemNow, data )
         AstroPyephem.__calculateSun( ephemNow, data )
-        AstroPyephem.__calculatePlanets( ephemNow, data, planets, magnitudeMaximum )
+        AstroPyephem.__calculatePlanets( ephemNow, data, planets )
         AstroPyephem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
@@ -537,12 +537,11 @@ class AstroPyephem( astrobase.AstroBase ):
     # http://www.geoastro.de/planets/index.html
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
-    def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum ):
+    def __calculatePlanets( ephemNow, data, planets ):
         for planet in planets:
             planetObject = getattr( ephem, planet.title() )()
             planetObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
-            if planetObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and planetObject.mag <= magnitudeMaximum:
-                AstroPyephem.__calculateCommon( ephemNow, data, planetObject, astrobase.AstroBase.BodyType.PLANET, planet )
+            AstroPyephem.__calculateCommon( ephemNow, data, planetObject, astrobase.AstroBase.BodyType.PLANET, planet )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
@@ -552,7 +551,7 @@ class AstroPyephem( astrobase.AstroBase ):
             if star in astrobase.AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
                 starObject = ephem.star( star.title() )
                 starObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
-                if starObject.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and starObject.mag <= magnitudeMaximum:
+                if starObject.mag <= magnitudeMaximum:
                     AstroPyephem.__calculateCommon( ephemNow, data, starObject, astrobase.AstroBase.BodyType.STAR, star )
 
 
@@ -564,7 +563,7 @@ class AstroPyephem( astrobase.AstroBase ):
                 body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-                if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitudeMaximum:
+                if not bad and body.mag <= magnitudeMaximum:
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
 
