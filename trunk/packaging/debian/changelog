@@ -11,8 +11,9 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 99%.
   * Removed date/time format from preferences; uses ISO 8601 without seconds.
-  * TLE/OE data files are no longer configurable; the code was becoming too
-    difficult to manage and the defaults are more than adequate.
+  * TLE/OE data files are no longer configurable as the defaults are more than
+    adequate.  For the adventurous, you can substitute the TLE/OE URLs for
+    sources directly in the code...at your own peril!
   * Bodies which are 'never up' are not displayed.
   * Bodies which are 'always up' only display azimuth/altitude.
   * Bodies below the horizon display the rise date/time.
