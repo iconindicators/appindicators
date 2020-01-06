@@ -583,16 +583,16 @@ class AstroPyephem( astrobase.AstroBase ):
             if rising > setting: # Above the horizon.
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( repr( body.az ) )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( repr( body.alt ) )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
             else: # Below the horizon.
                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rising.datetime() )
 
         except ephem.AlwaysUpError:
             body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( repr( body.az ) )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( repr( body.alt ) )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
         except ephem.NeverUpError:
             neverUp = True
@@ -640,8 +640,8 @@ class AstroPyephem( astrobase.AstroBase ):
 
             except ValueError:
                 if satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( str( repr( satellite.az ) ) )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( satellite.alt )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( satellite.az )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( satellite.alt )
 
                 break
 
@@ -658,9 +658,9 @@ class AstroPyephem( astrobase.AstroBase ):
                 # Satellite is yet to rise or is in transit...
                 if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( repr( nextPass[ 1 ] ) )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
                     data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( repr( nextPass[ 5 ] ) )
+                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
 
                 else: # Satellite will rise later, so only add rise time.
                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
