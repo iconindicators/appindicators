@@ -46,7 +46,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.8",
+            version = "1.0.9",
             copyrightStartYear = "2016",
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
@@ -132,8 +132,8 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
                 self.requestUpdate()
 
             except Exception as e:
-                logging.exception( e )
-                logging.error( "Error converting '" + protocol + text + pathQuery + "'." )
+                self.getLogging().exception( e )
+                self.getLogging().error( "Error converting '" + protocol + text + pathQuery + "'." )
                 Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
 
 

@@ -1,3 +1,10 @@
+indicator-punycode (1.0.9-1) xenial; urgency=low
+
+  * Bug fix: Erroneous call to logging.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 6 Jan 2019 16:49:08 +1000
+
+
 indicator-punycode (1.0.8-1) xenial; urgency=low
 
   * Bug fix: Dialogs now have a parent specified.
