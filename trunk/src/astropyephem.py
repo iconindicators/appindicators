@@ -600,6 +600,8 @@ class AstroPyephem( astrobase.AstroBase ):
         return neverUp
 
 
+#TODO Verify satellite stuff!
+#TODO Test using version 3.7.7.0 of PyEphem.
     # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
     #
     # Other sources/background:
@@ -612,63 +614,58 @@ class AstroPyephem( astrobase.AstroBase ):
     # If a satellite is yet to rise, show the rise/set time for the upcoming visible pass.
     # If a satellite is currently passing over (and is a visible pass), show the rise/set time for that pass.
     @staticmethod
-#TODO Verify satellite stuff!
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
         for key in satellites:
             if key in satelliteData:
-                AstroPyephem.__calculateNextSatellitePass( ephemNow, data, key, satelliteData[ key ] )
+                tle = satelliteData[ key ]
+                key = ( astrobase.AstroBase.BodyType.SATELLITE, key )
+                currentDateTime = ephemNow
+                endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
+                while currentDateTime < endDateTime:
+                    city = AstroPyephem.__getCity( data, currentDateTime )
+                    satellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+                    satellite.compute( city )
+                    try:
+                        # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
+                        # https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
+                        if ephem.__version__ == "3.7.6.0":
+                            nextPass = city.next_pass( satellite )
 
+                        else:
+                            nextPass = city.next_pass( satellite, singlepass = False ) #TODO When eventually testing on 3.7.7.0, test with and without the singlepass = False...
+                                                                                       # maybe we can get away without have to pass in single pass...which means no checking for version!
 
-#TODO Test using version 3.7.7.0 of PyEphem.
-    @staticmethod
-    def __calculateNextSatellitePass( ephemNow, data, key, satelliteTLE ):
-        key = ( astrobase.AstroBase.BodyType.SATELLITE, key )
-        currentDateTime = ephemNow
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
-        while currentDateTime < endDateTime:
-            city = AstroPyephem.__getCity( data, currentDateTime )
-            satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-            satellite.compute( city )
-            try:
-                # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
-                # https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
-                if ephem.__version__ == "3.7.6.0":
-                    nextPass = city.next_pass( satellite )
+                    except ValueError:
+                        if satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( satellite.az )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( satellite.alt )
 
-                else:
-                    nextPass = city.next_pass( satellite, singlepass = False )
+                        break
 
-            except ValueError:
-                if satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( satellite.az )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( satellite.alt )
+                    if AstroPyephem.__isSatellitePassIsValid( nextPass ) and AstroPyephem.__isSatellitePassVisible( data, nextPass[ 2 ], satellite ):
+                        if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+                            setTime = nextPass[ 4 ]
+                            nextPass = AstroPyephem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle ) #TODO Verify this method starts back in time, say 30 minutes.
+                            if nextPass is None:
+                                currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
+                                continue
+                            #TODO At this point we have a pass for which the rise is less than the set (because we looked back in time).
+                            # How do we know this is the pass we calculated above?  Really should compare the set times?
 
-                break
+                        # Satellite is yet to rise or is in transit...
+                        if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
 
-            if AstroPyephem.__isSatellitePassIsValid( nextPass ) and AstroPyephem.__isSatellitePassVisible( data, nextPass[ 2 ], satellite ):
-                if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-                    setTime = nextPass[ 4 ]
-                    nextPass = AstroPyephem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, satelliteTLE ) #TODO Verify this method starts back in time, say 30 minutes.
-                    if nextPass is None:
-                        currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
-                        continue
-                    #TODO At this point we have a pass for which the rise is less than the set (because we looked back in time).
-                    # How do we know this is the pass we calculated above?  Really should compare the set times?
+                        else: # Satellite will rise later, so only add rise time.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
 
-                # Satellite is yet to rise or is in transit...
-                if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
+                        break
 
-                else: # Satellite will rise later, so only add rise time.
-                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-
-                break
-
-            else:
-                currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
+                    else:
+                        currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
 
 
     @staticmethod
