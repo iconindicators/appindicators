@@ -717,8 +717,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                    magnitudeMaximum ):
 
         data = { }
+#TODO Why do we need to pass in both the time scale and utc to each function?
+# Further, why create a utc Skyfield and then change it again in each function?
         timeScale = load.timescale()
-        utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) ) #TODO In each function, so far, this is converted to a datetime...so maybe just pass in the original?
+        utcNowSkyfield = timeScale.utc( utcNow.replace( tzinfo = pytz.UTC ) )
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         observer = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + \
                    Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
