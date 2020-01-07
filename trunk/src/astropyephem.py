@@ -599,8 +599,6 @@ class AstroPyephem( astrobase.AstroBase ):
         return neverUp
 
 
-#TODO Verify satellite stuff!
-#TODO Test using version 3.7.7.0 of PyEphem.
     # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
     #
     # Other sources/background:
@@ -625,26 +623,14 @@ class AstroPyephem( astrobase.AstroBase ):
                     satellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     satellite.compute( city )
                     try:
-                        # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
-                        # https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
-                        if ephem.__version__ == "3.7.6.0":
-                            print( "3.7.6.0" ) #TODO Testing
-                            nextPass = city.next_pass( satellite )
-
-                        else:
-                            print( "3.7.7.0" )#TODO Testing
-                            nextPass = city.next_pass( satellite, singlepass = False ) #TODO When eventually testing on 3.7.7.0, test with and without the singlepass = False...
-                                                                                       # maybe we can get away without have to pass in single pass...which means no checking for version!
- 
+                        nextPass = AstroPyephem.__calculateNextPass( city, satellite )
                         if AstroPyephem.__isSatellitePassIsValid( nextPass ) and AstroPyephem.__isSatellitePassVisible( data, nextPass[ 2 ], satellite ):
                             if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
                                 setTime = nextPass[ 4 ]
-                                nextPass = AstroPyephem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle ) #TODO Verify this method starts back in time, say 30 minutes.
+                                nextPass = AstroPyephem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle )
                                 if nextPass is None:
                                     currentDateTime = ephem.Date( setTime + ephem.minute * 30 ) # Could not determine the rise, so look for the next pass.
                                     continue
-                                #TODO At this point we have a pass for which the rise is less than the set (because we looked back in time).
-                                # How do we know this is the pass we calculated above?  Really should compare the set times?
 
                             # Satellite is yet to rise or is in transit...
                             if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
@@ -671,27 +657,43 @@ class AstroPyephem( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
-        currentDateTime = ephem.Date( ephemNow - ephem.minute ) # Start looking from one minute ago.
-        endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time (then just give up).
+        currentDateTime = ephemNow
+        endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time.
         nextPass = None
         while currentDateTime > endDateTime:
             city = AstroPyephem.__getCity( data, currentDateTime )
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
             try:
-                nextPass = city.next_pass( satellite )
-                if not AstroPyephem.__isSatellitePassIsValid( nextPass ):
+                nextPass = AstroPyephem.__calculateNextPass( city, satellite )
+                if AstroPyephem.__isSatellitePassIsValid( nextPass ):
+                    if nextPass[ 0 ] < nextPass[ 4 ]:
+                        break # Found the rise time!
+
+                    currentDateTime = ephem.Date( currentDateTime - ephem.minute )
+
+                else:
                     nextPass = None
                     break # Unlikely to happen but better to be safe and check!
 
-                if nextPass[ 0 ] < nextPass[ 4 ]:
-                    break # Found the rise time!
-
-                currentDateTime = ephem.Date( currentDateTime - ephem.minute )
-
             except:
                 nextPass = None
-                break # This should never happen as the satellite has a rise and set (is not circumpolar nor never up).
+                break # This should never happen as the satellite has a rise and set (is not polar nor never up).
+
+        return nextPass
+
+
+    # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
+    #    https://rhodesmill.org/pyephem/CHANGELOG.html#version-3-7-7-0-2019-august-18
+    #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
+    @staticmethod
+    def __calculateNextPass( city, satellite ):
+        version = int( ephem.__version__.split( '.' )[ 2 ] )
+        if version <= 6:
+            nextPass = city.next_pass( satellite )
+
+        else:
+            nextPass = city.next_pass( satellite, singlepass = False )
 
         return nextPass
 
@@ -716,7 +718,6 @@ class AstroPyephem( astrobase.AstroBase ):
     #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
-        return True #TODO Testing
         city = AstroPyephem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
