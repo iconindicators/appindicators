@@ -644,12 +644,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
-#TODO Test each clause...will have to adjust date/time and lat/long.
-# Yet to rise (more than 5 minutes away): rise date/time
-# Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
-        satellitesCircumpolar = [ ]
+        satellitesPolar = [ ]
         if self.satellitesSortByDateTime:
             for number in self.satellites:
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
@@ -657,10 +654,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                 elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data:
-                    satellitesCircumpolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
+                    satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
 
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-            satellitesCircumpolar = sorted( satellitesCircumpolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
+            satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
 
         else:
             for number in self.satellites:
@@ -673,13 +670,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if satellites:
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
-        if satellitesCircumpolar:
-            self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesCircumpolar )
+        if satellitesPolar:
+            self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
-#TODO Test each clause...will have to adjust date/time and lat/long.
-# Yet to rise (more than 5 minutes away): rise date/time
-# Yet to rise (less than 5 minutes away) or in transit: rise date/time, set date/time, az/alt.
     def __updateMenuSatellites( self, menu, label, satellites ):
         menuItem = Gtk.MenuItem( _( label ) )
         menu.append( menuItem )
