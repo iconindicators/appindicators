@@ -56,6 +56,7 @@
 
 
 # Uncomment the lines below when needing to run the planet/star ephemeris creation functions at the end.
+# from datetime import timedelta
 # import gettext
 # gettext.install( "astroskyfield" )
 
@@ -972,7 +973,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         today = datetime.date.today()
         dateFormat = "%Y/%m/%d"
         firstOfThisMonth = datetime.date( today.year, today.month, 1 ).strftime( dateFormat )
-        oneYearFromNow = datetime.date( today.year + 1, today.month + 1, 1 ).strftime( dateFormat ) #TODO Test for month = 12 and ensure that the year/month roll over correctly (to year + 1 and January).
+        oneYearFromNow = ( datetime.date( today.year + 1, today.month, 1 ) + datetime.timedelta( days = 31 )  ).strftime( dateFormat )
         planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
         outputEphemeris = "planets.bsp"
         command = "python3 -m jplephem excerpt " + firstOfThisMonth + " " + oneYearFromNow + " " + planetEphemeris + " " + outputEphemeris
