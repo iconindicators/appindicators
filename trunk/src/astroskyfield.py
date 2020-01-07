@@ -777,9 +777,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
-        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
-#TODO Test the above line for Feb.
-# https://rhodesmill.org/skyfield/almanac.html
+        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month + 2 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
         t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
@@ -804,7 +802,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             utcNowDateTime = utcNow.utc_datetime()
             t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
-            t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Look seven months ahead.
+            t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7 ) # Look seven months ahead.
             t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemeris ) )
             t = t.utc_datetime()
             if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]: #TODO See above in moon for text...should somehow refer to the text from Skyfield.
@@ -857,7 +855,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         key = ( astronomicalBodyType, nameTag )
         utcNowDateTime = utcNow.utc_datetime()
         t0 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second )
-        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2, utcNowDateTime.hour, utcNowDateTime.minute, utcNowDateTime.second ) # Look two days ahead as one day ahead may miss the next rise or set.
+        t1 = timeScale.utc( utcNowDateTime.year, utcNowDateTime.month, utcNowDateTime.day + 2 ) # Look two days ahead as one day ahead may miss the next rise or set.
         t, y = almanac.find_discrete( t0, t1, AstroSkyfield.__bodyrise_bodyset( observer, body ) ) # Original Skyfield function only supports sun rise/set, so have generalised to any body.
         if t:
             t = t.utc_datetime()
