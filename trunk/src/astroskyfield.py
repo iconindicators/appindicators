@@ -781,15 +781,15 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
-        nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "New Moon" ) ) ] #TODO SHould not have text here...figure out the correct way to do it.
-        nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( "Full Moon" ) ) ]
+        nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] # New moon.
+        nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] # Full moon.
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime ) # Need for notification.
 
         if not neverUp:
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "First Quarter" ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "Full Moon" ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes [ ( moonPhases.index( "Last Quarter" ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( "New Moon" ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 1 ] ) ) ] ) # First quarter.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] ) # Full moon.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes [ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] ) # Last quarter.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] ) # New moon.
 
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime().replace( tzinfo = None ), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
@@ -805,7 +805,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             t1 = timeScale.utc( utcNowDateTime.year,  utcNowDateTime.month + 7 ) # Look seven months ahead.
             t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemeris ) )
             t = t.utc_datetime()
-            if "Equinox" in almanac.SEASON_EVENTS[ y[ 0 ] ]: #TODO See above in moon for text...should somehow refer to the text from Skyfield.
+            if almanac.SEASON_EVENTS[ 0 ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ 2 ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
