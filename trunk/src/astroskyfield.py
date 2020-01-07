@@ -19,8 +19,20 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO If/when we get skyfield up and running, need to add to creditz of the super for the indicator
-#(and remove pyephem)
+#TODO Pyephem can return fractional seconds in rise/set date/times which are subsequently removed.
+# Not sure if skyfield will/could have the same problem.
+
+
+#TODO Might need to cache deltat.data and deltat.preds as the backend website was down
+# and I couldn't get them except at a backup site.
+# What other files are downloaded?  
+# Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  
+# Be careful...this file expires!
+# Seems skyfield has changed the way data is loaded with a tag to say not to do a download (use old file).
+# There is a ticket about this...but cannot find it right now.  Seems an API call somewhere/somehow turns caching on/off.
+
+
+#TODO If/when we get skyfield up and running, need to add to creditz to the super for the indicator (and remove pyephem).
 
 
 #TODO Can pip3 be run from the install?
@@ -48,7 +60,7 @@
 # gettext.install( "astroskyfield" )
 
 from skyfield import almanac
-from skyfield.api import EarthSatellite, load, Star, Topos
+from skyfield.api import load, Star, Topos
 from skyfield.data import hipparcos
 from skyfield.nutationlib import iau2000b
 
@@ -693,19 +705,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         "Zurich" :           ( 47.3833333, 8.5333333, 405.500916 ) }
 
 
-#TODO Pyephem can return fractional seconds in rise/set date/times...so they have been removed...
-# ...not sure if skyfield will/could have the same problem.
-#How were the fractional seconds removed in PyEphem?  Using a formatter?
-
-
-#TODO Might need to cache deltat.data and deltat.preds as the backend website was down and I couldn't get them except at a backup site.
-# What other files are downloaded?  
-#Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat  
-#Be careful...this file expires!
-#Seems skyfield has changed the way data is loaded with a tag to say not to do a download (use old file).
-#There is a ticket about this...but cannot find it right now.  Seems an API call somewhere/somehow turns caching on/off.
-
-
     @staticmethod
     def calculate( utcNow,
                    latitude, longitude, elevation,
@@ -731,17 +730,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             ephemerisStars = hipparcos.load_dataframe( f )
 
         AstroSkyfield.__calculateStars( utcNowSkyfield, data, timeScale, observer, ephemerisStars, stars, magnitudeMaximum )
-
-#TODO
-# https://github.com/skyfielders/python-skyfield/issues/11
-# https://github.com/skyfielders/python-skyfield/issues/196
-# https://github.com/skyfielders/python-skyfield/pull/202
-# https://github.com/skyfielders/python-skyfield/issues/305
-#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.Comet, comets, cometData, magnitudeMaximum )
-#     __calculateCometsOrMinorPlanets( ephemNow, data, AstronomicalBodyType.MinorPlanet, minorPlanets, minorPlanetData, magnitudeMaximum )
-
-#TODO 
-# https://github.com/skyfielders/python-skyfield/issues/115
+        AstroSkyfield.__calculateCometsOrMinorPlanets( utcNowSkyfield, data, timeScale, observer, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+        AstroSkyfield.__calculateCometsOrMinorPlanets( utcNowSkyfield, data, timeScale, observer, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
         AstroSkyfield.__calculateSatellites( utcNowSkyfield, data, timeScale, satellites, satelliteData )
 
         return data
@@ -759,7 +749,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-        return { } #TODO Implement me! 
+        return { } #TODO Implement me when Skyfield implements Orbital Elements! 
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
@@ -835,7 +825,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO According to 
 #     https://github.com/skyfielders/python-skyfield/issues/39
 #     https://github.com/skyfielders/python-skyfield/pull/40
-# skyfield might support somehow star names out of the box.
+# Skyfield might support star names out of the box.
 # Does this conflict with the list from named_stars.py currently in play?
     # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
@@ -847,12 +837,18 @@ class AstroSkyfield( astrobase.AstroBase ):
                     AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
 
 
-#TODO Not yet implemented.
+#TODO Not yet implemented in Skyfield.
 # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
-    # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
+# https://github.com/skyfielders/python-skyfield/issues/11
+# https://github.com/skyfielders/python-skyfield/issues/196
+# https://github.com/skyfielders/python-skyfield/pull/202
+# https://github.com/skyfielders/python-skyfield/issues/305
+# The MPC might provide comet / minor planet data in a different format which Skyfield can read.
     @staticmethod
-    def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
-        pass
+    def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+        for key in cometsOrMinorPlanets:
+            if key in cometOrMinorPlanetData:
+                pass
 
 
     @staticmethod
@@ -909,42 +905,19 @@ class AstroSkyfield( astrobase.AstroBase ):
         return is_body_up_at
 
 
-#TODO Might be useful:
+#TODO rise/set not yet implemented in Skyfield.s
+# https://github.com/skyfielders/python-skyfield/issues/115
+# https://rhodesmill.org/skyfield/earth-satellites.html
+# https://github.com/skyfielders/python-skyfield/issues/115
 # https://github.com/skyfielders/python-skyfield/issues/242
 # https://rhodesmill.org/skyfield/positions.html
 # https://rhodesmill.org/skyfield/earth-satellites.html
 # https://rhodesmill.org/skyfield/api-satellites.html
-    # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
-    #
-    # Other sources/background:
-    #   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
-    #   http://spotthestation.nasa.gov/sightings
-    #   http://www.n2yo.com
-    #   http://www.heavens-above.com
-    #   http://in-the-sky.org
-    #
-    # For planets/stars, the immediate next rise/set time is shown.
-    # If already above the horizon, the set time is shown followed by the rise time for the following pass.
-    # This makes sense as planets/stars are slow moving.
-    #
-    # However, as satellites are faster moving and pass several times a day, a different approach is used.
-    # When a notification is displayed indicating a satellite is now passing overhead,
-    # the user would want to see the rise/set for the current pass (rather than the set for the current pass and rise for the next pass).
-    #
-    # Therefore...
-    #    If a satellite is yet to rise, show the upcoming rise/set time.
-    #    If a satellite is currently passing over, show the rise/set time for that pass.
-    #
-    # This allows the user to see the rise/set time for the current pass as it is happening.
-    # When the pass completes and an update occurs, the rise/set for the next pass will be displayed.
     @staticmethod
     def __calculateSatellites( utcNow, data, timeScale, satellites, satelliteData ):
         for key in satellites:
             if key in satelliteData:
-                tle = satelliteData[ key ]
-#TODO rise/set not yet implemented in Skyfield
-# https://github.com/skyfielders/python-skyfield/issues/115
-# https://rhodesmill.org/skyfield/earth-satellites.html
+                pass
 
 
 #TODO Add header comment
@@ -1015,5 +988,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( e )
 
 
+# Used to create the stars/planet ephemerides.
+# Must uncomment the gettext lines at the top! 
 # AstroSkyfield.createStarEphemeris()
 # AstroSkyfield.createPlanetEphemeris()
