@@ -835,8 +835,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO According to 
 #     https://github.com/skyfielders/python-skyfield/issues/39
 #     https://github.com/skyfielders/python-skyfield/pull/40
-# skyfield might support somehow star names out of the box...
-# ...how, if at all, does this conflict with the list from named_stars.py currently in play?
+# skyfield might support somehow star names out of the box.
+# Does this conflict with the list from named_stars.py currently in play?
     # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
     def __calculateStars( utcNow, data, timeScale, observer, ephemeris, stars, magnitudeMaximum ):
@@ -847,11 +847,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                     AstroSkyfield.__calculateCommon( utcNow, data, timeScale, observer, Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
 
 
-    # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
+#TODO Not yet implemented.
+# https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
     # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, observer, ephemeris, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
-        pass #TODO
+        pass
 
 
     @staticmethod
@@ -891,6 +892,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #TODO Have copied the code from skyfield/almanac.py as per
     # https://github.com/skyfielders/python-skyfield/issues/226
     # to compute rise/set for any body.
+    # See risings_and_settings() in
+    #    https://github.com/skyfielders/python-skyfield/blob/master/skyfield/almanac.py    
     #
     # Returns true if the body is up at the time give; false if down.
     @staticmethod
@@ -941,9 +944,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                 tle = satelliteData[ key ]
 #TODO rise/set not yet implemented in Skyfield
 # https://github.com/skyfielders/python-skyfield/issues/115
+# https://rhodesmill.org/skyfield/earth-satellites.html
 
 
-#TODO Header comment
+#TODO Add header comment
     @staticmethod
     def __getLatitudeLongitude( observer ):
         for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
