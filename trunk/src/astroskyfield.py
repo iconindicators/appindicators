@@ -707,7 +707,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def calculate( utcNow,
+    def calculateORIG( utcNow,
                    latitude, longitude, elevation,
                    planets,
                    stars,
@@ -886,6 +886,197 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
+    @staticmethod
+    def calculate( utcNow,
+                   latitude, longitude, elevation,
+                   planets,
+                   stars,
+                   satellites, satelliteData,
+                   comets, cometData,
+                   minorPlanets, minorPlanetData,
+                   magnitudeMaximum ):
+
+        data = { }
+        timeScale = load.timescale()
+        topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+        ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
+
+#TODO Temp hack for moon
+#         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+#         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = "50" # Needed for icon.
+#         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = "1" # Needed for icon.
+#         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.LUNAR_PHASE_THIRD_QUARTER # Need for notification.
+
+        AstroSkyfield.__calculateMoonNEW( utcNow, data, timeScale, topos, ephemerisPlanets )
+        AstroSkyfield.__calculateSunNEW( utcNow, data, timeScale, topos, ephemerisPlanets )
+        AstroSkyfield.__calculatePlanetsNEW( utcNow, data, timeScale, topos, ephemerisPlanets, planets )
+
+        with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
+            ephemerisStars = hipparcos.load_dataframe( f )
+
+        AstroSkyfield.__calculateStarsNEW( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
+
+        AstroSkyfield.__calculateCometsOrMinorPlanetsNEW( utcNow, 
+                                                       data, 
+                                                       timeScale, 
+                                                       topos, 
+                                                       ephemerisPlanets, 
+                                                       astrobase.AstroBase.BodyType.COMET, 
+                                                       comets, 
+                                                       cometData, 
+                                                       magnitudeMaximum )
+
+        AstroSkyfield.__calculateCometsOrMinorPlanetsNEW( utcNow, 
+                                                       data, 
+                                                       timeScale, 
+                                                       topos, 
+                                                       ephemerisPlanets, 
+                                                       astrobase.AstroBase.BodyType.MINOR_PLANET, 
+                                                       minorPlanets, 
+                                                       minorPlanetData, 
+                                                       magnitudeMaximum )
+
+        AstroSkyfield.__calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData )
+
+        return data
+
+
+    # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+    # http://futureboy.us/fsp/moon.fsp
+    # http://www.geoastro.de/moondata/index.html
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/elevazmoon/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://www.geoastro.de/sundata/index.html
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
+    @staticmethod
+    def __calculateMoonNEW( utcNow, data, timeScale, topos, ephemerisPlanets ):
+        key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+        moon = ephemerisPlanets[ AstroSkyfield.__MOON ]
+        neverUp = AstroSkyfield.__calculateCommonNEW( utcNow, data, timeScale, topos, ephemerisPlanets, 
+                                                      moon, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+
+        t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        illumination = str( int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, t0 ) * 100 ) ) # Needed for icon.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+
+        observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos )
+        sunRA, sunDec, earthDistance = observer.at( t0 ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
+        moonRA, moonDec, earthDistance = observer.at( t0 ).observe( moon ).apparent().radec()
+        latitude, longitude = AstroSkyfield.__getLatitudeLongitude( observer )
+        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
+                                                                     sunRA.radians, sunDec.radians, 
+                                                                     moonRA.radians, moonDec.radians, 
+                                                                     latitude.radians, longitude.radians )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
+
+        t1 = timeScale.utc( utcNow.year, utcNow.month + 2 ) # Ideally would just like to add one month, but not sure what happens if today's date is say the 31st and the next month is say February.
+        t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemerisPlanets ) )
+        moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
+        moonPhaseDateTimes = t.utc_datetime()
+        nextNewMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] # New moon.
+        nextFullMoonDateTime = moonPhaseDateTimes [ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] # Full moon.
+        lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
+
+        if not neverUp:
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 1 ] ) ) ] ) # First quarter.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] ) # Full moon.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes [ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] ) # Last quarter.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] ) # New moon.
+
+            astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+
+
+    @staticmethod
+    def __calculateSunNEW( utcNow, data, timeScale, topos, ephemerisPlanets ):
+        neverUp = AstroSkyfield.__calculateCommonNEW( utcNow, data, timeScale, topos, ephemerisPlanets,
+                                                      ephemerisPlanets[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+
+        if not neverUp:
+            key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+            t1 = timeScale.utc( utcNow.year,  utcNow.month + 7 ) # Look seven months ahead.
+            t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemerisPlanets ) )
+            t = t.utc_datetime()
+            if almanac.SEASON_EVENTS[ 0 ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ 2 ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+
+            else:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+
+            astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+
+
+    @staticmethod
+    def __calculatePlanetsNEW( utcNow, data, timeScale, topos, ephemerisPlanets, planets ):
+        for planet in planets:
+            AstroSkyfield.__calculateCommonNEW( utcNow, data, timeScale, topos, ephemerisPlanets, 
+                                                ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
+
+
+#TODO According to 
+#     https://github.com/skyfielders/python-skyfield/issues/39
+#     https://github.com/skyfielders/python-skyfield/pull/40
+# Skyfield might support star names out of the box.
+# Does this conflict with the list from named_stars.py currently in play?
+    # http://aa.usno.navy.mil/data/docs/mrst.php
+    @staticmethod
+    def __calculateStarsNEW( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
+        for star in stars:
+            if star in astrobase.AstroBase.STARS:
+                theStar = ephemerisStars.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ]
+                if theStar.magnitude <= magnitudeMaximum:
+                    AstroSkyfield.__calculateCommonNEW( utcNow, data, timeScale, topos, ephemerisPlanets, 
+                                                     Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
+
+
+#TODO Not yet implemented in Skyfield.
+# https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
+# https://github.com/skyfielders/python-skyfield/issues/11
+# https://github.com/skyfielders/python-skyfield/issues/196
+# https://github.com/skyfielders/python-skyfield/pull/202
+# https://github.com/skyfielders/python-skyfield/issues/305
+# The MPC might provide comet / minor planet data in a different format which Skyfield can read.
+    @staticmethod
+    def __calculateCometsOrMinorPlanetsNEW( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+        for key in cometsOrMinorPlanets:
+            if key in cometOrMinorPlanetData:
+                pass
+
+
+    @staticmethod
+    def __calculateCommonNEW( utcNow, data, timeScale, topos, ephemerisPlanets, body, astronomicalBodyType, nameTag ):
+        neverUp = False
+        key = ( astronomicalBodyType, nameTag )
+        t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 2 ) # Look two days ahead as one day ahead may miss the next rise or set.
+        t, y = almanac.find_discrete( t0, t1, almanac.risings_and_settings( ephemerisPlanets, body, topos ) )
+        if t:
+            t = t.utc_datetime()
+            if y[ 0 ]:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+
+            else:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+                alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t0 ).observe( body ).apparent().altaz()
+                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+
+        else:
+            if almanac.risings_and_settings( ephemerisPlanets, body, topos )( t0 ): # Body is up (and so always up).
+                alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t0 ).observe( body ).apparent().altaz()
+                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+
+            else:
+                neverUp = True # Body is down (and so never up). 
+
+        return neverUp
+
+
     #TODO Have copied the code from skyfield/almanac.py as per
     # https://github.com/skyfielders/python-skyfield/issues/226
     # to compute rise/set for any body.
@@ -915,7 +1106,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 # https://rhodesmill.org/skyfield/earth-satellites.html
 # https://rhodesmill.org/skyfield/api-satellites.html
     @staticmethod
-    def __calculateSatellites( utcNow, data, timeScale, satellites, satelliteData ):
+    def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         for key in satellites:
             if key in satelliteData:
                 pass
