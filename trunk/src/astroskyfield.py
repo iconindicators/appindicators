@@ -752,7 +752,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-        return { } #TODO Implement me when Skyfield implements Orbital Elements! 
+        return { } #TODO Waiting for when Skyfield implements Orbital Elements. 
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
