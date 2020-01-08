@@ -483,6 +483,10 @@ class AstroPyephem( astrobase.AstroBase ):
         return results
 
 
+    @staticmethod
+    def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
+
+
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     # http://futureboy.us/fsp/moon.fsp
     # http://www.geoastro.de/moondata/index.html

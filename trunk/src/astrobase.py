@@ -301,6 +301,13 @@ class AstroBase( ABC ):
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ): return { }
 
 
+    # Returns a string specify any third party credit.
+    # Format is a credit string followed by an option URL.
+    @staticmethod
+    @abstractmethod
+    def getCredit(): return ""
+
+
     # Get the lunar phase for the given date/time and illumination percentage.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.

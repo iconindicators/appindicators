@@ -199,7 +199,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             version = "1.0.81",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
-            creditz = [ _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" ),
+            creditz = [ IndicatorLunar.astrobackend.getCredit(),
                         _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" ),
                         _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" ),
                         _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) ] )

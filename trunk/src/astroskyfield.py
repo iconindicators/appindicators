@@ -19,10 +19,6 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO Pyephem can return fractional seconds in rise/set date/times which are subsequently removed.
-# Not sure if skyfield will/could have the same problem.
-
-
 #TODO Might need to cache deltat.data and deltat.preds as the backend website was down
 # and I couldn't get them except at a backup site.
 # What other files are downloaded?  
@@ -30,9 +26,6 @@
 # Be careful...this file expires!
 # Seems skyfield has changed the way data is loaded with a tag to say not to do a download (use old file).
 # There is a ticket about this...but cannot find it right now.  Seems an API call somewhere/somehow turns caching on/off.
-
-
-#TODO If/when we get skyfield up and running, need to add to creditz to the super for the indicator (and remove pyephem).
 
 
 #TODO Can pip3 be run from the install?
@@ -753,6 +746,10 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
         return { } #TODO Waiting for when Skyfield implements Orbital Elements. 
+
+
+    @staticmethod
+    def getCredit(): return _( "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield" )
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
