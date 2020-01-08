@@ -59,11 +59,6 @@
 # Might get resolved if we use the user cache for icons and not /tmp.
 
 
-#TODO Is there a problem with setting the minimum update time (using the last update of say 2 minutes)
-# and then because the user turns off stuff, the update now becomes one minute.
-# Does this make sense?
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
@@ -148,7 +143,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
 
-#TODO I think this has to stay here and cannot go into the base class because stars are initialised later.
     BODY_TAGS_TRANSLATIONS = dict(
         list( astrobase.AstroBase.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astrobase.AstroBase.PLANET_TAGS_TRANSLATIONS.items() ) +
