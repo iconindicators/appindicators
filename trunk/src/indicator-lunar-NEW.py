@@ -305,7 +305,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
         utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
-#TODO Are these all the date/time based tags of concern?  Any missed or any should not be here?
         for key in self.data:
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -316,8 +315,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
-
-#TODO Double check this logic!  Ensure we have sufficient buffer.
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
