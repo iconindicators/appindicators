@@ -766,7 +766,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         moon = ephemerisPlanets[ AstroSkyfield.__MOON ]
 
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        illumination = str( int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, t0 ) * 100 ) )
+        illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, t0 ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos )
