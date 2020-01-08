@@ -301,8 +301,8 @@ class AstroBase( ABC ):
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ): return { }
 
 
-    # Returns a string specify any third party credit.
-    # Format is a credit string followed by an option URL.
+    # Returns a string specifying any third party credit.
+    # Format is a credit string followed by an optional URL.
     @staticmethod
     @abstractmethod
     def getCredit(): return ""
