@@ -134,8 +134,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
-#TODO Instead of this temp dir thing...just use the user cache?
-    ICON_BASE_PATH = tempfile.gettempdir()
+    ICON_BASE_PATH = tempfile.gettempdir() #TODO Instead of this temp dir thing...just use the user cache?
     ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
     ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
@@ -366,15 +365,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.indicator.set_icon_full( iconFilename, "" )
 
 
-#TODO Verify at next full moon.
     def notificationFullMoon( self ):
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
         lunarPhase = self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ]
 
-#TODO Maybe set to 98 rather than 99?
         if ( lunarPhase == astrobase.AstroBase.LUNAR_PHASE_WAXING_GIBBOUS or lunarPhase == astrobase.AstroBase.LUNAR_PHASE_FULL_MOON ) and \
-           lunarIlluminationPercentage >= 99 and \
+           lunarIlluminationPercentage >= 98 and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
 
             summary = self.werewolfWarningSummary
