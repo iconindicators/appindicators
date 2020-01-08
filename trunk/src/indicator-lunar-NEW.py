@@ -263,6 +263,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if self.showSatelliteNotification:
             self.notificationSatellites()
+        self.notificationSatellites()
 
         return self.getNextUpdateTimeInSeconds( utcNow )
 
@@ -389,28 +390,29 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def notificationSatellites( self ):
         # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
         satelliteNameNumberRiseTimes = [ ]
-        for satelliteName, satelliteNumber, in self.satellites:
-            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteName + " " + satelliteNumber )
-            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ) in self.data: # Assume all other information is present!
-               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+        for number in self.satellites:
+            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
+            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ) in self.data:
+                satelliteNameNumberRiseTimes.append( [ self.satelliteData[ number ].getName(), number, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-        if self.satellitesSortByDateTime:
-            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-        else:
-            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
+#TODO I don't think we want to sort by anything other than rise time (certainly not by name at least here for the notification)???
+        satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
+#         if self.satellitesSortByDateTime:
+#             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
+#         else:
+#             satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
 
         utcNow = str( datetime.datetime.utcnow() )
-        for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
-            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteName + " " + satelliteNumber )
-
-            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications:
+        for name, number, riseTime in satelliteNameNumberRiseTimes:
+            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
+            if number in self.satelliteNotifications:
                 # There has been a previous notification for this satellite.
                 # Ensure that the current rise/set matches that of the previous notification.
                 # Due to a quirk of the astro backend, the date/time may not match exactly (be out by a few seconds or more).
                 # So need to ensure that the current rise/set and the previous rise/set overlap to be sure it is the same transit.
                 currentRise = self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ]
                 currentSet = self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]
-                previousRise, previousSet = self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ]
+                previousRise, previousSet = self.satelliteNotifications[ ( name, number ) ]
                 overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
                 if overlap:
                     continue
@@ -426,14 +428,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                utcNow > self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
                 continue
 
-            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+            self.satelliteNotifications[ ( name, number ) ] = ( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
             riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             riseAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             setTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             setAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            tle = self.satelliteData[ ( satelliteName, satelliteNumber ) ]
+            tle = self.satelliteData[ ( name, number ) ]
 
             summary = self.satelliteNotificationSummary. \
                       replace( astrobase.AstroBase.SATELLITE_TAG_NAME, tle.getName() ). \
