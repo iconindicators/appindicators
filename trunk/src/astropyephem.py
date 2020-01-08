@@ -645,6 +645,11 @@ class AstroPyephem( astrobase.AstroBase ):
                             break
 
                         else:
+#TODO Got an exception on the line below:
+# TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'                            
+# I guess that nextPass[ 4 ] was None?
+# Makes sense, as we are in the clause for when the next pass is deemed invalid, yet we use potentially a None value to look for the next pass.
+# Instead perhaps, set 30 minutes after the current date/time...think about this!
                             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 30 ) # Look for the next pass.
 
                     except ValueError:
