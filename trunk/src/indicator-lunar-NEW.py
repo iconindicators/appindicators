@@ -1731,21 +1731,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # End of hack!
 
 
-
-        #TODO Remove...testing for satellites.
-#         Sydney Latitude: -33.8,
-#         Sydney Longitude: 151.2
-# 
-        self.longitude = 151.2
-        self.latitude = -33.8
-#         self.latitude = -85.0
-#         self.latitude = -45.0
-#         self.latitude = -1.0
-#         self.latitude = -60.0
-#         self.latitude = 33.8
-#         self.latitude = 85.0
-
-
     def saveConfig( self ):
         if self.cometsAddNew:
             comets = [ ]
