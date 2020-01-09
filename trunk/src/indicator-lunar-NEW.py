@@ -170,17 +170,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
-    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
-    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
-        _( "Number: " ) + astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n" + \
-        _( "International Designator: " ) + astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n" + \
-        _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
-        _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
-        _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
-        _( "Set Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
-    SATELLITE_NOTIFICATION_MESSAGE_MULTIPLE = _( "More than one satellite will soon be rising." )
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + _( " now rising..." )
-    SATELLITE_NOTIFICATION_SUMMARY_MULTIPLE = _( "Satellites now rising..." )
+
+#TODO There are translation tags in the message default but not the menu text nor summary default...why?    
+    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
+                          astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
+                          astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
+    SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
+                                             _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
+                                             _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
+                                             _( "Set Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + \
+                                             " [" + astrobase.AstroBase.SATELLITE_TAG_NUMBER + "] " + \
+                                             _( " now rising..." )
     SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + astrobase.AstroBase.SATELLITE_TAG_NUMBER
 
     STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
@@ -205,7 +206,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
-        self.satelliteNotifications = { } #TODO This could be a list of satellite numbers eventually.
+        self.satellitePreviousNotifications = [ ]
 
 #         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH ) #TODO Needed?  Maybe needed when setting the icon.
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
@@ -266,11 +267,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showWerewolfWarning:
             self.notificationFullMoon()
 
+#TODO Put back
 #         if self.showSatelliteNotification:
 #             self.notificationSatellites()
         self.notificationSatellites()
 
-        return self.getNextUpdateTimeInSeconds( utcNow )
+
+#TODO Put back
+        x = self.getNextUpdateTimeInSeconds( utcNow )
+        print( x, "s" )
+        return x
+#         return self.getNextUpdateTimeInSeconds( utcNow )
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -365,6 +372,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         iconFilename = IndicatorLunar.ICON_BASE_NAME + "-" + str( datetime.datetime.utcnow().strftime( "%Y%m%d%H%M%S" ) ) + ".svg"
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
+        print( lunarIlluminationPercentage, "%" )#TODO testing
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees, iconFilename )
         self.indicator.set_icon_full( iconFilename, "" )
@@ -391,26 +399,28 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def notificationSatellites( self ):
-        notifications = [ ]
+        satelliteCurrentNotifications = [ ]
         utcNow = datetime.datetime.utcnow()
+        print( "Satellite Notifications from last update", self.satellitePreviousNotifications )#TODO Testing
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
-            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ) in self.data:
-                # Determine if a notification for the current satellite is required.
+            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data: # Satellite is about to rise or in transit.
                 riseTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], 
                                                        astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
-                riseTimeMinusTwoMinutes = riseTime - datetime.timedelta( minutes = 2 ) # Moving the rise time a couple of minutes earlier gives a buffer.
-                if riseTimeMinusTwoMinutes <= utcNow and number not in self.satelliteNotifications:
-                    notifications.append( number )
+                if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow:# and number not in self.satellitePreviousNotifications: # Two minute buffer.
+                    satelliteCurrentNotifications.append( [ number, riseTime ] )
+                    self.satellitePreviousNotifications.append( number )
 
-                # Determine if the satellite has completed the transit and if so, remove from the list.
-                if number in self.satelliteNotifications and \
-                   self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] < utcNow:
-                    self.satelliteNotifications.remove( number ) #TODO In the preferences, if we turn off sat notifications, maybe reset this to empty?
+                # Determine if the satellite has completed the transit and if so, remove from the list satelliteCurrentNotifications.
+#                 setTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], 
+#                                                        astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
-        if len( notifications ) == 1: # Only one satellite, so notify...
-            # Parse the satellite summary/message to create the notification...
+#                 if number in self.satellitePreviousNotifications and setTime < utcNow:
+#                     self.satellitePreviousNotifications.remove( number ) #TODO In the preferences, if we turn off sat satelliteCurrentNotifications, maybe reset this to empty?
+
+        for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ 1 ], x[ 0 ] ) ):
+            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             riseAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             setTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
@@ -436,11 +446,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME, setTime )
 
             Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
+            break#TODO Remove
 
-        elif len( notifications ) > 1: # Multiple satellites, so send a general notification...
-            Notify.Notification.new( IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_MULTIPLE, 
-                                     IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_MULTIPLE, 
-                                     IndicatorLunar.ICON_SATELLITE ).show()
+        print()#TODOTesting
 
 
 #TODO Verify
@@ -462,14 +470,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteName + " " + satelliteNumber )
 
-            if ( satelliteName, satelliteNumber ) in self.satelliteNotifications:
+            if ( satelliteName, satelliteNumber ) in self.satellitePreviousNotifications:
                 # There has been a previous notification for this satellite.
                 # Ensure that the current rise/set matches that of the previous notification.
                 # Due to a quirk of the astro backend, the date/time may not match exactly (be out by a few seconds or more).
                 # So need to ensure that the current rise/set and the previous rise/set overlap to be sure it is the same transit.
                 currentRise = self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ]
                 currentSet = self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]
-                previousRise, previousSet = self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ]
+                previousRise, previousSet = self.satellitePreviousNotifications[ ( satelliteName, satelliteNumber ) ]
                 overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
                 if overlap:
                     continue
@@ -485,7 +493,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                utcNow > self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
                 continue
 
-            self.satelliteNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+            self.satellitePreviousNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
 
             # Parse the satellite summary/message to create the notification...
             riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )

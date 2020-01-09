@@ -603,7 +603,8 @@ class AstroPyephem( astrobase.AstroBase ):
         return neverUp
 
 
-    # Use TLE data collated by Dr T S Kelso (http://celestrak.com/NORAD/elements) with PyEphem to compute satellite rise/pass/set times.
+    # Use TLE data collated by Dr T S Kelso
+    # http://celestrak.com/NORAD/elements
     #
     # Other sources/background:
     #   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
@@ -611,9 +612,6 @@ class AstroPyephem( astrobase.AstroBase ):
     #   http://www.n2yo.com
     #   http://www.heavens-above.com
     #   http://in-the-sky.org
-    #
-    # If a satellite is yet to rise, show the rise/set time for the upcoming visible pass.
-    # If a satellite is currently passing over (and is a visible pass), show the rise/set time for that pass.
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
         for key in satellites:
@@ -637,13 +635,13 @@ class AstroPyephem( astrobase.AstroBase ):
                                     continue
 
                             # Satellite is yet to rise or is in transit...
-                            if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Show all satellite information.
+                            if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Satellite is about to rise or in transit, so show all information.
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
 
-                            else: # Satellite will rise later, so only add rise time.
+                            else: # Satellite will rise later, so only show rise time.
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
 
                             break
@@ -722,6 +720,7 @@ class AstroPyephem( astrobase.AstroBase ):
     #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
+        return True #TODO Testing
         city = AstroPyephem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
