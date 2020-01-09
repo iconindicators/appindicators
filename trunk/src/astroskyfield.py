@@ -776,7 +776,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
                                                                      sunRA.radians, sunDec.radians, 
                                                                      moonRA.radians, moonDec.radians, 
-                                                                     latitude.radians, longitude.radians )
+                                                                     latitude, longitude )
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 )
@@ -905,13 +905,13 @@ class AstroSkyfield( astrobase.AstroBase ):
                 pass
 
 
-#TODO Add header comment
+    # Returns the latitude and longitude of the observer (or topos), in radians.
     @staticmethod
     def __getLatitudeLongitude( observer ):
-        for thing in observer.positives: # Get the latitude/longitude...there will be a Topos object in the observer, because that is how Skyfield works!
+        for thing in observer.positives: # If an observer is passed in, a Topos object will be contained within.
             if isinstance( thing, Topos ):
-                latitude = thing.latitude
-                longitude = thing.longitude
+                latitude = thing.latitude.radians
+                longitude = thing.longitude.radians
                 break
 
         return latitude, longitude
