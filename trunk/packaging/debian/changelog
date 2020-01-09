@@ -9,7 +9,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Removed decimal degrees from azimuth/altitude.
   * Removed planetary moons; each effectively has the same azimuth/altitude
     as the parent planet.
-  * Removed werewolf warning percentage from preferences and fixed at 98%.
+  * Removed werewolf warning percentage from preferences and fixed at 96%.
   * Removed date/time format from preferences; uses ISO 8601 without seconds.
   * TLE/OE data files are no longer configurable as the defaults are more than
     adequate.  For the adventurous, you can substitute the TLE/OE URLs for
