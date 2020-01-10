@@ -20,7 +20,7 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Note in the changelog about multiple satellite notifications.
+#TODO In the preferences, if we turn off sat satelliteCurrentNotifications, maybe reset self.satellitePreviousNotifications to empty?
 
 
 #TODO If the menu build takes too long, perhaps add in the following to each of the top level menu items (moon, sun, planets, etc):
@@ -256,12 +256,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
-        print( "Backend:", datetime.datetime.utcnow() - now )#TODO Testing
+#         print( "Backend:", datetime.datetime.utcnow() - now )#TODO Testing
 
         # Update frontend.
         now = datetime.datetime.utcnow()#TODO Testing
         self.updateMenu( menu )
-        print( "Frontend:", datetime.datetime.utcnow() - now )#TODO Testing
+#         print( "Frontend:", datetime.datetime.utcnow() - now )#TODO Testing
         self.updateIconAndLabel()
 
         if self.showWerewolfWarning:
@@ -275,7 +275,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Put back
         x = self.getNextUpdateTimeInSeconds( utcNow )
-        print( x, "s" )
+#         print( x, "s" )
         return x
 #         return self.getNextUpdateTimeInSeconds( utcNow )
 
@@ -372,7 +372,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         iconFilename = IndicatorLunar.ICON_BASE_NAME + "-" + str( datetime.datetime.utcnow().strftime( "%Y%m%d%H%M%S" ) ) + ".svg"
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
-        print( lunarIlluminationPercentage, "%" )#TODO testing
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees, iconFilename )
         self.indicator.set_icon_full( iconFilename, "" )
@@ -401,24 +400,27 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def notificationSatellites( self ):
         satelliteCurrentNotifications = [ ]
         utcNow = datetime.datetime.utcnow()
-        print( "Satellite Notifications from last update", self.satellitePreviousNotifications )#TODO Testing
+        print( utcNow )
+        print( "Previous notifications:", sorted( self.satellitePreviousNotifications ) )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
-            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data: # Satellite is about to rise or in transit.
+            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
                 riseTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], 
                                                        astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
-                if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow:# and number not in self.satellitePreviousNotifications: # Two minute buffer.
+                if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow: # Two minute buffer.
                     satelliteCurrentNotifications.append( [ number, riseTime ] )
                     self.satellitePreviousNotifications.append( number )
 
-                # Determine if the satellite has completed the transit and if so, remove from the list satelliteCurrentNotifications.
-#                 setTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], 
-#                                                        astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+            if ( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ) in self.data:
+                setTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
+                                                  astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
-#                 if number in self.satellitePreviousNotifications and setTime < utcNow:
-#                     self.satellitePreviousNotifications.remove( number ) #TODO In the preferences, if we turn off sat satelliteCurrentNotifications, maybe reset this to empty?
+                if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
+                    self.satellitePreviousNotifications.remove( number )
 
+        print( "Previous notifications updated", sorted( self.satellitePreviousNotifications ) )
+        print( "Current notifications", sorted( [item[0] for item in satelliteCurrentNotifications]  ) )
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ 1 ], x[ 0 ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
@@ -445,10 +447,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
                       replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME, setTime )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
-            break#TODO Remove
-
-        print()#TODOTesting
+#             Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
 
 #TODO Verify
