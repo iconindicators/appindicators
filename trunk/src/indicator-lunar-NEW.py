@@ -227,13 +227,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         utcNow = datetime.datetime.utcnow()
 
         # Update comet, minor planet and satellite data.
-        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, IndicatorLunar.COMET_DATA_URL, IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, 
+                                          IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, 
+                                          orbitalelement.download, 
+                                          IndicatorLunar.COMET_DATA_URL, 
+                                          IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         self.minorPlanetData = { }
         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
-            minorPlanetData = self.updateData( baseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, orbitalelement.download, url, IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+            minorPlanetData = self.updateData( baseName, 
+                                               IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, 
+                                               orbitalelement.download, 
+                                               url, 
+                                               IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
             for key in minorPlanetData:
                 if key not in self.minorPlanetData:
                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
@@ -241,7 +249,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
-        self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, None )
+        self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, 
+                                              IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, 
+                                              twolineelement.download, 
+                                              IndicatorLunar.SATELLITE_DATA_URL, 
+                                              None )
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
@@ -343,6 +355,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuSatellites( menu )
 
 
+#TODO Verify
     def updateIconAndLabel( self ):
         # Substitute tags for values.
         parsedOutput = self.indicatorText
@@ -453,6 +466,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
             nextPhases = [ ]
+#TODO Can this be made simpler (each line not so long)?
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ], _( "Full: " ), key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
@@ -473,8 +487,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, 0, 1 )
-            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAG_EQUINOX ) ) ) )
-            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAG_SOLSTICE ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ) ) )
+            subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ) ) )
             self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
