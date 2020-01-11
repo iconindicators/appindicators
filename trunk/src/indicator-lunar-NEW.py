@@ -248,7 +248,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update backend.
         now = datetime.datetime.utcnow()#TODO Testing
         self.data = IndicatorLunar.astrobackend.calculate(
-            datetime.datetime.utcnow(),
+            utcNow,
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
@@ -267,17 +267,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showWerewolfWarning:
             self.notificationFullMoon()
 
-#TODO Put back
-#         if self.showSatelliteNotification:
-#             self.notificationSatellites()
-        self.notificationSatellites()
+        if self.showSatelliteNotification:
+            self.notificationSatellites( utcNow )
 
-
-#TODO Put back
-        x = self.getNextUpdateTimeInSeconds( utcNow )
-#         print( x, "s" )
-        return x
-#         return self.getNextUpdateTimeInSeconds( utcNow )
+        return self.getNextUpdateTimeInSeconds( utcNow )
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -374,7 +367,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees, iconFilename )
-        self.indicator.set_icon_full( iconFilename, "" )
+        self.indicator.set_icon_full( iconFilename, "" )  #TODO This line causes this message:
+# (indicator-lunar-NEW.py:28266): libappindicator-WARNING **: 13:41:12.376: Using '/tmp' paths in SNAP environment will lead to unreadable resources
 
 
     def notificationFullMoon( self ):
@@ -397,10 +391,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def notificationSatellites( self ):
+    def notificationSatellites( self, utcNow ):
         satelliteCurrentNotifications = [ ]
-        utcNow = datetime.datetime.utcnow()
-        print( utcNow )
         print( "Previous notifications:", sorted( self.satellitePreviousNotifications ) )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
@@ -419,8 +411,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
                     self.satellitePreviousNotifications.remove( number )
 
+        print( "Current notifications", sorted( [ item[ 0 ] for item in satelliteCurrentNotifications] ) )
         print( "Previous notifications updated", sorted( self.satellitePreviousNotifications ) )
-        print( "Current notifications", sorted( [item[0] for item in satelliteCurrentNotifications]  ) )
+
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ 1 ], x[ 0 ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
