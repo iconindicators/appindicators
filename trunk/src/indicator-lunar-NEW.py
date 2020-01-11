@@ -393,7 +393,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def notificationSatellites( self, utcNow ):
         satelliteCurrentNotifications = [ ]
-        print( "Previous notifications:", sorted( self.satellitePreviousNotifications ) )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
@@ -410,9 +409,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
                     self.satellitePreviousNotifications.remove( number )
-
-        print( "Current notifications", sorted( [ item[ 0 ] for item in satelliteCurrentNotifications] ) )
-        print( "Previous notifications updated", sorted( self.satellitePreviousNotifications ) )
 
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ 1 ], x[ 0 ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
@@ -435,80 +431,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       replace( astrobase.AstroBase.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
                       replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
                       replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME, setTime )
-
-#             Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
-
-
-#TODO Verify
-#TODO Maybe if there are multiple satellites for this notification, then combine into one notification?  Ask Oleg.
-    def notificationSatellitesORIGINAL( self ):
-        # Create a list of satellite name/number and rise times to then either sort by name/number or rise time.
-        satelliteNameNumberRiseTimes = [ ]
-        for satelliteName, satelliteNumber, in self.satellites:
-            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteName + " " + satelliteNumber )
-            if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ) in self.data: # Assume all other information is present!
-               satelliteNameNumberRiseTimes.append( [ satelliteName, satelliteNumber, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
-
-        if self.satellitesSortByDateTime:
-            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
-        else:
-            satelliteNameNumberRiseTimes = sorted( satelliteNameNumberRiseTimes, key = lambda x: ( x[ 0 ], x[ 1 ], x[ 2 ] ) )
-
-        utcNow = str( datetime.datetime.utcnow() )
-        for satelliteName, satelliteNumber, riseTime in satelliteNameNumberRiseTimes:
-            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteName + " " + satelliteNumber )
-
-            if ( satelliteName, satelliteNumber ) in self.satellitePreviousNotifications:
-                # There has been a previous notification for this satellite.
-                # Ensure that the current rise/set matches that of the previous notification.
-                # Due to a quirk of the astro backend, the date/time may not match exactly (be out by a few seconds or more).
-                # So need to ensure that the current rise/set and the previous rise/set overlap to be sure it is the same transit.
-                currentRise = self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ]
-                currentSet = self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]
-                previousRise, previousSet = self.satellitePreviousNotifications[ ( satelliteName, satelliteNumber ) ]
-                overlap = ( currentRise < previousSet ) and ( currentSet > previousRise )
-                if overlap:
-                    continue
-
-            # Ensure the current time is within the rise/set...
-            # Subtract a minute from the rise time to force the notification to take place just prior to the satellite rise.
-#TODO Use the function below to convert from string to datetime.
-#     def toDateTime( self, dateTimeAsString, formatString ): return datetime.datetime.strptime( dateTimeAsString, formatString )
-            riseTimeMinusOneMinute = str( self.toDateTime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ) - datetime.timedelta( minutes = 1 ) )
-
-#TODO Is using strings safe here or do we need datetime?            
-            if utcNow < riseTimeMinusOneMinute or \
-               utcNow > self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-                continue
-
-            self.satellitePreviousNotifications[ ( satelliteName, satelliteNumber ) ] = ( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-
-            # Parse the satellite summary/message to create the notification...
-            riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            riseAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            setTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            setAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            tle = self.satelliteData[ ( satelliteName, satelliteNumber ) ]
-
-            summary = self.satelliteNotificationSummary. \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_NAME, tle.getName() ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME, setTime )
-            if summary == "":
-                summary = " " # The notification summary text must not be empty (at least on Unity).
-
-            message = self.satelliteNotificationMessage. \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_NAME, tle.getName() ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, tle.getNumber() ). \
-                      replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, tle.getInternationalDesignator() ). \
                       replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
                       replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME, riseTime ). \
                       replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \

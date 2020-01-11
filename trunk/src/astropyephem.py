@@ -720,7 +720,6 @@ class AstroPyephem( astrobase.AstroBase ):
     #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
-        return True #TODO Testing
         city = AstroPyephem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
