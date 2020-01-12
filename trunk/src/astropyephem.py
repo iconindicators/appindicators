@@ -603,6 +603,13 @@ class AstroPyephem( astrobase.AstroBase ):
         return neverUp
 
 
+#TODO This function takes a long time, much longer than all the others combined.
+# The common element to each visible satellite pass is the visible part, where the sun is at a particular altitude.
+# Perhaps before looking for each visible satellite pass (starting at the time for each and incrementing by 1 hour),
+# could instead first find the dates/times when the sun is at the correct altitude, typically sunrise/sunset,
+# but this could be not quite right for extreme latitudes.
+# Once the date/time windows are established, then look for each satellite pass within those.
+# https://physics.stackexchange.com/questions/25336/reverse-sun-position-algorithm
     # Use TLE data collated by Dr T S Kelso
     # http://celestrak.com/NORAD/elements
     #
