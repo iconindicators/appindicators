@@ -224,8 +224,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        utcNow = datetime.datetime.utcnow()
-
         # Update comet, minor planet and satellite data.
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, 
                                           IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, 
@@ -258,7 +256,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-        now = datetime.datetime.utcnow()#TODO Testing
+        utcNow = datetime.datetime.utcnow()
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -268,12 +266,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
-#         print( "Backend:", datetime.datetime.utcnow() - now )#TODO Testing
 
         # Update frontend.
-        now = datetime.datetime.utcnow()#TODO Testing
         self.updateMenu( menu )
-#         print( "Frontend:", datetime.datetime.utcnow() - now )#TODO Testing
         self.updateIconAndLabel()
 
         if self.showWerewolfWarning:
