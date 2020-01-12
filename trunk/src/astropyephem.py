@@ -451,11 +451,7 @@ class AstroPyephem( astrobase.AstroBase ):
         AstroPyephem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
-#TODO Satellites takes a long time...can it be made to run faster?
-        import datetime #TODO Testing
-        now = datetime.datetime.utcnow()#TODO Testing
         AstroPyephem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
-        print( "Satellites:", datetime.datetime.utcnow() - now )#TODO Testing
 
         del data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LATITUDE ) ]
         del data[ ( None, AstroPyephem.__NAME_TAG_CITY, AstroPyephem.__DATA_TAG_LONGITUDE ) ]
