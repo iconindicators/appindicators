@@ -418,7 +418,6 @@ class IndicatorBase( object ):
 
 
     def isAutoStart( self ):
-        autoStart = False
         try:
             autoStart = \
                 os.path.exists( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ) and \
