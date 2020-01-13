@@ -43,9 +43,7 @@
 #
 # Install (and upgrade to) latest skyfield: 
 #     sudo apt-get install python3-pip
-#     sudo pip3 install --upgrade skyfield
-#     sudo pip3 install --upgrade pytz
-#     sudo pip3 install --upgrade pandas
+#     sudo pip3 install --upgrade pandas pytz skyfield 
 
 
 # Uncomment the lines below when needing to run the planet/star ephemeris creation functions at the end.
@@ -773,10 +771,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         sunRA, sunDec, earthDistance = observer.at( t0 ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = observer.at( t0 ).observe( moon ).apparent().radec()
         latitude, longitude = AstroSkyfield.__getLatitudeLongitude( observer )
-        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
-                                                                     sunRA.radians, sunDec.radians, 
-                                                                     moonRA.radians, moonDec.radians, 
-                                                                     latitude, longitude )
+        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, sunRA.radians, sunDec.radians, moonRA.radians, moonDec.radians, latitude, longitude )
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 )
@@ -789,7 +784,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
 
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, 
-                                                      moon, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+                                                   moon, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
         if not neverUp:
 #TODO Tidy up the length of these lines...the code below and above seems complicated...can it be simplified?
@@ -804,7 +799,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, topos, ephemerisPlanets ):
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
-                                                      ephemerisPlanets[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+                                                   ephemerisPlanets[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
         if not neverUp:
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
@@ -827,7 +822,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets ):
         for planet in planets:
             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, 
-                                                ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
+                                             ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
 
 
 #TODO According to 
