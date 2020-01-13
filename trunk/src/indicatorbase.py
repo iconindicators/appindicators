@@ -395,6 +395,28 @@ class IndicatorBase( object ):
         return indent
 
 
+    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+
+
+#TODO Add Yaru and other themes for [ L | X | U ]buntu 16.04+.
+# On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
+    def getThemeColour( self ):
+        themeNames = { "Adwaita" : "bebebe",
+                       "elementary-xfce-darker" : "f3f3f3",  
+                       "Lubuntu" : "4c4c4c",
+                       "ubuntu-mono-dark" : "dfdbd2",
+                       "ubuntu-mono-light" : "3c3c3c" }
+
+        themeName = self.getThemeName()
+        if themeName in themeNames:
+            themeColour = themeNames[ themeName ]
+
+        else:
+            themeColour = "fff200" # Default to hicolor.  #TODO Test this for any indicator other than lunar.
+
+        return themeColour
+
+
     def isAutoStart( self ):
         autoStart = False
         try:
@@ -565,10 +587,12 @@ class IndicatorBase( object ):
         cacheDirectory = self.__getCacheDirectory()
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
-            if file.startswith( baseName ):
-                fileDateTime = datetime.datetime.strptime( file[ len( baseName ) : ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )            
-                if fileDateTime < cacheMaximumAgeDateTime:
-                    os.remove( cacheDirectory + "/" + file )
+            if file.startswith( baseName ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
+                dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYMMDDHHMMSS is 14 characters.
+                if dateTime.isdigit():
+                    fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                    if fileDateTime < cacheMaximumAgeDateTime:
+                        os.remove( cacheDirectory + "/" + file )
 
 
     # Read the most recent binary object from the cache.
@@ -668,9 +692,9 @@ class IndicatorBase( object ):
     # fileNameOrBaseName: The file name of the text file or the base name of the text file.
     # text: The text to write.
     # isFileName: If True (default), the full file name is provided by the caller, otherwise only the base name.
-    def writeCacheText( self, fileNameOrBaseName, text, isFileName = True ):
-        success = True
-
+    #
+    # Returns the full path and file name on success, None otherwise.
+    def writeCacheText( self, fileNameOrBaseName, text, isFileName = True, extension = None ):
         if isFileName:
             cacheFile = self.__getCacheDirectory() + fileNameOrBaseName
 
@@ -680,6 +704,10 @@ class IndicatorBase( object ):
                 fileNameOrBaseName + \
                 datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
+#TODO Update header for this parameter.
+        if extension is not None:
+            cacheFile += "." + extension
+
         try:
             with open( cacheFile, "w" ) as f:
                 f.write( text )
@@ -687,9 +715,9 @@ class IndicatorBase( object ):
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing to cache: " + cacheFile )
-            success = False
+            cacheFile = None
 
-        return success
+        return cacheFile
 
 
     # Return the full directory path to the user cache directory for the current indicator.
