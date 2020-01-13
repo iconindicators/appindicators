@@ -665,11 +665,21 @@ class IndicatorBase( object ):
 
     # Write a text file to the cache.
     #
-    # fileName: The file name of the text file.
+    # fileNameOrBaseName: The file name of the text file or the base name of the text file.
     # text: The text to write.
-    def writeCacheText( self, fileName, text ):
+    # isFileName: If True (default), the full file name is provided by the caller, otherwise only the base name.
+    def writeCacheText( self, fileNameOrBaseName, text, isFileName = True ):
         success = True
-        cacheFile = self.__getCacheDirectory() + fileName
+
+        if isFileName:
+            cacheFile = self.__getCacheDirectory() + fileNameOrBaseName
+
+        else:
+            cacheFile = \
+                self.__getCacheDirectory() + \
+                fileNameOrBaseName + \
+                datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+
         try:
             with open( cacheFile, "w" ) as f:
                 f.write( text )
