@@ -341,15 +341,15 @@ class IndicatorBase( object ):
 
 
     # Listens to checkbox events and toggles the visibility of the widgets.
-    def onCheckbox( self, *widgets ):
+    def onCheckbox( self, checkbox, *widgets ):
         for widget in widgets:
-            widget.set_sensitive( self.get_active() )
+            widget.set_sensitive( checkbox.get_active() )
 
 
     # Listens to radio events and toggles the visibility of the widgets.
-    def onRadio( self, *widgets ):
+    def onRadio( self, radio, *widgets ):
         for widget in widgets:
-            widget.set_sensitive( self.get_active() )
+            widget.set_sensitive( radio.get_active() )
 
 
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
