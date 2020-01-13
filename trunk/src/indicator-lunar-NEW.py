@@ -82,7 +82,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import GLib, Gtk, Notify
 
-import astrobase, datetime, eclipse, indicatorbase, glob, locale, math, orbitalelement, os, re, tempfile, twolineelement, webbrowser
+import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement, os, re, twolineelement, webbrowser
 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
@@ -198,6 +198,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
+        utcNow = datetime.datetime.utcnow()
+
         # Update comet, minor planet and satellite data.
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, 
                                           IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, 
@@ -230,7 +232,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-        utcNow = datetime.datetime.utcnow()
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -365,11 +366,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if self.werewolfWarningSummary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-            if not os.path.exists( IndicatorLunar.ICON_FULL_MOON ):
-                self.createIcon( 100, None, IndicatorLunar.ICON_FULL_MOON )
-
+            self.createFullMoonIcon()
             Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.ICON_FULL_MOON ).show()
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
+
+
+    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, self.createIconText( 100, None ), False, IndicatorLunar.ICON_EXTENSION )
 
 
     def notificationSatellites( self, utcNow ):
@@ -1515,8 +1517,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         message = self.getTextViewText( messageTextView )
 
         if isFullMoon:
-            svgIconText = self.createIconText( 100, None )
-            svgFile = self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
+            svgFile = self.createFullMoonIcon()
 
         else:
             svgFile = IndicatorLunar.ICON_SATELLITE
