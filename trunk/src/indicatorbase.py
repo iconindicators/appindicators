@@ -85,8 +85,8 @@ class IndicatorBase( object ):
         menu.show_all()
 
         self.indicator = AppIndicator3.Indicator.new(
-                            self.indicatorName, 
-                            self.indicatorName, 
+                            self.indicatorName, #ID
+                            self.indicatorName, # Icon name
                             AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
