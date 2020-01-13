@@ -1256,7 +1256,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-#TODO Need a loop still?
         while True:
             responseType = dialog.run()
             if responseType != Gtk.ResponseType.OK:
