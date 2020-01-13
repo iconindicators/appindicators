@@ -116,10 +116,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
     ICON_CACHE_BASENAME = "icon-"
-    ICON_CACHE_MAXIMUM_AGE_HOURS = 1
+    ICON_CACHE_MAXIMUM_AGE_HOURS = 0
     ICON_EXTENSION = "svg"
     ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
+
+    INDICATOR_TEXT_DEFAULT = " [" + astrobase.AstroBase.NAME_TAG_MOON + " " + astrobase.AstroBase.DATA_TAG_PHASE + "]"
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
@@ -168,8 +170,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    INDICATOR_TEXT_DEFAULT = " [" + astrobase.AstroBase.NAME_TAG_MOON + " " + astrobase.AstroBase.DATA_TAG_PHASE + "]"
-
 
     def __init__( self ):
         super().__init__(
@@ -189,7 +189,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
-        # Flush icon, comet, minor planet and satellite caches.
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
@@ -435,14 +434,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
             nextPhases = [ ]
-#TODO Can this be made simpler (each line not so long)?
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ], _( "Full: " ), key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] )
-            nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ], _( "New: " ), key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] )
-            nextPhases = sorted( nextPhases, key = lambda tuple: tuple[ 0 ] )
+            nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             indent = self.indent( 1, 2 )
-            for dateTime, displayText, key in nextPhases:
+            for dateTime, displayText, key in sorted( nextPhases, key = lambda tuple: tuple[ 0 ] ):
                 subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
 
             self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
@@ -745,7 +742,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return displayData
 
 
-    # Converts a UTC datetime string to a local datetime string in the given format.
+    # Converts a UTC date/time string to a local date/time string in the given format.
     def toLocalDateTimeString( self, utcDateTimeString, outputFormat ):
         utcDateTime = datetime.datetime.strptime( utcDateTimeString, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
         localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
