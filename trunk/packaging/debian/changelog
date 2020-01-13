@@ -25,7 +25,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
   * Added preference to hide a body if it is below the horizon (yet to rise).
-  * Dynamically created icons are store in user cache rather than /tmp.
+  * Dynamically created icons are stored in user cache rather than /tmp.
   * About dialog now pulls the changelog directly from /usr/doc rather than
     a redundant duplicate in the installation directory.
   * About dialog now shows copyright, artists and corrected URL for website.
