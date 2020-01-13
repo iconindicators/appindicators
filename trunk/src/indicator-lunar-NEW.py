@@ -51,17 +51,6 @@
 #     https://itsfoss.com/how-to-know-ubuntu-unity-version/
 
 
-#TODO In indicatorbase for the function
-#     def getThemeColour( self, iconName ):
-# Verify the function still works as intended.
-# Add header comment specifying the expectation that a tag with the colour is present in the SVG file.
-
-
-#TODO Look into this
-# (indicator-lunar-NEW.py:4242): libappindicator-WARNING **: 09:14:30.474: Using '/tmp' paths in SNAP environment will lead to unreadable resources
-# Might get resolved if we use the user cache for icons and not /tmp.
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
@@ -76,17 +65,6 @@
 #TODO When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
 #What to do?  If a user has checked specific items, then losing those because no data is available is not good.
 #In this case the update function will/should return { }.
-
-
-#TODO
-# On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
-# 
-# 2019-07-13 17:10:02,976 - root - ERROR - [Errno 2] No such file or directory: '/usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg'
-# Traceback (most recent call last):
-#   File "/usr/share/indicator-lunar/indicator-lunar.py", line 1897, in getThemeColour
-#     with open( iconFilenameForCurrentTheme, "r" ) as file:
-# FileNotFoundError: [Errno 2] No such file or directory: '/usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg'
-# 2019-07-13 17:10:02,989 - root - ERROR - Error reading SVG icon: /usr/share/icons/Yaru/scalable/apps/indicator-lunar.svg
 
 
 #TODO Given we now use an Enum for bodytype, Moon becomes MOON.
@@ -137,9 +115,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
-    ICON_BASE_PATH = tempfile.gettempdir() #TODO Instead of this temp dir thing...just use the user cache?
-    ICON_BASE_NAME = ICON_BASE_PATH + "/." + INDICATOR_NAME
-    ICON_FULL_MOON = ICON_BASE_NAME + "-fullmoon-icon" + ".svg" # Dynamically created in the temporary directory (typically /tmp).
+    ICON_CACHE_BASENAME = "icon-"
+    ICON_CACHE_MAXIMUM_AGE_HOURS = 1
+    ICON_EXTENSION = "svg"
+    ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
@@ -208,19 +187,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-#         self.indicator.set_icon_theme_path( IndicatorLunar.ICON_BASE_PATH ) #TODO Needed?  Maybe needed when setting the icon.
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
-        # Flush comet, minor planet and satellite caches.
+        # Flush icon, comet, minor planet and satellite caches.
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
         for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
             self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
-
-        # Remove old icons.
-        oldIcons = glob.glob( IndicatorLunar.ICON_BASE_NAME + "*" )
-        for oldIcon in oldIcons:
-            os.remove( oldIcon )
 
 
     def update( self, menu ):
@@ -306,7 +281,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if magnitudeFilterFunction:
                 data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
 
-            self.writeCacheBinary( data, cacheBaseName )
+            self.writeCacheBinary( cacheBaseName, data )
 
         return data
 
@@ -334,12 +309,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
-        #TODO Debugging.
+#TODO Start debugging.
         menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) ) 
         menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
         menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
         menu.append( Gtk.SeparatorMenuItem() )
-        # End debugging.
+#TODO End debugging.
 
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
@@ -365,18 +340,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.indicator.set_label( parsedOutput, "" )
         self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
 
-        # Ideally should be able to create the icon with the same name each time.
+        # Ideally should be able to overwrite the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
         # So change the name each time - using the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
-        iconFilename = IndicatorLunar.ICON_BASE_NAME + "-" + str( datetime.datetime.utcnow().strftime( "%Y%m%d%H%M%S" ) ) + ".svg"
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
-        self.createIcon( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees, iconFilename )
-        self.indicator.set_icon_full( iconFilename, "" )  #TODO This line causes this message:
-# (indicator-lunar-NEW.py:28266): libappindicator-WARNING **: 13:41:12.376: Using '/tmp' paths in SNAP environment will lead to unreadable resources
+        svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
+        iconFilename = self.writeCacheText( IndicatorLunar.ICON_CACHE_BASENAME, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
+        self.indicator.set_icon_full( iconFilename, "" )
 
 
     def notificationFullMoon( self ):
@@ -778,17 +752,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return localDateTime.strftime( outputFormat )
 
 
-    # Creates an SVG icon file representing the moon given the illumination and bright limb angle.
+    # Creates the SVG icon text representing the moon given the illumination and bright limb angle.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
     #
     #    brightLimbAngleInDegrees The angle of the bright limb, relative to zenith, ranging from 0 to 360 inclusive.
     #                             Ignored if illuminationPercentage is 0 or 100.
-    def createIcon( self, illuminationPercentage, brightLimbAngleInDegrees, svgFilename ):
+    def createIconText( self, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        colour = self.getThemeColour( self.icon )
+        colour = self.getThemeColour()
 
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
@@ -816,35 +790,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                  '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
 
         footer = '</svg>'
-
-        try:
-            with open( svgFilename, "w" ) as f:
-                f.write( header + svg + footer )
-                f.close()
-
-        except Exception as e:
-            self.getLogging().exception( e )
-            self.getLogging().error( "Error writing: " + svgFilename )
-
-
-    #TODO These two functions are only used by Lunar...so leave them here for now...until icons/themes are sorted.
-    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-
-
-    def getThemeColour( self, iconName ):
-        iconFilenameForCurrentTheme = "/usr/share/icons/" + self.getThemeName() + "/scalable/apps/" + iconName + ".svg"
-        try:
-            with open( iconFilenameForCurrentTheme, "r" ) as file:
-                data = file.read()
-                index = data.find( "style=\"fill:#" )
-                themeColour = data[ index + 13 : index + 19 ]
-
-        except Exception as e:
-            self.getLogging().exception( e )
-            self.getLogging().error( "Error reading SVG icon: " + iconFilenameForCurrentTheme )
-            themeColour = "fff200" # Default to hicolor.
-
-        return themeColour
+        return header + svg + footer
 
 
     def onPreferences( self, dialog ):
@@ -1572,13 +1518,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         message = self.getTextViewText( messageTextView )
 
         if isFullMoon:
-            if not os.path.exists( IndicatorLunar.ICON_FULL_MOON ):
-                svgFile = IndicatorLunar.ICON_FULL_MOON
-                self.createIcon( 100, None, svgFile )
+            svgIconText = self.createIconText( 100, None )
+            svgFile = self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
 
         else:
             svgFile = IndicatorLunar.ICON_SATELLITE
-
             utcNow = str( datetime.datetime.utcnow() )
             if utcNow.index( '.' ) > -1:
                 utcNow = utcNow.split( '.' )[ 0 ] # Remove fractional seconds.
@@ -1592,7 +1536,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
-                replace( Indicatorastrobase.AstroBaseLunar.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
+                replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
@@ -1609,9 +1553,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if summary == "":
             summary = " " # The notification summary text must not be empty (at least on Unity).
 
-#TODO I hit the "test for werewolf warning" and all was good.
-#Did it a second time and got an error that svgFile was invalid.
-# local variable 'svgFile' referenced before assignment
         Notify.Notification.new( summary, message, svgFile ).show()
 
 
@@ -1716,7 +1657,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 self.satellites = tmp
 
-        self.requestSaveConfig() #TODO Need to do a request here to save.
+        self.requestSaveConfig()
 # End of hack!
 
 
