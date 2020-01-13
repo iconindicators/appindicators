@@ -611,8 +611,8 @@ class IndicatorBase( object ):
 
     # Writes an object as a binary file.
     #
-    # binaryData: The object to write.
     # baseName: The text used to form the file name, typically the name of the calling application.
+    # binaryData: The object to write.
     #
     # The object will be written to the cache directory using the pattern
     #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
@@ -620,7 +620,7 @@ class IndicatorBase( object ):
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # Returns True on success; False otherwise.
-    def writeCacheBinary( self, binaryData, baseName ):
+    def writeCacheBinary( self, baseName, binaryData ):
         success = True
         cacheFile = \
             self.__getCacheDirectory() + \
