@@ -1033,7 +1033,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 "data was available from the source." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, satelliteStore, satelliteStoreSort, astrobase.AstroBase.BodyType.SATELLITE )
+        renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore )
@@ -1479,13 +1479,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return scrolledWindow
 
 
-    def onCheckbox( self, widget, row, dataStore, sortStore = None, bodyType = None ):
-        if bodyType == astrobase.AstroBase.BodyType.SATELLITE:
-            actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-            dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
-
-        else: # Planet, star, comet, minor planet.
-            dataStore[ row ][ 0 ] = not dataStore[ row ][ 0 ]
+#TODO Verify
+    def onSatelliteCheckbox( self, widget, row, dataStore, sortStore ):
+        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
 
 
     def onColumnHeaderClick( self, widget, dataStore ):
