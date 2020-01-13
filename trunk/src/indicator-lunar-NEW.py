@@ -286,6 +286,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
+    def addNewBodies( self, data, bodies ):
+        for body in data:
+            if body not in bodies:
+                bodies.append( body )
+
+
     def getNextUpdateTimeInSeconds( self, startDateTime ):
         utcNow = datetime.datetime.utcnow()
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
@@ -1479,7 +1485,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return scrolledWindow
 
 
-#TODO Verify
     def onSatelliteCheckbox( self, widget, row, dataStore, sortStore ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
@@ -1533,7 +1538,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
+                replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ) + \
+                " " # The notification summary text must not be empty (at least on Unity).
 
             message = message. \
                 replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
@@ -1543,9 +1549,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
-
-        if summary == "":
-            summary = " " # The notification summary text must not be empty (at least on Unity).
 
         Notify.Notification.new( summary, message, svgFile ).show()
 
@@ -1557,12 +1560,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             latitude.set_text( str( theLatitude ) )
             longitude.set_text( str( theLongitude ) )
             elevation.set_text( str( theElevation ) )
-
-
-    def addNewBodies( self, data, bodies ):
-        for body in data:
-            if body not in bodies:
-                bodies.append( body )
 
 
     def getDefaultCity( self ):
