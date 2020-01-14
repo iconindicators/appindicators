@@ -198,8 +198,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        utcNow = datetime.datetime.utcnow()
-
         # Update comet, minor planet and satellite data.
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, 
                                           IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, 
@@ -232,6 +230,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
+        utcNow = datetime.datetime.utcnow()
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -1357,8 +1356,74 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #Check this doesn't break the double click adding to the indicator text.
 #Check no satellite contains a : in the name or anywhere...if it does, then what?  Drop it?
 #Handle : when converting tags back and forth for the label text (in the preferences and when rendering.
+#NOT SURE IF THIS TODO IS VALID OR MAKES SENSE STILL!
     def initialiseDisplayTagsStore( self, displayTagsStore ):
-        # Populate the display store using current data.
+        items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
+                  [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
+
+        for item in items:
+            bodyType = item[ 0 ]
+            bodyTag = item[ 1 ]
+            dataTags = item[ 2 ]
+            for dataTag in dataTags:
+                translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                value = ""
+                key = ( bodyType, bodyTag, dataTag )
+                if key in self.data:
+                    value = self.getDisplayData( key )
+
+                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+
+        items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAGS_PLANET ],
+                  [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAGS_STAR ] ]
+
+        for item in items:
+            bodyType = item[ 0 ]
+            bodyTags = item[ 1 ]
+            dataTags = item[ 2 ]
+            for bodyTag in bodyTags:
+                for dataTag in dataTags:
+                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    value = ""
+                    key = ( bodyType, bodyTag, dataTag )
+                    if key in self.data:
+                        value = self.getDisplayData( key )
+
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+
+        items = [ [ astrobase.AstroBase.BodyType.COMET, self.cometData, astrobase.AstroBase.DATA_TAGS_COMET ],
+                  [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAGS_MINOR_PLANET ] ]
+
+        for item in items:
+            bodyType = item[ 0 ]
+            bodyTags = item[ 1 ]
+            dataTags = item[ 2 ]
+            for bodyTag in bodyTags:
+                for dataTag in dataTags:
+                    translatedTag = bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    value = ""
+                    key = ( bodyType, bodyTag, dataTag )
+                    if key in self.data:
+                        value = self.getDisplayData( key )
+
+                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+
+        bodyType = astrobase.AstroBase.BodyType.SATELLITE
+        for bodyTag in self.satelliteData:
+            for dataTag in astrobase.AstroBase.DATA_TAGS_SATELLITE:
+                value = ""
+                name = self.satelliteData[ bodyTag ].getName()
+                internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
+                translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                key = ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag )
+                if key in self.data:
+                    value = self.getDisplayData( key )
+
+                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+
+
+    def initialiseDisplayTagsStoreORIGINAL( self, displayTagsStore ):
+        # Add in all tags present in the current data (excluding internal tags).
         for key in self.data.keys():
             if key[ 2 ] not in astrobase.AstroBase.DATA_TAGS_INTERNAL:
 
@@ -1369,15 +1434,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 if bodyType == astrobase.AstroBase.BodyType.COMET or \
                    bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET: # Don't translate the names.
+#TODO See below for satellites...a comet/MP could drop out of the downloaded data but still be in the user's list.
                     translatedTag = bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
                 elif bodyType == astrobase.AstroBase.BodyType.SATELLITE: # Don't translate names; add in name/designator.
-                    satelliteName = self.satelliteData[ bodyTag ].getName()
-                    satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+#TODO Is it possible that satellite data is missing a satellite?
+#That is, the satellite has fallen off the list of data but the user once checked that satellite?
+# Maybe when the list of satellites is read in from the user preferences, 
+# need to cull it against available satellites in the downloaded/cached data?
+                    name = self.satelliteData[ bodyTag ].getName()
+                    internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator() 
+                    translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
 
-                else:
+                else: # Moon, Sun, Planet, Star.
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+#TODO Given we can switch between pyephem and skyfield, the list of stars could change...how to handle this?  Cull (like comet/satellite/MP in the loadConfig)?
 
                 displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
@@ -1399,9 +1470,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for bodyTag in self.satelliteData:
             for dataTag in astrobase.AstroBase.DATA_TAGS_SATELLITE:
                 if not ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag ) in self.data:
-                    satelliteName = self.satelliteData[ bodyTag ].getName()
-                    satelliteInternationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                    translatedTag = satelliteName + " : " + bodyTag + " : " + satelliteInternationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                    name = self.satelliteData[ bodyTag ].getName()
+                    internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
+                    translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, "" ] )
 
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
