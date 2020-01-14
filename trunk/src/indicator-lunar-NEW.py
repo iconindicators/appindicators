@@ -1075,13 +1075,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
-        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationSummaryText = Gtk.Entry()
-        satelliteTagTranslations = self.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
+        satelliteTagTranslations = self.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )  #TODO.............................................DIFFERENT
         satelliteNotificationSummaryText.set_text( self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationSummary ) )
-        satelliteNotificationSummaryText.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         satelliteNotificationSummaryText.set_tooltip_text( _(
             "The summary for the satellite rise notification.\n\n" + \
             "Available tags:\n\t" ) + \
@@ -1095,6 +1093,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             _( notifyOSDInformation ) )
 
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
+        box.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         grid.attach( box, 0, 1, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
@@ -1104,7 +1103,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         label = Gtk.Label( _( "Message" ) + "\n \n \n \n \n " ) # Padding to ensure the textview for the message text is not too small.  
         label.set_valign( Gtk.Align.START )
-        label.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
 
         satelliteNotificationMessageText = Gtk.TextView()
@@ -1122,11 +1120,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             _( notifyOSDInformation ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( satelliteNotificationMessageText )
         box.pack_start( scrolledWindow, True, True, 0 )
+        box.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         grid.attach( box, 0, 2, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
@@ -1141,7 +1139,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, test )
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
-        showWerewolfWarningCheckbox.set_margin_top( 10 )
+        showWerewolfWarningCheckbox.set_margin_top( 10 ) #TODO....................................................................................................DIFFERENT
         showWerewolfWarningCheckbox.set_active( self.showWerewolfWarning )
         showWerewolfWarningCheckbox.set_tooltip_text( _( "Hourly screen notification leading up to full moon." ) )
         grid.attach( showWerewolfWarningCheckbox, 0, 4, 1, 1 )
@@ -1150,14 +1148,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.set_margin_left( self.INDENT_TEXT_LEFT )
 
         label = Gtk.Label( _( "Summary" ) )
-        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
 
         werewolfNotificationSummaryText = Gtk.Entry()
         werewolfNotificationSummaryText.set_text( self.werewolfWarningSummary )
-        werewolfNotificationSummaryText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         werewolfNotificationSummaryText.set_tooltip_text( _( "The summary for the werewolf notification.\n\n" ) + notifyOSDInformation )
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
+        box.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( box, 0, 5, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
@@ -1167,19 +1164,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         label = Gtk.Label( _( "Message" ) + "\n \n " ) # Padding to ensure the textview for the message text is not too small.   
         label.set_valign( Gtk.Align.START )
-        label.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         box.pack_start( label, False, False, 0 )
 
         werewolfNotificationMessageText = Gtk.TextView()
         werewolfNotificationMessageText.get_buffer().set_text( self.werewolfWarningMessage )
         werewolfNotificationMessageText.set_tooltip_text( _( "The message for the werewolf notification.\n\n" ) + notifyOSDInformation )
-        werewolfNotificationMessageText.set_sensitive( showWerewolfWarningCheckbox.get_active() )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( werewolfNotificationMessageText )
         box.pack_start( scrolledWindow, True, True, 0 )
+        box.set_sensitive( showWerewolfWarningCheckbox.get_active() )
         grid.attach( box, 0, 6, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
