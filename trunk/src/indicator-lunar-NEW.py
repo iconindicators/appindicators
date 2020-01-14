@@ -376,7 +376,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, self.createIconText( 100, None ), False, IndicatorLunar.ICON_EXTENSION )
+    def createFullMoonIcon( self ):
+        return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, 
+                                    self.createIconText( 100, None ), 
+                                    False, 
+                                    IndicatorLunar.ICON_EXTENSION )
 
 
     def notificationSatellites( self, utcNow ):
@@ -1276,6 +1280,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #Handle : when converting tags back and forth for the label text (in the preferences and when rendering.
 #NOT SURE IF THIS TODO IS VALID OR MAKES SENSE STILL!
     def initialiseDisplayTagsStore( self, displayTagsStore ):
+#TODO Can we somehow make all of this into one loop?
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
 
