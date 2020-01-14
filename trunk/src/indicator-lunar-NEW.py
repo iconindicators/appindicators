@@ -911,8 +911,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         spinnerMagnitude = Gtk.SpinButton()
         spinnerMagnitude.set_numeric( True )
         spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerMagnitude.set_adjustment( Gtk.Adjustment( self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerMagnitude.set_value( self.magnitude ) # ...so need to force the initial value by explicitly setting it.
+        spinnerAdjustment = Gtk.Adjustment( self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, 0 )
+        spinnerMagnitude.set_adjustment( spinnerAdjustment )
+        spinnerMagnitude.set_value( self.magnitude ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
         spinnerMagnitude.set_tooltip_text( _(
             "Stars, comets and minor planets exceeding\n" + \
             "the magnitude will be hidden." ) )
@@ -946,10 +947,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for planetName in astrobase.AstroBase.PLANETS:
             planetStore.append( [ planetName in self.planets, planetName, astrobase.AstroBase.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
 
-        toolTipText = _(
-            "Check a planet to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." )
+        toolTipText = _( "Check a planet to display in the menu." ) + "\n\n" + \
+                      _( "Clicking the header of the first column\n" + \
+                         "will toggle all checkboxes." )
 
         box.pack_start( self.createTable( planetStore, toolTipText, _( "Planet" ), 2 ), True, True, 0 )
 
@@ -962,10 +962,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for star in stars:
             starStore.append( star )
 
-        toolTipText = _(
-            "Check a star to display in the menu.\n\n" + \
-            "Clicking the header of the first column\n" + \
-            "will toggle all checkboxes." )
+        toolTipText = _( "Check a star to display in the menu." ) + "\n\n" + \
+                      _( "Clicking the header of the first column\n" + \
+                         "will toggle all checkboxes." )
 
         box.pack_start( self.createTable( starStore, toolTipText, _( "Star" ), 2 ), True, True, 0 )
 
@@ -979,10 +978,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             cometStore.append( [ comet in self.comets, comet ] )
 
         if self.cometData:
-            toolTipText = _(
-                "Check a comet to display in the menu.\n\n" + \
-                "Clicking the header of the first column\n" + \
-                "will toggle all checkboxes." )
+            toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
+                          _( "Clicking the header of the first column\n" + \
+                             "will toggle all checkboxes." )
 
         else:
             toolTipText = _(
@@ -998,16 +996,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet ] )
 
         if self.minorPlanetData:
-            toolTipText = _(
-                "Check a minor planet to display in the menu.\n\n" + \
-                "Clicking the header of the first column\n" + \
-                "will toggle all checkboxes." )
+            toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
+                          _( "Clicking the header of the first column\n" + \
+                             "will toggle all checkboxes." )
 
         else:
             toolTipText = _(
-                "Minor planet data is unavailable; the source\n" + \
-                "could not be reached, or no data was\n" + \
-                "available from the source, or the data\n" + \
+                "Minor planet data is unavailable;\n" + \
+                "the source could not be reached,\n" + \
+                "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
         box.pack_start( self.createTable( minorPlanetStore, toolTipText, _( "Minor Planet" ), 1 ), True, True, 0 )
@@ -1019,23 +1016,24 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satelliteData:
-            satelliteStore.append( [ satellite in self.satellites, self.satelliteData[ satellite ].getName(), satellite, self.satelliteData[ satellite ].getInternationalDesignator() ] )
+            satelliteStore.append( [ satellite in self.satellites, 
+                                     self.satelliteData[ satellite ].getName(), 
+                                     satellite, self.satelliteData[ satellite ].getInternationalDesignator() ] )
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView( satelliteStoreSort )
         if self.satelliteData:
-            tree.set_tooltip_text( _(
-                "Check a satellite to display in the menu.\n\n" + \
-                "Clicking the header of the first column\n" + \
-                "will toggle all checkboxes." ) )
+            tree.set_tooltip_text( _( "Check a satellite to display in the menu." ) + "\n\n" + \
+                                   _( "Clicking the header of the first column\n" + \
+                                      "will toggle all checkboxes." ) )
 
         else:
             tree.set_tooltip_text( _(
-                "Satellite data is unavailable; the\n" + \
-                "source could not be reached, or no\n" + \
-                "data was available from the source." ) )
+                "Satellite data is unavailable;\n" + \
+                "the source could not be reached,\n" + \
+                "or data was available." ) )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
@@ -1063,7 +1061,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         notebook.append_page( box, Gtk.Label( _( "Satellites" ) ) )
 
-        # OSD (satellite and full moon).
+        # Notifications (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
         grid = self.createGrid()
@@ -1137,10 +1135,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( showSatelliteNotificationCheckbox.get_active() )
         test.connect( "clicked", self.onTestNotificationClicked, satelliteNotificationSummaryText, satelliteNotificationMessageText, False )
-        test.set_tooltip_text( _(
-            "Show the notification bubble.\n" + \
-            "Tags will be substituted with\n" + \
-            "mock text." ) )
+        test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
         grid.attach( test, 0, 3, 1, 1 )
 
         showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, test, test )
