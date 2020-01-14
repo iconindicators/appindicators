@@ -1092,6 +1092,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                             _( notifyOSDInformation ) 
 
         # Additional lines are added to the message to ensure the textview for the message text is not too small.
+#TODO Noticed in the summary that one of the tags has a [[ ]] happening!
         showSatelliteNotificationCheckbox, satelliteNotificationSummaryText, satelliteNotificationMessageText = \
             self.createNotificationPanel( grid, 0,
                                           _( "Satellite rise" ), _( "Screen notification when a satellite rises above the horizon." ), self.showSatelliteNotification,
@@ -1494,7 +1495,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             svgFile = self.createFullMoonIcon()
 
         else:
-            svgFile = IndicatorLunar.ICON_SATELLITE
+            # Create mock data.
             utcNow = str( datetime.datetime.utcnow() )
             if utcNow.index( '.' ) > -1:
                 utcNow = utcNow.split( '.' )[ 0 ] # Remove fractional seconds.
@@ -1503,18 +1504,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if utcNowPlusTenMinutes.index( '.' ) > -1:
                 utcNowPlusTenMinutes = utcNowPlusTenMinutes.split( '.' )[ 0 ] # Remove fractional seconds.
 
-            # Mock data...
-            summary = summary. \
-                replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ) + \
-                " " # The notification summary text must not be empty (at least on Unity).
-
-            message = message. \
+            def replaceTags( text ): return text. \
                 replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
@@ -1522,6 +1512,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 replace( astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
+
+            summary = replaceTags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
+            message = replaceTags( message )
+            svgFile = IndicatorLunar.ICON_SATELLITE
 
         Notify.Notification.new( summary, message, svgFile ).show()
 
