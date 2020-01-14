@@ -951,7 +951,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       _( "Clicking the header of the first column\n" + \
                          "will toggle all checkboxes." )
 
-        box.pack_start( self.createTable( planetStore, toolTipText, _( "Planet" ), 2 ), True, True, 0 )
+        box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planet" ), 2 ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.keys():
@@ -966,7 +966,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       _( "Clicking the header of the first column\n" + \
                          "will toggle all checkboxes." )
 
-        box.pack_start( self.createTable( starStore, toolTipText, _( "Star" ), 2 ), True, True, 0 )
+        box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), 2 ), True, True, 0 )
 
         notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
 
@@ -989,7 +989,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTable( cometStore, toolTipText, _( "Comet" ), 1 ), True, True, 0 )
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), 1 ), True, True, 0 )
 
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
         for minorPlanet in self.minorPlanetData:
@@ -1007,7 +1007,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTable( minorPlanetStore, toolTipText, _( "Minor Planet" ), 1 ), True, True, 0 )
+        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), 1 ), True, True, 0 )
 
         notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
 
@@ -1097,7 +1097,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( satelliteNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, label, satelliteNotificationSummaryText )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
@@ -1129,7 +1129,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, label, scrolledWindow )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
@@ -1138,7 +1138,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
         grid.attach( test, 0, 3, 1, 1 )
 
-        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, test, test )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, test )
 
         showWerewolfWarningCheckbox = Gtk.CheckButton( _( "Werewolf warning" ) )
         showWerewolfWarningCheckbox.set_margin_top( 10 )
@@ -1160,7 +1160,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( werewolfNotificationSummaryText, True, True, 0 )
         grid.attach( box, 0, 5, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, label, werewolfNotificationSummaryText )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
@@ -1182,7 +1182,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 6, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, label, werewolfNotificationMessageText )
+        showSatelliteNotificationCheckbox.connect( "toggled", self.onCheckbox, box )
 
         test = Gtk.Button( _( "Test" ) )
         test.set_halign( Gtk.Align.END )
@@ -1191,7 +1191,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         test.set_tooltip_text( _( "Show the notification using the current summary/message." ) )
         grid.attach( test, 0, 7, 1, 1 )
 
-        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, test, test )
+        showWerewolfWarningCheckbox.connect( "toggled", self.onCheckbox, test )
 
         notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
 
@@ -1455,13 +1455,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
-    def createTable( self, listStore, toolTipText, columnHeaderText, columnIndex ):
+    def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
+        
+        def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ 0 ] = not listStore[ row ][ 0 ]
+
         tree = Gtk.TreeView( listStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( toolTipText )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onCheckbox, listStore, None, None )
+        renderer_toggle.connect( "toggled", toggleCheckbox, listStore )
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, listStore )
