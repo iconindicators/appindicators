@@ -133,26 +133,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
+    MINOR_PLANET_CENTER_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
-    MINOR_PLANET_CENTER_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" # Used to search for minor planets and comets.
-
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
-
-#TODO There are translation tags in the message default but not the menu text nor summary default...why?    
-    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
-                          astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
-                          astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
-                                             _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
+                                             _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
                                              _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
                                              _( "Set Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER + _( " now rising..." )
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
+                                             astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
+                                             astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + _( " now rising..." )
     SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + astrobase.AstroBase.SATELLITE_TAG_NUMBER
 
     STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
@@ -194,6 +190,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                           orbitalelement.download, 
                                           IndicatorLunar.COMET_DATA_URL, 
                                           IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
@@ -204,6 +201,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                                orbitalelement.download, 
                                                url, 
                                                IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+
             for key in minorPlanetData:
                 if key not in self.minorPlanetData:
                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
@@ -216,6 +214,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                               twolineelement.download, 
                                               IndicatorLunar.SATELLITE_DATA_URL, 
                                               None )
+
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
@@ -629,10 +628,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
         for number, name, riseDateTime in satellites:
-            menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( astrobase.AstroBase.SATELLITE_TAG_NAME, name ) \
-                                                         .replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number ) \
-                                                         .replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
-            menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + menuText )
+            menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator() )
             url = IndicatorLunar.SATELLITE_ON_CLICK_URL.replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number )
             menuItem.set_name( url )
             subMenu.append( menuItem )
@@ -1640,6 +1636,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO For testing...
 import os
-# os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
+os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
 
 IndicatorLunar().main()
