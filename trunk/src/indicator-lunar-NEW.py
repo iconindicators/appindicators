@@ -365,11 +365,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def createFullMoonIcon( self ):
-        return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, 
-                                    self.createIconText( 100, None ), 
-                                    False, 
-                                    IndicatorLunar.ICON_EXTENSION )
+    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, 
+                                           self.createIconText( 100, None ), 
+                                           False, 
+                                           IndicatorLunar.ICON_EXTENSION )
 
 
     def notificationSatellites( self, utcNow ):
