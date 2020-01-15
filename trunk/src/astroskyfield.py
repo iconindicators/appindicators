@@ -713,7 +713,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         AstroSkyfield.__calculateMoon( utcNow, data, timeScale, topos, ephemerisPlanets )
         AstroSkyfield.__calculateSun( utcNow, data, timeScale, topos, ephemerisPlanets )
-        AstroSkyfield.__calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets )
+        AstroSkyfield.__calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets, magnitudeMaximum )
 
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
@@ -818,6 +818,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
+#TODO When Skyfield implements planetary magnitude, can then filter planets by magnitude here and in astropyephem.
+# https://github.com/skyfielders/python-skyfield/issues/210
     @staticmethod
     def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets ):
         for planet in planets:
