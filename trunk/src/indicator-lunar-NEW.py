@@ -153,16 +153,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
 
 #TODO There are translation tags in the message default but not the menu text nor summary default...why?    
-    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
-                          astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
-                          astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
+    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
                                              _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
                                              _( "Set Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
-    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + \
-                                             " [" + astrobase.AstroBase.SATELLITE_TAG_NUMBER + "] " + \
-                                             _( " now rising..." )
+    SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER + _( " now rising..." )
     SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + astrobase.AstroBase.SATELLITE_TAG_NUMBER
 
     STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
@@ -1071,29 +1067,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         satelliteTagTranslations = self.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
-        summaryText = self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationSummary )
-        summaryTooltip = _( "The summary for the satellite rise notification.\n\n" + \
-                             "Available tags:\n\t" ) + \
-                             astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-                             astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-                             astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-                             astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-                             astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-                             astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-                             astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-                             _( notifyOSDInformation )
-
         messageText = self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationMessage )
-        messageTooltip = _( "The message for the satellite rise notification.\n\n" + \
-                            "Available tags:\n\t" ) + \
-                            astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-                            astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-                            astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-                            astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-                            astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-                            astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-                            astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-                            _( notifyOSDInformation ) 
+        summaryText = self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationSummary )
+        toolTipCommon = astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+                        astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+                        astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+                        astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+                        astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+                        astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+                        astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+                        _( notifyOSDInformation )
+        summaryTooltip = _( "The summary for the satellite rise notification.\n\n" +  "Available tags:\n\t" ) + toolTipCommon
+        messageTooltip = _( "The message for the satellite rise notification.\n\n" + "Available tags:\n\t" ) + toolTipCommon
 
         # Additional lines are added to the message to ensure the textview for the message text is not too small.
         showSatelliteNotificationCheckbox, satelliteNotificationSummaryText, satelliteNotificationMessageText = \
