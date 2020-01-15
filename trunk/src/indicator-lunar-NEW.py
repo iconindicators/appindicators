@@ -1101,7 +1101,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createNotificationPanel( grid, 0,
                                           _( "Satellite rise" ), _( "Screen notification when a satellite rises above the horizon." ), self.showSatelliteNotification,
                                           _( "Summary" ), summaryText, summaryTooltip,
-                                          _( "Message" ) + "\n \n \n \n \n ", messageText, messageTooltip,
+                                          _( "Message" ) + "\n \n \n \n ", messageText, messageTooltip,
                                           _( "Test" ), _( "Show the notification using the current summary/message." ),
                                           False )
 
