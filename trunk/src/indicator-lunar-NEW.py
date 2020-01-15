@@ -1096,7 +1096,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                             _( notifyOSDInformation ) 
 
         # Additional lines are added to the message to ensure the textview for the message text is not too small.
-#TODO Noticed in the summary that one of the tags has a [[ ]] happening!
         showSatelliteNotificationCheckbox, satelliteNotificationSummaryText, satelliteNotificationMessageText = \
             self.createNotificationPanel( grid, 0,
                                           _( "Satellite rise" ), _( "Screen notification when a satellite rises above the horizon." ), self.showSatelliteNotification,
