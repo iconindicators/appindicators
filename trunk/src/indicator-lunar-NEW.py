@@ -20,9 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO In the preferences, if we turn off sat satelliteCurrentNotifications, maybe reset self.satellitePreviousNotifications to empty?
-
-
 #TODO If the menu build takes too long, perhaps add in the following to each of the top level menu items (moon, sun, planets, etc):
 #
 #    menuitem.connect( "activate", self.buildSubMenu, menuItem )
@@ -31,10 +28,6 @@
 #
 # This might work and will speed up initial menu build, but may take too long to build the submenu.
 # Needs testing and thinking.  Only do this if the menu build currently takes way too long.
-
-
-#TODO In the notifications preferences, there is a tooltip for each the summary and message about formatting.
-# Why is this mentioned?  Did the tags (say moon phase) originally get parsed in the notifications?
 
 
 #TODO This happens in stardate...fix here too. 
@@ -55,16 +48,15 @@
 # https://askubuntu.com/a/292529/67335
 
 
-#TODO If there is no data to download (no internet) and cache is stale,
+#TODO
+# If there is no data to download (no internet) and cache is stale,
 # ensure satellites/comets/minorplanets already selected by the user are not dropped.
-
-
-#TODO Test without internet connection...do so with cached items that are not stale, with cached items that are stale and no cached items.
-
-
-#TODO When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
-#What to do?  If a user has checked specific items, then losing those because no data is available is not good.
-#In this case the update function will/should return { }.
+#
+# Test without internet connection...do so with cached items that are not stale, with cached items that are stale and no cached items.
+#
+# When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
+# What to do?  If a user has checked specific items, then losing those because no data is available is not good.
+# In this case the update function will/should return { }.
 
 
 #TODO Given we now use an Enum for bodytype, Moon becomes MOON.
@@ -153,7 +145,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
 
 #TODO There are translation tags in the message default but not the menu text nor summary default...why?    
-    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER
+    SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
+                          astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
+                          astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
                                              _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
@@ -638,16 +632,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuText = IndicatorLunar.SATELLITE_MENU_TEXT.replace( astrobase.AstroBase.SATELLITE_TAG_NAME, name ) \
                                                          .replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number ) \
                                                          .replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
-
-            url = IndicatorLunar.SATELLITE_ON_CLICK_URL. \
-                  replace( astrobase.AstroBase.SATELLITE_TAG_NAME, name ). \
-                  replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number ). \
-                  replace( astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() )
-
             menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + menuText )
+            url = IndicatorLunar.SATELLITE_ON_CLICK_URL.replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number )
             menuItem.set_name( url )
             subMenu.append( menuItem )
-
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) in self.data:
                 self.createMenuItem( self.indent( 1, 2 ) + _( "Rise" ), url, subMenu )
@@ -934,8 +922,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "If checked, satellites are sorted\n" + \
             "by rise date/time.\n\n" + \
             "Otherwise satellites are sorted\n" + \
-            "by Name, Number and then\n" + \
-            "International Designator." ) )
+            "by Name then Number." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
@@ -1196,8 +1183,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 elevation.grab_focus()
                 continue
 
-#TODO Need a function that finds tags for satellites and then removes the name and int desig.  Do this after the translate function.
-#             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
+#TODO Need a function that finds tags for satellites and then removes the name and int desig.
+            self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active() # The update will add in new comets.
@@ -1234,8 +1221,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.satellites.append( satellite[ 2 ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
-
-            satelliteTagTranslations = self.listOfListsToListStore( astrobase.AstroBase.SATELLITE_TAG_TRANSLATIONS )
+            if not showSatelliteNotificationCheckbox.get_active(): self.satellitePreviousNotifications = { }
             self.satelliteNotificationSummary = self.translateTags( satelliteTagTranslations, False, satelliteNotificationSummaryText.get_text() )
             self.satelliteNotificationMessage = self.translateTags( satelliteTagTranslations, False, self.getTextViewText( satelliteNotificationMessageText ) )
 
@@ -1320,8 +1306,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for dataTag in astrobase.AstroBase.DATA_TAGS_SATELLITE:
                 value = ""
                 name = self.satelliteData[ bodyTag ].getName()
-                internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                translatedTag = name + " : " + bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag )
                 if key in self.data:
                     value = self.getDisplayData( key )
@@ -1652,5 +1637,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY: self.werewolfWarningSummary
         }
 
+
+#TODO For testing...
+import os
+# os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
 
 IndicatorLunar().main()

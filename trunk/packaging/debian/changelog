@@ -19,8 +19,6 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Bodies below the horizon display the rise date/time.
   * Bodies above the horizon display the set date/time and azimuth/altitude.
   * Only visible satellite passes (at dawn/dusk) are shown.
-  * The satellite menu text and the default satellite notification summary now
-    only shows the Name and Number.
   * Added minor planets, courtesy of the Minor Planet Center.
   * Magnitude filtering extended to include planets and stars.
   * Added on-click URL for minor planets and stars.
