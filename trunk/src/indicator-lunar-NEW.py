@@ -155,7 +155,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO There are translation tags in the message default but not the menu text nor summary default...why?    
     SATELLITE_MENU_TEXT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
-                                             _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
+                                             _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n" + \
                                              _( "Set Time: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
                                              _( "Set Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + astrobase.AstroBase.SATELLITE_TAG_NUMBER + _( " now rising..." )
