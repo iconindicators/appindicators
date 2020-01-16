@@ -255,34 +255,34 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     # The ID is the number at the end of self_link.
     # The published binary object looks like this...
     # {
-    #     "total_size": 4, 
-    #     "start": 0, 
+    #     "total_size": 4,
+    #     "start": 0,
     #     "entries": [
     #     {
-    #         "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386", 
-    #         "removal_comment": null, 
-    #         "display_name": "indicator-lunar 1.0.9-1 in precise i386", 
-    #         "date_made_pending": null, 
-    #         "date_superseded": null, 
-    #         "priority_name": "OPTIONAL", 
-    #         "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"", 
-    #         "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302", 
-    #         "binary_package_version": "1.0.9-1", 
-    #         "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history", 
-    #         "component_name": "main", 
-    #         "status": "Published", 
-    #         "date_removed": null, 
-    #         "pocket": "Release", 
-    #         "date_published": "2012-08-09T10:30:49.572656+00:00", 
-    #         "removed_by_link": null, "section_name": "python", 
-    #         "date_created": "2012-08-09T10:27:31.762212+00:00", 
-    #         "binary_package_name": "indicator-lunar", 
-    #         "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa", 
-    #         "architecture_specific": false, 
+    #         "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386",
+    #         "removal_comment": null,
+    #         "display_name": "indicator-lunar 1.0.9-1 in precise i386",
+    #         "date_made_pending": null,
+    #         "date_superseded": null,
+    #         "priority_name": "OPTIONAL",
+    #         "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"",
+    #         "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302",
+    #         "binary_package_version": "1.0.9-1",
+    #         "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history",
+    #         "component_name": "main",
+    #         "status": "Published",
+    #         "date_removed": null,
+    #         "pocket": "Release",
+    #         "date_published": "2012-08-09T10:30:49.572656+00:00",
+    #         "removed_by_link": null, "section_name": "python",
+    #         "date_created": "2012-08-09T10:27:31.762212+00:00",
+    #         "binary_package_name": "indicator-lunar",
+    #         "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa",
+    #         "architecture_specific": false,
     #         "scheduled_deletion_date": null
     #     }
     #     {
-    #     ,... 
+    #     ,...
     # }
     #
     # References:
@@ -591,7 +591,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
@@ -612,10 +612,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             treeiter = ppaStore.get_iter_first()
             while treeiter != None:
                 self.ppas.append(
-                    PPA( 
-                        ppaStore[ treeiter ][ 0 ], 
-                        ppaStore[ treeiter ][ 1 ], 
-                        ppaStore[ treeiter ][ 2 ], 
+                    PPA(
+                        ppaStore[ treeiter ][ 0 ],
+                        ppaStore[ treeiter ][ 1 ],
+                        ppaStore[ treeiter ][ 2 ],
                         ppaStore[ treeiter ][ 3 ] ) )
                 treeiter = ppaStore.iter_next( treeiter )
 
@@ -625,10 +625,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
                 self.filters.addFilter(
-                    filterStore[ treeiter ][ 0 ], 
-                    filterStore[ treeiter ][ 1 ], 
-                    filterStore[ treeiter ][ 2 ], 
-                    filterStore[ treeiter ][ 3 ], 
+                    filterStore[ treeiter ][ 0 ],
+                    filterStore[ treeiter ][ 1 ],
+                    filterStore[ treeiter ][ 2 ],
+                    filterStore[ treeiter ][ 3 ],
                     filterStore[ treeiter ][ 4 ].split() )
                 treeiter = filterStore.iter_next( treeiter )
 
@@ -693,7 +693,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         grid.attach( label, 0, 1, 1, 1 )
 
         if len( model ) > 0:
-            ppaNames = [ ] 
+            ppaNames = [ ]
             for row in range( len( model ) ):
                 if model[ row ][ 1 ] not in ppaNames:
                     ppaNames.append( model[ row ][ 1 ] )
@@ -800,7 +800,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                 # Update the model...
                 if rowNumber:
-                    model.remove( treeiter ) # This is an edit...remove the old value and append new value.  
+                    model.remove( treeiter ) # This is an edit...remove the old value and append new value.
 
                 model.append( [ ppaUserValue, ppaNameValue, series.get_active_text(), architectures.get_active_text() ] )
 
@@ -864,7 +864,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                         inFilterList = True
                         break
 
-                if not inFilterList:                        
+                if not inFilterList:
                     ppaUsersNames.append_text( ppaUserName )
                     temp.append( ppaUserName )
 
@@ -882,7 +882,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 0 )
 
-        label = Gtk.Label( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.  
+        label = Gtk.Label( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.
         label.set_valign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -926,9 +926,9 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                 # Update the model...
                 if rowNumber:
-                    filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.  
+                    filterTreeModel.remove( filterTreeIter ) # This is an edit...remove the old value and append new value.
 
-                filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] ) 
+                filterTreeModel.append( [ ppaUsersNames.get_active_text(), filterText ] )
 
             break
 
