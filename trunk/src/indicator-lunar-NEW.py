@@ -30,7 +30,7 @@
 # Needs testing and thinking.  Only do this if the menu build currently takes way too long.
 
 
-#TODO This happens in stardate...fix here too. 
+#TODO This happens in stardate...fix here too.
 # Lubuntu 18.04 - indicator runs and label displays.
 # Lubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
 # Xubuntu 18.04 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
@@ -133,7 +133,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
-    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
+    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
@@ -189,10 +189,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         # Update comet, minor planet and satellite data.
-        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME, 
-                                          IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, 
-                                          orbitalelement.download, 
-                                          IndicatorLunar.COMET_DATA_URL, 
+        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
+                                          IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+                                          orbitalelement.download,
+                                          IndicatorLunar.COMET_DATA_URL,
                                           IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
 
         if self.cometsAddNew:
@@ -200,10 +200,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.minorPlanetData = { }
         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
-            minorPlanetData = self.updateData( baseName, 
-                                               IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, 
-                                               orbitalelement.download, 
-                                               url, 
+            minorPlanetData = self.updateData( baseName,
+                                               IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
+                                               orbitalelement.download,
+                                               url,
                                                IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
 
             for key in minorPlanetData:
@@ -213,10 +213,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
-        self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME, 
-                                              IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, 
-                                              twolineelement.download, 
-                                              IndicatorLunar.SATELLITE_DATA_URL, 
+        self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                                              IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
+                                              twolineelement.download,
+                                              IndicatorLunar.SATELLITE_DATA_URL,
                                               None )
 
         if self.satellitesAddNew:
@@ -308,7 +308,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateMenu( self, menu ):
 #TODO Start debugging.
-        menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) ) 
+        menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
         menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
         menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
         menu.append( Gtk.SeparatorMenuItem() )
@@ -369,9 +369,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON, 
-                                           self.createIconText( 100, None ), 
-                                           False, 
+    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON,
+                                           self.createIconText( 100, None ),
+                                           False,
                                            IndicatorLunar.ICON_EXTENSION )
 
 
@@ -380,7 +380,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
-                riseTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], 
+                riseTime = datetime.datetime.strptime( self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
                                                        astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
                 if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow: # Two minute buffer.
@@ -489,7 +489,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + translatedName, url )
                 self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.PLANET, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
-                subMenu.append( separator ) 
+                subMenu.append( separator )
 
             subMenu.remove( separator )
 
@@ -509,7 +509,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + translatedName, url )
                 self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.STAR, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
-                subMenu.append( separator ) 
+                subMenu.append( separator )
 
             subMenu.remove( separator )
 
@@ -529,7 +529,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + name, url )
                 self.updateCommonMenu( subMenu, bodyType, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
-                subMenu.append( separator ) 
+                subMenu.append( separator )
 
             subMenu.remove( separator )
 
@@ -552,7 +552,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         else:
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
-                id = components[ 0 ] 
+                id = components[ 0 ]
 
             elif components[ 0 ].isnumeric() and components[ 1 ].isnumeric(): # 465402 2008 HW1
                 id = components[ 0 ]
@@ -561,7 +561,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 id = components[ 0 ] + " " + components[ 1 ]
 
             else: # 229762 G!kunll'homdima
-                id = components[ 0 ] 
+                id = components[ 0 ]
 
         return IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + id.replace( "/", "%2F" ).replace( " ", "+" )
 
@@ -640,7 +640,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), url )
 
             separator = Gtk.SeparatorMenuItem()
-            subMenu.append( separator ) 
+            subMenu.append( separator )
 
         subMenu.remove( separator )
 
@@ -990,8 +990,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satelliteData:
-            satelliteStore.append( [ satellite in self.satellites, 
-                                     self.satelliteData[ satellite ].getName(), 
+            satelliteStore.append( [ satellite in self.satellites,
+                                     self.satelliteData[ satellite ].getName(),
                                      satellite, self.satelliteData[ satellite ].getInternationalDesignator() ] )
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
@@ -1129,7 +1129,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.city ) )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
@@ -1195,13 +1195,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 for comet in cometStore:
                     if comet[ 0 ]:
                         self.comets.append( comet[ 1 ].upper() )
- 
+
             self.minorPlanets = [ ]
             if not self.minorPlanetsAddNew:
                 for minorPlanet in minorPlanetStore:
                     if minorPlanet[ 0 ]:
                         self.minorPlanets.append( minorPlanet[ 1 ].upper() )
- 
+
             self.satellites = [ ]
             if not self.satellitesAddNew:
                 for satellite in satelliteStore:
@@ -1228,11 +1228,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return responseType
 
 
-#TODO Satellites now have ':' between name, number and intl desig.  
+#TODO Satellites now have ':' between name, number and intl desig.
 #Check this doesn't break the double click adding to the indicator text.
-#Check no satellite contains a : in the name or anywhere...if it does, then what?  
-# Drop it? 
-# Maybe use :: instead?  
+#Check no satellite contains a : in the name or anywhere...if it does, then what?
+# Drop it?
+# Maybe use :: instead?
 # Should match what is in the menu items.
 # Perhaps if/when converting tags, find the : from the right since there will be no : in the int desig nor number.
 #Handle : when converting tags back and forth for the label text (in the preferences and when rendering.
@@ -1337,7 +1337,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
-        
+
         def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ 0 ] = not listStore[ row ][ 0 ]
 
         tree = Gtk.TreeView( listStore )
@@ -1388,8 +1388,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             dataStore[ row ][ 0 ] = value
 
 
-    def createNotificationPanel( self, 
-                                 grid, gridStartIndex, 
+    def createNotificationPanel( self,
+                                 grid, gridStartIndex,
                                  checkboxLabel, checkboxTooltip, checkboxIsActive,
                                  summaryLabel, summaryText, summaryTooltip,
                                  messageLabel, messageText, messageTooltip,
@@ -1484,7 +1484,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
-        if city in IndicatorLunar.astrobackend.getCities(): 
+        if city in IndicatorLunar.astrobackend.getCities():
             theLatitude, theLongitude, theElevation = IndicatorLunar.astrobackend.getLatitudeLongitudeElevation( city )
             latitude.set_text( str( theLatitude ) )
             longitude.set_text( str( theLongitude ) )

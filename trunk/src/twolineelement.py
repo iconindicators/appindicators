@@ -46,12 +46,12 @@ class TLE( object ):
     def getNumber( self ): return self.line1[ 2 : 7 ]
 
 
-    def getInternationalDesignator( self ): 
+    def getInternationalDesignator( self ):
         launchYear = self.line1[ 9 : 11 ]
         if int( launchYear ) < 57:
             launchYear = "20" + launchYear
         else:
-            launchYear = "19" + launchYear 
+            launchYear = "19" + launchYear
 
         return launchYear + "-" + self.line1[ 11 : 17 ].strip()
 
