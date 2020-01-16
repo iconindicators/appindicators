@@ -270,7 +270,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         radioShowScriptsSubmenu.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
         radioShowScriptsIndented.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
@@ -409,7 +409,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         continue
 
                     newScript = Info( scriptGroupCombo.get_active_text().strip(),
-                                      scriptNameEntry.get_text().strip(), 
+                                      scriptNameEntry.get_text().strip(),
                                       script.getDirectory(),
                                       script.getCommand(),
                                       script.isTerminalOpen() )
@@ -482,7 +482,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for group in groups:
             scriptGroupCombo.append_text( group )
 
-        if script.getGroup() == "": 
+        if script.getGroup() == "":
             scriptGroupCombo.set_active( scriptGroupComboBox.get_active() )
         else:
             scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
@@ -600,7 +600,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
                         pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
 
-                    else: # At this point either the script group or name has changed or both (and possibly the other script parameters). 
+                    else: # At this point either the script group or name has changed or both (and possibly the other script parameters).
                         duplicate = False
                         for scriptInList in scripts:
                             if not scriptInList.isIdentical( script ):
@@ -625,7 +625,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 # The new script or the edit.
                 newScript = Info( scriptGroupCombo.get_active_text().strip(),
-                                  scriptNameEntry.get_text().strip(), 
+                                  scriptNameEntry.get_text().strip(),
                                   scriptDirectoryEntry.get_text().strip(),
                                   self.getTextViewText( commandTextView ).strip(),
                                   terminalCheckbox.get_active() )
@@ -662,7 +662,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     # Script group/name must be valid OR group is None (name is ignored) OR group is valid and name is None.
-    def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, scriptName ): 
+    def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, scriptName ):
         scriptGroupComboBox.remove_all()
         groups = sorted( self.getScriptsByGroup( scripts ), key = str.lower )
         for group in groups:
