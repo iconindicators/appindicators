@@ -299,7 +299,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         try:
             uuids = list( line.rstrip( "\"/>\n" ).split( "value=\"" )[ 1 ].split( "," ) )
             for uuid in uuids:
-                virtualMachines.append( virtualmachine.Info( "", False, uuid, 0 ) )                
+                virtualMachines.append( virtualmachine.Info( "", False, uuid, 0 ) )
 
         except Exception as e:
             self.getLogging().exception( e )
@@ -334,7 +334,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 # Process the top level tag first...
                 i = 0
                 key = "GUI/GroupDefinitions/"
-                if len( groupDefinitions ) > 0 and key in groupDefinitions: 
+                if len( groupDefinitions ) > 0 and key in groupDefinitions:
                     values = groupDefinitions[ key ].split( "," )
                     for value in values:
                         if value.startswith( "go=" ):
@@ -342,7 +342,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
                         else:
                             virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
-    
+
                         i += 1
 
                 # Now have a list of virtual machine infos containing top level groups and/or VMs.
@@ -388,7 +388,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return version
 
 
-    def isVBoxManageInstalled( self ): 
+    def isVBoxManageInstalled( self ):
         isInstalled = False
         result = self.processGet( "which VBoxManage" )
         if result:
@@ -509,7 +509,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, row, 1, 1 )
         row += 1
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, row, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
@@ -612,7 +612,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             else:
                 model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, startCommand.get_text().strip(), model[ treeiter ][ 3 ] ] )
                 model.remove( treeiter )
-    
+
             break
 
         dialog.destroy()
