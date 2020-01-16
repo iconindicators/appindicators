@@ -256,7 +256,7 @@ class AstroBase( ABC ):
     #
     # Latitude, longitude are floating point numbers representing decimal degrees.
     # Elevation is a floating point number representing metres above sea level.
-    # Maximum magnitude will applies only to stars, comets and minor planets.
+    # Maximum magnitude will applies to planets, stars, comets and minor planets.
     #
     # If a body is never up, no data is added.
     # If a body is always up, azimuth/altitude are added.

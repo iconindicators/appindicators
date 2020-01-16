@@ -898,8 +898,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         spinnerMagnitude.set_adjustment( spinnerAdjustment )
         spinnerMagnitude.set_value( self.magnitude ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
         spinnerMagnitude.set_tooltip_text( _(
-            "Stars, comets and minor planets exceeding\n" + \
-            "the magnitude will be hidden." ) )
+            "Planets, stars, comets and minor planets\n" + \
+            "exceeding the magnitude will be hidden." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )

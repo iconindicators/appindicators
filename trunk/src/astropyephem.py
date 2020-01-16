@@ -447,7 +447,7 @@ class AstroPyephem( astrobase.AstroBase ):
 
         AstroPyephem.__calculateMoon( ephemNow, data )
         AstroPyephem.__calculateSun( ephemNow, data )
-        AstroPyephem.__calculatePlanets( ephemNow, data, planets )
+        AstroPyephem.__calculatePlanets( ephemNow, data, planets, magnitudeMaximum )
         AstroPyephem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyephem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
@@ -541,11 +541,12 @@ class AstroPyephem( astrobase.AstroBase ):
     # http://www.geoastro.de/planets/index.html
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
-    def __calculatePlanets( ephemNow, data, planets ):
+    def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum ):
         for planet in planets:
             planetObject = getattr( ephem, planet.title() )()
             planetObject.compute( AstroPyephem.__getCity( data, ephemNow ) )
-            AstroPyephem.__calculateCommon( ephemNow, data, planetObject, astrobase.AstroBase.BodyType.PLANET, planet )
+            if planetObject.mag <= magnitudeMaximum:
+                AstroPyephem.__calculateCommon( ephemNow, data, planetObject, astrobase.AstroBase.BodyType.PLANET, planet )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php

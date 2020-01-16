@@ -818,7 +818,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
-#TODO When Skyfield implements planetary magnitude, can then filter planets by magnitude here and in astropyephem.
+#TODO Add in magnitude filtering when Skyfield implements planetary magnitude.
 # https://github.com/skyfielders/python-skyfield/issues/210
     @staticmethod
     def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets ):
