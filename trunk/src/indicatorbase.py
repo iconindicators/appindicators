@@ -74,8 +74,8 @@ class IndicatorBase( object ):
         self.updateTimerID = None
 
         logging.basicConfig(
-            format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
-            level = logging.DEBUG, 
+            format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            level = logging.DEBUG,
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
         Notify.init( self.indicatorName )
@@ -239,7 +239,7 @@ class IndicatorBase( object ):
 
     def __setCommonMenuSensitivity( self, toggle ):
         menuItems = self.indicator.get_menu().get_children()
-        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
             menuItems[ -1 ].set_sensitive( toggle ) # Quit
             menuItems[ -2 ].set_sensitive( toggle ) # About
             menuItems[ -3 ].set_sensitive( toggle ) # Preferences
@@ -248,7 +248,7 @@ class IndicatorBase( object ):
     def __getCommonMenuSensitivity( self ):
         sensitive = False
         menuItems = self.indicator.get_menu().get_children()
-        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
             sensitive = menuItems[ -1 ].get_sensitive() # Quit menu item; no need to check for About/Preferences.
 
         return sensitive
@@ -297,11 +297,11 @@ class IndicatorBase( object ):
     #
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
     def showOKCancel( self, parentWidget, message, title = None ):
-        dialog = Gtk.MessageDialog( 
-                    self.__getParent( parentWidget ), 
-                    Gtk.DialogFlags.MODAL, 
-                    Gtk.MessageType.QUESTION, 
-                    Gtk.ButtonsType.OK_CANCEL, 
+        dialog = Gtk.MessageDialog(
+                    self.__getParent( parentWidget ),
+                    Gtk.DialogFlags.MODAL,
+                    Gtk.MessageType.QUESTION,
+                    Gtk.ButtonsType.OK_CANCEL,
                     message )
 
         if title is None:
@@ -346,13 +346,13 @@ class IndicatorBase( object ):
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
-    # Makes a guess at how many menu items will fit into an indicator menu. 
+    # Makes a guess at how many menu items will fit into an indicator menu.
     #
     # By experiment under Unity, a screen height of 900 pixels accommodates 37 menu items before a scroll bar appears.
     # For an initial guess, compute a divisor: 900 / 37 = 25.
     #
     # For GNOME Shell, the equivalent divisor is 36.
-    def getMenuItemsGuess( self ): 
+    def getMenuItemsGuess( self ):
         if self.isUbuntu1604():
             guess = Gtk.Window().get_screen().get_height() / 25
 
@@ -394,7 +394,7 @@ class IndicatorBase( object ):
 # Is there another new theme/colour for Ubuntu 20.20?
     def getThemeColour( self ):
         themeNames = { "Adwaita" : "bebebe",
-                       "elementary-xfce-darker" : "f3f3f3",  
+                       "elementary-xfce-darker" : "f3f3f3",
                        "Lubuntu" : "4c4c4c",
                        "ubuntu-mono-dark" : "dfdbd2",
                        "ubuntu-mono-light" : "3c3c3c" }
@@ -469,8 +469,8 @@ class IndicatorBase( object ):
         return terminal
 
 
-    # Return the execution flag for the given terminal; None on failure. 
-    def getTerminalExecutionFlag( self, terminal ): 
+    # Return the execution flag for the given terminal; None on failure.
+    def getTerminalExecutionFlag( self, terminal ):
         executionFlag = None
         if terminal:
             if terminal.endswith( IndicatorBase.__TERMINAL_GNOME ):
