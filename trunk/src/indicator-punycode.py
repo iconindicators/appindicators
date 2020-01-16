@@ -107,14 +107,14 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
                 convertedText = ""
                 if text.find( "xn--" ) == -1:
                     labels = [ ]
-                    for label in text.split( "." ):    
+                    for label in text.split( "." ):
                         labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
 
                     convertedText = str( b'.'.join( labels ), "utf-8" )
                     result = [ protocol + text + pathQuery, protocol + convertedText + pathQuery ]
 
                 else:
-                    for label in text.split( "." ):    
+                    for label in text.split( "." ):
                         convertedText += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
 
                     convertedText = convertedText[ : -1 ]
@@ -210,7 +210,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
