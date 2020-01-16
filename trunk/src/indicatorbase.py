@@ -155,11 +155,6 @@ class IndicatorBase( object ):
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
-#TODO Open the changelog via the about dialog.
-# Then close the about dialog.
-# Verify the changlog gets deleted from the file system (user .cache directory).
-# Also verify if we reopen the about dialog and click on the changelog link...what happens?
-
     def __onAbout( self, widget ):
         self.__setCommonMenuSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
@@ -172,13 +167,9 @@ class IndicatorBase( object ):
         aboutDialog.set_authors( self.authors )
         aboutDialog.set_comments( self.comments )
 
-        copyrightText = \
-            "Copyright \xa9 " + \
-            self.copyrightStartYear + \
-            "-" + \
-            str( datetime.datetime.now().year ) + \
-            " " + \
-            self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+        copyrightText = "Copyright \xa9 " + \
+                        self.copyrightStartYear + "-" + str( datetime.datetime.now().year ) + " " + \
+                        self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -211,8 +202,8 @@ class IndicatorBase( object ):
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
         toolTip = "file://" + filePath
-        label = Gtk.Label()
         markup = leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText
+        label = Gtk.Label()
         label.set_markup( markup )
         label.show()
         aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].add( label )
@@ -399,7 +390,8 @@ class IndicatorBase( object ):
 
 
 #TODO Add Yaru and other themes for [ L | X | U ]buntu 16.04+.
-# On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared:
+# On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared.
+# Is there another new theme/colour for Ubuntu 20.20?
     def getThemeColour( self ):
         themeNames = { "Adwaita" : "bebebe",
                        "elementary-xfce-darker" : "f3f3f3",  
@@ -691,6 +683,7 @@ class IndicatorBase( object ):
     # fileNameOrBaseName: The file name of the text file or the base name of the text file.
     # text: The text to write.
     # isFileName: If True (default), the full file name is provided by the caller, otherwise only the base name.
+    # extension: The file extension (without period).
     #
     # Returns the full path and file name on success, None otherwise.
     def writeCacheText( self, fileNameOrBaseName, text, isFileName = True, extension = None ):
@@ -703,7 +696,6 @@ class IndicatorBase( object ):
                 fileNameOrBaseName + \
                 datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
-#TODO Update header for this parameter.
         if extension is not None:
             cacheFile += "." + extension
 
