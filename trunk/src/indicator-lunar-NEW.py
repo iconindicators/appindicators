@@ -133,7 +133,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
-    MINOR_PLANET_CENTER_SEARCH_URL = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt", 
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
@@ -149,9 +148,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
                                              astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
                                              astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + _( " now rising..." )
-    SATELLITE_ON_CLICK_URL = "https://www.n2yo.com/satellite/?s=" + astrobase.AstroBase.SATELLITE_TAG_NUMBER
 
-    STAR_SEARCH_URL = "https://hipparcos-tools.cosmos.esa.int/cgi-bin/HIPcatalogueSearch.pl?hipId="
+    SEARCH_URL_DWARF_PLANET = "https://solarsystem.nasa.gov/planets/dwarf-planets/"
+    SEARCH_URL_COMET_AND_MINOR_PLANET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
+    SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
+    SEARCH_URL_SATELLITE = "https://www.n2yo.com/satellite/?s="
+    SEARCH_URL_STAR = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+"
+    SEARCH_URL_SUN = "https://solarsystem.nasa.gov/solar-system/sun"
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
@@ -442,6 +446,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 subMenu.append( Gtk.MenuItem( indent + displayText + self.getDisplayData( key ) ) )
 
             self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+            self.addOnClickToSubMenuChildren( subMenu, IndicatorLunar.SEARCH_URL_MOON )
 
 
     def updateMenuSun( self, menu ):
@@ -455,6 +460,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ) ) )
             subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ) ) )
             self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            self.addOnClickToSubMenuChildren( subMenu, IndicatorLunar.SEARCH_URL_SUN )
 
 
     def updateEclipseMenu( self, menu, bodyType, nameTag ):
@@ -465,6 +471,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         longitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) )
         menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude ) )
         menu.append( Gtk.MenuItem( self.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ) ) )
+
+
+    def addOnClickToSubMenuChildren( self, subMenu, url ):
+        for child in subMenu.get_children():
+            child.set_name( url )
+            child.connect( "activate", self.onMenuItemClick )
 
 
     def updateMenuPlanets( self, menu ):
@@ -479,12 +491,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
-                subMenu.append( Gtk.MenuItem( self.indent( 0, 1 ) + translatedName ) )
-                self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.PLANET, name, 1, 2 )
+                if name == astrobase.AstroBase.PLANET_PLUTO:
+                    url = IndicatorLunar.SEARCH_URL_DWARF_PLANET + name.lower()
+
+                else:                    
+                    url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
+
+                menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
+                menuItem.set_name( url )
+                subMenu.append( menuItem )
+                self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.PLANET, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator ) 
 
             subMenu.remove( separator )
+
+            for child in subMenu.get_children():
+                child.connect( "activate", self.onMenuItemClick )
 
 
     def updateMenuStars( self, menu ):
@@ -499,7 +522,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in stars:
-                url = IndicatorLunar.STAR_SEARCH_URL + str( IndicatorLunar.astrobackend.STARS_TO_HIP[ name ] )
+                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astrobackend.STARS_TO_HIP[ name ] )
                 menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + translatedName )
                 menuItem.set_name( url )
                 subMenu.append( menuItem )
@@ -588,7 +611,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             else: # 229762 G!kunll'homdima
                 id = components[ 0 ] 
 
-        return IndicatorLunar.MINOR_PLANET_CENTER_SEARCH_URL + id.replace( "/", "%2F" ).replace( " ", "+" )
+        return IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + id.replace( "/", "%2F" ).replace( " ", "+" )
 
 
     def updateMenuSatellites( self, menu ):
@@ -628,7 +651,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem.set_submenu( subMenu )
         for number, name, riseDateTime in satellites:
             menuItem = Gtk.MenuItem( self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator() )
-            url = IndicatorLunar.SATELLITE_ON_CLICK_URL.replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER, number )
+            url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem.set_name( url )
             subMenu.append( menuItem )
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
@@ -1636,6 +1659,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO For testing...
 import os
-os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
+# os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
 
 IndicatorLunar().main()

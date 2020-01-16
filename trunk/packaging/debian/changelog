@@ -21,7 +21,7 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
   * Only visible satellite passes (at dawn/dusk) are shown.
   * Added minor planets, courtesy of the Minor Planet Center.
   * Magnitude filtering extended to include planets and stars.
-  * Added on-click URL for minor planets and stars.
+  * Added on-click URL for the moon, sun, planets, stars and minor planets.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
   * Added preference to hide a body if it is below the horizon (yet to rise).
