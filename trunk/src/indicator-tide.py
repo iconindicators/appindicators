@@ -64,7 +64,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         if ports.isExpired():
             message = _(
-                "The license for non-UK ports has expired. " + 
+                "The license for non-UK ports has expired. " +
                 "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
 
             Notify.Notification.new( _( "Warning" ), message, self.icon ).show()
@@ -104,7 +104,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                     if self.showAsSubMenusExceptFirstDay and firstTidalReading:
                         self.__createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, url )
 
-                    else:                    
+                    else:
                         subMenu = Gtk.Menu()
                         self.__createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, None ).set_submenu( subMenu )
 
@@ -209,7 +209,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             nextUpdateTimeInSeconds = int( min( fiveMinutesAfterUTCMidnightInSeconds, fiveMinutesAfterLocalMidnightInSeconds ) )
         else:
             nextUpdateTimeInSeconds = fiveMinutesAfterUTCMidnightInSeconds
-        
+
         return nextUpdateTimeInSeconds
 
 
@@ -334,7 +334,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
@@ -350,7 +350,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
             self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
-            
+
             if dateFormat.get_text():
                 self.menuItemDateFormat = dateFormat.get_text()
 
@@ -463,11 +463,11 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                             utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # Example: "Port predictions (Standard Local Time) are -3 hours from UTC"
 
                     elif "mins from UTC" in line:
-                        hours = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ] 
+                        hours = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ]
                         if len( hours ) == 2:
                             hours = hours[ 0 ] + "0" + hours[ 1 ]
 
-                        minutes = line[ line.index( "hours" ) + 6 : line.index( "mins" ) - 1 ] 
+                        minutes = line[ line.index( "hours" ) + 6 : line.index( "mins" ) - 1 ]
                         utcOffset = hours + minutes
 
                     else:
@@ -549,7 +549,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     # then remove a reading if prior to user local today.
     #
     # Otherwise, tidal readings contain a mix of date and date/time or are date only.
-    # Compare each reading to UTC midnight date only and remove if older. 
+    # Compare each reading to UTC midnight date only and remove if older.
     def removeTidalReadingsPriorToToday( self, tidalReadings ):
         if self.tidalReadingsAreAllDateTimes( tidalReadings ):
             todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )

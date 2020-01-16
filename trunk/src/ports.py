@@ -37,7 +37,7 @@ def isValidPortID( portID ):
     return isValid
 
 
-def getCountry( portID ): 
+def getCountry( portID ):
     country = None
     for port in _ports:
         if portID == port[ _INDEX_PORT_ID ]:
@@ -47,7 +47,7 @@ def getCountry( portID ):
     return country
 
 
-def getPortName( portID ): 
+def getPortName( portID ):
     portName = None
     for port in _ports:
         if portID == port[ _INDEX_PORT_ID ]:
