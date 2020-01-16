@@ -402,9 +402,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         browseFileButton.set_sensitive( not isSystemFortune )
         if isSystemFortune:
             browseFileButton.set_tooltip_text( _(
-                "This fortune is part of\n" + \
-                "your system and cannot be\n" + \
-                "modified." ) )
+                "This fortune is part of your\n" + \
+                "system and cannot be modified." ) )
 
         else:
             browseFileButton.set_tooltip_text( _( 
@@ -418,9 +417,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         browseDirectoryButton.set_sensitive( not isSystemFortune )
         if isSystemFortune:
             browseDirectoryButton.set_tooltip_text( _(
-                "This fortune is part of\n" + \
-                "your system and cannot be\n" + \
-                "modified." ) )
+                "This fortune is part of your\n" + \
+                "system and cannot be modified." ) )
 
         else:
             browseDirectoryButton.set_tooltip_text( _( 
