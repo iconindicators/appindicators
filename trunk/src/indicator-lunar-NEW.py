@@ -1179,6 +1179,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 continue
 
 #TODO Need a function that finds tags for satellites and then removes the name and int desig.
+#Or can/should this be all done within the translate tags function (have a special clause for satellites)?
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
