@@ -96,7 +96,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             if self.copyToClipboard:
                 menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + " " + widget.props.label.strip(), -1 ) )
 
-            elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified. 
+            elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 menuItem.connect( "activate", lambda widget: webbrowser.open( self.searchURL.replace( IndicatorOnThisDay.TAG_EVENT, ( widget.props.name + " " + widget.props.label ).replace( " ", "+" ) ) ) )
 
             if menuItemCount == menuItemMaximum:
@@ -266,7 +266,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         searchEngineEntry = Gtk.Entry()
-        searchEngineEntry.set_tooltip_text( _( 
+        searchEngineEntry.set_tooltip_text( _(
             "The URL to search for the event.\n\n" + \
             "Use {0} in the URL to specify the\n" + \
             "position of the event text/date.\n\n" + \
@@ -291,7 +291,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         notifyCheckbox.set_margin_top( 10 )
         grid.attach( notifyCheckbox, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
@@ -395,7 +395,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                 "system and cannot be modified." ) )
 
         else:
-            browseButton.set_tooltip_text( _( 
+            browseButton.set_tooltip_text( _(
                 "Choose a calendar file.\n\n" + \
                 "Ensure the calendar file is\n" + \
                 "valid by running through\n" + \
@@ -430,15 +430,15 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                     self.showMessage( dialog, _( "The calendar path cannot be empty." ) )
                     fileEntry.grab_focus()
                     continue
-    
+
                 if not isSystemCalendar and not os.path.exists( fileEntry.get_text().strip() ):
                     self.showMessage( dialog, _( "The calendar path does not exist." ) )
                     fileEntry.grab_focus()
                     continue
 
                 if rowNumber:
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.  
-    
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.
+
                 model.get_model().append( [ fileEntry.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
 
             break
