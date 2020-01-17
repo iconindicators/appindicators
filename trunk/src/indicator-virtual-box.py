@@ -25,11 +25,10 @@ gettext.install( INDICATOR_NAME )
 
 import gi
 gi.require_version( "Gdk", "3.0" )
-gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import Gdk, GLib, Gtk, Notify
+from gi.repository import Gdk, Gtk, Notify
 
 import indicatorbase, datetime, os, time, virtualmachine
 
@@ -139,7 +138,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 time.sleep( self.delayBetweenAutoStartInSeconds )
 
 
-    def startVirtualMachine( self, widget, uuid, requiresUpdate = True ):
+    def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
         if uuid in runningVMUUIDs:
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
@@ -206,7 +205,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( self.scrollUUID ) ] )
 
 
-    def onLaunchVirtualBoxManager( self, widget ):
+    def onLaunchVirtualBoxManager( self, menuItem ):
         # The executable VirtualBox may exist in different locations, depending on how it was installed.
         # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
         virtualBoxExecutable = self.processGet( "which VirtualBox" ).strip()
