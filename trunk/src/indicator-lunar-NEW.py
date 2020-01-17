@@ -68,11 +68,10 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import gi
-gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
-from gi.repository import GLib, Gtk, Notify
+from gi.repository import Gtk, Notify
 
 import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement, re, twolineelement, webbrowser
 
@@ -179,18 +178,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
-        for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
-            self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
-
 
     def update( self, menu ):
+        self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
+
         # Update comet, minor planet and satellite data.
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
-                                          IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
                                           orbitalelement.download,
                                           IndicatorLunar.COMET_DATA_URL,
                                           IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
@@ -201,7 +194,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.minorPlanetData = { }
         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
             minorPlanetData = self.updateData( baseName,
-                                               IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
                                                orbitalelement.download,
                                                url,
                                                IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
@@ -214,7 +206,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                                              IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
                                               twolineelement.download,
                                               IndicatorLunar.SATELLITE_DATA_URL,
                                               None )
@@ -247,10 +238,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds( utcNow )
 
 
+    def flushCache( self ):
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
+        for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
+            self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+
+
     # Get the data from the cache, or if stale, download from the source.
     #
     # Returns a dictionary (may be empty).
-    def updateData( self, cacheBaseName, cacheMaximumAgeHours, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
+    def updateData( self, cacheBaseName, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
         data = self.readCacheBinary( cacheBaseName ) # Either valid or None.
 
 #TODO Start of temporary hack...
@@ -269,6 +269,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # End of hack!
 
         if data is None:
+            print( "Downloading data from", dataURL )#TODO Debug
             data = downloadDataFunction( dataURL, self.getLogging() )
             if magnitudeFilterFunction:
                 data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
@@ -441,7 +442,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ], _( "New: " ), key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             indent = self.indent( 1, 2 )
-            for dateTime, displayText, key in sorted( nextPhases, key = lambda tuple: tuple[ 0 ] ):
+            for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ 0 ] ):
                 self.createMenuItem( subMenu, indent + displayText + self.getDisplayData( key ), IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
@@ -516,7 +517,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateMenuCometsMinorPlanets( self, menu, bodyType ):
         bodies = [ ]
-        for body in self.comets if bodyType == astrobase.AstroBase.BodyType.COMET else self.minorPlanets:
+        for body in ( self.comets if bodyType == astrobase.AstroBase.BodyType.COMET else self.minorPlanets ):
             if self.display( bodyType, body ):
                 bodies.append( body )
 
@@ -539,31 +540,29 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def getCometMinorPlanetOnClickURL( self, name, bodyType ):
         if bodyType == astrobase.AstroBase.BodyType.COMET:
             if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
-                id = name[ : name.find( "(" ) ].strip()
+                hip = name[ : name.find( "(" ) ].strip()
 
             else:
                 postSlash = name[ name.find( "/" ) + 1 : ]
                 if re.search( '\d', postSlash ): # C/1931 AN
-                    id = name
+                    hip = name
 
                 else: # 97P/Metcalf-Brewington
-                    id = name[ : name.find( "/" ) ].strip()
+                    hip = name[ : name.find( "/" ) ].strip()
 
         else:
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
-                id = components[ 0 ]
+                hip = components[ 0 ]
 
             elif components[ 0 ].isnumeric() and components[ 1 ].isnumeric(): # 465402 2008 HW1
-                id = components[ 0 ]
+                hip = components[ 0 ]
 
             elif components[ 0 ].isnumeric() and components[ 1 ].isalnum(): # 1999 KL17
-                id = components[ 0 ] + " " + components[ 1 ]
+                hip = components[ 0 ] + " " + components[ 1 ]
 
             else: # 229762 G!kunll'homdima
-                id = components[ 0 ]
-
-        return IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + id.replace( "/", "%2F" ).replace( " ", "+" )
+                hip = components[ 0 ]
 
 
     def display( self, bodyType, nameTag ):
@@ -1144,29 +1143,29 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             cityValue = city.get_active_text()
             if cityValue == "":
+                notebook.set_current_page( notebook.get_n_pages() - 1 )
                 self.showMessage( dialog, _( "City cannot be empty." ) )
-                notebook.set_current_page( TAB_GENERAL )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
+                notebook.set_current_page( notebook.get_n_pages() - 1 )
                 self.showMessage( dialog, _( "Latitude must be a number between 90 and -90 inclusive." ) )
-                notebook.set_current_page( TAB_GENERAL )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
+                notebook.set_current_page( notebook.get_n_pages() - 1 )
                 self.showMessage( dialog, _( "Longitude must be a number between 180 and -180 inclusive." ) )
-                notebook.set_current_page( TAB_GENERAL )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
+                notebook.set_current_page( notebook.get_n_pages() - 1 )
                 self.showMessage( dialog, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
-                notebook.set_current_page( TAB_GENERAL )
                 elevation.grab_focus()
                 continue
 
@@ -1318,15 +1317,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         translatedText = text
         tags = re.findall( "\[([^\[^\]]+)\]", translatedText )
         for tag in tags:
-            iter = tagsListStore.get_iter_first()
-            while iter:
-                row = tagsListStore[ iter ]
+            iterator = tagsListStore.get_iter_first()
+            while iterator:
+                row = tagsListStore[ iterator ]
                 if row[ i ] == tag:
                     translatedText = translatedText.replace( "[" + tag + "]", "[" + row[ j ] + "]" )
-                    iter = None # Break and move on to next tag.
+                    iterator = None # Break and move on to next tag.
 
                 else:
-                    iter = tagsListStore.iter_next( iter )
+                    iterator = tagsListStore.iter_next( iterator )
 
         return translatedText
 
@@ -1360,12 +1359,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return scrolledWindow
 
 
-    def onSatelliteCheckbox( self, widget, row, dataStore, sortStore ):
+    def onSatelliteCheckbox( self, cellRendererToggle, row, dataStore, sortStore ):
+        print( type( checkbox))#TODO Remove
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
 
 
-    def onColumnHeaderClick( self, widget, dataStore ):
+    def onColumnHeaderClick( self, treeviewColumn, dataStore ):
         atLeastOneItemChecked = False
         atLeastOneItemUnchecked = False
         for row in range( len( dataStore ) ):
