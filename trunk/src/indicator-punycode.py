@@ -73,7 +73,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             menu.append( menuItem )
 
 
-    def onConvert( self, widget ): Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
+    def onConvert( self, menuItem ): Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
 
 
     def doConversion( self, clipboard, text, data ):
@@ -137,7 +137,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
                 Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
 
 
-    def pasteToClipboard( self, widget, text ):
+    def pasteToClipboard( self, menuItem, text ):
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
