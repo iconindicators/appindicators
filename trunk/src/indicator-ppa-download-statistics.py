@@ -298,8 +298,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     ppa.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
 
                 elif hasPublishedBinaries:
-                    for filter in self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
-                        self.getPublishedBinaries( ppa, filter )
+                    for theFilter in self.filters.getFilterText( ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ):
+                        self.getPublishedBinaries( ppa, theFilter )
                         if ppa.getStatus() == PPA.Status.ERROR_RETRIEVING_PPA:
                             break # No point continuing with each filter.
 
@@ -859,8 +859,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                 # Ensure the PPA User/Name is not present in the list of filters in the preferences.
                 inFilterList = False
-                for filter in range( len( filterTreeModel ) ):
-                    if ppaUserName in filterTreeModel[ filter ][ 0 ]:
+                for theFilter in range( len( filterTreeModel ) ):
+                    if ppaUserName in filterTreeModel[ theFilter ][ 0 ]:
                         inFilterList = True
                         break
 
@@ -952,8 +952,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
-            for filter in filters:
-                self.filters.addFilter( filter[ 0 ], filter[ 1 ], filter[ 2 ], filter[ 3 ], filter[ 4 ] )
+            for theFilter in filters:
+                self.filters.addFilter( theFilter[ 0 ], theFilter[ 1 ], theFilter[ 2 ], theFilter[ 3 ], theFilter[ 4 ] )
 
         else:
             self.ppas = [ ]
