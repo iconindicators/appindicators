@@ -87,7 +87,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.secondaryActivateTarget = menuItem
 
 
-    def onScript( self, widget, script ):
+    def onScript( self, menuItem, script ):
         terminal = self.getTerminal()
         terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
 
@@ -300,7 +300,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return responseType
 
 
-    def onDisplayCheckboxes( self, source, radioShowScriptsSubmenu, hideGroupsCheckbox ):
+    def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
         hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
@@ -430,7 +430,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
         if scriptGroup and treeiter:
             scriptName = model[ treeiter ][ 0 ]
-            theScript = self.getScript( scripts, scriptGroup, scriptName )
             if self.showOKCancel( scriptNameTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
