@@ -269,7 +269,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # End of hack!
 
         if data is None:
-            print( "Downloading data from", dataURL )#TODO Debug
             data = downloadDataFunction( dataURL, self.getLogging() )
             if magnitudeFilterFunction:
                 data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
@@ -1293,7 +1292,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for dataTag in astrobase.AstroBase.DATA_TAGS_SATELLITE:
                 value = ""
                 name = self.satelliteData[ bodyTag ].getName()
-                translatedTag = name + " : " + bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
+                internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
+                translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag )
                 if key in self.data:
                     value = self.getDisplayData( key )
@@ -1360,7 +1360,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def onSatelliteCheckbox( self, cellRendererToggle, row, dataStore, sortStore ):
-        print( type( checkbox))#TODO Remove
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
 
