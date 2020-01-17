@@ -324,6 +324,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Verify
+##TODO When extracting a tag, say MOON PHASE, it is easy to know this pertains to the moon.
+# But what if an item has two or more words for the name OR two or more words for the attribute.
+# How to tell name from attribute and then to select the correct astro body type?
     def updateIconAndLabel( self ):
         # Substitute tags for values.
         parsedOutput = self.indicatorText
@@ -796,6 +799,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialiseDisplayTagsStore( displayTagsStore )
 
+
+#TODO
+# When parsing the indicator text, need to translate the tags,
+# but also insert the satellite name/intldesig at some point too.
+#
 #         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
 #         for key in self.data.keys():
 #             if key[ 2 ] not in IndicatorLunar.astrobackend.DATA_INTERNAL:
@@ -1228,15 +1236,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Satellites now have ':' between name, number and intl desig.
 #Check this doesn't break the double click adding to the indicator text.
-#Check no satellite contains a : in the name or anywhere...if it does, then what?
-# Drop it?
-# Maybe use :: instead?
-# Should match what is in the menu items.
-# Perhaps if/when converting tags, find the : from the right since there will be no : in the int desig nor number.
-#Handle : when converting tags back and forth for the label text (in the preferences and when rendering.
-#NOT SURE IF THIS TODO IS VALID OR MAKES SENSE STILL!
+#If a satellite contains a : in the name or anywhere, when converting tags, 
+# find the : from the right since there will be no : in the int desig nor number.
     def initialiseDisplayTagsStore( self, displayTagsStore ):
-#TODO Can we somehow make all of this into one loop?
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
 
@@ -1301,6 +1303,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
+#TODO Given that the translated satellite tags contain the satellite name and intl desig,
+# do we handle the name and intl desig here or externally?
+#
+#TODO Find all callers of this function and verify!
     def translateTags( self, tagsListStore, originalToLocal, text ):
         # The tags store contains at least 2 columns (additional columns are ignored).
         # First column contains the original/untranslated tags.
@@ -1330,6 +1336,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return translatedText
 
 
+#TODO Verify
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
@@ -1626,6 +1633,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO For testing...
-# import os; os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
+import os; os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
 
 IndicatorLunar().main()
