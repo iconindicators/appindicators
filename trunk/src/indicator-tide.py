@@ -394,7 +394,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
 
     def getTidalData( self, portID ):
-        tidalReadings = [ ]
         self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
         tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
         if tidalReadings:
