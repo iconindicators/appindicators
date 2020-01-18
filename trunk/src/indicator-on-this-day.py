@@ -25,16 +25,14 @@ gettext.install( INDICATOR_NAME )
 
 import gi
 gi.require_version( "Gdk", "3.0" )
-gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from event import Event
 from datetime import date, datetime, timedelta
-from gi.repository import Gdk, GLib, Gtk, Notify
+from gi.repository import Gdk, Gtk, Notify
 
-import indicatorbase, encodings.idna, re
-import fnmatch, os, webbrowser
+import fnmatch, indicatorbase, os, webbrowser
 
 
 class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
@@ -133,7 +131,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
         # Sort events of the same date by description.
         sortedEvents = [ ]
-        currentDate = ""
         i = 0
         j = 1
         while( j < len( events ) ):
