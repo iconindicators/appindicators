@@ -81,9 +81,10 @@ import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allowing easy switching between alternate backends (eventually looking to move to Skyfield).
-    astrobackend = getattr( __import__( "astropyephem" ), "AstroPyephem" )
-#     astrobackend = getattr( __import__( "astroskyfield" ), "AstroSkyfield" )
+    # Allowing switching between alternate backends (eventually looking to move to Skyfield).
+    astrobackendPyephem = "AstroPyephem"
+    astrobackendSkyfield = "AstroSkyfield"
+    astrobackend = getattr( __import__( astrobackendPyephem.lower() ), astrobackendPyephem )
 
 
     CONFIG_CITY_ELEVATION = "cityElevation"
