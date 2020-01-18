@@ -818,10 +818,10 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
-#TODO Add in magnitude filtering when Skyfield implements planetary magnitude.
+#TODO Factor in magnitude filtering when Skyfield implements planetary magnitude.
 # https://github.com/skyfielders/python-skyfield/issues/210
     @staticmethod
-    def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets ):
+    def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets, magnitudeMaximum ):
         for planet in planets:
             AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
                                              ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
