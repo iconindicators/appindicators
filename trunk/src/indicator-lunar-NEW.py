@@ -20,6 +20,9 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Indicator Lunar version 1037...before major overhaul!
+
+
 #TODO If the menu build takes too long, perhaps add in the following to each of the top level menu items (moon, sun, planets, etc):
 #
 #    menuitem.connect( "activate", self.buildSubMenu, menuItem )
