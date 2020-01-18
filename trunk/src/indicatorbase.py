@@ -31,15 +31,13 @@ gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+from abc import ABC
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 
 import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 
-#TODO Look at astrobase and how it implements abstract stuff...
-#...may need to change things here
-#...and in all indicators.
-class IndicatorBase( object ):
+class IndicatorBase( ABC ):
 
     # Private
     __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
