@@ -3,7 +3,8 @@
 
 
 # Iterate through each indicator's main file and changelog, 
-# compare the version numbers and report any difference.
+# compare the version numbers and report any difference against each other
+# and the released version on LaunchPad.
 
 
 basePath = "../../"
