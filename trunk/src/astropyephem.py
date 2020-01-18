@@ -24,9 +24,6 @@ from ephem.cities import _city_data
 import astrobase, ephem, locale, math, orbitalelement, twolineelement
 
 
-#TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
-
-
 class AstroPyephem( astrobase.AstroBase ):
 
     # Taken from ephem/stars.py
