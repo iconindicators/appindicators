@@ -391,11 +391,11 @@ class IndicatorBase( ABC ):
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared.
 # Is there another new theme/colour for Ubuntu 20.20?
     def getThemeColour( self ):
-        themeNames = { "Adwaita" : "bebebe",
+        themeNames = { "Adwaita"                : "bebebe",
                        "elementary-xfce-darker" : "f3f3f3",
-                       "Lubuntu" : "4c4c4c",
-                       "ubuntu-mono-dark" : "dfdbd2",
-                       "ubuntu-mono-light" : "3c3c3c" }
+                       "Lubuntu"                : "4c4c4c",
+                       "ubuntu-mono-dark"       : "dfdbd2",
+                       "ubuntu-mono-light"      : "3c3c3c" }
 
         themeName = self.getThemeName()
         if themeName in themeNames:
