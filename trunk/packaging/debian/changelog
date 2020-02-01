@@ -1,5 +1,15 @@
 indicator-virtual-box (1.0.62-1) xenial; urgency=low
 
+  * Increased the default time to wait when auto-starting one VM to the next
+    from 5 seconds to 10 seconds.
+  * The auto-start delay now kicks in BEFORE a VM starts up.
+    This gives the host time to start up before kicking off a VM.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Feb 2029 13:51:11 +1000
+
+
+indicator-virtual-box (1.0.62-1) xenial; urgency=low
+
   * Bug fix: When a VM hangs during boot the indicator would also hang.
   * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.

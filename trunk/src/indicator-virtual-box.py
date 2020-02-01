@@ -51,7 +51,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.62",
+            version = "1.0.63",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -134,8 +134,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def autoStartVirtualMachines( self ):
         for virtualMachine in self.getVirtualMachines():
             if self.isAutostart( virtualMachine.getUUID() ):
-                self.startVirtualMachine( None, virtualMachine.getUUID(), False )
                 time.sleep( self.delayBetweenAutoStartInSeconds )
+                self.startVirtualMachine( None, virtualMachine.getUUID(), False )
 
 
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
@@ -618,7 +618,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 5 )
+        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 10 )
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
         self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
