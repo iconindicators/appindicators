@@ -139,21 +139,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 24
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 100000 # TODO Replace 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 100000 # TODO Replace 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 100000 # TODO Replace 24
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
@@ -192,6 +192,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+        self.increment = 0 # Minutes TODO Remove
 
 
     def update( self, menu ):
@@ -229,7 +230,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-        utcNow = datetime.datetime.utcnow()
+#         utcNow = datetime.datetime.utcnow() #TODO Replace
+        utcNow = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.increment )
+        print( utcNow )
+        self.increment += 60 
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -250,7 +254,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites( utcNow )
 
-        return self.getNextUpdateTimeInSeconds( utcNow )
+        return 10 # TODO Replace self.getNextUpdateTimeInSeconds( utcNow )
 
 
     def flushCache( self ):
@@ -371,6 +375,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
         iconFilename = self.writeCacheText( IndicatorLunar.ICON_CACHE_BASENAME, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
+        print( iconFilename ) #TODO Testing
         self.indicator.set_icon_full( iconFilename, "" )
 
 
