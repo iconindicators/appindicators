@@ -109,6 +109,7 @@ class IndicatorBase( ABC ):
         menu = Gtk.Menu()
         self.secondaryActivateTarget = None
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
+        menu.prepend( Gtk.MenuItem.new_with_label( "Next update: " + ( datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) ).strftime( "%Y-%m-%d %H:%M:%S" ) ) ) #TODO Remove
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
