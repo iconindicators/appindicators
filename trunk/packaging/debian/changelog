@@ -1,9 +1,9 @@
 indicator-virtual-box (1.0.62-1) xenial; urgency=low
 
+  * The auto-start delay commences BEFORE a VM starts up (rather than after).
+    This gives the host time to start up before kicking off a VM.
   * Increased the default time to wait when auto-starting one VM to the next
     from 5 seconds to 10 seconds.
-  * The auto-start delay now kicks in BEFORE a VM starts up.
-    This gives the host time to start up before kicking off a VM.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 1 Feb 2029 13:51:11 +1000
 
