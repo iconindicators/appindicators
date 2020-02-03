@@ -1,4 +1,4 @@
-indicator-virtual-box (1.0.62-1) xenial; urgency=low
+indicator-virtual-box (1.0.63-1) xenial; urgency=low
 
   * The auto-start delay commences BEFORE a VM starts up (rather than after).
     This gives the host time to start up before kicking off a VM.
