@@ -1,31 +1,29 @@
 indicator-lunar (1.0.81-1) xenial; urgency=low
 
-  * Under GNOME Shell, the indicator grinds to a halt and menu items beyond
-    the bottom of the screen do not scroll properly.
+  * Under GNOME Shell, the indicator grinds to a halt and if menu items extend
+    beyond the bottom of the screen, scrolling does not work.
     Consequently, any item/attribute/preference not directly assisting the
     home astronomer to locate an object has been removed.
-    The attributes moon phase, eclipse, solstice/equinox remain.
-  * Removed right ascension and declination; azimuth/altitude are sufficient.
+    The exceptions are the attributes moon phase, eclipse, solstice/equinox.
   * Removed decimal degrees from azimuth/altitude.
-  * Removed planetary moons; each effectively has the same azimuth/altitude
-    as the parent planet.
+  * Removed right ascension and declination; azimuth/altitude are sufficient.
+  * Removed planetary moons; each moon effectively has the same
+    azimuth/altitude as the parent planet.
   * Removed werewolf warning percentage from preferences and fixed at 96%.
   * Removed date/time format from preferences; uses ISO 8601 without seconds.
-  * TLE/OE data files are no longer configurable as the defaults are more than
-    adequate.  For the adventurous, you can substitute the TLE/OE URLs for
-    sources directly in the code...at your own peril!
+  * TLE/OE data files are no longer configurable.
   * Bodies which are 'never up' are not displayed.
   * Bodies which are 'always up' only display azimuth/altitude.
   * Bodies below the horizon display the rise date/time.
   * Bodies above the horizon display the set date/time and azimuth/altitude.
-  * Only visible satellite passes (at dawn/dusk) are shown.
+  * Only visible satellite passes (at dawn/dusk for most latitudes) are shown.
   * Added minor planets, courtesy of the Minor Planet Center.
   * Magnitude filtering extended to include planets and stars.
   * Added on-click URL for the moon, sun, planets, stars and minor planets.
-  * Added hyperlink to the About dialog which links to the error log text file
-    (only visible if the underlying file is present).
   * Added preference to hide a body if it is below the horizon (yet to rise).
   * Dynamically created icons are stored in user cache rather than /tmp.
+  * Added hyperlink to the About dialog which links to the error log text file
+    (only visible if the underlying file is present).
   * About dialog now pulls the changelog directly from /usr/doc rather than
     a redundant duplicate in the installation directory.
   * About dialog now shows copyright, artists and corrected URL for website.
