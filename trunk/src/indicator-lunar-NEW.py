@@ -299,9 +299,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
-#TODO Need to ensure that only bodies that are displayed are taken into account.
-# For example, the moon had calculated values, yet was not visible, but its values were taken into account.
-#
 #TODO If the user only shows the moon and sun, the next update time could be 12 hours away.
 # This means the moon icon will be very out of date.
 # Perhaps do a test to see how much the moon changes over time.
@@ -311,16 +308,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
         utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
-        for key in self.data:
-            if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
+        for key in self.data: # Only take into account a body that is visible!
+            if self.display( key[ 0 ], key[ 1 ] ) and \
+               ( key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER ):
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
