@@ -299,6 +299,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
+#TODO Need to ensure that only bodies that are displayed are taken into account.
+# For example, the moon had calculated values, yet was not visible, but its values were taken into account.
+#
+#TODO If the user only shows the moon and sun, the next update time could be 12 hours away.
+# This means the moon icon will be very out of date.
+# Perhaps do a test to see how much the moon changes over time.
+# Hopefully a minimum hourly update will correct for this.
     def getNextUpdateTimeInSeconds( self, startDateTime ):
         utcNow = datetime.datetime.utcnow()
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
