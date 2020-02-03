@@ -69,6 +69,14 @@
 #So may need a hack for this release to read in user icon text and fix any body tags present.
 
 
+#TODO Pyephem will be a different version on Ubuntu 19.10+ and so has more stars than the version on Ubuntu 18.04.
+# Is this somehow a problem?
+# This is somewhat related to running first with astropyephem and then astroskyfield.
+# Is there a problems switching back/forth between backends?
+# When reading in the stars/planets/whatever, do we need to check if they exist in the backend?
+# How to do this check?
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
