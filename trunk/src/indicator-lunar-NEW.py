@@ -323,7 +323,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateMenu( self, menu ):
 #TODO Start debugging.
-        menu.append( Gtk.MenuItem( str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
+        menu.append( Gtk.MenuItem( "Backend: " + str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
         menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
         menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
         menu.append( Gtk.SeparatorMenuItem() )
@@ -1648,6 +1648,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO For testing...
-import os; os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
+# import os; os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
 
 IndicatorLunar().main()
