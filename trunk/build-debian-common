@@ -71,6 +71,31 @@ copyTopLevelAndSource()
 {
   local -n _source=$1
 
+  # Check .py files (and others) for a TODO.
+  foundTODO="false"
+  for item in "${_source[@]}"; do
+    if [ -n "$(grep -i TODO src/$item)" ]
+    then
+      echo "Found one or more TODO in src/$item"
+      foundTODO="true"
+    fi
+    done
+
+  nonSource=( "$PYTHON_UTILS/src/indicatorbase.py" "packaging/debian/changelog" "packaging/debian/control" "packaging/debian/install" )
+  for item in "${nonSource[@]}"; do
+    if [ -n "$(grep -i TODO $item)" ]
+    then
+      echo "Found one or more TODO in $item"
+      foundTODO="true"
+    fi
+    done
+
+  if "$foundTODO"
+  then
+    exit
+  fi
+
+  # No TODOs...so continue and copy source files.
   rm -rf build
   mkdir -p build/$NAME-$VERSION
 
@@ -83,6 +108,7 @@ copyTopLevelAndSource()
     cp src/"$item" build/$NAME-$VERSION/src
   done
 }
+
 
 
 # Arguments:
