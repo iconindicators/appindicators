@@ -303,27 +303,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         utcNow = datetime.datetime.utcnow()
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
         utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
-        nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
+        nextUpdateTime = utcNow + datetime.timedelta( hours = 3600 ) # Do an update at least hourly so the moon icon reflects reality.
         for key in self.data: # Only take into account a body which is visible!
-            if self.display( key[ 0 ], key[ 1 ] ) and \
-               ( key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
-                 key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER ):
+            if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+               key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        nextUpdateInSeconds = int( ( nextUpdateTime - utcNow ).total_seconds() )
-        if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update occurs at least hourly so that the icon is relatively up to date with reality!
-            nextUpdateInSeconds = 60 * 60
-
-        return nextUpdateInSeconds
+        return int( ( nextUpdateTime - utcNow ).total_seconds() )
 
 
     def updateMenu( self, menu ):
