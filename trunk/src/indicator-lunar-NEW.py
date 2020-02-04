@@ -192,7 +192,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        self.increment = 0 # Minutes TODO Remove
 
 
     def update( self, menu ):
@@ -230,10 +229,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-#         utcNow = datetime.datetime.utcnow() #TODO Replace
-        utcNow = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.increment )
-        print( utcNow )
-        self.increment += 60 
+        utcNow = datetime.datetime.utcnow()
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -254,7 +250,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites( utcNow )
 
-        return 10 # TODO Replace self.getNextUpdateTimeInSeconds( utcNow )
+        return self.getNextUpdateTimeInSeconds( utcNow )
 
 
     def flushCache( self ):
@@ -303,16 +299,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
-#TODO If the user only shows the moon and sun, the next update time could be 12 hours away.
-# This means the moon icon will be very out of date.
-# Perhaps do a test to see how much the moon changes over time.
-# Hopefully a minimum hourly update will correct for this.
     def getNextUpdateTimeInSeconds( self, startDateTime ):
         utcNow = datetime.datetime.utcnow()
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
         utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1000 ) # Set a bogus date/time in the future.
-        for key in self.data: # Only take into account a body that is visible!
+        for key in self.data: # Only take into account a body which is visible!
             if self.display( key[ 0 ], key[ 1 ] ) and \
                ( key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                  key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -327,7 +319,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        return int( ( nextUpdateTime - utcNow ).total_seconds() )
+        nextUpdateInSeconds = int( ( nextUpdateTime - utcNow ).total_seconds() )
+        if nextUpdateInSeconds > ( 60 * 60 ): # Ensure the update occurs at least hourly so that the icon is relatively up to date with reality!
+            nextUpdateInSeconds = 60 * 60
+
+        return nextUpdateInSeconds
 
 
     def updateMenu( self, menu ):
@@ -375,7 +371,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
         iconFilename = self.writeCacheText( IndicatorLunar.ICON_CACHE_BASENAME, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
-        print( iconFilename ) #TODO Testing
         self.indicator.set_icon_full( iconFilename, "" )
 
 
