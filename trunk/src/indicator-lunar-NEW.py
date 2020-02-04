@@ -299,6 +299,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
+#TODO Some problem with this...
+# Noticed that Mercury was going to set at 20:53 but the next update was scheduled for 21:53 (an hour later).
     def getNextUpdateTimeInSeconds( self, startDateTime ):
         utcNow = datetime.datetime.utcnow()
         durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
