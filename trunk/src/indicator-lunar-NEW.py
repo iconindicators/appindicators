@@ -300,7 +300,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def getNextUpdateTimeInSeconds( self ):
-        nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
+        utcNow = datetime.datetime.utcnow()
+        nextUpdateTime = utcNow + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
         for key in self.data: # Only take into account a body which is visible!
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
