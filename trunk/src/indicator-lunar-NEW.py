@@ -250,7 +250,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites( utcNow )
 
-        return self.getNextUpdateTimeInSeconds( utcNow )
+        return self.getNextUpdateTimeInSeconds()
 
 
     def flushCache( self ):
@@ -299,13 +299,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
-#TODO Some problem with this...
-# Noticed that Mercury was going to set at 20:53 but the next update was scheduled for 21:53 (an hour later).
-    def getNextUpdateTimeInSeconds( self, startDateTime ):
-        utcNow = datetime.datetime.utcnow()
-        durationOfLastRunInSeconds = ( utcNow - startDateTime ).total_seconds()
-        utcNowPlusLastRun = utcNow + datetime.timedelta( seconds = durationOfLastRunInSeconds )
-        nextUpdateTime = utcNow + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
+    def getNextUpdateTimeInSeconds( self ):
+        nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
         for key in self.data: # Only take into account a body which is visible!
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -317,7 +312,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
-                if dateTime > utcNowPlusLastRun and dateTime < nextUpdateTime:
+                if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
         return int( ( nextUpdateTime - utcNow ).total_seconds() )
