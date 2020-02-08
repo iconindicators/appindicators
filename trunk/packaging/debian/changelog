@@ -1,5 +1,12 @@
 indicator-fortune (1.0.30-1) xenial; urgency=low
 
+  * Bug fix: Cache backend generated bad paths with a double slash. 
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 8 Feb 2020 17:41:38 +1000
+
+
+indicator-fortune (1.0.30-1) xenial; urgency=low
+
   * Bug fix: Default fortune would cause a crash on a reset.
   * Bug fix: Dialogs now have a parent specified.
   * Now uses a base class to share functionality amongst indicators.
