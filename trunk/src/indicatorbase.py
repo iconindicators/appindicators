@@ -560,7 +560,7 @@ class IndicatorBase( ABC ):
         cacheDirectory = self.__getCacheDirectory()
         for file in os.listdir( cacheDirectory ):
             if file == fileName:
-                os.remove( cacheDirectory + "/" + file )
+                os.remove( cacheDirectory + file )
 
 
     # Removes out of date cache files.
@@ -582,7 +582,7 @@ class IndicatorBase( ABC ):
                 if dateTime.isdigit():
                     fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
                     if fileDateTime < cacheMaximumAgeDateTime:
-                        os.remove( cacheDirectory + "/" + file )
+                        os.remove( cacheDirectory + file )
 
 
     # Read the most recent binary object from the cache.
@@ -610,7 +610,7 @@ class IndicatorBase( ABC ):
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
-            filename = cacheDirectory + "/" + theFile
+            filename = cacheDirectory + theFile
             try:
                 with open( filename, "rb" ) as f:
                     data = pickle.load( f )
