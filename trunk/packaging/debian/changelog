@@ -1,3 +1,10 @@
+indicator-tide (1.0.20-1) xenial; urgency=low
+
+  * Bug fix: Cache backend generated bad paths with a double slash. 
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 8 Feb 2020 17:40:13 +1000
+
+
 indicator-tide (1.0.19-1) xenial; urgency=low
 
   * On-click URL now takes into account daylight savings.
