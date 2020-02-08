@@ -556,7 +556,7 @@ class IndicatorBase( ABC ):
     #     ${XDGKey}/applicationBaseDirectory/fileName
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
-    def removeFileFromCache( self, fileName ): #TODO Given the fix here, muy need to release fortune/tide as they use this.
+    def removeFileFromCache( self, fileName ):
         cacheDirectory = self.__getCacheDirectory()
         for file in os.listdir( cacheDirectory ):
             if file == fileName:
@@ -573,7 +573,7 @@ class IndicatorBase( ABC ):
     # or
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     # and is older than the cache maximum age is discarded.
-    def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):#TODO Given the fix here, muy need to release fortune/tide as they use this.
+    def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
@@ -601,7 +601,7 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-    def readCacheBinary( self, baseName ):#TODO Given the fix here, muy need to release fortune/tide as they use this.
+    def readCacheBinary( self, baseName ):
         cacheDirectory = self.__getCacheDirectory()
         data = None
         theFile = ""
