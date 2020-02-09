@@ -1,4 +1,4 @@
-indicator-fortune (1.0.30-1) xenial; urgency=low
+indicator-fortune (1.0.31-1) xenial; urgency=low
 
   * Bug fix: Cache backend generated bad paths with a double slash. 
 
