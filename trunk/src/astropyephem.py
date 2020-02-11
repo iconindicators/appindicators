@@ -581,6 +581,7 @@ class AstroPyephem( astrobase.AstroBase ):
             rising = city.next_rising( body )
             setting = city.next_setting( body )
 
+#TODO If we add in all data, then remove the if/else and just combine.
             if rising > setting: # Above the horizon.
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.

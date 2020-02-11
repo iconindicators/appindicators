@@ -591,7 +591,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
-
+#TODO If we compute all data in the backend, then need to make changes here...
+# Hopefully only need to change the test below to be if rise time < set time.
+# If a rise time is present (which menas also a set time is present),
+#    then add in the rise time if rise < set
+#    else add in the set time.
+# Add in the az/alt.
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
             self.createMenuItem( menu, indent + _( "Rise: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), onClickURL )
 

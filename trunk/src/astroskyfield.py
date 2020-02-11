@@ -866,6 +866,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( t0, t1, almanac.risings_and_settings( ephemerisPlanets, body, topos ) )
         if t:
             t = t.utc_datetime()
+#TODO If we add in all data, then remove the if/else and just combine.
             if y[ 0 ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
 
