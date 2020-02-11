@@ -800,6 +800,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
+#TODO This tooltip needs to be fixed.
+# Do we remove a tag if a body is unchecked?
+# Do we remove a tag if a body no longer exists?
+# In the table we show bodies that are unchecked (we show all available bodies),
+# so maybe don't remove a tag for a body which is unchecked (and remove tags for bodies which no longer exist).
+# But instead, let the user know during parsing, if a body has no data, 
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -817,8 +823,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO
-# When parsing the indicator text, need to translate the tags,
-# but also insert the satellite name/intldesig at some point too.
+# When parsing the indicator text for display next to the icon,
+# need to translate the tags and insert the satellite name/intldesig.
 #
 #         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
 #         for key in self.data.keys():
