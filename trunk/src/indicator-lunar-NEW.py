@@ -1249,12 +1249,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return responseType
 
 
-#TODO Satellites now have ':' between name, number and intl desig.
-#Check this doesn't break the double click adding to the indicator text.
-#If a satellite contains a : in the name or anywhere, when converting tags, 
-# find the : from the right since there will be no : in the int desig nor number.
-#
-#TODO If there is no data calcluated for an item (such as a comet or minor planet is not actually checked)
+#TODO If there is no data calculated for an item (such as a comet or minor planet is not actually checked)
 #then why show it?
 #What if we don't show these items until a user checks them.  Then the user has to do a save/update and reopen the preferences.
 #So not sure what to do here.
@@ -1357,6 +1352,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Verify
+#
+#TODO Satellites now have ':' between name, number and intl desig.
+#Check this doesn't break the double click adding to the indicator text.
+#If a satellite contains a : in the name or anywhere, when converting tags, 
+# find the : from the right since there will be no : in the int desig nor number.
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
