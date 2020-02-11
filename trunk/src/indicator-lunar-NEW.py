@@ -953,9 +953,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for starName in astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.keys():
             stars.append( [ starName in self.stars, starName, astrobase.AstroBase.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
-        stars = sorted( stars, key = lambda x: ( x[ 2 ] ) )
         starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
-        for star in stars:
+        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ):
             starStore.append( star )
 
         toolTipText = _( "Check a star to display in the menu." ) + "\n\n" + \
@@ -970,7 +969,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 20 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
-        for comet in self.cometData:
+        for comet in sorted( self.cometData.keys() ):
             cometStore.append( [ comet in self.comets, comet ] )
 
         if self.cometData:
@@ -988,7 +987,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), 1 ), True, True, 0 )
 
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
-        for minorPlanet in self.minorPlanetData:
+        for minorPlanet in sorted( self.minorPlanetData.keys() ):
             minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet ] )
 
         if self.minorPlanetData:
@@ -1254,6 +1253,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #Check this doesn't break the double click adding to the indicator text.
 #If a satellite contains a : in the name or anywhere, when converting tags, 
 # find the : from the right since there will be no : in the int desig nor number.
+#
+#TODO If there is no data calcluated for an item (such as a comet or minor planet is not actually checked)
+#then why show it?
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
