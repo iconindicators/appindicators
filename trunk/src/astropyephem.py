@@ -580,8 +580,32 @@ class AstroPyephem( astrobase.AstroBase ):
             city = AstroPyephem.__getCity( data, ephemNow )
             rising = city.next_rising( body )
             setting = city.next_setting( body )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rising.datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
 
-#TODO If we add in all data, then remove the if/else and just combine.
+            body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
+
+        except ephem.AlwaysUpError:
+            body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
+
+        except ephem.NeverUpError:
+            neverUp = True
+
+        return neverUp
+
+#TODO Remove if not needed.
+    def __calculateCommonORIGINAL( ephemNow, data, body, bodyType, nameTag ):
+        neverUp = False
+        key = ( bodyType, nameTag )
+        try:
+            city = AstroPyephem.__getCity( data, ephemNow )
+            rising = city.next_rising( body )
+            setting = city.next_setting( body )
+
             if rising > setting: # Above the horizon.
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
