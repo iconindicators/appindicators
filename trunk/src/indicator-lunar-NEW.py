@@ -1256,6 +1256,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #
 #TODO If there is no data calcluated for an item (such as a comet or minor planet is not actually checked)
 #then why show it?
+#What if we don't show these items until a user checks them.  Then the user has to do a save/update and reopen the preferences.
+#So not sure what to do here.
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
