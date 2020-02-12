@@ -259,9 +259,8 @@ class AstroBase( ABC ):
     # Maximum magnitude will applies to planets, stars, comets and minor planets.
     #
     # If a body is never up, no data is added.
-    # If a body is always up, azimuth/altitude are added.
-    # If the body is below the horizon, only the rise date/time is added.
-    # If the body is above the horizon, set date/time and azimuth/altitude are added.
+    # If a body is always up, the current azimuth/altitude are added.
+    # If the body will rise/set, the next rise date/time, next set date/time and current azimuth/altitude are added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
     #
