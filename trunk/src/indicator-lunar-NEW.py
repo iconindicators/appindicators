@@ -139,21 +139,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 100000 # TODO Replace 24
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 100000 # TODO Replace 24
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 100000 # TODO Replace 24
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
