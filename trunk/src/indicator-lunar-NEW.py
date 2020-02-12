@@ -316,8 +316,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     nextUpdateTime = dateTime
 
         nextUpdateInSeconds = int( ( nextUpdateTime - datetime.datetime.utcnow() ).total_seconds() )
-        if nextUpdateInSeconds <= 0:
-            nextUpdateInSeconds = 1 # The next update should have already happened, so just set the next update to happen immediately. 
+        if nextUpdateInSeconds <= 60:
+            nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
         return nextUpdateInSeconds 
 
@@ -583,6 +583,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 hip = components[ 0 ]
 
 
+#TODO Need to change this...if a body is below the horizon and we want to hide such objects,
+#the test below does not work!
     def display( self, bodyType, nameTag ):
         return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
                ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
