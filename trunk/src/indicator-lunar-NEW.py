@@ -586,8 +586,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Need to change this...if a body is below the horizon and we want to hide such objects,
 #the test below does not work!
     def display( self, bodyType, nameTag ):
-        return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
-               ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
+        displayBody = False
+        key = ( bodyType, nameTag )
+        if ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Body will rise or set or is 'always up'.
+            displayBody = True
+            if ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data:
+                if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
+                    displayBody = not self.hideBodiesBelowHorizon
+
+        return displayBody
+#         return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
+#                ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
 
 
     def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):

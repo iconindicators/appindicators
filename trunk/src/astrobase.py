@@ -48,7 +48,7 @@ class AstroBase( ABC ):
     DATA_TAG_EQUINOX = "EQUINOX"
     DATA_TAG_FIRST_QUARTER = "FIRST QUARTER"
     DATA_TAG_FULL = "FULL"
-    DATA_TAG_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user.
+    DATA_TAG_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user. #TODO Maybe put this in as not internal?  What about bright limb?
     DATA_TAG_NEW = "NEW"
     DATA_TAG_PHASE = "PHASE"
     DATA_TAG_RISE_AZIMUTH = "RISE AZIMUTH"
