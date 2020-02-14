@@ -238,7 +238,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satellites, self.satelliteData,
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
-            20 )
+            20 )#TODO Put back!
 
         # Update frontend.
         self.updateMenu( menu )
