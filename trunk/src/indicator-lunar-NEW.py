@@ -238,7 +238,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satellites, self.satelliteData,
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
-            self.magnitude )
+            20 )
 
         # Update frontend.
         self.updateMenu( menu )
@@ -583,8 +583,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 hip = components[ 0 ]
 
 
-#TODO Need to change this...if a body is below the horizon and we want to hide such objects,
-#the test below does not work!
+    # Determine if a body should be displayed taking into account:
+    # 
+    #    The user preference for hiding a body if it is below the horizon.
+    #    The astro backend will add in rise/set/az/alt for any body that will rise and set.
+    #    A body which is always up will only have az/alt.
+    #    No data will be present for a body which is never up.
     def display( self, bodyType, nameTag ):
         displayBody = False
         key = ( bodyType, nameTag )
@@ -595,10 +599,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     displayBody = not self.hideBodiesBelowHorizon
 
         return displayBody
-#         return ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_ALTITUDE ) in self.data or \
-#                ( ( bodyType, nameTag, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data and not self.hideBodiesBelowHorizon )
 
 
+#TODO Cannot see any minor planets that are to rise.
     def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
