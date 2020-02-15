@@ -568,6 +568,11 @@ class AstroPyephem( astrobase.AstroBase ):
                 if not bad and body.mag <= magnitudeMaximum:
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
+                    #TODO Testing
+                    if ( bodyType, key, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in data:
+                        if data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) ] < data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_SET_DATE_TIME ) ]:
+                            print( key )
+
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
     #
