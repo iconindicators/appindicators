@@ -568,11 +568,6 @@ class AstroPyephem( astrobase.AstroBase ):
                 if not bad and body.mag <= magnitudeMaximum:
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
-                    #TODO Testing
-                    if ( bodyType, key, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) in data:
-                        if data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) ] < data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_SET_DATE_TIME ) ]:
-                            print( key )
-
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
     #
@@ -589,34 +584,6 @@ class AstroPyephem( astrobase.AstroBase ):
             body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
-
-        except ephem.AlwaysUpError:
-            body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
-
-        except ephem.NeverUpError:
-            neverUp = True
-
-        return neverUp
-
-#TODO Remove if not needed.
-    def __calculateCommonORIGINAL( ephemNow, data, body, bodyType, nameTag ):
-        neverUp = False
-        key = ( bodyType, nameTag )
-        try:
-            city = AstroPyephem.__getCity( data, ephemNow )
-            rising = city.next_rising( body )
-            setting = city.next_setting( body )
-
-            if rising > setting: # Above the horizon.
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setting.datetime() )
-                body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
-
-            else: # Below the horizon.
-                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rising.datetime() )
 
         except ephem.AlwaysUpError:
             body.compute( AstroPyephem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.

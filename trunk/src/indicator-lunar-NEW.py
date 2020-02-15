@@ -585,10 +585,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Determine if a body should be displayed taking into account:
     # 
-    #    The user preference for hiding a body if it is below the horizon.
-    #    The astro backend will add in rise/set/az/alt for any body that will rise and set.
-    #    A body which is always up will only have az/alt.
-    #    No data will be present for a body which is never up.
+    #    The user preference for hiding a body if the body is below the horizon.
+    #    The astro backend behaviour:
+    #        The rise/set/az/alt is present for a body which will rise and set.
+    #        The az/alt is present for a body which is always up.
+    #        No data will be present for a body which is never up.
     def display( self, bodyType, nameTag ):
         displayBody = False
         key = ( bodyType, nameTag )
@@ -601,16 +602,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return displayBody
 
 
-#TODO Cannot see any minor planets that are to rise.
     def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
-#TODO If we compute all data in the backend, then need to make changes here...
-# Hopefully only need to change the test below to be if rise time < set time.
-# If a rise time is present (which menas also a set time is present),
-#    then add in the rise time if rise < set
-#    else add in the set time.
-# Add in the az/alt.
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
             if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
                 self.createMenuItem( menu, indent + _( "Rise: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), onClickURL )
@@ -621,21 +615,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
 
         else: # Body is always up.
-            self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), onClickURL )
-            self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
-
-
-#TODO Remove if not used.
-    def updateCommonMenuORIGINAL( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
-        key = ( bodyType, nameTag )
-        indent = self.indent( indentUnity, indentGnomeShell )
-        if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
-            self.createMenuItem( menu, indent + _( "Rise: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), onClickURL )
-
-        else:
-            if key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) in self.data:
-                self.createMenuItem( menu, indent + _( "Set: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), onClickURL )
-
             self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), onClickURL )
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
 
@@ -1598,7 +1577,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
 
         self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 3 ) # Although a value of 6 is visible with the naked eye, that gives too many minor planets initially.
-        self.magnitude = 20 #TODO Testing
 
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astrobase.AstroBase.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
 

@@ -866,15 +866,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( t0, t1, almanac.risings_and_settings( ephemerisPlanets, body, topos ) )
         if t:
             t = t.utc_datetime()
-#TODO If we add in all data, then remove the if/else and just combine.
-            if y[ 0 ]:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
-
-            else:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
-                alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t0 ).observe( body ).apparent().altaz()
-                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+            alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t0 ).observe( body ).apparent().altaz()
+            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
             if almanac.risings_and_settings( ephemerisPlanets, body, topos )( t0 ): # Body is up (and so always up).
