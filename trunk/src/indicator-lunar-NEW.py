@@ -1675,7 +1675,4 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         }
 
 
-#TODO For testing...
-# import os; os.remove( "/home/bernard/.config/indicator-lunar/indicator-lunar.json" )
-
 IndicatorLunar().main()
