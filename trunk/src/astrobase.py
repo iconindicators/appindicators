@@ -40,7 +40,7 @@ class AstroBase( ABC ):
     # Data tags representing each of the pieces of calculated astronomical information.
     DATA_TAG_ALTITUDE = "ALTITUDE"
     DATA_TAG_AZIMUTH = "AZIMUTH"
-    DATA_TAG_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon; not intended for display to the user.
+    DATA_TAG_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon.
     DATA_TAG_ECLIPSE_DATE_TIME = "ECLIPSE DATE TIME"
     DATA_TAG_ECLIPSE_LATITUDE = "ECLIPSE LATITUDE"
     DATA_TAG_ECLIPSE_LONGITUDE = "ECLIPSE LONGITUDE"
@@ -48,19 +48,15 @@ class AstroBase( ABC ):
     DATA_TAG_EQUINOX = "EQUINOX"
     DATA_TAG_FIRST_QUARTER = "FIRST QUARTER"
     DATA_TAG_FULL = "FULL"
-    DATA_TAG_ILLUMINATION = "ILLUMINATION" # Used for creating an icon; not intended for display to the user. #TODO Maybe put this in as not internal?  What about bright limb?
+    DATA_TAG_ILLUMINATION = "ILLUMINATION" # Used for creating an icon.
     DATA_TAG_NEW = "NEW"
-    DATA_TAG_PHASE = "PHASE"
+    DATA_TAG_PHASE = "PHASE" # Used for creating an icon.
     DATA_TAG_RISE_AZIMUTH = "RISE AZIMUTH"
     DATA_TAG_RISE_DATE_TIME = "RISE DATE TIME"
     DATA_TAG_SET_AZIMUTH = "SET AZIMUTH"
     DATA_TAG_SET_DATE_TIME = "SET DATE TIME"
     DATA_TAG_SOLSTICE = "SOLSTICE"
     DATA_TAG_THIRD_QUARTER = "THIRD QUARTER"
-
-    DATA_TAGS_INTERNAL = [
-        DATA_TAG_BRIGHT_LIMB,
-        DATA_TAG_ILLUMINATION ]
 
     DATA_TAGS_COMET = [
         DATA_TAG_ALTITUDE,
@@ -77,12 +73,14 @@ class AstroBase( ABC ):
     DATA_TAGS_MOON = [
         DATA_TAG_ALTITUDE,
         DATA_TAG_AZIMUTH,
+        DATA_TAG_BRIGHT_LIMB,
         DATA_TAG_ECLIPSE_DATE_TIME,
         DATA_TAG_ECLIPSE_LATITUDE,
         DATA_TAG_ECLIPSE_LONGITUDE,
         DATA_TAG_ECLIPSE_TYPE,
         DATA_TAG_FIRST_QUARTER,
         DATA_TAG_FULL,
+        DATA_TAG_ILLUMINATION,
         DATA_TAG_NEW,
         DATA_TAG_PHASE,
         DATA_TAG_RISE_DATE_TIME,
@@ -123,12 +121,14 @@ class AstroBase( ABC ):
     DATA_TAGS_TRANSLATIONS = {
         DATA_TAG_ALTITUDE          : _( "ALTITUDE" ),
         DATA_TAG_AZIMUTH           : _( "AZIMUTH" ),
+        DATA_TAG_BRIGHT_LIMB       : _( "BRIGHT LIMB" ),
         DATA_TAG_ECLIPSE_DATE_TIME : _( "ECLIPSE DATE TIME" ),
         DATA_TAG_ECLIPSE_LATITUDE  : _( "ECLIPSE LATITUDE" ),
         DATA_TAG_ECLIPSE_LONGITUDE : _( "ECLIPSE LONGITUDE" ),
         DATA_TAG_ECLIPSE_TYPE      : _( "ECLIPSE TYPE" ),
         DATA_TAG_EQUINOX           : _( "EQUINOX" ),
         DATA_TAG_FIRST_QUARTER     : _( "FIRST QUARTER" ),
+        DATA_TAG_ILLUMINATION      : _( "ILLUMINATION" ),
         DATA_TAG_FULL              : _( "FULL" ),
         DATA_TAG_NEW               : _( "NEW" ),
         DATA_TAG_PHASE             : _( "PHASE" ),

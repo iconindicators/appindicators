@@ -700,6 +700,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
            key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
 
+        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB:
+            displayData = str( int( float( self.data[ key ] ) ) ) + "°"
+
         elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
              key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
              key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
@@ -747,12 +750,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
                 displayData = _( "Total" )
 
+        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ILLUMINATION:
+            displayData = self.data[ key ] + "%"
+
         elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_PHASE:
             displayData = astrobase.AstroBase.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
 
         if displayData is None:
             displayData = "" # Better to show nothing than let None slip through and crash.
-            self.getLogging().error( "Unknown key: " + key )
+            self.getLogging().error( "Unknown key: " + str( key ) )
 
         return displayData
 
