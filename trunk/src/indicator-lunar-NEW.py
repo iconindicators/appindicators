@@ -339,18 +339,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuSatellites( menu )
 
 
-#TODO Verify
 ##TODO When extracting a tag, say MOON PHASE, it is easy to know this pertains to the moon.
 # But what if an item has two or more words for the name OR two or more words for the attribute.
 # How to tell name from attribute and then to select the correct astro body type?
+# Need to find an example of this and check this is actually a problem.
     def updateIconAndLabel( self ):
         # Substitute tags for values.
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) ) #TODO What if a tag is a satellite rise/set?  This is a different date/time format.
-
-#TODO For satellites, tags will contain both the name and number...so ensure satellites work!
 
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
@@ -649,6 +647,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
+#TODO Need to modify to handle all satellite data being provided (rise/set/az/alt),
+#and handle either showing just the rise time for a satellite more than 5 minutes away versus
+# showing rise/set/az/alt for a satellite in transit or less than 5 minutes from rising.
     def __updateMenuSatellites( self, menu, label, satellites ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
@@ -1352,10 +1353,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #
 #TODO Find all callers of this function and verify!
     def translateTags( self, tagsListStore, originalToLocal, text ):
-        # The tags store contains at least 2 columns (additional columns are ignored).
+        # The tags list store contains at least 2 columns; additional columns may exist,
+        # depending on the tags list store provided by the caller, but are ignored.
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
-        # Depending on the direction the translation, one of the columns contains the source tags to match.
         if originalToLocal:
             i = 0
             j = 1
