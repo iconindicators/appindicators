@@ -628,6 +628,9 @@ class AstroPyephem( astrobase.AstroBase ):
                                     continue
 
                             # Satellite is yet to rise or is in transit...
+#TODO All other body types show the full rise/set/az/alt...
+#...maybe do this with satellites too, allowing the user to show the rise time without it dropping out.
+#This means the frontend has to handle how to display data (either show the upcoming rise time or show everything).
                             if nextPass[ 0 ] < ( ephem.Date( ephemNow + ephem.minute * 5 ) ): # Satellite is about to rise or in transit, so show all information.
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
                                 data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
