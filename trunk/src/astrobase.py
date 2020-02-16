@@ -258,6 +258,7 @@ class AstroBase( ABC ):
     # Elevation is a floating point number representing metres above sea level.
     # Maximum magnitude will applies to planets, stars, comets and minor planets.
     #
+#TODO Need to add another comment about satellites.
     # If a body is never up, no data is added.
     # If a body is always up, the current azimuth/altitude are added.
     # If the body will rise/set, the next rise date/time, next set date/time and current azimuth/altitude are added.
