@@ -654,6 +654,39 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
+        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 )
+        for number, name, riseDateTime in satellites:
+            url = IndicatorLunar.SEARCH_URL_SATELLITE + number
+            menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
+            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite will rise or is in transit.
+
+                if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ), url )
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ), url )
+
+                else:
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
+                
+            else: # Polar (always up).
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), url )
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), url )
+
+            separator = Gtk.SeparatorMenuItem()
+            subMenu.append( separator )
+
+        subMenu.remove( separator )
+
+
+#TODO Probably no longer needed.
+    def __updateMenuSatellitesORIGINAL( self, menu, label, satellites ):
+        menuItem = self.createMenuItem( menu, label )
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
         for number, name, riseDateTime in satellites:
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
