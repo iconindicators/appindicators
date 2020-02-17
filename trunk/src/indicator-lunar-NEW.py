@@ -339,16 +339,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuSatellites( menu )
 
 
-##TODO When extracting a tag, say MOON PHASE, it is easy to know this pertains to the moon.
-# But what if an item has two or more words for the name OR two or more words for the attribute.
-# How to tell name from attribute and then to select the correct astro body type?
-# Need to find an example of this and check this is actually a problem.
     def updateIconAndLabel( self ):
         # Substitute tags for values.
         parsedOutput = self.indicatorText
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
-                parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) ) #TODO What if a tag is a satellite rise/set?  This is a different date/time format.
+                parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
