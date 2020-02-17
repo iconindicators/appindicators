@@ -50,6 +50,8 @@
 # from datetime import timedelta
 # import gettext
 # gettext.install( "astroskyfield" )
+#TODO Can the above be put into each of the functions rather than here?
+
 
 from skyfield import almanac
 from skyfield.api import load, Star, Topos
