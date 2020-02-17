@@ -823,8 +823,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "Tags will be removed at render time\n" + \
-            "if no value for the tag exists." ) )
+            "Tags will be removed at render time if\n" + \
+            "no value for the tag exists." ) )
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
