@@ -20,6 +20,9 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Contains astroskyfield.py in build-debian.  Remove before release!
+
+
 #TODO Indicator Lunar version 1037...before major overhaul!
 
 
