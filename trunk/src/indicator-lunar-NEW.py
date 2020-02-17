@@ -71,6 +71,11 @@
 # Is there a problems switching back/forth between backends?
 # When reading in the stars/planets/whatever, do we need to check if they exist in the backend?
 # How to do this check?
+#
+# Get the list of stars from pyephem on Ubuntu 19.10 and add to the list in astropyephem.
+# Then run on Ubuntu 18.04...is there a problem?
+#
+# What about choosing stars in pyephem but not in skyfield, and vice versa?
 
 
 INDICATOR_NAME = "indicator-lunar"
