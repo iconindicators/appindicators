@@ -23,31 +23,7 @@
 #TODO Indicator Lunar version 1037...before major overhaul!
 
 
-#TODO Need to test with a lat/long such that bodies rise/set, always up and never up.
-
-
-#TODO If the menu build takes too long, perhaps add in the following to each of the top level menu items (moon, sun, planets, etc):
-#
-#    menuitem.connect( "activate", self.buildSubMenu, menuItem )
-#
-#    def buildSubMenu( self, widget, menuItem ): ...build the submenu.
-#
-# This might work and will speed up initial menu build, but may take too long to build the submenu.
-# Needs testing and thinking.  Only do this if the menu build currently takes way too long.
-
-
-#TODO This happens in stardate...fix here too.
-# Lubuntu 18.04 - indicator runs and label displays.
-# Lubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
-# Xubuntu 18.04 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
-# Xubuntu 19.10 - indicator runs, but no label.  Workaround is to use set_title and that creates a tooltip.
-# in regards to actually running and whether the label appears (and if not, add a menu item).
-#
-# Don't want to have an option if possible to add the menu item; rather add automagically.
-#     https://askubuntu.com/questions/452182/is-it-possible-to-know-which-recognized-flavor-i-am-running-using-terminal
-#     https://unix.stackexchange.com/questions/116539/how-to-detect-the-desktop-environment-in-a-bash-script
-#     https://www.howtogeek.com/351361/how-to-check-which-version-of-ubuntu-you-have-installed/
-#     https://itsfoss.com/how-to-know-ubuntu-unity-version/
+#TODO Test with a lat/long such that bodies rise/set, always up and never up.
 
 
 #TODO Update screen shot
@@ -63,19 +39,6 @@
 # When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
 # What to do?  If a user has checked specific items, then losing those because no data is available is not good.
 # In this case the update function will/should return { }.
-
-
-#TODO Pyephem will be a different version on Ubuntu 19.10+ and so has more stars than the version on Ubuntu 18.04.
-# Is this somehow a problem?
-# This is somewhat related to running first with astropyephem and then astroskyfield.
-# Is there a problems switching back/forth between backends?
-# When reading in the stars/planets/whatever, do we need to check if they exist in the backend?
-# How to do this check?
-#
-# Get the list of stars from pyephem on Ubuntu 19.10 and add to the list in astropyephem.
-# Then run on Ubuntu 18.04...is there a problem?
-#
-# What about choosing stars in pyephem but not in skyfield, and vice versa?
 
 
 INDICATOR_NAME = "indicator-lunar"
