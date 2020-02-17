@@ -1,6 +1,7 @@
 indicator-lunar.py.desktop usr/share/applications
 src/astrobase.py usr/share/indicator-lunar
 src/astropyephem.py usr/share/indicator-lunar
+src/astroskyfield.py usr/share/indicator-lunar
 src/eclipse.py usr/share/indicator-lunar
 src/indicatorbase.py usr/share/indicator-lunar
 src/indicator-lunar.py usr/share/indicator-lunar
