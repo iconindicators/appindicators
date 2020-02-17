@@ -823,18 +823,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
-#TODO This tooltip needs to be fixed.
-# Do we remove a tag if a body is unchecked?
-# Do we remove a tag if a body no longer exists?
-# In the table we show bodies that are unchecked (we show all available bodies),
-# so maybe don't remove a tag for a body which is unchecked (and remove tags for bodies which no longer exist).
-# But instead, let the user know during parsing, if a body has no data, 
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "If a body is unchecked or no longer exists\n" + \
-            "such as a comet/satellite not on the list,\n" + \
-            "the tag will be automatically removed." ) )
+            "Tags will be removed at render time\n" + \
+            "if no value for the tag exists." ) )
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -844,36 +837,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialiseDisplayTagsStore( displayTagsStore )
 
-
-#TODO
-# When parsing the indicator text for display next to the icon,
-# need to translate the tags and insert the satellite name/intldesig.
-#
-#         tags = re.split( "(\[[^\[^\]]+\])", self.indicatorText )
-#         for key in self.data.keys():
-#             if key[ 2 ] not in IndicatorLunar.astrobackend.DATA_INTERNAL:
-#TODO Need to handle satellite tags...
-#When to remove the satellite name from the tag?  Here or at render time or when?
-#                 tag = "[" + key[ 1 ] + " " + key[ 2 ] + "]"
-#                 if tag in tags:
-#                     i = tags.index( tag )
-#                     tags[ i ] = ""
-
-#TODO What is happening here?
-# Are we stripping tags from the indicator text which no longer appear in the table?
-# Maybe just leave the tags there and the user can manually remove after they see displayed?  Ask Oleg.
-# Tried the text [DEF][MOON PHASE][ABC] and commented out the code below and the ABC/DEF tags did not appear in the final label.  Why?
-#Maybe show the tags in the preferences always, but drop them when rendering?
-#Before making changes consider what happens if we leave unknown tags here, but then at render time is that an issue?
-#Not sure what to do now...
-# Leave tags in here, but what if a user has added in there own tags...can they do that?
-#         unknownTags = [ ]
-#         for tag in tags:
-#             if re.match( "\[[^\[^\]]+\]", tag ) is not None:
-#                 self.indicatorText = self.indicatorText.replace( tag, "" )
-
-#TODO Assuming any satellite tags will only contain the satellite number (not name and intl desig)
-# need to pre-process the indicator text to insert the satellite name and intl desig.
         indicatorText.set_text( self.translateTags( displayTagsStore, True, self.indicatorText ) ) # Translate tags into local language.
 
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
@@ -893,10 +856,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         tree.set_tooltip_text( _(
             "Double click to add a tag to the icon text.\n\n" + \
-            "A tag with no value arises if a body is dropped\n" + \
-            "due to exceeding magnitude, or below the horizon\n" + \
-            "(no set date/time and no azimuth/altitude),\n" + \
-            "or above the horizon (no rise date/time)." ) )
+            "A tag will have no value when the body is\n" + \
+            "dropped (exceeds magnitude), when the body\n" + \
+            "is below the horizon (no set date/time and\n" + \
+            "no azimuth/altitude), or the body is above\n" + \
+            "the horizon (no rise date/time)." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
@@ -1220,13 +1184,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 elevation.grab_focus()
                 continue
 
-#TODO Need a function that finds tags for satellites and then removes the name and int desig.
-#Or can/should this be all done within the translate tags function (have a special clause for satellites)?
-#
-#TODO Satellites now have ':' between name, number and intl desig.
-#Check this doesn't break the double click adding to the indicator text.
-#If a satellite contains a : in the name or anywhere, when converting tags, 
-# find the : from the right since there will be no : in the int desig nor number.
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
@@ -1348,10 +1305,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
-#TODO Given that the translated satellite tags contain the satellite name and intl desig,
-# do we handle the name and intl desig here or externally?
-#
-#TODO Find all callers of this function and verify!
     def translateTags( self, tagsListStore, originalToLocal, text ):
         # The tags list store contains at least 2 columns; additional columns may exist,
         # depending on the tags list store provided by the caller, but are ignored.
