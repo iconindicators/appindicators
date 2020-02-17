@@ -1521,8 +1521,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Start of temporary hack...
 # Convert lat/long from str to float.
 # Convert planet/star to upper case.
-# Convert satellites from list of lists of tuple of satellite name and satellite number to list of satellite numbers.
-# Remove this hack in release 82 or later.
+# Convert satellites from list of lists of tuple ( satellite name, satellite number ) to list of satellite numbers.
+# Remove this hack in release 82.
         self.latitude = float( self.latitude )
         self.longitude = float( self.longitude )
 
