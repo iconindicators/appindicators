@@ -65,10 +65,6 @@
 # In this case the update function will/should return { }.
 
 
-#TODO Given we now use an Enum for bodytype, Moon becomes MOON.
-#So may need a hack for this release to read in user icon text and fix any body tags present.
-
-
 #TODO Pyephem will be a different version on Ubuntu 19.10+ and so has more stars than the version on Ubuntu 18.04.
 # Is this somehow a problem?
 # This is somewhat related to running first with astropyephem and then astroskyfield.
