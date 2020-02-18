@@ -258,14 +258,15 @@ class AstroBase( ABC ):
     # Elevation is a floating point number representing metres above sea level.
     # Maximum magnitude will applies to planets, stars, comets and minor planets.
     #
-#TODO Need to add another comment about satellites.
     # If a body is never up, no data is added.
     # If a body is always up, the current azimuth/altitude are added.
     # If the body will rise/set, the next rise date/time, next set date/time and current azimuth/altitude are added.
+    # For satellites, a satellite which is yet to rise or in transit will have the rise and set date/time and azimuth/altitude.
+    # For a polar satellite, only the azimuth/altitude  is added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
     #
-    # Results can be verified using Verify results: https://ssd.jpl.nasa.gov/horizons.cgi
+    # Results can be verified using https://ssd.jpl.nasa.gov/horizons.cgi
     @staticmethod
     @abstractmethod
     def calculate( utcNow,
