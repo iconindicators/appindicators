@@ -764,7 +764,12 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def isAvailable(): return available
+    def getAvailabilityMessage(): 
+        message = None
+        if not available:
+            return _( "" ) #TODO Need message for missing skyfield.
+
+        return message
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp

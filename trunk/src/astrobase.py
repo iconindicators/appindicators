@@ -309,10 +309,10 @@ class AstroBase( ABC ):
     def getCredit(): return ""
 
 
-    # Returns True if the backend (and required third party libraries) are available; False otherwise.
+    # Returns None if the backend (and required third party libraries) is available; an error message otherwise.
     @staticmethod
     @abstractmethod
-    def isAvailable(): return True
+    def getAvailabilityMessage(): return None
 
 
     # Get the lunar phase for the given date/time and illumination percentage.

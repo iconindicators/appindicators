@@ -161,8 +161,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
 #TODO Need a description of what the specific problem is...
-        if not IndicatorLunar.astrobackend.isAvailable(): 
-            Notify.Notification.new( _( "Missing library" ), _( "Could not locate "  ), IndicatorLunar.ICON_FULL_MOON ).show()
+#TODO Maybe instead do this at the import point (in the exception)...can we then show a dialog?
+        if IndicatorLunar.astrobackend.getAvailabilityMessage() is not None:
+            dialog = Gtk.MessageDialog( None, Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, IndicatorLunar.astrobackend.getAvailabilityMessage() )
+#         if title is None:
+#             dialog.set_title( self.indicatorName )
+#         else:
+#             dialog.set_title( title )
+
+            dialog.run()
+            dialog.destroy()
+             
+#             Notify.Notification.new( _( "Missing library" ), _( "Could not locate "  ), IndicatorLunar.ICON_FULL_MOON ).show()
+#             self.showMessage( self, None, "message" )
             import sys
             sys.exit()
 
