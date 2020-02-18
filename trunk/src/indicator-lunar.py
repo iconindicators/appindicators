@@ -63,8 +63,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allowing switching between alternate backends (eventually looking to move to Skyfield).
     astrobackendPyephem = "AstroPyephem"
     astrobackendSkyfield = "AstroSkyfield"
-    astrobackend = getattr( __import__( astrobackendPyephem.lower() ), astrobackendPyephem )
-
+    astrobackend = getattr( __import__( astrobackendSkyfield.lower() ), astrobackendSkyfield )
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -160,6 +159,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+
+#TODO Need a description of what the specific problem is...
+        if not IndicatorLunar.astrobackend.isAvailable(): 
+            Notify.Notification.new( _( "Missing library" ), _( "Could not locate "  ), IndicatorLunar.ICON_FULL_MOON ).show()
+            import sys
+            sys.exit()
 
 
     def update( self, menu ):

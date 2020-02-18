@@ -19,9 +19,15 @@
 # Calculate astronomical information using PyEphem.
 
 
-from ephem.cities import _city_data
+try:
+    from ephem.cities import _city_data
+    import ephem
+    available = True
 
-import astrobase, ephem, locale, math, orbitalelement, twolineelement
+except ImportError:
+    available = False
+
+import astrobase, locale, math, orbitalelement, twolineelement
 
 
 class AstroPyephem( astrobase.AstroBase ):
@@ -482,6 +488,10 @@ class AstroPyephem( astrobase.AstroBase ):
 
     @staticmethod
     def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem" )
+
+
+    @staticmethod
+    def isAvailable(): return available
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp

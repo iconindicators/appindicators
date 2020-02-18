@@ -44,16 +44,29 @@
 # Install (and upgrade to) latest skyfield:
 #     sudo apt-get install python3-pip
 #     sudo pip3 install --upgrade pandas pytz skyfield
+#
+# Maybe also check at runtime if Skyfield is installed:
+# try:
+#     import mymodule
+# except ImportError as e:
+#     pass  # module doesn't exist, deal with it.
 
 
-# Uncomment the lines below when needing to run the planet/star ephemeris creation functions at the end.
+#TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
+
+
+# Uncomment the lines below to run the planet/star ephemeris creation functions at the end.
 # import gettext
 # gettext.install( "astroskyfield" )
 
+try:
+    from skyfield import almanac
+    from skyfield.api import load, Star, Topos
+    from skyfield.data import hipparcos
+    available = True
 
-from skyfield import almanac
-from skyfield.api import load, Star, Topos
-from skyfield.data import hipparcos
+except ImportError:
+    available = False
 
 import astrobase, datetime, gzip, locale, os, orbitalelement, subprocess, twolineelement
 
@@ -748,6 +761,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def getCredit(): return _( "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield" )
+
+
+    @staticmethod
+    def isAvailable(): return available
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
