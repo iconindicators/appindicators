@@ -830,7 +830,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 #     https://github.com/skyfielders/python-skyfield/issues/39
 #     https://github.com/skyfielders/python-skyfield/pull/40
 # Skyfield might support star names out of the box.
-# Does this conflict with the list from named_stars.py currently in play?
     # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
     def __calculateStars( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
