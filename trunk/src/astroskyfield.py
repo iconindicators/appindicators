@@ -47,10 +47,8 @@
 
 
 # Uncomment the lines below when needing to run the planet/star ephemeris creation functions at the end.
-# from datetime import timedelta
 # import gettext
 # gettext.install( "astroskyfield" )
-#TODO Can the above be put into each of the functions rather than here?
 
 
 from skyfield import almanac
@@ -943,7 +941,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 if hip in hipparcosIdentifiers:
                     outFile.write( line )
 
-        print( "Created", outFile )
+        print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
 
 
     # Create the planet ephemeris from online source.
@@ -952,18 +950,20 @@ class AstroSkyfield( astrobase.AstroBase ):
     # The ephemeris will last from the date of creation to one year ahead.
     @staticmethod
     def createPlanetEphemeris():
+        if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
+            os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
+
         today = datetime.date.today()
         dateFormat = "%Y/%m/%d"
         firstOfThisMonth = datetime.date( today.year, today.month, 1 ).strftime( dateFormat )
         oneYearFromNow = ( datetime.date( today.year + 1, today.month, 1 ) + datetime.timedelta( days = 31 )  ).strftime( dateFormat )
         planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
-        outputEphemeris = "planets.bsp"
-        command = "python3 -m jplephem excerpt " + firstOfThisMonth + " " + oneYearFromNow + " " + planetEphemeris + " " + outputEphemeris
+        command = "python3 -m jplephem excerpt " + firstOfThisMonth + " " + oneYearFromNow + " " + planetEphemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
             print( "Creating planet ephemeris..." )
             subprocess.call( command, shell = True )
-            print( "Created", outputEphemeris ) #TODO This prints even if an error/exception occurs...
+            print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS ) #TODO This prints even if an error/exception occurs...
 
         except subprocess.CalledProcessError as e:
             print( e )
