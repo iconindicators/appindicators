@@ -283,6 +283,7 @@ class IndicatorBase( ABC ):
         dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
         if title is None:
             dialog.set_title( self.indicatorName )
+
         else:
             dialog.set_title( title )
 
@@ -305,6 +306,7 @@ class IndicatorBase( ABC ):
 
         if title is None:
             dialog.set_title( self.indicatorName )
+
         else:
             dialog.set_title( title )
 
