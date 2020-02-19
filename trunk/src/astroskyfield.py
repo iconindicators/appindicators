@@ -19,15 +19,6 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO Might need to cache deltat.data and deltat.preds as the backend website was down
-# and I couldn't get them except at a backup site.
-# What other files are downloaded?
-# Need to also grab: https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat
-# Be careful...this file expires!
-# Seems skyfield has changed the way data is loaded with a tag to say not to do a download (use old file).
-# There is a ticket about this...but cannot find it right now.  Seems an API call somewhere/somehow turns caching on/off.
-
-
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
 
 
@@ -696,7 +687,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                    magnitudeMaximum ):
 
         data = { }
-        timeScale = load.timescale()
+        timeScale = load.timescale( builtin = True )
         topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
 
@@ -744,7 +735,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         message = None
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install skyfield pandas" ) #TODO Need pytz?
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade skyfield pandas" ) #TODO Need pytz?
 
         return message
 
