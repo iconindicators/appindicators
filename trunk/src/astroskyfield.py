@@ -821,6 +821,12 @@ class AstroSkyfield( astrobase.AstroBase ):
 #     https://github.com/skyfielders/python-skyfield/pull/40
 # Skyfield might support star names out of the box.
     # http://aa.usno.navy.mil/data/docs/mrst.php
+#     http://www.skyandtelescope.com/astronomy-resources/how-many-stars-night-sky-09172014/
+#     http://astronomy.stackexchange.com/questions/13488/where-can-i-find-visualize-planets-stars-moons-etc-positions
+#     http://astronomy.stackexchange.com/questions/14119/open-access-table-of-visible-stars-with-magnitude-coordinates-and-possibly-col
+#     http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
+#     http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
+#     http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm
     @staticmethod
     def __calculateStars( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
         for star in stars:
@@ -940,8 +946,14 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     # Create the planet ephemeris from online source.
     #     https://github.com/skyfielders/python-skyfield/issues/123
+    #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
+    #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
     #
     # The ephemeris will last from the date of creation to one year ahead.
+    #
+    # Prior to jplephem being released, download a .bsp and use spkmerge to create a smaller subset.
+    # Refer to https://github.com/skyfielders/python-skyfield/issues/123
+    # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createPlanetEphemeris():
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
