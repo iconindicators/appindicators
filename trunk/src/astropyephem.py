@@ -494,7 +494,8 @@ class AstroPyephem( astrobase.AstroBase ):
     def getAvailabilityMessage(): 
         message = None
         if not available:
-            message = _( "PyEphem could not be found.\nPlease install using 'apt'." )
+            message = _( "PyEphem could not be found. Install using:\n\n" + \
+                         "sudo apt-get install -y python3-ephem" )
 
         return message
 

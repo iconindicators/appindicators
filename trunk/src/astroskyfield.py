@@ -767,7 +767,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     def getAvailabilityMessage(): 
         message = None
         if not available:
-            message = _( "Skyfield could not be found.\nPlease install using 'pip3'." )
+            message = _( "Skyfield could not be found. Install using:\n\n" + \
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install skyfield pandas" ) #TODO Need pytz?
 
         return message
 
@@ -884,10 +885,16 @@ class AstroSkyfield( astrobase.AstroBase ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 2 )
         t, y = almanac.find_discrete( t0, t1, almanac.risings_and_settings( ephemerisPlanets, body, topos ) )
-        if t:
+        if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
-            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+            if y[ 0 ]:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+
+            else:
+                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+
             alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t0 ).observe( body ).apparent().altaz()
             data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )

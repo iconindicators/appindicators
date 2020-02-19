@@ -72,6 +72,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         dialog.destroy()
         sys.exit()
 
+
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
