@@ -949,16 +949,19 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         today = datetime.date.today()
         dateFormat = "%Y/%m/%d"
-        firstOfThisMonth = datetime.date( today.year, today.month, 1 ).strftime( dateFormat )
-        oneYearFromNow = ( datetime.date( today.year + 1, today.month, 1 ) + datetime.timedelta( days = 31 )  ).strftime( dateFormat )
+        firstOfThisMonth = datetime.date( today.year, today.month, today.day )
+        oneYearFromNow = firstOfThisMonth.replace( year = today.year + 1 )
         planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
-        command = "python3 -m jplephem excerpt " + firstOfThisMonth + " " + oneYearFromNow + " " + planetEphemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
+        command = "python3 -m jplephem excerpt " + \
+                  firstOfThisMonth.strftime( dateFormat ) + " " + \
+                  oneYearFromNow.strftime( dateFormat ) + " " + \
+                  planetEphemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
             print( "Creating planet ephemeris..." )
             subprocess.call( command, shell = True )
             print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS ) #TODO This prints even if an error/exception occurs...
-
+ 
         except subprocess.CalledProcessError as e:
             print( e )
 
