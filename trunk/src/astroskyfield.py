@@ -767,7 +767,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     def getAvailabilityMessage(): 
         message = None
         if not available:
-            return _( "" ) #TODO Need message for missing skyfield.
+            message = _( "Skyfield could not be found.\nPlease install using 'pip3'." )
 
         return message
 
