@@ -55,14 +55,14 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gtk, Notify
 
-import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement, re, twolineelement, webbrowser
+import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement, re, sys, twolineelement, webbrowser
 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allowing switching between alternate backends (eventually looking to move to Skyfield).
-    astrobackend = getattr( __import__( astrobackendPyephem.lower() ), astrobackendPyephem )
-#     astrobackend = getattr( __import__( astrobackendSkyfield.lower() ), astrobackendSkyfield )
+    # Allow switching between alternate backends.
+    astrobackend = getattr( __import__( "AstroPyephem".lower() ), "AstroPyephem" )
+#     astrobackend = getattr( __import__( "AstroSkyfield".lower() ), "AstroSkyfield" )
 
 #TODO How to avoid the message "GtkDialog mapped without a transient parent."?
     if astrobackend.getAvailabilityMessage() is not None:
@@ -70,7 +70,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         dialog.set_title( INDICATOR_NAME )
         dialog.run()
         dialog.destroy()
-        import sys
         sys.exit()
 
     CONFIG_CITY_ELEVATION = "cityElevation"
