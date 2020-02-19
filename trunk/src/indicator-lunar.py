@@ -20,9 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Indicator Lunar version 1037...before major overhaul!
-
-
 #TODO Test with a lat/long such that bodies rise/set, always up and never up.
 
 
