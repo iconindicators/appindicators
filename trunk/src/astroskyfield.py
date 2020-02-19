@@ -28,30 +28,6 @@
 # There is a ticket about this...but cannot find it right now.  Seems an API call somewhere/somehow turns caching on/off.
 
 
-#TODO Can pip3 be run from the install?
-# Possible ways to have PIP stuff installed with the DEB/PPA:
-# https://unix.stackexchange.com/questions/347649/how-to-add-a-python-package-dependance-to-a-debian-package
-# https://www.debian.org/doc/manuals/maint-guide/dreq.en.html#control
-# https://askubuntu.com/questions/327543/how-can-a-debian-package-install-python-modules-from-pypi
-# https://wiki.debian.org/Python/Pybuild
-#
-# Alternatively, maybe put in a note at the top of the PPA page and/or
-# when the indicator runs, do some sort of check to see if the stuff is installed and correct versions
-# and if not, fire off a notification to the user and log the install sequence in the log.
-#
-# Also can put information in the AskUbuntu page.
-#
-# Install (and upgrade to) latest skyfield:
-#     sudo apt-get install python3-pip
-#     sudo pip3 install --upgrade pandas pytz skyfield
-#
-# Maybe also check at runtime if Skyfield is installed:
-# try:
-#     import mymodule
-# except ImportError as e:
-#     pass  # module doesn't exist, deal with it.
-
-
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
 
 
