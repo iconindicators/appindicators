@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-lunar 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2020-02-20 18:30+1100\n"
+"POT-Creation-Date: 2020-02-20 20:58+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -694,11 +694,11 @@ msgid "ARCTURUS"
 msgstr ""
 
 #: astropyephem.py:351
-msgid "ARKABPOSTERIOR"
+msgid "ARKAB POSTERIOR"
 msgstr ""
 
 #: astropyephem.py:352
-msgid "ARKABPRIOR"
+msgid "ARKAB PRIOR"
 msgstr ""
 
 #: astropyephem.py:353
@@ -770,7 +770,7 @@ msgid "FOMALHAUT"
 msgstr ""
 
 #: astropyephem.py:370
-msgid "GIENAHCORVI"
+msgid "GIENAH CORVI"
 msgstr ""
 
 #: astropyephem.py:371 astroskyfield.py:489
@@ -781,8 +781,8 @@ msgstr ""
 msgid "IZAR"
 msgstr ""
 
-#: astropyephem.py:373
-msgid "KAUSAUSTRALIS"
+#: astropyephem.py:373 astroskyfield.py:492
+msgid "KAUS AUSTRALIS"
 msgstr ""
 
 #: astropyephem.py:374 astroskyfield.py:493
@@ -1298,10 +1298,6 @@ msgstr ""
 
 #: astroskyfield.py:490
 msgid "HERSCHEL'S GARNET STAR"
-msgstr ""
-
-#: astroskyfield.py:492
-msgid "KAUS AUSTRALIS"
 msgstr ""
 
 #: astroskyfield.py:494
