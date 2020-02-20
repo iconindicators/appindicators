@@ -22,7 +22,7 @@
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
 
 
-# Uncomment the lines below to run the planet/star ephemeris creation functions at the end.
+# Uncomment to run the planet/star ephemeris creation functions at the end.
 # import gettext
 # gettext.install( "astroskyfield" )
 
@@ -978,7 +978,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( e )
 
 
-# Used to create the stars/planet ephemerides.
-# Must uncomment the gettext lines at the top!
+# Functions to create the stars/planet ephemerides.
+# Uncomment the gettext lines at the top!
 # AstroSkyfield.createStarEphemeris()
 # AstroSkyfield.createPlanetEphemeris()
