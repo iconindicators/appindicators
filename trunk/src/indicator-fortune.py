@@ -60,7 +60,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
-        #TODO Perhaps revisit the issue
+        #TODO Revisit the issue
         #
         #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
         #
