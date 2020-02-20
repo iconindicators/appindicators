@@ -276,7 +276,7 @@ class AstroPyephem( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 47 ] : _( "Kaus Australis" ),
         astrobase.AstroBase.STARS[ 48 ] : _( "Kochab" ),
         astrobase.AstroBase.STARS[ 49 ] : _( "Maia" ),
-        astrobase.AstroBase.STARS[ 50 ] : _( "Maastrobase.AstroBase.rkab" ),
+        astrobase.AstroBase.STARS[ 50 ] : _( "Markab" ),
         astrobase.AstroBase.STARS[ 51 ] : _( "Megrez" ),
         astrobase.AstroBase.STARS[ 52 ] : _( "Menkalinan" ),
         astrobase.AstroBase.STARS[ 53 ] : _( "Menkar" ),
