@@ -157,7 +157,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
                         _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" ),
                         _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" ),
-                        _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) ] )
+                        _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) ],
+#TODO Remove debug before release!
+            debug = True )
 
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
@@ -296,12 +298,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
-#TODO Start debugging.
+#TODO Remove debugging before release!
         menu.append( Gtk.MenuItem( "Backend: " + str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
         menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
         menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
         menu.append( Gtk.SeparatorMenuItem() )
-#TODO End debugging.
 
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
