@@ -111,6 +111,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+
+#TODO Have made a copy of comet/mp/tle data from 2020 02 19 21 24
+#For the next few days, make backups of the same data.
+# Then run the indicator using each set of data and compare the comet/mp rise/set/alt/az.
+# Determine if it is possible to change the comet/mp cache age from 24 to 48 hours or something in between.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
