@@ -393,7 +393,13 @@ class IndicatorBase( ABC ):
 #TODO Add Yaru and other themes for [ L | X | U ]buntu 16.04+.
 # On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared.
 # Is there another new theme/colour for Ubuntu 20.20?
-    def getThemeColour( self ):
+#
+#TODO
+# Why do the icons appear to change shade/colour?
+# https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
+    # Get the colour (in hexadecimal) for the current theme.
+    # The defaultColour will be returned if the current theme has no colour defined.
+    def getThemeColour( self, defaultColour ):
         themeNames = { "Adwaita"                : "bebebe",
                        "elementary-xfce-darker" : "f3f3f3",
                        "Lubuntu"                : "4c4c4c",
@@ -405,7 +411,7 @@ class IndicatorBase( ABC ):
             themeColour = themeNames[ themeName ]
 
         else:
-            themeColour = "fff200" # Default to hicolor.  #TODO Test this for any indicator other than lunar.
+            themeColour = defaultColour
 
         return themeColour
 
