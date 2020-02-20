@@ -38,6 +38,11 @@
 # In this case the update function will/should return { }.
 
 
+#TODO Is there some way to limit the number of satellites displayed?
+# Limit to the next transit period?
+#How does this work for circumpolar and/or high latitudes?
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
