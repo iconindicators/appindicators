@@ -53,7 +53,7 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 5
 
 
-    def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None ):
+    def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None, debug = False ):
         self.indicatorName = indicatorName
         self.version = version
         self.copyrightStartYear = copyrightStartYear
@@ -67,6 +67,7 @@ class IndicatorBase( ABC ):
         self.authors = [ "Bernard Giannetti" + " " + self.website ]
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
+        self.debug = debug
 
         self.secondaryActivateTarget = None
         self.updateTimerID = None
@@ -109,7 +110,11 @@ class IndicatorBase( ABC ):
         menu = Gtk.Menu()
         self.secondaryActivateTarget = None
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-        menu.prepend( Gtk.MenuItem.new_with_label( "Next update: " + ( datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) ).strftime( "%Y-%m-%d %H:%M:%S" ) ) ) #TODO Remove
+
+        if self.debug:
+            nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
+            menu.prepend( Gtk.MenuItem.new_with_label( "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] ) )
+
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
