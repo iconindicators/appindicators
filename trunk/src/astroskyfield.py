@@ -721,21 +721,24 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                       AstroSkyfield._city_data.get( city )[ 2 ]
 
 
+#TODO Waiting for when Skyfield implements Orbital Elements.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-        return { } #TODO Waiting for when Skyfield implements Orbital Elements.
+        return { }
 
 
     @staticmethod
     def getCredit(): return _( "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield" )
 
 
+#TODO Need pytz?  If so, add to the install message.
+#TODO The install message needs to be changed in the POT and RU PO file...wait for Oleg to send back translations.
     @staticmethod
     def getAvailabilityMessage(): 
         message = None
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade skyfield pandas" ) #TODO Need pytz?
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade skyfield pandas" )
 
         return message
 
