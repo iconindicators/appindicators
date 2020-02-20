@@ -85,7 +85,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         #     https://eev.ee/blog/2015/05/20/i-stared-into-the-fontconfig-and-the-fontconfig-stared-back-at-me/
         #     https://repolinux.wordpress.com/2013/03/10/find-out-fallback-font-used-by-fontconfig-for-a-certain-character/
         def fontTesting():
-
             from gi.repository import Gio
             fontName = Gio.Settings( "org.gnome.desktop.interface" ).get_string( "font-name" )
             print( "Font name:", fontName )
