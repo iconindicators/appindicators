@@ -594,7 +594,7 @@ class IndicatorBase( ABC ):
                 dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
                     fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-                    print( baseName, ( cacheMaximumAgeDateTime - fileDateTime ) ) #TODO Remove after cache experiment over!
+#                     print( baseName, ( cacheMaximumAgeDateTime - fileDateTime ) ) #TODO Remove after cache experiment over!
                     if fileDateTime < cacheMaximumAgeDateTime:
                         os.remove( cacheDirectory + file )
 
@@ -628,6 +628,7 @@ class IndicatorBase( ABC ):
             try:
                 with open( filename, "rb" ) as f:
                     data = pickle.load( f )
+                    print( filename )#TODO
 
             except Exception as e:
                 data = None
