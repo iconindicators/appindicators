@@ -175,6 +175,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
+#TODO On each update we do:
+#     A cache flush (access filesystem per data file totalling 8)
+#     A read of each data file (totalling 8).
+# How long does this take?
+# Perhaps change things such that:
+#     Flush cache in init and record last cache flush date/time, or work out when next cache flush should happen based on each individual file's cache age property.
+#     Ensure we don't flush the cache later than needed (so find the smallest cache age...might need to look at existing files).
+#     On each update, if the current time exceeds the next cache flush time, flush the cache.
+
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
         # Update comet, minor planet and satellite data.
@@ -230,7 +239,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites( utcNow )
 
-        return self.getNextUpdateTimeInSeconds()
+        return 60 * 60 #TODO Remove testing only
+#         return self.getNextUpdateTimeInSeconds()
 
 
     def flushCache( self ):
