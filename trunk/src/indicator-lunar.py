@@ -128,7 +128,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
+                               "file:///home/bernard/Desktop/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 2400 #TODO Set to 48 and do another test.
@@ -183,7 +183,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #     Flush cache in init and record last cache flush date/time, or work out when next cache flush should happen based on each individual file's cache age property.
 #     Ensure we don't flush the cache later than needed (so find the smallest cache age...might need to look at existing files).
 #     On each update, if the current time exceeds the next cache flush time, flush the cache.
-
+#
+# Have to be careful here...
+# Say we have a slow internet connection or something happens whereby the download of a data file fails.
+# If the cache age is set to several days, then it will be several days before we try to get data again!!!
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
         # Update comet, minor planet and satellite data.
@@ -1225,6 +1228,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return responseType
 
 
+#TODO This adds all tags for all (current) bodies.
+# But we end up with a lot of empty tags/values.
+# We also end up with empty values for tags which cannot have a value (a star which is always up only has alt/az but no rise/set).
+# So maybe only add tags for which there is a value...
+# But will this data set fluctuate too much?
+#
+# TODO A satellite may not have a rise/set time computed for the current window.
+# If a user has icon text "ISS Rise: [ISS RISE DATE TIME]", the tag will be removed but not the free text.
+# Not good...so can we make a component (a table with one row for each piece of free text either side of a tag)
+# and the icon text is a list of these rows, and the whole row is dropped if no data is available for the tag?
+# If we do this, then maybe put the backend back to only adding in data as it applies
+# (so only add in rise time when the object is below the horizon, and so on...).
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
