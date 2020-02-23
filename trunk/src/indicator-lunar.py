@@ -128,7 +128,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
-                               "file:///home/bernard/Desktop/Soft03Unusual.txt" ]
+                               "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 2400 #TODO Set to 48 and do another test.
