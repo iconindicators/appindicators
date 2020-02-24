@@ -192,6 +192,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Have to be careful here...
 # Say we have a slow internet connection or something happens whereby the download of a data file fails.
 # If the cache age is set to several days, then it will be several days before we try to get data again!!!
+#
+# Maybe part of the update should be to check if we can hit google or similar.
+# So if we fail at getting data, we could do a retry in an hour but only if we can hit google.
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
         # Update comet, minor planet and satellite data.
