@@ -20,6 +20,11 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Before release, download released version, run and check if this new version loads in the .config.
+#
+# Add in stars, planets, etc with the released version and check if this new version handles.
+
+
 #TODO Test with a lat/long such that bodies rise/set, always up and never up.
 
 
