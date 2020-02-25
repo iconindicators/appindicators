@@ -1242,19 +1242,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return responseType
 
 
-#TODO This adds all tags for all (current) bodies.
-# But we end up with a lot of empty tags/values.
-# We also end up with empty values for tags which cannot have a value (a star which is always up only has alt/az but no rise/set).
-# So maybe only add tags for which there is a value...
-# But will this data set fluctuate too much?
-#
-# TODO A satellite may not have a rise/set time computed for the current window.
-# If a user has icon text "ISS Rise: [ISS RISE DATE TIME]", the tag will be removed but not the free text.
-# Not good...so can we make a component (a table with one row for each piece of free text either side of a tag)
-# and the icon text is a list of these rows, and the whole row is dropped if no data is available for the tag?
-# If we do this, then maybe put the backend back to only adding in data as it applies
-# (so only add in rise time when the object is below the horizon, and so on...).
-#
 #TODO Check the logic of this new function!
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
