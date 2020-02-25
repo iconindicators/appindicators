@@ -818,18 +818,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
 
-#TODO Tooltip will need to change once the { } stuff is sorted...
+#TODO Check the tooltip makes sense and matches the code!
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "To\n" + \
-            "\n" + \
-            "\n" + \
-            "\n" + \
-            "\n\n" + \
-            "Text and tags will be removed at render time if\n" + \
-            "no value for the tag exists." ) )
+            "The icon text can contain free text and\n" + \
+            "tags from the table below.\n\n" + \
+            "To associate text with one or more tags,\n" + \
+            "enclose the text and tag(s) within { }.\n\n" + \
+            "For example\n\n" + \
+            "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
+            "If a tag contains no data at render time,\n" + \
+            "the tag will be removed.\n\n" + \
+            "If a removed tag is within a { }, the tag and\n" + \
+            "text will be removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -838,13 +841,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label( _( "Separator" ) ), False, False, 0 )
 
         separator = Gtk.Entry()
-        separator.set_tooltip_text( _(
-            "TODO\n" + \
-            "TODO\n" + \
-            "TODO\n" + \
-            "TODO\n" + \
-            "TODO\n" + \
-            "TODO." ) )
+        separator.set_tooltip_text( _( "The separator will be added between each { }." ) )
         box.pack_start( separator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
