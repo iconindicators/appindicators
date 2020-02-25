@@ -1195,6 +1195,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Do we need to parse the icon text to check it?
 #Ensure that there are matching { } pairs?
 # A [ ] can exist within { } or not, but not split. 
+            self.indicatorText = indicatorText.get_text().split( '{' )
+
+
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
