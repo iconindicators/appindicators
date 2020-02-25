@@ -871,14 +871,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         treeViewColumn.set_sort_column_id( COLUMN_VALUE )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( _( "Double click to add a tag to the icon text.\n\n" ) )
-#TODO I don't think this is needed anymore...
-#         + \
-#             "A tag will have no value when the body is\n" + \
-#             "dropped (exceeds magnitude), when the body\n" + \
-#             "is below the horizon (no set date/time and\n" + \
-#             "no azimuth/altitude), or the body is above\n" + \
-#             "the horizon (no rise date/time)." ) )
+        tree.set_tooltip_text( _( "Double click to add a tag to the icon text." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
