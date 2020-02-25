@@ -833,6 +833,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label( _( "Separator" ) ), False, False, 0 )
+
+        separator = Gtk.Entry()
+        separator.set_tooltip_text( _(
+            "TODO\n" + \
+            "TODO\n" + \
+            "TODO\n" + \
+            "TODO\n" + \
+            "TODO\n" + \
+            "TODO." ) )
+        box.pack_start( separator, False, False, 0 )
+        grid.attach( box, 0, 1, 1, 1 )
+
         COLUMN_TAG = 0
         COLUMN_TRANSLATED_TAG = 1
         COLUMN_VALUE = 2
@@ -856,20 +871,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         treeViewColumn.set_sort_column_id( COLUMN_VALUE )
         tree.append_column( treeViewColumn )
 
-        tree.set_tooltip_text( _(
-            "Double click to add a tag to the icon text.\n\n" + \
-            "A tag will have no value when the body is\n" + \
-            "dropped (exceeds magnitude), when the body\n" + \
-            "is below the horizon (no set date/time and\n" + \
-            "no azimuth/altitude), or the body is above\n" + \
-            "the horizon (no rise date/time)." ) )
+        tree.set_tooltip_text( _( "Double click to add a tag to the icon text.\n\n" ) )
+#TODO I don't think this is needed anymore...
+#         + \
+#             "A tag will have no value when the body is\n" + \
+#             "dropped (exceeds magnitude), when the body\n" + \
+#             "is below the horizon (no set date/time and\n" + \
+#             "no azimuth/altitude), or the body is above\n" + \
+#             "the horizon (no rise date/time)." ) )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( tree )
-        grid.attach( scrolledWindow, 0, 1, 1, 1 )
+        grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "Icon" ) ) )
 
@@ -1186,6 +1202,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 elevation.grab_focus()
                 continue
 
+#TODO Do we need to parse the icon text to check it?
+#Ensure that there are matching { } pairs?
+# A [ ] can exist within { } or not, but not split. 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
