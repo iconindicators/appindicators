@@ -87,6 +87,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_MINOR_PLANETS_ADD_NEW = "minorPlanetsAddNew"
     CONFIG_HIDE_BODIES_BELOW_HORIZON = "hideBodiesBelowHorizon"
     CONFIG_INDICATOR_TEXT = "indicatorText"
+    CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator"
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
@@ -106,6 +107,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
     INDICATOR_TEXT_DEFAULT = " [" + astrobase.AstroBase.NAME_TAG_MOON + " " + astrobase.AstroBase.DATA_TAG_PHASE + "]"
+    INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
@@ -347,6 +349,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+
+#TODO Handle { }.  Maybe don't remove the unused tags yet...check if there are tags present between any { } pair.
+#If there are any tags still present, then remove the entire { }.
+
+#TODO Handle separator.
+        
 
         self.indicator.set_label( parsedOutput, "" )
         self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
@@ -840,9 +848,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label( _( "Separator" ) ), False, False, 0 )
 
-        separator = Gtk.Entry()
-        separator.set_tooltip_text( _( "The separator will be added between each { }." ) )
-        box.pack_start( separator, False, False, 0 )
+        indicatorTextSeparator = Gtk.Entry()
+        indicatorTextSeparator.set_tooltip_text( _( "The separator will be added between each { }." ) )
+        box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
         COLUMN_TAG = 0
@@ -1193,6 +1201,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 continue
 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
+            self.indicatorTextSeparator = indicatorTextSeparator.get_text()
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
             self.cometsAddNew = cometsAddNewCheckbox.get_active() # The update will add in new comets.
@@ -1545,6 +1554,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.hideBodiesBelowHorizon = config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, False )
 
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
+        self.indicatorTextSeparator = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT_SEPARATOR, IndicatorLunar.INDICATOR_TEXT_SEPARATOR_DEFAULT )
 
         self.minorPlanets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
         self.minorPlanetsAddNew = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
@@ -1625,6 +1635,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             IndicatorLunar.CONFIG_COMETS_ADD_NEW: self.cometsAddNew,
             IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON: self.hideBodiesBelowHorizon,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
+            IndicatorLunar.CONFIG_INDICATOR_TEXT_SEPARATOR: self.indicatorTextSeparator,
             IndicatorLunar.CONFIG_MINOR_PLANETS: minorPlanets,
             IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW: self.minorPlanetsAddNew,
             IndicatorLunar.CONFIG_MAGNITUDE: self.magnitude,
