@@ -348,7 +348,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-        parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+        leftParentheses = parsedOutput.split( '{' )
+        parsedOutputNew = ""
+        i = 0
+        for leftParenthesis in leftParentheses:
+            print( str( i ), 'X' + leftParenthesis + 'Y' )
+            i += 1
+
+            rightParenthesisIndex = leftParenthesis.find( '}' )
+            if rightParenthesisIndex == -1:
+                parsedOutputNew += '{' + leftParenthesis
+#TODO Remove unused tags?
+            else:
+                left = leftParenthesis[ 0 : rightParenthesisIndex ]
+                right = leftParenthesis[ rightParenthesisIndex + 1 : ]
+
+#         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
 #TODO Handle { }.  Maybe don't remove the unused tags yet...check if there are tags present between any { } pair.
 #If there are any tags still present, then remove the entire { }.
