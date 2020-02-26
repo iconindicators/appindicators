@@ -1192,12 +1192,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 elevation.grab_focus()
                 continue
 
-#TODO Do we need to parse the icon text to check it?
-#Ensure that there are matching { } pairs?
-# A [ ] can exist within { } or not, but not split. 
-            self.indicatorText = indicatorText.get_text().split( '{' )
-
-
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
@@ -1322,71 +1316,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         value = self.getDisplayData( key )
 
                     displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
-
-
-    def initialiseDisplayTagsStoreORIGINAL( self, displayTagsStore ):
-        items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
-                  [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
-
-        for item in items:
-            bodyType = item[ 0 ]
-            bodyTag = item[ 1 ]
-            dataTags = item[ 2 ]
-            for dataTag in dataTags:
-                translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                value = ""
-                key = ( bodyType, bodyTag, dataTag )
-                if key in self.data:
-                    value = self.getDisplayData( key )
-
-                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
-
-        items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAGS_PLANET ],
-                  [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAGS_STAR ] ]
-
-        for item in items:
-            bodyType = item[ 0 ]
-            bodyTags = item[ 1 ]
-            dataTags = item[ 2 ]
-            for bodyTag in bodyTags:
-                for dataTag in dataTags:
-                    translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    value = ""
-                    key = ( bodyType, bodyTag, dataTag )
-                    if key in self.data:
-                        value = self.getDisplayData( key )
-
-                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
-
-        items = [ [ astrobase.AstroBase.BodyType.COMET, self.cometData, astrobase.AstroBase.DATA_TAGS_COMET ],
-                  [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAGS_MINOR_PLANET ] ]
-
-        for item in items:
-            bodyType = item[ 0 ]
-            bodyTags = item[ 1 ]
-            dataTags = item[ 2 ]
-            for bodyTag in bodyTags:
-                for dataTag in dataTags:
-                    translatedTag = bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                    value = ""
-                    key = ( bodyType, bodyTag, dataTag )
-                    if key in self.data:
-                        value = self.getDisplayData( key )
-
-                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
-
-        bodyType = astrobase.AstroBase.BodyType.SATELLITE
-        for bodyTag in self.satelliteData:
-            for dataTag in astrobase.AstroBase.DATA_TAGS_SATELLITE:
-                value = ""
-                name = self.satelliteData[ bodyTag ].getName()
-                internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
-                translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
-                key = ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag )
-                if key in self.data:
-                    value = self.getDisplayData( key )
-
-                displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
     def translateTags( self, tagsListStore, originalToLocal, text ):
