@@ -244,7 +244,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         # Update frontend.
         self.updateMenu( menu )
-        self.updateIconAndLabel()
+        self.updateLabel()
+        self.updateIcon()
 
         if self.showWerewolfWarning:
             self.notificationFullMoon()
@@ -341,7 +342,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuSatellites( menu )
 
 
-    def updateIconAndLabel( self ):
+    def updateLabel( self ):
         # Substitute tags for values.
         parsedOutput = self.indicatorText
         for key in self.data.keys():
@@ -374,6 +375,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.indicator.set_label( parsedOutput, "" )
         self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
 
+
+    def updateIcon( self ):
         # Ideally should be able to overwrite the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
         # So change the name each time - using the current date/time.
