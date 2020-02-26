@@ -377,7 +377,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateIcon( self ):
-        # Ideally should be able to overwrite the icon with the same name each time.
+        # Ideally overwrite the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
         # So change the name each time - using the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
