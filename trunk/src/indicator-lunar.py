@@ -352,6 +352,39 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         parsedOutputOriginal = parsedOutput
         # Handle any free text '{' and '}'.
+
+
+        leftParentheses = parsedOutput.split( '{' )
+        parsedOutput = ""
+        i = 0
+        for chunk in leftParentheses:
+#TODO Ensure if there are no {, that we at least get the result back.
+#
+#TODO Handle { }.  Maybe don't remove the unused tags yet...check if there are tags present between any { } pair.
+#If there are any tags still present, then remove the entire { }.
+#
+#TODO Handle separator.
+            print( str( i ), 'X' + chunk + 'Y' )
+            i += 1
+ 
+            rightParenthesisIndex = chunk.find( '}' )
+            if rightParenthesisIndex == -1:
+                parsedOutput += chunk + '{'
+                parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+ 
+            else:
+                left = chunk[ : rightParenthesisIndex ]
+                leftMinusUnusedTags = re.sub( "\[[^\[^\]]*\]", "", left ) # Remove unused tags.
+                if left == leftMinusUnusedTags: # No unused tags were present, so keep.
+                    parsedOutput += left
+ 
+                right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
+                parsedOutput += right
+
+        if len( leftParentheses ) == 1:
+            parsedOutput = parsedOutput[ 0 : -1 ] # If there was no initial '{', remove from the end due to processing above.
+
+
         
 #         i = 0
 #         x = ""
@@ -421,23 +454,37 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 
-        leftParenthesisIndex = parsedOutput.find( '{' )
-        if leftParenthesisIndex == -1: # There is no free text...
-            parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # ...so remove unused tags.
-
-        else:
-            i = 0
-            x = ""
-            while( i < len( parsedOutput ) ):
-                if parsedOutput[ i ] == '{':
-                    j = i + 1
-                    while( j < len( parsedOutput ) ):
-                        if parsedOutput[ j ] == '}':
-                            pass
-     
-                    j += 1
-     
-                i += 1
+#         leftParenthesisIndex = parsedOutput.find( '{' )
+#         if leftParenthesisIndex == -1: # There is no free text...
+#             parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # ...so remove unused tags.
+# 
+#         else:
+#             leftParentheses = parsedOutput.split( '{' )
+#             parsedOutput = ""
+#             i = 0
+#             for chunk in leftParentheses:
+# #TODO Ensure if there are no {, that we at least get the result back.
+# #
+# #TODO Handle { }.  Maybe don't remove the unused tags yet...check if there are tags present between any { } pair.
+# #If there are any tags still present, then remove the entire { }.
+# #
+# #TODO Handle separator.
+#                 print( str( i ), 'X' + chunk + 'Y' )
+#                 i += 1
+#      
+#                 rightParenthesisIndex = chunk.find( '}' )
+#                 if rightParenthesisIndex == -1:
+#                     parsedOutput += '{' + chunk
+#                     parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+#      
+#                 else:
+#                     left = chunk[ : rightParenthesisIndex ]
+#                     leftMinusUnusedTags = re.sub( "\[[^\[^\]]*\]", "", left ) # Remove unused tags.
+#                     if left == leftMinusUnusedTags: # No unused tags were present, so keep.
+#                         parsedOutput += left
+#      
+#                     right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
+#                     parsedOutput += right
 
 
 
