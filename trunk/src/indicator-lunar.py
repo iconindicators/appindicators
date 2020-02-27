@@ -352,6 +352,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         parsedOutputOriginal = parsedOutput
         # Handle any free text '{' and '}'.
+        
+#         i = 0
+#         x = ""
+#         while( i < len( parsedOutput ) ):
+#             if parsedOutput[ i ] == '{':
+#                 j = i + 1
+#                 while( j < len( parsedOutput ) ):
+#                     if parsedOutput[ j ] == '}':
+#                         pass
+# 
+#                 j += 1
+# 
+#             i += 1
+
+
+
 #         def processChunk( chunk ):
 #             parsedOutput = ""
 #             rightParenthesisIndex = chunk.find( '}' )
@@ -401,6 +417,29 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #     
 #                     right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
 #                     parsedOutput += right
+
+
+
+
+        leftParenthesisIndex = parsedOutput.find( '{' )
+        if leftParenthesisIndex == -1: # There is no free text...
+            parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # ...so remove unused tags.
+
+        else:
+            i = 0
+            x = ""
+            while( i < len( parsedOutput ) ):
+                if parsedOutput[ i ] == '{':
+                    j = i + 1
+                    while( j < len( parsedOutput ) ):
+                        if parsedOutput[ j ] == '}':
+                            pass
+     
+                    j += 1
+     
+                i += 1
+
+
 
         self.indicator.set_label( parsedOutput, "" )
         self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
