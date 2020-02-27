@@ -343,34 +343,64 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateLabel( self ):
-        # Substitute tags for values.
+        # Substitute data tags '[' and ']' for values.
         parsedOutput = self.indicatorText
+        parsedOutput = "{The sun rises at [SUN RISE DATE TIME]}[MOON PHASE]"
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-        leftParentheses = parsedOutput.split( '{' )
-        parsedOutputNew = ""
-        i = 0
-        for leftParenthesis in leftParentheses:
-            print( str( i ), 'X' + leftParenthesis + 'Y' )
-            i += 1
+        parsedOutputOriginal = parsedOutput
+        # Handle any free text '{' and '}'.
+#         def processChunk( chunk ):
+#             parsedOutput = ""
+#             rightParenthesisIndex = chunk.find( '}' )
+#             if rightParenthesisIndex == -1:
+#                 parsedOutput += '{' + chunk
+#                 parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+# 
+#             else:
+#                 left = chunk[ : rightParenthesisIndex ]
+#                 leftMinusUnusedTags = re.sub( "\[[^\[^\]]*\]", "", left ) # Remove unused tags.
+#                 if left == leftMinusUnusedTags: # No unused tags were present, so keep.
+#                     parsedOutput += left
+# 
+#                 right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
+#                 parsedOutput += right
 
-            rightParenthesisIndex = leftParenthesis.find( '}' )
-            if rightParenthesisIndex == -1:
-                parsedOutputNew += '{' + leftParenthesis
-#TODO Remove unused tags?
-            else:
-                left = leftParenthesis[ 0 : rightParenthesisIndex ]
-                right = leftParenthesis[ rightParenthesisIndex + 1 : ]
 
-#         parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
 
+#         leftParenthesisIndex = parsedOutput.find( '{' )
+#         if leftParenthesisIndex == -1: # There is no free text.
+#             parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+# 
+#         else:
+#             leftParentheses = parsedOutput.split( '{' )
+#             parsedOutput = ""
+#             i = 0
+#             for chunk in leftParentheses:
+#TODO Ensure if there are no {, that we at least get the result back.
+#
 #TODO Handle { }.  Maybe don't remove the unused tags yet...check if there are tags present between any { } pair.
 #If there are any tags still present, then remove the entire { }.
-
+#
 #TODO Handle separator.
-        
+#                 print( str( i ), 'X' + chunk + 'Y' )
+#                 i += 1
+#     
+#                 rightParenthesisIndex = chunk.find( '}' )
+#                 if rightParenthesisIndex == -1:
+#                     parsedOutput += '{' + chunk
+#                     parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+#     
+#                 else:
+#                     left = chunk[ : rightParenthesisIndex ]
+#                     leftMinusUnusedTags = re.sub( "\[[^\[^\]]*\]", "", left ) # Remove unused tags.
+#                     if left == leftMinusUnusedTags: # No unused tags were present, so keep.
+#                         parsedOutput += left
+#     
+#                     right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
+#                     parsedOutput += right
 
         self.indicator.set_label( parsedOutput, "" )
         self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
