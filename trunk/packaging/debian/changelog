@@ -31,8 +31,8 @@ indicator-ppa-download-statistics (1.0.66-1) xenial; urgency=low
     No change for GNOME Shell as empty icons are treated as full size.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
-  * About dialog now pulls the changelog directly from /usr/doc
-    rather than a local copy in the installation directory.
+  * About dialog now pulls the changelog directly from /usr/share/doc rather than
+    a redundant duplicate in the installation directory.
   * Corrected the indents for menu items for GNOME Shell.
   * Tidy up load config of user preferences.
 
