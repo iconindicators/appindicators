@@ -351,6 +351,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         parsedOutput = "{Some text}This is the label: {The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
         parsedOutput = "{The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
         parsedOutput = "{The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
+        parsedOutput = "[SOME BOGUS TAG]}; [MOON PHASE]"
+        parsedOutput = "{[SOME BOGUS TAG]; [MOON PHASE]"
 
         print( "Original text:\t\t", parsedOutput )#TODO Remove
         for key in self.data.keys():
@@ -360,31 +362,32 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         print( "Known tags replaced:\t", parsedOutput )#TODO Remove
 
         # Handle any free text '{' and '}'.
-        leftParentheses = parsedOutput.split( '{' )
-        parsedOutput = ""
-        for chunk in leftParentheses:
+        if parsedOutput.find( '{' ) == -1: # No free text present.
+            parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+
+        else:
+            leftParentheses = parsedOutput.split( '{' )
+            parsedOutput = ""
+            for chunk in leftParentheses:
 #TODO Ensure if there are no {, that we at least get the result back.
 #
 #TODO Handle { }.  Maybe don't remove the unused tags yet...check if there are tags present between any { } pair.
 #If there are any tags still present, then remove the entire { }.
 #
 #TODO Handle separator.
-            rightParenthesisIndex = chunk.find( '}' )
-            if rightParenthesisIndex == -1:
-                parsedOutput += chunk
-                parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
- 
-            else:
-                left = chunk[ : rightParenthesisIndex ]
-                leftMinusUnusedTags = re.sub( "\[[^\[^\]]*\]", "", left ) # Remove unused tags.
-                if left == leftMinusUnusedTags: # No unused tags were present, so keep.
-                    parsedOutput += left
- 
-                right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
-                parsedOutput += right
-
-        if len( leftParentheses ) == 1: #TODO Can we get a length of two but still have no '{'?  What about a '{' at the end of the text?
-            parsedOutput = parsedOutput[ 0 : -1 ] # If there was no initial '{', remove from the end due to processing above.
+                rightParenthesisIndex = chunk.find( '}' )
+                if rightParenthesisIndex == -1:
+                    parsedOutput += chunk
+                    parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
+     
+                else:
+                    left = chunk[ : rightParenthesisIndex ]
+                    leftMinusUnusedTags = re.sub( "\[[^\[^\]]*\]", "", left ) # Remove unused tags.
+                    if left == leftMinusUnusedTags: # No unused tags were present, so keep.
+                        parsedOutput += left
+     
+                    right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
+                    parsedOutput += right
 
         print( "Final text:\t\t", parsedOutput )
 
