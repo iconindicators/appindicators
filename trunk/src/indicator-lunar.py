@@ -347,13 +347,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         parsedOutput = self.indicatorText
         parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
         parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
+        parsedOutput = "{Some text}This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
+        parsedOutput = "{Some text}This is the label: {The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
+        parsedOutput = "{The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
+        parsedOutput = "{The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
+
+        print( "Original text:\t\t", parsedOutput )#TODO Remove
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
                 parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-        parsedOutputOriginal = parsedOutput
-        # Handle any free text '{' and '}'.
+        print( "Known tags replaced:\t", parsedOutput )#TODO Remove
 
+        # Handle any free text '{' and '}'.
         leftParentheses = parsedOutput.split( '{' )
         parsedOutput = ""
         for chunk in leftParentheses:
@@ -379,6 +385,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if len( leftParentheses ) == 1: #TODO Can we get a length of two but still have no '{'?  What about a '{' at the end of the text?
             parsedOutput = parsedOutput[ 0 : -1 ] # If there was no initial '{', remove from the end due to processing above.
+
+        print( "Final text:\t\t", parsedOutput )
 
 #         i = 0
 #         x = ""
