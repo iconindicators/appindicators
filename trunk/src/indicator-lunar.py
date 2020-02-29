@@ -355,6 +355,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         parsedOutput = "{[SOME BOGUS TAG]; [MOON PHASE]"
         parsedOutput = "[MOON PHASE]"
 
+#TODO Tested and work...        
+        parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
+
         print( "Original text:\t\t", parsedOutput )#TODO Remove
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
@@ -371,13 +374,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 j = i + 1
                 while( j < len( parsedOutput ) ):
                     if parsedOutput[ j ] == '}':
-                        pass
- 
+                        freeText = parsedOutput[ i + 1 : j ]
+                        freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
+                        if freeText == freeTextMinusUnknownTags: # No unused tags were found.
+                            result = parsedOutput[ start : i ] + freeText
+
+                        else:
+                            result = parsedOutput[ start : i ]
+
+                        start = i + 1
+                        break
                 j += 1
  
             i += 1
 
-        parsedOutput = parsedOutput[ start : i ]
+#         parsedOutput = parsedOutput[ start : i ]
 
 #         if parsedOutput.find( '{' ) == -1: # No free text present.
 #             parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
