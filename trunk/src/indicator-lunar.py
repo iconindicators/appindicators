@@ -857,7 +857,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        # Icon.
+        # Icon text.
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
