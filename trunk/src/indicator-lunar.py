@@ -362,6 +362,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         print( "Known tags replaced:\t", parsedOutput )#TODO Remove
 
+#TODO Need to put in the separator!
         # Handle any free text '{' and '}'.
         i = 0
         start = i
