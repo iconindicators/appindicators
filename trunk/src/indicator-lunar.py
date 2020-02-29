@@ -344,41 +344,44 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateLabel( self ):
         # Substitute data tags '[' and ']' for values.
-        parsedOutput = self.indicatorText
+        label = self.indicatorText
 
 #TODO Tested and works...
-        parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
-        parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
-        parsedOutput = "{The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
-        parsedOutput = "{The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
-        parsedOutput = "[SOME BOGUS TAG]}; [MOON PHASE]"
-        parsedOutput = "{[SOME BOGUS TAG]; [MOON PHASE]"
-        parsedOutput = "[MOON PHASE]"
+#         label = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
+#         label = "This is the label: {The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
+#         label = "{The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
+#         label = "{The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
+#         label = "[SOME BOGUS TAG]}; [MOON PHASE]"
+#         label = "{[SOME BOGUS TAG]; [MOON PHASE]"
+#         label = "[MOON PHASE]"
+#         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay}"
+#         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS}"
+#         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS]}"
 
-        print( "Original text:\t\t", parsedOutput )#TODO Remove
+        print( "Original text:\t\t", label )#TODO Remove
         for key in self.data.keys():
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in parsedOutput:
-                parsedOutput = parsedOutput.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
+            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
+                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
 
-        print( "Known tags replaced:\t", parsedOutput )#TODO Remove
+        print( "Known tags replaced:\t", label )#TODO Remove
 
 #TODO Need to put in the separator!
         # Handle any free text '{' and '}'.
         i = 0
         start = i
         result = ""
-        while( i < len( parsedOutput ) ):
-            if parsedOutput[ i ] == '{':
+        while( i < len( label ) ):
+            if label[ i ] == '{':
                 j = i + 1
-                while( j < len( parsedOutput ) ):
-                    if parsedOutput[ j ] == '}':
-                        freeText = parsedOutput[ i + 1 : j ]
+                while( j < len( label ) ):
+                    if label[ j ] == '}':
+                        freeText = label[ i + 1 : j ]
                         freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
                         if freeText == freeTextMinusUnknownTags: # No unused tags were found.
-                            result = parsedOutput[ start : i ] + freeText
+                            result = label[ start : i ] + freeText
 
                         else:
-                            result = parsedOutput[ start : i ]
+                            result = label[ start : i ]
 
                         i = j
                         start = i + 1
@@ -388,12 +391,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             i += 1
 
-        result += parsedOutput[ start : i ]
+        result += label[ start : i ]
 
         print( "Final text:\t\t", result )#TODO Remove
 
-        self.indicator.set_label( parsedOutput, "" )
-        self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
+        self.indicator.set_label( result, "" )
+        self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
 
 
     def updateIcon( self ):
