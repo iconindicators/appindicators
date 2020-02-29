@@ -431,10 +431,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.lastFullMoonNotfication = datetime.datetime.utcnow()
 
 
-    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON,
-                                           self.createIconText( 100, None ),
-                                           False,
-                                           IndicatorLunar.ICON_EXTENSION )
+    def createFullMoonIcon( self ):
+        return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON,
+                                    self.createIconText( 100, None ),
+                                    False,
+                                    IndicatorLunar.ICON_EXTENSION )
 
 
     def notificationSatellites( self, utcNow ):
@@ -491,7 +492,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Moon" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, 0, 1, IndicatorLunar.SEARCH_URL_MOON )
+            self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, 0, 1, IndicatorLunar.SEARCH_URL_MOON )
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ), IndicatorLunar.SEARCH_URL_MOON )
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Next Phases" ), IndicatorLunar.SEARCH_URL_MOON )
 
@@ -506,7 +507,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ 0 ] ):
                 self.createMenuItem( subMenu, indent + displayText + self.getDisplayData( key ), IndicatorLunar.SEARCH_URL_MOON )
 
-            self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
+            self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
 
     def updateMenuSun( self, menu ):
@@ -515,13 +516,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Sun" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, 0, 1, IndicatorLunar.SEARCH_URL_SUN )
+            self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, 0, 1, IndicatorLunar.SEARCH_URL_SUN )
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ), IndicatorLunar.SEARCH_URL_SUN )
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ), IndicatorLunar.SEARCH_URL_SUN )
-            self.updateEclipseMenu( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
+            self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
 
-    def updateEclipseMenu( self, menu, bodyType, nameTag, url ):
+    def updateMenuEclipse( self, menu, bodyType, nameTag, url ):
         key = ( bodyType, nameTag )
         self.createMenuItem( menu, self.indent( 0, 1 ) + _( "Eclipse" ), url )
         self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ), url )
@@ -549,7 +550,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
 
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + translatedName, url )
-                self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.PLANET, name, 1, 2, url )
+                self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.PLANET, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
@@ -569,7 +570,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for name, translatedName in stars:
                 url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astrobackend.STARS_TO_HIP[ name ] )
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + translatedName, url )
-                self.updateCommonMenu( subMenu, astrobase.AstroBase.BodyType.STAR, name, 1, 2, url )
+                self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.STAR, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
@@ -589,7 +590,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for name in sorted( bodies ):
                 url = self.getCometMinorPlanetOnClickURL( name, bodyType )
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + name, url )
-                self.updateCommonMenu( subMenu, bodyType, name, 1, 2, url )
+                self.updateMenuCommon( subMenu, bodyType, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
@@ -645,7 +646,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return displayBody
 
 
-    def updateCommonMenu( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
+    def updateMenuCommon( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
@@ -1299,6 +1300,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Check the logic of this new function!
+#
+#TODO At night (moon and sun both below horizon) and "hide bodies below horizon" was checked, so nothing was displayed.
+#But in the preferences, the table had all the attributes for sun and moon.  Is this correct?
+#If "hide bodies" is unchecked, the moon/sun and planets (all with rise times as they were below the horizon) were in the menu,
+#but only the moon/sun are in the table.  Is this correct?
+#Maybe the planet data should have been in the backend data...?
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
