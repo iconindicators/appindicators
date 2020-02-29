@@ -865,6 +865,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
 
 #TODO Check the tooltip makes sense and matches the code!
+#TODO Mention that tags unmatched are removed (and why that can happen...if a user has an old comet tag say).
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
