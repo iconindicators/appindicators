@@ -354,9 +354,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         parsedOutput = "[SOME BOGUS TAG]}; [MOON PHASE]"
         parsedOutput = "{[SOME BOGUS TAG]; [MOON PHASE]"
         parsedOutput = "[MOON PHASE]"
+        parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
 
 #TODO Tested and work...        
-        parsedOutput = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
 
         print( "Original text:\t\t", parsedOutput )#TODO Remove
         for key in self.data.keys():
@@ -382,13 +382,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         else:
                             result = parsedOutput[ start : i ]
 
+                        i = j
                         start = i + 1
                         break
-                j += 1
+
+                    j += 1
  
             i += 1
 
-#         parsedOutput = parsedOutput[ start : i ]
+        result += parsedOutput[ start : i ]
 
 #         if parsedOutput.find( '{' ) == -1: # No free text present.
 #             parsedOutput = re.sub( "\[[^\[^\]]*\]", "", parsedOutput ) # Remove unused tags.
@@ -417,20 +419,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                     right = chunk[ rightParenthesisIndex + 1 : ] # Any text to the right of the '}'.
 #                     parsedOutput += right
 
-        print( "Final text:\t\t", parsedOutput )
-
-#         i = 0
-#         x = ""
-#         while( i < len( parsedOutput ) ):
-#             if parsedOutput[ i ] == '{':
-#                 j = i + 1
-#                 while( j < len( parsedOutput ) ):
-#                     if parsedOutput[ j ] == '}':
-#                         pass
-# 
-#                 j += 1
-# 
-#             i += 1
+        print( "Final text:\t\t", result )
 
         self.indicator.set_label( parsedOutput, "" )
         self.indicator.set_title( parsedOutput ) # Needed for Lubuntu/Xubuntu.
@@ -797,7 +786,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
              key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
                 if dateTimeFormat is None:
                     displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' )
-
+#TODO Why put in the ' ' with '  '?  For readability?  If so, maybe set this to be the format.  Where else is the format used?
                 else:
                     displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat )
 
