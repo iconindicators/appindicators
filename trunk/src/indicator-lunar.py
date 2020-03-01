@@ -242,6 +242,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
 
+        print( self.data.keys() )#TODO Remove
+
         # Update frontend.
         self.updateMenu( menu )
         self.updateLabel()
