@@ -242,8 +242,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
 
-        print( self.data.keys() )#TODO Remove
-
         # Update frontend.
         self.updateMenu( menu )
         self.updateLabel()
@@ -870,18 +868,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
 
-#TODO Check the tooltip makes sense and matches the code!
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "The icon text can contain free text and\n" + \
-            "tags from the table below.\n\n" + \
+            "The icon text can contain text and tags\n" + \
+            "from the table below.\n\n" + \
             "To associate text with one or more tags,\n" + \
             "enclose the text and tag(s) within { }.\n\n" + \
             "For example\n\n" + \
             "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
-            "If a tag contains no data at render time,\n" + \
+            "If any tag contains no data at render time,\n" + \
             "the tag will be removed.\n\n" + \
             "If a removed tag is within a { }, the tag and\n" + \
             "text will be removed." ) )
