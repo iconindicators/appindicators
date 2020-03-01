@@ -110,7 +110,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
 
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM = "%Y-%m-%d %H:%M"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
     BODY_TAGS_TRANSLATIONS = dict(
         list( astrobase.AstroBase.NAME_TAG_MOON_TRANSLATION.items() ) +
@@ -760,8 +760,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
              key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
              key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
                 if dateTimeFormat is None:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMM ).replace( ' ', '  ' )
-#TODO Why put in the ' ' with '  '?  For readability?  If so, maybe set this to be the format.  Where else is the format used?
+                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM )
+
                 else:
                     displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat )
 
