@@ -1301,13 +1301,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return responseType
 
 
-#TODO Check the logic of this new function!
-#
-#TODO At night (moon and sun both below horizon) and "hide bodies below horizon" was checked, so nothing was displayed.
-#But in the preferences, the table had all the attributes for sun and moon.  Is this correct?
-#If "hide bodies" is unchecked, the moon/sun and planets (all with rise times as they were below the horizon) were in the menu,
-#but only the moon/sun are in the table.  Is this correct?
-#Maybe the planet data should have been in the backend data...?
     def initialiseDisplayTagsStore( self, displayTagsStore ):
         items = [ [ astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, astrobase.AstroBase.DATA_TAGS_MOON ],
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
@@ -1323,8 +1316,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     key = ( bodyType, bodyTag, dataTag )
                     if key in self.data:
                         value = self.getDisplayData( key )
-
-                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAGS_PLANET ],
                   [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAGS_STAR ] ]
@@ -1333,16 +1325,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             bodyType = item[ 0 ]
             bodyTags = item[ 1 ]
             dataTags = item[ 2 ]
-            if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
-                for bodyTag in bodyTags:
+            for bodyTag in bodyTags:
+                if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                     for dataTag in dataTags:
                         translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                         value = ""
                         key = ( bodyType, bodyTag, dataTag )
                         if key in self.data:
                             value = self.getDisplayData( key )
-
-                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+                            displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ astrobase.AstroBase.BodyType.COMET, self.cometData, astrobase.AstroBase.DATA_TAGS_COMET ],
                   [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAGS_MINOR_PLANET ] ]
@@ -1351,16 +1342,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             bodyType = item[ 0 ]
             bodyTags = item[ 1 ]
             dataTags = item[ 2 ]
-            if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
-                for bodyTag in bodyTags:
+            for bodyTag in bodyTags:
+                if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                     for dataTag in dataTags:
                         translatedTag = bodyTag + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                         value = ""
                         key = ( bodyType, bodyTag, dataTag )
                         if key in self.data:
                             value = self.getDisplayData( key )
-
-                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+                            displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         bodyType = astrobase.AstroBase.BodyType.SATELLITE
         for bodyTag in self.satelliteData:
@@ -1373,8 +1363,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag )
                     if key in self.data:
                         value = self.getDisplayData( key )
-
-                    displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
+                        displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
     def translateTags( self, tagsListStore, originalToLocal, text ):
