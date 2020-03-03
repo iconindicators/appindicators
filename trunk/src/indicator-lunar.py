@@ -130,6 +130,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Or is this true: if a download fail happens, there should be no files...so no age to check against.
 #
 # MORE THINKING!
+#
+#Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
