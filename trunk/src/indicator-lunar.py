@@ -358,6 +358,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS}"
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS]}"
 #         label = {Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}
+#         label = ABC{Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}DEF
 
         print( "Original text:\t\t", label )#TODO Remove
         for key in self.data.keys():
@@ -370,6 +371,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         i = 0
         start = i
         result = ""
+        lastSeparatorIndex = -1
         while( i < len( label ) ):
             if label[ i ] == '{':
                 j = i + 1
@@ -378,7 +380,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         freeText = label[ i + 1 : j ]
                         freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
                         if freeText == freeTextMinusUnknownTags: # No unused tags were found.
-                            result += label[ start : i ] + freeText + self.indicatorTextSeparator #TODO Need to remove last separator.
+                            result += label[ start : i ] + freeText + self.indicatorTextSeparator
+                            lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
 
                         else:
                             result += label[ start : i ]
@@ -390,6 +393,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     j += 1
 
             i += 1
+
+        if lastSeparatorIndex > -1:
+            result = result[ 0 : lastSeparatorIndex ]
 
         result += label[ start : i ]
 
