@@ -358,6 +358,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS}"
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS]}"
 
+# TODO DOes not work:
+#     Original text:         {Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}
+#     Known tags replaced:     {Moon Phase: Waxing Gibbous}{Moon Rise: 2020-03-03  14:12}
+#     Final text:         Moon Rise: 2020-03-03  14:12, 
+
+
         print( "Original text:\t\t", label )#TODO Remove
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
