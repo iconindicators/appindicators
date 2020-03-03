@@ -897,7 +897,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         indicatorTextSeparator = Gtk.Entry()
         indicatorTextSeparator.set_text( self.indicatorTextSeparator )
-        indicatorTextSeparator.set_tooltip_text( _( "The separator will be added to the end of each { }." ) )
+        indicatorTextSeparator.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
