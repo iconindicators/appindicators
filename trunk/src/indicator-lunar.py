@@ -123,22 +123,29 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #For the next few days, make backups of the same data.
 # Then run the indicator using each set of data and compare the comet/mp rise/set/alt/az.
 # Determine if it is possible to change the comet/mp cache age from 24 to 48 hours or something in between.
+#
+# Even with a cache age of 24 hours, if the user has a bad connection, then updates, will not attempt a new download.
+# Similarly if the user restarts the indicator/computer; new data will not be re downloaded until the age elapses.
+#
+# Or is this true: if a download fail happens, there should be no files...so no age to check against.
+#
+# MORE THINKING!
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 2400 #TODO Set to 48 and do another test.
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 2400 #TODO Set to 48 and do another test.
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 2400 #TODO Set to 48 and do another test.
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
@@ -197,18 +204,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #
 # Maybe part of the update should be to check if we can hit google or similar.
 # So if we fail at getting data, we could do a retry in an hour but only if we can hit google.
+        now = datetime.datetime.now()
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
+        print( "Flush:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         # Update comet, minor planet and satellite data.
+        now = datetime.datetime.now()
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
                                           orbitalelement.download,
                                           IndicatorLunar.COMET_DATA_URL,
                                           IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+        print( "Comets:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         self.minorPlanetData = { }
+        now = datetime.datetime.now()
         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
             minorPlanetData = self.updateData( baseName,
                                                orbitalelement.download,
@@ -218,14 +230,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for key in minorPlanetData:
                 if key not in self.minorPlanetData:
                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
+        print( "Minor Planets:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
+        now = datetime.datetime.now()
         self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME,
                                               twolineelement.download,
                                               IndicatorLunar.SATELLITE_DATA_URL,
                                               None )
+        print( "Satellites:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
