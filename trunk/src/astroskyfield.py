@@ -950,14 +950,14 @@ class AstroSkyfield( astrobase.AstroBase ):
         print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
 
 
-    # Create the planet ephemeris from online source.
+    # Create the planet ephemeris from online source:
     #     https://github.com/skyfielders/python-skyfield/issues/123
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
     #
-    # The ephemeris will last from the date of creation to one year ahead.
+    # The ephemeris date range is from the date of creation plus one year.
     #
-    # Prior to jplephem being released, download a .bsp and use spkmerge to create a smaller subset.
+    # Prior to using jplephem, download a .bsp and use spkmerge to create a smaller subset.
     # Refer to https://github.com/skyfielders/python-skyfield/issues/123
     # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
@@ -966,20 +966,19 @@ class AstroSkyfield( astrobase.AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         today = datetime.date.today()
-        dateFormat = "%Y/%m/%d"
-        firstOfThisMonth = datetime.date( today.year, today.month, today.day )
-        oneYearFromNow = firstOfThisMonth.replace( year = today.year + 1 )
+        oneYearFromToday = today.replace( year = today.year + 1 )
         planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
+        dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
-                  firstOfThisMonth.strftime( dateFormat ) + " " + \
-                  oneYearFromNow.strftime( dateFormat ) + " " + \
+                  today.strftime( dateFormat ) + " " + \
+                  oneYearFromToday.strftime( dateFormat ) + " " + \
                   planetEphemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
             print( "Creating planet ephemeris..." )
             subprocess.call( command, shell = True )
             print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS ) #TODO This prints even if an error/exception occurs...
- 
+  
         except subprocess.CalledProcessError as e:
             print( e )
 
