@@ -357,8 +357,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay}"
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS}"
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS]}"
-#         label = {Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}
-#         label = ABC{Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}DEF
+#         label = "{Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}"
+#         label = "ABC{Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}DEF"
 
         print( "Original text:\t\t", label )#TODO Remove
         for key in self.data.keys():
