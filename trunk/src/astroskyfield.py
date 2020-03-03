@@ -978,7 +978,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( "Creating planet ephemeris..." )
             subprocess.call( command, shell = True )
             print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS ) #TODO This prints even if an error/exception occurs...
-  
+
         except subprocess.CalledProcessError as e:
             print( e )
 
