@@ -371,7 +371,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         i = 0
         start = i
         result = ""
-        lastSeparatorIndex = -1
+        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
         while( i < len( label ) ):
             if label[ i ] == '{':
                 j = i + 1
@@ -395,7 +395,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             i += 1
 
         if lastSeparatorIndex > -1:
-            result = result[ 0 : lastSeparatorIndex ]
+            result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
 
         result += label[ start : i ]
 
