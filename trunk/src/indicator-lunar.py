@@ -270,8 +270,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites( utcNow )
 
-        return 60 * 60 #TODO Remove testing only
-#         return self.getNextUpdateTimeInSeconds()
+        return self.getNextUpdateTimeInSeconds()
 
 
     def flushCache( self ):
