@@ -357,12 +357,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay}"
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS}"
 #         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS]}"
-
-# TODO DOes not work:
-#     Original text:         {Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}
-#     Known tags replaced:     {Moon Phase: Waxing Gibbous}{Moon Rise: 2020-03-03  14:12}
-#     Final text:         Moon Rise: 2020-03-03  14:12, 
-
+#         label = {Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}
 
         print( "Original text:\t\t", label )#TODO Remove
         for key in self.data.keys():
@@ -371,7 +366,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         print( "Known tags replaced:\t", label )#TODO Remove
 
-#TODO Need to put in the separator!
         # Handle any free text '{' and '}'.
         i = 0
         start = i
@@ -384,10 +378,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         freeText = label[ i + 1 : j ]
                         freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
                         if freeText == freeTextMinusUnknownTags: # No unused tags were found.
-                            result = label[ start : i ] + freeText
+                            result += label[ start : i ] + freeText + self.indicatorTextSeparator #TODO Need to remove last separator.
 
                         else:
-                            result = label[ start : i ]
+                            result += label[ start : i ]
 
                         i = j
                         start = i + 1
