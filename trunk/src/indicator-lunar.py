@@ -886,7 +886,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
             "If any tag contains no data at render time,\n" + \
             "the tag will be removed.\n\n" + \
-            "If a removed tag is within a { }, the tag and\n" + \
+            "If a removed tag is within { }, the tag and\n" + \
             "text will be removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
