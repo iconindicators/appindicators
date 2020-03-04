@@ -83,9 +83,10 @@ import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allow switching between alternate backends.
-    astrobackend = getattr( __import__( "AstroPyephem".lower() ), "AstroPyephem" )
-#     astrobackend = getattr( __import__( "AstroSkyfield".lower() ), "AstroSkyfield" )
+    # Allow switching between alternate backends (eventually looking to move to Skyfield).
+    astrobackendName = "AstroPyephem"
+#     astrobackendName = "AstroSkyfield"
+    astrobackend = getattr( __import__( astrobackendName.lower() ), astrobackendName )
 
     if astrobackend.getAvailabilityMessage() is not None:
         dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, astrobackend.getAvailabilityMessage() )
