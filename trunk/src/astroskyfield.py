@@ -19,9 +19,6 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO Copy planets.bsp and stars.dat.gz to server.
-
-
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
 
 
