@@ -87,9 +87,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     astrobackend = getattr( __import__( "AstroPyephem".lower() ), "AstroPyephem" )
 #     astrobackend = getattr( __import__( "AstroSkyfield".lower() ), "AstroSkyfield" )
 
-#TODO How to avoid the message "GtkDialog mapped without a transient parent."?
     if astrobackend.getAvailabilityMessage() is not None:
-        dialog = Gtk.MessageDialog( None, Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, astrobackend.getAvailabilityMessage() )
+        dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, astrobackend.getAvailabilityMessage() )
         dialog.set_title( INDICATOR_NAME )
         dialog.run()
         dialog.destroy()
