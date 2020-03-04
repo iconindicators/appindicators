@@ -1413,7 +1413,7 @@ msgid ""
 "Skyfield could not be found. Install using:\n"
 "\n"
 "sudo apt-get install -y python3-pip\n"
-"sudo pip3 install --upgrade pip skyfield pandas"
+"sudo pip3 install --upgrade pip skyfield pandas pytz"
 msgstr ""
 
 #: indicator-lunar.py:152
