@@ -40,6 +40,9 @@
 # Not sure why this happened, but I could not generate it.
 # Was fixed by deleting his .cache and .config
 # Which deletion fixed this and why?
+#
+# I suspect something odd is happening, partly because the indicator was not run from within the directory but from another directory:
+#     /home/adeptus/tmp/IndicatorLunar/
 
 
 # Required to run the planet/star ephemeris creation functions at the end.  Uncomment as needed!
