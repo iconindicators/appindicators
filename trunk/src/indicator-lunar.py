@@ -205,7 +205,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # If the cache age is set to several days, then it will be several days before we try to get data again!!!
 #
 # Maybe part of the update should be to check if we can hit google or similar.
-# So if we fail at getting data, we could do a retry in an hour but only if we can hit google.
+# So if we fail at getting data, we could do a retry in an hour but only if we can hit google.#
+#
+#The age of a data file (cache age) and whether or not that file should be deleted (because it is stale) and so do a download,
+#should be independant of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
+#If the download fails, perhaps don't write any cache binary file.  What's the point?
         now = datetime.datetime.now()
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
         print( "Flush:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
