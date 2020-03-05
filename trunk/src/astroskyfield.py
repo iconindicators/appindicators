@@ -950,7 +950,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # Format of Hipparcos catalogue:
     #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
     @staticmethod
-    def createStarEphemeris():
+    def createEphemerisStars():
         catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
         if not os.path.isfile( catalogue ):
             print( "Downloading star catalogue..." )
@@ -963,7 +963,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         print( "Creating list of stars..." )
         with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
-                hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at columns indices [ 42 : 46 ].
+                hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
                 if hip in hipparcosIdentifiers:
                     outFile.write( line )
 
@@ -981,7 +981,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # Refer to https://github.com/skyfielders/python-skyfield/issues/123
     # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
-    def createPlanetEphemeris():
+    def createEphemerisPlanets():
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
