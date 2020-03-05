@@ -210,23 +210,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #The age of a data file (cache age) and whether or not that file should be deleted (because it is stale) and so do a download,
 #should be independant of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
 #If the download fails, perhaps don't write any cache binary file.  What's the point?
-        now = datetime.datetime.now()
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
-        print( "Flush:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         # Update comet, minor planet and satellite data.
-        now = datetime.datetime.now()
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
                                           orbitalelement.download,
                                           IndicatorLunar.COMET_DATA_URL,
                                           IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
-        print( "Comets:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         self.minorPlanetData = { }
-        now = datetime.datetime.now()
         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
             minorPlanetData = self.updateData( baseName,
                                                orbitalelement.download,
@@ -236,17 +231,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             for key in minorPlanetData:
                 if key not in self.minorPlanetData:
                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
-        print( "Minor Planets:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
-        now = datetime.datetime.now()
         self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME,
                                               twolineelement.download,
                                               IndicatorLunar.SATELLITE_DATA_URL,
                                               None )
-        print( "Satellites:", str( ( datetime.datetime.now() - now ).total_seconds() ) )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
