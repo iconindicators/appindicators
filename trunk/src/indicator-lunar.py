@@ -306,7 +306,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #Maybe only write out data if we have data to write out.
 #This distinction will let us determine if we attempt a re-download say one hour later (by checking the cache and seeing it is empty).
 #
-#TODO Assuming the tle/oe download functions are changed such that None is returned on error, then we should write out nothing.            
+#TODO Assuming the tle/oe download functions are changed such that None is returned on error, then we should write out nothing. 
+#
+#TODO If we allow multiple attempts at re-download data (because not present in cache), will need an attempt counter PER cache.           
             if magnitudeFilterFunction:
                 data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
 
