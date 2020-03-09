@@ -168,6 +168,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
+    DEBUG = False #TODO Testing
+    
 
     def __init__( self ):
         super().__init__(
@@ -180,7 +182,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" ),
                         _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) ],
 #TODO Remove debug before release!
-            debug = True )
+            debug = IndicatorLunar.DEBUG )
 
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
@@ -348,10 +350,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateMenu( self, menu ):
 #TODO Remove debugging before release!
-        menu.append( Gtk.MenuItem( "Backend: " + str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
-        menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
-        menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
-        menu.append( Gtk.SeparatorMenuItem() )
+        if IndicatorLunar.DEBUG:
+            menu.append( Gtk.MenuItem( "Backend: " + str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
+            menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
+            menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
+            menu.append( Gtk.SeparatorMenuItem() )
 
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
