@@ -301,8 +301,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if data is None:
             data = downloadDataFunction( dataURL, self.getLogging() )
-#TODO At this point, what if the data downloaded is empty?  Means there's no data (but the site was up)...so write out empty/small file?
-#We want to maybe one hour later attempt to redownload.
+#TODO At this point, what if the data downloaded is empty?  Means there's no data (but the site was up) OR there was an exceptin.
+#...so does it make sense to write out empty/small file in these cases?
+#Maybe only write out data if we have data to write out.
+#This distinction will let us determine if we attempt a re-download say one hour later (by checking the cache and seeing it is empty).
 #
 #TODO Assuming the tle/oe download functions are changed such that None is returned on error, then we should write out nothing.            
             if magnitudeFilterFunction:
