@@ -348,8 +348,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return nextUpdateInSeconds 
 
 
-#TODO Do some timing tests...if the menu building is taking the bulk of the time (versus the backend),
-# is there a way to reuse menu items between updates?
     def updateMenu( self, menu ):
 #TODO Remove debugging before release!
         if IndicatorLunar.DEBUG:
