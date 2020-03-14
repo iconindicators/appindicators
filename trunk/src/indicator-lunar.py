@@ -301,9 +301,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 data = None
 # End of hack!
 
+#TODO Why need the above hack at all?
+# Can we do the check on startup and if the file exists, delete it and then in the update a download of the new data happens?
+
         if data is None:
             data = downloadDataFunction( dataURL, self.getLogging() )
-#TODO At this point, what if the data downloaded is empty?  Means there's no data (but the site was up) OR there was an exceptin.
+#TODO At this point, what if the data downloaded is empty?  Means there's no data (but the site was up) OR there was an exception.
 #...so does it make sense to write out empty/small file in these cases?
 #Maybe only write out data if we have data to write out.
 #This distinction will let us determine if we attempt a re-download say one hour later (by checking the cache and seeing it is empty).
@@ -317,6 +320,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.writeCacheBinary( cacheBaseName, data )
 
         return data
+
+
+    def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
+        pass
+#TODO
+#     Read cache binary
+#     If binary is present
+#         return binary
+#
+#     Else
+#         If time since last download is less than the limit
+#             return None
+#         ...need to do a download, but also factor in how often.
 
 
     def addNewBodies( self, data, bodies ):
