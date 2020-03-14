@@ -731,8 +731,6 @@ class AstroSkyfield( astrobase.AstroBase ):
     def getCredit(): return _( "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield" )
 
 
-#TODO Need pytz?  If so, add to the install message.
-#TODO The install message needs to be changed in the POT and RU PO file...wait for Oleg to send back translations.
     @staticmethod
     def getAvailabilityMessage(): 
         message = None
