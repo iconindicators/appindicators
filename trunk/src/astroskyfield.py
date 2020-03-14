@@ -22,29 +22,6 @@
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
 
 
-#TODO Oleg could not get astroskyfield to run and was getting this trace:
-#
-#     Traceback (most recent call last):
-#       File "/usr/share/indicator-lunar/indicatorbase.py", line 112, in __updateInternal
-#         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
-#       File "/usr/share/indicator-lunar/indicator-lunar.py", line 221, in update
-#         self.magnitude )
-#       File "/usr/share/indicator-lunar/astroskyfield.py", line 692, in calculate
-#         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
-#       File "/usr/local/lib/python3.5/dist-packages/skyfield/iokit.py", line 203, in __call__
-#         download(url, path, self.verbose)
-#       File "/usr/local/lib/python3.5/dist-packages/skyfield/iokit.py", line 528, in download
-#         raise e2
-#     OSError: cannot get ftp://ssd.jpl.nasa.gov/pub/eph/planets/bsp/planets.bsp because <urlopen error ftp error: URLError("ftp error: error_perm('550 Failed to change directory.',)",)>
-#
-# Not sure why this happened, but I could not generate it.
-# Was fixed by deleting his .cache and .config
-# Which deletion fixed this and why?
-#
-# I suspect something odd is happening, partly because the indicator was not run from within the directory but from another directory:
-#     /home/adeptus/tmp/IndicatorLunar/
-
-
 # Required to run the planet/star ephemeris creation functions at the end.  Uncomment as needed!
 # import gettext
 # gettext.install( "astroskyfield" )
