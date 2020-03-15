@@ -582,9 +582,11 @@ class IndicatorBase( ABC ):
     # cacheMaximumAgeInHours: Anything older than the maximum age (hours) is deleted.
     #
     # Any file in the cache directory matching the pattern
+    #
     #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     # or
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #
     # and is older than the cache maximum age is discarded.
     def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
