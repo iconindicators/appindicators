@@ -289,20 +289,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Start of temporary hack...
 # Cache data formats changed between version 80 and 81.
 #
-# Satellites still use the TLE object, but the file name changed from satellite to twolineelement and is deemed an invalid object.
-# Therefore reading the cache binary will throw an exception and return None.
-# Not a problem as a new version will be downloaded and the cache will eventually clear out.
+# Satellites still use the TLE object, but the file name changed from 'satellite' to 'twolineelement'.
+# When the cache file is read, the file will be deemed an invalid object, throwing an exception and returning None.
+# Not a problem as a new version will be downloaded and the cache will eventually clear out the old version.
 #
 # Comets will successfully read in because their objects (dictionary, tuple string) are valid.
-# Comets are still stored in a dictionary using a string as key but now with a new OE object as the value, which must be handled.
-# This check can be removed in version 82.
-        if data and cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
+# Although comets are still stored in a dictionary using a string as key, the value type has changed to a new OE object as the value, which must be handled.
+# Old format comet data must be skipped and force a download.
+# Remove this hack in release 82.
+        if cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and data:
             if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
                 data = None
 # End of hack!
-
-#TODO Why need the above hack at all?
-# Can we do the check on startup and if the file exists, delete it and then in the update a download of the new data happens?
 
         if data is None:
             data = downloadDataFunction( dataURL, self.getLogging() )
