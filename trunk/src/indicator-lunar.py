@@ -118,6 +118,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+#TODO Thinking...
+    DOWNLOAD_RETRY_INTERVALS_IN_MINUTES = [ 5 * 60, 30 * 60, 60 * 60 ]
+
 
 #TODO Have made a copy of comet/mp/tle data from 2020 02 19 21 24
 #For the next few days, make backups of the same data.
@@ -189,6 +192,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
+#TODO Thinking...
+        self.satelliteRetryInterval = 5 * 60 # Five minutes.
+
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
 
@@ -210,7 +216,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # So if we fail at getting data, we could do a retry in an hour but only if we can hit google.#
 #
 #The age of a data file (cache age) and whether or not that file should be deleted (because it is stale) and so do a download,
-#should be independant of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
+#should be independent of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
 #If the download fails, perhaps don't write any cache binary file.  What's the point?
         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
@@ -305,7 +311,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if data is None:
             data = downloadDataFunction( dataURL, self.getLogging() )
 #TODO At this point, what if the data downloaded is empty?  Means there's no data (but the site was up) OR there was an exception.
-#...so does it make sense to write out empty/small file in these cases?
+#...so does it make sense to write out empty or small (dataless) file in these cases?
 #Maybe only write out data if we have data to write out.
 #This distinction will let us determine if we attempt a re-download say one hour later (by checking the cache and seeing it is empty).
 #
@@ -325,12 +331,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO
 #     Read cache binary
 #     If binary is present
-#         return binary
+#         Return binary
 #
 #     Else
 #         If time since last download is less than the limit
-#             return None
-#         ...need to do a download, but also factor in how often.
+#             Return None
+#
+#         Else
+#            Download
+#            If download contains data
+#                 Write to cache
+#                 Return binary
+#
+#            Else
+#                 Set next download attempt
+#                 Return None
 
 
     def addNewBodies( self, data, bodies ):
