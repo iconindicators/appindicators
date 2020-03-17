@@ -398,26 +398,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Substitute data tags '[' and ']' for values.
         label = self.indicatorText
 
-#TODO Tested and works...
-#         label = "This is the label: {The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
-#         label = "This is the label: {The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
-#         label = "{The sun rises at [SUN RISE DATE TIME]}; [MOON PHASE]"
-#         label = "{The sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]"
-#         label = "[SOME BOGUS TAG]}; [MOON PHASE]"
-#         label = "{[SOME BOGUS TAG]; [MOON PHASE]"
-#         label = "[MOON PHASE]"
-#         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay}"
-#         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS}"
-#         label = "{Sun rises at [SUN RISE DATE TIME] with a bogus [SOME BOGUS TAG]}; [MOON PHASE]{Some text should stay [BOGUS]}"
-#         label = "{Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}"
-#         label = "ABC{Moon Phase: [MOON PHASE]}{Moon Rise: [MOON RISE DATE TIME]}DEF"
-
-        print( "Original text:\t\t", label )#TODO Remove
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
                 label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
-
-        print( "Known tags replaced:\t", label )#TODO Remove
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -450,8 +433,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
 
         result += label[ start : i ]
-
-        print( "Final text:\t\t", result )#TODO Remove
 
         self.indicator.set_label( result, "" )
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
