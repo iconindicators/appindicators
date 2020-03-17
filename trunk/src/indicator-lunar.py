@@ -353,13 +353,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Cache data formats changed between version 80 and 81.
 #
 # The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
-# When an old cache file is read, the underlying object will be deemed, throwing an exception and returning None.
-# Not a problem as a None return value causes a new version to be downloaded.
+# When an old cache file is read, the underlying object will be deemed invalid, throwing an exception and returning None.
+# In this event, simply download a new version (and write out using the new object format).
 # The old version will eventually be cleared from the cache.
 #
-# Comets were originally stored as a dict with a string for both key and value.
-# Comets are now stored as a dict with key string and value is a orbitalelement.OE object.
-# Therefore need to check if the format is valid and if not, force a download.
+# Comets were originally stored as a dictionary with a string for both key and value.
+# Comets are now stored as a dictionary with key string and value orbitalelement.OE.
+# When a comet cache file is read, check if the format is valid and if not, force a download.
 # The old version will eventually be cleared from the cache.
         if data and \
            cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
