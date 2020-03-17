@@ -331,7 +331,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         pass
 #TODO
 #     Read cache binary
-#     If binary is present
+#     If binary is present (non-empty, non-None)
 #         Return binary
 #
 #     Else
@@ -342,6 +342,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #            Download
 #            If download contains data
 #                 Write to cache
+#                 Need to reset the download attempt?
 #                 Return binary
 #
 #            Else
