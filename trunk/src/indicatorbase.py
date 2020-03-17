@@ -629,7 +629,6 @@ class IndicatorBase( ABC ):
             try:
                 with open( filename, "rb" ) as f:
                     data = pickle.load( f )
-                    print( filename )#TODO Remove
 
             except Exception as e:
                 data = None
