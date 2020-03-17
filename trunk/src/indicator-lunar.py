@@ -292,19 +292,20 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def updateData( self, cacheBaseName, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
         data = self.readCacheBinary( cacheBaseName ) # Either valid or None.
 
-#TODO Start of temporary hack...
+#TODO Start of temporary hack...remove in release 82,
 # Cache data formats changed between version 80 and 81.
 #
-# Satellites still use the TLE object, but the file name changed from 'satellite' to 'twolineelement'.
-# When the cache file is read, the file will be deemed an invalid object, throwing an exception and returning None.
-# Not a problem as a new version will be downloaded and the cache will eventually clear out the old version.
+# The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
+# When an old cache file is read, the underlying object will be deemed, throwing an exception and returning None.
+# Not a problem as a None return value causes a new version to be downloaded.
+# The old version will eventually be cleared from the cache.
 #
-# Comets will successfully read in because their objects (dictionary, tuple string) are valid.
-# Although comets are still stored in a dictionary using a string as key, the value type has changed to a new OE object as the value, which must be handled.
-# Old format comet data must be skipped and force a download.
-# Remove this hack in release 82.
+# Comets were originally stored as a dict with a string for both key and value.
+# Comets are now stored as a dict with key string and value is a orbitalelement.OE object.
+# Therefore need to check if the format is valid and if not, force a download.
+# The old version will eventually be cleared from the cache.
         if cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and data:
-            if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Check that the object loaded from cache matches the new OE object.
+            if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Ensure the object loaded from cache matches the new OE object.
                 data = None
 # End of hack!
 
@@ -1653,11 +1654,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT )
 
-#TODO Start of temporary hack...
+#TODO Start of temporary hack...remove in release 82.
 # Convert lat/long from str to float.
 # Convert planet/star to upper case.
 # Convert satellites from list of lists of tuple ( satellite name, satellite number ) to list of satellite numbers.
-# Remove this hack in release 82.
         self.latitude = float( self.latitude )
         self.longitude = float( self.longitude )
 
