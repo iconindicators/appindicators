@@ -63,9 +63,9 @@ import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allow switching between alternate backends (eventually looking to move to Skyfield).
+    # Allow switching between alternate backends.
     astrobackendName = "AstroPyephem"
-#     astrobackendName = "AstroSkyfield"
+#     astrobackendName = "AstroSkyfield" #TODO Remove prior to release.
     astrobackend = getattr( __import__( astrobackendName.lower() ), astrobackendName )
 
     if astrobackend.getAvailabilityMessage() is not None:
