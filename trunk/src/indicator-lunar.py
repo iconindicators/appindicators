@@ -118,10 +118,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
-#TODO Thinking...
-    DOWNLOAD_RETRY_INTERVALS_IN_MINUTES = [ 5 * 60, 30 * 60, 60 * 60 ]
-
-
 #TODO Have made a copy of comet/mp/tle data from 2020 02 19 21 24
 #For the next few days, make backups of the same data.
 # Then run the indicator using each set of data and compare the comet/mp rise/set/alt/az.
@@ -193,7 +189,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
 #TODO Thinking...
-        self.lastDownloadTimeForSatelliteTLE = datetime.datetime.utcnow()
+        self.downloadCountForTLE = 0
+        self.nextDownloadTimeForTLE = datetime.datetime.utcnow()
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
@@ -327,7 +324,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
-    def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, nextDownloadTime, magnitudeFilterFunction = None ):
+    def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
         #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
         #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
         data = self.readCacheBinary( cacheBaseName )
@@ -347,7 +344,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if data and \
            cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
            not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
-            data = { } #TODO Maybe set to None to mimick how readCacheBinary only returns None (from now on)?
+            data = { } #TODO Maybe set to None to mimic how readCacheBinary only returns None (from now on)?
 # End of hack!
 
 #TODO
@@ -376,17 +373,35 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             data = { }
             if nextDownloadTime < datetime.datetime.utcnow():
                 data = downloadDataFunction( dataURL, self.getLogging() )
+                downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
 
                     if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
                         self.writeCacheBinary( cacheBaseName, data )
+                        downloadCount = 0
+                        nextDownloadTime = None #TODO What to set this to?
 
                 else: # Download failed; set up for next download attempt...
-                    pass #TODO Set another download attempt.  Need to track download attempts and the time for the next attempt.
+                    nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
 
-        return data #TODO May need to return the nextDownloadTime and the download attempt (attempt number or interval between attempts or similar).
+        return data, downloadCount, nextDownloadTime
+
+
+#TODO Thinking...
+    def getNextDownloadInterval( self, downloadCount ):
+        defaultTimeInterval = 60 # If no download attempt can be found (because we have done four or more) set to a sixty minute interval.
+        downloadCountsAndTimeIntervals = {
+            1 : 5, # After one download attempt, set the time to the next download attempt to five minutes from now and so on...
+            2 : 10,
+            3 : 30 }
+
+        timeInterval = defaultTimeInterval
+        if downloadCount in downloadCountsAndTimeIntervals:
+            timeInterval = downloadCountsAndTimeIntervals[ downloadCount ]
+
+        return timeInterval
 
 
     def addNewBodies( self, data, bodies ):
