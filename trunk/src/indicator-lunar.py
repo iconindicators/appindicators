@@ -193,7 +193,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
 #TODO Thinking...
-        self.satelliteRetryInterval = 5 * 60 # Five minutes.
+        self.lastDownloadTimeForSatelliteTLE = datetime.datetime.utcnow()
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
@@ -327,26 +327,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
-    def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-#TODO
-#     Read cache binary
-#     If binary is present (non-empty, non-None)
-#         Return binary
-#
-#     Else
-#         If time since last download is less than the limit
-#             Return None
-#
-#         Else
-#            Download
-#            If download contains data
-#                 Write to cache
-#                 Need to reset the download attempt?
-#                 Return binary
-#
-#            Else
-#                 Set next download attempt
-#                 Return None
+    def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, nextDownloadTime, magnitudeFilterFunction = None ):
         data = self.readCacheBinary( cacheBaseName )
 
 #TODO Start of temporary hack...remove in release 82,
@@ -367,15 +348,40 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             data = { }
 # End of hack!
 
-        if not data:
-            pass
-#             data = downloadDataFunction( dataURL, self.getLogging() )
-#             if magnitudeFilterFunction:
-#                 data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-# 
-#             self.writeCacheBinary( cacheBaseName, data )
+#TODO
+#     Read cache binary
+#     If binary is empty/None:
+#         If time since last download is less than the limit
+#             Return None/Empty
+#
+#         Else
+#            Download
+#            If download contains data
+#                 Write to cache
+#                 Need to reset the download attempt?
+#                 Return binary
+#
+#            Else
+#                 Set next download attempt
+#                 Return None
+#
+#     Return binary
+        
+        #TODO We could have empty data from old cache files...is this a problem?
+        # Does the check below handle this?
+        if not data: #TODO Need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
+            if nextDownloadTime < datetime.datetime.utcnow():
+                data = downloadDataFunction( dataURL, self.getLogging() )
+                if data and magnitudeFilterFunction:
+                    data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
 
-        return data
+                if data: # The magnitude filter function may have stripped out the data, so no point writing out empty data.
+                    self.writeCacheBinary( cacheBaseName, data )
+
+                else:
+                    pass #TODO Set another download attempt.  Need to track download attempts and the time for the next attempt.
+
+        return data #TODO May need to return the nextDownloadTime and the download attempt (attempt number or interval between attempts or similar).
 
 
     def addNewBodies( self, data, bodies ):
