@@ -389,6 +389,71 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data, downloadCount, nextDownloadTime
 
 
+    def updateDataNEWNEW( self, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+        #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
+        #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
+        data = self.readCacheBinary( cacheBaseName )
+
+#TODO Start of temporary hack...remove in release 82,
+# Cache data formats changed between version 80 and 81.
+#
+# The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
+# When an old cache file is read, the underlying object will be deemed invalid, throwing an exception and returning None.
+# In this event, simply download a new version (and write out using the new object format).
+# The old version will eventually be cleared from the cache.
+#
+# Comets were originally stored as a dictionary with a string for both key and value.
+# Comets are now stored as a dictionary with key string and value orbitalelement.OE.
+# When a comet cache file is read, check if the format is valid and if not, force a download.
+# The old version will eventually be cleared from the cache.
+        if data and \
+           cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
+           not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
+            data = { } #TODO Maybe set to None to mimic how readCacheBinary only returns None (from now on)?
+# End of hack!
+
+#TODO
+#     Read cache binary
+#     If binary is empty/None:
+#         If time since last download is less than the limit
+#             Return None/Empty
+#
+#         Else
+#            Download
+#            If download contains data
+#                 Write to cache
+#                 Need to reset the download attempt?
+#                 Return binary
+#
+#            Else
+#                 Set next download attempt
+#                 Return None
+#
+#     Return binary
+        
+        #TODO We could have empty data from old cache files...is this a problem?  Does checking "if data" catch both None and empty data?
+        # Does the check below handle this?
+        #TODO Do we need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
+        if not data: # Catches None and empty objects....TODO Empty objects should not exist after version 80.
+            data = { }
+            if nextDownloadTime < datetime.datetime.utcnow():
+                data = downloadDataFunction( dataURL, self.getLogging() )
+                downloadCount += 1
+                if data:
+                    if magnitudeFilterFunction:
+                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
+
+                    if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
+                        self.writeCacheBinary( cacheBaseName, data )
+                        downloadCount = 0
+                        nextDownloadTime = None #TODO What to set this to?
+
+                else: # Download failed; set up for next download attempt...
+                    nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
+
+        return data, downloadCount, nextDownloadTime
+
+
 #TODO Thinking...
     def getNextDownloadInterval( self, downloadCount ):
         defaultTimeInterval = 60 # If no download attempt can be found (because we have done four or more) set to a sixty minute interval.
