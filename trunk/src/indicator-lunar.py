@@ -347,7 +347,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if data and \
            cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
            not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
-            data = { }
+            data = { } #TODO Maybe set to None to mimick how readCacheBinary only returns None (from now on)?
 # End of hack!
 
 #TODO
@@ -379,25 +379,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if data:
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-                
-                    if data: # The magnitude filter function may have stripped out the data, so no point writing out empty data.
+
+                    if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
                         self.writeCacheBinary( cacheBaseName, data )
 
-                else:
-                    data = { } #TODO Set another download attempt.  Need to track download attempts and the time for the next attempt.
-
-
-                if data and magnitudeFilterFunction:
-                    data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-
-                if data: # The magnitude filter function may have stripped out the data, so no point writing out empty data.
-                    self.writeCacheBinary( cacheBaseName, data )
-
-                else:
+                else: # Download failed; set up for next download attempt...
                     pass #TODO Set another download attempt.  Need to track download attempts and the time for the next attempt.
-
-            else:
-                data = { } # Data read from cache was None (an error occurred) but cannot attempt another download yet, so return empty data.
 
         return data #TODO May need to return the nextDownloadTime and the download attempt (attempt number or interval between attempts or similar).
 
