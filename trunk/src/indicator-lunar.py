@@ -328,6 +328,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, nextDownloadTime, magnitudeFilterFunction = None ):
+        #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
+        #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
         data = self.readCacheBinary( cacheBaseName )
 
 #TODO Start of temporary hack...remove in release 82,
@@ -367,11 +369,24 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #
 #     Return binary
         
-        #TODO We could have empty data from old cache files...is this a problem?
+        #TODO We could have empty data from old cache files...is this a problem?  Does checking "if data" catch both None and empty data?
         # Does the check below handle this?
-        if not data: #TODO Need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
+        #TODO Do we need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
+        if not data: # Catches None and empty objects....TODO Empty objects should not exist after version 80.
+            data = { }
             if nextDownloadTime < datetime.datetime.utcnow():
                 data = downloadDataFunction( dataURL, self.getLogging() )
+                if data:
+                    if magnitudeFilterFunction:
+                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
+                
+                    if data: # The magnitude filter function may have stripped out the data, so no point writing out empty data.
+                        self.writeCacheBinary( cacheBaseName, data )
+
+                else:
+                    data = { } #TODO Set another download attempt.  Need to track download attempts and the time for the next attempt.
+
+
                 if data and magnitudeFilterFunction:
                     data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
 
@@ -380,6 +395,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 else:
                     pass #TODO Set another download attempt.  Need to track download attempts and the time for the next attempt.
+
+            else:
+                data = { } # Data read from cache was None (an error occurred) but cannot attempt another download yet, so return empty data.
 
         return data #TODO May need to return the nextDownloadTime and the download attempt (attempt number or interval between attempts or similar).
 
