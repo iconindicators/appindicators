@@ -369,6 +369,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         #TODO We could have empty data from old cache files...is this a problem?  Does checking "if data" catch both None and empty data?
         # Does the check below handle this?
         #TODO Do we need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
+        #TODO After a download (and save) do we need to figure out the cache expiration and then set the next download time to that?
         if not data: # Catches None and empty objects....TODO Empty objects should not exist after version 80.
             data = { }
             if nextDownloadTime < datetime.datetime.utcnow():
