@@ -600,6 +600,37 @@ class IndicatorBase( ABC ):
                         os.remove( cacheDirectory + file )
 
 
+#TODO Not sure if this will stay...if so, fix the header.
+    # Read the most recent binary object from the cache.
+    #
+    # baseName: The text used to form the file name, typically the name of the calling application.
+    #
+    # All files in cache directory are filtered based on the pattern
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    # or
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #
+    # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
+    #    ~/.cache/fred/apple-20170629174950
+    #    ~/.cache/fred/orange-20170629174951
+    #
+    # Files which pass the filter are sorted by date/time and the most recent file is read.
+    #
+    # Returns the binary object; None when no suitable cache file exists; None on error and logs.
+    def getCacheExpiry( self, baseName ):
+        cacheDirectory = self.__getCacheDirectory()
+        expiry = datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        theFile = ""
+        for file in os.listdir( cacheDirectory ):
+            if file.startswith( baseName ) and file > theFile:
+                theFile = file
+
+        if theFile: # A value of "" evaluates to False.
+            expiry = theFile[ len( theFile ) - 14 : ]
+
+        return datetime.datetime.strptime( expiry, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+
+
     # Read the most recent binary object from the cache.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
