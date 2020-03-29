@@ -324,6 +324,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
+#TODO Maybe put in a check at the start of this function (or outside) to check the cache age...
+# somehow determine if we actually need to access the cache at all.
+#This could be used to also determine if/when to flush the cache.
     def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
         #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
         #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
