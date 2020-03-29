@@ -215,7 +215,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #The age of a data file (cache age) and whether or not that file should be deleted (because it is stale) and so do a download,
 #should be independent of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
 #If the download fails, perhaps don't write any cache binary file.  What's the point?
-        self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
+
+        utcNow = datetime.datetime.utcnow()
+        self.flushCache() #TODO Fix this comment if incorrect after cacheing is sorted out...# Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
         # Update comet, minor planet and satellite data.
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
@@ -249,7 +251,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-        utcNow = datetime.datetime.utcnow()
+#         utcNow = datetime.datetime.utcnow()
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -327,10 +329,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Maybe put in a check at the start of this function (or outside) to check the cache age...
 # somehow determine if we actually need to access the cache at all.
 #This could be used to also determine if/when to flush the cache.
-    def updateDataNEW( self, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
-        #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
-        #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
-        data = self.readCacheBinary( cacheBaseName )
+    def updateDataNEW( self, utcNow, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+        data = None
+        cacheExpiry = self.getCacheExpiry( cacheBaseName )
+        if cacheExpiry > utcNow:
+            #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
+            #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
+            data = self.readCacheBinary( cacheBaseName )
 
 #TODO Start of temporary hack...remove in release 82,
 # Cache data formats changed between version 80 and 81.
