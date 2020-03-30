@@ -31,7 +31,7 @@ from gi.repository import Gtk
 from ppa import Filters, PPA, PublishedBinary
 from urllib.request import urlopen
 
-import concurrent.futures, indicatorbase, json, locale, tempfile, webbrowser
+import concurrent.futures, indicatorbase, json, locale, tempfile, time, webbrowser
 
 
 class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
@@ -362,18 +362,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
-                import datetime
-                start = datetime.datetime.utcnow() 
+                start = time.time()
                 response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
-                end = datetime.datetime.utcnow() 
-                
-#                 st = 0.1 # Mbps
-#                 stkbps = st * 1000
-#                 stbps = stkbps * 1000
-                
+                end = time.time()
                 publishedBinaries = json.loads( response.read().decode( "utf8" ) )
-
-#                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
                 self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
@@ -391,12 +383,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            bandwidthBytesPerSecond = float( response.info()[ "Content-length" ] ) / float( ( end - start ).total_seconds() )
-#             bwBitsPerSecond = bandwidthBytesPerSecond * 8
-            bandwidthKiloBitsPerSecond = ( bandwidthBytesPerSecond * 8 ) / 1000
-            print( bandwidthKiloBitsPerSecond )
-#             if True: return
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 1 ) as executor:
+            with concurrent.futures.ThreadPoolExecutor( max_workers = self.getMaxWorkers( start, end, response ) ) as executor:
                 {
                     executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ):
                         i for i in range( numberPublishedBinariesCurrentPage )
@@ -404,6 +391,26 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
+
+
+    # For low bandwidth, limit the number of threads (workers).
+    def getMaxWorkers( self, start, end, response ):
+        contentLengthBytes = float( response.info()[ "Content-length" ] )
+        durationSeconds = float( end - start )
+#         bandwidthBytesPerSecond = contentLengthBytes / durationSeconds
+#         bandwidthBitsPerSecond = bandwidthBytesPerSecond * 8
+        bandwidthKiloBitsPerSecond = ( ( contentLengthBytes / durationSeconds ) * 8 ) / 1000
+        print( bandwidthKiloBitsPerSecond )
+        if bandwidthKiloBitsPerSecond < 128:
+            maxWorkers = 1
+
+        elif bandwidthKiloBitsPerSecond < 512:
+            maxWorkers = 2
+
+        else:
+            maxWorkers = 3
+
+        return maxWorkers
 
 
     def getDownloadCount( self, ppa, publishedBinaries, i ):
