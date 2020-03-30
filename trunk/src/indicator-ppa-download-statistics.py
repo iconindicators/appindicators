@@ -362,8 +362,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
+#TODO Problem...when I am no longer shaped (129kbps versus 10Mbps) I still get the same bandwidth of around 40 - 60 kbps...WHY!!!                
+                finalURL = url + "&ws.start=" + str( publishedBinaryCounter )
                 start = time.time()
-                response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
+                response = urlopen( finalURL, timeout = self.URL_TIMEOUT_IN_SECONDS )
+#                 response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
                 end = time.time()
                 publishedBinaries = json.loads( response.read().decode( "utf8" ) )
 
@@ -407,6 +410,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         else:
             maxWorkers = 3
 
+        print( bandwidthKiloBitsPerSecond, maxWorkers )
         return maxWorkers
 
 
