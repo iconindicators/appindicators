@@ -397,10 +397,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def getMaxWorkers( self, start, end, response ):
         contentLengthBytes = float( response.info()[ "Content-length" ] )
         durationSeconds = float( end - start )
-#         bandwidthBytesPerSecond = contentLengthBytes / durationSeconds
-#         bandwidthBitsPerSecond = bandwidthBytesPerSecond * 8
         bandwidthKiloBitsPerSecond = ( ( contentLengthBytes / durationSeconds ) * 8 ) / 1000
-        print( bandwidthKiloBitsPerSecond )
         if bandwidthKiloBitsPerSecond < 128:
             maxWorkers = 1
 

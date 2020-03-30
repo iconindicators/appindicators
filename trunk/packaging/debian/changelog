@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.68-1) xenial; urgency=low
 
+  * Now reduces the threads used to download when low bandwidth is detected.
   * Removed code which bridged the change in filter format.
   * Added TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO  to the list of series.
 
