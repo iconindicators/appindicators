@@ -362,7 +362,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
-                publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                import datetime
+                start = datetime.datetime.utcnow() 
+                response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
+                end = datetime.datetime.utcnow() 
+                
+#                 st = 0.1 # Mbps
+#                 stkbps = st * 1000
+#                 stbps = stkbps * 1000
+                
+                publishedBinaries = json.loads( response.read().decode( "utf8" ) )
+
+#                 publishedBinaries = json.loads( urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
                 self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
@@ -380,7 +391,12 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 3 ) as executor:
+            bandwidthBytesPerSecond = float( response.info()[ "Content-length" ] ) / float( ( end - start ).total_seconds() )
+#             bwBitsPerSecond = bandwidthBytesPerSecond * 8
+            bandwidthKiloBitsPerSecond = ( bandwidthBytesPerSecond * 8 ) / 1000
+            print( bandwidthKiloBitsPerSecond )
+#             if True: return
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 1 ) as executor:
                 {
                     executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ):
                         i for i in range( numberPublishedBinariesCurrentPage )
