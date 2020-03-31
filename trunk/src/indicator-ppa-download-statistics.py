@@ -362,13 +362,23 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
-#TODO Problem...when I am no longer shaped (129kbps versus 10Mbps) I still get the same bandwidth of around 40 - 60 kbps...WHY!!!                
+#TODO Problem...when I am no longer shaped (128kbps versus 10Mbps) I still get the same bandwidth of around 40 - 60 kbps...WHY!!!                
                 finalURL = url + "&ws.start=" + str( publishedBinaryCounter )
                 start = time.time()
                 response = urlopen( finalURL, timeout = self.URL_TIMEOUT_IN_SECONDS )
 #                 response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
                 end = time.time()
-                publishedBinaries = json.loads( response.read().decode( "utf8" ) )
+                print( "Duration (urlopen):", str( end - start ) )
+                
+                start = time.time()
+                read = response.read()
+                end = time.time()
+                print( "Duration (read):", str( end - start ) )
+
+                publishedBinaries = json.loads( read.decode( "utf8" ) )
+
+                
+#                 publishedBinaries = json.loads( response.read().decode( "utf8" ) )
 
             except Exception as e:
                 self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
@@ -410,7 +420,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         else:
             maxWorkers = 3
 
-        print( bandwidthKiloBitsPerSecond, maxWorkers )
+        print( "Bandwidth kbps:", bandwidthKiloBitsPerSecond )
+        print( "Threads", maxWorkers )
         return maxWorkers
 
 
