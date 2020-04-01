@@ -362,6 +362,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
+#TODO This is not good enough...the file size is too small to get an accurate download speed reading.
+#So instead, provide a user option for low bandwidth and if checked, use max workers of 1, otherwise max workers of 3.                
                 start = time.time()
                 response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
                 end = time.time()
@@ -395,9 +397,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     # For low bandwidth, limit the number of threads (workers).
     def getMaxWorkers( self, start, end, response ):
-        contentLengthBytes = float( response.info()[ "Content-length" ] )
+        info = response.info()
+        contentLengthBytes = float( response.info()[ "Content-Length" ] )
         durationSeconds = float( end - start )
-        bandwidthKiloBitsPerSecond = ( ( contentLengthBytes / durationSeconds ) * 8 ) / 1000
+        bandwidthKiloBitsPerSecond = ( contentLengthBytes * 8 ) / durationSeconds / 1000
         if bandwidthKiloBitsPerSecond < 128:
             maxWorkers = 1
 
