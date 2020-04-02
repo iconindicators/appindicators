@@ -31,7 +31,7 @@ from gi.repository import Gtk
 from ppa import Filters, PPA, PublishedBinary
 from urllib.request import urlopen
 
-import concurrent.futures, indicatorbase, json, locale, tempfile, time, webbrowser
+import concurrent.futures, indicatorbase, json, locale, tempfile, webbrowser
 
 
 class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
@@ -39,6 +39,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
     CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
+    CONFIG_LOW_BANDWIDTH = "lowBandwidth"
     CONFIG_PPAS = "ppas"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
     CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
@@ -362,15 +363,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         totalPublishedBinaries = publishedBinaryCounter + 1 # Set to a value greater than publishedBinaryCounter to ensure the loop executes at least once.
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
-#TODO This is not good enough...the file size is too small to get an accurate download speed reading.
-#So instead, provide a user option for low bandwidth and if checked, use max workers of 1, otherwise max workers of 3.                
-                start = time.time()
-                response = urlopen( url + "&ws.start=" + str( publishedBinaryCounter ), timeout = self.URL_TIMEOUT_IN_SECONDS )
-                end = time.time()
-                publishedBinaries = json.loads( response.read().decode( "utf8" ) )
+                currentURL =  url + "&ws.start=" + str( publishedBinaryCounter )
+                publishedBinaries = json.loads( urlopen( currentURL, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
-                self.getLogging().error( "Problem with " + url + "&ws.start=" + str( publishedBinaryCounter ) )
+                self.getLogging().error( "Problem with " + currentURL )
                 self.getLogging().exception( e )
                 ppa.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
                 publishedBinaryCounter = totalPublishedBinaries
@@ -385,7 +382,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             if( pageNumber * publishedBinariesPerPage ) > totalPublishedBinaries:
                 numberPublishedBinariesCurrentPage = totalPublishedBinaries - ( ( pageNumber - 1 ) * publishedBinariesPerPage )
 
-            with concurrent.futures.ThreadPoolExecutor( max_workers = self.getMaxWorkers( start, end, response ) ) as executor:
+            with concurrent.futures.ThreadPoolExecutor( max_workers = 1 if self.lowBandwidth else 3 ) as executor:
                 {
                     executor.submit( self.getDownloadCount, ppa, publishedBinaries, i ):
                         i for i in range( numberPublishedBinariesCurrentPage )
@@ -393,26 +390,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             publishedBinaryCounter += publishedBinariesPerPage
             pageNumber += 1
-
-
-    # For low bandwidth, limit the number of threads (workers).
-    def getMaxWorkers( self, start, end, response ):
-        info = response.info()
-        contentLengthBytes = float( response.info()[ "Content-Length" ] )
-        durationSeconds = float( end - start )
-        bandwidthKiloBitsPerSecond = ( contentLengthBytes * 8 ) / durationSeconds / 1000
-        if bandwidthKiloBitsPerSecond < 128:
-            maxWorkers = 1
-
-        elif bandwidthKiloBitsPerSecond < 512:
-            maxWorkers = 2
-
-        else:
-            maxWorkers = 3
-
-        print( "Bandwidth (kbps):", str( bandwidthKiloBitsPerSecond ) ) #TODO Remove
-        print( "Max Workers:", str( maxWorkers ) ) #TODO Remove
-        return maxWorkers
 
 
     def getDownloadCount( self, ppa, publishedBinaries, i ):
@@ -616,8 +593,14 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
+        lowBandwitdhCheckbox = Gtk.CheckButton( _( "Low bandwidth" ) )
+        lowBandwitdhCheckbox.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
+        lowBandwitdhCheckbox.set_active( self.lowBandwidth )
+        lowBandwitdhCheckbox.set_margin_top( 10 )
+        grid.attach( lowBandwitdhCheckbox, 0, 5, 1, 1 )
+
         autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 5, 1, 1 )
+        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
 
@@ -629,6 +612,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.combinePPAs = combinePPAsCheckbox.get_active()
             self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
+            self.lowBandwidth = lowBandwitdhCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
             self.setAutoStart( autostartCheckbox.get_active() )
@@ -963,6 +947,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def loadConfig( self, config ):
         self.combinePPAs = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
         self.ignoreVersionArchitectureSpecific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
+        self.lowBandwidth = config.get( IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH, False )
         self.showSubmenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
         self.sortByDownload = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
         self.sortByDownloadAmount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
@@ -1013,6 +998,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
             IndicatorPPADownloadStatistics.CONFIG_FILTERS: filters,
             IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
+            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH: self.lowBandwidth,
             IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
             IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,
             IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD: self.sortByDownload,
