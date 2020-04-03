@@ -617,7 +617,7 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-    def getCacheExpiry( self, baseName ):
+    def getCacheDateTime( self, baseName ):
         cacheDirectory = self.__getCacheDirectory()
         expiry = datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
         theFile = ""
