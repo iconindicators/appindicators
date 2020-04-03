@@ -126,7 +126,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Repeat for second oldest data.  If the attributes et al match the previous results, then repeat with third oldest data.
 # Continue until a difference is noted and that is one day too far for cache age.
 #
-#
+# Before doing the testing, run the indicator and get data to download.  
+# As all the data has been downloaded around 7/8/9 in the morning local time,
+# obtain the utc time component and use that when doing the testing for each batchof data.
+
+
 #TODO Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
