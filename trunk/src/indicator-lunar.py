@@ -118,19 +118,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
-#TODO Have made a copy of comet/mp/tle data from 2020 02 19 21 24
-#For the next few days, make backups of the same data.
-# Then run the indicator using each set of data and compare the comet/mp rise/set/alt/az.
-# Determine if it is possible to change the comet/mp cache age from 24 to 48 hours or something in between.
+#TODO Determine if the cache age for comets/mps and satellites can be increased from 24 hours to 48 or more.
+# Collect download data for several days.
 #
-# Even with a cache age of 24 hours, if the user has a bad connection, then updates, will not attempt a new download.
-# Similarly if the user restarts the indicator/computer; new data will not be re downloaded until the age elapses.
+# Run the indicator, hard coding the date to be the same date as the oldest data.
+# Note the attributes of rise/set/az/alt for each type of object.  Note eclipse for sun/moon and phase for moon.
+# Repeat for second oldest data.  If the attributes et al match the previous results, then repeat with third oldest data.
+# Continue until a difference is noted and that is one day too far for cache age.
 #
-# Or is this true: if a download fail happens, there should be no files...so no age to check against.
 #
-# MORE THINKING!
-#
-#Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
+#TODO Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
@@ -252,13 +249,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                               None )
 
 #TODO Testing....
-        self.satelliteData, 
-        self.downloadCountTLE, 
-        self.nextDownloadTimeTLE, 
-        self.cacheDateTimeTLE = self.updateDataNEW( utcNow,
-                                                 self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                                                 twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
-                                                 None )
+#         self.satelliteData, 
+#         self.downloadCountTLE, 
+#         self.nextDownloadTimeTLE, 
+#         self.cacheDateTimeTLE = self.updateDataNEW( utcNow,
+#                                                  self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+#                                                  twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+#                                                  None )
 
 
 
