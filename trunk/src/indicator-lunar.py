@@ -188,15 +188,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
+        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+
 #TODO Thinking...
         self.downloadCountTLE = 0
         self.nextDownloadTimeTLE = datetime.datetime.utcnow()
-
-        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         
 #TODO Flush cache on startup...may not end up here.
         self.flushCache()
-        self.cacheExpiryTLE = self.getCacheExpiry( IndicatorLunar.SATELLITE_CACHE_BASENAME )
+        self.cacheDateTimeTLE = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
 
 
     def update( self, menu ):
@@ -250,6 +250,31 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                               twolineelement.download,
                                               IndicatorLunar.SATELLITE_DATA_URL,
                                               None )
+
+#TODO Testing....
+        self.satelliteData, 
+        self.downloadCountTLE, 
+        self.nextDownloadTimeTLE, 
+        self.cacheDateTimeTLE = self.updateDataNEW( utcNow,
+                                                 self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                                                 twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+                                                 None )
+
+
+
+    def getNextDownloadInterval( self, downloadCount ):
+        defaultTimeInterval = 60 # If no download attempt can be found (because we have done four or more) set to a sixty minute interval.
+        downloadCountsAndTimeIntervals = {
+            1 : 5, # After one download attempt, set the time to the next download attempt to five minutes from now and so on...
+            2 : 10,
+            3 : 30 }
+
+        timeInterval = defaultTimeInterval
+        if downloadCount in downloadCountsAndTimeIntervals:
+            timeInterval = downloadCountsAndTimeIntervals[ downloadCount ]
+
+        return timeInterval
+
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -333,9 +358,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Maybe put in a check at the start of this function (or outside) to check the cache age...
 # somehow determine if we actually need to access the cache at all.
 #This could be used to also determine if/when to flush the cache.
-    def updateDataNEW( self, utcNow, cacheExpiry, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+    def updateDataNEW( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
         data = None
-        if cacheExpiry > utcNow:
+        if ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) > utcNow:
             #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
             #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
             data = self.readCacheBinary( cacheBaseName )
@@ -368,6 +393,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Does the check below handle this?
         #TODO Do we need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
         #TODO After a download (and save) do we need to figure out the cache expiration and then set the next download time to that?
+#TODO Set the cacheDateTime to be None or similar?
         if not data: # Catches None and empty objects....TODO Empty objects should not exist after version 80.
             #TODO...download!
             data = { }
@@ -381,6 +407,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
                         self.writeCacheBinary( cacheBaseName, data )
                         downloadCount = 0
+                        cacheDateTime = self.getCacheDateTime( baseName )
 
 #TODO
 #     Read cache binary
@@ -418,10 +445,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                 else: # Download failed; set up for next download attempt...
 #                     nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
 
-#TODO If we do a download and cache write, return the cacheExpiry....but how?  
+#TODO If we do a download and cache write, return the cacheDateTime....but how?  
 #Does the caller need this...or maybe it is okay on each update to check if the cache has expired?
 #Or get the cache expiry and only need check again if we have expired.
-        return data, downloadCount, nextDownloadTime, cacheExpiry 
+        return data, downloadCount, nextDownloadTime, cacheDateTime 
 
 
 #TODO Thinking...
