@@ -257,13 +257,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                               None )
 
 #TODO Testing....
-#         self.satelliteData, 
-#         self.downloadCountTLE, 
-#         self.nextDownloadTimeTLE, 
-#         self.cacheDateTimeTLE = self.updateDataNEW( utcNow,
-#                                                  self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-#                                                  twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
-#                                                  None )
+        if True:
+            self.satelliteData, 
+            self.downloadCountTLE, 
+            self.nextDownloadTimeTLE, 
+            self.cacheDateTimeTLE = self.updateDataNEW( utcNow,
+                                                     self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                                                     twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+                                                     None )
 
         timeInterval = defaultTimeInterval
         if downloadCount in downloadCountsAndTimeIntervals:
