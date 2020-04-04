@@ -118,6 +118,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+
+#TODO Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
+
+
 #TODO Determine if the cache age for comets/mps and satellites can be increased from 24 hours to 48 or more.
 # Collect download data for several days.
 #
@@ -128,26 +132,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #
 # Before doing the testing, run the indicator and get data to download.  
 # As all the data has been downloaded around 7/8/9 in the morning local time,
-# obtain the utc time component and use that when doing the testing for each batchof data.
-
-
-#TODO Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
+# obtain the utc time component and use that when doing the testing for each batch of data.
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24 #TODO Set to 48 and do another test.
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
@@ -222,7 +223,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #If the download fails, perhaps don't write any cache binary file.  What's the point?
 
         utcNow = datetime.datetime.utcnow()
-#         self.flushCache() #TODO Fix this comment if incorrect after cacheing is sorted out...# Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
+
+#TODO Fix this line/comment if incorrect after cacheing is sorted out...
+# If we don't flush here (always) ensure flushing is done as needed somewhere else.
+#         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
         # Update comet, minor planet and satellite data.
         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
@@ -260,15 +264,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                                                  self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
 #                                                  twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
 #                                                  None )
-
-
-
-    def getNextDownloadInterval( self, downloadCount ):
-        defaultTimeInterval = 60 # If no download attempt can be found (because we have done four or more) set to a sixty minute interval.
-        downloadCountsAndTimeIntervals = {
-            1 : 5, # After one download attempt, set the time to the next download attempt to five minutes from now and so on...
-            2 : 10,
-            3 : 30 }
 
         timeInterval = defaultTimeInterval
         if downloadCount in downloadCountsAndTimeIntervals:
