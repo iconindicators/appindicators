@@ -257,7 +257,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                               None )
 
 #TODO Testing....
-        if True:
+        if False:
             self.satelliteData, 
             self.downloadCountTLE, 
             self.nextDownloadTimeTLE, 
