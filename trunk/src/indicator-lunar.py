@@ -266,13 +266,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                                      twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
                                                      None )
 
-        timeInterval = defaultTimeInterval
-        if downloadCount in downloadCountsAndTimeIntervals:
-            timeInterval = downloadCountsAndTimeIntervals[ downloadCount ]
-
-        return timeInterval
-
-
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
