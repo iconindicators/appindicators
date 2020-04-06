@@ -281,6 +281,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
 
+#TODO Testing
+        for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
+            print( key, self.data[ key ] )
+
+        try:
+            with open( "/home/bernard/Desktop/", "w" ) as f:
+                f.write( text )
+
+        except Exception as e:
+            logging.exception( e )
+            logging.error( "Error writing to cache: " + cacheFile )
+            cacheFile = None
+
+
+
         # Update frontend.
         self.updateMenu( menu )
         self.updateLabel()
