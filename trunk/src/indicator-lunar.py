@@ -282,18 +282,20 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.magnitude )
 
 #TODO Testing
-        for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
-            print( key, self.data[ key ] )
+#         x = sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) )
+#         for key in x:
+#             print( key, self.data[ key ] )
 
+#         for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
+#             print( key, self.data[ key ] )
+
+#         y = 1
         try:
-            with open( "/home/bernard/Desktop/", "w" ) as f:
-                f.write( text )
-
+            with open( "/home/bernard/Desktop/" + self.cacheDateTimeTLE.strftime( "%Y%m%d%H%M%S" ), "w" ) as f:
+                for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
+                    f.write( str( key ) + " : " + self.data[ key ] + "\n" )
         except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing to cache: " + cacheFile )
-            cacheFile = None
-
+            print( e )
 
 
         # Update frontend.
