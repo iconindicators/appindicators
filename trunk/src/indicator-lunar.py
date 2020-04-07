@@ -134,21 +134,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # As all the data has been downloaded around 7/8/9 in the morning local time,
 # obtain the utc time component and use that when doing the testing for each batch of data.
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 24
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 1000 #TODO Was 24  No real difference after 8 * 24
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 1000 #TODO Was 24  No real difference after 8 * 24
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 1000 #TODO Was 24  At 72, still no major data differences...maybe split the difference between 48 and 72 and set to 60.
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
@@ -222,7 +222,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #should be independent of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
 #If the download fails, perhaps don't write any cache binary file.  What's the point?
 
-        utcNow = datetime.datetime.utcnow()
+#TODO Testing
+#         utcNow = datetime.datetime.utcnow()
+        utcNow = datetime.datetime.strptime( "2020-04-07 08:37:25.698075Z", "%Y-%m-%d %H:%M:%S.%fZ" ) #Set to date/time of latest data.
+        print( utcNow )
+
 
 #TODO Fix this line/comment if incorrect after cacheing is sorted out...
 # If we don't flush here (always) ensure flushing is done as needed somewhere else.
@@ -284,7 +288,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Testing cached data differences between days.
         try:
             with open( "/home/bernard/Desktop/" + self.cacheDateTimeTLE.strftime( "%Y%m%d" ), "w" ) as f:
-                for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
+                for key in sorted( self.data.keys(), key = lambda tup: ( str( tup[ 0 ] ), tup[ 1 ], tup[ 2 ] ) ):
                     if ( key[ 0 ] == astrobase.AstroBase.BodyType.COMET ) or ( key[ 0 ] == astrobase.AstroBase.BodyType.MINOR_PLANET ) or ( key[ 0 ] == astrobase.AstroBase.BodyType.SATELLITE ):
                         f.write( str( key ) + " : " + self.data[ key ] + "\n" )
         except Exception as e:
