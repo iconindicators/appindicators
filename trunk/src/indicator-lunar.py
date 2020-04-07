@@ -281,19 +281,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
 
-#TODO Testing
-#         x = sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) )
-#         for key in x:
-#             print( key, self.data[ key ] )
-
-#         for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
-#             print( key, self.data[ key ] )
-
-#         y = 1
+#TODO Testing cached data differences between days.
         try:
-            with open( "/home/bernard/Desktop/" + self.cacheDateTimeTLE.strftime( "%Y%m%d%H%M%S" ), "w" ) as f:
+            with open( "/home/bernard/Desktop/" + self.cacheDateTimeTLE.strftime( "%Y%m%d" ), "w" ) as f:
                 for key in sorted( self.data.keys(), key = lambda tup: ( tup[ 1 ], tup[ 2 ] ) ):
-                    f.write( str( key ) + " : " + self.data[ key ] + "\n" )
+                    if ( key[ 0 ] == astrobase.AstroBase.BodyType.COMET ) or ( key[ 0 ] == astrobase.AstroBase.BodyType.MINOR_PLANET ) or ( key[ 0 ] == astrobase.AstroBase.BodyType.SATELLITE ):
+                        f.write( str( key ) + " : " + self.data[ key ] + "\n" )
         except Exception as e:
             print( e )
 
