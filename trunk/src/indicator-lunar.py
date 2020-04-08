@@ -188,6 +188,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Flush cache on startup...may not end up here.
         self.flushCache()
         self.cacheDateTimeTLE = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
+        if self.cacheDateTimeTLE is None:
+            self.cacheDateTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
 
     def update( self, menu ):
@@ -251,13 +253,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Testing....
         if False:
-            self.satelliteData, 
+            self.satelliteData,
+            self.cacheDateTimeTLE,
             self.downloadCountTLE, 
-            self.nextDownloadTimeTLE, 
-            self.cacheDateTimeTLE = self.updateDataNEW( utcNow,
-                                                     self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                                                     twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
-                                                     None )
+            self.nextDownloadTimeTLE = self.updateDataNEW( utcNow,
+                                                           self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                                                           twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+                                                           None )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -401,6 +403,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.writeCacheBinary( cacheBaseName, data )
                         downloadCount = 0
                         cacheDateTime = self.getCacheDateTime( baseName )
+                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
 
 #TODO
 #     Read cache binary
@@ -441,7 +444,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO If we do a download and cache write, return the cacheDateTime....but how?  
 #Does the caller need this...or maybe it is okay on each update to check if the cache has expired?
 #Or get the cache expiry and only need check again if we have expired.
-        return data, downloadCount, nextDownloadTime, cacheDateTime 
+        return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
 #TODO Thinking...
