@@ -619,16 +619,16 @@ class IndicatorBase( ABC ):
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
     def getCacheDateTime( self, baseName ):
         cacheDirectory = self.__getCacheDirectory()
-        expiry = datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        expiry = None
         theFile = ""
         for file in os.listdir( cacheDirectory ):
             if file.startswith( baseName ) and file > theFile:
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
-            expiry = theFile[ len( theFile ) - 14 : ]
+            expiry = datetime.datetime.strptime( theFile[ len( theFile ) - 14 : ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
-        return datetime.datetime.strptime( expiry, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+        return expiry
 
 
     # Read the most recent binary object from the cache.
