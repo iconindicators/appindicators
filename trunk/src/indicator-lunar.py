@@ -122,33 +122,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Maybe the oe/tle download functions need in the except clauses return a None to distinguish from empty data (the data site was up) versus an error.
 
 
-#TODO Determine if the cache age for comets/mps and satellites can be increased from 24 hours to 48 or more.
-# Collect download data for several days.
-#
-# Run the indicator, hard coding the date to be the same date as the oldest data.
-# Note the attributes of rise/set/az/alt for each type of object.  Note eclipse for sun/moon and phase for moon.
-# Repeat for second oldest data.  If the attributes et al match the previous results, then repeat with third oldest data.
-# Continue until a difference is noted and that is one day too far for cache age.
-#
-# Before doing the testing, run the indicator and get data to download.  
-# As all the data has been downloaded around 7/8/9 in the morning local time,
-# obtain the utc time component and use that when doing the testing for each batch of data.
     COMET_CACHE_BASENAME = "comet-oe-"
-    COMET_CACHE_MAXIMUM_AGE_HOURS = 1000 #TODO Was 24  No real difference after 8 * 24
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
-    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 1000 #TODO Was 24  No real difference after 8 * 24
+    MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
-    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 1000 #TODO Was 24  At 72, still no major data differences...maybe split the difference between 48 and 72 and set to 60.
+    SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = _( "Rise Time: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
                                              _( "Rise Azimuth: " ) + astrobase.AstroBase.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
