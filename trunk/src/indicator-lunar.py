@@ -367,25 +367,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
-    def updateDataNEW( self, utcNow, data, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+    def updateDataNEW( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            #TODO Can/should we use the cache age or next download time to determine if do a cache read?  Is this complexity worth avoiding doing a file read?
-            data = self.readCacheBinary( cacheBaseName ) #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.
-            # If we change things in the future, non-empty objects should never be written out...so no need to check for them.
+            #TODO Can/should we use the cache age or next download time to determine if do a cache read?  
+            #Is this complexity worth avoiding doing a file read?
+            data = self.readCacheBinary( cacheBaseName )
 
-#TODO I don't like how the download functions will return an empty object on error,
-# but read cache binary will return None (or could be empty if using old data).
-# We return an empty object if the download/cache yields nothing.
-# So maybe change the read cache binary to return empty (for consistency)?
-# This will be problematic if for some reason a function wants to write out an empty object.
-
-        #TODO We could have empty data from old cache files...is this a problem?  Does checking "if data" catch both None and empty data?
-        # Does the check below handle this?
-        #TODO Do we need to check for if we do have data...and is there anything to do (say reset download attempt/count)?
-        #TODO After a download (and save) do we need to figure out the cache expiration and then set the next download time to that?
-#TODO Set the cacheDateTime to be None or similar?
-        if not data: # Catches None and empty objects....TODO Empty objects should not exist after version 80.
-            #TODO...download!
+        else:
             data = { }
             if nextDownloadTime < utcNow:
                 data = downloadDataFunction( dataURL, self.getLogging() )
@@ -400,45 +388,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         cacheDateTime = self.getCacheDateTime( cacheBaseName )
                         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
 
-#TODO
-#     Read cache binary
-#     If binary is empty/None:
-#         If time since last download is less than the limit
-#             Return None/Empty
-#
-#         Else
-#            Download
-#            If download contains data
-#                 Write to cache
-#                 Need to reset the download attempt?
-#                 Return binary
-#
-#            Else
-#                 Set next download attempt
-#                 Return None
-#
-#     Return binary
-        
-#         if not data: # Catches None and empty objects....TODO Empty objects should not exist after version 80.
-#             data = { }
-#             if nextDownloadTime < datetime.datetime.utcnow():
-#                 data = downloadDataFunction( dataURL, self.getLogging() )
-#                 downloadCount += 1
-#                 if data:
-#                     if magnitudeFilterFunction:
-#                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-# 
-#                     if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
-#                         self.writeCacheBinary( cacheBaseName, data )
-#                         downloadCount = 0
-#                         nextDownloadTime = None #TODO What to set this to?
-# 
-#                 else: # Download failed; set up for next download attempt...
+                else:
+                    pass
+                    #TODO No data from the download...so set the next download time to what?
 #                     nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
 
-#TODO If we do a download and cache write, return the cacheDateTime....but how?  
-#Does the caller need this...or maybe it is okay on each update to check if the cache has expired?
-#Or get the cache expiry and only need check again if we have expired.
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
