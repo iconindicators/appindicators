@@ -392,6 +392,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     pass
                     #TODO No data from the download...so set the next download time to what?
 #                     nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
+#                     cacheDateTime = ???
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
