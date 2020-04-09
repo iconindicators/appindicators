@@ -158,7 +158,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    DEBUG = False #TODO Testing
+    DEBUG = True #TODO Testing
 
 
     def __init__( self ):
@@ -183,7 +183,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Thinking...
         self.downloadCountTLE = 0
-        self.nextDownloadTimeTLE = datetime.datetime.utcnow()
+        self.nextDownloadTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         
 #TODO Flush cache on startup...may not end up here.
         self.flushCache()
@@ -284,6 +284,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites( utcNow )
 
+#TODO Need to pass in the next download times for comets/mp/sat.
         return self.getNextUpdateTimeInSeconds()
 
 
@@ -389,7 +390,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
                         self.writeCacheBinary( cacheBaseName, data )
                         downloadCount = 0
-                        cacheDateTime = self.getCacheDateTime( baseName )
+                        cacheDateTime = self.getCacheDateTime( cacheBaseName )
                         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
 
 #TODO
