@@ -181,16 +181,45 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
+        self.__removePreviousVersionCacheFiles()
+
 #TODO Thinking...
-        self.data = { }
+        self.data = { } #TODO May not be needed after all...
         self.downloadCountTLE = 0
         self.nextDownloadTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         
 #TODO Flush cache on startup...may not end up here.
-        self.flushCache()
+#         self.flushCache()  
         self.cacheDateTimeTLE = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
         if self.cacheDateTimeTLE is None:
             self.cacheDateTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+
+
+    #TODO Start of temporary hack...remove in release 82.
+    # Cache data formats changed between version 80 and 81 and so remove old format files if any.
+    #
+    # The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
+    # When an old cache file is read, the underlying object will be deemed invalid, throwing an exception.
+    #
+    # Comets were originally stored as a dictionary with a string for both key and value.
+    # Comets are now stored as a dictionary with key string and value an orbitalelement.OE object.
+    def __removePreviousVersionCacheFiles( self ):
+        import os, pickle
+        cachePath = self.getCachePath( "" )
+        for file in os.listdir( cachePath ):
+            if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ):
+                with open( cachePath + file, "rb" ) as f:
+                    data = pickle.load( f )
+                    if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
+                        os.remove( cachePath + file )
+
+            elif file.startswith( IndicatorLunar.SATELLITE_CACHE_BASENAME ):
+                try:
+                    with open( cachePath + file, "rb" ) as f:
+                        data = pickle.load( f )
+
+                except Exception as e:
+                    os.remove( cachePath + file )
 
 
     def update( self, menu ):
