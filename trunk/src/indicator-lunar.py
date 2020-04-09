@@ -182,6 +182,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
 
 #TODO Thinking...
+        self.data = { }
         self.downloadCountTLE = 0
         self.nextDownloadTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         
@@ -253,7 +254,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satelliteData,
             self.cacheDateTimeTLE,
             self.downloadCountTLE, 
-            self.nextDownloadTimeTLE = self.updateDataNEW( utcNow,
+            self.nextDownloadTimeTLE = self.updateDataNEW( utcNow, self.data,
                                                            self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
                                                            twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
                                                            None )
@@ -338,15 +339,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data
 
 
-#TODO Maybe put in a check at the start of this function (or outside) to check the cache age...
-# somehow determine if we actually need to access the cache at all.
-#This could be used to also determine if/when to flush the cache.
-    def updateDataNEW( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
-        data = None
-        if ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) > utcNow:
-            #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.  Handle!
-            #If we change things in the future, non-empty objects should never be written out...so no need to check for them.
-            data = self.readCacheBinary( cacheBaseName )
+    def updateDataNEW( self, utcNow, data, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+        if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
+            #TODO Can/should we use the cache age or next download time to determine if do a cache read?  Is this complexity worth avoiding doing a file read?
+            data = self.readCacheBinary( cacheBaseName ) #TODO This returns None on error or an empty object if an empty object was written out or a non-empty object.
+            # If we change things in the future, non-empty objects should never be written out...so no need to check for them.
 
 #TODO I don't like how the download functions will return an empty object on error,
 # but read cache binary will return None (or could be empty if using old data).
@@ -366,10 +363,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Comets are now stored as a dictionary with key string and value orbitalelement.OE.
 # When a comet cache file is read, check if the format is valid and if not, force a download.
 # The old version will eventually be cleared from the cache.
-        if data and \
-           cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
-           not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
-            data = { } #TODO Maybe set to None to mimic how readCacheBinary only returns None (from now on)?
+            if data and \
+               cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
+               not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
+                data = { } #TODO Maybe set to None to mimic how readCacheBinary only returns None (from now on)?
 # End of hack!
 
         #TODO We could have empty data from old cache files...is this a problem?  Does checking "if data" catch both None and empty data?
@@ -476,7 +473,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
-        return nextUpdateInSeconds 
+        return 60#TODO Testing
+#         return nextUpdateInSeconds
 
 
     def updateMenu( self, menu ):
