@@ -184,7 +184,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.__removePreviousVersionCacheFiles()
 
 #TODO Thinking...
-        self.data = { } #TODO May not be needed after all...
         self.downloadCountTLE = 0
         self.nextDownloadTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
         
@@ -283,7 +282,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satelliteData,
             self.cacheDateTimeTLE,
             self.downloadCountTLE, 
-            self.nextDownloadTimeTLE = self.updateDataNEW( utcNow, self.data,
+            self.nextDownloadTimeTLE = self.updateDataNEW( utcNow,
                                                            self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
                                                            twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
                                                            None )
@@ -379,24 +378,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # We return an empty object if the download/cache yields nothing.
 # So maybe change the read cache binary to return empty (for consistency)?
 # This will be problematic if for some reason a function wants to write out an empty object.
-
-#TODO Start of temporary hack...remove in release 82,
-# Cache data formats changed between version 80 and 81.
-#
-# The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
-# When an old cache file is read, the underlying object will be deemed invalid, throwing an exception and returning None.
-# In this event, simply download a new version (and write out using the new object format).
-# The old version will eventually be cleared from the cache.
-#
-# Comets were originally stored as a dictionary with a string for both key and value.
-# Comets are now stored as a dictionary with key string and value orbitalelement.OE.
-# When a comet cache file is read, check if the format is valid and if not, force a download.
-# The old version will eventually be cleared from the cache.
-            if data and \
-               cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and \
-               not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
-                data = { } #TODO Maybe set to None to mimic how readCacheBinary only returns None (from now on)?
-# End of hack!
 
         #TODO We could have empty data from old cache files...is this a problem?  Does checking "if data" catch both None and empty data?
         # Does the check below handle this?
