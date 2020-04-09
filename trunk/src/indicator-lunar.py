@@ -213,46 +213,43 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #should be independent of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
 #If the download fails, perhaps don't write any cache binary file.  What's the point?
 
-#TODO Testing
-#         utcNow = datetime.datetime.utcnow()
-        utcNow = datetime.datetime.strptime( "2020-04-07 08:37:25.698075Z", "%Y-%m-%d %H:%M:%S.%fZ" ) #Set to date/time of latest data.
-        print( utcNow )
-
+        utcNow = datetime.datetime.utcnow() #TODO Testing...may leave this here if we need to pass into updateData function.  If not, put back to where we calculate.
 
 #TODO Fix this line/comment if incorrect after cacheing is sorted out...
 # If we don't flush here (always) ensure flushing is done as needed somewhere else.
 #         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
 
         # Update comet, minor planet and satellite data.
-        self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
-                                          orbitalelement.download,
-                                          IndicatorLunar.COMET_DATA_URL,
-                                          IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
-
-        if self.cometsAddNew:
-            self.addNewBodies( self.cometData, self.comets )
-
-        self.minorPlanetData = { }
-        for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
-            minorPlanetData = self.updateData( baseName,
-                                               orbitalelement.download,
-                                               url,
-                                               IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
-
-            for key in minorPlanetData:
-                if key not in self.minorPlanetData:
-                    self.minorPlanetData[ key ] = minorPlanetData[ key ]
-
-        if self.minorPlanetsAddNew:
-            self.addNewBodies( self.minorPlanetData, self.minorPlanets )
-
-        self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                                              twolineelement.download,
-                                              IndicatorLunar.SATELLITE_DATA_URL,
-                                              None )
+#TODO Commented out for testing purposes.
+#         self.cometData = self.updateData( IndicatorLunar.COMET_CACHE_BASENAME,
+#                                           orbitalelement.download,
+#                                           IndicatorLunar.COMET_DATA_URL,
+#                                           IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+# 
+#         if self.cometsAddNew:
+#             self.addNewBodies( self.cometData, self.comets )
+# 
+#         self.minorPlanetData = { }
+#         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
+#             minorPlanetData = self.updateData( baseName,
+#                                                orbitalelement.download,
+#                                                url,
+#                                                IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
+# 
+#             for key in minorPlanetData:
+#                 if key not in self.minorPlanetData:
+#                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
+# 
+#         if self.minorPlanetsAddNew:
+#             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
+# 
+#         self.satelliteData = self.updateData( IndicatorLunar.SATELLITE_CACHE_BASENAME,
+#                                               twolineelement.download,
+#                                               IndicatorLunar.SATELLITE_DATA_URL,
+#                                               None )
 
 #TODO Testing....
-        if False:
+        if True:
             self.satelliteData,
             self.cacheDateTimeTLE,
             self.downloadCountTLE, 
@@ -265,7 +262,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-#         utcNow = datetime.datetime.utcnow()
+#         utcNow = datetime.datetime.utcnow() #TODO May not be needed here eventually...depends on new update function.
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -275,16 +272,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude )
-
-#TODO Testing cached data differences between days.
-        try:
-            with open( "/home/bernard/Desktop/" + self.cacheDateTimeTLE.strftime( "%Y%m%d" ), "w" ) as f:
-                for key in sorted( self.data.keys(), key = lambda tup: ( str( tup[ 0 ] ), tup[ 1 ], tup[ 2 ] ) ):
-                    if ( key[ 0 ] == astrobase.AstroBase.BodyType.COMET ) or ( key[ 0 ] == astrobase.AstroBase.BodyType.MINOR_PLANET ) or ( key[ 0 ] == astrobase.AstroBase.BodyType.SATELLITE ):
-                        f.write( str( key ) + " : " + self.data[ key ] + "\n" )
-        except Exception as e:
-            print( e )
-
 
         # Update frontend.
         self.updateMenu( menu )
