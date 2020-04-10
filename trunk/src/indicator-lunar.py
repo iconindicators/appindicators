@@ -390,7 +390,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                     nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
                     cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 ) #TODO If this is correct...write a comment!
 
-        return data, cacheDateTime, downloadCount, nextDownloadTime
+        return data, cacheDateTime, downloadCount, nextDownloadTime #TODO The values assigned don't get updated...why?
 
 
 #TODO Thinking...
