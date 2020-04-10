@@ -1718,10 +1718,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT )
 
-#TODO Start of temporary hack...remove in release 82.
-# Convert lat/long from str to float.
-# Convert planet/star to upper case.
-# Convert satellites from list of lists of tuple ( satellite name, satellite number ) to list of satellite numbers.
+        self.__adjustConfig()
+
+
+    #TODO Start of temporary hack...remove in release 82.
+    # Convert lat/long from str to float.
+    # Convert planet/star to upper case.
+    # Convert satellites from list of lists of tuple ( satellite name, satellite number ) to list of satellite numbers.
+    def __adjustConfig( self ):
         self.latitude = float( self.latitude )
         self.longitude = float( self.longitude )
 
@@ -1744,7 +1748,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.satellites = tmp
 
         self.requestSaveConfig()
-# End of hack!
 
 
     def saveConfig( self ):
