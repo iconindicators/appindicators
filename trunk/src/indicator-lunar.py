@@ -182,7 +182,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Thinking...
         self.downloadCountTLE = 0
         self.nextDownloadTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
-        
+
 #TODO Flush cache on startup...may not end up here.
 #         self.flushCache()  
         self.cacheDateTimeTLE = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
@@ -191,13 +191,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     #TODO Start of temporary hack...remove in release 82.
-    # Cache data formats changed between version 80 and 81 and so remove old format files if any.
-    #
-    # The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
-    # When an old cache file is read, the underlying object will be deemed invalid, throwing an exception.
+    # Cache data formats changed between version 80 and 81 and so remove old format files.
     #
     # Comets were originally stored as a dictionary with a string for both key and value.
-    # Comets are now stored as a dictionary with key string and value an orbitalelement.OE object.
+    # Comets are now stored as a dictionary with key string and value an orbitalelement.OE class.
+    #
+    # The class used to store satellites was renamed from 'satellite' to 'twolineelement'.
+    # When an old cache file is read, the underlying object will be deemed invalid, throwing an exception.
     def __removePreviousVersionCacheFiles( self ):
         import os, pickle
         cachePath = self.getCachePath( "" )
