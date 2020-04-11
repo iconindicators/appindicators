@@ -275,7 +275,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Testing....
         self.satelliteData, self.cacheDateTimeTLE, self.downloadCountTLE, self.nextDownloadTimeTLE = \
-            self.updateDataNEW( utcNow,
+            self.updateData( utcNow,
                                 self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
                                 twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
                                 None )
@@ -325,48 +325,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Get the data from the cache, or if stale, download from the source.
     #
     # Returns a dictionary (may be empty).
-    def updateData( self, cacheBaseName, downloadDataFunction, dataURL, magnitudeFilterFunction = None ):
-        data = self.readCacheBinary( cacheBaseName ) # Either valid or None.
-
-#TODO Start of temporary hack...remove in release 82,
-# Cache data formats changed between version 80 and 81.
-#
-# The object/class used to store satellites was renamed from 'satellite' to 'twolineelement'.
-# When an old cache file is read, the underlying object will be deemed, throwing an exception and returning None.
-# Not a problem as a None return value causes a new version to be downloaded.
-# The old version will eventually be cleared from the cache.
-#
-# Comets were originally stored as a dict with a string for both key and value.
-# Comets are now stored as a dict with key string and value is a orbitalelement.OE object.
-# Therefore need to check if the format is valid and if not, force a download.
-# The old version will eventually be cleared from the cache.
-        if cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME and data:
-            if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ): # Ensure the object loaded from cache matches the new OE object.
-                data = None
-# End of hack!
-
-        if data is None:
-            data = downloadDataFunction( dataURL, self.getLogging() )
-#TODO At this point, what if the data downloaded is empty?  Means there's no data (but the site was up) OR there was an exception.
-#...so does it make sense to write out empty or small (dataless) file in these cases?
-#Maybe only write out data if we have data to write out.
-#This distinction will let us determine if we attempt a re-download say one hour later (by checking the cache and seeing it is empty).
-#
-#TODO Assuming the tle/oe download functions are changed such that None is returned on error, then we should write out nothing. 
-#
-#TODO If we allow multiple attempts at re-download data (because not present in cache), will need an attempt counter PER cache.           
-            if magnitudeFilterFunction:
-                data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-
-            self.writeCacheBinary( cacheBaseName, data )
-
-        return data
-
-
-    def updateDataNEW( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+    def updateData( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            #TODO Can/should we use the cache age or next download time to determine if do a cache read?  
-            #Is this complexity worth avoiding doing a file read?
             data = self.readCacheBinary( cacheBaseName )
 
         else:
@@ -385,28 +345,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
 
                 else:
-                    #TODO No data from the download...so set the next download time to what?
-#                     nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
-
-                    #TODO If this is correct...write a comment!
-                    cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+#TODO If we just retry hourly, we don't need a download counter.
+#Is an hourly retry too much?  Will it somehow impact the minor planet center and/or celestrak?                    
+                    nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = 60 ) # Download failed for some reason...retry in one hour.
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
-
-
-#TODO Thinking...
-    def getNextDownloadInterval( self, downloadCount ):
-        defaultTimeInterval = 60 # If no download attempt can be found (because we have done four or more) set to a sixty minute interval.
-        downloadCountsAndTimeIntervals = {
-            1 : 5, # After one download attempt, set the time to the next download attempt to five minutes from now and so on...
-            2 : 10,
-            3 : 30 }
-
-        timeInterval = defaultTimeInterval
-        if downloadCount in downloadCountsAndTimeIntervals:
-            timeInterval = downloadCountsAndTimeIntervals[ downloadCount ]
-
-        return timeInterval
 
 
     def addNewBodies( self, data, bodies ):
