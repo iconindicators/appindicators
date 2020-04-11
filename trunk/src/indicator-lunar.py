@@ -274,11 +274,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                                               None )
 
 #TODO Testing....
-        if True:
-            self.satelliteData, self.cacheDateTimeTLE, self.downloadCountTLE, self.nextDownloadTimeTLE = self.updateDataNEW( utcNow,
-                                                           self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                                                           twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
-                                                           None )
+        self.satelliteData, self.cacheDateTimeTLE, self.downloadCountTLE, self.nextDownloadTimeTLE = \
+            self.updateDataNEW( utcNow,
+                                self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                                twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+                                None )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -310,6 +310,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds()
 
 
+#TODO Work out when and how often to call this.
+# Is is adequate to only call on init?  Will the next download time and cache age ensure that a new download occurs?
+# Can the cache age be checked in the update method or elsewhere to kick off a flush if needed?
     def flushCache( self ):
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
@@ -382,12 +385,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
 
                 else:
-                    pass
                     #TODO No data from the download...so set the next download time to what?
 #                     nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = self.getNextDownloadInterval( downloadCount ) )
-                    cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 ) #TODO If this is correct...write a comment!
 
-        return data, cacheDateTime, downloadCount, nextDownloadTime #TODO The values assigned don't get updated...why?
+                    #TODO If this is correct...write a comment!
+                    cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+
+        return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
 #TODO Thinking...
