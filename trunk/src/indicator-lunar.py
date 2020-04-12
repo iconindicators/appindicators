@@ -345,24 +345,22 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
 
                 else:
-#TODO If we just retry hourly, we don't need a download counter.
-#Is an hourly retry too much?  Will it somehow impact the minor planet center and/or celestrak?                    
-                    nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = 60 ) # Download failed for some reason...retry in one hour.
+                    nextDownloadTime = self.getNextDownloadTime( downloadCount ) # Download failed for some reason; retry at a later time...
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
     def getNextDownloadTime( self, downloadCount ):
-        downloadCountToTimeInterval = {
+        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
+        timeIntervalInMinutes = {
             1 : 5,
-            2 : 10,
-            3 : 30,
-            4 : 60 }
+            2 : 15,
+            3 : 60 }
 
-#         timeInterval = 60
-#         if downloadCount in
+        if downloadCount in timeIntervalInMinutes:
+            nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = timeIntervalInMinutes[ downloadCount ] )
 
-        return
+        return nextDownloadTime
 
 
     def addNewBodies( self, data, bodies ):
