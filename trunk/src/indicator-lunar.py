@@ -352,10 +352,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def getNextDownloadTime( self, downloadCount ):
         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
-        timeIntervalInMinutes = {
-            1 : 5,
-            2 : 15,
-            3 : 60 }
+        timeIntervalInMinutes = { 1 : 5,
+                                  2 : 15,
+                                  3 : 60 }
 
         if downloadCount in timeIntervalInMinutes:
             nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = timeIntervalInMinutes[ downloadCount ] )
