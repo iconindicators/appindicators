@@ -600,23 +600,11 @@ class IndicatorBase( ABC ):
                         os.remove( cacheDirectory + file )
 
 
-#TODO Not sure if this will stay...if so, fix the header.
-    # Read the most recent binary object from the cache.
+    # Find the date/time of the newest file in the cache matching the basename.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
     #
-    # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
-    #    ~/.cache/fred/apple-20170629174950
-    #    ~/.cache/fred/orange-20170629174951
-    #
-    # Files which pass the filter are sorted by date/time and the most recent file is read.
-    #
-    # Returns the binary object; None when no suitable cache file exists; None on error and logs.
+    # Returns the datetime of the newest file in the cache.  None if no file can be found.
     def getCacheDateTime( self, baseName ):
         cacheDirectory = self.__getCacheDirectory()
         expiry = None
