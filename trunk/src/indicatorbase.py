@@ -396,11 +396,10 @@ class IndicatorBase( ABC ):
 
 
 #TODO Add Yaru and other themes for [ L | X | U ]buntu 16.04+.
-# On Ubuntu 19.04, new Yaru theme, so hicolor icon appeared.
+# On Ubuntu 19.04, the hicolor icon appeared because there was no icon for the new Yaru theme.
 # Is there another new theme/colour for Ubuntu 20.20?
 #
-#TODO
-# Why do the icons appear to change shade/colour?
+#TODO Why do the icons appear to change shade/colour?
 # https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
