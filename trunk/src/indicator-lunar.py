@@ -175,19 +175,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )  #TODO Can this be just set to utcNow?
 
         self.__removePreviousVersionCacheFiles()
 
 #TODO Thinking...
         self.downloadCountTLE = 0
-        self.nextDownloadTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+        self.nextDownloadTimeTLE = datetime.datetime.utcnow()
 
 #TODO Flush cache on startup...may not end up here.
 #         self.flushCache()  
         self.cacheDateTimeTLE = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
         if self.cacheDateTimeTLE is None:
-            self.cacheDateTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = 1000 )
+            self.cacheDateTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
 
     #TODO Start of temporary hack...remove in release 82.
@@ -273,12 +273,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                                               IndicatorLunar.SATELLITE_DATA_URL,
 #                                               None )
 
-#TODO Testing....
+#TODO Not sure if we need to pass in (or assign from return) all the parameters.
         self.satelliteData, self.cacheDateTimeTLE, self.downloadCountTLE, self.nextDownloadTimeTLE = \
             self.updateData( utcNow,
-                                self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                                twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
-                                None )
+                             self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                             twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+                             None )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -352,6 +352,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
+    def getNextDownloadTime( self, downloadCount ):
+        downloadCountToTimeInterval = {
+            1 : 5,
+            2 : 10,
+            3 : 30,
+            4 : 60 }
+
+#         timeInterval = 60
+#         if downloadCount in
+
+        return
+
+
     def addNewBodies( self, data, bodies ):
         for body in data:
             if body not in bodies:
@@ -378,7 +391,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
-        return 60#TODO Testing
+        return 60#TODO Testing.  Eventually need to pass in the next update time for comet/mp/sat and take into account.
 #         return nextUpdateInSeconds
 
 
