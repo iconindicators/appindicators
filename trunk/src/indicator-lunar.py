@@ -200,15 +200,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.cacheDateTimeMinorPlanetBright is None:
             self.cacheDateTimeMinorPlanetBright = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
-        self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ] )
+        self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ] )
         if self.cacheDateTimeMinorPlanetCritical is None:
             self.cacheDateTimeMinorPlanetCritical = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
-        self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ] )
+        self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ] )
         if self.cacheDateTimeMinorPlanetDistant is None:
             self.cacheDateTimeMinorPlanetDistant = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
-        self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ] )
+        self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ] )
         if self.cacheDateTimeMinorPlanetUnusual is None:
             self.cacheDateTimeMinorPlanetUnusual = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
@@ -260,7 +260,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.minorPlanetData = { }
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS[ 0 ], IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ],
+                             self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ],
                              orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_URLS[ 0 ], self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
                              IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
 
@@ -268,7 +268,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         minorPlanetData, self.cacheDateTimeMinorPlanetCritical, self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS[ 1 ], IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ],
+                             self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ],
                              orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_URLS[ 1 ], self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
                              IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
 
@@ -276,7 +276,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         minorPlanetData, self.cacheDateTimeMinorPlanetDistant, self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS[ 2 ], IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ],
+                             self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ],
                              orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_URLS[ 2 ], self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
                              IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
 
@@ -284,7 +284,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         minorPlanetData, self.cacheDateTimeMinorPlanetUnusual, self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS[ 3 ], IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ],
+                             self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ],
                              orbitalelement.download, IndicatorLunar.MINOR_PLANET_DATA_URLS[ 3 ], self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
                              IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
 
@@ -362,12 +362,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         else:
             data = { }
-            if nextDownloadTime < utcNow:
+            if nextDownloadTime < utcNow: #TODO Is this around the wrong way?  When critical MP are filtered first time, we come in here again...need to avoid this...maybe set something in the filtering clause if no data.
                 data = downloadDataFunction( dataURL, self.getLogging() )
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
+                        #TODO If there is nothing to write out...will this cause another download attempt?
+                        # If no data, maybe set the next download time to be 24 hours from now?
 
                     if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
                         self.writeCacheBinary( cacheBaseName, data )
@@ -420,7 +422,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
 #TODO Eventually need to pass in the next update time for comet/mp/sat and take into account.
-        return nextUpdateInSeconds
+        return 30
+#         return nextUpdateInSeconds
 
 
     def updateMenu( self, menu ):
