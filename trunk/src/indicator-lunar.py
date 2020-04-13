@@ -174,16 +174,31 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.__removePreviousVersionCacheFiles()
 
-#TODO Thinking...
-        self.downloadCountTLE = 0
-        self.nextDownloadTimeTLE = datetime.datetime.utcnow()
+#TODO Need versions of these...one for each of the data files (tle = 1, comet = 1, mp = 4)
+#Seems a lot of boilerplate...can we instead maybe use dicts or something to reduce the number of variables?
+#Maybe an object to manage each?
+        self.downloadCountComet = 0
+        self.downloadCountMinorPlanetBright = 0
+        self.downloadCountMinorPlanetCritical = 0
+        self.downloadCountMinorPlanetDistant = 0
+        self.downloadCountMinorPlanetUnusual = 0
+        self.downloadCountSatellite = 0
 
-#TODO Flush cache on startup...may not end up here.
-#         self.flushCache()  
-        self.cacheDateTimeTLE = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
-        if self.cacheDateTimeTLE is None:
-            self.cacheDateTimeTLE = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+        self.nextDownloadTimeComet = datetime.datetime.utcnow()
+        self.nextDownloadTimeMinorPlanetBright = datetime.datetime.utcnow()
+        self.nextDownloadTimeMinorPlanetCritical = datetime.datetime.utcnow()
+        self.nextDownloadTimeMinorPlanetDistant = datetime.datetime.utcnow()
+        self.nextDownloadTimeMinorPlanetUnusual = datetime.datetime.utcnow()
+        self.nextDownloadTimeSatellite = datetime.datetime.utcnow()
 
+        self.flushCache()  
+        self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME )
+        if self.cacheDateTimeComent is None:
+            self.cacheDateTimeComet = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+
+        self.cacheDateTimeSatellite = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
+        if self.cacheDateTimeSatellite is None:
+            self.cacheDateTimeSatellite = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
     #TODO Start of temporary hack...remove in release 82.
     # Cache data formats changed between version 80 and 81 and so remove old format files.
@@ -213,31 +228,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-#TODO On each update we do:
-#     A cache flush (access filesystem per data file totalling 8)
-#     A read of each data file (totalling 8).
-# How long does this take?
-# Perhaps change things such that:
-#     Flush cache in init and record last cache flush date/time, or work out when next cache flush should happen based on each individual file's cache age property.
-#     Ensure we don't flush the cache later than needed (so find the smallest cache age...might need to look at existing files).
-#     On each update, if the current time exceeds the next cache flush time, flush the cache.
-#
-# Have to be careful here...
-# Say we have a slow internet connection or something happens whereby the download of a data file fails.
-# If the cache age is set to several days, then it will be several days before we try to get data again!!!
-#
-# Maybe part of the update should be to check if we can hit google or similar.
-# So if we fail at getting data, we could do a retry in an hour but only if we can hit google.#
-#
-#The age of a data file (cache age) and whether or not that file should be deleted (because it is stale) and so do a download,
-#should be independent of whether the download fails (no internet, no data from site) and how often we retry the download (and before giving up).
-#If the download fails, perhaps don't write any cache binary file.  What's the point?
-
-        utcNow = datetime.datetime.utcnow() #TODO Testing...may leave this here if we need to pass into updateData function.  If not, put back to where we calculate.
-
-#TODO Fix this line/comment if incorrect after cacheing is sorted out...
-# If we don't flush here (always) ensure flushing is done as needed somewhere else.
-#         self.flushCache() # Would prefer to flush only on initialisation, but a user may run the indicator for more than 24 hours (older than cache age)!
+        utcNow = datetime.datetime.utcnow()
 
         # Update comet, minor planet and satellite data.
 #TODO Commented out for testing purposes.
@@ -268,18 +259,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #                                               IndicatorLunar.SATELLITE_DATA_URL,
 #                                               None )
 
-#TODO Not sure if we need to pass in (or assign from return) all the parameters.
-        self.satelliteData, self.cacheDateTimeTLE, self.downloadCountTLE, self.nextDownloadTimeTLE = \
+        self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = \
             self.updateData( utcNow,
-                             self.cacheDateTimeTLE, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                             twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountTLE, self.nextDownloadTimeTLE,
+                             self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                             twolineelement.download, IndicatorLunar.SATELLITE_DATA_URL, self.downloadCountSatellite, self.nextDownloadTimeSatellite,
                              None )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
-#         utcNow = datetime.datetime.utcnow() #TODO May not be needed here eventually...depends on new update function.
         self.data = IndicatorLunar.astrobackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -305,9 +294,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds()
 
 
-#TODO Work out when and how often to call this.
-# Is is adequate to only call on init?  Will the next download time and cache age ensure that a new download occurs?
-# Can the cache age be checked in the update method or elsewhere to kick off a flush if needed?
     def flushCache( self ):
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
@@ -383,8 +369,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
-        return 60#TODO Testing.  Eventually need to pass in the next update time for comet/mp/sat and take into account.
-#         return nextUpdateInSeconds
+#TODO Eventually need to pass in the next update time for comet/mp/sat and take into account.
+        return nextUpdateInSeconds
 
 
     def updateMenu( self, menu ):
