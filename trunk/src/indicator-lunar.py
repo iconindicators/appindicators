@@ -362,7 +362,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         else:
             data = { }
-            if nextDownloadTime < utcNow: #TODO Is this around the wrong way?  When critical MP are filtered first time, we come in here again...need to avoid this...maybe set something in the filtering clause if no data.
+            if nextDownloadTime < utcNow:
                 data = downloadDataFunction( dataURL, self.getLogging() )
                 downloadCount += 1
                 if data:
@@ -379,8 +379,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         #TODO Ensure that if the filtering removes all data, we don't attempt a download again until we should.
                         # So work out what the next download time should be...and also what should the cache date time be reset to?
                         # DO we need to set the cache time to something also?
-                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
-                        cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) )
+                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge ) #TODO Maybe use the same value in getNextDownloadTime (24 hours)...and if so, make it a constant.
+                        cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) ) #TODO Not sure what to set this to.
 
                 else:
                     nextDownloadTime = self.getNextDownloadTime( downloadCount ) # Download failed for some reason; retry at a later time...
