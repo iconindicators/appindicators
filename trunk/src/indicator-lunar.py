@@ -368,16 +368,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if data:
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
-                        #TODO If there is nothing to write out...will this cause another download attempt?
-                        # If no data, maybe set the next download time to be 24 hours from now?
-                        # DO we need to set the cache time to something also?
 
-                    if data: # The magnitude filter function may have dropped all data; only write out non-empty data.
+                    if data:
                         self.writeCacheBinary( cacheBaseName, data )
                         downloadCount = 0
                         cacheDateTime = self.getCacheDateTime( cacheBaseName )
                         nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
+
+                    else: # Data was filtered out, so nothing to write.
+                        #TODO Ensure that if the filtering removes all data, we don't attempt a download again until we should.
+                        # So work out what the next download time should be...and also what should the cache date time be reset to?
+                        # DO we need to set the cache time to something also?
+                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
+                        cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) )
 
                 else:
                     nextDownloadTime = self.getNextDownloadTime( downloadCount ) # Download failed for some reason; retry at a later time...
