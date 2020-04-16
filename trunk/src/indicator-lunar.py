@@ -170,14 +170,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
+
+        utcNow = datetime.datetime.utcnow()
+
+        self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
         self.__removePreviousVersionCacheFiles()
         self.flushCache()  
-        self.initialiseDownloadCountsAndCacheDateTimes()
+        self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
 
-    def initialiseDownloadCountsAndCacheDateTimes( self ):
+    def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
         self.downloadCountComet = 0
         self.downloadCountMinorPlanetBright = 0
         self.downloadCountMinorPlanetCritical = 0
@@ -185,36 +188,36 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.downloadCountMinorPlanetUnusual = 0
         self.downloadCountSatellite = 0
 
-        self.nextDownloadTimeComet = datetime.datetime.utcnow()
-        self.nextDownloadTimeMinorPlanetBright = datetime.datetime.utcnow()
-        self.nextDownloadTimeMinorPlanetCritical = datetime.datetime.utcnow()
-        self.nextDownloadTimeMinorPlanetDistant = datetime.datetime.utcnow()
-        self.nextDownloadTimeMinorPlanetUnusual = datetime.datetime.utcnow()
-        self.nextDownloadTimeSatellite = datetime.datetime.utcnow()
+        self.nextDownloadTimeComet = utcNow
+        self.nextDownloadTimeMinorPlanetBright = utcNow
+        self.nextDownloadTimeMinorPlanetCritical = utcNow
+        self.nextDownloadTimeMinorPlanetDistant = utcNow
+        self.nextDownloadTimeMinorPlanetUnusual = utcNow
+        self.nextDownloadTimeSatellite = utcNow
 
         self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME )
         if self.cacheDateTimeComet is None:
-            self.cacheDateTimeComet = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+            self.cacheDateTimeComet = utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
         self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ] )
         if self.cacheDateTimeMinorPlanetBright is None:
-            self.cacheDateTimeMinorPlanetBright = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+            self.cacheDateTimeMinorPlanetBright = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
         self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ] )
         if self.cacheDateTimeMinorPlanetCritical is None:
-            self.cacheDateTimeMinorPlanetCritical = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+            self.cacheDateTimeMinorPlanetCritical = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
         self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ] )
         if self.cacheDateTimeMinorPlanetDistant is None:
-            self.cacheDateTimeMinorPlanetDistant = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+            self.cacheDateTimeMinorPlanetDistant = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
         self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ] )
         if self.cacheDateTimeMinorPlanetUnusual is None:
-            self.cacheDateTimeMinorPlanetUnusual = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+            self.cacheDateTimeMinorPlanetUnusual = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
         self.cacheDateTimeSatellite = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
         if self.cacheDateTimeSatellite is None:
-            self.cacheDateTimeSatellite = datetime.datetime.utcnow() - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+            self.cacheDateTimeSatellite = utcNow - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
 
     #TODO Start of temporary hack...remove in release 82.
@@ -294,7 +297,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
 
-
+#TODO Fix above and below.
 #         self.minorPlanetData = { }
 #         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
 #             minorPlanetData = self.updateData( baseName,
@@ -341,7 +344,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.notificationSatellites( utcNow )
 
 #TODO Need to pass in the next download times for comets/mp/sat.
-        return self.getNextUpdateTimeInSeconds()
+        return self.getNextUpdateTimeInSeconds( utcNow )
 
 
     def flushCache( self ):
@@ -373,29 +376,29 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.writeCacheBinary( cacheBaseName, data )
                         downloadCount = 0
                         cacheDateTime = self.getCacheDateTime( cacheBaseName )
-                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge )
+                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
 
                     else: # Data was filtered out, so nothing to write.
                         #TODO Ensure that if the filtering removes all data, we don't attempt a download again until we should.
                         # So work out what the next download time should be...and also what should the cache date time be reset to?
                         # DO we need to set the cache time to something also?
-                        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( hours = cacheMaximumAge ) #TODO Maybe use the same value in getNextDownloadTime (24 hours)...and if so, make it a constant.
-                        cacheDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) ) #TODO Not sure what to set this to.
+                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge ) #TODO Maybe use the same value in getNextDownloadTime (24 hours)...and if so, make it a constant.
+                        cacheDateTime = utcNow - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) ) #TODO Not sure what to set this to.
 
                 else:
-                    nextDownloadTime = self.getNextDownloadTime( downloadCount ) # Download failed for some reason; retry at a later time...
+                    nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
-    def getNextDownloadTime( self, downloadCount ):
-        nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
+    def getNextDownloadTime( self, utcNow, downloadCount ):
+        nextDownloadTime = utcNow + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
         timeIntervalInMinutes = { 1 : 5,
                                   2 : 15,
                                   3 : 60 }
 
         if downloadCount in timeIntervalInMinutes:
-            nextDownloadTime = datetime.datetime.utcnow() + datetime.timedelta( minutes = timeIntervalInMinutes[ downloadCount ] )
+            nextDownloadTime = utcNow + datetime.timedelta( minutes = timeIntervalInMinutes[ downloadCount ] )
 
         return nextDownloadTime
 
@@ -406,8 +409,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
-    def getNextUpdateTimeInSeconds( self ):
-        nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
+    def getNextUpdateTimeInSeconds( self, utcNow ):
+        nextUpdateTime = utcNow + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
         for key in self.data:
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -422,7 +425,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        nextUpdateInSeconds = int( ( nextUpdateTime - datetime.datetime.utcnow() ).total_seconds() )
+        nextUpdateInSeconds = int( ( nextUpdateTime - utcNow ).total_seconds() )
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
@@ -506,14 +509,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.indicator.set_icon_full( iconFilename, "" )
 
 
-    def notificationFullMoon( self ):
+    def notificationFullMoon( self, utcNow ):
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
         lunarPhase = self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ]
 
         if ( lunarPhase == astrobase.AstroBase.LUNAR_PHASE_WAXING_GIBBOUS or lunarPhase == astrobase.AstroBase.LUNAR_PHASE_FULL_MOON ) and \
            lunarIlluminationPercentage >= 96 and \
-           ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < datetime.datetime.utcnow() ):
+           ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < utcNow ):
 
             summary = self.werewolfWarningSummary
             if self.werewolfWarningSummary == "":
@@ -521,7 +524,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             self.createFullMoonIcon()
             Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.ICON_FULL_MOON ).show()
-            self.lastFullMoonNotfication = datetime.datetime.utcnow()
+            self.lastFullMoonNotfication = utcNow
 
 
     def createFullMoonIcon( self ):
@@ -790,7 +793,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 )
+        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 ) #TODO Can we pass in utcNow somehow?
         for number, name, riseDateTime in satellites:
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
