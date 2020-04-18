@@ -43,10 +43,6 @@
 # In this case the update function will/should return { }.
 
 
-#TODO Have replaced various calls to datetime.datetime.utcnow() with utcNow passed in.
-# Check that this change is valid!
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -169,13 +165,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Remove debug before release!
             debug = IndicatorLunar.DEBUG )
 
+        utcNow = datetime.datetime.utcnow()
+
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
-
-
-        utcNow = datetime.datetime.utcnow()
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
@@ -345,10 +340,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.notificationFullMoon()
 
         if self.showSatelliteNotification:
-            self.notificationSatellites( utcNow )
+            self.notificationSatellites()
 
 #TODO Need to pass in the next download times for comets/mp/sat.
-        return self.getNextUpdateTimeInSeconds( utcNow )
+        return self.getNextUpdateTimeInSeconds()
 
 
     def flushCache( self ):
@@ -413,7 +408,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
-    def getNextUpdateTimeInSeconds( self, utcNow ):
+    def getNextUpdateTimeInSeconds( self ):
+        utcNow = datetime.datetime.utcnow()
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
         for key in self.data:
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
@@ -434,8 +430,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
 #TODO Eventually need to pass in the next update time for comet/mp/sat and take into account.
-        return 30
-#         return nextUpdateInSeconds
+        return nextUpdateInSeconds
 
 
     def updateMenu( self, menu ):
@@ -538,7 +533,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                     IndicatorLunar.ICON_EXTENSION )
 
 
-    def notificationSatellites( self, utcNow ):
+    def notificationSatellites( self ):
+        utcNow = datetime.datetime.utcnow()
         satelliteCurrentNotifications = [ ]
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
