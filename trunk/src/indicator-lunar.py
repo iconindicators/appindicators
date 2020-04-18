@@ -249,7 +249,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
 
-        # Update comet, minor planet and satellite data.
+        # Update comet data.
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
             self.updateData( utcNow,
                              self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
@@ -259,6 +259,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
  
+        # Update minor planet data.
         self.minorPlanetData = { }
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
@@ -295,22 +296,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
-
-#TODO Fix above and below.
-#         self.minorPlanetData = { }
-#         for baseName, url in zip( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES, IndicatorLunar.MINOR_PLANET_DATA_URLS ):
-#             minorPlanetData = self.updateData( baseName,
-#                                                orbitalelement.download,
-#                                                url,
-#                                                IndicatorLunar.astrobackend.getOrbitalElementsLessThanMagnitude )
-# 
-#             for key in minorPlanetData:
-#                 if key not in self.minorPlanetData:
-#                     self.minorPlanetData[ key ] = minorPlanetData[ key ]
-# 
-#         if self.minorPlanetsAddNew:
-#             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
-# 
+        # Update satellite data.
         self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = \
             self.updateData( utcNow,
                              self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
@@ -342,7 +328,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites()
 
-#TODO Need to pass in the next download times for comets/mp/sat.
         return self.getNextUpdateTimeInSeconds()
 
 
@@ -410,7 +395,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def getNextUpdateTimeInSeconds( self ):
         utcNow = datetime.datetime.utcnow()
-        nextUpdateTime = utcNow + datetime.timedelta( hours = 1 ) # Do an update at least hourly so the moon icon reflects reality.
+
+        # Do an update at least hourly so the moon icon reflects reality.
+        # This also ensures the download of comet/minor planet/satellite data occurs no more than an hour from when they are supposed to happen.
+        nextUpdateTime = utcNow + datetime.timedelta( hours = 1 )
+
         for key in self.data:
             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -429,7 +418,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
-#TODO Eventually need to pass in the next update time for comet/mp/sat and take into account.
         return nextUpdateInSeconds
 
 
@@ -508,7 +496,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.indicator.set_icon_full( iconFilename, "" )
 
 
-    def notificationFullMoon( self, utcNow ):
+    def notificationFullMoon( self ):
+        utcNow = datetime.datetime.utcnow()
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] )
         lunarPhase = self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ]
