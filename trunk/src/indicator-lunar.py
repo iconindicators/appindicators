@@ -43,6 +43,10 @@
 # In this case the update function will/should return { }.
 
 
+#TODO Have replaced various calls to datetime.datetime.utcnow() with utcNow passed in.
+# Check that this change is valid!
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
