@@ -25,6 +25,13 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
+#TODO Add support for the Yaru theme for [ L | X | U ]buntu 18.10+.
+
+
+#TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
+# https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
+
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
@@ -395,12 +402,6 @@ class IndicatorBase( ABC ):
     def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
-#TODO Add Yaru and other themes for [ L | X | U ]buntu 16.04+.
-# On Ubuntu 19.04, the hicolor icon appeared because there was no icon for the new Yaru theme.
-# Is there another new theme/colour for Ubuntu 20.20?
-#
-#TODO Why do the icons appear to change shade/colour?
-# https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getThemeColour( self, defaultColour ):
