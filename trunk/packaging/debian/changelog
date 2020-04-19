@@ -7,20 +7,21 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     The exceptions are the attributes moon phase, eclipse, solstice/equinox.
   * Removed decimal degrees from azimuth/altitude.
   * Removed right ascension and declination; azimuth/altitude are sufficient.
-  * Removed planetary moons; each moon effectively has the same
-    azimuth/altitude as the parent planet.
+  * Removed planetary moons; each moon's azimuth/altitude is effectively the
+    same as the parent planet for the purposes of the indicator.
   * Removed werewolf warning percentage from preferences and fixed at 96%.
   * Removed date/time format from preferences; uses ISO 8601 without seconds.
-  * TLE/OE data files are no longer configurable.
+  * TLE/OE data file sources are no longer configurable.
   * Bodies which are 'never up' are not displayed.
   * Bodies which are 'always up' only display azimuth/altitude.
-  * Bodies below the horizon display the rise date/time.
+  * Bodies below the horizon only display the rise date/time.
   * Bodies above the horizon display the set date/time and azimuth/altitude.
   * Only visible satellite passes (at dawn/dusk for most latitudes) are shown.
-  * Added minor planets, courtesy of the Minor Planet Center.
+  * Added minor planets courtesy of the Minor Planet Center.
   * Magnitude filtering extended to include planets and stars.
   * Added on-click URL for the moon, sun, planets, stars and minor planets.
   * Added preference to hide a body if it is below the horizon (yet to rise).
+  * Removed old eclipse information.
   * Dynamically created icons are stored in user cache rather than /tmp.
   * Added hyperlink to the About dialog which links to the error log text file
     (only visible if the underlying file is present).
@@ -32,7 +33,6 @@ indicator-lunar (1.0.81-1) xenial; urgency=low
     Once fully initialised, the menu proper is shown.
   * When an update is underway or the About/Preferences dialogs are displayed,
     the About/Preferences/Quit menu items are disabled.
-  * Removed old eclipse information.
   * Update release to xenial as trusty is end of life.
   * Update debian/control Standards-Version to 3.9.7.
   * Update debian/compat to 9.
