@@ -25,7 +25,7 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
-#TODO Add support for the Yaru theme for [ L | X | U ]buntu 18.10+.
+#TODO Add support for the Yaru theme for Ubuntu 18.10+.
 
 
 #TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
