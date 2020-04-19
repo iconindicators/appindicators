@@ -362,12 +362,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         cacheDateTime = self.getCacheDateTime( cacheBaseName )
                         nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
 
-                    else: # Data was filtered out, so nothing to write.
-                        #TODO Ensure that if the filtering removes all data, we don't attempt a download again until we should.
-                        # So work out what the next download time should be...and also what should the cache date time be reset to?
-                        # DO we need to set the cache time to something also?
-                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge ) #TODO Maybe use the same value in getNextDownloadTime (24 hours)...and if so, make it a constant.
-                        cacheDateTime = utcNow - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) ) #TODO Not sure what to set this to.
+                    else:
+                        # Data was filtered out, so do not write out an empty file.
+                        # Ensure the cache read is not attempted on the next update, as the cache will be empty.
+                        # Ensure the next download attempt happens at a time in the future such that the cache would have expired.
+                        # If a new body appears within that period, it will be missed, but c'est la vie.
+                        cacheDateTime = utcNow - datetime.timedelta( hours = cacheMaximumAge )
+                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
 
                 else:
                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
