@@ -485,7 +485,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         }
 
 
-    #TODO Revisit the issue
+    #TODO Revisit this issue...
     #
     #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
     #
@@ -510,7 +510,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def __fontTesting():
         from gi.repository import Gio
         fontName = Gio.Settings( "org.gnome.desktop.interface" ).get_string( "font-name" )
-        print( "Font name:", fontName )
 
 
 IndicatorFortune().main()
