@@ -86,6 +86,40 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
             self.secondaryActivateTarget = menuItem
 
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        menuItem = Gtk.MenuItem( _( "History" ) )
+        menuItem.connect( "activate", lambda widget: self.showHistory( widget ) )
+        menu.append( menuItem )
+
+
+    def showHistory( self, widget ):
+        historyFile = self.getCachePath( IndicatorFortune.HISTORY_FILE )
+        text = None
+        if os.path.isfile( historyFile ):
+            try:
+                with open( historyFile, "r" ) as f:
+                    text = f.read()
+
+            except Exception as e:
+                text = None
+                logging.exception( e )
+                logging.error( "Error reading from cache: " + historyFile )
+
+        textView = Gtk.TextView()
+        textView.set_editable( False )
+        textView.get_buffer().set_text( text )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( textView )
+
+        box = Gtk.Box()
+        box.pack_start( scrolledWindow, True, True, 0 )
+
+        self.createDialogExternalToAboutOrPreferences( widget, _( "Fortune History for Session" ), box, True )
+
 
     def refreshFortune( self ):
         locations = " "
