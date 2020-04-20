@@ -49,6 +49,8 @@ class IndicatorBase( ABC ):
     # Private
     __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    __DIALOG_DEFAULT_HEIGHT = 480
+    __DIALOG_DEFAULT_WIDTH = 640
     __JSON_EXTENSION = ".json"
     __TERMINAL_GNOME = "gnome-terminal"
     __TERMINAL_LXDE = "lxterminal"
@@ -109,7 +111,7 @@ class IndicatorBase( ABC ):
         # If the About/Preferences menu items are disabled as the update kicks off,
         # the user interface will not reflect the change until the update completes.
         # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
-        self.__setCommonMenuSensitivity( False )
+        self.__setMenuSensitivity( False )
         GLib.timeout_add_seconds( 1, self.__updateInternal )
 
 
@@ -162,12 +164,12 @@ class IndicatorBase( ABC ):
         # Need to ignore events when Preferences is open or an update is underway.
         # Do so by checking the sensitivity of the Preferences menu item.
         # A side effect is the event will be ignored when About is showing...oh well.
-        if self.__getCommonMenuSensitivity():
+        if self.__getMenuSensitivity():
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
     def __onAbout( self, widget ):
-        self.__setCommonMenuSensitivity( False )
+        self.__setMenuSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
 
 
@@ -208,7 +210,7 @@ class IndicatorBase( ABC ):
         aboutDialog.run()
         aboutDialog.destroy()
         os.remove( changeLog )
-        self.__setCommonMenuSensitivity( True )
+        self.__setMenuSensitivity( True )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -225,7 +227,7 @@ class IndicatorBase( ABC ):
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
-        self.__setCommonMenuSensitivity( False )
+        self.__setMenuSensitivity( False )
         GLib.idle_add( self.__onPreferencesInternal, widget )
 
 
@@ -233,7 +235,7 @@ class IndicatorBase( ABC ):
         dialog = self.createDialog( widget, _( "Preferences" ) )
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
-        self.__setCommonMenuSensitivity( True )
+        self.__setMenuSensitivity( True )
 
         if responseType == Gtk.ResponseType.OK:
             self.__saveConfig()
@@ -248,15 +250,12 @@ class IndicatorBase( ABC ):
                 GLib.idle_add( self.__update )
 
 
-    def __setCommonMenuSensitivity( self, toggle ):
-        menuItems = self.indicator.get_menu().get_children()
-        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
-            menuItems[ -1 ].set_sensitive( toggle ) # Quit
-            menuItems[ -2 ].set_sensitive( toggle ) # About
-            menuItems[ -3 ].set_sensitive( toggle ) # Preferences
+    def __setMenuSensitivity( self, toggle ):
+        for menuItem in self.indicator.get_menu().get_children():
+            menuItem.set_sensitive( toggle )
 
 
-    def __getCommonMenuSensitivity( self ):
+    def __getMenuSensitivity( self ):
         sensitive = False
         menuItems = self.indicator.get_menu().get_children()
         if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
@@ -277,6 +276,29 @@ class IndicatorBase( ABC ):
             dialog.vbox.pack_start( grid, True, True, 0 )
 
         return dialog
+
+
+    def createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
+        self.__setMenuSensitivity( False )
+        GLib.idle_add( self.__createDialogExternalToAboutOrPreferences, parentWidget, title, contentWidget, setDefaultSize )
+
+
+    def __createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
+        dialog = Gtk.Dialog(
+            title,
+            self.__getParent( parentWidget ),
+            Gtk.DialogFlags.MODAL,
+            ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ) )
+
+        if setDefaultSize:
+            dialog.set_default_size( IndicatorBase.__DIALOG_DEFAULT_WIDTH, IndicatorBase.__DIALOG_DEFAULT_HEIGHT )
+
+        dialog.set_border_width( 5 )
+        dialog.vbox.pack_start( contentWidget, True, True, 0 )
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
+        self.__setMenuSensitivity( True )
 
 
     def createAutostartCheckbox( self ):
