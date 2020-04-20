@@ -293,4 +293,3 @@ msgstr "Выберите файл .dat с изречениями"
 #: indicator-fortune.py:492
 msgid "The fortune is part of your system and is already included."
 msgstr "Этот файл с изречениями является частью системы и уже подключён."
-
