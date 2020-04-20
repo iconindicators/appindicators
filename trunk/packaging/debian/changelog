@@ -1,5 +1,6 @@
 indicator-fortune (1.0.31-1) xenial; urgency=low
 
+  * Can now display the fortune history (for the session) in a dialog.
   * Bug fix: Cache backend generated bad paths with a double slash. 
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 8 Feb 2020 17:41:38 +1000
