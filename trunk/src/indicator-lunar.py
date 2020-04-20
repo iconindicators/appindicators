@@ -783,7 +783,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 ) #TODO Can we pass in utcNow somehow?
+        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 )
         for number, name, riseDateTime in satellites:
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
