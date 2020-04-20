@@ -250,9 +250,17 @@ class IndicatorBase( ABC ):
                 GLib.idle_add( self.__update )
 
 
-    def __setMenuSensitivity( self, toggle ):
-        for menuItem in self.indicator.get_menu().get_children():
-            menuItem.set_sensitive( toggle )
+    def __setMenuSensitivity( self, toggle, allMenuItems = False ):
+        if allMenuItems:
+            for menuItem in self.indicator.get_menu().get_children():
+                menuItem.set_sensitive( toggle )
+
+        else:
+            menuItems = self.indicator.get_menu().get_children()
+            if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+                menuItems[ -1 ].set_sensitive( toggle ) # Quit
+                menuItems[ -2 ].set_sensitive( toggle ) # About
+                menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
     def __getMenuSensitivity( self ):
@@ -279,7 +287,7 @@ class IndicatorBase( ABC ):
 
 
     def createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
-        self.__setMenuSensitivity( False )
+        self.__setMenuSensitivity( False, True )
         GLib.idle_add( self.__createDialogExternalToAboutOrPreferences, parentWidget, title, contentWidget, setDefaultSize )
 
 
@@ -298,7 +306,7 @@ class IndicatorBase( ABC ):
         dialog.show_all()
         dialog.run()
         dialog.destroy()
-        self.__setMenuSensitivity( True )
+        self.__setMenuSensitivity( True, True )
 
 
     def createAutostartCheckbox( self ):
