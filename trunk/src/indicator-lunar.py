@@ -394,6 +394,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 bodies.append( body )
 
 
+#TODO Need to store each date/time with the object name and sort by date/time...
+# ...when looking at the menu, cannot determine what object is triggering the next update.
     def getNextUpdateTimeInSeconds( self ):
         utcNow = datetime.datetime.utcnow()
 
