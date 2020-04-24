@@ -32,17 +32,6 @@
 # https://askubuntu.com/a/292529/67335
 
 
-#TODO
-# If there is no data to download (no internet) and cache is stale,
-# ensure satellites/comets/minorplanets already selected by the user are not dropped.
-#
-# Test without internet connection...do so with cached items that are not stale, with cached items that are stale and no cached items.
-#
-# When no internet and no cached items, the satellites, comets and minor planets selected by the user might get blown away.
-# What to do?  If a user has checked specific items, then losing those because no data is available is not good.
-# In this case the update function will/should return { }.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
