@@ -25,9 +25,6 @@
 # Add in stars, planets, etc with the released version and check if this new version handles.
 
 
-#TODO Test with a lat/long such that bodies rise/set, always up and never up.
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
@@ -49,7 +46,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allow switching between alternate backends.
     astrobackendName = "AstroPyephem"
-#     astrobackendName = "AstroSkyfield" #TODO Remove prior to release.
     astrobackend = getattr( __import__( astrobackendName.lower() ), astrobackendName )
 
     if astrobackend.getAvailabilityMessage() is not None:
@@ -132,7 +128,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
     SEARCH_URL_SATELLITE = "https://www.n2yo.com/satellite/?s="
-    SEARCH_URL_STAR = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+" #TODO Test this works
+    SEARCH_URL_STAR = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+"
     SEARCH_URL_SUN = "https://solarsystem.nasa.gov/solar-system/sun"
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
