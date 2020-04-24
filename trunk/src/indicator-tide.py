@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Application indicator which displays tidal information.
@@ -59,7 +59,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             version = "1.0.20",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
-            creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. http://www.GOV.uk/UKHO" ),
+            creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
                         _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
 
         if ports.isExpired():
@@ -283,7 +283,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         dateFormat.set_hexpand( True )
         dateFormat.set_tooltip_text( _(
             "Formatting options for the date:\n\n" + \
-            "    http://docs.python.org/3/library/datetime.html\n\n" + \
+            "    https://docs.python.org/3/library/datetime.html\n\n" + \
             "Leave empty to reset back to default." ) )
 
         box.pack_start( dateFormat, True, True, 0 )
@@ -309,7 +309,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             "    {0} - the tide is high or low.\n" + \
             "    {1} - the tide level, measured in metres.\n\n" + \
             "Formatting options for the time:\n\n" + \
-            "    http://docs.python.org/3/library/datetime.html\n\n" + \
+            "    https://docs.python.org/3/library/datetime.html\n\n" + \
             "Leave empty to reset back to default." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
         box.pack_start( tideFormat, True, True, 0 )
 
@@ -435,6 +435,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         #    UTC offset negative: 2168
         #    UTC offset positive: 4000
 
+#TODO See if https will work here.
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 

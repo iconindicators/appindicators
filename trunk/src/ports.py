@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 import time
@@ -107,7 +107,7 @@ _INDEX_PORT_COUNTRY = 2
 
 # © Crown Copyright and/or database rights.
 # Reproduced by permission of the\nController of Her Majesty’s Stationery Office and the UK Hydrographic Office.
-# http://www.GOV.uk/UKHO
+# https://www.GOV.uk/UKHO
 #
 # Port ID. port name, country.
 _ports = [
