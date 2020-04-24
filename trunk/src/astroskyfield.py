@@ -35,7 +35,7 @@ try:
 except ImportError:
     available = False
 
-import astrobase, datetime, gzip, locale, os, orbitalelement, subprocess, twolineelement
+import astrobase, locale, orbitalelement, twolineelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -926,6 +926,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
     @staticmethod
     def createEphemerisStars():
+        import gzip, os
+
         catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
         if not os.path.isfile( catalogue ):
             print( "Downloading star catalogue..." )
@@ -957,6 +959,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createEphemerisPlanets():
+        import datetime, os, subprocess
+
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
@@ -980,5 +984,5 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 # Functions to create the stars/planet ephemerides.
 # Uncomment the gettext lines at the top!
-# AstroSkyfield.createStarEphemeris()
-# AstroSkyfield.createPlanetEphemeris()
+# AstroSkyfield.createEphemerisStars()
+# AstroSkyfield.createEphemerisPlanets()
