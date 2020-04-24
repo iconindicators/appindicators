@@ -397,6 +397,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Need to store each date/time with the object name and sort by date/time...
 # ...when looking at the menu, cannot determine what object is triggering the next update.
     def getNextUpdateTimeInSeconds( self ):
+        dateTimeAttribute = [ ]#TODO Testing
         utcNow = datetime.datetime.utcnow()
 
         # Do an update at least hourly so the moon icon reflects reality.
@@ -404,16 +405,31 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         nextUpdateTime = utcNow + datetime.timedelta( hours = 1 )
 
         for key in self.data:
-            if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
-               key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
+            dateTimeAttributeExceptRiseDateTime = \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER
+
+            riseDateTimeAtributeAndDoNotHideBodiesBelowHorizon = \
+                key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and not self.hideBodiesBelowHorizon
+
+            if dateTimeAttributeExceptRiseDateTime or riseDateTimeAtributeAndDoNotHideBodiesBelowHorizon:
+#             if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+#                key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+                dateTimeAttribute.append( [ dateTime, key ] )#TODO Testing
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
@@ -421,6 +437,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
 
+        print( sorted( dateTimeAttribute, key = lambda x: x[ 0 ] ) )#TODO Testing
+        print( utcNow )#TODO Testing
+        print( nextUpdateTime )#TODO Testing
         return nextUpdateInSeconds
 
 
