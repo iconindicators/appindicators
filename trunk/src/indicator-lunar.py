@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Application indicator which displays lunar, solar, planetary, star,
@@ -143,7 +143,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
     SEARCH_URL_SATELLITE = "https://www.n2yo.com/satellite/?s="
-    SEARCH_URL_STAR = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+"
+    SEARCH_URL_STAR = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+" #TODO Test this works
     SEARCH_URL_SUN = "https://solarsystem.nasa.gov/solar-system/sun"
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
@@ -159,9 +159,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
-                        _( "Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa.gov" ),
-                        _( "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com" ),
-                        _( "Comet and Minor Planet OE data by Minor Planet Center. http://www.minorplanetcenter.net" ) ],
+                        _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
+                        _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
+                        _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ],
 #TODO Remove debug before release!
             debug = IndicatorLunar.DEBUG )
 
@@ -942,8 +942,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             svg += ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
         header = '<?xml version="1.0" standalone="no"?>' \
-                 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-                 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+                 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+                 '<svg xmlns="https://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
 
         footer = '</svg>'
         return header + svg + footer

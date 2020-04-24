@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Lunar/solar eclipse tables from 2014 to 2099.
@@ -51,7 +51,7 @@ def getEclipse( dateTimeUTC, isLunar ):
     eclipseInfo = None
     for eclipse in eclipseData:
         dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
-        dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) ) # Need to subtract delta T (http://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
+        dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) ) # Need to subtract delta T (https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
         if dateTimeUTC <= dateTime:
             latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ]
             if eclipse[ 6 ][ -1 ] == "S":
@@ -67,13 +67,13 @@ def getEclipse( dateTimeUTC, isLunar ):
     return eclipseInfo
 
 
-# http://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
+# https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 #
 # Title: Five Millennium Catalog of Lunar Eclipses: -1999 to +3000 (2000 BCE to 3000CE)
 # Authors: Fred Espenak and Jean Meeus
 # Source: NASA Technical Publication NASA/TP-2009-214173
-# On Web: http://eclipse.gsfc.nasa.gov/SEpubs/5MKLE.html
-# Catalog Key: http://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
+# On Web: https://eclipse.gsfc.nasa.gov/SEpubs/5MKLE.html
+# Catalog Key: https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # Date: 2011 May 23
 # 
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat   Long
@@ -262,13 +262,13 @@ __lunarEclipseData = [
     [ "2099", "09", "29", "10:36:38", "202", "N", "3N", "161W" ] ]
 
 
-# http://eclipse.gsfc.nasa.gov/SEpubs/5MKSE.html
-# http://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
+# https://eclipse.gsfc.nasa.gov/SEpubs/5MKSE.html
+# https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 #
 # Title: Five Millennium Catalog of Solar Eclipses: -1999 to +3000 (2000 BCE to 3000CE)
 # Authors: Fred Espenak and Jean Meeus
 # Source: NASA Technical Publication NASA/TP-2008-214170
-# Catalog Key: http://sunearth.gsfc.nasa.gov/eclipse/SEcat5/catkey.html
+# Catalog Key: https://sunearth.gsfc.nasa.gov/eclipse/SEcat5/catkey.html
 # Date: 2008 10 07
 #
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat      Long

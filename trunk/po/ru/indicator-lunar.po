@@ -1411,9 +1411,9 @@ msgid "WEI"
 msgstr "ВЕЙ"
 
 #: astroskyfield.py:734
-msgid "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield"
+msgid "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield"
 msgstr ""
-"Расчёты выполняются благодаря использованию Skyfield. http://rhodesmill.org/"
+"Расчёты выполняются благодаря использованию Skyfield. https://rhodesmill.org/"
 "skyfield"
 
 #: astroskyfield.py:743
@@ -1466,23 +1466,23 @@ msgstr ""
 
 #: indicator-lunar.py:179
 msgid ""
-"Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa."
+"Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa."
 "gov"
 msgstr ""
-"Сведения о затмениях: Фред Эспенак и Жан Меёс. http://eclipse.gsfc.nasa.gov"
+"Сведения о затмениях: Фред Эспенак и Жан Меёс. https://eclipse.gsfc.nasa.gov"
 
 #: indicator-lunar.py:180
-msgid "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com"
+msgid "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com"
 msgstr ""
-"Данные TLE для спутников предоставил д-р Т.С. Келсо. http://www.celestrak.com"
+"Данные TLE для спутников предоставил д-р Т.С. Келсо. https://www.celestrak.com"
 
 #: indicator-lunar.py:181
 msgid ""
-"Comet and Minor Planet OE data by Minor Planet Center. http://www."
+"Comet and Minor Planet OE data by Minor Planet Center. https://www."
 "minorplanetcenter.net"
 msgstr ""
 "Элементы орбит комет и малых планет предоставлены Центром малых планет. "
-"http://www.minorplanetcenter.net"
+"https://www.minorplanetcenter.net"
 
 #: indicator-lunar.py:515
 msgid "Moon"

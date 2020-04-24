@@ -970,7 +970,7 @@ msgid "ZAURAK"
 msgstr ""
 
 #: astropyephem.py:490
-msgid "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
+msgid "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem"
 msgstr ""
 
 #: astropyephem.py:497
@@ -1405,7 +1405,7 @@ msgid "WEI"
 msgstr ""
 
 #: astroskyfield.py:734
-msgid "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield"
+msgid "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield"
 msgstr ""
 
 #: astroskyfield.py:743
@@ -1452,17 +1452,17 @@ msgstr ""
 
 #: indicator-lunar.py:179
 msgid ""
-"Eclipse information by Fred Espenak and Jean Meeus. http://eclipse.gsfc.nasa."
+"Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa."
 "gov"
 msgstr ""
 
 #: indicator-lunar.py:180
-msgid "Satellite TLE data by Dr T S Kelso. http://www.celestrak.com"
+msgid "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com"
 msgstr ""
 
 #: indicator-lunar.py:181
 msgid ""
-"Comet and Minor Planet OE data by Minor Planet Center. http://www."
+"Comet and Minor Planet OE data by Minor Planet Center. https://www."
 "minorplanetcenter.net"
 msgstr ""
 

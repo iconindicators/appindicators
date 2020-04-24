@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Calculate astronomical information using Skyfield.
@@ -728,7 +728,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getCredit(): return _( "Calculations courtesy of Skyfield. http://rhodesmill.org/skyfield" )
+    def getCredit(): return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
 
 
     @staticmethod
