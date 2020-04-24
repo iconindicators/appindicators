@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Application indicator which displays the current Star Trek™ stardate.
@@ -46,7 +46,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [ _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
-                        _( "Wikipedia::Stardate" "http://en.wikipedia.org/wiki/Stardate" ) ] )
+                        _( "Wikipedia::Stardate" "https://en.wikipedia.org/wiki/Stardate" ) ] )
 
         self.requestMouseWheelScrollEvents()
         self.saveConfigTimerID = None
@@ -124,7 +124,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             "If checked, show stardate 'classic' based on\n\n" + \
             "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
             "Otherwise show stardate '2009 revised' based on\n\n" + \
-            "\thttp://en.wikipedia.org/wiki/Stardate" ) )
+            "\thttps://en.wikipedia.org/wiki/Stardate" ) )
         grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
 
         showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )

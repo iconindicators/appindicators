@@ -31,8 +31,8 @@ msgstr ""
 "faqs.org/faqs/star-trek/stardates"
 
 #: indicator-stardate.py:49
-msgid "Wikipedia::Stardatehttp://en.wikipedia.org/wiki/Stardate"
-msgstr "Wikipedia::Stardatehttp://en.wikipedia.org/wiki/Stardate"
+msgid "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
+msgstr "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
 
 #: indicator-stardate.py:121
 msgid "Show stardate 'classic'"
@@ -46,14 +46,14 @@ msgid ""
 "\n"
 "Otherwise show stardate '2009 revised' based on\n"
 "\n"
-"\thttp://en.wikipedia.org/wiki/Stardate"
+"\thttps://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 "Если стоит отметка, показываются \"классические\"\n"
 "звёздные даты, основанные на\n"
 "\"ЧАВО ПО ЗВЁЗДНЫМ ДАТАМ В \"ЗВЁЗДНОМ ПУТИ\", автор Эндрю Мэйн.\n"
 "\n"
 "Иначе показываются звёздные даты \"ревизии 2009 года\"\n"
-"http://en.wikipedia.org/wiki/Stardate"
+"https://en.wikipedia.org/wiki/Stardate"
 
 #: indicator-stardate.py:130
 msgid "Show ISSUE"

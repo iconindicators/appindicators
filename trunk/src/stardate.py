@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Converts between Star Trek™ stardates and Gregorian date/times.
@@ -60,7 +60,7 @@
 # '2009 revised'
 # ==============
 #
-# The '2009 revised' stardate is based on http://en.wikipedia.org/wiki/Stardate.
+# The '2009 revised' stardate is based on https://en.wikipedia.org/wiki/Stardate.
 
 
 import datetime, math

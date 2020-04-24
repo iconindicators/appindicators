@@ -28,7 +28,7 @@ msgid ""
 msgstr ""
 
 #: indicator-stardate.py:49
-msgid "Wikipedia::Stardatehttp://en.wikipedia.org/wiki/Stardate"
+msgid "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
 #: indicator-stardate.py:121
@@ -43,7 +43,7 @@ msgid ""
 "\n"
 "Otherwise show stardate '2009 revised' based on\n"
 "\n"
-"\thttp://en.wikipedia.org/wiki/Stardate"
+"\thttps://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
 #: indicator-stardate.py:130
