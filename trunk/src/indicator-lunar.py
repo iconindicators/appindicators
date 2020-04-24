@@ -1281,6 +1281,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         city.connect( "changed", self.onCityChanged, latitude, longitude, elevation )
         city.set_active( cities.index( self.city ) )
 
+        latitude.set_text( str( self.latitude ) )
+        longitude.set_text( str( self.longitude ) )
+        elevation.set_text( str( self.elevation ) )
+
         autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
