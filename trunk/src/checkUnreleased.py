@@ -14,7 +14,7 @@ indicators = [
     [ "IndicatorFortune", "indicator-fortune", "1.0.31" ],
     [ "IndicatorLunar", "indicator-lunar", "1.0.81" ],
     [ "IndicatorOnThisDay", "indicator-on-this-day", "1.0.6" ],
-    [ "IndicatorPPADownloadStatistics", "indicator-ppa-download-statistics", "1.0.68" ],
+    [ "IndicatorPPADownloadStatistics", "indicator-ppa-download-statistics", "1.0.69" ],
     [ "IndicatorPunycode", "indicator-punycode", "1.0.9" ],
     [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.11" ],
     [ "IndicatorStardate", "indicator-stardate", "1.0.38" ],
