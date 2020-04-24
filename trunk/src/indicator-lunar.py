@@ -134,8 +134,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    DEBUG = True #TODO Testing
-
 
     def __init__( self ):
         super().__init__(
@@ -146,9 +144,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
                         _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
                         _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
-                        _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ],
-#TODO Remove debug before release!
-            debug = IndicatorLunar.DEBUG )
+                        _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
 
         utcNow = datetime.datetime.utcnow()
 
@@ -413,13 +409,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
-#TODO Remove debugging before release!
-        if IndicatorLunar.DEBUG:
-            menu.append( Gtk.MenuItem( "Backend: " + str( IndicatorLunar.astrobackend ).replace( "<class '", "" ).replace( "'>", "" ) ) )
-            menu.append( Gtk.MenuItem( "Latitude: " + str( self.latitude ) ) )
-            menu.append( Gtk.MenuItem( "Longitude: " + str( self.longitude ) ) )
-            menu.append( Gtk.SeparatorMenuItem() )
-
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
