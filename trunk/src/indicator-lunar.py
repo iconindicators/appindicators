@@ -20,10 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Update screen shot
-# https://askubuntu.com/a/292529/67335
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -39,7 +35,7 @@ import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allow switching between alternate backends.
+    # Allow switching between eventual alternate backends.
     astrobackendName = "AstroPyephem"
     astrobackend = getattr( __import__( astrobackendName.lower() ), astrobackendName )
 
