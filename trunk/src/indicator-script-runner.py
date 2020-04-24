@@ -728,7 +728,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         else:
             self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False ) ) #TODO Check this still works.
+            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False ) )
             self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
