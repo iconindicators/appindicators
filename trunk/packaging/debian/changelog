@@ -2,7 +2,6 @@ indicator-ppa-download-statistics (1.0.68-1) xenial; urgency=low
 
   * Added an option to reduce the network access when on low bandwidth.
   * Removed code which bridged the change in filter format.
-  * Added TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO  to the list of series.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 17 Dec 2019 14:27:19 +1000
 
