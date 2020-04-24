@@ -971,9 +971,9 @@ msgid "ZAURAK"
 msgstr "ЗАУРАК"
 
 #: astropyephem.py:490
-msgid "Calculations courtesy of PyEphem/XEphem. http://rhodesmill.org/pyephem"
+msgid "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem"
 msgstr ""
-"Расчёты выполняются благодаря использованию PyEphem/XEphem. http://"
+"Расчёты выполняются благодаря использованию PyEphem/XEphem. https://"
 "rhodesmill.org/pyephem"
 
 #: astropyephem.py:497
