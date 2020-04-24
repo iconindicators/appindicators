@@ -435,7 +435,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         #    UTC offset negative: 2168
         #    UTC offset positive: 4000
 
-#TODO See if https will work here.
         url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
               "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
