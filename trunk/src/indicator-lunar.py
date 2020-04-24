@@ -20,11 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Before release, download released version, run and check if this new version loads in the .config.
-#
-# Add in stars, planets, etc with the released version and check if this new version handles.
-
-
 #TODO Update screen shot
 # https://askubuntu.com/a/292529/67335
 
