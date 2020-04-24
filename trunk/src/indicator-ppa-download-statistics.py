@@ -13,7 +13,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 # Application indicator which displays PPA download statistics.
@@ -75,8 +75,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             fileHandle, icon = tempfile.mkstemp( suffix = ".svg" )
             with open( icon, "w" ) as f:
                 svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> \
-                       <svg id="empty" xmlns="http://www.w3.org/2000/svg" height="22" width="1" version="1.0" \
-                            xmlns:xlink="http://www.w3.org/1999/xlink"></svg>'
+                       <svg id="empty" xmlns="https://www.w3.org/2000/svg" height="22" width="1" version="1.0" \
+                            xmlns:xlink="https://www.w3.org/1999/xlink"></svg>'
                 f.write( svg )
                 f.close()
 
@@ -233,7 +233,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def onPPA( self, widget ):
-        url = "http://launchpad.net/~"
+        url = "https://launchpad.net/~"
         firstPipe = str.find( widget.props.name, "|" )
         ppaUser = widget.props.name[ 0 : firstPipe ].strip()
         secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
