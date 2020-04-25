@@ -19,7 +19,7 @@ indicators = [
     [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.11" ],
     [ "IndicatorStardate", "indicator-stardate", "1.0.38" ],
     [ "IndicatorTide", "indicator-tide", "1.0.20" ],
-    [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.63" ] ]
+    [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.64" ] ]
 
 
 for project, source, versionOnPPA in indicators:
