@@ -1,14 +1,14 @@
 # Russian translation for indicator-virtual-box.
-# Copyright (C) 2015-2019 Bernard Giannetti
+# Copyright (C) 2015-2020 Bernard Giannetti
 # This file is distributed under the same license as the indicator-virtual-box package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2019.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-virtual-box 1.0.63\n"
+"Project-Id-Version: indicator-virtual-box 1.0.64\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-17 09:48+1100\n"
-"PO-Revision-Date: 2019-10-17 09:48+1100\n"
+"POT-Creation-Date: 2020-04-25 15:29+1000\n"
+"PO-Revision-Date: 2020-04-25 15:29+1000\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -116,7 +116,9 @@ msgid "Refresh interval (minutes)"
 msgstr "Интервал обновления (в минутах)"
 
 #: indicator-virtual-box.py:490
-msgid "How often the list of virtual machines and running status are updated."
+msgid ""
+"How often the list of virtual machines\n"
+"and running status are updated."
 msgstr ""
 "Насколько часто обновляется список виртуальных машин\n"
 "и статус запущенных машин."
@@ -127,8 +129,8 @@ msgstr "Задержка запуска (в секундах)"
 
 #: indicator-virtual-box.py:505
 msgid ""
-"Amount of time to wait from automatically starting one virtual machine to "
-"the next."
+"Amount of time to wait from automatically\n"
+"starting one virtual machine to the next."
 msgstr ""
 "Интервал времени после автоматического запуска\n"
 "одной виртуальной машины до запуска следующей."

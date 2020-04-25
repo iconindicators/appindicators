@@ -51,7 +51,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.63",
+            version = "1.0.64",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -484,9 +484,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of virtual machines and running status are updated." ) )
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
+        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to explicitly set.
+        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of virtual machines\nand running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
@@ -499,9 +499,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
         spinnerDelay = Gtk.SpinButton()
-        spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to force the initial value by explicitly setting it.
-        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically starting one virtual machine to the next." ) )
+        spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
+        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to explicitly set.
+        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically\nstarting one virtual machine to the next." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
 
