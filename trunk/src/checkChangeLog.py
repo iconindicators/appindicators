@@ -52,6 +52,11 @@ for changeLog in changeLogs:
     if dates != sorted( dates, reverse = True ):
         errors.append( "\tDates out of order!" )
 
+    for date in dates:
+        if date.replace( tzinfo = None ) > datetime.now():
+            print( changeLog, "has future date:", date )
+
+
     if lineNumbers:
         errors.append( "\tOne or more lines exceed 80 character limit." )
 
