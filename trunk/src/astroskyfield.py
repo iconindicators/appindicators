@@ -976,10 +976,14 @@ class AstroSkyfield( astrobase.AstroBase ):
         try:
             print( "Creating planet ephemeris..." )
             subprocess.call( command, shell = True )
-            print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS ) #TODO This prints even if an error/exception occurs...
+            completed = True
 
         except subprocess.CalledProcessError as e:
             print( e )
+            completed = False
+
+        if completed:
+            print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
 
 # Functions to create the stars/planet ephemerides.
