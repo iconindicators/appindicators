@@ -54,7 +54,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.31",
+            version = "1.0.32",
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
@@ -114,6 +114,14 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         scrolledWindow.set_hexpand( True )
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( textView )
+
+        # Scroll to the end...strange way of doing so!
+        # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
+        def textViewChanged( self, widget ):
+            adjustment = scrolledWindow.get_vadjustment()
+            adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
+
+        textView.connect( "size-allocate", textViewChanged )
 
         box = Gtk.Box()
         box.pack_start( scrolledWindow, True, True, 0 )
