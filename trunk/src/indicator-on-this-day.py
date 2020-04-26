@@ -219,17 +219,17 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 26, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Calendars" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
 
         # General settings.
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Lines" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Lines" ) ), False, False, 0 )
 
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.lines, 1, 1000, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinner.set_adjustment( Gtk.Adjustment.new( self.lines, 1, 1000, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.lines ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( _( "The number of menu items available for display." ) )
 
@@ -237,7 +237,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 0, 1, 1 )
 
-        label = Gtk.Label( _( "On event click" ) )
+        label = Gtk.Label.new( _( "On event click" ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
         grid.attach( label, 0, 1, 1, 1 )
@@ -258,7 +258,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         box.set_hexpand( True )
         box.set_margin_left( self.INDENT_WIDGET_LEFT * 2 )
 
-        label = Gtk.Label( _( "URL" ) )
+        label = Gtk.Label.new( _( "URL" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -291,7 +291,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
