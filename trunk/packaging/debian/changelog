@@ -1,3 +1,10 @@
+indicator-stardate (1.0.39-1) xenial; urgency=low
+
+  * Fixed deprecation warnings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 21:47:10 +1000
+
+
 indicator-stardate (1.0.38-1) xenial; urgency=low
 
   * Bug fix: On some variants of Lubuntu/Xubuntu, the icon label is absent.

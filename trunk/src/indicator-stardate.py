@@ -42,7 +42,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.38",
+            version = "1.0.39",
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [ _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
@@ -118,7 +118,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
-        showClassicCheckbox = Gtk.CheckButton( _( "Show stardate 'classic'" ) )
+        showClassicCheckbox = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
         showClassicCheckbox.set_active( self.showClassic )
         showClassicCheckbox.set_tooltip_text( _(
             "If checked, show stardate 'classic' based on\n\n" + \
@@ -127,14 +127,14 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             "\thttps://en.wikipedia.org/wiki/Stardate" ) )
         grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
 
-        showIssueCheckbox = Gtk.CheckButton( _( "Show ISSUE" ) )
+        showIssueCheckbox = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
         showIssueCheckbox.set_active( self.showIssue )
         showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         showIssueCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
         grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
 
-        padIntegerCheckbox = Gtk.CheckButton( _( "Pad INTEGER" ) )
+        padIntegerCheckbox = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
         padIntegerCheckbox.set_active( self.padInteger )
         padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
         padIntegerCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
