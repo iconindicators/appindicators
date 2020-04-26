@@ -1,3 +1,10 @@
+indicator-script-runner (1.0.12-1) xenial; urgency=low
+
+  * Fixed deprecation warnings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 21:34:02 +1000
+
+
 indicator-script-runner (1.0.11-1) xenial; urgency=low
 
   * Bug fix: Dialogs now have a parent specified.
