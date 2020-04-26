@@ -782,7 +782,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def createMenuItem( self, menu, label, onClickURL = "" ):
-        menuItem = Gtk.MenuItem( label )
+        menuItem = Gtk.MenuItem.new_with_label( label )
         menu.append( menuItem )
         if onClickURL:
             menuItem.set_name( onClickURL )
