@@ -54,7 +54,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.32",
+            version = "1.0.33",
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
@@ -68,19 +68,19 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
 
     def buildMenu( self, menu ):
-        menuItem = Gtk.MenuItem( _( "New Fortune" ) )
+        menuItem = Gtk.MenuItem.new_with_label( _( "New Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.refreshAndShowFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
             self.secondaryActivateTarget = menuItem
 
-        menuItem = Gtk.MenuItem( _( "Copy Last Fortune" ) )
+        menuItem = Gtk.MenuItem.new_with_label( _( "Copy Last Fortune" ) )
         menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ) )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
             self.secondaryActivateTarget = menuItem
 
-        menuItem = Gtk.MenuItem( _( "Show Last Fortune" ) )
+        menuItem = Gtk.MenuItem.new_with_label( _( "Show Last Fortune" ) )
         menuItem.connect( "activate", lambda widget: self.showFortune() )
         menu.append( menuItem )
         if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
@@ -88,7 +88,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.MenuItem( _( "History" ) )
+        menuItem = Gtk.MenuItem.new_with_label( _( "History" ) )
         menuItem.connect( "activate", lambda widget: self.showHistory( widget ) )
         menu.append( menuItem )
 
@@ -192,7 +192,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         storeSort = Gtk.TreeModelSort( model = store )
         storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
-        tree = Gtk.TreeView( storeSort )
+        tree = Gtk.TreeView.new_with_model( storeSort )
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
@@ -224,17 +224,17 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
 
-        addButton = Gtk.Button( _( "Add" ) )
+        addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new fortune location." ) )
         addButton.connect( "clicked", self.onFortuneAdd, tree )
         box.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected fortune location." ) )
         removeButton.connect( "clicked", self.onFortuneRemove, tree )
         box.pack_start( removeButton, True, True, 0 )
 
-        resetButton = Gtk.Button( _( "Reset" ) )
+        resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
         resetButton.set_tooltip_text( _( "Reset to factory default." ) )
         resetButton.connect( "clicked", self.onFortuneReset, tree )
         box.pack_start( resetButton, True, True, 0 )
@@ -242,17 +242,17 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Fortunes" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
 
         # General.
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Refresh interval (minutes)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
         spinnerRefreshInterval.set_tooltip_text( _( "How often a fortune is displayed." ) )
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
@@ -262,7 +262,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Notification summary" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Notification summary" ) ), False, False, 0 )
 
         notificationSummary = Gtk.Entry()
         notificationSummary.set_text( self.notificationSummary )
@@ -275,10 +275,10 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Message character limit" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Message character limit" ) ), False, False, 0 )
 
         spinnerCharacterCount = Gtk.SpinButton()
-        spinnerCharacterCount.set_adjustment( Gtk.Adjustment( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinnerCharacterCount.set_adjustment( Gtk.Adjustment.new( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
         spinnerCharacterCount.set_tooltip_text( _(
             "If the fortune exceeds the limit,\n" + \
@@ -291,7 +291,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        label = Gtk.Label( _( "Middle mouse click of the icon" ) )
+        label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
         label.set_tooltip_text( _( "Not supported on all versions/derivatives of Ubuntu." ) )
         label.set_halign( Gtk.Align.START )
         label.set_margin_top( 10 )
@@ -315,7 +315,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         autostartCheckbox = self.createAutostartCheckbox() 
         grid.attach( autostartCheckbox, 0, 7, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()

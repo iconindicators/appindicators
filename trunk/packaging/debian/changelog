@@ -1,3 +1,10 @@
+indicator-fortune (1.0.33-1) xenial; urgency=low
+
+  * Fixed deprecation warnings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 15:58:30 +1000
+
+
 indicator-fortune (1.0.32-1) xenial; urgency=low
 
   * Fortune history dialog now scrolls to the end. 
