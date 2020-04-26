@@ -51,7 +51,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.6",
+            version = "1.0.7",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
@@ -79,14 +79,14 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         for event in events:
             if event.getDate() != lastDate:
                 if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and an event menu item.
-                    menu.append( Gtk.MenuItem( event.getDate() ) )
+                    menu.append( Gtk.MenuItem.new_with_label( event.getDate() ) )
                     lastDate = event.getDate()
                     menuItemCount += 1
 
                 else:
                     break # Don't add the menu item for the new date and don't add a subsequent event.
 
-            menuItem = Gtk.MenuItem( "    " + event.getDescription() )
+            menuItem = Gtk.MenuItem.new_with_label( "    " + event.getDescription() )
             menuItem.props.name = event.getDate() # Allows the month/day to be passed to the copy/search functions below.
             menu.append( menuItem )
             menuItemCount += 1
@@ -175,7 +175,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         storeSort = Gtk.TreeModelSort( model = store )
         storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
-        tree = Gtk.TreeView( storeSort )
+        tree = Gtk.TreeView.new_with_model( storeSort )
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
@@ -201,17 +201,17 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
 
-        addButton = Gtk.Button( _( "Add" ) )
+        addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new calendar." ) )
         addButton.connect( "clicked", self.onCalendarAdd, tree )
         box.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected calendar." ) )
         removeButton.connect( "clicked", self.onCalendarRemove, tree )
         box.pack_start( removeButton, True, True, 0 )
 
-        resetButton = Gtk.Button( _( "Reset" ) )
+        resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
         resetButton.set_tooltip_text( _( "Reset to factory default." ) )
         resetButton.connect( "clicked", self.onCalendarReset, tree )
         box.pack_start( resetButton, True, True, 0 )
@@ -280,7 +280,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         radioCopyToClipboard.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
         radioInternetSearch.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
 
-        notifyCheckbox = Gtk.CheckButton( _( "Notify" ) )
+        notifyCheckbox = Gtk.CheckButton.new_with_label( _( "Notify" ) )
         notifyCheckbox.set_tooltip_text( _(
             "On startup or when saving preferences,\n" + \
             "show a notification for each of today's events." ) )
@@ -384,7 +384,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         fileEntry.set_tooltip_text( _( "The path to a calendar file." ) )
         box.pack_start( fileEntry, True, True, 0 )
 
-        browseButton = Gtk.Button( _( "Browse" ) )
+        browseButton = Gtk.Button.new_with_label( _( "Browse" ) )
         browseButton.set_sensitive( not isSystemCalendar )
         if isSystemCalendar:
             browseButton.set_tooltip_text( _(
@@ -401,7 +401,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         box.pack_start( browseButton, False, False, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
+        enabledCheckbox = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
         if rowNumber is None: # This is an add.
             enabledCheckbox.set_active( True )
 
