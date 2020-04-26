@@ -64,7 +64,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.69",
+            version = "1.0.70",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 
@@ -119,7 +119,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         else:
             indent = self.indent( 1, 1 )
             for ppa in ppas:
-                menuItem = Gtk.MenuItem( ppa.getDescriptor() )
+                menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getDescriptor() )
                 menuItem.connect( "activate", self.onPPA )
@@ -144,7 +144,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         else:
             label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
-        menuItem = Gtk.MenuItem( label )
+        menuItem = Gtk.MenuItem.new( label )
         menuItem.set_name( ppa.getDescriptor() )
         menuItem.connect( "activate", self.onPPA )
         menu.append( menuItem )
@@ -429,7 +429,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
-        ppaTree = Gtk.TreeView( ppaStore )
+        ppaTree = Gtk.TreeView.new_with_model( ppaStore )
         ppaTree.set_hexpand( True )
         ppaTree.set_vexpand( True )
         ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
@@ -449,19 +449,19 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         box.set_homogeneous( True )
         box.set_halign( Gtk.Align.CENTER )
 
-        addButton = Gtk.Button( _( "Add" ) )
+        addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new PPA." ) )
         addButton.connect( "clicked", self.onPPAAdd, ppaTree )
         box.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected PPA." ) )
         removeButton.connect( "clicked", self.onPPARemove, ppaTree )
         box.pack_start( removeButton, True, True, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "PPAs" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
         # Filters.
         grid = self.createGrid()
@@ -471,7 +471,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             filterText = self.filters.getFilterText( user, name, series, architecture )
             filterStore.append( [ user, name, series, architecture, "\n".join( filterText ) ] )
 
-        filterTree = Gtk.TreeView( filterStore )
+        filterTree = Gtk.TreeView.new_with_model( filterStore )
         filterTree.set_hexpand( True )
         filterTree.set_vexpand( True )
         filterTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
@@ -492,31 +492,31 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         box.set_homogeneous( True )
         box.set_halign( Gtk.Align.CENTER )
 
-        addButton = Gtk.Button( _( "Add" ) )
+        addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new filter." ) )
         addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
         box.pack_start( addButton, True, True, 0 )
 
-        removeButton = Gtk.Button( _( "Remove" ) )
+        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected filter." ) )
         removeButton.connect( "clicked", self.onFilterRemove, filterTree )
         box.pack_start( removeButton, True, True, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Filters" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Filters" ) ) )
 
         # General settings.
         grid = self.createGrid()
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show PPAs as submenus" ) )
+        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
             "The download statistics for each PPA\n" + \
             "are shown in a separate submenu." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
 
-        combinePPAsCheckbox = Gtk.CheckButton( _( "Combine PPAs" ) )
+        combinePPAsCheckbox = Gtk.CheckButton.new_with_label( _( "Combine PPAs" ) )
         combinePPAsCheckbox.set_tooltip_text( _(
             "Combine the statistics of binary\n" + \
             "packages when the PPA user/name\n" + \
@@ -541,7 +541,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         combinePPAsCheckbox.set_margin_top( 10 )
         grid.attach( combinePPAsCheckbox, 0, 1, 1, 1 )
 
-        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton( _( "Ignore version for architecture specific" ) )
+        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
         ignoreVersionArchitectureSpecificCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( _(
             "Sometimes architecture specific\n" + \
@@ -566,7 +566,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
-        sortByDownloadCheckbox = Gtk.CheckButton( _( "Sort by download" ) )
+        sortByDownloadCheckbox = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
         sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count within each PPA." ) )
         sortByDownloadCheckbox.set_active( self.sortByDownload )
         sortByDownloadCheckbox.set_margin_top( 10 )
@@ -574,13 +574,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        label = Gtk.Label( _( "  Clip amount" ) )
+        label = Gtk.Label.new( _( "  Clip amount" ) )
         label.set_sensitive( sortByDownloadCheckbox.get_active() )
         label.set_margin_left( self.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
 
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
+        spinner.set_adjustment( Gtk.Adjustment.new( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
         spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
         spinner.set_tooltip_text( _(
             "Limit the number of entries\n" + \
@@ -593,7 +593,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
 
-        lowBandwitdhCheckbox = Gtk.CheckButton( _( "Low bandwidth" ) )
+        lowBandwitdhCheckbox = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
         lowBandwitdhCheckbox.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
         lowBandwitdhCheckbox.set_active( self.lowBandwidth )
         lowBandwitdhCheckbox.set_margin_top( 10 )
@@ -602,7 +602,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
@@ -967,7 +967,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         else:
             self.ppas = [ ]
-            self.ppas.append( PPA( "thebernmeister", "ppa", "bionic", "amd64" ) )
+            self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
 
             filterText = [
                 "indicator-fortune",
@@ -981,7 +981,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 "indicator-virtual-box" ]
 
             self.filters = Filters()
-            self.filters.addFilter( "thebernmeister", "ppa", "bionic", "amd64", filterText )
+            self.filters.addFilter( "thebernmeister", "ppa", "focal", "amd64", filterText )
 
 
     def saveConfig( self ):
