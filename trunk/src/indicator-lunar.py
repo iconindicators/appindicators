@@ -922,7 +922,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Icon Text" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
         indicatorText.set_tooltip_text( _(
@@ -943,7 +943,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Separator" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
 
         indicatorTextSeparator = Gtk.Entry()
         indicatorTextSeparator.set_text( self.indicatorTextSeparator )
@@ -962,7 +962,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         displayTagsStoreSort = Gtk.TreeModelSort( model = displayTagsStore )
         displayTagsStoreSort.set_sort_column_id( COLUMN_TRANSLATED_TAG, Gtk.SortType.ASCENDING )
 
-        tree = Gtk.TreeView( displayTagsStoreSort )
+        tree = Gtk.TreeView.new_with_model( displayTagsStoreSort )
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
@@ -983,25 +983,25 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Icon" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.
         grid = self.createGrid()
 
-        hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton( _( "Hide bodies below the horizon" ) )
+        hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
         hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
         hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _(
             "If checked, all bodies below the horizon\n" + \
             "are hidden (excludes satellites)." ) )
         grid.attach( hideBodiesBelowTheHorizonCheckbox, 0, 0, 1, 1 )
 
-        cometsAddNewCheckbox = Gtk.CheckButton( _( "Add new comets" ) )
+        cometsAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
         cometsAddNewCheckbox.set_margin_top( 10 )
         cometsAddNewCheckbox.set_active( self.cometsAddNew )
         cometsAddNewCheckbox.set_tooltip_text( _( "If checked, all comets are added." ) )
         grid.attach( cometsAddNewCheckbox, 0, 1, 1, 1 )
 
-        minorPlanetsAddNewCheckbox = Gtk.CheckButton( _( "Add new minor planets" ) )
+        minorPlanetsAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbox.set_margin_top( 10 )
         minorPlanetsAddNewCheckbox.set_active( self.minorPlanetsAddNew )
         minorPlanetsAddNewCheckbox.set_tooltip_text( _( "If checked, all minor planets are added." ) )
@@ -1010,12 +1010,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
 
         spinnerMagnitude = Gtk.SpinButton()
         spinnerMagnitude.set_numeric( True )
         spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerAdjustment = Gtk.Adjustment( self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, 0 )
+        spinnerAdjustment = Gtk.Adjustment.new( self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, 0 )
         spinnerMagnitude.set_adjustment( spinnerAdjustment )
         spinnerMagnitude.set_value( self.magnitude ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
         spinnerMagnitude.set_tooltip_text( _(
@@ -1025,13 +1025,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
 
-        satellitesAddNewCheckbox = Gtk.CheckButton( _( "Add new satellites" ) )
+        satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( "If checked all satellites are added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 4, 1, 1 )
 
-        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton( _( "Sort satellites by rise date/time" ) )
+        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
         sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
         sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
@@ -1041,7 +1041,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "by Name then Number." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Menu" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Planets/Stars.
         box = Gtk.Box( spacing = 20 )
@@ -1070,7 +1070,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), 2 ), True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label( _( "Planets / Stars" ) ) )
+        notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
 
         # Comets and minor planets.
         box = Gtk.Box( spacing = 20 )
@@ -1111,7 +1111,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), 1 ), True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label( _( "Comets / Minor Planets" ) ) )
+        notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
 
         # Satellites.
         box = Gtk.Box()
@@ -1125,7 +1125,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
-        tree = Gtk.TreeView( satelliteStoreSort )
+        tree = Gtk.TreeView.new_with_model( satelliteStoreSort )
         if self.satelliteData:
             tree.set_tooltip_text( _( "Check a satellite to display in the menu." ) + "\n\n" + \
                                    _( "Clicking the header of the first column\n" + \
@@ -1161,7 +1161,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         scrolledWindow.add( tree )
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label( _( "Satellites" ) ) )
+        notebook.append_page( box, Gtk.Label.new( _( "Satellites" ) ) )
 
         # Notifications (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
@@ -1202,14 +1202,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         showWerewolfWarningCheckbox.set_margin_top( 10 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Notifications" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Notifications" ) ) )
 
         # Location.
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "City" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "City" ) ), False, False, 0 )
 
         city = Gtk.ComboBoxText.new_with_entry()
         city.set_tooltip_text( _(
@@ -1229,7 +1229,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Latitude" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Latitude" ) ), False, False, 0 )
 
         latitude = Gtk.Entry()
         latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
@@ -1238,7 +1238,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Longitude" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Longitude" ) ), False, False, 0 )
 
         longitude = Gtk.Entry()
         longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
@@ -1247,7 +1247,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Elevation" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Elevation" ) ), False, False, 0 )
 
         elevation = Gtk.Entry()
         elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
@@ -1264,7 +1264,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 4, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
@@ -1462,7 +1462,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ 0 ] = not listStore[ row ][ 0 ]
 
-        tree = Gtk.TreeView( listStore )
+        tree = Gtk.TreeView.new_with_model( listStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( toolTipText )
 
@@ -1518,7 +1518,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                  testButtonText, testButtonTooltip,
                                  isMoonNotification ):
 
-        checkbox = Gtk.CheckButton( checkboxLabel )
+        checkbox = Gtk.CheckButton.new_with_label( checkboxLabel )
         checkbox.set_active( checkboxIsActive )
         checkbox.set_tooltip_text( checkboxTooltip )
         grid.attach( checkbox, 0, gridStartIndex, 1, 1 )
@@ -1526,7 +1526,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
 
-        label = Gtk.Label( summaryLabel )
+        label = Gtk.Label.new( summaryLabel )
         box.pack_start( label, False, False, 0 )
 
         summaryTextEntry = Gtk.Entry()
@@ -1541,7 +1541,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
 
-        label = Gtk.Label( messageLabel )
+        label = Gtk.Label.new( messageLabel )
         label.set_valign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -1559,7 +1559,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         checkbox.connect( "toggled", self.onCheckbox, box )
 
-        test = Gtk.Button( testButtonText )
+        test = Gtk.Button.new_with_label( testButtonText )
         test.set_halign( Gtk.Align.END )
         test.set_sensitive( checkbox.get_active() )
         test.connect( "clicked", self.onTestNotificationClicked, summaryTextEntry, messageTextView, isMoonNotification )
