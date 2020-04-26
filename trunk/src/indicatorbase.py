@@ -28,9 +28,6 @@
 #TODO Check on Ubuntu 20.04 if there is a dark and light Yaru theme, using tweaks.
 
 
-#TODO Once Yaru is sorted, add to each indicator's build script.
-
-
 #TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
 # https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
 
