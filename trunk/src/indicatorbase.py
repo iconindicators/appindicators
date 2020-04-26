@@ -89,7 +89,7 @@ class IndicatorBase( ABC ):
         Notify.init( self.indicatorName )
 
         menu = Gtk.Menu()
-        menu.append( Gtk.MenuItem( _( "Initialising..." ) ) )
+        menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         menu.show_all()
 
         self.indicator = AppIndicator3.Indicator.new(
@@ -310,7 +310,7 @@ class IndicatorBase( ABC ):
 
 
     def createAutostartCheckbox( self ):
-        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         autostartCheckbox.set_active( self.isAutoStart() )
         autostartCheckbox.set_margin_top( 10 )
