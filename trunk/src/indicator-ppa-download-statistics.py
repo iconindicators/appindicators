@@ -144,7 +144,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         else:
             label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
-        menuItem = Gtk.MenuItem.new( label )
+        menuItem = Gtk.MenuItem.new_with_label( label )
         menuItem.set_name( ppa.getDescriptor() )
         menuItem.connect( "activate", self.onPPA )
         menu.append( menuItem )
