@@ -25,7 +25,10 @@
 #     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
 
 
-#TODO Add support for the Yaru theme for Ubuntu 18.10+.
+#TODO Check on Ubuntu 20.04 if there is a dark and light Yaru theme, using tweaks.
+
+
+#TODO Once Yaru is sorted, add to each indicator's build script.
 
 
 #TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
@@ -439,7 +442,8 @@ class IndicatorBase( ABC ):
                        "elementary-xfce-darker" : "f3f3f3",
                        "Lubuntu"                : "4c4c4c",
                        "ubuntu-mono-dark"       : "dfdbd2",
-                       "ubuntu-mono-light"      : "3c3c3c" }
+                       "ubuntu-mono-light"      : "3c3c3c",
+                       "Yaru"                   : "dbdbdb" }
 
         themeName = self.getThemeName()
         if themeName in themeNames:
