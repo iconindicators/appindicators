@@ -129,7 +129,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.81",
+            version = "1.0.82",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
@@ -191,7 +191,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.cacheDateTimeSatellite = utcNow - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
 
 
-    #TODO Start of temporary hack...remove in release 82.
+    #TODO Start of temporary hack...remove in later release.
     # Cache data formats changed between version 80 and 81 and so remove old format files.
     #
     # Comets were originally stored as a dictionary with a string for both key and value.
@@ -1677,7 +1677,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.__adjustConfig()
 
 
-    #TODO Start of temporary hack...remove in release 82.
+    #TODO Start of temporary hack...remove in later release.
     # Convert lat/long from str to float.
     # Convert planet/star to upper case.
     # Convert satellites from list of lists of tuple ( satellite name, satellite number ) to list of satellite numbers.
