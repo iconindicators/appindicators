@@ -20,6 +20,10 @@
 # comet, minor planet and satellite information.
 
 
+#TODO On Ubuntu 20.04, the dynamic lunar icon does not render correctly.
+# If the icon is copied to Ubuntu 18.04, the same icon/file renders/displays correctly!
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
