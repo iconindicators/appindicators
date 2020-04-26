@@ -26,6 +26,9 @@
 
 
 #TODO Check on Ubuntu 20.04 if there is a dark and light Yaru theme, using tweaks.
+# There is a standard, light and dark setting for Yaru.
+# However there seems to be only one icon set and the icons don't seem to change when changed from standard to light/dark.
+# The icons which are displayed in the indicators (not sure which theme is used) are darker than the Yaru icons for network/audio/power.
 
 
 #TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
