@@ -770,7 +770,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 else:
                     self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
-                
+
             else: # Polar (always up).
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), url )
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), url )
@@ -908,7 +908,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         header = '<?xml version="1.0" standalone="no"?>' \
                  '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-                 '<svg xmlns="https://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
+                 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
 
         footer = '</svg>'
         return header + svg + footer
