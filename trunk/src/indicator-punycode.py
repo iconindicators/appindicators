@@ -46,7 +46,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.9",
+            version = "1.0.10",
             copyrightStartYear = "2016",
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
@@ -55,7 +55,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
-        menuItem = Gtk.MenuItem( _( "Convert" ) )
+        menuItem = Gtk.MenuItem.new_with_label( _( "Convert" ) )
         menu.append( menuItem )
         menuItem.connect( "activate", self.onConvert )
         self.secondaryActivateTarget = menuItem
@@ -153,7 +153,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
-        label = Gtk.Label( _( "Input source" ) )
+        label = Gtk.Label.new( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -174,7 +174,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         inputPrimaryRadio.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
 
-        outputBothCheckbox = Gtk.CheckButton( _( "Output to clipboard and primary" ) )
+        outputBothCheckbox = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )
         outputBothCheckbox.set_tooltip_text( _(
             "If checked, the output text is sent\n" + \
             "to both the clipboard and primary.\n\n" + \
@@ -184,7 +184,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         outputBothCheckbox.set_margin_top( 10 )
         grid.attach( outputBothCheckbox, 0, 3, 1, 1 )
 
-        dropPathQueryCheckbox = Gtk.CheckButton( _( "Drop path/query in output" ) )
+        dropPathQueryCheckbox = Gtk.CheckButton.new_with_label( _( "Drop path/query in output" ) )
         dropPathQueryCheckbox.set_tooltip_text( _(
             "If checked, the output text will not\n" + \
             "contain any path/query (if present)." ) )
@@ -195,10 +195,10 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Maximum results" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Maximum results" ) ), False, False, 0 )
 
         resultsAmountSpinner = Gtk.SpinButton()
-        resultsAmountSpinner.set_adjustment( Gtk.Adjustment( self.resultHistoryLength, 0, 1000, 1, 1, 0 ) )
+        resultsAmountSpinner.set_adjustment( Gtk.Adjustment.new( self.resultHistoryLength, 0, 1000, 1, 1, 0 ) )
         resultsAmountSpinner.set_value( self.resultHistoryLength )
         resultsAmountSpinner.set_tooltip_text( _(
             "The number of most recent\n" + \

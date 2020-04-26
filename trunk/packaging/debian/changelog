@@ -1,3 +1,10 @@
+indicator-punycode (1.0.10-1) xenial; urgency=low
+
+  * Fixed deprecation warnings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 16:12:04 +1000
+
+
 indicator-punycode (1.0.9-1) xenial; urgency=low
 
   * Bug fix: Erroneous call to logging.
