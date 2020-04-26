@@ -51,7 +51,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.64",
+            version = "1.0.65",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -72,7 +72,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.buildMenu( menu )
 
         else:
-            menu.append( Gtk.MenuItem( _( "(VirtualBox™ is not installed)" ) ) )
+            menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
 
         return int( 60 * self.refreshIntervalInMinutes )
 
@@ -80,7 +80,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def buildMenu( self, menu ):
         virtualMachines = self.getVirtualMachines()
         if len( virtualMachines ) == 0:
-            menu.append( Gtk.MenuItem( _( "(no virtual machines exist)" ) ) )
+            menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
 
         else:
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
@@ -92,7 +92,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                         currentMenu = stack.pop()
 
                     if virtualMachine.isGroup():
-                        menuItem = Gtk.MenuItem( self.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
+                        menuItem = Gtk.MenuItem.new_with_label( self.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
                         currentMenu.append( menuItem )
                         subMenu = Gtk.Menu()
                         menuItem.set_submenu( subMenu )
@@ -106,14 +106,14 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 for virtualMachine in virtualMachines:
                     indent = self.indent( virtualMachine.getIndent(), virtualMachine.getIndent() )
                     if virtualMachine.isGroup():
-                        menu.append( Gtk.MenuItem( indent + virtualMachine.getGroupName() ) )
+                        menu.append( Gtk.MenuItem.new_with_label( indent + virtualMachine.getGroupName() ) )
 
                     else:
                         menu.append( self.createMenuItemForVirtualMachine( virtualMachine, indent, virtualMachine.getUUID() in runningVMUUIDs ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.MenuItem( _( "Launch VirtualBox™ Manager" ) )
+        menuItem = Gtk.MenuItem.new_with_label( _( "Launch VirtualBox™ Manager" ) )
         menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
         menu.append( menuItem )
         self.secondaryActivateTarget = menuItem
@@ -125,7 +125,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             menuItem.set_active( True )
 
         else:
-            menuItem = Gtk.MenuItem( indent + virtualMachine.getName() )
+            menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )
 
         menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() )
         return menuItem
@@ -431,7 +431,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
                 store.append( parent, [ virtualMachine.getName(), autoStart, self.getStartCommand( virtualMachine.getUUID() ), virtualMachine.getUUID() ] )
 
-        tree = Gtk.TreeView( store )
+        tree = Gtk.TreeView.new_with_model( store )
         tree.expand_all()
         tree.set_hexpand( True )
         tree.set_vexpand( True )
@@ -446,7 +446,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         scrolledWindow.add( tree )
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
 
-        notebook.append_page( scrolledWindow, Gtk.Label( _( "Virtual Machines" ) ) )
+        notebook.append_page( scrolledWindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
 
         # General settings.
         grid = self.createGrid()
@@ -454,7 +454,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
 
-        label = Gtk.Label( _( "VirtualBox™ Manager" ) )
+        label = Gtk.Label.new( _( "VirtualBox™ Manager" ) )
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
@@ -467,7 +467,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 0, 1, 1 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show groups as submenus" ) )
+        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show groups as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
             "If checked, groups are shown using submenus.\n\n" + \
             "Otherwise groups are shown as an indented list." ) )
@@ -481,10 +481,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Refresh interval (minutes)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to explicitly set.
         spinnerRefreshInterval.set_tooltip_text( _( "How often the list of virtual machines\nand running status are updated." ) )
 
@@ -496,10 +496,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Startup delay (seconds)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
         spinnerDelay = Gtk.SpinButton()
-        spinnerDelay.set_adjustment( Gtk.Adjustment( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
+        spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
         spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to explicitly set.
         spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically\nstarting one virtual machine to the next." ) )
 
@@ -511,7 +511,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, row, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
@@ -553,7 +553,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def editVirtualMachine( self, tree, model, treeiter ):
         grid = self.createGrid()
 
-        label = Gtk.Label( _( "Start Command" ) )
+        label = Gtk.Label.new( _( "Start Command" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -571,7 +571,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton( _( "Autostart" ) )
+        autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
         autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
