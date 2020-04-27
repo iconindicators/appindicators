@@ -1,5 +1,6 @@
 indicator-stardate (1.0.39-1) xenial; urgency=low
 
+  * Added Yaru icon.
   * Fixed deprecation warnings.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 21:47:10 +1000
