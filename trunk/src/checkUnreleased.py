@@ -11,15 +11,15 @@ basePath = "../../"
 changeLogPath = "/packaging/debian/changelog"
 sourcePath = "/src/"
 indicators = [
-    [ "IndicatorFortune", "indicator-fortune", "1.0.32" ],
-    [ "IndicatorLunar", "indicator-lunar", "1.0.81" ],
-    [ "IndicatorOnThisDay", "indicator-on-this-day", "1.0.6" ],
-    [ "IndicatorPPADownloadStatistics", "indicator-ppa-download-statistics", "1.0.69" ],
-    [ "IndicatorPunycode", "indicator-punycode", "1.0.9" ],
-    [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.11" ],
-    [ "IndicatorStardate", "indicator-stardate", "1.0.38" ],
-    [ "IndicatorTide", "indicator-tide", "1.0.20" ],
-    [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.64" ] ]
+    [ "IndicatorFortune", "indicator-fortune", "1.0.33" ],
+    [ "IndicatorLunar", "indicator-lunar", "1.0.82" ],
+    [ "IndicatorOnThisDay", "indicator-on-this-day", "1.0.7" ],
+    [ "IndicatorPPADownloadStatistics", "indicator-ppa-download-statistics", "1.0.70" ],
+    [ "IndicatorPunycode", "indicator-punycode", "1.0.10" ],
+    [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.12" ],
+    [ "IndicatorStardate", "indicator-stardate", "1.0.39" ],
+    [ "IndicatorTide", "indicator-tide", "1.0.21" ],
+    [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.65" ] ]
 
 
 for project, source, versionOnPPA in indicators:
