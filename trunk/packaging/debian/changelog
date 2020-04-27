@@ -1,6 +1,7 @@
 indicator-lunar (1.0.82-1) xenial; urgency=low
 
   * Bug fix: Under Ubuntu 20.04, SVG header only supports http, not https.
+  * Added Yaru icon.
   * Fixed deprecation warnings.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 15:12:25 +1000
