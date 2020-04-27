@@ -54,7 +54,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.33",
+            version = "1.0.34",
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
@@ -380,7 +380,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Fortune file/directory" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Fortune file/directory" ) ), False, False, 0 )
 
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.set_editable( False )
@@ -408,7 +408,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if rowNumber: # This is an edit.
             isSystemFortune = model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE
 
-        browseFileButton = Gtk.Button( _( "File" ) )
+        browseFileButton = Gtk.Button.new_with_label( _( "File" ) )
         browseFileButton.set_sensitive( not isSystemFortune )
         if isSystemFortune:
             browseFileButton.set_tooltip_text( _(
@@ -423,7 +423,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         box.pack_start( browseFileButton, True, True, 0 )
 
-        browseDirectoryButton = Gtk.Button( _( "Directory" ) )
+        browseDirectoryButton = Gtk.Button.new_with_label( _( "Directory" ) )
         browseDirectoryButton.set_sensitive( not isSystemFortune )
         if isSystemFortune:
             browseDirectoryButton.set_tooltip_text( _(
@@ -443,7 +443,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        enabledCheckbox = Gtk.CheckButton( _( "Enabled" ) )
+        enabledCheckbox = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
         enabledCheckbox.set_tooltip_text( _(
             "Ensure the fortune file/directory\n" + \
             "works by running through 'fortune'\n" + \
