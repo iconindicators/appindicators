@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.70-1) xenial; urgency=low
 
+  * Added Yaru icon.
   * Changed default series from bionic to focal.
   * Fixed deprecation warnings.
 
