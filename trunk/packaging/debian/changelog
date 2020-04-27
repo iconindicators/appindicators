@@ -1,5 +1,6 @@
 indicator-virtual-box (1.0.65-1) xenial; urgency=low
 
+  * Added Yaru icon.
   * Fixed deprecation warnings.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 21:52:50 +1000
