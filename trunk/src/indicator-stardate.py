@@ -143,7 +143,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 3, 1, 1 )
 
         dialog.vbox.pack_start( grid, True, True, 0 )

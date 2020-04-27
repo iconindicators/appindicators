@@ -53,7 +53,7 @@
 # Between 2283/10/5 to 2323/1/1 ([19]7840.0 and [20]5006.0, respectively),
 # the rate changes to 0.5 units per day.
 #
-# From 2323/1/1 ([20]5006.0) the rate changed to 1000 units per mean solar year.  
+# From 2323/1/1 ([20]5006.0) the rate changed to 1000 units per mean solar year.
 # Also, stardate [20]5006.0 becomes [21]00000.0.
 #
 #
@@ -77,7 +77,7 @@ __gregorianDates = [
     datetime.datetime( 2323, 1, 1 ) ]
 
 
-# Rates (in stardate units per day) for each 'classic' stardate era. 
+# Rates (in stardate units per day) for each 'classic' stardate era.
 __stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
@@ -109,7 +109,7 @@ def getStardateClassic( gregorianDateTime ):
     month = gregorianDateTime.month # Month is one-based.
     day = gregorianDateTime.day
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
-        # Pre-stardate (pre 2162/1/4)...do the conversion here because a negative time is generated and throws out all other cases.          
+        # Pre-stardate (pre 2162/1/4)...do the conversion here because a negative time is generated and throws out all other cases.
         index = 0
         numberOfSeconds = ( __gregorianDates[ index ] - gregorianDateTime ).total_seconds()
         numberOfDays = numberOfSeconds / 60.0 / 60.0 / 24.0
@@ -205,15 +205,15 @@ def getNextUpdateInSeconds( gregorianDateTime, isClassic ):
         oneSecondAfterMidnight = ( gregorianDateTime + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
         numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - gregorianDateTime ).total_seconds() )
 
-    return numberOfSecondsToNextUpdate + 1 # Add in a bit of safety. 
+    return numberOfSecondsToNextUpdate + 1 # Add in a bit of safety.
 
 
 # Convert a 'classic' stardate to a Gregorian datetime.datetime.
 #
 # Rules:
-#  issue <= 19: 0 <= integer <= 9999, fraction >= 0. 
-#  issue == 20: 0 <= integer < 5006, fraction >= 0. 
-#  issue >= 21: 0 <= integer <= 99999, fraction >= 0. 
+#  issue <= 19: 0 <= integer <= 9999, fraction >= 0.
+#  issue == 20: 0 <= integer < 5006, fraction >= 0.
+#  issue >= 21: 0 <= integer <= 99999, fraction >= 0.
 #
 #  stardateIssue The issue number for the stardate (can be negative).
 #  stardateInteger The integer part of a stardate.
