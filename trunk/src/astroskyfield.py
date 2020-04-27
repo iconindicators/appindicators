@@ -732,7 +732,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getAvailabilityMessage(): 
+    def getAvailabilityMessage():
         message = None
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \

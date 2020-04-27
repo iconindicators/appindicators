@@ -117,7 +117,7 @@ class AstroBase( ABC ):
         DATA_TAG_SET_DATE_TIME,
         DATA_TAG_SOLSTICE ]
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     DATA_TAGS_TRANSLATIONS = {
         DATA_TAG_ALTITUDE          : _( "ALTITUDE" ),
         DATA_TAG_AZIMUTH           : _( "AZIMUTH" ),
@@ -144,7 +144,7 @@ class AstroBase( ABC ):
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     NAME_TAG_MOON_TRANSLATION = { NAME_TAG_MOON : _( "MOON" ) }
     NAME_TAG_SUN_TRANSLATION = { NAME_TAG_SUN : _( "SUN" ) }
 
@@ -171,7 +171,7 @@ class AstroBase( ABC ):
         PLANET_NEPTUNE : _( "Neptune" ),
         PLANET_PLUTO   : _( "Pluto" ) }
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     PLANET_TAGS_TRANSLATIONS = {
         PLANET_MERCURY : _( "MERCURY" ),
         PLANET_VENUS   : _( "VENUS" ),
@@ -193,7 +193,7 @@ class AstroBase( ABC ):
     LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences. 
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     LUNAR_PHASE_NAMES_TRANSLATIONS = {
         LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
         LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
@@ -276,7 +276,7 @@ class AstroBase( ABC ):
                    satellites, satelliteData,
                    comets, cometData,
                    minorPlanets, minorPlanetData,
-                   magnitudeMaximum ): 
+                   magnitudeMaximum ):
         return { }
 
 
@@ -403,7 +403,7 @@ class AstroBase( ABC ):
         D = int( 30.6001 * ( mPrime + 1 ) )
         julianDate = B + C + D + d + 1720994.5
 
-        # Find universal time.  Section 12 of the reference. 
+        # Find universal time.  Section 12 of the reference.
         S = julianDate - 2451545.0
         T = S / 36525.0
         T0 = ( 6.697374558 + ( 2400.051336 * T ) + ( 0.000025862 * T * T ) ) % 24
@@ -415,8 +415,8 @@ class AstroBase( ABC ):
         longitudeInHours = math.degrees( longitude ) / 15
 
         return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal time.
-    
-    
+
+
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
     # Measured in radians counter clockwise from a positive y axis.
     #

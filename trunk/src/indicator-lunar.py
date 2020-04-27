@@ -151,7 +151,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
         self.__removePreviousVersionCacheFiles()
-        self.flushCache()  
+        self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
 
@@ -234,7 +234,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
- 
+
         # Update minor planet data.
         self.minorPlanetData = { }
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
@@ -398,7 +398,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         nextUpdateInSeconds = int( ( nextUpdateTime - utcNow ).total_seconds() )
         if nextUpdateInSeconds <= 60:
-            nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources. 
+            nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources.
 
         return nextUpdateInSeconds
 
@@ -688,7 +688,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     # Determine if a body should be displayed taking into account:
-    # 
+    #
     #    The user preference for hiding a body if the body is below the horizon.
     #    The astro backend behaviour:
     #        The rise/set/az/alt is present for a body which will rise and set.

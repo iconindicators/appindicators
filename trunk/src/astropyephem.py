@@ -491,7 +491,7 @@ class AstroPyephem( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getAvailabilityMessage(): 
+    def getAvailabilityMessage():
         message = None
         if not available:
             message = _( "PyEphem could not be found. Install using:\n\n" + \
