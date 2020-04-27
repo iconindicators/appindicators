@@ -134,7 +134,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         for location, enabled in self.fortunes:
             if enabled:
                 if os.path.isdir( location ):
-                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it! 
+                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it!
 
                 elif os.path.isfile( location ):
                     locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
@@ -312,7 +312,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         radioMiddleMouseClickShowLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox() 
+        autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 7, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
@@ -431,7 +431,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 "system and cannot be modified." ) )
 
         else:
-            browseDirectoryButton.set_tooltip_text( _( 
+            browseDirectoryButton.set_tooltip_text( _(
                 "Choose a directory containing\n" + \
                 "a fortune .dat file(s).\n\n" + \
                 "Ensure the corresponding text\n" + \
