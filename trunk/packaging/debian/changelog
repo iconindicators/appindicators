@@ -1,3 +1,11 @@
+indicator-tide (1.0.21-1) xenial; urgency=low
+
+  * Added Yaru icon.
+  * Fixed deprecation warnings.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 21:51:37 +1000
+
+
 indicator-tide (1.0.20-1) xenial; urgency=low
 
   * Bug fix: Cache backend generated bad paths with a double slash. 

@@ -56,7 +56,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.20",
+            version = "1.0.21",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
@@ -81,7 +81,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                 message = _( "Tidal data is presented in your local time zone." )
 
         else:
-            menu.append( Gtk.MenuItem( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
+            menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
             summary = _( "Error" )
             message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
             self.getLogging().error( message )
@@ -173,7 +173,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
 
     def __createAndAppendMenuItem( self, menu, menuItemText, url ):
-        menuItem = Gtk.MenuItem( menuItemText )
+        menuItem = Gtk.MenuItem.new_with_label( menuItemText )
         menu.append( menuItem )
 
         if url:
@@ -221,7 +221,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Country" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Country" ) ), False, False, 0 )
 
         countriesComboBox = Gtk.ComboBoxText()
         countriesComboBox.set_tooltip_text( _( "Choose your country." ) )
@@ -236,7 +236,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         portsList = Gtk.ListStore( str ) # Port.
         portsList.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
-        portsTree = Gtk.TreeView( portsList )
+        portsTree = Gtk.TreeView.new_with_model( portsList )
         portsTree.set_tooltip_text( _( "Choose your port." ) )
         portsTree.set_hexpand( True )
         portsTree.set_vexpand( True )
@@ -252,18 +252,18 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( scrolledWindow, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "Ports" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Ports" ) ) )
 
         # General settings.
         grid = self.createGrid()
 
-        showAsSubmenusCheckbox = Gtk.CheckButton( _( "Show as submenus" ) )
+        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
         showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
         showAsSubmenusCheckbox.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
 
         grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
 
-        showAsSubmenusExceptFirstDayCheckbox = Gtk.CheckButton( _( "Except first day" ) )
+        showAsSubmenusExceptFirstDayCheckbox = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
         showAsSubmenusExceptFirstDayCheckbox.set_sensitive( showAsSubmenusCheckbox.get_active() )
         showAsSubmenusExceptFirstDayCheckbox.set_active( self.showAsSubMenusExceptFirstDay )
         showAsSubmenusExceptFirstDayCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
@@ -276,7 +276,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
 
-        box.pack_start( Gtk.Label( _( "Date format" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Date format" ) ), False, False, 0 )
 
         dateFormat = Gtk.Entry()
         dateFormat.set_text( self.menuItemDateFormat )
@@ -290,7 +290,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        label = Gtk.Label( _( "Tide format" ) )
+        label = Gtk.Label.new( _( "Tide format" ) )
         label.set_margin_top( 10 )
         label.set_halign( Gtk.Align.START )
 
@@ -299,7 +299,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_WIDGET_LEFT )
 
-        box.pack_start( Gtk.Label( _( "Default" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Default" ) ), False, False, 0 )
 
         tideFormat = Gtk.Entry()
         tideFormat.set_text( self.menuItemTideFormat )
@@ -318,7 +318,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_WIDGET_LEFT )
 
-        box.pack_start( Gtk.Label( _( "Missing time" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Missing time" ) ), False, False, 0 )
 
         tideFormatSansTime = Gtk.Entry()
         tideFormatSansTime.set_text( self.menuItemTideFormatSansTime )
@@ -337,7 +337,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         autostartCheckbox = self.createAutostartCheckbox()
         grid.attach( autostartCheckbox, 0, 6, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
