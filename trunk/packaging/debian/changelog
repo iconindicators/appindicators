@@ -1,5 +1,6 @@
 indicator-fortune (1.0.33-1) xenial; urgency=low
 
+  * Added Yaru icon.
   * Fixed deprecation warnings.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 26 Apr 2020 15:58:30 +1000
