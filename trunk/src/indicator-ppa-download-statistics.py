@@ -64,7 +64,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.70",
+            version = "1.0.71",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 
@@ -671,7 +671,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid = self.createGrid()
 
-        label = Gtk.Label( _( "PPA User" ) )
+        label = Gtk.Label.new( _( "PPA User" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -697,7 +697,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( ppaUser, 1, 0, 1, 1 )
 
-        label = Gtk.Label( _( "PPA Name" ) )
+        label = Gtk.Label.new( _( "PPA Name" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 1, 1 )
 
@@ -721,7 +721,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( ppaName, 1, 1, 1, 1 )
 
-        label = Gtk.Label( _( "Series" ) )
+        label = Gtk.Label.new( _( "Series" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
@@ -737,7 +737,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( series, 1, 2, 1, 1 )
 
-        label = Gtk.Label( _( "Architecture" ) )
+        label = Gtk.Label.new( _( "Architecture" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 3, 1, 1 )
 
@@ -854,7 +854,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid = self.createGrid()
 
-        label = Gtk.Label( _( "PPA User/Name" ) )
+        label = Gtk.Label.new( _( "PPA User/Name" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -885,13 +885,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( ppaUsersNames, 1, 0, 1, 1 )
 
-        label = Gtk.Label( _( "Filter Text" ) )
+        label = Gtk.Label.new( _( "Filter Text" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 2, 1 )
 
         box = Gtk.Box( spacing = 0 )
 
-        label = Gtk.Label( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.
+        label = Gtk.Label.new( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.
         label.set_valign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
