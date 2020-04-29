@@ -33,7 +33,7 @@ ECLIPSE_TYPE_TOTAL = "T"
 
 # Gets the upcoming eclipse, lunar or solar.
 #
-# dateTimeUTC - Current date/time in UTC as a python datetime.datetime object. 
+# dateTimeUTC - Current date/time in UTC as a python datetime.datetime object.
 # isLunar - If True, finds the next lunar eclipse; otherwise finds the next solar eclipse.
 #
 # Returns a tuple of strings describing the next eclipse:
@@ -75,7 +75,7 @@ def getEclipse( dateTimeUTC, isLunar ):
 # On Web: https://eclipse.gsfc.nasa.gov/SEpubs/5MKLE.html
 # Catalog Key: https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # Date: 2011 May 23
-# 
+#
 #      Year   Month  Day   HH:MM:SS    DT   Type  Lat   Long
 __lunarEclipseData = [
     [ "2020", "06", "05", "19:26:14", "72", "N", "21S", "69E" ],
