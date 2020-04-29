@@ -917,10 +917,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO How does the 1st versus 3rd look?  Does the 3rd face the other way?
 
             elif illuminationPercentage < 50: # Crescent
-                body += 'A ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' ' + str( radius ) + ' 0 0 0 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
+                body += ' A ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' ' + str( radius ) + ' 0 0 0 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
 
             else: # Gibbous
-                body += 'A ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' ' + str( radius ) + ' 0 1 1 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
+                body += ' A ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' ' + str( radius ) + ' 0 1 1 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
 
 #TODO Rotation does not match that of the released version nor futureboy/frink.
             body += ' transform="rotate(' + str( 360 - brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
