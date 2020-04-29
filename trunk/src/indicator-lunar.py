@@ -911,19 +911,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         else:
             body = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + ' ' + \
-                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( width / 2 ) + ' ' + str( height / 2 + radius )
+                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 0 ' + str( width / 2 ) + ' ' + str( height / 2 + radius )
             if illuminationPercentage == 50: # Quarter
                 body += ' Z"'
 #TODO How does the 1st versus 3rd look?  Does the 3rd face the other way?
 
             elif illuminationPercentage < 50: # Crescent
-                body += ' A ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' ' + str( radius ) + ' 0 0 0 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
+                body += ' A ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' ' + str( radius ) + ' 0 0 1 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
+                print( "Crescent" )#TODO Test
 
             else: # Gibbous
                 body += ' A ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' ' + str( radius ) + ' 0 1 1 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
+                print( "Gibbous" )#TODO Test
 
 #TODO Rotation does not match that of the released version nor futureboy/frink.
-            body += ' transform="rotate(' + str( 360 - brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
+            body += ' transform="rotate(' + str( brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
