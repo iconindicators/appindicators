@@ -1,3 +1,10 @@
+indicator-lunar (1.0.83-1) xenial; urgency=low
+
+  * Simplified icon generation.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 30 Apr 2020 19:01:07 +1000
+
+
 indicator-lunar (1.0.82-1) xenial; urgency=low
 
   * Bug fix: Under Ubuntu 20.04, SVG header only supports http, not https.
