@@ -1,6 +1,6 @@
 indicator-lunar (1.0.83-1) xenial; urgency=low
 
-  * Bug fix: icon incorrectly rendered on Ubuntu 20.04.
+  * Bug fix: Icon incorrectly rendered on Ubuntu 20.04.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 30 Apr 2020 19:01:07 +1000
 
