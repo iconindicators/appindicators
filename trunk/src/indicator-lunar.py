@@ -20,10 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO On Ubuntu 20.04, the dynamic lunar icon does not render correctly.
-# If the icon is copied to Ubuntu 18.04, the same icon/file renders/displays correctly!
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -133,7 +129,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.82",
+            version = "1.0.83",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
@@ -224,17 +220,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
-
-#TODO Testing
-#        utcNow = utcNow.replace( year = 2020, month = 4, day = 12, hour = 23, minute = 45 ) # Gibbous
-#        utcNow = utcNow.replace( year = 2020, month = 5, day = 14, hour = 14, minute = 2 ) # 3rd Quarter
-#        utcNow = utcNow.replace( year = 2020, month = 5, day = 22, hour = 17, minute = 38 ) # New Moon
-#        utcNow = utcNow.replace( year = 2020, month = 5, day = 30, hour = 3, minute = 29 ) # 1st Quarter
-#        utcNow = utcNow.replace( year = 2020, month = 5, day = 25, hour = 13, minute = 29 ) # Crescent
-        utcNow = utcNow.replace( year = 2020, month = 6, day = 23, hour = 0, minute = 0, second = 0 )
-        print( utcNow )
-        self.latitude = 34
-        self.longitude = -151
 
         # Update comet data.
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
@@ -331,10 +316,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #
     # Returns a dictionary (may be empty).
     def updateData( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
-        if True:#TODO Remove
-            return { }, cacheDateTime, downloadCount, nextDownloadTime
-
-        
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
@@ -904,10 +885,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         radius = float( width / 2 ) * 0.8 # Ensure the icon takes up most of the viewing area with a small boundary.
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
 
-#TODO Testing
-        print( str( illuminationPercentage ) + "%" )
-        print( str( brightLimbAngleInDegrees ) + "°" )
-
         if illuminationPercentage == 0 or illuminationPercentage == 100:
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if illuminationPercentage == 0: # New
@@ -921,107 +898,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                    'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( width / 2 + radius ) + ' ' + str( height / 2 )
             if illuminationPercentage == 50: # Quarter
                 body += ' Z"'
-#TODO How does the 1st versus 3rd look?  Does the 3rd face the other way?
 
             elif illuminationPercentage < 50: # Crescent
                 body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
-                print( "Crescent" )#TODO Test
 
             else: # Gibbous
                 body += ' A ' + str( radius ) + ' ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
-                print( "Gibbous" )#TODO Test
 
-#TODO Rotation does not match that of the released version nor futureboy/frink.
             body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
                '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">' + body + '</svg>'
-
-
-    def createIconTextBACKUP( self, illuminationPercentage, brightLimbAngleInDegrees ):
-        width = 100
-        height = 100
-        radius = float( width / 2 ) * 0.8 # Ensure the icon takes up most of the viewing area with a small boundary.
-        colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
-
-#TODO Testing
-#         illuminationPercentage = 25
-#         brightLimbAngleInDegrees = 0
-        print( str( illuminationPercentage ) + "%" )
-        print( str( brightLimbAngleInDegrees ) + "°" )
-
-        if illuminationPercentage == 0 or illuminationPercentage == 100:
-            body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
-            if illuminationPercentage == 0: # New
-                body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
-
-            else: # Full
-                body += '" fill="#' + colour + '" />'
-
-        else:
-            body = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + ' ' + \
-                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 0 ' + str( width / 2 ) + ' ' + str( height / 2 + radius )
-            if illuminationPercentage == 50: # Quarter
-                body += ' Z"'
-#TODO How does the 1st versus 3rd look?  Does the 3rd face the other way?
-
-            elif illuminationPercentage < 50: # Crescent
-                body += ' A ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' ' + str( radius ) + ' 0 0 1 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
-                print( "Crescent" )#TODO Test
-
-            else: # Gibbous
-                body += ' A ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' ' + str( radius ) + ' 0 1 1 ' + str( width / 2 ) + ' ' + str( height / 2 - radius ) + '"'
-                print( "Gibbous" )#TODO Test
-
-#TODO Rotation does not match that of the released version nor futureboy/frink.
-            body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
-
-        return '<?xml version="1.0" standalone="no"?>' \
-               '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">' + body + '</svg>'
-
-
-#TODO Remove if not needed 
-    # Creates the SVG icon text representing the moon given the illumination and bright limb angle.
-    #
-    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
-    #
-    #    brightLimbAngleInDegrees The angle of the bright limb, relative to zenith, ranging from 0 to 360 inclusive.
-    #                             Ignored if illuminationPercentage is 0 or 100.
-    def createIconTextORIG( self, illuminationPercentage, brightLimbAngleInDegrees ):
-        width = 100
-        height = 100
-        radius = float( width / 2 ) * 0.8 # The radius of the moon should have the full moon take up most of the viewing area but with a boundary.
-        colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
-
-        if illuminationPercentage == 0 or illuminationPercentage == 100:
-            svgStart = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
-            if illuminationPercentage == 0: # New
-                svg = svgStart + '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
-
-            else: # Full
-                svg = svgStart + '" fill="#' + colour + '" />'
-
-        else:
-            svgStart = '<path d="M ' + str( width / 2 ) + ' ' + str( height / 2 ) + ' h-' + str( radius ) + ' a ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( radius * 2 ) + ' 0'
-            if illuminationPercentage == 50: # Quarter
-                svg = svgStart + '"'
-
-            elif illuminationPercentage < 50: # Crescent
-                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( 50 - illuminationPercentage ) / 50.0 * radius ) + ' 0 0 0 ' + str( radius * 2 * -1 ) + ' + 0"'
-
-            else: # Gibbous
-                svg = svgStart + ' a ' + str( radius ) + ' ' + str( ( illuminationPercentage - 50 ) / 50.0 * radius ) + ' 0 1 1 ' + str( radius * 2 * -1 ) + ' + 0"'
-
-            svg += ' transform="rotate(' + str( brightLimbAngleInDegrees * -1 ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
-
-        header = '<?xml version="1.0" standalone="no"?>' \
-                 '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-                 '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">'
-
-        footer = '</svg>'
-        return header + svg + footer
 
 
     def onPreferences( self, dialog ):
