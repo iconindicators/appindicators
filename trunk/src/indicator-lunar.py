@@ -231,7 +231,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #        utcNow = utcNow.replace( year = 2020, month = 5, day = 22, hour = 17, minute = 38 ) # New Moon
 #        utcNow = utcNow.replace( year = 2020, month = 5, day = 30, hour = 3, minute = 29 ) # 1st Quarter
 #        utcNow = utcNow.replace( year = 2020, month = 5, day = 25, hour = 13, minute = 29 ) # Crescent
+        utcNow = utcNow.replace( year = 2020, month = 6, day = 23, hour = 0, minute = 0, second = 0 )
         print( utcNow )
+        self.latitude = 34
+        self.longitude = -151
 
         # Update comet data.
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
@@ -328,6 +331,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #
     # Returns a dictionary (may be empty).
     def updateData( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+        if True:#TODO Remove
+            return { }, cacheDateTime, downloadCount, nextDownloadTime
+
+        
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
@@ -898,8 +905,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
 
 #TODO Testing
-#         illuminationPercentage = 50
-#         brightLimbAngleInDegrees = 0
         print( str( illuminationPercentage ) + "%" )
         print( str( brightLimbAngleInDegrees ) + "°" )
 
