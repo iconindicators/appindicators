@@ -898,6 +898,51 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
 
 #TODO Testing
+#         illuminationPercentage = 50
+#         brightLimbAngleInDegrees = 0
+        print( str( illuminationPercentage ) + "%" )
+        print( str( brightLimbAngleInDegrees ) + "°" )
+
+        if illuminationPercentage == 0 or illuminationPercentage == 100:
+            body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
+            if illuminationPercentage == 0: # New
+                body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
+
+            else: # Full
+                body += '" fill="#' + colour + '" />'
+
+        else:
+            body = '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
+                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( width / 2 + radius ) + ' ' + str( height / 2 )
+            if illuminationPercentage == 50: # Quarter
+                body += ' Z"'
+#TODO How does the 1st versus 3rd look?  Does the 3rd face the other way?
+
+            elif illuminationPercentage < 50: # Crescent
+                body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+                print( "Crescent" )#TODO Test
+
+            else: # Gibbous
+                body += ' A ' + str( radius ) + ' ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+                print( "Gibbous" )#TODO Test
+
+#TODO Rotation does not match that of the released version nor futureboy/frink.
+            body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
+
+        return '<?xml version="1.0" standalone="no"?>' \
+               '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">' + body + '</svg>'
+
+
+    def createIconTextBACKUP( self, illuminationPercentage, brightLimbAngleInDegrees ):
+        width = 100
+        height = 100
+        radius = float( width / 2 ) * 0.8 # Ensure the icon takes up most of the viewing area with a small boundary.
+        colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
+
+#TODO Testing
+#         illuminationPercentage = 25
+#         brightLimbAngleInDegrees = 0
         print( str( illuminationPercentage ) + "%" )
         print( str( brightLimbAngleInDegrees ) + "°" )
 
@@ -925,7 +970,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 print( "Gibbous" )#TODO Test
 
 #TODO Rotation does not match that of the released version nor futureboy/frink.
-            body += ' transform="rotate(' + str( brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
+            body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
