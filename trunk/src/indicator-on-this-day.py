@@ -51,7 +51,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.7",
+            version = "1.0.8",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
@@ -79,7 +79,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         for event in events:
             if event.getDate() != lastDate:
                 if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and an event menu item.
-                    menu.append( Gtk.MenuItem.new_with_label( event.getDate() ) )
+                    menu.append( Gtk.MenuItem.new_with_label( self.removeLeadingZeroFromDate( event.getDate() ) ) )
                     lastDate = event.getDate()
                     menuItemCount += 1
 
@@ -87,7 +87,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                     break # Don't add the menu item for the new date and don't add a subsequent event.
 
             menuItem = Gtk.MenuItem.new_with_label( "    " + event.getDescription() )
-            menuItem.props.name = event.getDate() # Allows the month/day to be passed to the copy/search functions below.
+            menuItem.props.name = self.removeLeadingZeroFromDate( event.getDate() ) # Allows the month/day to be passed to the copy/search functions below.
             menu.append( menuItem )
             menuItemCount += 1
 
@@ -99,6 +99,9 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             if menuItemCount == menuItemMaximum:
                 break
+
+
+    def removeLeadingZeroFromDate( self, date ): return date[ 0 : -3 ] + ' ' + date[ -1 ] if date[ -2 ] == '0' else date[ 0 : -3 ] + ' ' + date[ -2 : ]
 
 
     def getEvents( self ):

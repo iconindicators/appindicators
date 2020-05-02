@@ -1,3 +1,10 @@
+indicator-on-this-day (1.0.8-1) xenial; urgency=low
+
+  * Removed leading zero from day in date.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 2 May 2020 16:15:07 +1000
+
+
 indicator-on-this-day (1.0.7-1) xenial; urgency=low
 
   * Added Yaru icon.
