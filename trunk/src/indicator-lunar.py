@@ -53,6 +53,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_CITY_NAME = "city"
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
+    CONFIG_DELAY = "delay"
     CONFIG_MAGNITUDE = "magnitude"
     CONFIG_MINOR_PLANETS = "minorPlanets"
     CONFIG_MINOR_PLANETS_ADD_NEW = "minorPlanetsAddNew"
@@ -129,7 +130,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.83",
+            version = "1.0.84",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
@@ -149,6 +150,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.__removePreviousVersionCacheFiles()
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
+
+        self.delayStartup()
+
+
+    # Found on Ubuntu 18.04 that the indicator can start up but the menu does not display...this delay seems to work around the issue.
+    def delayStartup( self ):
+        uptime = datetime.datetime.strptime( self.processGet( "uptime -s" ).strip(), "%Y-%m-%d %H:%M:%S" )
+        now = datetime.datetime.now()
+        secondsSinceStart = ( now - uptime ).total_seconds()
+        if secondsSinceStart < self.delay:
+            import time
+            Notify.Notification.new( "Sleeping...", " ", None ).show() #TODO Remove
+            time.sleep( self.delay - secondsSinceStart )
+
+        Notify.Notification.new( "Waking up...", " ", None ).show() #TODO Remove
 
 
     def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
@@ -1039,6 +1055,28 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "by Name then Number." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label.new( _( "Delay start up" ) ), False, False, 0 )
+
+        spinnerDelay = Gtk.SpinButton()
+        spinnerDelay.set_numeric( True )
+        spinnerDelay.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delay, 0, 1000, 1, 5, 0 ) )
+        spinnerDelay.set_value( self.delay ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
+        spinnerDelay.set_tooltip_text( _(
+            "On Ubuntu 18.04 (and perhaps other versions)\n" + \
+            "the indicator menu can become unresponsive\n" + \
+            "on computer start up.\n\n" + \
+            "This setting delays the indicator start up\n" + \
+            "measured (in seconds) from the computer start." ) )
+
+#TODO Reword the tooltip.
+
+        box.pack_start( spinnerDelay, False, False, 0 )
+        grid.attach( box, 0, 6, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Planets/Stars.
@@ -1308,6 +1346,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active() # The update will add in new minor planets.
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
+            self.delay = spinnerDelay.get_value_as_int()
 
             self.planets = [ ]
             for row in planetStore:
@@ -1646,6 +1685,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, [ ] )
         self.cometsAddNew = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
 
+        self.delay = config.get( IndicatorLunar.CONFIG_DELAY, 0 ) # Number of seconds from computer start up to delay indicator start up.
+
         self.hideBodiesBelowHorizon = config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, False )
 
         self.indicatorText = config.get( IndicatorLunar.CONFIG_INDICATOR_TEXT, IndicatorLunar.INDICATOR_TEXT_DEFAULT )
@@ -1730,6 +1771,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             IndicatorLunar.CONFIG_CITY_NAME: self.city,
             IndicatorLunar.CONFIG_COMETS: comets,
             IndicatorLunar.CONFIG_COMETS_ADD_NEW: self.cometsAddNew,
+            IndicatorLunar.CONFIG_DELAY: self.delay,
             IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON: self.hideBodiesBelowHorizon,
             IndicatorLunar.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorLunar.CONFIG_INDICATOR_TEXT_SEPARATOR: self.indicatorTextSeparator,
