@@ -157,14 +157,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Found on Ubuntu 18.04 that the indicator can start up but the menu does not display...this delay seems to work around the issue.
     def delayStartup( self ):
         uptime = datetime.datetime.strptime( self.processGet( "uptime -s" ).strip(), "%Y-%m-%d %H:%M:%S" )
-        now = datetime.datetime.now()
-        secondsSinceStart = ( now - uptime ).total_seconds()
+        secondsSinceStart = ( datetime.datetime.now() - uptime ).total_seconds()
         if secondsSinceStart < self.delay:
             import time
-            Notify.Notification.new( "Sleeping...", " ", None ).show() #TODO Remove
             time.sleep( self.delay - secondsSinceStart )
-
-        Notify.Notification.new( "Waking up...", " ", None ).show() #TODO Remove
 
 
     def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
@@ -1070,9 +1066,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "the indicator menu can become unresponsive\n" + \
             "on computer start up.\n\n" + \
             "This setting delays the indicator start up\n" + \
-            "measured (in seconds) from the computer start." ) )
-
-#TODO Reword the tooltip.
+            "measured (in seconds) from computer start up." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
         grid.attach( box, 0, 6, 1, 1 )
