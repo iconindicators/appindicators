@@ -1,12 +1,3 @@
-indicator-lunar (1.0.84-1) xenial; urgency=low
-
-  * Workaround: On Ubuntu 18.04 (and possibly other versions), the indicator
-    menu can lock up when the indicator autostarts during computer start up.
-    A preference has been added to delay the indicator during start up.
-
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 11 May 2020 22:24:17 +1000
-
-
 indicator-lunar (1.0.83-1) xenial; urgency=low
 
   * Bug fix: Icon incorrectly rendered on Ubuntu 20.04.
