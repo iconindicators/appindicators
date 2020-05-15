@@ -1026,7 +1026,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text( _( "If checked all satellites are added." ) )
+        satellitesAddNewCheckbox.set_tooltip_text( _( "If checked, all satellites are added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbox = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )

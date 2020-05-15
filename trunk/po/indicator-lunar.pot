@@ -1702,7 +1702,7 @@ msgid "Add new satellites"
 msgstr ""
 
 #: indicator-lunar.py:998
-msgid "If checked all satellites are added."
+msgid "If checked, all satellites are added."
 msgstr ""
 
 #: indicator-lunar.py:1001
