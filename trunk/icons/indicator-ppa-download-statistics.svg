@@ -13,8 +13,8 @@
    height="22"
    width="22"
    version="1.0"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="indicator-punycode.svg">
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="indicator-ppa-download-statistics.svg">
   <defs
      id="defs8" />
   <sodipodi:namedview
@@ -26,16 +26,16 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="960"
-     inkscape:window-height="1028"
+     inkscape:window-width="1920"
+     inkscape:window-height="1052"
      id="namedview6"
      showgrid="true"
-     inkscape:zoom="9.0237488"
-     inkscape:cx="21.503602"
-     inkscape:cy="6.8839278"
-     inkscape:window-x="960"
-     inkscape:window-y="24"
-     inkscape:window-maximized="0"
+     inkscape:zoom="32"
+     inkscape:cx="4.7149572"
+     inkscape:cy="9.2447024"
+     inkscape:window-x="0"
+     inkscape:window-y="28"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg3229">
     <inkscape:grid
        type="xygrid"
@@ -55,24 +55,68 @@
   </metadata>
   <text
      xml:space="preserve"
-     style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-     x="-0.21900554"
-     y="16.290073"
-     id="text3766-5"
-     sodipodi:linespacing="125%"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;opacity:0.2;fill:#000000;fill-opacity:1;stroke:none;"
+     x="12.393516"
+     y="20.99733"
+     id="text3766-5-5-9"><tspan
        sodipodi:role="line"
-       id="tspan3768-7"
-       x="-0.21900554"
-       y="16.290073">PPA</tspan></text>
+       id="tspan3768-7-0-6"
+       x="12.393516"
+       y="20.99733"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;">A</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:12px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
-     x="-0.21900554"
-     y="15.299685"
-     id="text3766"
-     sodipodi:linespacing="125%"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;opacity:0.2;fill:#000000;fill-opacity:1;stroke:none"
+     x="0.029451445"
+     y="9.101819"
+     id="text3766-5-5"><tspan
        sodipodi:role="line"
-       id="tspan3768"
-       x="-0.21900554"
-       y="15.299685">PPA</tspan></text>
+       id="tspan3768-7-0"
+       x="0.029451445"
+       y="9.101819"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">P</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;"
+     x="0.38449746"
+     y="8.7703505"
+     id="text3766-9-5"><tspan
+       sodipodi:role="line"
+       id="tspan3768-0-0"
+       x="0.38449746"
+       y="8.7703505"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;">P</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none"
+     x="12.792867"
+     y="20.759718"
+     id="text3766-9-8"><tspan
+       sodipodi:role="line"
+       id="tspan3768-0-08"
+       x="12.792867"
+       y="20.759718"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">A</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;opacity:0.2;fill:#000000;fill-opacity:1;stroke:none"
+     x="6.4569349"
+     y="15.055925"
+     id="text3766-5-5-7"><tspan
+       sodipodi:role="line"
+       id="tspan3768-7-0-3"
+       x="6.4569349"
+       y="15.055925"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">P</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:Sans;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none"
+     x="6.7709055"
+     y="14.780594"
+     id="text3766-9"><tspan
+       sodipodi:role="line"
+       id="tspan3768-0"
+       x="6.7709055"
+       y="14.780594"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.66666698px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start">P</tspan></text>
 </svg>
