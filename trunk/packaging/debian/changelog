@@ -1,5 +1,6 @@
 indicator-ppa-download-statistics (1.0.71-1) xenial; urgency=low
 
+  * Changed the icon as it was difficult to read on Ubuntu 20.04.
   * Fixed deprecation warnings.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 27 Apr 2020 13:34:38 +1000
