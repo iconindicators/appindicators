@@ -1,3 +1,10 @@
+indicator-lunar (1.0.84-1) xenial; urgency=low
+
+  * Bug fix: On-click function not working for comets and minor planets.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 29 May 2020 9:08:40 +1000
+
+
 indicator-lunar (1.0.83-1) xenial; urgency=low
 
   * Bug fix: Icon incorrectly rendered on Ubuntu 20.04.

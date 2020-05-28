@@ -129,7 +129,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.83",
+            version = "1.0.84",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astrobackend.getCredit(),
@@ -644,7 +644,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name in sorted( bodies ):
-                url = self.getCometMinorPlanetOnClickURL( name, bodyType )
+                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + self.getCometMinorPlanetOnClickURL( name, bodyType )
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + name, url )
                 self.updateMenuCommon( subMenu, bodyType, name, 1, 2, url )
                 separator = Gtk.SeparatorMenuItem()
@@ -681,6 +681,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             else: # 229762 G!kunll'homdima
                 hip = components[ 0 ]
+
+        return hip
 
 
     # Determine if a body should be displayed taking into account:
