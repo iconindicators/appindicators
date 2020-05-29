@@ -719,9 +719,9 @@ class AstroPyephem( astrobase.AstroBase ):
 
     # Determine if a satellite pass is visible.
     #
-    #    http://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
-    #    http://www.celestrak.com/columns/v03n01
-    #    http://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+    #    https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+    #    https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+    #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
         city = AstroPyephem.__getCity( data, passDateTime )
