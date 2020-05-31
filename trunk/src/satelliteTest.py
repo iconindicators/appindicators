@@ -2,6 +2,23 @@
 # -*- coding: utf-8 -*-
 
 
+# https://github.com/skyfielders/python-skyfield/issues/327
+# https://rhodesmill.org/skyfield/earth-satellites.html#finding-when-a-satellite-is-in-sunlight
+# 
+# https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+# 
+# https://spotthestation.nasa.gov/sightings/index.cfm
+# https://www.heavens-above.com/PassSummary.aspx
+# https://www.n2yo.com/passes/?s=25544
+# https://www.satflare.com/track.asp?q=iss
+# https://uphere.space/
+# https://www.amsat.org/track/
+# https://www.calsky.com/cs.cgi?cha=12&sec=4
+# 
+# https://rhodesmill.org/pyephem/quick.html
+# https://rhodesmill.org/pyephem/tutorial.html
+
+
 import datetime, ephem
 
 
