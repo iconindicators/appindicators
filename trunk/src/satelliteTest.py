@@ -27,8 +27,7 @@ def getNextPass( now ):
     observer.lat = '-33.87'
     observer.long = '151.21'
     observer.elevation = 0
-    # observer.pressure = 0
-    # observer.horizon = '-0:34'
+    observer.pressure = 0
     observer.date = now
 
     sat = ephem.readtle( "ISS (ZARYA)",
@@ -43,21 +42,17 @@ def getNextPass( now ):
     sun.compute( observer )
 
     sat.compute( observer )
-    visible = False
-    if sat.eclipsed is False and ephem.degrees( '-18' ) < sun.alt < ephem.degrees( '-6' ) :
-        visible = True
+    visible = sat.eclipsed is False and ephem.degrees( '-18' ) < sun.alt < ephem.degrees( '-6' )
 
     return tr, visible
 
 
-keepLooking = True
+visiblePasses = 0
 now = datetime.datetime.utcnow()
-while( keepLooking ):
-    print( now.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+while( visiblePasses < 11 ):
     riseTime, visible = getNextPass( now )
     if visible:
-        keepLooking = False
-        print( "Rise time:", riseTime )
+        visiblePasses += 1
+        print( riseTime.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
 
-    else:
-        now = now + datetime.timedelta( hours = 1 )
+    now = now + datetime.timedelta( minutes = 90 )
