@@ -22,6 +22,9 @@
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
 
 
+#TODO Not sure where, but also need to install jplemphem along with skyfield using pip3.
+
+
 # Required to run the planet/star ephemeris creation functions at the end.  Uncomment as needed!
 # import gettext
 # gettext.install( "astroskyfield" )
