@@ -25,7 +25,7 @@ dayStart = 6
 
 yearEnd = 2020
 monthEnd = 6
-dayEnd = 7
+dayEnd = 8
 
 tle = [ "ISS (ZARYA)",
         "1 25544U 98067A   20157.17043900  .00001189  00000-0  29319-4 0  9996",
@@ -35,6 +35,7 @@ tle = [ "ISS (ZARYA)",
 # https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
 # https://stackoverflow.com/questions/25966098/pyephem-next-pass-function-returns-different-result
 def getPassesPyEphem():
+    print( "ISS passes calculated from PyEphem:" )
     now = str( yearStart ) + '/' + str( monthStart  ) + '/' + str( dayStart )
     while( ephem.date( now ).datetime() < datetime.datetime( yearEnd, monthEnd, dayEnd ) ):
         observer = ephem.Observer()
@@ -56,7 +57,8 @@ def getPassesPyEphem():
 
 
 def getPassesSkyfield():
-    observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' W' if lat >= 0 else ' E' ) )
+    print( "ISS passes calculated from Skyfield:" )
+    observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
     ts = load.timescale()
     satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
     t0 = ts.utc( yearStart, monthStart, dayStart )
@@ -64,8 +66,9 @@ def getPassesSkyfield():
     t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
     for ti, event in zip( t, events ):
         if event == 0:
-            print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+            print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
 
 
 getPassesPyEphem()
+print()
 getPassesSkyfield()
