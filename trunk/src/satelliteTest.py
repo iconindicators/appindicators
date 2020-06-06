@@ -17,30 +17,30 @@ from skyfield.api import EarthSatellite, load, Topos
 
 lat = -33.87
 lon = 151.21
+elev = 0
 
 yearStart = 2020
 monthStart = 6
-dayStart = 5
+dayStart = 6
 
 yearEnd = 2020
 monthEnd = 6
 dayEnd = 7
 
-# Source: https://celestrak.com/NORAD/elements/visual.txt
 tle = [ "ISS (ZARYA)",
         "1 25544U 98067A   20157.17043900  .00001189  00000-0  29319-4 0  9996",
         "2 25544  51.6455  47.9439 0001982  29.8888  69.4543 15.49422649230155" ]
 
 
 # https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+# https://stackoverflow.com/questions/25966098/pyephem-next-pass-function-returns-different-result
 def getPassesPyEphem():
     now = str( yearStart ) + '/' + str( monthStart  ) + '/' + str( dayStart )
     while( ephem.date( now ).datetime() < datetime.datetime( yearEnd, monthEnd, dayEnd ) ):
         observer = ephem.Observer()
         observer.lat = str( lat )
         observer.long = str( lon )
-        observer.elevation = 0
-        observer.pressure = 0
+        observer.elevation = elev
         observer.date = now
 
         sat = ephem.readtle( tle[ 0 ], tle[ 1 ], tle[ 2 ] )                 
