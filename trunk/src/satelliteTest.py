@@ -77,9 +77,30 @@ def getPassesSkyfield():
     t0 = ts.utc( yearStart, monthStart, dayStart )
     t1 = ts.utc( yearEnd, monthEnd, dayEnd )
     t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
-    for ti, event in zip( t, events ):
-        if event == 0:
-            print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
+    passes = [ ]
+    rise = False
+    set = False
+    culminate = False
+
+    print( ''.join( str( i ) for i in events ) )
+    i = 0
+    while i < len( events ):
+        if events[ i ] == 0: # Rise
+            pass
+
+        elif events[ i ] == 1: # Culminate
+            pass
+
+        else: # Set
+            pass
+
+        print( events[ i ] )
+        i += 1
+    
+    
+#     for ti, event in zip( t, events ):
+#         if event == 0:
+#             print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
 
 
 #     timeScale = load.timescale( builtin = True )
