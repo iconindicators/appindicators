@@ -56,6 +56,19 @@ def getPassesPyEphem():
         now = observer.date.datetime() + datetime.timedelta( minutes = 90 )
 
 
+def getPassesSkyfieldORIGINAL():
+    print( "ISS passes calculated from Skyfield:" )
+    observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
+    ts = load.timescale()
+    satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
+    t0 = ts.utc( yearStart, monthStart, dayStart )
+    t1 = ts.utc( yearEnd, monthEnd, dayEnd )
+    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
+    for ti, event in zip( t, events ):
+        if event == 0:
+            print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
+
+
 def getPassesSkyfield():
     print( "ISS passes calculated from Skyfield:" )
     observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
@@ -67,6 +80,12 @@ def getPassesSkyfield():
     for ti, event in zip( t, events ):
         if event == 0:
             print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
+
+
+#     timeScale = load.timescale( builtin = True )
+#     two_hours = timeScale.utc(2014, 1, 20, 0, range(0, 120, 20))
+#     topos = Topos( latitude_degrees = lat, longitude_degrees = lon, elevation_m = elev )
+#     ephemerisPlanets = load( "planets.bsp" )
 
 
 getPassesPyEphem()
