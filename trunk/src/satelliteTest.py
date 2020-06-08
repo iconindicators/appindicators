@@ -82,20 +82,31 @@ def getPassesSkyfield():
     set = False
     culminate = False
 
-    print( ''.join( str( i ) for i in events ) )
-    i = 0
-    while i < len( events ):
-        if events[ i ] == 0: # Rise
-            pass
+    print( events )
+    events = ''.join( str( i ) for i in events )
+    events += "zzz"
+    events = "aaa" + events 
+    print( events )
+    pattern = "(01+2)"
 
-        elif events[ i ] == 1: # Culminate
-            pass
+    import re
+#     print( re.findall( pattern, events ) )
+    print( re.split( pattern, events ) )
 
-        else: # Set
-            pass
-
-        print( events[ i ] )
-        i += 1
+#     print( ''.join( str( i ) for i in events ) )
+#     i = 0
+#     while i < len( events ):
+#         if events[ i ] == 0: # Rise
+#             pass
+# 
+#         elif events[ i ] == 1: # Culminate
+#             pass
+# 
+#         else: # Set
+#             pass
+# 
+#         print( events[ i ] )
+#         i += 1
     
     
 #     for ti, event in zip( t, events ):
