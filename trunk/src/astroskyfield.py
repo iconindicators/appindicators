@@ -20,9 +20,13 @@
 
 
 #TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
+# Need to add anything else, say pip3?
+# sudo apt install python3-pip
 
 
 #TODO Not sure where, but also need to install jplemphem along with skyfield using pip3.
+# Need to also install other dependencies:
+# sudo pip3 install --upgrade jplephem numpy pandas pytz skyfield
 
 
 # Required to run the planet/star ephemeris creation functions at the end.  Uncomment as needed!
