@@ -731,7 +731,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Waiting for when Skyfield implements Orbital Elements.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-        return { }
+#         return { }
+        return orbitalElementData
 
 
     @staticmethod
@@ -854,8 +855,26 @@ class AstroSkyfield( astrobase.AstroBase ):
 # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+#TODO Testing how to get comet/mp data into a dataframe/row format for skyfield to then process.
+        from skyfield.api import load
+        from skyfield.data import mpc
+        
+        with load.open(mpc.COMET_URL) as f:
+            comets = mpc.load_comets_dataframe(f)
+        
+        print(len(comets), 'comets loaded')
+        
+        # Index by designation for fast lookup.
+        comets = comets.set_index('designation', drop=False)
+        
+        # Sample lookups.
+        row = comets.loc['1P/Halley']
+        row = comets.loc['C/1995 O1 (Hale-Bopp)']
+
+        
         for key in cometsOrMinorPlanets:
             if key in cometOrMinorPlanetData:
+                print( key )
                 pass
 
 
