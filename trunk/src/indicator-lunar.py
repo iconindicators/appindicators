@@ -89,6 +89,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+#TODO Change 03 to 00 if using Skyfield:
+# https://rhodesmill.org/skyfield/kepler-orbits.html
+# https://github.com/skyfielders/python-skyfield/blob/master/skyfield/data/mpc.py
+# https://www.minorplanetcenter.net/iau/Ephemerides/Soft00.html
+# https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
+#...not sure if minor planets are the same.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
