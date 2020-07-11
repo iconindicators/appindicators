@@ -42,7 +42,7 @@ try:
 except ImportError:
     available = False
 
-import astrobase, locale, orbitalelement, twolineelement
+import astrobase, locale, orbitalelement, pandas, twolineelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -732,6 +732,35 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
 #         return { }
+
+        from skyfield.data import mpc
+        
+        with load.open(mpc.COMET_URL) as f:
+            comets = mpc.load_comets_dataframe(f)
+        
+        print(len(comets), 'comets loaded')
+        
+        # Index by designation for fast lookup.
+        comets = comets.set_index('designation', drop=False)
+        
+        # Sample lookups.
+        row = comets.loc['1P/Halley']
+        print( row )
+        row = comets.loc['C/1995 O1 (Hale-Bopp)']        
+        print( row )
+        
+#TODO Need to convert from 
+# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+# to
+# https://minorplanetcenter.net/iau/MPCORB/CometEls.txt        
+        
+        
+        for key in orbitalElementData:
+            df = pandas.DataFrame( [ orbitalElementData[ key ].getData() ] )
+            print( type((df)))
+            print( (df.loc[[0]]))
+            print( type((df.loc[[0]])))
+
         return orbitalElementData
 
 
