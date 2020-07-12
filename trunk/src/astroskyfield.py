@@ -876,6 +876,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
 #TODO Not yet implemented in Skyfield.
+# https://rhodesmill.org/skyfield/kepler-orbits.html
+# https://github.com/skyfielders/python-skyfield/blob/master/skyfield/data/mpc.py
 # https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
 # https://github.com/skyfielders/python-skyfield/issues/11
 # https://github.com/skyfielders/python-skyfield/issues/196
@@ -893,6 +895,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 # C/1995 O1 (Hale-Bopp),e,88.9869,283.3678,130.5969,179.9329,0.0004084,0.99493595,0.0000,03/29.6897/1997,2000,g -2.0,4.0
 #
 # http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId468501
+#
+# It is possible that comets and minorplanets have different format for the MPC format...so check that.
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
 #TODO Testing how to get comet/mp data into a dataframe/row format for skyfield to then process.
