@@ -882,6 +882,17 @@ class AstroSkyfield( astrobase.AstroBase ):
 # https://github.com/skyfielders/python-skyfield/pull/202
 # https://github.com/skyfielders/python-skyfield/issues/305
 # The MPC might provide comet / minor planet data in a different format which Skyfield can read.
+#
+# Maybe need to load the data (dict) by pretending it is a file:
+# https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object/44672691
+#
+# Need to convert to MPC format for skyfield:
+#     CJ95O010  1997 03 29.6897  0.911189  0.994936  130.5969  283.3678   88.9869  20200711  -2.0  4.0  C/1995 O1 (Hale-Bopp)                                    MPC106342
+#
+# from XEphem format:
+# C/1995 O1 (Hale-Bopp),e,88.9869,283.3678,130.5969,179.9329,0.0004084,0.99493595,0.0000,03/29.6897/1997,2000,g -2.0,4.0
+#
+# http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId468501
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
 #TODO Testing how to get comet/mp data into a dataframe/row format for skyfield to then process.
