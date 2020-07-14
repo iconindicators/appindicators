@@ -900,6 +900,9 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
 #TODO Testing how to get comet/mp data into a dataframe/row format for skyfield to then process.
+#
+#TODO Write string as file:
+# https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object/44672691
         from skyfield.api import load
         from skyfield.data import mpc
         
