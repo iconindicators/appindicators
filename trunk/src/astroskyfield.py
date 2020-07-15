@@ -731,13 +731,14 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Waiting for when Skyfield implements Orbital Elements.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-#         return { }
+        if True:
+            return { }
 
         from skyfield.data import mpc
         
         with load.open(mpc.COMET_URL) as f:
             comets = mpc.load_comets_dataframe(f)
-        
+
         print(len(comets), 'comets loaded')
         
         # Index by designation for fast lookup.
@@ -903,53 +904,47 @@ class AstroSkyfield( astrobase.AstroBase ):
 #
 #TODO Write string as file:
 # https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object/44672691
+
+        filename = "/home/bernard/Desktop/Soft00Cmt.txt"
+        objectName = '88P/Howell'
+        AstroSkyfield.printComet( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, True )
+        
+        filename = "/home/bernard/Desktop/Soft00Bright.txt"
+        objectName = ''
+        AstroSkyfield.printComet( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, False )
+        
+        
+#TODO Print comet
+    @staticmethod
+    def printComet( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
         from skyfield.api import load
         from skyfield.data import mpc
 
-#TODO Need to replace this with loading the saved file (manually saved from the URL to disk) to avoid hitting the MPC site.
-#Then read in the file into say a dict or list, then simulate this as a virtual file.        
-        with load.open(mpc.COMET_URL) as f:
-            comets = mpc.load_comets_dataframe(f)
-        
-        print(len(comets), 'comets loaded')
-        print(comets.to_string())
-        
+        if True:
+            with load.open( filename ) as f:
+                objects = mpc.load_comets_dataframe(f)
+
+        else:
+            with load.open( filename ) as f:
+                objects = mpc.load_mpcorb_dataframe(f)
+
+        print( filename, len( objects ) )
+
         # Index by designation for fast lookup.
-        comets = comets.set_index('designation', drop=False)
-        
-        # Sample lookups.
-#         row = comets.loc['1P/Halley']
-#         row = comets.loc['C/1995 O1 (Hale-Bopp)']
-        row = comets.loc['88P/Howell']
-#         row = comets.loc['289P/Blanpain']
+        objects = objects.set_index('designation', drop=False)
 
-        # Generating a position.
-        
+        if objectName == '':
+            print(objects.to_string())
+            return
+
+        row = objects.loc[ objectName ]
+
         from skyfield.constants import GM_SUN_Pitjeva_2005_km3_s2 as GM_SUN
-        
-#         ts = load.timescale(builtin=True)
-#         eph = load('de421.bsp')
         sun, earth = ephemerisPlanets['sun'], ephemerisPlanets['earth']
-        
         comet = sun + mpc.comet_orbit(row, timeScale, GM_SUN)
-        
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-#         t = timeScale.utc(2020, 5, 31)
-#         ra, dec, distance = earth.at(t).observe(comet).radec()
-#         print(ra)
-#         print(dec)
-
         alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( comet ).apparent().altaz()
-        print(alt)
-        print(az)
-        
-
-        
-        
-#         for key in cometsOrMinorPlanets:
-#             if key in cometOrMinorPlanetData:
-#                 print( key )
-#                 pass
+        print( "Az:", az, "Alt:", alt )
 
 
     @staticmethod
