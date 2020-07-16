@@ -928,6 +928,9 @@ class AstroSkyfield( astrobase.AstroBase ):
             with load.open( filename ) as f:
                 objects = mpc.load_mpcorb_dataframe(f)
 
+#             for index, row in objects.iterrows():
+#                 print( row['designation'], row['magnitude_H'], row['magnitude_G'])
+
 #         print( filename, len( objects ) )
 #         pandas.set_option("display.max_rows", None, "display.max_columns", None)
 #         print( objects)
@@ -948,7 +951,12 @@ class AstroSkyfield( astrobase.AstroBase ):
             
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( object ).apparent().altaz()
-        print( objectName, "Az:", az, "Alt:", alt )
+        print( objectName, "Az:", az, "Alt:", alt, row['magnitude_H'], row['magnitude_G'] )
+
+#TODO From pyephem:
+# 289P/BLANPAIN 8.85
+# 88P/HOWELL 14.38
+# 1 CERES 8.3
 
 
     @staticmethod

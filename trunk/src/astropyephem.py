@@ -582,6 +582,7 @@ class AstroPyephem( astrobase.AstroBase ):
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
                 if not bad and body.mag <= magnitudeMaximum:
+                    print( key, body.mag )#TODO Testing
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
 
