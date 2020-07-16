@@ -907,20 +907,20 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         filename = "/home/bernard/Desktop/Soft00Cmt.txt"
         objectName = '88P/Howell'
-        AstroSkyfield.printComet( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, True )
+        AstroSkyfield.print( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, True )
         
         filename = "/home/bernard/Desktop/Soft00Bright.txt"
-        objectName = ''
-        AstroSkyfield.printComet( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, False )
+        objectName = '(1) Ceres'
+        AstroSkyfield.print( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, False )
         
         
 #TODO Print comet
     @staticmethod
-    def printComet( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
+    def print( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
         from skyfield.api import load
         from skyfield.data import mpc
 
-        if True:
+        if isComet:
             with load.open( filename ) as f:
                 objects = mpc.load_comets_dataframe(f)
 
@@ -928,23 +928,27 @@ class AstroSkyfield( astrobase.AstroBase ):
             with load.open( filename ) as f:
                 objects = mpc.load_mpcorb_dataframe(f)
 
-        print( filename, len( objects ) )
+#         print( filename, len( objects ) )
+#         pandas.set_option("display.max_rows", None, "display.max_columns", None)
+#         print( objects)
+#         if True: return
 
         # Index by designation for fast lookup.
         objects = objects.set_index('designation', drop=False)
-
-        if objectName == '':
-            print(objects.to_string())
-            return
 
         row = objects.loc[ objectName ]
 
         from skyfield.constants import GM_SUN_Pitjeva_2005_km3_s2 as GM_SUN
         sun, earth = ephemerisPlanets['sun'], ephemerisPlanets['earth']
-        comet = sun + mpc.comet_orbit(row, timeScale, GM_SUN)
+
+        if isComet:
+            object = sun + mpc.comet_orbit(row, timeScale, GM_SUN)
+        else:
+            object = sun + mpc.mpcorb_orbit(row, timeScale, GM_SUN)
+            
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( comet ).apparent().altaz()
-        print( "Az:", az, "Alt:", alt )
+        alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( object ).apparent().altaz()
+        print( objectName, "Az:", az, "Alt:", alt )
 
 
     @staticmethod
