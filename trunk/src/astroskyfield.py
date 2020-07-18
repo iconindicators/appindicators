@@ -979,8 +979,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         visualMagnitude = row['magnitude_H'] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - row['magnitude_G'] ) * Psi_1 + row['magnitude_G'] * Psi_2 )
 
         print( objectName, 
-               "Az:", az, 
-               "Alt:", alt, 
+               "Az:", az.radians, 
+               "Alt:", alt.radians, 
                "H:", row['magnitude_H'], 
                "G:", row['magnitude_G'],
                "Earth dist:", bodyDistanceToEarth.au,
@@ -988,15 +988,14 @@ class AstroSkyfield( astrobase.AstroBase ):
                "Calculated visual mag:", visualMagnitude )
 
 #TODO PyEphem:
-# Earth Sun dist: 1.016339898109436
-# 88P/HOWELL Az: 4.829979419708252 Alt: 0.45881175994873047 g: 11.0 k: 6.0 Earth dist: 1.2498843669891357 Sun dist: 1.5528193712234497 Mag: 14.35 Calculated visual mag: 14.351163283369317
-# 1 CERES Az: 1.803073763847351 Alt: 0.2594553828239441 H: 3.3399999141693115 G: 0.11999999731779099 Earth dist: 2.1953659057617188 Sun dist: 2.9750359058380127 Mag: 8.27 Calculated visual mag: 8.9892126220325
+# Earth Sun dist: 1.0162590742111206
+# 88P/HOWELL Az: 2.101228713989258 Alt: -0.4133838713169098 g: 11.0 k: 6.0 Earth dist: 1.2511037588119507 Sun dist: 1.55043625831604 Mag: 14.34 Calculated visual mag: 14.343275387194021
+# 1 CERES Az: 4.482479572296143 Alt: 0.264737993478775 H: 3.3399999141693115 G: 0.11999999731779099 Earth dist: 2.1909737586975098 Sun dist: 2.975069284439087 Mag: 8.26 Calculated visual mag: 8.981837878520516
 
 # Skyfield
-# Earth Sun dist: 1.01634 au
-# 88P/Howell Az: 268deg 23' 26.3" Alt: 14deg 11' 50.7" H: 11.0 G: 6.0 Earth dist: 1.2499955692802749 Sun dist: 1.5526226072680664 Calculated visual mag: 11.233641199908483
-# (1) Ceres Az: 95deg 55' 56.0" Alt: 26deg 43' 48.5" H: 3.34 G: 0.12 Earth dist: 2.1949782699591034 Sun dist: 2.975038970562804 Calculated visual mag: 8.98857325093807
-
+# Earth Sun dist: 1.01626 au
+# 88P/Howell Az: 2.0943268647452458 Alt: -0.40666790371446493 H: 11.0 G: 6.0 Earth dist: 1.251103143642515 Sun dist: 1.5504361222015481 Calculated visual mag: 11.233534600811838
+# (1) Ceres Az: 4.477734956527358 Alt: 0.2561558290897174 H: 3.34 G: 0.12 Earth dist: 2.190961091971942 Sun dist: 2.9750694296143676 Calculated visual mag: 8.981816736012936
 
     @staticmethod
     def __calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, nameTag ):
