@@ -907,16 +907,16 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         filename = "/home/bernard/Desktop/Soft00Cmt.txt"
         objectName = '88P/Howell'
-        AstroSkyfield.print( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, True )
+        AstroSkyfield.print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, True )
         
         filename = "/home/bernard/Desktop/Soft00Bright.txt"
         objectName = '(1) Ceres'
-        AstroSkyfield.print( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, False )
+        AstroSkyfield.print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, False )
         
         
 #TODO Print comet
     @staticmethod
-    def print( utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
+    def print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
         from skyfield.api import load
         from skyfield.data import mpc
 
@@ -950,19 +950,49 @@ class AstroSkyfield( astrobase.AstroBase ):
             object = sun + mpc.mpcorb_orbit(row, timeScale, GM_SUN)
             
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        alt, az, bodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( object ).apparent().altaz()
-        print( objectName, "Az:", az, "Alt:", alt, row['magnitude_H'], row['magnitude_G'] )
+        alt, az, bodyDistanceToEarth = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( object ).apparent().altaz()
+        ra, dec, bodyDistanceToSun = ( ephemerisPlanets[ AstroSkyfield.__SUN ] ).at( t ).observe( object ).radec()
 
-#TODO From pyephem:
-# 289P/BLANPAIN 8.85
-# 88P/HOWELL 14.38
-# 1 CERES 8.3
+#         print( "Earth dist:", bodyDistanceToEarth )
+#         print( "Sun dist:", bodyDistanceToSun )
+
+# m  = resulting visual magnitude
+# rp  = distance from sun to object
+# rho = distance from earth to object
+# rsn = distance from sun to earth
+        import math
+        sunEarthDistance = float( data[ ( astrobase.AstroBase.BodyType.SUN, "SUN", "DATA_TAG_SUN_EARTH_DISTANCE" ) ] )
+        beta = math.acos( ( bodyDistanceToSun.au * bodyDistanceToSun.au + bodyDistanceToEarth.au * bodyDistanceToEarth.au - sunEarthDistance * sunEarthDistance ) / ( 2 * bodyDistanceToSun.au * bodyDistanceToSun.au ) )
+        psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
+        Psi_1 = math.exp( -3.33 * psi_t )
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+        Psi_2 = math.exp( -1.87 * psi_t )
+        visualMagnitude = row['magnitude_H'] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - row['magnitude_G'] ) * Psi_1 + row['magnitude_G'] * Psi_2 )
+
+        print( objectName, 
+               "Az:", az, 
+               "Alt:", alt, 
+               "H:", row['magnitude_H'], 
+               "G:", row['magnitude_G'],
+               "Earth dist:", bodyDistanceToEarth.au,
+               "Sun dist:", bodyDistanceToSun.au,
+               "Calculated visual mag:", visualMagnitude )
+
+#TODO PyEphem:
+# Earth Sun dist: 1.016339898109436
+# 88P/HOWELL Az: 4.829979419708252 Alt: 0.45881175994873047 g: 11.0 k: 6.0 Earth dist: 1.2498843669891357 Sun dist: 1.5528193712234497 Mag: 14.35 Calculated visual mag: 14.351163283369317
+# 1 CERES Az: 1.803073763847351 Alt: 0.2594553828239441 H: 3.3399999141693115 G: 0.11999999731779099 Earth dist: 2.1953659057617188 Sun dist: 2.9750359058380127 Mag: 8.27 Calculated visual mag: 8.9892126220325
+
+# Skyfield
+# Earth Sun dist: 1.01634 au
+# 88P/Howell Az: 271deg 32' 51.7" Alt: 18deg 53' 39.0" H: 11.0 G: 6.0 Earth dist: 1.2499525791384516 Sun dist: 1.5527027537904319 Calculated visual mag: 11.486075013850416
+# (1) Ceres Az: 98deg 48' 55.5" Alt: 22deg 03' 49.7" H: 3.34 G: 0.12 Earth dist: 2.19512926589454 Sun dist: 2.975037847670236 Calculated visual mag: 9.638354961307696
 
 
     @staticmethod
-    def __calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, astronomicalBodyType, nameTag ):
+    def __calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, nameTag ):
         neverUp = False
-        key = ( astronomicalBodyType, nameTag )
+        key = ( bodyType, nameTag )
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 2 )
         t, y = almanac.find_discrete( t0, t1, almanac.risings_and_settings( ephemerisPlanets, body, topos ) )
@@ -988,6 +1018,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             else:
                 neverUp = True # Body is down (and so never up).
+
+        if bodyType == astrobase.AstroBase.BodyType.SUN:
+            data[ key + ( "DATA_TAG_SUN_EARTH_DISTANCE", ) ] = str( bodyDistance.au )
+            print( "Earth Sun dist:", bodyDistance )
 
         return neverUp
 

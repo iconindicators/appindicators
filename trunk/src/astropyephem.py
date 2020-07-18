@@ -582,9 +582,61 @@ class AstroPyephem( astrobase.AstroBase ):
                 body.compute( AstroPyephem.__getCity( data, ephemNow ) )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
                 if not bad and body.mag <= magnitudeMaximum:
-                    print( key, body.mag )#TODO Testing
                     AstroPyephem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
+                    #TODO Testing
+                    if bodyType == astrobase.AstroBase.BodyType.COMET:
+# m = g + 5*log10(D) + 2.5*k*log10(r)
+# 
+# where:
+# 
+# m = resulting visual magnitude
+# g = absolute visual magnitude
+# D = comet-earth distance, in AU
+# k = luminosity index
+# r = comet-sun distance.
+                        visualMagnitude = body._g + 5 * math.log10( body.earth_distance ) + 2.5 * body._k * math.log10( body.sun_distance )
+                        print( key, 
+                               "Az:", data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_AZIMUTH ) ],
+                               "Alt:", data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_ALTITUDE ) ],
+                               "g:", body._g,
+                               "k:", body._k,
+                               "Earth dist:", body.earth_distance,
+                               "Sun dist:", body.sun_distance,
+                               "Mag:", body.mag,
+                               "Calculated visual mag:", visualMagnitude )
+
+                    else:
+# beta = acos((rp*rp + rho*rho - rsn*rsn)/ (2*rp*rho));
+# psi_t = exp(log(tan(beta/2.0))*0.63);
+# Psi_1 = exp(-3.33*psi_t);
+# psi_t = exp(log(tan(beta/2.0))*1.22);
+# Psi_2 = exp(-1.87*psi_t);
+# m = H + 5.0*log10(rp*rho) - 2.5*log10((1-G)*Psi_1 + G*Psi_2);
+# 
+# where:
+# 
+# m  = resulting visual magnitude
+# rp  = distance from sun to object
+# rho = distance from earth to object
+# rsn = distance from sun to earth
+                        sunEarthDistance = float( data[ ( astrobase.AstroBase.BodyType.SUN, "SUN", "DATA_TAG_SUN_EARTH_DISTANCE" ) ] )
+                        beta = math.acos( ( body.sun_distance * body.sun_distance + body.earth_distance * body.earth_distance - sunEarthDistance * sunEarthDistance ) / ( 2 * body.sun_distance * body.earth_distance ) )
+                        psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
+                        Psi_1 = math.exp( -3.33 * psi_t )
+                        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+                        Psi_2 = math.exp( -1.87 * psi_t )
+                        visualMagnitude = body._H + 5.0 * math.log10( body.sun_distance * body.earth_distance ) - 2.5 * math.log10( ( 1 - body._G ) * Psi_1 + body._G * Psi_2 )
+
+                        print( key, 
+                               "Az:", data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_AZIMUTH ) ],
+                               "Alt:", data[ ( bodyType, key, astrobase.AstroBase.DATA_TAG_ALTITUDE ) ],
+                               "H:", body._H,
+                               "G:", body._G,
+                               "Earth dist:", body.earth_distance,
+                               "Sun dist:", body.sun_distance,
+                               "Mag:", body.mag,
+                               "Calculated visual mag:", visualMagnitude )
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
     #
@@ -609,6 +661,11 @@ class AstroPyephem( astrobase.AstroBase ):
 
         except ephem.NeverUpError:
             neverUp = True
+
+#TODO Testing
+        if bodyType == astrobase.AstroBase.BodyType.SUN:
+            data[ key + ( "DATA_TAG_SUN_EARTH_DISTANCE", ) ] = str( body.earth_distance )
+            print( "Earth Sun dist:", body.earth_distance )
 
         return neverUp
 
