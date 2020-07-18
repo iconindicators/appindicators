@@ -956,13 +956,22 @@ class AstroSkyfield( astrobase.AstroBase ):
 #         print( "Earth dist:", bodyDistanceToEarth )
 #         print( "Sun dist:", bodyDistanceToSun )
 
+# beta = acos((rp*rp + rho*rho - rsn*rsn)/ (2*rp*rho));
+# psi_t = exp(log(tan(beta/2.0))*0.63);
+# Psi_1 = exp(-3.33*psi_t);
+# psi_t = exp(log(tan(beta/2.0))*1.22);
+# Psi_2 = exp(-1.87*psi_t);
+# m = H + 5.0*log10(rp*rho) - 2.5*log10((1-G)*Psi_1 + G*Psi_2);
+# 
+# where:
+# 
 # m  = resulting visual magnitude
 # rp  = distance from sun to object
 # rho = distance from earth to object
 # rsn = distance from sun to earth
         import math
         sunEarthDistance = float( data[ ( astrobase.AstroBase.BodyType.SUN, "SUN", "DATA_TAG_SUN_EARTH_DISTANCE" ) ] )
-        beta = math.acos( ( bodyDistanceToSun.au * bodyDistanceToSun.au + bodyDistanceToEarth.au * bodyDistanceToEarth.au - sunEarthDistance * sunEarthDistance ) / ( 2 * bodyDistanceToSun.au * bodyDistanceToSun.au ) )
+        beta = math.acos( ( bodyDistanceToSun.au * bodyDistanceToSun.au + bodyDistanceToEarth.au * bodyDistanceToEarth.au - sunEarthDistance * sunEarthDistance ) / ( 2 * bodyDistanceToSun.au * bodyDistanceToEarth.au ) )
         psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
         Psi_1 = math.exp( -3.33 * psi_t )
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
@@ -985,8 +994,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 # Skyfield
 # Earth Sun dist: 1.01634 au
-# 88P/Howell Az: 271deg 32' 51.7" Alt: 18deg 53' 39.0" H: 11.0 G: 6.0 Earth dist: 1.2499525791384516 Sun dist: 1.5527027537904319 Calculated visual mag: 11.486075013850416
-# (1) Ceres Az: 98deg 48' 55.5" Alt: 22deg 03' 49.7" H: 3.34 G: 0.12 Earth dist: 2.19512926589454 Sun dist: 2.975037847670236 Calculated visual mag: 9.638354961307696
+# 88P/Howell Az: 268deg 23' 26.3" Alt: 14deg 11' 50.7" H: 11.0 G: 6.0 Earth dist: 1.2499955692802749 Sun dist: 1.5526226072680664 Calculated visual mag: 11.233641199908483
+# (1) Ceres Az: 95deg 55' 56.0" Alt: 26deg 43' 48.5" H: 3.34 G: 0.12 Earth dist: 2.1949782699591034 Sun dist: 2.975038970562804 Calculated visual mag: 8.98857325093807
 
 
     @staticmethod
