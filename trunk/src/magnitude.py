@@ -54,22 +54,23 @@ sun, earth = ephemeris[ "sun" ], ephemeris[ "earth" ]
 body = sun + skyfield.data.mpc.comet_orbit( dataframe.loc[ cometName ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
 t = timeScale.utc( now.year, now.month, now.day )
+alt, az, sunEarthDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
 alt, az, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
 ra, dec, bodyDistanceToSun = ( sun ).at( t ).observe( body ).radec()
-alt, az, sunEarthDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
 
+# https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
 beta = math.acos( ( bodyDistanceToSun.au * bodyDistanceToSun.au + bodyDistanceToEarth.au * bodyDistanceToEarth.au - sunEarthDistance.au * sunEarthDistance.au ) / ( 2 * bodyDistanceToSun.au * bodyDistanceToEarth.au ) )
 psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
 Psi_1 = math.exp( -3.33 * psi_t )
 psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
 Psi_2 = math.exp( -1.87 * psi_t )
-apparentMagnitude = dataframe.loc[ cometName ]['magnitude_H'] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - dataframe.loc[ cometName ]['magnitude_G'] ) * Psi_1 + dataframe.loc[ cometName ]['magnitude_G'] * Psi_2 )
+apparentMagnitude = dataframe.loc[ cometName ][ "magnitude_H" ] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - dataframe.loc[ cometName ][ "magnitude_G" ] ) * Psi_1 + dataframe.loc[ cometName ][ "magnitude_G" ] * Psi_2 )
 
 print( "Skyfield comet", cometName,
        "\n\tAz:", az.radians, 
        "\n\tAlt:", alt.radians, 
-       "\n\tH:", dataframe.loc[ cometName ]['magnitude_H'], 
-       "\n\tG:", dataframe.loc[ cometName ]['magnitude_G'],
+       "\n\tH:", dataframe.loc[ cometName ][ "magnitude_H" ], 
+       "\n\tG:", dataframe.loc[ cometName ][ "magnitude_G" ],
        "\n\tEarth dist:", bodyDistanceToEarth.au,
        "\n\tSun dist:", bodyDistanceToSun.au,
        "\n\tApp Mag:", apparentMagnitude )
