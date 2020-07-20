@@ -15,6 +15,10 @@ cometName = "88P/Howell"
 cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9160,3.105725,0.1800776,0.56432968,347.2821,07/18.0/2020,2000,g 11.0,6.0"
 cometDataSkyfield = "0088P         2020 09 26.6245  1.353071  0.564328  235.9161   56.6855    4.3838  20200714  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
 
+# https://in-the-sky.org/data/object.php?id=0088P
+# https://theskylive.com/88p-info
+# https://heavens-above.com/comet.aspx?cid=88P&lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en
+
 
 # PyEphem - Comet
 ephemNow = ephem.Date( now )
@@ -34,8 +38,10 @@ sun = ephem.Sun()
 sun.compute( observer )
 
 print( "PyEphem comet", cometName,
-       "\n\tAz:", repr( body.az ),
-       "\n\tAlt:", repr( body.alt ),
+       "\n\tAz:", body.az,
+       "\n\tAlt:", body.alt,
+       "\n\tRA:", body.ra,
+       "\n\tDec:", body.dec,
        "\n\tg:", body._g,
        "\n\tk:", body._k,
        "\n\tSun-Earth dist:", sun.earth_distance,
@@ -60,6 +66,7 @@ body = sun + skyfield.data.mpc.comet_orbit( dataframe.loc[ cometName ], timeScal
 
 t = timeScale.utc( now.year, now.month, now.day, now.hour, now.minute, now.second )
 alt, az, sunEarthDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
+ra, dec, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).radec()
 alt, az, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
 ra, dec, bodyDistanceToSun = ( sun ).at( t ).observe( body ).radec()
 
@@ -72,8 +79,10 @@ Psi_2 = math.exp( -1.87 * psi_t )
 apparentMagnitude = dataframe.loc[ cometName ][ "magnitude_H" ] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - dataframe.loc[ cometName ][ "magnitude_G" ] ) * Psi_1 + dataframe.loc[ cometName ][ "magnitude_G" ] * Psi_2 )
 
 print( "Skyfield comet", cometName,
-       "\n\tAz:", az.radians, 
-       "\n\tAlt:", alt.radians, 
+       "\n\tAz:", az, 
+       "\n\tAlt:", alt, 
+       "\n\tRA:", ra, 
+       "\n\tDec:", dec, 
        "\n\tH:", dataframe.loc[ cometName ][ "magnitude_H" ], 
        "\n\tG:", dataframe.loc[ cometName ][ "magnitude_G" ],
        "\n\tSun-Earth dist:", sunEarthDistance.au,
