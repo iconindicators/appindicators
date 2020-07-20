@@ -66,9 +66,9 @@ body = sun + skyfield.data.mpc.comet_orbit( dataframe.loc[ cometName ], timeScal
 
 t = timeScale.utc( now.year, now.month, now.day, now.hour, now.minute, now.second )
 alt, az, sunEarthDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
-ra, dec, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).radec()
-alt, az, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
 ra, dec, bodyDistanceToSun = ( sun ).at( t ).observe( body ).radec()
+alt, az, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
+ra, dec, bodyDistanceToEarth = ( earth + topos ).at( t ).observe( body ).radec()
 
 # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
 beta = math.acos( ( bodyDistanceToSun.au * bodyDistanceToSun.au + bodyDistanceToEarth.au * bodyDistanceToEarth.au - sunEarthDistance.au * sunEarthDistance.au ) / ( 2 * bodyDistanceToSun.au * bodyDistanceToEarth.au ) )
@@ -79,8 +79,8 @@ Psi_2 = math.exp( -1.87 * psi_t )
 apparentMagnitude = dataframe.loc[ cometName ][ "magnitude_H" ] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - dataframe.loc[ cometName ][ "magnitude_G" ] ) * Psi_1 + dataframe.loc[ cometName ][ "magnitude_G" ] * Psi_2 )
 
 print( "Skyfield comet", cometName,
-       "\n\tAz:", az, 
-       "\n\tAlt:", alt, 
+       "\n\tAz:", az.dstr(), 
+       "\n\tAlt:", alt.dstr(), 
        "\n\tRA:", ra, 
        "\n\tDec:", dec, 
        "\n\tH:", dataframe.loc[ cometName ][ "magnitude_H" ], 
