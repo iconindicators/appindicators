@@ -1,23 +1,28 @@
 #!/usr/bin/env python3
 
 
-# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-
-
 import datetime, ephem, io, math, skyfield.api, skyfield.constants, skyfield.data.mpc
 
 
-now = datetime.datetime.strptime( "2020-07-19", "%Y-%m-%d" )
+now = datetime.datetime.strptime( "2020-07-22", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
 
 cometName = "88P/Howell"
-cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9160,3.105725,0.1800776,0.56432968,347.2821,07/18.0/2020,2000,g 11.0,6.0"
-cometDataSkyfield = "0088P         2020 09 26.6245  1.353071  0.564328  235.9161   56.6855    4.3838  20200714  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
+
+# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9159,3.105737,0.1800765,0.56433120,347.8225,07/21.0/2020,2000,g 11.0,6.0"
+
+# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
+cometDataSkyfield = "0088P         2020 09 26.6241  1.353073  0.564331  235.9159   56.6855    4.3838  20200721  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
 
 # https://in-the-sky.org/data/object.php?id=0088P
 # https://theskylive.com/88p-info
-# https://heavens-above.com/comet.aspx?cid=88P&lat=0&lng=0&loc=Unspecified&alt=0&tz=UCT&cul=en
+# https://heavens-above.com/comet.aspx?cid=88P
+
+
+print( "PyEphem:", ephem.__version__ )
+print( "Skyfield:", skyfield.__version__ )
 
 
 # PyEphem - Comet
