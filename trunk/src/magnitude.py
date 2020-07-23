@@ -11,7 +11,7 @@
 import datetime, ephem, io, math, skyfield.api, skyfield.constants, skyfield.data.mpc
 
 
-now = datetime.datetime.strptime( "2020-07-22", "%Y-%m-%d" )
+now = datetime.datetime.strptime( "2020-07-23", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
 
@@ -22,6 +22,15 @@ cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9159,3.105737,0.1800765,0.56
 
 # https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
 cometDataSkyfield = "0088P         2020 09 26.6241  1.353073  0.564331  235.9159   56.6855    4.3838  20200721  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
+
+
+minorPlanetName = "(1) Ceres"
+
+# https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt
+minorPlanetDataPyEphem = "1 Ceres,e,10.5935,80.3099,73.1153,2.767046,0.2141309,0.07553468,352.2305,03/23.0/2018,2000,H 3.34,0.12"
+
+# https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt
+minorPlanetDataSkyfield = "00001    3.34  0.12 K183N 352.23052   73.11528   80.30992   10.59351  0.0755347  0.21413094   2.7670463  0 MPO431490  6689 114 1801-2018 0.60 M-v 30h MPC        0000              (1) Ceres"
 
 
 print( "PyEphem:", ephem.__version__ )
@@ -44,8 +53,6 @@ sun = ephem.Sun()
 sun.compute( observer )
 
 print( "PyEphem comet", cometName,
-       "\n\tLat:", observer.lat,
-       "\n\tLon:", observer.lon,
        "\n\tAz:", body.az,
        "\n\tAlt:", body.alt,
        "\n\tRA:", body.ra,
@@ -57,6 +64,36 @@ print( "PyEphem comet", cometName,
        "\n\tSun-Body dist:", body.sun_distance,
        "\n\tAbs Mag:", body.mag,
        "\n\tApp Mag:", apparentMagnitude )
+
+
+# PyEphem - Comet / Minor Planet
+def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
+    observer = ephem.Observer()
+    observer.date = ephem.Date( now )
+    observer.lat = str( latitude )
+    observer.lon = str( longitude )
+
+    body = ephem.readdb( data )
+    body.compute( observer )
+
+    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+    apparentMagnitude = body._g + 5 * math.log10( body.earth_distance ) + 2.5 * body._k * math.log10( body.sun_distance )
+
+    sun = ephem.Sun()
+    sun.compute( observer )
+
+    print( "PyEphem", name,
+           "\n\tAz:", body.az,
+           "\n\tAlt:", body.alt,
+           "\n\tRA:", body.ra,
+           "\n\tDec:", body.dec,
+           "\n\tg:", body._g,
+           "\n\tk:", body._k,
+           "\n\tEarth-Sun dist:", sun.earth_distance,
+           "\n\tEarth-Body dist:", body.earth_distance,
+           "\n\tSun-Body dist:", body.sun_distance,
+           "\n\tAbs Mag:", body.mag,
+           "\n\tApp Mag:", apparentMagnitude )
 
 
 # Skyfield - Comet
@@ -92,7 +129,7 @@ print( "Skyfield comet", cometName,
        "\n\tDec:", dec, 
        "\n\tH:", dataframe.loc[ cometName ][ "magnitude_H" ], 
        "\n\tG:", dataframe.loc[ cometName ][ "magnitude_G" ],
-       "\n\tSun-Earth dist:", earthSunDistance.au,
+       "\n\tEarth-Sun dist:", earthSunDistance.au,
        "\n\tEarth-Body dist:", earthBodyDistance.au,
        "\n\tSun-Body dist:", sunBodyDistance.au,
        "\n\tApp Mag:", apparentMagnitude )
