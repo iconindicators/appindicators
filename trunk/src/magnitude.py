@@ -11,7 +11,6 @@
 import datetime, ephem, io, math, skyfield.api, skyfield.constants, skyfield.data.mpc
 
 
-# PyEphem - Comet / Minor Planet
 def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     observer = ephem.Observer()
     observer.date = ephem.Date( now )
@@ -42,7 +41,6 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
            "\n\tApp Mag:", apparentMagnitude )
 
 
-# Skyfield - Comet / Minor Planet
 def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     timeScale = skyfield.api.load.timescale( builtin = True )
     topos = skyfield.api.Topos( latitude_degrees = latitude, longitude_degrees = longitude )
