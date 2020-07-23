@@ -338,23 +338,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         else:
             data = { }
             if nextDownloadTime < utcNow:
-                
-                #TODO Testing
-                if cacheBaseName == IndicatorLunar.COMET_CACHE_BASENAME:
-                    print( "Downloading comet data for Skyfield" )
-                    import requests
-                    r = requests.get( "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt" )
-                    with open( "/home/bernard/Desktop/Soft00Cmt.txt", 'wb' ) as f:
-                        f.write( r.content )
-
-                if cacheBaseName == IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ]:
-                    print( "Downloading bright minor planet data for Skyfield" )
-                    import requests
-                    r = requests.get( "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt" )
-                    with open( "/home/bernard/Desktop/Soft00Bright.txt", 'wb' ) as f:
-                        f.write( r.content )
-                #TODO End testing
-                
                 data = downloadDataFunction( dataURL, self.getLogging() )
                 downloadCount += 1
                 if data:
