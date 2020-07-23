@@ -11,6 +11,53 @@
 import datetime, ephem, io, math, skyfield.api, skyfield.constants, skyfield.data.mpc
 
 
+# PyEphem - Comet / Minor Planet
+def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
+    observer = ephem.Observer()
+    observer.date = ephem.Date( now )
+    observer.lat = str( latitude )
+    observer.lon = str( longitude )
+
+    body = ephem.readdb( data )
+    body.compute( observer )
+
+    sun = ephem.Sun()
+    sun.compute( observer )
+
+    if isComet:
+        apparentMagnitude = getApparentMagnitude( True, body._g, body._k, None, None, body.earth_distance, body.sun_distance, None )
+
+    else:
+        apparentMagnitude = getApparentMagnitude( False, None, None, body._G, body._H, body.earth_distance, body.sun_distance, sun.earth_distance )
+
+    print( "PyEphem", name,
+           "\n\tAz:", body.az,
+           "\n\tAlt:", body.alt,
+           "\n\tRA:", body.ra,
+           "\n\tDec:", body.dec,
+           "\n\tEarth-Sun dist:", sun.earth_distance,
+           "\n\tEarth-Body dist:", body.earth_distance,
+           "\n\tSun-Body dist:", body.sun_distance,
+           "\n\tAbs Mag:", body.mag,
+           "\n\tApp Mag:", apparentMagnitude )
+
+
+# https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+def getApparentMagnitude( gkModel, gAbsoluteVisualMagnitude, kLuminosityIndex, GAbsoluteMagnitude, HSlope, bodyEarthDistance, bodySunDistance, earthSunDistance ):
+    if gkModel:
+        apparentMagnitude = gAbsoluteVisualMagnitude + 5 * math.log10( bodyEarthDistance ) + 2.5 * kLuminosityIndex * math.log10( bodySunDistance )
+
+    else:
+        beta = math.acos( ( bodySunDistance * bodySunDistance + bodyEarthDistance * bodyEarthDistance - earthSunDistance * earthSunDistance ) / ( 2 * bodySunDistance * bodyEarthDistance ) )
+        psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
+        Psi_1 = math.exp( -3.33 * psi_t )
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+        Psi_2 = math.exp( -1.87 * psi_t )
+        apparentMagnitude = HSlope + 5.0 * math.log10( bodySunDistance * bodyEarthDistance ) - 2.5 * math.log10( ( 1 - GAbsoluteMagnitude ) * Psi_1 + GAbsoluteMagnitude * Psi_2 )
+
+    return apparentMagnitude
+
+
 now = datetime.datetime.strptime( "2020-07-23", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
@@ -37,63 +84,37 @@ print( "PyEphem:", ephem.__version__ )
 print( "Skyfield:", skyfield.__version__ )
 
 
-# PyEphem - Comet
-observer = ephem.Observer()
-observer.date = ephem.Date( now )
-observer.lat = str( latitude )
-observer.lon = str( longitude )
+# # PyEphem - Comet
+# observer = ephem.Observer()
+# observer.date = ephem.Date( now )
+# observer.lat = str( latitude )
+# observer.lon = str( longitude )
+# 
+# body = ephem.readdb( cometDataPyEphem )
+# body.compute( observer )
+# 
+# # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+# apparentMagnitude = body._g + 5 * math.log10( body.earth_distance ) + 2.5 * body._k * math.log10( body.sun_distance )
+# 
+# sun = ephem.Sun()
+# sun.compute( observer )
+# 
+# print( "PyEphem comet", cometName,
+#        "\n\tAz:", body.az,
+#        "\n\tAlt:", body.alt,
+#        "\n\tRA:", body.ra,
+#        "\n\tDec:", body.dec,
+#        "\n\tg:", body._g,
+#        "\n\tk:", body._k,
+#        "\n\tEarth-Sun dist:", sun.earth_distance,
+#        "\n\tEarth-Body dist:", body.earth_distance,
+#        "\n\tSun-Body dist:", body.sun_distance,
+#        "\n\tAbs Mag:", body.mag,
+#        "\n\tApp Mag:", apparentMagnitude )
 
-body = ephem.readdb( cometDataPyEphem )
-body.compute( observer )
 
-# https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-apparentMagnitude = body._g + 5 * math.log10( body.earth_distance ) + 2.5 * body._k * math.log10( body.sun_distance )
-
-sun = ephem.Sun()
-sun.compute( observer )
-
-print( "PyEphem comet", cometName,
-       "\n\tAz:", body.az,
-       "\n\tAlt:", body.alt,
-       "\n\tRA:", body.ra,
-       "\n\tDec:", body.dec,
-       "\n\tg:", body._g,
-       "\n\tk:", body._k,
-       "\n\tEarth-Sun dist:", sun.earth_distance,
-       "\n\tEarth-Body dist:", body.earth_distance,
-       "\n\tSun-Body dist:", body.sun_distance,
-       "\n\tAbs Mag:", body.mag,
-       "\n\tApp Mag:", apparentMagnitude )
-
-
-# PyEphem - Comet / Minor Planet
-def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
-    observer = ephem.Observer()
-    observer.date = ephem.Date( now )
-    observer.lat = str( latitude )
-    observer.lon = str( longitude )
-
-    body = ephem.readdb( data )
-    body.compute( observer )
-
-    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-    apparentMagnitude = body._g + 5 * math.log10( body.earth_distance ) + 2.5 * body._k * math.log10( body.sun_distance )
-
-    sun = ephem.Sun()
-    sun.compute( observer )
-
-    print( "PyEphem", name,
-           "\n\tAz:", body.az,
-           "\n\tAlt:", body.alt,
-           "\n\tRA:", body.ra,
-           "\n\tDec:", body.dec,
-           "\n\tg:", body._g,
-           "\n\tk:", body._k,
-           "\n\tEarth-Sun dist:", sun.earth_distance,
-           "\n\tEarth-Body dist:", body.earth_distance,
-           "\n\tSun-Body dist:", body.sun_distance,
-           "\n\tAbs Mag:", body.mag,
-           "\n\tApp Mag:", apparentMagnitude )
+pyephemCometMinorPlanet( now, latitude, longitude, cometName, cometDataPyEphem, True )
+pyephemCometMinorPlanet( now, latitude, longitude, minorPlanetName, minorPlanetDataPyEphem, False )
 
 
 # Skyfield - Comet
