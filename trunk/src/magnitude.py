@@ -30,13 +30,6 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
         apparentMagnitude = getApparentMagnitude_GH( body._G, body._H, body.earth_distance, body.sun_distance, sun.earth_distance )
 
     print( "PyEphem", name,
-           "\n\tAz:", body.az,
-           "\n\tAlt:", body.alt,
-           "\n\tRA:", body.ra,
-           "\n\tDec:", body.dec,
-           "\n\tEarth-Sun dist:", sun.earth_distance,
-           "\n\tEarth-Body dist:", body.earth_distance,
-           "\n\tSun-Body dist:", body.sun_distance,
            "\n\tAbs Mag:", body.mag,
            "\n\tApp Mag:", apparentMagnitude )
 
@@ -70,13 +63,6 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     apparentMagnitude = getApparentMagnitude_GH( dataframe.loc[ name ][ "magnitude_G" ], dataframe.loc[ name ][ "magnitude_H" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
     print( "Skyfield", name,
-           "\n\tAz:", az.dstr(),
-           "\n\tAlt:", alt.dstr(),
-           "\n\tRA:", ra,
-           "\n\tDec:", dec,
-           "\n\tEarth-Sun dist:", earthSunDistance.au,
-           "\n\tEarth-Body dist:", earthBodyDistance.au,
-           "\n\tSun-Body dist:", sunBodyDistance.au,
            "\n\tAbs Mag:", dataframe.loc[ name ][ "magnitude_H" ],
            "\n\tApp Mag:", apparentMagnitude )
 
