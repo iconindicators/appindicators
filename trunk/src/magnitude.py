@@ -82,7 +82,7 @@ def calculateApparentMagnitude_GH( G_slope, H_absoluteMagnitude, bodyEarthDistan
     return H_absoluteMagnitude + 5.0 * math.log10( bodySunDistance * bodyEarthDistance ) - 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
 
-now = datetime.datetime.strptime( "2020-07-23", "%Y-%m-%d" )
+now = datetime.datetime.strptime( "2020-07-25", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
 
