@@ -24,10 +24,10 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     sun.compute( observer )
 
     if isComet:
-        apparentMagnitude = getApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
+        apparentMagnitude = calculateApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
 
     else:
-        apparentMagnitude = getApparentMagnitude_GH( body._G, body._H, body.earth_distance, body.sun_distance, sun.earth_distance )
+        apparentMagnitude = calculateApparentMagnitude_GH( body._G, body._H, body.earth_distance, body.sun_distance, sun.earth_distance )
 
     print( "PyEphem", name,
            "\n\tAbs Mag:", body.mag,
@@ -60,7 +60,7 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     alt, az, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
     ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
-    apparentMagnitude = getApparentMagnitude_GH( dataframe.loc[ name ][ "magnitude_G" ], dataframe.loc[ name ][ "magnitude_H" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+    apparentMagnitude = calculateApparentMagnitude_GH( dataframe.loc[ name ][ "magnitude_G" ], dataframe.loc[ name ][ "magnitude_H" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
     print( "Skyfield", name,
            "\n\tAbs Mag:", dataframe.loc[ name ][ "magnitude_H" ],
@@ -68,12 +68,12 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
 
 
 # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistance, bodySunDistance ):
+def calculateApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistance, bodySunDistance ):
     return g_absoluteMagnitude + 5 * math.log10( bodyEarthDistance ) + 2.5 * k_luminosityIndex * math.log10( bodySunDistance )
 
 
 # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-def getApparentMagnitude_GH( G_slope, H_absoluteMagnitude, bodyEarthDistance, bodySunDistance, earthSunDistance ):
+def calculateApparentMagnitude_GH( G_slope, H_absoluteMagnitude, bodyEarthDistance, bodySunDistance, earthSunDistance ):
     beta = math.acos( ( bodySunDistance * bodySunDistance + bodyEarthDistance * bodyEarthDistance - earthSunDistance * earthSunDistance ) / ( 2 * bodySunDistance * bodyEarthDistance ) )
     psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
     Psi_1 = math.exp( -3.33 * psi_t )
