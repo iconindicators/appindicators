@@ -33,6 +33,17 @@
 # import gettext
 # gettext.install( "astroskyfield" )
 
+
+
+#TODO Comet and minor planet formats for later use:
+#
+# Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
+#
+# https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt
+# Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+
+
 try:
     from skyfield import almanac
     from skyfield.api import load, Star, Topos
