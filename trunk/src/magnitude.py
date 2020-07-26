@@ -26,18 +26,18 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     if isComet:
         apparentMagnitude = calculateApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
         print( "PyEphem", name,
-               "\n\tAbs Mag:", body.mag,
+               "\n\tMagnitude:", body.mag,
                "\n\tg:", body._g,
                "\n\tk:", body._k,
-               "\n\tApp Mag:", apparentMagnitude )
+               "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
     else:
         apparentMagnitude = calculateApparentMagnitude_HG( body._H, body._G, body.earth_distance, body.sun_distance, sun.earth_distance )
         print( "PyEphem", name,
-               "\n\tAbs Mag:", body.mag,
+               "\n\tMagnitude:", body.mag,
                "\n\tH:", body._H,
                "\n\tG:", body._G,
-               "\n\tApp Mag:", apparentMagnitude )
+               "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
 def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     timeScale = skyfield.api.load.timescale( builtin = True )
@@ -65,10 +65,10 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     apparentMagnitude = calculateApparentMagnitude_HG( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
     print( "Skyfield", name,
-           "\n\tAbs Mag:", dataframe.loc[ name ][ "magnitude_H" ],
+           "\n\tAbsolute Magnitude (from data file):", dataframe.loc[ name ][ "magnitude_H" ],
            "\n\tH:", dataframe.loc[ name ][ "magnitude_H" ],
            "\n\tG:", dataframe.loc[ name ][ "magnitude_G" ],
-           "\n\tApp Mag:", apparentMagnitude )
+           "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
 
 # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
