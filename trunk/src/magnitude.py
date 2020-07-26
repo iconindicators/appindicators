@@ -25,14 +25,19 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
 
     if isComet:
         apparentMagnitude = calculateApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
+        print( "PyEphem", name,
+               "\n\tAbs Mag:", body.mag,
+               "\n\tg:", body._g,
+               "\n\tk:", body._k,
+               "\n\tApp Mag:", apparentMagnitude )
 
     else:
         apparentMagnitude = calculateApparentMagnitude_HG( body._H, body._G, body.earth_distance, body.sun_distance, sun.earth_distance )
-
-    print( "PyEphem", name,
-           "\n\tAbs Mag:", body.mag,
-           "\n\tApp Mag:", apparentMagnitude )
-
+        print( "PyEphem", name,
+               "\n\tAbs Mag:", body.mag,
+               "\n\tH:", body._H,
+               "\n\tG:", body._G,
+               "\n\tApp Mag:", apparentMagnitude )
 
 def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     timeScale = skyfield.api.load.timescale( builtin = True )
@@ -61,6 +66,8 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
 
     print( "Skyfield", name,
            "\n\tAbs Mag:", dataframe.loc[ name ][ "magnitude_H" ],
+           "\n\tH:", dataframe.loc[ name ][ "magnitude_H" ],
+           "\n\tG:", dataframe.loc[ name ][ "magnitude_G" ],
            "\n\tApp Mag:", apparentMagnitude )
 
 
@@ -80,7 +87,7 @@ def calculateApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistan
     return H_absoluteMagnitude + 5.0 * math.log10( bodySunDistance * bodyEarthDistance ) - 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
 
-now = datetime.datetime.strptime( "2020-07-25", "%Y-%m-%d" )
+now = datetime.datetime.strptime( "2020-07-26", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
 
