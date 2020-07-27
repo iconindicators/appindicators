@@ -153,6 +153,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                         _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
 
+
         utcNow = datetime.datetime.utcnow()
 
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
@@ -165,6 +166,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.__removePreviousVersionCacheFiles()
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
+
+#TODO Maybe check to see if PyEphem is running and if so check the cache files and if they are PyEphem, then continue.
+# If not, then rename (or delete outright) or move to a SKyfield directory.  Vice versa for Skyfield.
+# Just don't want to download each time during testing.
 
 
     def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
