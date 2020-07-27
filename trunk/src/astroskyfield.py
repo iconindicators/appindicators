@@ -801,7 +801,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         message = None
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip skyfield pandas pytz" )
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas pytz skyfield" )
 
         return message
 
