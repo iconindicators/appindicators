@@ -783,12 +783,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         row = comets.loc['C/1995 O1 (Hale-Bopp)']        
         print( row )
         
-#TODO Need to convert from 
-# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-# to
-# https://minorplanetcenter.net/iau/MPCORB/CometEls.txt        
-        
-        
         for key in orbitalElementData:
             df = pandas.DataFrame( [ orbitalElementData[ key ].getData() ] )
             print( type((df)))
