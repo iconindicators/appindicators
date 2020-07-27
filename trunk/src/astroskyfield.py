@@ -44,6 +44,28 @@
 # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
 
 
+#TODO If/when move to Skyfield, need to delete the cache files for comets and minor planets.
+# One way to differentiate is during the call to 
+# self.__removePreviousVersionCacheFiles()
+# check the data for the first element and if it contains commas, then that is the format for PyEphem.
+# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+#
+# cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9158,3.105749,0.1800755,0.56433269,348.3628,07/24.0/2020,2000,g 11.0,6.0"
+# 
+# # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+# # https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
+# cometDataSkyfield = "0088P         2020 09 26.6239  1.353073  0.564333  235.9158   56.6855    4.3838  20200724  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
+# 
+# minorPlanetName = "(1) Ceres"
+# 
+# # https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt
+# minorPlanetDataPyEphem = "1 Ceres,e,10.5935,80.3099,73.1153,2.767046,0.2141309,0.07553468,352.2305,03/23.0/2018,2000,H 3.34,0.12"
+# 
+# # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+# # https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt
+# minorPlanetDataSkyfield = "00001    3.34  0.12 K183N 352.23052   73.11528   80.30992   10.59351  0.0755347  0.21413094   2.7670463  0 MPO431490  6689 114 1801-2018 0.60 M-v 30h MPC        0000              (1) Ceres"
+
+
 try:
     from skyfield import almanac
     from skyfield.api import load, Star, Topos
