@@ -172,6 +172,42 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Just don't want to download each time during testing.
 
 
+    #TODO Start of temporary hack...remove in later release.
+    # Cache data formats changed between version 80 and 81 and so remove old format files.
+    #
+    # Comets were originally stored as a dictionary with a string for both key and value.
+    # Comets are now stored as a dictionary with key string and value an orbitalelement.OE class.
+    #
+    # The class used to store satellites was renamed from 'satellite' to 'twolineelement'.
+    # When an old cache file is read, the underlying object will be deemed invalid, throwing an exception.
+    def __removePreviousVersionCacheFiles( self ):
+        import os, pickle
+        cachePath = self.getCachePath( "" )
+        for file in os.listdir( cachePath ):
+            if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ):
+                with open( cachePath + file, "rb" ) as f:
+                    data = pickle.load( f )
+                    if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
+                        os.remove( cachePath + file )
+
+            elif file.startswith( IndicatorLunar.SATELLITE_CACHE_BASENAME ):
+                try:
+                    with open( cachePath + file, "rb" ) as f:
+                        data = pickle.load( f )
+
+                except Exception as e:
+                    os.remove( cachePath + file )
+
+
+    def flushCache( self ):
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
+        for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
+            self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+
+
     def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
         self.downloadCountComet = 0
         self.downloadCountMinorPlanetBright = 0
@@ -210,33 +246,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.cacheDateTimeSatellite = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
         if self.cacheDateTimeSatellite is None:
             self.cacheDateTimeSatellite = utcNow - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
-
-
-    #TODO Start of temporary hack...remove in later release.
-    # Cache data formats changed between version 80 and 81 and so remove old format files.
-    #
-    # Comets were originally stored as a dictionary with a string for both key and value.
-    # Comets are now stored as a dictionary with key string and value an orbitalelement.OE class.
-    #
-    # The class used to store satellites was renamed from 'satellite' to 'twolineelement'.
-    # When an old cache file is read, the underlying object will be deemed invalid, throwing an exception.
-    def __removePreviousVersionCacheFiles( self ):
-        import os, pickle
-        cachePath = self.getCachePath( "" )
-        for file in os.listdir( cachePath ):
-            if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ):
-                with open( cachePath + file, "rb" ) as f:
-                    data = pickle.load( f )
-                    if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
-                        os.remove( cachePath + file )
-
-            elif file.startswith( IndicatorLunar.SATELLITE_CACHE_BASENAME ):
-                try:
-                    with open( cachePath + file, "rb" ) as f:
-                        data = pickle.load( f )
-
-                except Exception as e:
-                    os.remove( cachePath + file )
 
 
     def update( self, menu ):
@@ -322,15 +331,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.notificationSatellites()
 
         return self.getNextUpdateTimeInSeconds()
-
-
-    def flushCache( self ):
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
-        for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
-            self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
 
 
     # Get the data from the cache, or if stale, download from the source.
