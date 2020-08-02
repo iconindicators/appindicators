@@ -107,14 +107,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #...not sure if minor planets are the same.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
-    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"#TODO Skyfield
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
-    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
+    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt", #TODO Skyfield
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
@@ -206,13 +206,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # minorPlanetDataPyEphem = "1 Ceres,e,10.5935,80.3099,73.1153,2.767046,0.2141309,0.07553468,352.2305,03/23.0/2018,2000,H 3.34,0.12"
 # minorPlanetDataSkyfield = "00001    3.34  0.12 K183N 352.23052   73.11528   80.30992   10.59351  0.0755347  0.21413094   2.7670463  0 MPO431490  6689 114 1801-2018 0.60 M-v 30h MPC        0000              (1) Ceres"
     def __swapCacheFiles( self ):
-        print( IndicatorLunar.astrobackend )
-        try:
-            data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
-            name = next( iter( data.values() ) ).getName()
-            print( )
-        except:
-            print( "Bad Comet" )
+        pass
+#         print( IndicatorLunar.astrobackend )
+#         try:
+#             data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
+#             name = next( iter( data.values() ) ).getName()
+#             print( )
+#         except:
+#             print( "Bad Comet" )
 
 
     def flushCache( self ):
