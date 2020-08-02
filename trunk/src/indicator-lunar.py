@@ -164,6 +164,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
         self.__removePreviousVersionCacheFiles()
+        self.__swapCacheFiles()
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
@@ -197,6 +198,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 except Exception as e:
                     os.remove( cachePath + file )
+
+
+#TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
+# cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9158,3.105749,0.1800755,0.56433269,348.3628,07/24.0/2020,2000,g 11.0,6.0"
+# cometDataSkyfield = "0088P         2020 09 26.6239  1.353073  0.564333  235.9158   56.6855    4.3838  20200724  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
+# minorPlanetDataPyEphem = "1 Ceres,e,10.5935,80.3099,73.1153,2.767046,0.2141309,0.07553468,352.2305,03/23.0/2018,2000,H 3.34,0.12"
+# minorPlanetDataSkyfield = "00001    3.34  0.12 K183N 352.23052   73.11528   80.30992   10.59351  0.0755347  0.21413094   2.7670463  0 MPO431490  6689 114 1801-2018 0.60 M-v 30h MPC        0000              (1) Ceres"
+    def __swapCacheFiles( self ):
+        print( IndicatorLunar.astrobackend )
+        try:
+            data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
+            name = next( iter( data.values() ) ).getName()
+            print( )
+        except:
+            print( "Bad Comet" )
 
 
     def flushCache( self ):
