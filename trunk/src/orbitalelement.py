@@ -27,7 +27,12 @@ import indicatorbase, re
 class OE( object ):
     def __init__( self, data ):
         self.data = data
-        self.name = re.sub( "\s\s+", "", self.data[ 0 : self.data.index( "," ) ] ) # The name can have multiple whitespace, so remove.
+#         self.name = re.sub( "\s\s+", "", self.data[ 0 : self.data.index( "," ) ] ) # The name can have multiple whitespace, so remove.  #TODO Put back.
+#TODO Testing
+        try:
+            self.name = re.sub( "\s\s+", "", self.data[ 0 : self.data.index( "," ) ] ) # The name can have multiple whitespace, so remove.
+        except:
+            self.name = ""
 
 
     def getName( self ): return self.name
