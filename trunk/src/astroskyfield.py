@@ -931,6 +931,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #
 #TODO Write string as file:
 # https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object/44672691
+        if True: return
 
         filename = "/home/bernard/Desktop/Soft00Cmt.txt"
         objectName = '88P/Howell'
