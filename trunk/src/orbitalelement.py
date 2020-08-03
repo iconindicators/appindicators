@@ -71,16 +71,15 @@ def download( url, logging = None ):
         l = 0
         print( len( data) )
         for i in range( 0, len( data ) ):
-            if not data[ i ].startswith( "#" ):
-                l = len( data[ i ] )
-                line = data[ i ]
-
+            line = data[ i ]
+            if not line.startswith( "#" ):
                 if line.count( "," ) > 5: # PyEphem/XEphem format.
                     name = re.sub( "\s\s+", "", line[ 0 : line.index( "," ) ] ) # The name can have multiple whitespace, so remove.
                     j+=1
 
                 else: # Assume Minor Planet Center format, used by Skyfield.
-                    if len( line ) < 195: # Comet
+                    l = len( line )
+                    if len( line ) < 194: # Comet
                         name = line[ 102 : 158 ]
                         k+=1
 
@@ -88,6 +87,7 @@ def download( url, logging = None ):
                         name = line[ 166 : 194 ]
                         l+=1
 
+                print( name )
 # Comet    
 #     ('designation', (102, 158)),
 #     ('reference', (159, 168)),
@@ -95,8 +95,6 @@ def download( url, logging = None ):
 # Minor Planet     
 #     ('designation', (166, 194)),
 #     ('last_observation_date', (194, 202)),
-
-                    pass
 
 #                 oe = OE( data[ i ].strip() )
 #                 oeData[ oe.getName().upper() ] = oe
