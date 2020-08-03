@@ -45,8 +45,8 @@ import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allow switching between eventual alternate backends.
-    astrobackendName = "AstroSkyfield"#TODO Testing skyfield
-#     astrobackendName = "AstroPyephem"#TODO Testing skyfield
+#     astrobackendName = "AstroSkyfield"#TODO Testing skyfield
+    astrobackendName = "AstroPyephem"#TODO Testing skyfield
     astrobackend = getattr( __import__( astrobackendName.lower() ), astrobackendName )
 
     if astrobackend.getAvailabilityMessage() is not None:
@@ -162,6 +162,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
+
+#TODO New
+        cometDataSourceNames = IndicatorLunar.astrobackend.getCometDataSourceNames()
+        for cometDataSourceName in cometDataSourceNames:
+            url = IndicatorLunar.astrobackend.getCometDataSourceURL( cometDataSourceName )
+            print( cometDataSourceName, url )
+
+        minorPlanetDataSourceNames = IndicatorLunar.astrobackend.getMinorPlanetDataSourceNames()
+        for minorPlanetDataSourceName in minorPlanetDataSourceNames:
+            url = IndicatorLunar.astrobackend.getMinorPlanetDataSourceURL( minorPlanetDataSourceName )
+            print( minorPlanetDataSourceName, url )
+#TODO end new
 
         self.__removePreviousVersionCacheFiles()
         self.__swapCacheFiles()

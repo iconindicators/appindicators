@@ -429,6 +429,35 @@ class AstroPyephem( astrobase.AstroBase ):
     __NAME_TAG_CITY = "CITY"
 
 
+#TODO New stuff
+    COMET_DATA_SOURCE_NAME = "comet"
+
+    astrobase.AstroBase.COMET_DATA_SOURCE_NAMES.extend( [
+        COMET_DATA_SOURCE_NAME ] )
+
+    astrobase.AstroBase.COMET_DATA_SOURCE_URLS.update( {
+        COMET_DATA_SOURCE_NAME   : "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt" } )
+
+
+    MINOR_PLANET_DATA_SOURCE_NAME_BRIGHT = "bright"
+    MINOR_PLANET_DATA_SOURCE_NAME_CRITICAL = "critical"
+    MINOR_PLANET_DATA_SOURCE_NAME_DISTANT = "distant"
+    MINOR_PLANET_DATA_SOURCE_NAME_UNUSUAL = "unusual"
+
+    astrobase.AstroBase.MINOR_PLANET_DATA_SOURCE_NAMES.extend( [
+        MINOR_PLANET_DATA_SOURCE_NAME_BRIGHT,
+        MINOR_PLANET_DATA_SOURCE_NAME_CRITICAL,
+        MINOR_PLANET_DATA_SOURCE_NAME_DISTANT,
+        MINOR_PLANET_DATA_SOURCE_NAME_UNUSUAL ] )
+
+    astrobase.AstroBase.MINOR_PLANET_DATA_SOURCE_URLS.update( {
+        MINOR_PLANET_DATA_SOURCE_NAME_BRIGHT    : "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
+        MINOR_PLANET_DATA_SOURCE_NAME_CRITICAL  : "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03CritList.txt",
+        MINOR_PLANET_DATA_SOURCE_NAME_DISTANT   : "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Distant.txt",
+        MINOR_PLANET_DATA_SOURCE_NAME_UNUSUAL   : "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Unusual.txt" } )
+#TODO End new stuff
+
+
     @staticmethod
     def calculate( utcNow,
                    latitude, longitude, elevation,

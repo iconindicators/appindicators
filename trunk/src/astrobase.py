@@ -218,6 +218,35 @@ class AstroBase( ABC ):
     STAR_TAGS_TRANSLATIONS = { }
 
 
+#TODO New stuff
+    COMET_DATA_SOURCE_NAMES = [ ] #TODO Need explanatory comment.
+
+    COMET_DATA_SOURCE_URLS = { } #TODO Need explanatory comment.
+
+    @staticmethod
+    @abstractmethod
+    def getCometDataSourceNames(): return AstroBase.COMET_DATA_SOURCE_NAMES
+
+
+    @staticmethod
+    @abstractmethod
+    def getCometDataSourceURL( cometDataSourceName ): return AstroBase.COMET_DATA_SOURCE_URLS[ cometDataSourceName ]
+
+
+    MINOR_PLANET_DATA_SOURCE_NAMES = [ ] #TODO Need explanatory comment.
+
+    MINOR_PLANET_DATA_SOURCE_URLS = { } #TODO Need explanatory comment.
+
+    @staticmethod
+    @abstractmethod
+    def getMinorPlanetDataSourceNames(): return AstroBase.MINOR_PLANET_DATA_SOURCE_NAMES
+
+
+    @staticmethod
+    @abstractmethod
+    def getMinorPlanetDataSourceURL( minorPlanetDataSourceName ): return AstroBase.MINOR_PLANET_DATA_SOURCE_URLS[ minorPlanetDataSourceName ]
+#TODO End new stuff
+
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
     SATELLITE_TAG_INTERNATIONAL_DESIGNATOR = "[INTERNATIONAL DESIGNATOR]"
