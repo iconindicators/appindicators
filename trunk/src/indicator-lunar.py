@@ -107,14 +107,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #...not sure if minor planets are the same.
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
-    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"#TODO Skyfield
+    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
-    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt", #TODO Skyfield
+    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
@@ -279,6 +279,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
+#TODO Can this section somehow be made into a loop?  Look at zip maybe?        
         self.minorPlanetData = { }
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
