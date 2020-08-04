@@ -17,6 +17,9 @@
 
 
 # Two Line Element - holds parameters to compute orbit for satellites.
+#
+# https://www.celestrak.com/NORAD/documentation/tle-fmt.php
+# https://en.wikipedia.org/wiki/Two-line_element_set
 
 
 from urllib.request import urlopen
