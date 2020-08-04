@@ -44,8 +44,8 @@ import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
-    # Allow switching between eventual alternate backends.
-    astroBackendPyEphem = "AstroPyephem"
+    # Allow switching between alternate backends.
+    astroBackendPyEphem = "AstroPyephem" #TODO Consider renaming the class (not file) to AstroPyEphem.
     astroBackendSkyfield = "AstroSkyfield"
     astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
@@ -100,27 +100,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
-#TODO Change 03 to 00 if using Skyfield:
-# https://rhodesmill.org/skyfield/kepler-orbits.html
-# https://github.com/skyfielders/python-skyfield/blob/master/skyfield/data/mpc.py
-# https://www.minorplanetcenter.net/iau/Ephemerides/Soft00.html
-# https://www.minorplanetcenter.net/iau/Ephemerides/Soft03.html
-#...not sure if minor planets are the same.
-    COMET_MINOR_PLANET_URL_HACK = "3" if astroBackendName == astroBackendPyEphem else "0"
+    COMET_MINOR_PLANET_URL_SWITCH = "3" if astroBackendName == astroBackendPyEphem else "0"
 
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
-    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft0" + COMET_MINOR_PLANET_URL_HACK + "Cmt.txt"
+    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
-    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft0" + COMET_MINOR_PLANET_URL_HACK + "Bright.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft0" + COMET_MINOR_PLANET_URL_HACK + "CritList.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft0" + COMET_MINOR_PLANET_URL_HACK + "Distant.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft0" + COMET_MINOR_PLANET_URL_HACK + "Unusual.txt" ]
+    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Bright.txt",
+                               "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "CritList.txt",
+                               "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Distant.txt",
+                               "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
@@ -148,7 +142,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.84",
+            version = "1.0.85",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astroBackend.getCredit(),
@@ -255,6 +249,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.nextDownloadTimeMinorPlanetUnusual = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
+#TODO Can getCacheDateTime() take another parameter as a default if None is returned and use that?
         self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME )
         if self.cacheDateTimeComet is None:
             self.cacheDateTimeComet = utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
@@ -371,6 +366,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Get the data from the cache, or if stale, download from the source.
     #
     # Returns a dictionary (may be empty).
+#TODO Change this to positional arguments to handle different types of download functions.
+# https://stackoverflow.com/a/706735/2156453
     def updateData( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, dataType, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )

@@ -103,6 +103,7 @@ def download( url, dataType, logging = None ):
     return oeData
 
 
+#TODO Delete
 # Downloads OE data for an object in XEphem format from the URL.
 #
 # Returns a dictionary:
