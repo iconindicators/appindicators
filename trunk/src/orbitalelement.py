@@ -81,7 +81,6 @@ def download( url, dataType, logging = None ):
                 name = data[ i ][ start : end ].strip()
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
-#TODO Why does the name/key have to be uppercased?
 
         elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
             for i in range( 0, len( data ) ):
@@ -89,7 +88,6 @@ def download( url, dataType, logging = None ):
                     name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
                     oe = OE( name, data[ i ], dataType )
                     oeData[ oe.getName().upper() ] = oe
-#TODO Why does the name/key have to be uppercased?
 
         if not oeData and logging:
             logging.error( "No OE data found at " + str( url ) )

@@ -53,6 +53,7 @@ class TLE( object ):
         launchYear = self.line1[ 9 : 11 ]
         if int( launchYear ) < 57:
             launchYear = "20" + launchYear
+
         else:
             launchYear = "19" + launchYear
 
