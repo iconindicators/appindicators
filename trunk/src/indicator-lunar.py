@@ -205,14 +205,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
     def __swapCacheFiles( self ):
         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
-        try:
+        if data is not None:
             firstItem = next( iter( data.values() ) )
             dt = firstItem.dataType
             print( firstItem.dataType == orbitalelement.OE.DataType.XEPHEM_COMET )
             print( firstItem.dataType == orbitalelement.OE.DataType.SKYFIELD_COMET )
-
-        except Exception as e:
-            print( e )
 
 
     def flushCache( self ):
