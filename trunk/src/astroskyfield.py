@@ -765,7 +765,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
         if True:
-            return { }
+            return orbitalElementData
 
         from skyfield.data import mpc
         

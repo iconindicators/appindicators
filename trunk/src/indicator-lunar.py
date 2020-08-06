@@ -100,6 +100,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+#TODO Instead of this hack, maybe just have two lots of each (and remove the data source name stuff from astrobase et al).
     COMET_MINOR_PLANET_URL_SWITCH = "3" if astroBackendName == astroBackendPyEphem else "0"
 
     COMET_CACHE_BASENAME = "comet-oe-"
@@ -206,10 +207,35 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __swapCacheFiles( self ):
         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
         if data is not None:
-            firstItem = next( iter( data.values() ) )
-            dt = firstItem.dataType
-            print( firstItem.dataType == orbitalelement.OE.DataType.XEPHEM_COMET )
-            print( firstItem.dataType == orbitalelement.OE.DataType.SKYFIELD_COMET )
+            import glob, os, shutil
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and \
+               next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.XEPHEM_COMET:
+                shutil.rmtree( self.getCachePath( "" ) + "xephem", ignore_errors = True )
+                os.mkdir( self.getCachePath( "" ) + "xephem" )
+                for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
+                    shutil.move( data, self.getCachePath( "" ) + "xephem" )
+
+                for data in glob.glob( self.getCachePath( "" ) + "minorplanet*" ):
+                    shutil.move( data, self.getCachePath( "" ) + "xephem" )
+
+                if os.path.isdir( self.getCachePath( "" ) + "skyfield" ):
+                    for data in glob.glob( self.getCachePath( "" ) + "skyfield/*" ):
+                        shutil.move( data, self.getCachePath( "" ) )
+
+            elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
+               next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
+                print( "Skyfield to XEphem" )
+                shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
+                os.mkdir( self.getCachePath( "" ) + "skyfield" )
+                for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
+                    shutil.move( data, self.getCachePath( "" ) + "skyfield" )
+
+                for data in glob.glob( self.getCachePath( "" ) + "minorplanet*" ):
+                    shutil.move( data, self.getCachePath( "" ) + "skyfield" )
+
+                if os.path.isdir( self.getCachePath( "" ) + "xephem" ):
+                    for data in glob.glob( self.getCachePath( "" ) + "xephem/*" ):
+                        shutil.move( data, self.getCachePath( "" ) )
 
 
     def flushCache( self ):
