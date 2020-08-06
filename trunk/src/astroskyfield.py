@@ -75,7 +75,7 @@ try:
 except ImportError:
     available = False
 
-import astrobase, locale, orbitalelement, pandas
+import astrobase, locale, pandas
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -784,7 +784,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         print( row )
 
         for key in orbitalElementData:
-            df = pandas.DataFrame( [ orbitalElementData[ key ].getData() ] ) #TODO Instead of passing in the OE object...maybe just have the raw data?
+            df = pandas.DataFrame( [ orbitalElementData[ key ].getData() ] )
             print( type((df)))
             print( (df.loc[[0]]))
             print( type((df.loc[[0]])))

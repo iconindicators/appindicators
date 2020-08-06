@@ -506,7 +506,7 @@ class AstroPyephem( astrobase.AstroBase ):
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
         results = { }
         for key in orbitalElementData:
-            body = ephem.readdb( orbitalElementData[ key ].getData() ) #TODO As in AstroSkyfield, maybe just have the raw data rather than the OE object?
+            body = ephem.readdb( orbitalElementData[ key ].getData() )
             body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
