@@ -193,7 +193,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ) or file[ 0 : file.rfind( "-" ) + 1 ] in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
                 with open( cachePath + file, "rb" ) as f:
                     data = pickle.load( f )
-                    if not hasattr( next( iter( data.values() ) ), "dataType" ): 
+                    if data and not hasattr( next( iter( data.values() ) ), "dataType" ): 
+                        os.remove( cachePath + file )
+
+                    elif not data: #TODO Need this maybe as an empty cache file does not have a dataType...so this means what?
                         os.remove( cachePath + file )
 
 
@@ -385,21 +388,25 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
-                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
+                        data = magnitudeFilterFunction( data, 1 )
 
-                    if data:
-                        self.writeCacheBinary( cacheBaseName, data )
-                        downloadCount = 0
-                        cacheDateTime = self.getCacheDateTime( cacheBaseName )
-                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-
-                    else:
-                        # Data was filtered out, so do not write out an empty file.
-                        # Ensure the cache read is not attempted on the next update, as the cache will be empty.
-                        # Ensure the next download attempt happens at a time in the future such that the cache would have expired.
-                        # If a new body appears within that period, it will be missed, but c'est la vie.
-                        cacheDateTime = utcNow - datetime.timedelta( hours = cacheMaximumAge )
-                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+                    self.writeCacheBinary( cacheBaseName, data )
+                    downloadCount = 0
+                    cacheDateTime = self.getCacheDateTime( cacheBaseName )
+                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+#                     if data:
+#                         self.writeCacheBinary( cacheBaseName, data )
+#                         downloadCount = 0
+#                         cacheDateTime = self.getCacheDateTime( cacheBaseName )
+#                         nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+# 
+#                     else:
+#                         # Data was filtered out, so do not write out an empty file.
+#                         # Ensure the cache read is not attempted on the next update, as the cache will be empty.
+#                         # Ensure the next download attempt happens at a time in the future such that the cache would have expired.
+#                         # If a new body appears within that period, it will be missed, but c'est la vie.
+#                         cacheDateTime = utcNow - datetime.timedelta( hours = cacheMaximumAge )
+#                         nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
 
                 else:
                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
