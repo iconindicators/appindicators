@@ -32,6 +32,7 @@
 #TODO Minor planet critical is filtered out by magnitude and therefore no data is cached.
 #This means however that on each indicator run, we attempt a new download.
 #Maybe the solution is to save an empty file?
+#What is the consequence of storing an empty cache file?
 
 
 INDICATOR_NAME = "indicator-lunar"
