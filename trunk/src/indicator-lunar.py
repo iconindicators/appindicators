@@ -29,23 +29,6 @@
 # but filter to the user specified magnitude when display/calculating.
 
 
-#TODO
-# Need to ensure the update function works with new download/data/cache format.
-# Then need two functions:
-#     One to remove old format cache files
-#     One to let me switch between backends and copy/move cache files.
-
-
-# Detect previous version cache files (should return false if previous version):
-#         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
-#         try:
-#             firstItem = next( iter( data.values() ) )
-#             print( hasattr( firstItem, "dataType" ) )
-#         except Exception as e:
-#             pass
-
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -189,8 +172,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             print( minorPlanetDataSourceName, url )
 #TODO end new
 
+        self.__swapCacheFiles() #TODO Only for me!
         self.__removePreviousVersionCacheFiles()
-        self.__swapCacheFiles()
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
@@ -199,6 +182,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Just don't want to download each time during testing.
 
 
+#TODO Update this comment.
     #TODO Start of temporary hack...remove in later release.
     # Cache data formats changed between version 80 and 81 and so remove old format files.
     #
@@ -211,19 +195,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         import os, pickle
         cachePath = self.getCachePath( "" )
         for file in os.listdir( cachePath ):
-            if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ):
+            if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ) or file[ 0 : file.rfind( "-" ) + 1 ] in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
                 with open( cachePath + file, "rb" ) as f:
                     data = pickle.load( f )
-                    if not isinstance( next( iter( data.values() ) ), orbitalelement.OE ):
+                    if not hasattr( next( iter( data.values() ) ), "dataType" ): 
                         os.remove( cachePath + file )
-
-            elif file.startswith( IndicatorLunar.SATELLITE_CACHE_BASENAME ):
-                try:
-                    with open( cachePath + file, "rb" ) as f:
-                        data = pickle.load( f )
-
-                except Exception as e:
-                    os.remove( cachePath + file )
 
 
 #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
@@ -231,7 +207,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
         try:
             firstItem = next( iter( data.values() ) )
-            print( "XEPHEM" in firstItem.dataType )
+            dt = firstItem.dataType
+            print( firstItem.dataType == orbitalelement.OE.DataType.XEPHEM_COMET )
+            print( firstItem.dataType == orbitalelement.OE.DataType.SKYFIELD_COMET )
+
         except Exception as e:
             print( e )
 
