@@ -29,6 +29,11 @@
 # but filter to the user specified magnitude when display/calculating.
 
 
+#TODO Minor planet critical is filtered out by magnitude and therefore no data is cached.
+#This means however that on each indicator run, we attempt a new download.
+#Maybe the solution is to save an empty file?
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -161,18 +166,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
-#TODO New
-        cometDataSourceNames = IndicatorLunar.astroBackend.getCometDataSourceNames()
-        for cometDataSourceName in cometDataSourceNames:
-            url = IndicatorLunar.astroBackend.getCometDataSourceURL( cometDataSourceName )
-            print( cometDataSourceName, url )
-
-        minorPlanetDataSourceNames = IndicatorLunar.astroBackend.getMinorPlanetDataSourceNames()
-        for minorPlanetDataSourceName in minorPlanetDataSourceNames:
-            url = IndicatorLunar.astroBackend.getMinorPlanetDataSourceURL( minorPlanetDataSourceName )
-            print( minorPlanetDataSourceName, url )
-#TODO end new
-
         self.__swapCacheFiles() #TODO Only for me!
         self.__removePreviousVersionCacheFiles()
         self.flushCache()
@@ -204,6 +197,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
+#CHECK THIS WORKS AS EXPECTED!!!
     def __swapCacheFiles( self ):
         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
         if data is not None:
@@ -224,7 +218,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
-                print( "Skyfield to XEphem" )
                 shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "skyfield" )
                 for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
@@ -386,6 +379,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         else:
             data = { }
             if nextDownloadTime < utcNow:
+                print( "Downloading:", cacheBaseName )#TODO Debug
                 data = downloadDataFunction( *downloadDataArguments )
                 downloadCount += 1
                 if data:
@@ -498,6 +492,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
+        menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
