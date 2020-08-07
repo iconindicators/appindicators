@@ -99,32 +99,3 @@ def download( url, dataType, logging = None ):
             logging.exception( e )
 
     return oeData
-
-
-#TODO Delete
-# Downloads OE data for an object in XEphem format from the URL.
-#
-# Returns a dictionary:
-#    Key: object name (upper cased)
-#    Value: OE object
-#
-# Otherwise, returns an empty dictionary and may write to the log.
-def downloadORIGINAL( url, logging = None ):
-    oeData = { }
-    try:
-        data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-        for i in range( 0, len( data ) ):
-            if not data[ i ].startswith( "#" ):
-                oe = OE( data[ i ].strip() )
-                oeData[ oe.getName().upper() ] = oe
-
-        if not oeData and logging:
-            logging.error( "No OE data found at " + str( url ) )
-
-    except Exception as e:
-        oeData = { }
-        if logging:
-            logging.error( "Error retrieving OE data from " + str( url ) )
-            logging.exception( e )
-
-    return oeData
