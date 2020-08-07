@@ -67,15 +67,15 @@
 
 
 try:
-    from skyfield import almanac
+    from skyfield import almanac, constants
     from skyfield.api import load, Star, Topos
-    from skyfield.data import hipparcos
+    from skyfield.data import hipparcos, mpc
     available = True
 
 except ImportError:
     available = False
 
-import astrobase, locale, pandas
+import astrobase, io, locale, orbitalelement, pandas
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -764,9 +764,40 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Waiting for when Skyfield implements Orbital Elements.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
-        if True:
-            return orbitalElementData
+        results = { }
+        for key in orbitalElementData:
+            data = orbitalElementData[ key ]
+            with io.BytesIO( data.getData().encode() ) as f:
+                if data.getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
+                    dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                    body = sun + mpc.comet_orbit( dataframe.loc[ name ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
+                else:
+                    dataframe = skyfield.data.mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                    body = sun + mpc.mpcorb_orbit( dataframe.loc[ name ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            
+            
+            body = ephem.readdb( orbitalElementData[ key ].getData() )
+            body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
+            bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+            if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
+                results[ key ] = orbitalElementData[ key ]
+ 
+        return results
+
+        return orbitalElementData
+
+#         results = { }
+#         for key in orbitalElementData:
+#             body = ephem.readdb( orbitalElementData[ key ].getData() )
+#             body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
+#             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+#             if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
+#                 results[ key ] = orbitalElementData[ key ]
+# 
+#         return results
+
+        
         from skyfield.data import mpc
         
         with load.open(mpc.COMET_URL) as f:
