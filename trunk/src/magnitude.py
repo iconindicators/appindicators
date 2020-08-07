@@ -39,6 +39,7 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
                "\n\tG:", body._G,
                "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
+
 def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     timeScale = skyfield.api.load.timescale( builtin = True )
     topos = skyfield.api.Topos( latitude_degrees = latitude, longitude_degrees = longitude )
