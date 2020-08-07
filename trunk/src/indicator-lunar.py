@@ -167,14 +167,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
-        self.__swapCacheFiles() #TODO Only for me!
         self.__removePreviousVersionCacheFiles()
+        self.__swapCacheFiles() #TODO Only for me!
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
-
-#TODO Maybe check to see if PyEphem is running and if so check the cache files and if they are PyEphem, then continue.
-# If not, then rename (or delete outright) or move to a SKyfield directory.  Vice versa for Skyfield.
-# Just don't want to download each time during testing.
 
 
 #TODO Update this comment.
@@ -195,21 +191,20 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     data = pickle.load( f )
                     if data and not hasattr( next( iter( data.values() ) ), "dataType" ): 
                         os.remove( cachePath + file )
-
-                    elif not data: #TODO Need this maybe as an empty cache file does not have a dataType...so this means what?
-                        os.remove( cachePath + file )
+                        print( "Removing previous version cache file", cachePath + file )
 
 
 #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
-#CHECK THIS WORKS AS EXPECTED!!!
     def __swapCacheFiles( self ):
         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
         if data is not None:
             import glob, os, shutil
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.XEPHEM_COMET:
+                print( "Swapping Skyfield for XEphem" )
                 shutil.rmtree( self.getCachePath( "" ) + "xephem", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "xephem" )
+
                 for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
                     shutil.move( data, self.getCachePath( "" ) + "xephem" )
 
@@ -222,6 +217,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
+                print( "Swapping XEphem for Skyfield" )
                 shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "skyfield" )
                 for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
@@ -388,12 +384,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
-                        data = magnitudeFilterFunction( data, 1 )
+                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
 
                     self.writeCacheBinary( cacheBaseName, data )
                     downloadCount = 0
                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+#TODO Now write out empty files, otherwise we will always do a download on startup.
 #                     if data:
 #                         self.writeCacheBinary( cacheBaseName, data )
 #                         downloadCount = 0
