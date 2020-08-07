@@ -460,3 +460,21 @@ class AstroBase( ABC ):
         parallacticAngle = math.atan2( y, x )
 
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
+
+
+    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+    @staticmethod
+    def calculateApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistance, bodySunDistance ):
+        return g_absoluteMagnitude + 5 * math.log10( bodyEarthDistance ) + 2.5 * k_luminosityIndex * math.log10( bodySunDistance )
+
+
+    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+    # https://www.britastro.org/asteroids/dymock4.pdf
+    @staticmethod
+    def calculateApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistance, bodySunDistance, earthSunDistance ):
+        beta = math.acos( ( bodySunDistance * bodySunDistance + bodyEarthDistance * bodyEarthDistance - earthSunDistance * earthSunDistance ) / ( 2 * bodySunDistance * bodyEarthDistance ) )
+        psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
+        Psi_1 = math.exp( -3.33 * psi_t )
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+        Psi_2 = math.exp( -1.87 * psi_t )
+        return H_absoluteMagnitude + 5.0 * math.log10( bodySunDistance * bodyEarthDistance ) - 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
