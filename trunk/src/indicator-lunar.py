@@ -392,27 +392,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
-#                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )#TODO Testing
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
                     self.writeCacheBinary( cacheBaseName, data )
                     downloadCount = 0
                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-#TODO Now write out empty files, otherwise we will always do a download on startup.
-#                     if data:
-#                         self.writeCacheBinary( cacheBaseName, data )
-#                         downloadCount = 0
-#                         cacheDateTime = self.getCacheDateTime( cacheBaseName )
-#                         nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-# 
-#                     else:
-#                         # Data was filtered out, so do not write out an empty file.
-#                         # Ensure the cache read is not attempted on the next update, as the cache will be empty.
-#                         # Ensure the next download attempt happens at a time in the future such that the cache would have expired.
-#                         # If a new body appears within that period, it will be missed, but c'est la vie.
-#                         cacheDateTime = utcNow - datetime.timedelta( hours = cacheMaximumAge )
-#                         nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
 
                 else:
                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
