@@ -191,7 +191,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     data = pickle.load( f )
                     if data and not hasattr( next( iter( data.values() ) ), "dataType" ): 
                         os.remove( cachePath + file )
-                        print( "Removing previous version cache file", cachePath + file )
+                        print( "Removing previous version cache file", cachePath + file )#TODO Testing
 
 
 #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
@@ -201,7 +201,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             import glob, os, shutil
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.XEPHEM_COMET:
-                print( "Swapping Skyfield for XEphem" )
+                print( "Swapping Skyfield for XEphem" )#TODO Testing
                 shutil.rmtree( self.getCachePath( "" ) + "xephem", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "xephem" )
 
@@ -217,7 +217,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
-                print( "Swapping XEphem for Skyfield" )
+                print( "Swapping XEphem for Skyfield" )#TODO Testing
                 shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "skyfield" )
                 for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
@@ -283,6 +283,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
+        magnitudeFilterAdditionalArguments = [ utcNow, self.latitude, self.longitude, self.elevation ] if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield else [ ]
 
         # Update comet data.
         dataType = orbitalelement.OE.DataType.XEPHEM_COMET if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
@@ -290,7 +291,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
                              orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ], self.downloadCountComet, self.nextDownloadTimeComet,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
@@ -303,7 +304,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 0 ], dataType, self.getLogging() ], self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -311,7 +312,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 1 ], dataType, self.getLogging( )], self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -319,7 +320,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 2 ], dataType, self.getLogging( ) ], self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -327,7 +328,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 3 ], dataType, self.getLogging( ) ], self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -372,7 +373,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Get the data from the cache, or if stale, download from the source.
     #
     # Returns a dictionary (may be empty).
-    def updateData( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, downloadDataArguments, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
+    def updateData( self, utcNow,
+                    cacheDateTime, cacheMaximumAge, cacheBaseName,
+                    downloadDataFunction, downloadDataArguments,
+                    downloadCount, nextDownloadTime,
+                    magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
@@ -382,12 +387,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 print( "Downloading:", cacheBaseName )#TODO Debug
 #                 data = downloadDataFunction( *downloadDataArguments ) #TODO Testing.
                 d = "0088P         2020 09 26.6239  1.353073  0.564333  235.9158   56.6855    4.3838  20200724  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
-                oe = orbitalelement.OE( "88P/HOWELL", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
+                oe = orbitalelement.OE( "88P/Howell", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
                 data[ "88P/HOWELL" ] = oe
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
-                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
+#                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )#TODO Testing
+                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
                     self.writeCacheBinary( cacheBaseName, data )
                     downloadCount = 0

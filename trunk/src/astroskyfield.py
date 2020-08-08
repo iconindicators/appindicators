@@ -761,66 +761,40 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                       AstroSkyfield._city_data.get( city )[ 2 ]
 
 
-#TODO Waiting for when Skyfield implements Orbital Elements.
     @staticmethod
-    def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude ):
+    def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude, utcNow, latitude, longitude, elevation ):
+        timeScale = load.timescale( builtin = True )
+        t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
+        sun = ephemerisPlanets[ "sun" ]
+        earth = ephemerisPlanets[ "earth" ]
+        topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+        alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         results = { }
         for key in orbitalElementData:
             data = orbitalElementData[ key ]
             with io.BytesIO( data.getData().encode() ) as f:
                 if data.getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
                     dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-                    body = sun + mpc.comet_orbit( dataframe.loc[ name ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+                    body = sun + mpc.comet_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
                 else:
-                    dataframe = skyfield.data.mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
-                    body = sun + mpc.mpcorb_orbit( dataframe.loc[ name ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            
-            
-            body = ephem.readdb( orbitalElementData[ key ].getData() )
-            body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
-            bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-            if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
+                    dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                    body = sun + mpc.mpcorb_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+
+            ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
+            ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+
+            apparentMagnitude = astrobase.AstroBase.calculateApparentMagnitude_HG( dataframe.loc[ data.getName() ][ "magnitude_H" ], 
+                                                                                   dataframe.loc[ data.getName() ][ "magnitude_G" ], 
+                                                                                   earthBodyDistance.au, 
+                                                                                   sunBodyDistance.au, 
+                                                                                   earthSunDistance.au )
+
+            if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= maximumMagnitude:
                 results[ key ] = orbitalElementData[ key ]
- 
+
         return results
-
-        return orbitalElementData
-
-#         results = { }
-#         for key in orbitalElementData:
-#             body = ephem.readdb( orbitalElementData[ key ].getData() )
-#             body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
-#             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-#             if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
-#                 results[ key ] = orbitalElementData[ key ]
-# 
-#         return results
-
-        
-        from skyfield.data import mpc
-        
-        with load.open(mpc.COMET_URL) as f:
-            comets = mpc.load_comets_dataframe(f)
-
-        print(len(comets), 'comets loaded')
-        
-        # Index by designation for fast lookup.
-        comets = comets.set_index('designation', drop=False)
-        
-        # Sample lookups.
-        row = comets.loc['1P/Halley']
-        print( row )
-        row = comets.loc['C/1995 O1 (Hale-Bopp)']        
-        print( row )
-
-        for key in orbitalElementData:
-            df = pandas.DataFrame( [ orbitalElementData[ key ].getData() ] )
-            print( type((df)))
-            print( (df.loc[[0]]))
-            print( type((df.loc[[0]])))
-
-        return orbitalElementData
 
 
     @staticmethod
@@ -976,9 +950,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Print comet
     @staticmethod
     def print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
-        from skyfield.api import load
-        from skyfield.data import mpc
-
         if isComet:
             with load.open( filename ) as f:
                 objects = mpc.load_comets_dataframe(f)
