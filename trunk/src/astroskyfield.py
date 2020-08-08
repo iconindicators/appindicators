@@ -29,53 +29,22 @@
 # sudo pip3 install --upgrade jplephem numpy pandas pytz skyfield
 
 
-# Required to run the planet/star ephemeris creation functions at the end.  Uncomment as needed!
+# Required by the functions at the end to create the stars/planet ephemerides; uncomment as needed!
 # import gettext
 # gettext.install( "astroskyfield" )
-
-
-
-#TODO Comet and minor planet formats for later use:
-#
-# Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
-#
-# https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt
-# Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-
-
-#TODO If/when move to Skyfield, need to delete the cache files for comets and minor planets.
-# One way to differentiate is during the call to 
-# self.__removePreviousVersionCacheFiles()
-# check the data for the first element and if it contains commas, then that is the format for PyEphem.
-# https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-#
-# cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9158,3.105749,0.1800755,0.56433269,348.3628,07/24.0/2020,2000,g 11.0,6.0"
-# 
-# # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-# # https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
-# cometDataSkyfield = "0088P         2020 09 26.6239  1.353073  0.564333  235.9158   56.6855    4.3838  20200724  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
-# 
-# minorPlanetName = "(1) Ceres"
-# 
-# # https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt
-# minorPlanetDataPyEphem = "1 Ceres,e,10.5935,80.3099,73.1153,2.767046,0.2141309,0.07553468,352.2305,03/23.0/2018,2000,H 3.34,0.12"
-# 
-# # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-# # https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt
-# minorPlanetDataSkyfield = "00001    3.34  0.12 K183N 352.23052   73.11528   80.30992   10.59351  0.0755347  0.21413094   2.7670463  0 MPO431490  6689 114 1801-2018 0.60 M-v 30h MPC        0000              (1) Ceres"
 
 
 try:
     from skyfield import almanac, constants
     from skyfield.api import load, Star, Topos
     from skyfield.data import hipparcos, mpc
+    from skyfield.magnitudelib import planetary_magnitude
     available = True
 
 except ImportError:
     available = False
 
-import astrobase, io, locale, orbitalelement, pandas
+import astrobase, io, locale, orbitalelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -779,6 +748,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     body = sun + mpc.comet_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
                 else:
+#TODO Test!
                     dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                     body = sun + mpc.mpcorb_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
@@ -878,13 +848,36 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
-#TODO Factor in magnitude filtering when Skyfield implements planetary magnitude.
-# https://github.com/skyfielders/python-skyfield/issues/210
     @staticmethod
     def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets, magnitudeMaximum ):
+        t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day )
         for planet in planets:
-            AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
-                                             ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
+#TODO Need to test this!
+            if planet == astrobase.AstroBase.PLANET_MERCURY or \
+               planet == astrobase.AstroBase.PLANET_VENUS or \
+               planet == astrobase.AstroBase.PLANET_JUPITER or \
+               planet == astrobase.AstroBase.PLANET_URANUS:
+                apparentMagnitude = planetary_magnitude( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( t ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
+
+            else:
+                #TODO Hard coded for now until Skyfield can provide...
+                # https://github.com/skyfielders/python-skyfield/issues/210
+                # https://rhodesmill.org/skyfield/api.html#skyfield.magnitudelib.planetary_magnitude
+                if planet == astrobase.AstroBase.PLANET_MARS:
+                    apparentMagnitude = -3.0
+
+                elif planet == astrobase.AstroBase.PLANET_SATURN:
+                    apparentMagnitude = 0.0
+
+                elif planet == astrobase.AstroBase.PLANET_NEPTUNE:
+                    apparentMagnitude = 8.0
+
+                elif planet == astrobase.AstroBase.PLANET_PLUTO:
+                    apparentMagnitude = 14.0
+
+            if apparentMagnitude <= magnitudeMaximum:
+                AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
+                                                 ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
 
 
 #TODO According to
@@ -950,6 +943,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Print comet
     @staticmethod
     def print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
+        import pandas
         if isComet:
             with load.open( filename ) as f:
                 objects = mpc.load_comets_dataframe(f)
@@ -1165,7 +1159,6 @@ class AstroSkyfield( astrobase.AstroBase ):
             print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
 
-# Functions to create the stars/planet ephemerides.
-# Uncomment the gettext lines at the top!
+# Functions to create the stars/planet ephemerides; uncomment the gettext lines at the top!
 # AstroSkyfield.createEphemerisStars()
 # AstroSkyfield.createEphemerisPlanets()
