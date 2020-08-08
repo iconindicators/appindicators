@@ -24,8 +24,7 @@
 # sudo apt install python3-pip
 
 
-#TODO Not sure where, but also need to install jplemphem along with skyfield using pip3.
-# Need to also install other dependencies:
+#TODO Verify which of the following need to be install for Skyfield to work:
 # sudo pip3 install --upgrade jplephem numpy pandas pytz skyfield
 
 
