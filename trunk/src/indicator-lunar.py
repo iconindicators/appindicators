@@ -379,10 +379,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             data = { }
             if nextDownloadTime < utcNow:
                 print( "Downloading:", cacheBaseName )#TODO Debug
-                data = downloadDataFunction( *downloadDataArguments ) #TODO Testing.
-#                 d = "0088P         2020 09 26.6239  1.353073  0.564333  235.9158   56.6855    4.3838  20200724  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
-#                 oe = orbitalelement.OE( "88P/Howell", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
-#                 data[ "88P/HOWELL" ] = oe
+#                 data = downloadDataFunction( *downloadDataArguments ) #TODO Testing.
+                d = "    CK15A020  2015 08  1.8353  5.341055  1.000000  208.8369  258.5042  109.1696            10.5  4.0  C/2015 A2 (PANSTARRS)                                    MPC 93587"
+                oe = orbitalelement.OE( "C/2015 A2 (PANSTARRS)", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
+                data[ "C/2015 A2 (PANSTARRS)" ] = oe
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
