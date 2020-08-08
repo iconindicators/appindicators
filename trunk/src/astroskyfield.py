@@ -741,10 +741,17 @@ class AstroSkyfield( astrobase.AstroBase ):
         results = { }
         for key in orbitalElementData:
             data = orbitalElementData[ key ]
+            print( data.getName() )
+            print( data.getData() )
+            print( utcNow )
             with io.BytesIO( data.getData().encode() ) as f:
                 if data.getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
                     dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                     body = sun + mpc.comet_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+#TODO On hold until 
+# https://github.com/skyfielders/python-skyfield/issues/428
+#is resolved.
+
 
                 else:
 #TODO Test!
