@@ -113,20 +113,7 @@ minorPlanetDataSkyfield = "00001    3.34  0.12 K183N 352.23052   73.11528   80.3
 print( "PyEphem:", ephem.__version__ )
 print( "Skyfield:", skyfield.__version__ )
 
-# pyephemCometMinorPlanet( now, latitude, longitude, cometName, cometDataPyEphem, True )
-# skyfieldCometMinorPlanet( now, latitude, longitude, cometName, cometDataSkyfield, True )
-# pyephemCometMinorPlanet( now, latitude, longitude, minorPlanetName, minorPlanetDataPyEphem, False )
-# skyfieldCometMinorPlanet( now, latitude, longitude, minorPlanetName, minorPlanetDataSkyfield, False )
-
-now = datetime.datetime.strptime( "2020-08-08", "%Y-%m-%d" )
-data = "    CK19Y04a  2020 05 31.0420  0.251014  1.001333  177.2464  120.9277   45.8250  20200807  11.6  6.0  C/2019 Y4-A (ATLAS)                                      MPEC 2020-L06"
-timeScale = skyfield.api.load.timescale( builtin = True )
-topos = skyfield.api.Topos( latitude_degrees = latitude, longitude_degrees = longitude )
-ephemeris = skyfield.api.load( "de421.bsp" )
-
-sun = ephemeris[ "sun" ]
-earth = ephemeris[ "earth" ]
-
-with io.BytesIO( data.encode() ) as f:
-    dataframe = skyfield.data.mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-    body = sun + skyfield.data.mpc.comet_orbit( dataframe.loc[ "C/2019 Y4-A (ATLAS)" ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
+pyephemCometMinorPlanet( now, latitude, longitude, cometName, cometDataPyEphem, True )
+skyfieldCometMinorPlanet( now, latitude, longitude, cometName, cometDataSkyfield, True )
+pyephemCometMinorPlanet( now, latitude, longitude, minorPlanetName, minorPlanetDataPyEphem, False )
+skyfieldCometMinorPlanet( now, latitude, longitude, minorPlanetName, minorPlanetDataSkyfield, False )
