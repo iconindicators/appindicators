@@ -1766,37 +1766,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT )
 
-        self.__adjustConfig()
-
-
-    #TODO Start of temporary hack...remove in later release.
-    # Convert lat/long from str to float.
-    # Convert planet/star to upper case.
-    # Convert satellites from list of lists of tuple ( satellite name, satellite number ) to list of satellite numbers.
-    def __adjustConfig( self ):
-        self.latitude = float( self.latitude )
-        self.longitude = float( self.longitude )
-
-        tmp = [ ]
-        for planet in self.planets:
-            tmp.append( planet.upper() )
-        self.planets = tmp
-
-        tmp = [ ]
-        for star in self.stars:
-            tmp.append( star.upper() )
-        self.stars = tmp
-
-        if self.satellites:
-            if isinstance( self.satellites[ 0 ], list ):
-                tmp = [ ]
-                for satelliteInfo in self.satellites:
-                    tmp.append( satelliteInfo[ 1 ] )
-
-                self.satellites = tmp
-
-        self.requestSaveConfig()
-
 
     def saveConfig( self ):
         if self.cometsAddNew:
