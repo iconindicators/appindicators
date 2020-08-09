@@ -931,101 +931,44 @@ class AstroSkyfield( astrobase.AstroBase ):
 # It is possible that comets and minorplanets have different format for the MPC format...so check that.
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
-#TODO Testing how to get comet/mp data into a dataframe/row format for skyfield to then process.
-#
-#TODO Write string as file:
-# https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object/44672691
-        if True: return
-
-        filename = "/home/bernard/Desktop/Soft00Cmt.txt"
-        objectName = '88P/Howell'
-        AstroSkyfield.print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, True )
-        
-        filename = "/home/bernard/Desktop/Soft00Bright.txt"
-        objectName = '(1) Ceres'
-        AstroSkyfield.print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, False )
-        
-        
-#TODO Print comet
-    @staticmethod
-    def print( data, utcNow, timeScale, topos, ephemerisPlanets, filename, objectName, isComet ):
-        import pandas
-        if isComet:
-            with load.open( filename ) as f:
-                objects = mpc.load_comets_dataframe(f)
-
-        else:
-            with load.open( filename ) as f:
-                objects = mpc.load_mpcorb_dataframe(f)
-
-#             for index, row in objects.iterrows():
-#                 print( row['designation'], row['magnitude_H'], row['magnitude_G'])
-
-#         print( filename, len( objects ) )
-#         pandas.set_option("display.max_rows", None, "display.max_columns", None)
-#         print( objects)
-#         if True: return
-
-        # Index by designation for fast lookup.
-        objects = objects.set_index('designation', drop=False)
-
-        row = objects.loc[ objectName ]
-
-        from skyfield.constants import GM_SUN_Pitjeva_2005_km3_s2 as GM_SUN
-        sun, earth = ephemerisPlanets['sun'], ephemerisPlanets['earth']
-
-        if isComet:
-            object = sun + mpc.comet_orbit(row, timeScale, GM_SUN)
-        else:
-            object = sun + mpc.mpcorb_orbit(row, timeScale, GM_SUN)
-            
+#TODO New code taken from magnitude filtering above...
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        alt, az, bodyDistanceToEarth = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ).at( t ).observe( object ).apparent().altaz()
-        ra, dec, bodyDistanceToSun = ( ephemerisPlanets[ AstroSkyfield.__SUN ] ).at( t ).observe( object ).radec()
+        sun = ephemerisPlanets[ "sun" ]
+        earth = ephemerisPlanets[ "earth" ]
+        alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
+        for key in cometsOrMinorPlanets:
+            if key in cometOrMinorPlanetData:
+                data = cometOrMinorPlanetData[ key ]
+                print( data.getName() )
+                print( data.getData() )
 
-#         print( "Earth dist:", bodyDistanceToEarth )
-#         print( "Sun dist:", bodyDistanceToSun )
+                with io.BytesIO( data.getData().encode() ) as f:
+                    if data.getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
+                        dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                        body = sun + mpc.comet_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+#TODO On hold until 
+# https://github.com/skyfielders/python-skyfield/issues/428
+#is resolved.
 
-# beta = acos((rp*rp + rho*rho - rsn*rsn)/ (2*rp*rho));
-# psi_t = exp(log(tan(beta/2.0))*0.63);
-# Psi_1 = exp(-3.33*psi_t);
-# psi_t = exp(log(tan(beta/2.0))*1.22);
-# Psi_2 = exp(-1.87*psi_t);
-# m = H + 5.0*log10(rp*rho) - 2.5*log10((1-G)*Psi_1 + G*Psi_2);
-# 
-# where:
-# 
-# m  = resulting visual magnitude
-# rp  = distance from sun to object
-# rho = distance from earth to object
-# rsn = distance from sun to earth
-        import math
-        sunEarthDistance = float( data[ ( astrobase.AstroBase.BodyType.SUN, "SUN", "DATA_TAG_SUN_EARTH_DISTANCE" ) ] )
-        beta = math.acos( ( bodyDistanceToSun.au * bodyDistanceToSun.au + bodyDistanceToEarth.au * bodyDistanceToEarth.au - sunEarthDistance * sunEarthDistance ) / ( 2 * bodyDistanceToSun.au * bodyDistanceToEarth.au ) )
-        psi_t = math.exp( math.log10( math.tan( beta / 2.0 ) ) * 0.63 )
-        Psi_1 = math.exp( -3.33 * psi_t )
-        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
-        Psi_2 = math.exp( -1.87 * psi_t )
-        visualMagnitude = row['magnitude_H'] + 5.0 * math.log10( bodyDistanceToSun.au * bodyDistanceToEarth.au ) - 2.5 * math.log10( ( 1 - row['magnitude_G'] ) * Psi_1 + row['magnitude_G'] * Psi_2 )
 
-        print( objectName, 
-               "Az:", az.radians, 
-               "Alt:", alt.radians, 
-               "H:", row['magnitude_H'], 
-               "G:", row['magnitude_G'],
-               "Earth dist:", bodyDistanceToEarth.au,
-               "Sun dist:", bodyDistanceToSun.au,
-               "Calculated visual mag:", visualMagnitude )
+                    else:
+#TODO Test!
+                        dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                        body = sun + mpc.mpcorb_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
-#TODO PyEphem:
-# Earth Sun dist: 1.0162590742111206
-# 88P/HOWELL Az: 2.101228713989258 Alt: -0.4133838713169098 g: 11.0 k: 6.0 Earth dist: 1.2511037588119507 Sun dist: 1.55043625831604 Mag: 14.34 Calculated visual mag: 14.343275387194021
-# 1 CERES Az: 4.482479572296143 Alt: 0.264737993478775 H: 3.3399999141693115 G: 0.11999999731779099 Earth dist: 2.1909737586975098 Sun dist: 2.975069284439087 Mag: 8.26 Calculated visual mag: 8.981837878520516
+                ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
+                ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
-# Skyfield
-# Earth Sun dist: 1.01626 au
-# 88P/Howell Az: 2.0943268647452458 Alt: -0.40666790371446493 H: 11.0 G: 6.0 Earth dist: 1.251103143642515 Sun dist: 1.5504361222015481 Calculated visual mag: 11.233534600811838
-# (1) Ceres Az: 4.477734956527358 Alt: 0.2561558290897174 H: 3.34 G: 0.12 Earth dist: 2.190961091971942 Sun dist: 2.9750694296143676 Calculated visual mag: 8.981816736012936
+                apparentMagnitude = astrobase.AstroBase.calculateApparentMagnitude_HG( dataframe.loc[ data.getName() ][ "magnitude_H" ], 
+                                                                                       dataframe.loc[ data.getName() ][ "magnitude_G" ], 
+                                                                                       earthBodyDistance.au, 
+                                                                                       sunBodyDistance.au, 
+                                                                                       earthSunDistance.au )
+
+                if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                    AstroSkyfield.__calculateCommon( utcNow, data, body, bodyType, key )
+#TODO End of new code.
+
 
     @staticmethod
     def __calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, nameTag ):
