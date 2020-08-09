@@ -100,22 +100,30 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
-#TODO Instead of this hack, maybe just have two lots of each (and remove the data source name stuff from astrobase et al).
-    COMET_MINOR_PLANET_URL_SWITCH = "3" if astroBackendName == astroBackendPyEphem else "0"
-
     COMET_CACHE_BASENAME = "comet-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
-    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Cmt.txt"
+    if astroBackendName == astroBackendPyEphem:
+        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+
+    else:
+        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
-    MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Bright.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "CritList.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Distant.txt",
-                               "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft0" + COMET_MINOR_PLANET_URL_SWITCH + "Unusual.txt" ]
+    if astroBackendName == astroBackendPyEphem:
+        MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
+                                   "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
+                                   "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
+                                   "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
+
+    else:
+        MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt",
+                                   "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt",
+                                   "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt",
+                                   "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
