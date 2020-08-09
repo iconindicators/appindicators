@@ -15,29 +15,25 @@ import datetime, ephem
 from skyfield.api import EarthSatellite, load, Topos
 
 
-lat = -33.87
-lon = 151.21
+lat = -33
+lon = 151
 elev = 0
+start = datetime.datetime.utcnow()
+duration = 48
 
-yearStart = 2020
-monthStart = 6
-dayStart = 6
 
-yearEnd = 2020
-monthEnd = 6
-dayEnd = 8
-
+# https://celestrak.com/NORAD/elements/visual.txt
 tle = [ "ISS (ZARYA)",
-        "1 25544U 98067A   20157.17043900  .00001189  00000-0  29319-4 0  9996",
-        "2 25544  51.6455  47.9439 0001982  29.8888  69.4543 15.49422649230155" ]
+        "1 25544U 98067A   20222.12808138  .00000492  00000-0  16982-4 0  9994",
+        "2 25544  51.6456  86.4479 0001149  27.1176 110.9291 15.49152445240229" ]
 
 
 # https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
 # https://stackoverflow.com/questions/25966098/pyephem-next-pass-function-returns-different-result
 def getPassesPyEphem():
     print( "ISS passes calculated from PyEphem:" )
-    now = str( yearStart ) + '/' + str( monthStart  ) + '/' + str( dayStart )
-    while( ephem.date( now ).datetime() < datetime.datetime( yearEnd, monthEnd, dayEnd ) ):
+    now = start
+    while( now < ( start + datetime.timedelta( hours = duration ) ) ):
         observer = ephem.Observer()
         observer.lat = str( lat )
         observer.long = str( lon )
@@ -122,4 +118,4 @@ def getPassesSkyfield():
 
 getPassesPyEphem()
 print()
-getPassesSkyfield()
+# getPassesSkyfield()
