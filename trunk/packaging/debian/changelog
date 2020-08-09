@@ -4,6 +4,7 @@ indicator-lunar (1.0.85-1) xenial; urgency=low
     Setting a value, say 120 (seconds), for the attribute
     X-GNOME-Autostart-Delay in ~/.config/autostart/indicator-lunar.py.desktop,
     start up is delayed sufficiently to avoid this issue.
+  * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 31 May 2020 13:33:01 +1000
 
