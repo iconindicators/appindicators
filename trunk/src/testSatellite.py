@@ -19,7 +19,7 @@ lat = -33
 lon = 151
 elev = 0
 start = datetime.datetime.utcnow()
-duration = 2
+duration = 10
 
 
 # https://celestrak.com/NORAD/elements/visual.txt
@@ -130,10 +130,29 @@ def getPassesSkyfieldNEW():
     t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
     for ti, event in zip( t, events ):
         name = ( "rise above 30°", "culminate", "set below 30°" )[ event ]
-        print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), name )
+        print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), event, name )
+
+    events = ''.join( str( i ) for i in events )
+#     events += "zzz"
+#     events = "aaa" + events 
+    print( events )
+    pattern = "(01+2)"
+
+    import re
+#     print( re.findall( pattern, events ) )
+    print( re.split( pattern, events ) )
 
 
-getPassesPyEphem()
-print()
+# getPassesPyEphem()
+# print()
 # getPassesSkyfield()
-getPassesSkyfieldNEW()
+# getPassesSkyfieldNEW()
+
+
+events = "001012012012"
+pattern = "(01+2)"
+import re
+print( re.findall( pattern, events ) )
+print( re.split( pattern, events ) )
+
+
