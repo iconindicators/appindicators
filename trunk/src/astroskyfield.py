@@ -24,10 +24,6 @@
 # sudo apt install python3-pip
 
 
-#TODO Verify which of the following need to be install for Skyfield to work:
-# sudo pip3 install --upgrade jplephem numpy pandas pytz skyfield
-
-
 # Required by the functions at the end to create the stars/planet ephemerides; uncomment as needed!
 # import gettext
 # gettext.install( "astroskyfield" )
@@ -752,7 +748,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 # https://github.com/skyfielders/python-skyfield/issues/428
 #is resolved.
 
-
                 else:
 #TODO Test!
                     dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
@@ -887,17 +882,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                  ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
 
 
-#TODO According to
-#     https://github.com/skyfielders/python-skyfield/issues/39
-#     https://github.com/skyfielders/python-skyfield/pull/40
-# Skyfield might support star names out of the box.
-    # http://aa.usno.navy.mil/data/docs/mrst.php
-#     http://www.skyandtelescope.com/astronomy-resources/how-many-stars-night-sky-09172014/
-#     http://astronomy.stackexchange.com/questions/13488/where-can-i-find-visualize-planets-stars-moons-etc-positions
-#     http://astronomy.stackexchange.com/questions/14119/open-access-table-of-visible-stars-with-magnitude-coordinates-and-possibly-col
-#     http://astronomy.stackexchange.com/questions/11334/any-freely-available-large-stellar-spectra-catalog
-#     http://simbad.u-strasbg.fr/simbad/sim-id?Ident=BD%2B043561a
-#     http://wwwadd.zah.uni-heidelberg.de/datenbanken/aricns/cnspages/4c01453.htm
+    #TODO According to
+    #     https://github.com/skyfielders/python-skyfield/issues/39
+    #     https://github.com/skyfielders/python-skyfield/pull/40
+    # Skyfield might eventually support star names out of the box.
     @staticmethod
     def __calculateStars( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
         for star in stars:
@@ -910,7 +898,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
-#TODO New code taken from magnitude filtering above...
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         sun = ephemerisPlanets[ "sun" ]
         earth = ephemerisPlanets[ "earth" ]
@@ -929,7 +916,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 # https://github.com/skyfielders/python-skyfield/issues/428
 #is resolved.
 
-
                     else:
 #TODO Test!
                         dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
@@ -946,7 +932,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
                 if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                     AstroSkyfield.__calculateCommon( utcNow, data, body, bodyType, key )
-#TODO End of new code.
 
 
     @staticmethod
@@ -982,14 +967,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
-#TODO rise/set not yet implemented in Skyfield.s
-# https://github.com/skyfielders/python-skyfield/issues/115
-# https://rhodesmill.org/skyfield/earth-satellites.html
-# https://github.com/skyfielders/python-skyfield/issues/115
-# https://github.com/skyfielders/python-skyfield/issues/242
-# https://rhodesmill.org/skyfield/positions.html
+#TODO...
 # https://rhodesmill.org/skyfield/earth-satellites.html
 # https://rhodesmill.org/skyfield/api-satellites.html
+# https://github.com/skyfielders/python-skyfield/issues/327
+# https://github.com/redraw/satellite-passes-api/blob/ffab732e20f6db0503d8e14be3e546ea35a50924/app/tracker.py#L28
     @staticmethod
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         for key in satellites:
