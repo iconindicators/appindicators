@@ -783,7 +783,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \
                          "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas pytz skyfield" )
-
+#TODO Determine if numpy and/or jplephem are needed.
         return message
 
 
