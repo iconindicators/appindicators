@@ -861,8 +861,9 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Need to test this!
             if planet == astrobase.AstroBase.PLANET_MERCURY or \
                planet == astrobase.AstroBase.PLANET_VENUS or \
-               planet == astrobase.AstroBase.PLANET_JUPITER or \
-               planet == astrobase.AstroBase.PLANET_URANUS:
+               planet == astrobase.AstroBase.PLANET_JUPITER:
+#                  or \
+#                planet == astrobase.AstroBase.PLANET_URANUS:
                 apparentMagnitude = planetary_magnitude( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( t ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
 
             else:
@@ -977,11 +978,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             else:
                 neverUp = True # Body is down (and so never up).
-
-#TODO Is this still needed?
-        if bodyType == astrobase.AstroBase.BodyType.SUN:
-            data[ key + ( "DATA_TAG_SUN_EARTH_DISTANCE", ) ] = str( bodyDistance.au )
-            print( "Earth Sun dist:", bodyDistance )
 
         return neverUp
 

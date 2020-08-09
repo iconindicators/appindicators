@@ -342,7 +342,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
                              twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ], self.downloadCountSatellite, self.nextDownloadTimeSatellite,
-                             None )
+                             None, [ ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -380,31 +380,32 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadDataFunction, downloadDataArguments,
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
-        if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            data = self.readCacheBinary( cacheBaseName )
-
-        else:
-            data = { }
-            if nextDownloadTime < utcNow:
-                print( "Downloading:", cacheBaseName )#TODO Debug
-#                 data = downloadDataFunction( *downloadDataArguments ) #TODO Testing.
-                d = "    CK15A020  2015 08  1.8353  5.341055  1.000000  208.8369  258.5042  109.1696            10.5  4.0  C/2015 A2 (PANSTARRS)                                    MPC 93587"
-                oe = orbitalelement.OE( "C/2015 A2 (PANSTARRS)", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
-                data[ "C/2015 A2 (PANSTARRS)" ] = oe
-                downloadCount += 1
-                if data:
-                    if magnitudeFilterFunction:
-                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
-
-                    self.writeCacheBinary( cacheBaseName, data )
-                    downloadCount = 0
-                    cacheDateTime = self.getCacheDateTime( cacheBaseName )
-                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-
-                else:
-                    nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
-
-        return data, cacheDateTime, downloadCount, nextDownloadTime
+#         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
+#             data = self.readCacheBinary( cacheBaseName )
+# 
+#         else:
+#             data = { }
+#             if nextDownloadTime < utcNow:
+#                 print( "Downloading:", cacheBaseName )#TODO Debug
+# #                 data = downloadDataFunction( *downloadDataArguments ) #TODO Testing.
+#                 d = "    CK15A020  2015 08  1.8353  5.341055  1.000000  208.8369  258.5042  109.1696            10.5  4.0  C/2015 A2 (PANSTARRS)                                    MPC 93587"
+#                 oe = orbitalelement.OE( "C/2015 A2 (PANSTARRS)", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
+#                 data[ "C/2015 A2 (PANSTARRS)" ] = oe
+#                 downloadCount += 1
+#                 if data:
+#                     if magnitudeFilterFunction:
+#                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
+# 
+#                     self.writeCacheBinary( cacheBaseName, data )
+#                     downloadCount = 0
+#                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
+#                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+# 
+#                 else:
+#                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
+# 
+#         return data, cacheDateTime, downloadCount, nextDownloadTime
+        return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing so that no download/caching occurs.
 
 
 #TODO Remove
