@@ -19,7 +19,7 @@ lat = -33
 lon = 151
 elev = 0
 start = datetime.datetime.utcnow()
-duration = 48
+duration = 2
 
 
 # https://celestrak.com/NORAD/elements/visual.txt
@@ -33,7 +33,7 @@ tle = [ "ISS (ZARYA)",
 def getPassesPyEphem():
     print( "ISS passes calculated from PyEphem:" )
     now = start
-    while( now < ( start + datetime.timedelta( hours = duration ) ) ):
+    while( now < ( start + datetime.timedelta( days = 2 ) ) ):
         observer = ephem.Observer()
         observer.lat = str( lat )
         observer.long = str( lon )
@@ -65,6 +65,10 @@ def getPassesSkyfieldORIGINAL():
             print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
 
 
+# https://rhodesmill.org/skyfield/earth-satellites.html
+# https://rhodesmill.org/skyfield/api-satellites.html
+# https://github.com/skyfielders/python-skyfield/issues/327
+# https://github.com/redraw/satellite-passes-api/blob/ffab732e20f6db0503d8e14be3e546ea35a50924/app/tracker.py#L28
 def getPassesSkyfield():
     print( "ISS passes calculated from Skyfield:" )
     observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
@@ -116,6 +120,20 @@ def getPassesSkyfield():
 #     ephemerisPlanets = load( "planets.bsp" )
 
 
+def getPassesSkyfieldNEW():
+    observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
+    ts = load.timescale()
+    t0 = ts.utc( start.year, start.month, start.day )
+    end = start + datetime.timedelta( days = duration )
+    t1 = ts.utc( end.year, end.month, end.day )
+    satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
+    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
+    for ti, event in zip( t, events ):
+        name = ( "rise above 30°", "culminate", "set below 30°" )[ event ]
+        print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), name )
+
+
 getPassesPyEphem()
 print()
 # getPassesSkyfield()
+getPassesSkyfieldNEW()
