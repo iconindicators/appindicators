@@ -907,28 +907,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                      Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
 
 
-#TODO Not yet implemented in Skyfield.
-# https://rhodesmill.org/skyfield/kepler-orbits.html
-# https://github.com/skyfielders/python-skyfield/blob/master/skyfield/data/mpc.py
-# https://github.com/skyfielders/python-skyfield/issues/196#issuecomment-418139819
-# https://github.com/skyfielders/python-skyfield/issues/11
-# https://github.com/skyfielders/python-skyfield/issues/196
-# https://github.com/skyfielders/python-skyfield/pull/202
-# https://github.com/skyfielders/python-skyfield/issues/305
-# The MPC might provide comet / minor planet data in a different format which Skyfield can read.
-#
-# Maybe need to load the data (dict) by pretending it is a file:
-# https://stackoverflow.com/questions/44672524/how-to-create-in-memory-file-object/44672691
-#
-# Need to convert to MPC format for skyfield:
-#     CJ95O010  1997 03 29.6897  0.911189  0.994936  130.5969  283.3678   88.9869  20200711  -2.0  4.0  C/1995 O1 (Hale-Bopp)                                    MPC106342
-#
-# from XEphem format:
-# C/1995 O1 (Hale-Bopp),e,88.9869,283.3678,130.5969,179.9329,0.0004084,0.99493595,0.0000,03/29.6897/1997,2000,g -2.0,4.0
-#
-# http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId468501
-#
-# It is possible that comets and minorplanets have different format for the MPC format...so check that.
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
 #TODO New code taken from magnitude filtering above...
@@ -1000,6 +978,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             else:
                 neverUp = True # Body is down (and so never up).
 
+#TODO Is this still needed?
         if bodyType == astrobase.AstroBase.BodyType.SUN:
             data[ key + ( "DATA_TAG_SUN_EARTH_DISTANCE", ) ] = str( bodyDistance.au )
             print( "Earth Sun dist:", bodyDistance )
