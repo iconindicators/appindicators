@@ -29,6 +29,58 @@
 # but filter to the user specified magnitude when display/calculating.
 
 
+# Skyfield
+# Downloading: comet-oe-
+# 876 171
+# Downloading: minorplanet-oe-bright-
+# 54 52
+# Downloading: minorplanet-oe-critical-
+# 650 0
+# Downloading: minorplanet-oe-distant-
+#
+#
+# PyEphem
+# Downloading: comet-oe-
+# 876 12
+# Downloading: minorplanet-oe-bright-
+# 54 54
+# Downloading: minorplanet-oe-critical-
+# 650 0
+# Downloading: minorplanet-oe-distant-
+# 3747 2
+# Downloading: minorplanet-oe-unusual-
+# 18169 75
+
+# Pyephem comets
+# 11P/Tempel-Swift-LINEAR 11.44
+# 162P/Siding Spring 14.67
+# 289P/Blanpain 9.54
+# 2P/Encke 11.27
+# 58P/Jackson-Neujmin 12.36
+# 88P/Howell 13.96
+# C/2017 T2 (PANSTARRS) 10.05
+# C/2019 N1 (ATLAS) 13.26
+# C/2019 U6 (Lemmon) 11.81
+# C/2020 F3 (NEOWISE) 8.05
+# C/2020 F8 (SWAN) 14.04
+# C/2020 K8 (Catalina-ATLAS) 13.53
+#
+#
+# Skyfield
+# 11P/Tempel-Swift-LINEAR 9.138597541223742
+# 162P/Siding Spring 12.359208827959362
+# 289P/Blanpain 6.149353435065221
+# 2P/Encke 10.288157039034054
+# 58P/Jackson-Neujmin 6.122858878936106
+# 88P/Howell 11.208382824947623
+# C/2017 T2 (PANSTARRS) 7.409583284621313
+# C/2019 N1 (ATLAS) 10.37274905266074
+# C/2019 U6 (Lemmon) 10.523161158282115
+# C/2020 F3 (NEOWISE) 7.114661230824944
+# C/2020 F8 (SWAN) 11.844116330870833
+# C/2020 K8 (Catalina-ATLAS) 14.282533447242235
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -380,32 +432,40 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadDataFunction, downloadDataArguments,
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
-#         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-#             data = self.readCacheBinary( cacheBaseName )
-# 
-#         else:
-#             data = { }
-#             if nextDownloadTime < utcNow:
-#                 print( "Downloading:", cacheBaseName )#TODO Debug
-# #                 data = downloadDataFunction( *downloadDataArguments ) #TODO Testing.
+
+
+#TODO Testing        
+        if cacheBaseName != "comet-oe-":
+            return { }, cacheDateTime, downloadCount, nextDownloadTime         
+
+
+        if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
+            data = self.readCacheBinary( cacheBaseName )
+ 
+        else:
+            data = { }
+            if nextDownloadTime < utcNow:
+                print( "Downloading:", cacheBaseName )#TODO Debug
+                data = downloadDataFunction( *downloadDataArguments )
+#TODO Testing                
 #                 d = "    CK15A020  2015 08  1.8353  5.341055  1.000000  208.8369  258.5042  109.1696            10.5  4.0  C/2015 A2 (PANSTARRS)                                    MPC 93587"
 #                 oe = orbitalelement.OE( "C/2015 A2 (PANSTARRS)", d, orbitalelement.OE.DataType.SKYFIELD_COMET )
 #                 data[ "C/2015 A2 (PANSTARRS)" ] = oe
-#                 downloadCount += 1
-#                 if data:
-#                     if magnitudeFilterFunction:
-#                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
-# 
-#                     self.writeCacheBinary( cacheBaseName, data )
-#                     downloadCount = 0
-#                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
-#                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-# 
-#                 else:
-#                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
-# 
-#         return data, cacheDateTime, downloadCount, nextDownloadTime
-        return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing so that no download/caching occurs.
+                downloadCount += 1
+                if data:
+                    if magnitudeFilterFunction:
+                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
+ 
+                    self.writeCacheBinary( cacheBaseName, data )
+                    downloadCount = 0
+                    cacheDateTime = self.getCacheDateTime( cacheBaseName )
+                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+ 
+                else:
+                    nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
+ 
+        return data, cacheDateTime, downloadCount, nextDownloadTime
+#         return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing so that no download/caching occurs.
 
 
 #TODO Remove

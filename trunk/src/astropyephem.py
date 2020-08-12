@@ -483,6 +483,8 @@ class AstroPyEphem( astrobase.AstroBase ):
             if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= maximumMagnitude:
                 results[ key ] = orbitalElementData[ key ]
 
+#TODO Testing
+        print( len( orbitalElementData ), len( results ) )
         return results
 
 
@@ -583,6 +585,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
                 if not bad and body.mag <= magnitudeMaximum:
                     AstroPyEphem.__calculateCommon( ephemNow, data, body, bodyType, key )
+                    print( cometOrMinorPlanetData[ key ].getName(), body.mag )#TODO Testing
 
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
