@@ -726,7 +726,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getOrbitalElementsLessThanMagnitude( orbitalElementData, maximumMagnitude, utcNow, latitude, longitude, elevation ):
+    def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
         timeScale = load.timescale( builtin = True )
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
@@ -736,15 +736,14 @@ class AstroSkyfield( astrobase.AstroBase ):
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         results = { }
         for key in orbitalElementData:
-            data = orbitalElementData[ key ]
 #TODO Testing
-#             print( data.getName() )
-#             print( data.getData() )
+#             print( orbitalElementData[ key ].getName() )
+#             print( orbitalElementData[ key ].getData() )
 #             print( utcNow )
-            with io.BytesIO( data.getData().encode() ) as f:
-                if data.getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
+            with io.BytesIO( orbitalElementData[ key ].getData().encode() ) as f:
+                if orbitalElementData[ key ].getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
                     dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-                    body = sun + mpc.comet_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+                    body = sun + mpc.comet_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 #TODO On hold until 
 # https://github.com/skyfielders/python-skyfield/issues/428
 #is resolved.
@@ -753,20 +752,20 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Test!
                     try:#TODO Testing
                         dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
-                        body = sun + mpc.mpcorb_orbit( dataframe.loc[ data.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+                        body = sun + mpc.mpcorb_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
                     except Exception as e: #TODO Testing
                         print( e )    #TODO Testing
 
             ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
-            apparentMagnitude = astrobase.AstroBase.calculateApparentMagnitude_HG( dataframe.loc[ data.getName() ][ "magnitude_H" ], 
-                                                                                   dataframe.loc[ data.getName() ][ "magnitude_G" ], 
+            apparentMagnitude = astrobase.AstroBase.calculateApparentMagnitude_HG( dataframe.loc[ orbitalElementData[ key ].getName() ][ "magnitude_H" ], 
+                                                                                   dataframe.loc[ orbitalElementData[ key ].getName() ][ "magnitude_G" ], 
                                                                                    earthBodyDistance.au, 
                                                                                    sunBodyDistance.au, 
                                                                                    earthSunDistance.au )
 
-            if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= maximumMagnitude:
+            if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ key ] = orbitalElementData[ key ]
 
         print( len( orbitalElementData ), len( results ) )
@@ -908,15 +907,14 @@ class AstroSkyfield( astrobase.AstroBase ):
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         for key in cometsOrMinorPlanets:
             if key in cometOrMinorPlanetData:
-                orbitalElementData = cometOrMinorPlanetData[ key ]
 #TODO Testing
-#                 print( orbitalElementData.getName() )
-#                 print( orbitalElementData.getData() )
+#                 print( cometOrMinorPlanetData[ key ].getName() )
+#                 print( cometOrMinorPlanetData[ key ].getData() )
 
-                with io.BytesIO( orbitalElementData.getData().encode() ) as f:
-                    if orbitalElementData.getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
+                with io.BytesIO( cometOrMinorPlanetData[ key ].getData().encode() ) as f:
+                    if cometOrMinorPlanetData[ key ].getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
                         dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-                        body = sun + mpc.comet_orbit( dataframe.loc[ orbitalElementData.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+                        body = sun + mpc.comet_orbit( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 #TODO On hold until 
 # https://github.com/skyfielders/python-skyfield/issues/428
 #is resolved.
@@ -924,13 +922,13 @@ class AstroSkyfield( astrobase.AstroBase ):
                     else:
 #TODO Test!
                         dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
-                        body = sun + mpc.mpcorb_orbit( dataframe.loc[ orbitalElementData.getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+                        body = sun + mpc.mpcorb_orbit( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
                 ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
                 ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
-                apparentMagnitude = astrobase.AstroBase.calculateApparentMagnitude_HG( dataframe.loc[ orbitalElementData.getName() ][ "magnitude_H" ], 
-                                                                                       dataframe.loc[ orbitalElementData.getName() ][ "magnitude_G" ], 
+                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_H" ], 
+                                                                                       dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_G" ], 
                                                                                        earthBodyDistance.au, 
                                                                                        sunBodyDistance.au, 
                                                                                        earthSunDistance.au )
