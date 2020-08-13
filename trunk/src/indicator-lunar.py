@@ -106,7 +106,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     else:
-        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
+#         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
+        COMET_DATA_URL = "file:///home/bernard/Desktop/Soft00Cmt.txt"
+
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
@@ -400,7 +402,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
+                        now = datetime.datetime.utcnow()#TODO Testing
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
+                        print( cacheBaseName, "magnitude filter:", str( datetime.datetime.utcnow() - now ) )#TODO Testing
  
                     self.writeCacheBinary( cacheBaseName, data )
                     downloadCount = 0

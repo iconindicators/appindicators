@@ -759,11 +759,11 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
-            apparentMagnitude = astrobase.AstroBase.calculateApparentMagnitude_HG( dataframe.loc[ orbitalElementData[ key ].getName() ][ "magnitude_H" ], 
-                                                                                   dataframe.loc[ orbitalElementData[ key ].getName() ][ "magnitude_G" ], 
-                                                                                   earthBodyDistance.au, 
-                                                                                   sunBodyDistance.au, 
-                                                                                   earthSunDistance.au )
+            apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( dataframe.loc[ orbitalElementData[ key ].getName() ][ "magnitude_H" ], 
+                                                                             dataframe.loc[ orbitalElementData[ key ].getName() ][ "magnitude_G" ], 
+                                                                             earthBodyDistance.au, 
+                                                                             sunBodyDistance.au, 
+                                                                             earthSunDistance.au )
 
             if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ key ] = orbitalElementData[ key ]
