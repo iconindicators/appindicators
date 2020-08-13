@@ -107,7 +107,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     else:
 #         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
-        COMET_DATA_URL = "file:///home/bernard/Desktop/Soft00Cmt.txt"
+        COMET_DATA_URL = "file:///home/bernard/Desktop/Soft00Cmt.txt" #TODO Testing
 
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
