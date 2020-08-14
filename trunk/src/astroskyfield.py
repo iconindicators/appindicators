@@ -896,24 +896,16 @@ class AstroSkyfield( astrobase.AstroBase ):
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         for key in cometsOrMinorPlanets:
             if key in cometOrMinorPlanetData:
-#TODO Testing
-#                 print( cometOrMinorPlanetData[ key ].getName() )
-#                 print( cometOrMinorPlanetData[ key ].getData() )
-
                 with io.BytesIO( cometOrMinorPlanetData[ key ].getData().encode() ) as f:
                     if cometOrMinorPlanetData[ key ].getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
                         dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                         body = sun + mpc.comet_orbit( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-#TODO On hold until 
-# https://github.com/skyfielders/python-skyfield/issues/428
-#is resolved.
 
                     else:
-#TODO Test!
                         dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                         body = sun + mpc.mpcorb_orbit( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
-                ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
+                ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
                 ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
                 apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_H" ], 
