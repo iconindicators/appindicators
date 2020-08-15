@@ -1426,7 +1426,7 @@ msgstr ""
 "Библиотека Skyfield не найдена. Установите с помощью:\n"
 "\n"
 "sudo apt-get install -y python3-pip\n"
-"sudo pip3 install --upgrade pip pandas pytz skyfield"
+"sudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield"
 
 #: indicator-lunar.py:152
 msgid "Rise Time: "
