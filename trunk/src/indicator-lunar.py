@@ -47,7 +47,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -386,10 +386,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
 
-#TODO Testing        
-        if cacheBaseName != "comet-oe-":
-            return { }, cacheDateTime, downloadCount, nextDownloadTime         
-
+#TODO Testing
+        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
+            return { }, cacheDateTime, downloadCount, nextDownloadTime
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )

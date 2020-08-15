@@ -44,7 +44,6 @@ import astrobase, io, locale, orbitalelement
 
 class AstroSkyfield( astrobase.AstroBase ):
 
-    # Ephemerides
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
 
@@ -770,8 +769,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         message = None
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas pytz skyfield" )
-#TODO Determine if numpy and/or jplephem are needed.
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" )
         return message
 
 
@@ -846,7 +844,6 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculatePlanets( utcNow, data, timeScale, topos, ephemerisPlanets, planets, magnitudeMaximum ):
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day )
         for planet in planets:
-#TODO Need to test this!
             if planet == astrobase.AstroBase.PLANET_MERCURY or \
                planet == astrobase.AstroBase.PLANET_VENUS or \
                planet == astrobase.AstroBase.PLANET_JUPITER or \
@@ -854,7 +851,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 apparentMagnitude = planetary_magnitude( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( t ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
 
             else:
-                #TODO Hard coded for now until Skyfield can provide...
+                #TODO Hard coded for now until Skyfield can provide calculated apparent magnitude...
                 # https://github.com/skyfielders/python-skyfield/issues/210
                 # https://rhodesmill.org/skyfield/api.html#skyfield.magnitudelib.planetary_magnitude
                 if planet == astrobase.AstroBase.PLANET_MARS:
@@ -909,10 +906,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                 ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
                 apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_H" ], 
-                                                                                       dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_G" ], 
-                                                                                       earthBodyDistance.au, 
-                                                                                       sunBodyDistance.au, 
-                                                                                       earthSunDistance.au )
+                                                                                 dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_G" ], 
+                                                                                 earthBodyDistance.au, 
+                                                                                 sunBodyDistance.au, 
+                                                                                 earthSunDistance.au )
 
                 if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                     AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
@@ -1018,7 +1015,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     #
     # The ephemeris date range is from the date of creation plus one year.
     #
-    # Prior to using jplephem, download a .bsp and use spkmerge to create a smaller subset.
+    # Alternate method to create the ephemeris, download a .bsp and use spkmerge to create a smaller subset.
     # Refer to https://github.com/skyfielders/python-skyfield/issues/123
     # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
