@@ -724,6 +724,31 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                       AstroSkyfield._city_data.get( city )[ 2 ]
 
 
+#TODO Testing...
+    @staticmethod
+    def __zzz( data, ts, gm_km3_s2 ):
+        e = data[ 41 : 49 + 1 ]
+        a = data[ 30 : 39 + 1 ] / ( 1.0 - e )
+        p = a * ( 1.0 - e * e )
+        t_perihelion = ts.tt( data[ 14 : 18 + 1 ], data[ 19 : 21 + 1 ], data[ 22 : 29 + 1 ] )
+
+        comet = _KeplerOrbit._from_mean_anomaly(
+            p,
+            e,
+            data[ 71 : 79 + 1 ],
+            data[ 61 : 69 + 1 ],
+            data[ 51 : 59 + 1 ],
+            0.0,
+            t_perihelion,
+            gm_km3_s2,
+            10,
+            data[ 102 : 158 + 1 ],
+        )
+
+        comet._rotation = inertial_frames[ "ECLIPJ2000" ].T
+        return comet
+
+
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
         timeScale = load.timescale( builtin = True )
