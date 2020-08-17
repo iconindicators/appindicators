@@ -1034,12 +1034,15 @@ class AstroSkyfield( astrobase.AstroBase ):
                 for ti, event in zip( t, events ):
                     if event == 0: # Rise.
                         rise = ti
-            
+
                     elif event == 1: # Culminate (only the last culmination is taken if there happens to be more than one).
                         culminate = ti
-            
+
                     else: # Set.
-                        if rise is not None and culminate is not None and satellite.at( culminate ).is_sunlit( ephemerisPlanets ) and almanac.dark_twilight_day( ephemerisPlanets, topos )( culminate ) < 3:
+                        if rise is not None and \
+                           culminate is not None and \
+                           satellite.at( culminate ).is_sunlit( ephemerisPlanets ) and \
+                           almanac.dark_twilight_day( ephemerisPlanets, topos )( culminate ) < 3:
                             print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
                             rise = None
                             culminate = None
