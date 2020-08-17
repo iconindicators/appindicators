@@ -741,6 +741,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     body = sun + mpc.comet_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
                 else:
+                    #TODO Waiting on https://github.com/skyfielders/python-skyfield/issues/432
                     dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                     body = sun + mpc.mpcorb_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
  
