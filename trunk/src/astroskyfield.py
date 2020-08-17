@@ -753,6 +753,9 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                                              sunBodyDistance.au, 
                                                                              earthSunDistance.au )
 
+            if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                results[ key ] = orbitalElementData[ key ]
+
         print( len( orbitalElementData ), len( results ) )#TODO Testing
         return results
 
