@@ -57,17 +57,16 @@ def getPassesPyEphem():
 # https://rhodesmill.org/skyfield/earth-satellites.html
 # https://rhodesmill.org/skyfield/api-satellites.html
 # https://github.com/skyfielders/python-skyfield/issues/327
-# https://github.com/redraw/satellite-passes-api/blob/ffab732e20f6db0503d8e14be3e546ea35a50924/app/tracker.py#L28
 def getPassesSkyfield():
     print( "ISS passes calculated from Skyfield:" )
     ephemeris = load( "de421.bsp" )
     observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
     ts = load.timescale()
-    t0 = ts.utc( start.year, start.month, start.day )
+    t0 = ts.utc( start.year, start.month, start.day, start.hour, start.minute )
     end = start + datetime.timedelta( days = duration )
-    t1 = ts.utc( end.year, end.month, end.day )
+    t1 = ts.utc( end.year, end.month, end.day, end.hour, end.minute )
     satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
-    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
+    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 10.0 )
     rise = None
     culminate = None
     for ti, event in zip( t, events ):

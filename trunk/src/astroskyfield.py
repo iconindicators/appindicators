@@ -31,7 +31,7 @@
 
 try:
     from skyfield import almanac, constants
-    from skyfield.api import load, Star, Topos
+    from skyfield.api import EarthSatellite, load, Star, Topos
     from skyfield.data import hipparcos, mpc
     from skyfield.magnitudelib import planetary_magnitude
     available = True
@@ -39,7 +39,7 @@ try:
 except ImportError:
     available = False
 
-import astrobase, io, locale, orbitalelement
+import astrobase, datetime, io, locale, orbitalelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -1013,16 +1013,37 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
-#TODO...
-# https://rhodesmill.org/skyfield/earth-satellites.html
-# https://rhodesmill.org/skyfield/api-satellites.html
-# https://github.com/skyfielders/python-skyfield/issues/327
-# https://github.com/redraw/satellite-passes-api/blob/ffab732e20f6db0503d8e14be3e546ea35a50924/app/tracker.py#L28
+    # https://spotthestation.nasa.gov/sightings/index.cfm
+    # https://www.heavens-above.com/PassSummary.aspx
+    # https://www.n2yo.com/passes/?s=25544
+    # https://www.satflare.com/track.asp?q=iss
+    # https://uphere.space/
+    # https://www.amsat.org/track/
+    # https://www.calsky.com/cs.cgi?cha=12&sec=4
     @staticmethod
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         for key in satellites:
             if key in satelliteData:
-                pass
+                t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+                end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
+                t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
+                satellite = EarthSatellite( satelliteData[ key ].getLine1(), satelliteData[ key ].getLine2(), satelliteData[ key ].getName(), timeScale )
+                t, events = satellite.find_events( topos, t0, t1, altitude_degrees = 30.0 )
+                rise = None
+                culminate = None
+                for ti, event in zip( t, events ):
+                    if event == 0: # Rise.
+                        rise = ti
+            
+                    elif event == 1: # Culminate (only the last culmination is taken if there happens to be more than one).
+                        culminate = ti
+            
+                    else: # Set.
+                        if rise is not None and culminate is not None and satellite.at( culminate ).is_sunlit( ephemerisPlanets ) and almanac.dark_twilight_day( ephemerisPlanets, topos )( culminate ) < 3:
+                            print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+                            rise = None
+                            culminate = None
+#TODO This gets the next visible pass...as per AstroPyEphem, take into account a satellite currently in transit.
 
 
     # Returns the latitude and longitude of the observer (or topos), in radians.
