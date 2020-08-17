@@ -763,7 +763,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO Test for getting comet and minor planet computations without using a dataframe.
 # Unfortunately the dataframe makes little difference.  The time is consumed deeper within Skyfield.
-    @staticmethod
 #     def getOrbitalElementsLessThanMagnitudeWithoutDataframe( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
 #         timeScale = load.timescale( builtin = True )
 #         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
@@ -795,8 +794,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 # 
 #         return results
 
-
-    #TODO Used to test without using a dataframe...needs to be pasted into skyfield's mpc.py
+#TODO Used to test without using a dataframe...needs to be pasted into skyfield's mpc.py
 #     def comet_orbit_without_dataframe( data, ts, gm_km3_s2 ):
 #         e = float( data[ 41 : 49 + 1 ] )
 #         if e == 1.0:
