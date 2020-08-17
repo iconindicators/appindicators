@@ -13,6 +13,7 @@
 
 import datetime, ephem
 from skyfield.api import EarthSatellite, load, Topos
+from skyfield import almanac
 
 
 lat = -33
@@ -47,22 +48,10 @@ def getPassesPyEphem():
         sun = ephem.Sun()
         sun.compute( observer )
         sat.compute( observer )
-        visible = sat.eclipsed is False and ephem.degrees( '-18' ) < sun.alt < ephem.degrees( '-6' )
-        print( tr.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), visible )
+        if sat.eclipsed is False and ephem.degrees( '-18' ) < sun.alt < ephem.degrees( '-6' ):
+            print( tr.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+
         now = observer.date.datetime() + datetime.timedelta( minutes = 90 )
-
-
-def getPassesSkyfieldORIGINAL():
-    print( "ISS passes calculated from Skyfield:" )
-    observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
-    ts = load.timescale()
-    satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
-    t0 = ts.utc( yearStart, monthStart, dayStart )
-    t1 = ts.utc( yearEnd, monthEnd, dayEnd )
-    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
-    for ti, event in zip( t, events ):
-        if event == 0:
-            print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
 
 
 # https://rhodesmill.org/skyfield/earth-satellites.html
@@ -71,56 +60,6 @@ def getPassesSkyfieldORIGINAL():
 # https://github.com/redraw/satellite-passes-api/blob/ffab732e20f6db0503d8e14be3e546ea35a50924/app/tracker.py#L28
 def getPassesSkyfield():
     print( "ISS passes calculated from Skyfield:" )
-    observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
-    ts = load.timescale()
-    satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
-    t0 = ts.utc( yearStart, monthStart, dayStart )
-    t1 = ts.utc( yearEnd, monthEnd, dayEnd )
-    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
-    passes = [ ]
-    rise = False
-    set = False
-    culminate = False
-
-    print( events )
-    events = ''.join( str( i ) for i in events )
-    events += "zzz"
-    events = "aaa" + events 
-    print( events )
-    pattern = "(01+2)"
-
-    import re
-#     print( re.findall( pattern, events ) )
-    print( re.split( pattern, events ) )
-
-#     print( ''.join( str( i ) for i in events ) )
-#     i = 0
-#     while i < len( events ):
-#         if events[ i ] == 0: # Rise
-#             pass
-# 
-#         elif events[ i ] == 1: # Culminate
-#             pass
-# 
-#         else: # Set
-#             pass
-# 
-#         print( events[ i ] )
-#         i += 1
-    
-    
-#     for ti, event in zip( t, events ):
-#         if event == 0:
-#             print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), "False" )
-
-
-#     timeScale = load.timescale( builtin = True )
-#     two_hours = timeScale.utc(2014, 1, 20, 0, range(0, 120, 20))
-#     topos = Topos( latitude_degrees = lat, longitude_degrees = lon, elevation_m = elev )
-#     ephemerisPlanets = load( "planets.bsp" )
-
-
-def getPassesSkyfieldNEW():
     ephemeris = load( "de421.bsp" )
     observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
     ts = load.timescale()
@@ -139,13 +78,12 @@ def getPassesSkyfieldNEW():
             culminate = ti
 
         else: # Set
-            if rise is not None and culminate is not None and satellite.at( culminate ).is_sunlit( ephemeris ):
+            if rise is not None and culminate is not None and satellite.at( culminate ).is_sunlit( ephemeris ) and almanac.dark_twilight_day( ephemeris, observer )( culminate ) < 3:
                 print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
                 rise = None
                 culminate = None
 
 
-# getPassesPyEphem()
-# print()
-# getPassesSkyfield()
-getPassesSkyfieldNEW()
+getPassesPyEphem()
+print()
+getPassesSkyfield()
