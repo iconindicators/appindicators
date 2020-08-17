@@ -24,8 +24,8 @@ duration = 10
 
 # https://celestrak.com/NORAD/elements/visual.txt
 tle = [ "ISS (ZARYA)",
-        "1 25544U 98067A   20222.12808138  .00000492  00000-0  16982-4 0  9994",
-        "2 25544  51.6456  86.4479 0001149  27.1176 110.9291 15.49152445240229" ]
+        "1 25544U 98067A   20230.44286670  .00000191  00000-0  11560-4 0  9992",
+        "2 25544  51.6456  45.3129 0001685  35.7517  64.2421 15.49165392241518" ]
 
 
 # https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
@@ -121,6 +121,7 @@ def getPassesSkyfield():
 
 
 def getPassesSkyfieldNEW():
+    ephemeris = load( "de421.bsp" )
     observer = Topos( str( abs( lat ) ) + ( ' N' if lat >= 0 else ' S' ), str( abs( lon ) ) + ( ' E' if lon >= 0 else ' W' ) )
     ts = load.timescale()
     t0 = ts.utc( start.year, start.month, start.day )
@@ -128,31 +129,23 @@ def getPassesSkyfieldNEW():
     t1 = ts.utc( end.year, end.month, end.day )
     satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
     t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30.0 )
+    rise = None
+    culminate = None
     for ti, event in zip( t, events ):
-        name = ( "rise above 30°", "culminate", "set below 30°" )[ event ]
-        print( ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), event, name )
+        if event == 0: # Rise
+            rise = ti
 
-    events = ''.join( str( i ) for i in events )
-#     events += "zzz"
-#     events = "aaa" + events 
-    print( events )
-    pattern = "(01+2)"
+        elif event == 1: # Culminate (only the last culmination is taken if there happens to be more than one)
+            culminate = ti
 
-    import re
-#     print( re.findall( pattern, events ) )
-    print( re.split( pattern, events ) )
+        else: # Set
+            if rise is not None and culminate is not None and satellite.at( culminate ).is_sunlit( ephemeris ):
+                print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+                rise = None
+                culminate = None
 
 
 # getPassesPyEphem()
 # print()
 # getPassesSkyfield()
-# getPassesSkyfieldNEW()
-
-
-events = "001012012012"
-pattern = "(01+2)"
-import re
-print( re.findall( pattern, events ) )
-print( re.split( pattern, events ) )
-
-
+getPassesSkyfieldNEW()
