@@ -952,6 +952,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+#TODO See if some of this code can be put into a function to be shared with the magnitude filter function.
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         sun = ephemerisPlanets[ "sun" ]
         earth = ephemerisPlanets[ "earth" ]
