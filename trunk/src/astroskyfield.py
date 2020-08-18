@@ -1043,10 +1043,21 @@ class AstroSkyfield( astrobase.AstroBase ):
                            culminate is not None and \
                            satellite.at( culminate ).is_sunlit( ephemerisPlanets ) and \
                            almanac.dark_twilight_day( ephemerisPlanets, topos )( culminate ) < 3:
-                            print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
-                            rise = None
-                            culminate = None
+                            # Satellite is yet to rise or is in transit...
+                            x = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
+                            print( type( x ) )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( 123 ) #TODO Need to figure out rise Az: https://rhodesmill.org/skyfield/earth-satellites.html#generating-a-satellite-position
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( 456 ) #TODO Need to figure out set Az: https://rhodesmill.org/skyfield/earth-satellites.html#generating-a-satellite-position
+                            break
+#                             print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+#                             rise = None
+#                             culminate = None
+
+
 #TODO This gets the next visible pass...as per AstroPyEphem, take into account a satellite currently in transit.
+#TODO Somehow test for circumpolar satellites as per AstroPyEphem.
 
 
     # Returns the latitude and longitude of the observer (or topos), in radians.
