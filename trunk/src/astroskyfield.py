@@ -1022,13 +1022,13 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://www.calsky.com/cs.cgi?cha=12&sec=4
     @staticmethod
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
-        for key in satellites:
-            if key in satelliteData:
+        for satellite in satellites:
+            if satellite in satelliteData:
                 t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
                 end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
                 t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
-                satellite = EarthSatellite( satelliteData[ key ].getLine1(), satelliteData[ key ].getLine2(), satelliteData[ key ].getName(), timeScale )
-                t, events = satellite.find_events( topos, t0, t1, altitude_degrees = 30.0 )
+                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
+                t, events = earthSatellite.find_events( topos, t0, t1, altitude_degrees = 30.0 )
                 rise = None
                 culminate = None
                 for ti, event in zip( t, events ):
@@ -1041,11 +1041,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                     else: # Set.
                         if rise is not None and \
                            culminate is not None and \
-                           satellite.at( culminate ).is_sunlit( ephemerisPlanets ) and \
+                           earthSatellite.at( culminate ).is_sunlit( ephemerisPlanets ) and \
                            almanac.dark_twilight_day( ephemerisPlanets, topos )( culminate ) < 3:
                             # Satellite is yet to rise or is in transit...
-                            x = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
-                            print( type( x ) )
+                            key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( 123 ) #TODO Need to figure out rise Az: https://rhodesmill.org/skyfield/earth-satellites.html#generating-a-satellite-position
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
