@@ -626,19 +626,19 @@ class AstroPyEphem( astrobase.AstroBase ):
     #   http://in-the-sky.org
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
-        for key in satellites:
-            if key in satelliteData:
-                tle = satelliteData[ key ]
-                key = ( astrobase.AstroBase.BodyType.SATELLITE, key )
+        for satellite in satellites:
+            if satellite in satelliteData:
+                tle = satelliteData[ satellite ]
                 currentDateTime = ephemNow
                 endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
                 while currentDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, currentDateTime )
-                    satellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-                    satellite.compute( city )
+                    earthSatellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+                    earthSatellite.compute( city )
+                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
-                        nextPass = AstroPyEphem.__calculateNextPass( city, satellite )
-                        if AstroPyEphem.__isSatellitePassIsValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], satellite ):
+                        nextPass = AstroPyEphem.__calculateNextPass( city, earthSatellite )
+                        if AstroPyEphem.__isSatellitePassIsValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
                             if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
                                 setTime = nextPass[ 4 ]
                                 nextPass = AstroPyEphem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle )
@@ -657,9 +657,9 @@ class AstroPyEphem( astrobase.AstroBase ):
                             currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Look for the next pass.
 
                     except ValueError:
-                        if satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( satellite.az )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( satellite.alt )
+                        if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
 
                         break
 
