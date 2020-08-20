@@ -25,8 +25,8 @@ duration = 10
 
 # https://celestrak.com/NORAD/elements/visual.txt
 tle = [ "ISS (ZARYA)",
-        "1 25544U 98067A   20230.44286670  .00000191  00000-0  11560-4 0  9992",
-        "2 25544  51.6456  45.3129 0001685  35.7517  64.2421 15.49165392241518" ]
+        "1 25544U 98067A   20233.40047826  .00003047  00000-0  63045-4 0  9997",
+        "2 25544  51.6452  30.6789 0001426  56.0652 349.4690 15.49180893241971" ]
 
 
 # https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
@@ -34,7 +34,7 @@ tle = [ "ISS (ZARYA)",
 def getPassesPyEphem():
     print( "ISS passes calculated from PyEphem:" )
     now = start
-    while( now < ( start + datetime.timedelta( days = 2 ) ) ):
+    while( now < ( start + datetime.timedelta( days = duration ) ) ):
         observer = ephem.Observer()
         observer.lat = str( lat )
         observer.long = str( lon )
@@ -49,7 +49,7 @@ def getPassesPyEphem():
         sun.compute( observer )
         sat.compute( observer )
         if sat.eclipsed is False and ephem.degrees( '-18' ) < sun.alt < ephem.degrees( '-6' ):
-            print( tr.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+            print( tr.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), azr, "\t", ts.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), azs )
 
         now = observer.date.datetime() + datetime.timedelta( minutes = 90 )
 
@@ -66,7 +66,7 @@ def getPassesSkyfield():
     end = start + datetime.timedelta( days = duration )
     t1 = ts.utc( end.year, end.month, end.day, end.hour, end.minute )
     satellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], ts )
-    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 10.0 )
+    t, events = satellite.find_events( observer, t0, t1, altitude_degrees = 30 )
     rise = None
     culminate = None
     for ti, event in zip( t, events ):
@@ -78,7 +78,9 @@ def getPassesSkyfield():
 
         else: # Set
             if rise is not None and culminate is not None and satellite.at( culminate ).is_sunlit( ephemeris ) and almanac.dark_twilight_day( ephemeris, observer )( culminate ) < 3:
-                print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
+                riseAlt, riseAz, riseBodyDistance = ( satellite - observer ).at( rise ).altaz()
+                setAlt, setAz, setBodyDistance = ( satellite - observer ).at( ti ).altaz()
+                print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), str( riseAz ), "\t", ti.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), str( setAz ) )
                 rise = None
                 culminate = None
 
