@@ -1025,7 +1025,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-                end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
+                end = utcNow + datetime.timedelta( hours = 100 ) # Stop looking for passes 36 hours from now. #TODO Put back to 36 after testing.
                 t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
                 earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
                 t, events = earthSatellite.find_events( topos, t0, t1, altitude_degrees = 30.0 )
@@ -1044,11 +1044,14 @@ class AstroSkyfield( astrobase.AstroBase ):
                            earthSatellite.at( culminate ).is_sunlit( ephemerisPlanets ) and \
                            almanac.dark_twilight_day( ephemerisPlanets, topos )( culminate ) < 3:
                             # Satellite is yet to rise or is in transit...
+
                             key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( 123 ) #TODO Need to figure out rise Az: https://rhodesmill.org/skyfield/earth-satellites.html#generating-a-satellite-position
+                            alt, az, bodyDistance = ( earthSatellite - topos ).at( rise ).altaz()
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians ) #TODO Need to check this value
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( 456 ) #TODO Need to figure out set Az: https://rhodesmill.org/skyfield/earth-satellites.html#generating-a-satellite-position
+                            alt, az, bodyDistance = ( earthSatellite - topos ).at( ti ).altaz()
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians ) #TODO Need to check this value
                             break
 #                             print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
 #                             rise = None
