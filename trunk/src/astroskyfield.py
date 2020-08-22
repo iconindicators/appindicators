@@ -1048,10 +1048,11 @@ class AstroSkyfield( astrobase.AstroBase ):
                             key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
                             alt, az, bodyDistance = ( earthSatellite - topos ).at( rise ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians ) #TODO Need to check this value
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
                             alt, az, bodyDistance = ( earthSatellite - topos ).at( ti ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians ) #TODO Need to check this value
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                            x = data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
                             break
 #                             print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
 #                             rise = None
