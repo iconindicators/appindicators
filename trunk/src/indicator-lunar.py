@@ -20,15 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO
-# If I increase the magnitude filter value from 5 to 10,
-# have the comets et al already been filtered out and saved in the cache,
-# meaning comets et al are not available in the cache files greater than magnitude of 5?
-# Does this mean we need to do a new download?
-# If this is the case, maybe just hard filter the cache data to a maximum of say 15 and keep that data around,
-# but filter to the user specified magnitude when display/calculating.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
