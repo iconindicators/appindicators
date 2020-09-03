@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -246,32 +246,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.nextDownloadTimeMinorPlanetUnusual = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
-#TODO Can getCacheDateTime() take another parameter as a default if None is returned and use that?
-# Be careful because getCacheDateTime is called in the update function and an addition, not subtraction, is performed.
-# So maybe need another function, or loop?
-        self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME )
-        if self.cacheDateTimeComet is None:
-            self.cacheDateTimeComet = utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
-
-        self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ] )
-        if self.cacheDateTimeMinorPlanetBright is None:
-            self.cacheDateTimeMinorPlanetBright = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
-
-        self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ] )
-        if self.cacheDateTimeMinorPlanetCritical is None:
-            self.cacheDateTimeMinorPlanetCritical = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
-
-        self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ] )
-        if self.cacheDateTimeMinorPlanetDistant is None:
-            self.cacheDateTimeMinorPlanetDistant = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
-
-        self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ] )
-        if self.cacheDateTimeMinorPlanetUnusual is None:
-            self.cacheDateTimeMinorPlanetUnusual = utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
-
-        self.cacheDateTimeSatellite = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME )
-        if self.cacheDateTimeSatellite is None:
-            self.cacheDateTimeSatellite = utcNow - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) )
+        self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME, utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
+        self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
+        self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
+        self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
+        self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
+        self.cacheDateTimeSatellite = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME, utcNow - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
 
     def update( self, menu ):
@@ -376,6 +356,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #TODO Testing
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
             return { }, cacheDateTime, downloadCount, nextDownloadTime
+#TODO End testing.
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
