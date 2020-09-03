@@ -633,7 +633,7 @@ class IndicatorBase( ABC ):
     # baseName: The text used to form the file name, typically the name of the calling application.
     #
     # Returns the datetime of the newest file in the cache.  None if no file can be found.
-    def getCacheDateTime( self, baseName ):
+    def getCacheDateTime( self, baseName, defaultExpiry = None ):
         cacheDirectory = self.__getCacheDirectory()
         expiry = None
         theFile = ""
@@ -643,6 +643,9 @@ class IndicatorBase( ABC ):
 
         if theFile: # A value of "" evaluates to False.
             expiry = datetime.datetime.strptime( theFile[ len( theFile ) - 14 : ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+
+        if expiry is None:
+            expiry = defaultExpiry
 
         return expiry
 
