@@ -19,6 +19,14 @@
 # Application indicator which displays tidal information.
 
 
+#TODO Sent email Sep 4 for license renewal.
+
+
+#TODO With the license currently expired, the list of ports does not appear to have changed.
+# Should the port list be smaller, showing only licensed ports, or something else?
+# When the license expires, how does the indicator change? 
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
