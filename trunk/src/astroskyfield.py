@@ -1126,7 +1126,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createEphemerisPlanets():
-        import datetime, os, subprocess
+        import os, subprocess
 
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
