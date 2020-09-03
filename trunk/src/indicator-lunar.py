@@ -168,15 +168,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
 
-#TODO Update this comment.
     #TODO Start of temporary hack...remove in later release.
-    # Cache data formats changed between version 80 and 81 and so remove old format files.
+    # Cache data formats for comets and minor planets changed between version 84 and 85, so remove old format files.
     #
-    # Comets were originally stored as a dictionary with a string for both key and value.
-    # Comets are now stored as a dictionary with key string and value an orbitalelement.OE class.
-    #
-    # The class used to store satellites was renamed from 'satellite' to 'twolineelement'.
-    # When an old cache file is read, the underlying object will be deemed invalid, throwing an exception.
+    # A new attribute, dataType, and a new inner class, DataType, were added to orbitalelement.
+    # Need to remove old versions of data in this format.
     def __removePreviousVersionCacheFiles( self ):
         import os, pickle
         cachePath = self.getCachePath( "" )
@@ -189,7 +185,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         print( "Removing previous version cache file", cachePath + file )#TODO Testing
 
 
-#TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center
+    #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center.
     def __swapCacheFiles( self ):
         data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
         if data is not None:
