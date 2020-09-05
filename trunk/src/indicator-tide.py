@@ -27,6 +27,9 @@
 # When the license expires, how does the indicator change? 
 
 
+#TODO Need to regenerate translations files and have Oleg spin a new Russian version.
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -64,39 +67,37 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.21",
+            version = "1.0.22",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
                         _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
 
-        if ports.isExpired():
-            message = _(
-                "The license for non-UK ports has expired. " +
-                "Until you upgrade to the latest version of the indicator, only UK ports will be available." )
-
-            Notify.Notification.new( _( "Warning" ), message, self.icon ).show()
-            self.getLogging().warning( message )
-
-
     def update( self, menu ):
-        tidalReadings = self.getTidalData( self.portID )
-        if tidalReadings:
-            self.buildMenu( menu, tidalReadings )
-            summary = _( "Tidal data ready" )
-            message = _( "Tidal data is presented in the time zone of the port." )
-            if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-                message = _( "Tidal data is presented in your local time zone." )
+        if ports.isExpired():
+            message = _( "The license for tidal port data has expired; please upgrade to the latest version of the indicator." )
+            Notify.Notification.new( _( "License has expired" ), message, self.icon ).show()
+            self.getLogging().warning( message )
+            Gtk.main_quit()
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
-            summary = _( "Error" )
-            message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
-            self.getLogging().error( message )
+            tidalReadings = self.getTidalData( self.portID )
+            if tidalReadings:
+                self.buildMenu( menu, tidalReadings )
+                summary = _( "Tidal data ready" )
+                message = _( "Tidal data is presented in the time zone of the port." )
+                if self.tidalReadingsAreAllDateTimes( tidalReadings ):
+                    message = _( "Tidal data is presented in your local time zone." )
 
-        Notify.Notification.new( summary, message, self.icon ).show()
+            else:
+                menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
+                summary = _( "Error" )
+                message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
+                self.getLogging().error( message )
 
-        return self.getNextUpdateTimeInSeconds( tidalReadings )
+            Notify.Notification.new( summary, message, self.icon ).show()
+
+            return self.getNextUpdateTimeInSeconds( tidalReadings )
 
 
     def buildMenu( self, menu, tidalReadings ):

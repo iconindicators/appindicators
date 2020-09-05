@@ -1,3 +1,10 @@
+indicator-tide (1.0.22-1) xenial; urgency=low
+
+  * Annual renewal of UKHO licence.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 5 Sep 2020 16:50:24 +1000
+
+
 indicator-tide (1.0.21-1) xenial; urgency=low
 
   * Added Yaru icon.

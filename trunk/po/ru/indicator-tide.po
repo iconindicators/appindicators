@@ -1,11 +1,11 @@
 # Russian translation for indicator-tide.
-# Copyright (C) 2015-2019 Bernard Giannetti
+# Copyright (C) 2015-2020 Bernard Giannetti
 # This file is distributed under the same license as the indicator-tide package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2019.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.21\n"
+"Project-Id-Version: indicator-tide 1.0.22\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2019-12-05 10:13+1100\n"
 "PO-Revision-Date: 2019-12-05 10:10+0300\n"
