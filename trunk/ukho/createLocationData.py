@@ -8,7 +8,7 @@
 #
 # then Save As 'Text CSV' with the filename
 #
-#     Current Tidal Prediction Ports.csv
+#     2018 Current Tidal Prediction Ports.csv
 #
 # using TAB as the field delimiter.
 #
@@ -29,7 +29,7 @@
 # which can then be used to paste into ports.py
 
 
-with open( "Current Tidal Prediction Ports.csv" ) as f:
+with open( "2018 Current Tidal Prediction Ports.csv" ) as f:
    for line in f:
        if not line.startswith( "PortNo" ):
            line = line.strip().split( "\t" )
