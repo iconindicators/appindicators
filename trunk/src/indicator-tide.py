@@ -19,17 +19,6 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Sent email Sep 4 for license renewal.
-
-
-#TODO With the license currently expired, the list of ports does not appear to have changed.
-# Should the port list be smaller, showing only licensed ports, or something else?
-# When the license expires, how does the indicator change? 
-
-
-#TODO Need to regenerate translations files and have Oleg spin a new Russian version.
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -72,6 +61,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
                         _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
+
 
     def update( self, menu ):
         if ports.isExpired():
