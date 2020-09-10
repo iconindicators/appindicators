@@ -1119,32 +1119,31 @@ class AstroSkyfield( astrobase.AstroBase ):
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
     #
-    # The ephemeris date range is from the date of creation plus one year.
+    # The ephemeris date range is from the date of creation plus ten years.
     #
     # Alternate method to create the ephemeris, download a .bsp and use spkmerge to create a smaller subset.
     # Refer to https://github.com/skyfielders/python-skyfield/issues/123
     # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createEphemerisPlanets():
-        import os, subprocess
+        import os, subprocess, urllib
+
+        ephemerisFile = "de438.bsp"
+        ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
+        if not os.path.isfile( ephemerisFile ):
+            print( "Downloading planet ephemeris..." )
+            urllib.request.urlretrieve ( ephemerisURL, ephemerisFile )
 
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         today = datetime.date.today()
-        oneYearFromToday = today.replace( year = today.year + 1 ) #TODO I think this should be five years or even ten years from now (avoid error when computing seasons with less than a year's data(.
+        tenYearsFromToday = today.replace( year = today.year + 10 )
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
                   today.strftime( dateFormat ) + " " + \
-                  oneYearFromToday.strftime( dateFormat ) + " " + \
-                  "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp" + " " + AstroSkyfield.__EPHEMERIS_PLANETS
-
-#TODO As above for stars in which we use a URL from Skyfield, the URL for planets is not so easy/simple,
-# so have used the hard coded version above. 
-# Not sure if we can use the Skyfield version:
-#         from skyfield import iokit
-#         print( iokit._JPL )
-
+                  tenYearsFromToday.strftime( dateFormat ) + " " + \
+                  ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
             print( "Creating planet ephemeris..." )
