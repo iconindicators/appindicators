@@ -1132,13 +1132,19 @@ class AstroSkyfield( astrobase.AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         today = datetime.date.today()
-        oneYearFromToday = today.replace( year = today.year + 1 )
-        planetEphemeris = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp"
+        oneYearFromToday = today.replace( year = today.year + 1 ) #TODO I think this should be five years or even ten years from now (avoid error when computing seasons with less than a year's data(.
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
                   today.strftime( dateFormat ) + " " + \
                   oneYearFromToday.strftime( dateFormat ) + " " + \
-                  planetEphemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
+                  "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de438.bsp" + " " + AstroSkyfield.__EPHEMERIS_PLANETS
+
+#TODO As above for stars in which we use a URL from Skyfield, the URL for planets is not so easy/simple,
+# so have used the hard coded version above. 
+# Not sure if we can use the Skyfield version:
+#         from skyfield import iokit
+#         print( iokit._JPL )
+
 
         try:
             print( "Creating planet ephemeris..." )
