@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-tide 1.0.22\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-12-05 10:13+1100\n"
-"PO-Revision-Date: 2019-12-05 10:10+0300\n"
+"POT-Creation-Date: 2020-09-10 00:13+1000\n"
+"PO-Revision-Date: 2020-09-10 10:41+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -45,91 +45,91 @@ msgstr ""
 "Щёлкните по любому пункту меню, чтобы отобразить страницу\n"
 "‘Admiralty EasyTide’ для проверки выдаваемых результатов."
 
-#: indicator-tide.py:67
+#: indicator-tide.py:68
 msgid ""
-"The license for non-UK ports has expired. Until you upgrade to the latest "
-"version of the indicator, only UK ports will be available."
+"The license for tidal port data has expired; please upgrade to the latest "
+"version of the indicator."
 msgstr ""
-"Лицензия для портов за пределами Великобритании истекла. Пока вы не обновите "
-"индикатор, будут доступны только порты Великобритании."
+"Лицензия на данные о приливах в портах истекла. Пожалуйста, обновите "
+"индикатор до последней версии."
 
-#: indicator-tide.py:70
-msgid "Warning"
-msgstr "Предупреждение"
+#: indicator-tide.py:69
+msgid "License has expired"
+msgstr "Лицензия истекла"
 
-#: indicator-tide.py:78
+#: indicator-tide.py:77
 msgid "Tidal data ready"
 msgstr "Данные о приливах получены"
 
-#: indicator-tide.py:79
+#: indicator-tide.py:78
 msgid "Tidal data is presented in the time zone of the port."
 msgstr "Данные о приливах соответствуют часовому поясу порта."
 
-#: indicator-tide.py:81
+#: indicator-tide.py:80
 msgid "Tidal data is presented in your local time zone."
 msgstr "Данные о приливах соответствуют местному времени."
 
-#: indicator-tide.py:84 indicator-tide.py:86
+#: indicator-tide.py:83 indicator-tide.py:85
 msgid "No tidal data available for {0}!"
 msgstr "Данные о приливах для {0} недоступны!"
 
-#: indicator-tide.py:85
+#: indicator-tide.py:84
 msgid "Error"
 msgstr "Ошибка"
 
-#: indicator-tide.py:95
+#: indicator-tide.py:94
 msgid "{0}, {1}"
 msgstr "{0}, {1}"
 
-#: indicator-tide.py:133
+#: indicator-tide.py:158
 msgid "H"
 msgstr "П"
 
-#: indicator-tide.py:136
+#: indicator-tide.py:161
 msgid "L"
 msgstr "О"
 
-#: indicator-tide.py:206
+#: indicator-tide.py:223
 msgid "Country"
 msgstr "Страна"
 
-#: indicator-tide.py:209
+#: indicator-tide.py:226
 msgid "Choose your country."
 msgstr "Выберите вашу страну."
 
-#: indicator-tide.py:222
+#: indicator-tide.py:239
 msgid "Choose your port."
 msgstr "Выберите ваш порт."
 
-#: indicator-tide.py:225
+#: indicator-tide.py:242
 msgid "Port"
 msgstr "Порт"
 
-#: indicator-tide.py:237
+#: indicator-tide.py:254
 msgid "Ports"
 msgstr "Порты"
 
-#: indicator-tide.py:242
+#: indicator-tide.py:259
 msgid "Show as submenus"
 msgstr "Отображать подменю"
 
-#: indicator-tide.py:244
+#: indicator-tide.py:261
 msgid "Show each day's tides in a submenu."
 msgstr "Отображать приливы каждого дня в виде подменю."
 
-#: indicator-tide.py:248
+#: indicator-tide.py:265
 msgid "Except first day"
 msgstr "Кроме первого дня"
 
-#: indicator-tide.py:252
+#: indicator-tide.py:269
 msgid "Show the first day's tide in full."
 msgstr "Отображать приливы первого дня полностью."
 
-#: indicator-tide.py:261
+#: indicator-tide.py:278
 msgid "Date format"
 msgstr "Формат даты"
 
-#: indicator-tide.py:267
+#: indicator-tide.py:284
 msgid ""
 "Formatting options for the date:\n"
 "\n"
@@ -143,15 +143,15 @@ msgstr ""
 "\n"
 "Для сброса в настройку по умолчанию очистите поле."
 
-#: indicator-tide.py:275
+#: indicator-tide.py:292
 msgid "Tide format"
 msgstr "Формат приливных данных"
 
-#: indicator-tide.py:284
+#: indicator-tide.py:301
 msgid "Default"
 msgstr "Формат по умолчанию"
 
-#: indicator-tide.py:290
+#: indicator-tide.py:307
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -175,11 +175,11 @@ msgstr ""
 "\n"
 "Для сброса в настройку по умолчанию очистите поле."
 
-#: indicator-tide.py:303
+#: indicator-tide.py:320
 msgid "Missing time"
 msgstr "Формат данных без времени"
 
-#: indicator-tide.py:309
+#: indicator-tide.py:326
 msgid ""
 "Tide information is specified using:\n"
 "\n"
@@ -201,6 +201,6 @@ msgstr ""
 "\n"
 "Для сброса в настройку по умолчанию очистите поле."
 
-#: indicator-tide.py:322
+#: indicator-tide.py:339
 msgid "General"
 msgstr "Общие"
