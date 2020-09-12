@@ -30,7 +30,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
 
-import indicatorbase, os
+import codecs, indicatorbase, os
 
 
 class IndicatorFortune( indicatorbase.IndicatorBase ):
@@ -144,41 +144,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         else:
             while True:
-                self.fortune = self.processGet( "fortune testFortune" )
-                if "System shutdown message from root" in self.fortune:
-                    print( self.fortune )
-
-                    import codecs
-                    a = self.fortune[ 0 ]                    
-                    b = self.fortune[ 1 ]                    
-                    aa = codecs.encode( str.encode( a ), "hex" )                    
-                    bb = codecs.encode( str.encode( b ), "hex" )    
-                    output = ""
-                    for c in self.fortune:
-                        if codecs.encode( str.encode( c ), "hex" ) == b'07':
-                            continue 
-                        
-                        output += c                   
-                        
-                    print( output )
-                    break
-
-
-    def refreshFortuneORIGINAL( self ):
-        locations = " "
-        for location, enabled in self.fortunes:
-            if enabled:
-                if os.path.isdir( location ):
-                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it!
-
-                elif os.path.isfile( location ):
-                    locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
-
-        if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
-            self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
-
-        else:
-            while True:
                 self.fortune = self.processGet( "fortune" + locations )
                 if self.fortune is None: # Occurs when no fortune data is found...
                     self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
@@ -189,6 +154,24 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                     if history is None:
                         history = ""
 
+                    # Fix an issue: unknown characters/glyphs appear as hexadecimal.  Refer to:
+                    #
+                    #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+                    #
+                    # Examples:
+                    # 
+                    #     Ask not for whom the <CONTROL-G> tolls.
+                    # 
+                    #         *** System shutdown message from root ***
+                    #
+                    output = ""
+                    for c in self.fortune:
+                        if codecs.encode( str.encode( c ), "hex" ) == b'07':
+                            continue 
+
+                        output += c                   
+
+                    self.fortune = output
                     self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
                     break
 
@@ -560,39 +543,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
             IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
         }
-
-
-    #TODO Revisit this issue...
-    #
-    #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
-    #
-    # in which characters/glyphs not rendering in the OSD.
-    # Requires finding a fortune which presents this problem.
-    # Initial investigations can be found in revision 140.
-    #
-    # Examples:
-    # 
-    #     Ask not for whom the <CONTROL-G> tolls.
-    # 
-    #         *** System shutdown message from root ***
-    #
-    # Possible helpful stuff/solutions:
-    #     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports/19438403#19438403
-    #     https://stackoverflow.com/questions/36344711/python3-check-if-unicode-character-is-not-present?noredirect=1&lq=1
-    #     https://stackoverflow.com/questions/51418976/could-not-install-harf-buzz-text-shaping-engine
-    #     https://stackoverflow.com/questions/56501666/harfbuzz-language-from-string-python-introspection-method-doesnt-accept-str
-    #
-    # Other information:
-    #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
-    #     https://askubuntu.com/questions/530486/how-to-locate-font-files-given-the-font-family-name
-    #     https://askubuntu.com/questions/552979/how-can-i-determine-which-fonts-are-installed-from-the-command-line-and-what-is
-    #     https://unix.stackexchange.com/questions/42228/how-to-find-out-how-fc-match-matches
-    #     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports
-    #     https://eev.ee/blog/2015/05/20/i-stared-into-the-fontconfig-and-the-fontconfig-stared-back-at-me/
-    #     https://repolinux.wordpress.com/2013/03/10/find-out-fallback-font-used-by-fontconfig-for-a-certain-character/
-    def __fontTesting():
-        from gi.repository import Gio
-        fontName = Gio.Settings( "org.gnome.desktop.interface" ).get_string( "font-name" )
 
 
 IndicatorFortune().main()
