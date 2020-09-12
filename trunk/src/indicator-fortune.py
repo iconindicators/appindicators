@@ -144,6 +144,41 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         else:
             while True:
+                self.fortune = self.processGet( "fortune testFortune" )
+                if "System shutdown message from root" in self.fortune:
+                    print( self.fortune )
+
+                    import codecs
+                    a = self.fortune[ 0 ]                    
+                    b = self.fortune[ 1 ]                    
+                    aa = codecs.encode( str.encode( a ), "hex" )                    
+                    bb = codecs.encode( str.encode( b ), "hex" )    
+                    output = ""
+                    for c in self.fortune:
+                        if codecs.encode( str.encode( c ), "hex" ) == b'07':
+                            continue 
+                        
+                        output += c                   
+                        
+                    print( output )
+                    break
+
+
+    def refreshFortuneORIGINAL( self ):
+        locations = " "
+        for location, enabled in self.fortunes:
+            if enabled:
+                if os.path.isdir( location ):
+                    locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it!
+
+                elif os.path.isfile( location ):
+                    locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
+
+        if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
+            self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "No enabled fortunes have a valid location!" )
+
+        else:
+            while True:
                 self.fortune = self.processGet( "fortune" + locations )
                 if self.fortune is None: # Occurs when no fortune data is found...
                     self.fortune = IndicatorFortune.NOTIFICATION_WARNING_FLAG + _( "Ensure enabled fortunes contain fortune data!" )
@@ -534,6 +569,12 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     # in which characters/glyphs not rendering in the OSD.
     # Requires finding a fortune which presents this problem.
     # Initial investigations can be found in revision 140.
+    #
+    # Examples:
+    # 
+    #     Ask not for whom the <CONTROL-G> tolls.
+    # 
+    #         *** System shutdown message from root ***
     #
     # Possible helpful stuff/solutions:
     #     https://stackoverflow.com/questions/4458696/finding-out-what-characters-a-given-font-supports/19438403#19438403
