@@ -18,7 +18,7 @@ indicators = [
     [ "IndicatorPunycode", "indicator-punycode", "1.0.10" ],
     [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.12" ],
     [ "IndicatorStardate", "indicator-stardate", "1.0.39" ],
-    [ "IndicatorTide", "indicator-tide", "1.0.21" ],
+    [ "IndicatorTide", "indicator-tide", "1.0.22" ],
     [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.65" ] ]
 
 
