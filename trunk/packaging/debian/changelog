@@ -1,6 +1,6 @@
 indicator-fortune (1.0.34-1) xenial; urgency=low
 
-  * Fixed issue: unknown characters/glyphs appear as hexadecimal.
+  * Bug fix: Remove characters/glyphs which appear as hexadecimal.
   * Fixed deprecation warnings.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 27 Apr 2020 13:32:10 +1000
