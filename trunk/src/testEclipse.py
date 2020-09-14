@@ -2,7 +2,20 @@
 # -*- coding: utf-8 -*-
 
 
+from enum import Enum
+
 import calendar, datetime, ephem, math
+
+
+class EclipseType( Enum ):
+    CENTRAL = 0
+    NONE = 1
+    NOT_CENTRAL = 2
+    TOTAL = 3
+    ANNULAR = 4
+    ANNULAR_TOTAL = 5
+
+
 
 
 def getMoonDatesForOneYearPyEphem( utcNow, isFullMoon, latitude, longitude, elevation ):
@@ -169,6 +182,27 @@ def getEclipseMeeus( utcNow, isSolar, upcomingMoonDates ):
             - 0.0182 * math.cos( math.radians( Mdash ) ) \
             + 0.0004 * math.cos( math.radians( 2 * Mdash ) ) \
             - 0.0005 * math.cos( math.radians( M + Mdash ) )
+
+        if math.fabs( gamma ) <= 0.9972:
+            eclipseType = EclipseType.CENTRAL
+            if u < 0:
+                eclipseType = EclipseType.TOTAL
+
+            elif u > 0.0047:
+                eclipseType = EclipseType.ANNULAR
+
+            else:
+                if u < 0.00464 * math.sqrt( 1 - gamma * gamma ):
+                    eclipseType = EclipseType.ANNULAR_TOTAL
+
+                else:
+                    eclipseType = EclipseType.ANNULAR
+
+        elif math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.5433 + u:   
+            eclipseType = EclipseType.NOT_CENTRAL
+
+        else: # math.fabs( gamma ) > 1.5433 + u:
+            eclipseType = EclipseType.NONE
 
         break
 
