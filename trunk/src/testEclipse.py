@@ -14,6 +14,7 @@ class EclipseType( Enum ):
     TOTAL = 3
     ANNULAR = 4
     ANNULAR_TOTAL = 5
+    PARTIAL = 6
 
 
 
@@ -184,19 +185,6 @@ def getEclipseMeeus( utcNow, isSolar, upcomingMoonDates ):
             - 0.0005 * math.cos( math.radians( M + Mdash ) )
 
 
-# if abs(g)>=0.9972+abs(u): info['type']='partial'
-#
-# elif abs(g)>0.9972: info['type']='non-central annular/total'
-#
-# elif u<0: info['type']='total'
-#
-# elif u>0.0047: info['type']='annular'
-#
-# elif u<0.00464*math.sqrt(1-g**2): info['type']='hybrid'
-#
-# else: info['type']='annular'
-
-
 # //Check to see if the eclipse is visible from the Earth's surface
 # const double fgamma = fabs(details.gamma);
 # if (fgamma > (1.5433 + details.u))
@@ -248,26 +236,47 @@ def getEclipseMeeus( utcNow, isSolar, upcomingMoonDates ):
 # 
 # return details;
 
-        if math.fabs( gamma ) <= 0.9972:
+
+# if abs(g)>=0.9972+abs(u): info['type']='partial'
+#
+# elif abs(g)>0.9972: info['type']='non-central annular/total'
+#
+# elif u<0: info['type']='total'
+#
+# elif u>0.0047: info['type']='annular'
+#
+# elif u<0.00464*math.sqrt(1-g**2): info['type']='hybrid'
+#
+# else: info['type']='annular'
+
+        if math.fabs( gamma ) < 0.9972:
             eclipseType = EclipseType.CENTRAL
             if u < 0:
                 eclipseType = EclipseType.TOTAL
-
+ 
             elif u > 0.0047:
                 eclipseType = EclipseType.ANNULAR
-
+ 
             else:
                 if u < 0.00464 * math.sqrt( 1 - gamma * gamma ):
                     eclipseType = EclipseType.ANNULAR_TOTAL
-
+ 
                 else:
                     eclipseType = EclipseType.ANNULAR
 
-        elif math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.5433 + u:   
-            eclipseType = EclipseType.NOT_CENTRAL
-
-        else: # math.fabs( gamma ) > 1.5433 + u:
+        elif math.fabs( gamma ) > 1.5433 + u:
             eclipseType = EclipseType.NONE
+
+        else: # Not central...partial.
+            eclipseType = EclipseType.NOT_CENTRAL
+            if math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.0260:
+                
+
+            else:
+                eclipseType = EclipseType.PARTIAL
+        
+#         elif math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.5433 + math.fabs( u ):
+#             eclipseType = EclipseType.NOT_CENTRAL
 
         break
 
