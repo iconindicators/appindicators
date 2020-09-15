@@ -183,6 +183,71 @@ def getEclipseMeeus( utcNow, isSolar, upcomingMoonDates ):
             + 0.0004 * math.cos( math.radians( 2 * Mdash ) ) \
             - 0.0005 * math.cos( math.radians( M + Mdash ) )
 
+
+# if abs(g)>=0.9972+abs(u): info['type']='partial'
+#
+# elif abs(g)>0.9972: info['type']='non-central annular/total'
+#
+# elif u<0: info['type']='total'
+#
+# elif u>0.0047: info['type']='annular'
+#
+# elif u<0.00464*math.sqrt(1-g**2): info['type']='hybrid'
+#
+# else: info['type']='annular'
+
+
+# //Check to see if the eclipse is visible from the Earth's surface
+# const double fgamma = fabs(details.gamma);
+# if (fgamma > (1.5433 + details.u))
+#   return details;
+# 
+# //We have an eclipse at this time, fill in the details
+# if (fgamma < 0.9972)
+# {
+#   if (details.u < 0)
+#     details.Flags = CAASolarEclipseDetails::TOTAL_ECLIPSE;
+#   else if (details.u > 0.0047)
+#     details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
+#   else if (details.u >= 0 && details.u <= 0.0047)
+#   {
+#     const double w = 0.00464 * sqrt(1 - (details.gamma * details.gamma));
+#     if (details.u < w)
+#       details.Flags = CAASolarEclipseDetails::ANNULAR_TOTAL_ECLIPSE;
+#     else
+#       details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
+#   }
+# 
+#   details.Flags |= CAASolarEclipseDetails::CENTRAL_ECLIPSE;
+# }
+# else if ((fgamma > 0.9972) && (fgamma < (1.5433 + details.u)))
+# {
+#   if ((fgamma > 0.9972) && (fgamma < (0.9972 + fabs(details.u))))
+#   {
+#     if (details.u < 0)
+#       details.Flags = CAASolarEclipseDetails::TOTAL_ECLIPSE;
+#     else if (details.u > 0.0047)
+#       details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
+#     else if (details.u >= 0 && details.u <= 0.0047)
+#     {
+#       const double w = 0.00464 * sqrt(1 - (details.gamma * details.gamma));
+#       if (details.u < w)
+#         details.Flags = CAASolarEclipseDetails::ANNULAR_TOTAL_ECLIPSE;
+#       else
+#         details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
+#     }
+#   }
+#   else
+#   {
+#     details.Flags = CAASolarEclipseDetails::PARTIAL_ECLIPSE;
+#     details.GreatestMagnitude = (1.5433 + details.u - fgamma) / (0.5461 + (2*details.u));
+#   }
+# 
+#   details.Flags |= CAASolarEclipseDetails::NON_CENTRAL_ECLIPSE;
+# }
+# 
+# return details;
+
         if math.fabs( gamma ) <= 0.9972:
             eclipseType = EclipseType.CENTRAL
             if u < 0:
