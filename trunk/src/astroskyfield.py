@@ -741,7 +741,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                     body = sun + mpc.comet_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
                 else:
-                    #TODO Waiting on https://github.com/skyfielders/python-skyfield/issues/432
                     dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                     body = sun + mpc.mpcorb_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
  
@@ -895,6 +894,14 @@ class AstroSkyfield( astrobase.AstroBase ):
 #Maybe wait for 
 # https://github.com/skyfielders/python-skyfield/issues/443
 # and hopefully there will be a way to get the end epoch.
+#
+# This might help:
+# segment = planets.segments[0]
+# start, end = segment.time_range(ts)
+# 
+# print('Center:', segment.center_name)
+# print('Target:', segment.target_name)
+# print('Date range:', start.tdb_strftime(), '-', end.tdb_strftime())
             t = t.utc_datetime()
             if almanac.SEASON_EVENTS[ 0 ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ 2 ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
