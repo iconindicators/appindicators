@@ -889,19 +889,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
             t1 = timeScale.utc( utcNow.year, utcNow.month + 7 )
-            t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemerisPlanets ) ) #TODO This burped because the planets.bsp file did not run at least 12 months from the calculation time (utcNow)...
-#...so is there some pre-check we can do to ensure the .bsp has enough data (or runs for at least a year)?
-#Maybe wait for 
-# https://github.com/skyfielders/python-skyfield/issues/443
-# and hopefully there will be a way to get the end epoch.
-#
-# This might help:
-# segment = planets.segments[0]
-# start, end = segment.time_range(ts)
-# 
-# print('Center:', segment.center_name)
-# print('Target:', segment.target_name)
-# print('Date range:', start.tdb_strftime(), '-', end.tdb_strftime())
+            t, y = almanac.find_discrete( t0, t1, almanac.seasons( ephemerisPlanets ) )
             t = t.utc_datetime()
             if almanac.SEASON_EVENTS[ 0 ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ 2 ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
