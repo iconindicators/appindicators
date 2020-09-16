@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -97,8 +97,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     else:
-#         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
-        COMET_DATA_URL = "file:///home/bernard/Desktop/Soft00Cmt.txt" #TODO Testing
+        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
+#         COMET_DATA_URL = "file:///home/bernard/Desktop/Soft00Cmt.txt" #TODO Testing
 
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
@@ -354,8 +354,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Testing
-        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
-            return { }, cacheDateTime, downloadCount, nextDownloadTime
+#         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
+#             return { }, cacheDateTime, downloadCount, nextDownloadTime
 #TODO End testing.
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
