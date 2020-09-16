@@ -855,8 +855,10 @@ class AstroSkyfield( astrobase.AstroBase ):
         observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos )
         sunRA, sunDec, earthDistance = observer.at( t0 ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = observer.at( t0 ).observe( moon ).apparent().radec()
-        latitude, longitude = AstroSkyfield.__getLatitudeLongitude( observer )
-        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, sunRA.radians, sunDec.radians, moonRA.radians, moonDec.radians, latitude, longitude )
+        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
+                                                                     sunRA.radians, sunDec.radians, 
+                                                                     moonRA.radians, moonDec.radians, 
+                                                                     observer.target.latitude.radians, observer.target.longitude.radians )
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 )
@@ -1060,22 +1062,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO This gets the next visible pass...as per AstroPyEphem, take into account a satellite currently in transit.
 #TODO Somehow test for circumpolar satellites as per AstroPyEphem.
-
-
-#TODO
-# Found that this breaks in version 1.27 so this hack is needed until
-# https://github.com/skyfielders/python-skyfield/issues/448
-# is resolved.
-    # Returns the latitude and longitude of the observer (or topos), in radians.
-    @staticmethod
-    def __getLatitudeLongitude( observer ):
-#         for thing in observer.positives: # If an observer is passed in, a Topos object will be contained within.
-#             if isinstance( thing, Topos ):
-#                 latitude = thing.latitude.radians
-#                 longitude = thing.longitude.radians
-#                 break
-
-        return observer.target.latitude.radians, observer.target.longitude.radians
 
 
     # If all stars in the Hipparcos catalogue were included, capped to magnitude 15,
