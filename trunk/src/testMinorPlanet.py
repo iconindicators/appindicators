@@ -13,6 +13,7 @@ latitude = -33
 longitude = 151
 timeScale = skyfield.api.load.timescale( builtin = True )
 t = timeScale.utc( now.year, now.month, now.day, now.hour, now.minute, now.second )
+print( t.utc_jpl() )
 topos = skyfield.api.Topos( latitude_degrees = latitude, longitude_degrees = longitude )
 ephemeris = skyfield.api.load( "de421.bsp" )
 sun = ephemeris[ "sun" ]
