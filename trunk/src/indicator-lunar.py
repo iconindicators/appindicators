@@ -354,8 +354,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
 #TODO Testing
-#         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
-#             return { }, cacheDateTime, downloadCount, nextDownloadTime
+        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
+            return { }, cacheDateTime, downloadCount, nextDownloadTime
 #TODO End testing.
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
