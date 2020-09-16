@@ -1126,8 +1126,9 @@ class AstroSkyfield( astrobase.AstroBase ):
     # The ephemeris date range is from the date of creation plus ten years.
     #
     # Alternate method to create the ephemeris, download a .bsp and use spkmerge to create a smaller subset.
-    # Refer to https://github.com/skyfielders/python-skyfield/issues/123
-    # https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+    # Refer to
+    #    https://github.com/skyfielders/python-skyfield/issues/123
+    #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createEphemerisPlanets():
         import os, subprocess, urllib
