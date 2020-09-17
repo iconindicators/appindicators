@@ -106,7 +106,8 @@ def getType( gamma, u ):
     return eclipseType
 
 
-# Chapter 54 Astronomical http://www.agopax.it/Libri_astronomia/Libri_astronomia.html
+# Chapter 54 Astronomical Algorithms, Jean Meeus.
+# http://www.agopax.it/Libri_astronomia/Libri_astronomia.html
 def getEclipse( utcNow, isSolar, upcomingMoonDates ):
     eclipseDate = None
     date = utcNow
