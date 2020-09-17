@@ -17,8 +17,6 @@ class EclipseType( Enum ):
     PARTIAL = 6
 
 
-
-
 def getMoonDatesForOneYearPyEphem( utcNow, isFullMoon, latitude, longitude, elevation ):
     city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
     city.lat = str( latitude )
@@ -74,7 +72,42 @@ def julianDayToGregorian( julianDay ):
     return datetime.datetime( year, month, 1 ) + datetime.timedelta( days = dayOfMonth - 1 )
 
 
-def getEclipseMeeus( utcNow, isSolar, upcomingMoonDates ):
+# Sammple implementations...not sure which is correct, if any!
+# https://github.com/pavolgaj/AstroAlgorithms4Python/blob/master/eclipse.py
+# https://github.com/soniakeys/meeus/blob/master/v3/eclipse/eclipse.go
+# https://github.com/soniakeys/meeus/blob/master/v3/eclipse/eclipse_test.go
+def getType( gamma, u ):
+    if math.fabs( gamma ) < 0.9972:
+        eclipseType = EclipseType.CENTRAL
+        if u < 0:
+            eclipseType = EclipseType.TOTAL
+
+        elif u > 0.0047:
+            eclipseType = EclipseType.ANNULAR
+
+        else:
+            if u < 0.00464 * math.sqrt( 1 - gamma * gamma ):
+                eclipseType = EclipseType.ANNULAR_TOTAL
+
+            else:
+                eclipseType = EclipseType.ANNULAR
+
+    elif math.fabs( gamma ) > 1.5433 + u:
+        eclipseType = EclipseType.NONE
+
+    else: # Not central...partial.
+        eclipseType = EclipseType.NOT_CENTRAL
+        if math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.0260:
+            pass # Not sure what to do here.
+
+        else:
+            eclipseType = EclipseType.PARTIAL
+
+    return eclipseType
+
+
+# Chapter 54 Astronomical http://www.agopax.it/Libri_astronomia/Libri_astronomia.html
+def getEclipse( utcNow, isSolar, upcomingMoonDates ):
     eclipseDate = None
     date = utcNow
     moonIndex = 0
@@ -184,115 +217,21 @@ def getEclipseMeeus( utcNow, isSolar, upcomingMoonDates ):
             + 0.0004 * math.cos( math.radians( 2 * Mdash ) ) \
             - 0.0005 * math.cos( math.radians( M + Mdash ) )
 
-
-# //Check to see if the eclipse is visible from the Earth's surface
-# const double fgamma = fabs(details.gamma);
-# if (fgamma > (1.5433 + details.u))
-#   return details;
-# 
-# //We have an eclipse at this time, fill in the details
-# if (fgamma < 0.9972)
-# {
-#   if (details.u < 0)
-#     details.Flags = CAASolarEclipseDetails::TOTAL_ECLIPSE;
-#   else if (details.u > 0.0047)
-#     details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
-#   else if (details.u >= 0 && details.u <= 0.0047)
-#   {
-#     const double w = 0.00464 * sqrt(1 - (details.gamma * details.gamma));
-#     if (details.u < w)
-#       details.Flags = CAASolarEclipseDetails::ANNULAR_TOTAL_ECLIPSE;
-#     else
-#       details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
-#   }
-# 
-#   details.Flags |= CAASolarEclipseDetails::CENTRAL_ECLIPSE;
-# }
-# else if ((fgamma > 0.9972) && (fgamma < (1.5433 + details.u)))
-# {
-#   if ((fgamma > 0.9972) && (fgamma < (0.9972 + fabs(details.u))))
-#   {
-#     if (details.u < 0)
-#       details.Flags = CAASolarEclipseDetails::TOTAL_ECLIPSE;
-#     else if (details.u > 0.0047)
-#       details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
-#     else if (details.u >= 0 && details.u <= 0.0047)
-#     {
-#       const double w = 0.00464 * sqrt(1 - (details.gamma * details.gamma));
-#       if (details.u < w)
-#         details.Flags = CAASolarEclipseDetails::ANNULAR_TOTAL_ECLIPSE;
-#       else
-#         details.Flags = CAASolarEclipseDetails::ANNULAR_ECLIPSE;
-#     }
-#   }
-#   else
-#   {
-#     details.Flags = CAASolarEclipseDetails::PARTIAL_ECLIPSE;
-#     details.GreatestMagnitude = (1.5433 + details.u - fgamma) / (0.5461 + (2*details.u));
-#   }
-# 
-#   details.Flags |= CAASolarEclipseDetails::NON_CENTRAL_ECLIPSE;
-# }
-# 
-# return details;
-
-
-# if abs(g)>=0.9972+abs(u): info['type']='partial'
-#
-# elif abs(g)>0.9972: info['type']='non-central annular/total'
-#
-# elif u<0: info['type']='total'
-#
-# elif u>0.0047: info['type']='annular'
-#
-# elif u<0.00464*math.sqrt(1-g**2): info['type']='hybrid'
-#
-# else: info['type']='annular'
-
-        if math.fabs( gamma ) < 0.9972:
-            eclipseType = EclipseType.CENTRAL
-            if u < 0:
-                eclipseType = EclipseType.TOTAL
- 
-            elif u > 0.0047:
-                eclipseType = EclipseType.ANNULAR
- 
-            else:
-                if u < 0.00464 * math.sqrt( 1 - gamma * gamma ):
-                    eclipseType = EclipseType.ANNULAR_TOTAL
- 
-                else:
-                    eclipseType = EclipseType.ANNULAR
-
-        elif math.fabs( gamma ) > 1.5433 + u:
-            eclipseType = EclipseType.NONE
-
-        else: # Not central...partial.
-            eclipseType = EclipseType.NOT_CENTRAL
-            if math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.0260:
-                
-
-            else:
-                eclipseType = EclipseType.PARTIAL
-        
-#         elif math.fabs( gamma ) > 0.9972 and math.fabs( gamma ) < 1.5433 + math.fabs( u ):
-#             eclipseType = EclipseType.NOT_CENTRAL
+        eclipseType = getType( gamma, u )
 
         break
 
-    return eclipseDate
+    return eclipseDate, eclipseType
 
 
 latitude = -33
 longitude = 151
 elevation = 0
 
-# utcNow = datetime.datetime.strptime( "1997-07-01", "%Y-%m-%d" )
-utcNow = datetime.datetime.utcnow()
-fullMoonDates = getMoonDatesForOneYearPyEphem( utcNow, True, latitude, longitude, elevation )
-newMoonDates = getMoonDatesForOneYearPyEphem( utcNow, False, latitude, longitude, elevation )
+# now = datetime.datetime.strptime( "1997-07-01", "%Y-%m-%d" )
+now = datetime.datetime.utcnow()
+fullMoonDates = getMoonDatesForOneYearPyEphem( now, True, latitude, longitude, elevation )
+newMoonDates = getMoonDatesForOneYearPyEphem( now, False, latitude, longitude, elevation )
 
-print( "Meeus solar eclipse:", getEclipseMeeus( utcNow, True, newMoonDates ) )
-print( "Meeus lunar eclipse:", getEclipseMeeus( utcNow, False, fullMoonDates ) )
-# getEclipseMeeus( datetime.datetime.strptime( "1993-05-21", "%Y-%m-%d" ), True )
-# getEclipseMeeus( datetime.datetime.utcnow(), True )
+print( "Meeus solar eclipse:", getEclipse( now, True, newMoonDates ) )
+print( "Meeus lunar eclipse:", getEclipse( now, False, fullMoonDates ) )
