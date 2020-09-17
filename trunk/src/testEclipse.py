@@ -72,7 +72,7 @@ def julianDayToGregorian( julianDay ):
     return datetime.datetime( year, month, 1 ) + datetime.timedelta( days = dayOfMonth - 1 )
 
 
-# Sammple implementations...not sure which is correct, if any!
+# Sample implementations...not sure which is correct, if any!
 # https://github.com/pavolgaj/AstroAlgorithms4Python/blob/master/eclipse.py
 # https://github.com/soniakeys/meeus/blob/master/v3/eclipse/eclipse.go
 # https://github.com/soniakeys/meeus/blob/master/v3/eclipse/eclipse_test.go
