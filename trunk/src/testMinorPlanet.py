@@ -33,6 +33,10 @@ source = "Soft00Distant.txt"
 #                print( name, e )
 
 
+#TODO Hit an exception and logged it
+# https://github.com/skyfielders/python-skyfield/issues/449
+# So need to reproduce (maybe in test code)
+# but also see if the suggestion of using the dataframe loaded once makes a difference (may need a new issue logged for that).
 data = "K17M07B 14.2   0.15 K1794   0.00140   80.46498   58.25502   55.71379  0.9987471  0.00000466                MPO435133    33   1  174 days 0.34         MPC        0000         2017 MB7"
 with io.BytesIO( data.encode() ) as f:
     dataframe = skyfield.data.mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )

@@ -735,6 +735,11 @@ class AstroSkyfield( astrobase.AstroBase ):
 #     orbit = skyfield.data.mpc.mpcorb_orbit(row, timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2)
 #     # then, add to `sun` and so forth
 
+
+#TODO Hit an exception and logged it
+# https://github.com/skyfielders/python-skyfield/issues/449
+# So need to reproduce (maybe in test code)
+# but also see if the suggestion of using the dataframe loaded once makes a difference (may need a new issue logged for that).
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
         timeScale = load.timescale( builtin = True )
