@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.72-1) xenial; urgency=low
+
+  * Added hirsute to the list of series.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 25 Oct 2020 14:18:07 +1000
+
+
 indicator-ppa-download-statistics (1.0.71-1) xenial; urgency=low
 
   * Changed the icon as it was difficult to read on Ubuntu 20.04.
