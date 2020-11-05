@@ -449,42 +449,6 @@ class IndicatorBase( ABC ):
         return themeColour
 
 
-    def isAutoStart( self ):
-        try:
-            autoStart = \
-                os.path.exists( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ) and \
-                "X-GNOME-Autostart-enabled=true" in open( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ).read()
-
-        except Exception as e:
-            logging.exception( e )
-            autoStart = False
-
-        return autoStart
-
-
-#TODO The config file in /usr/share/applications does NOT contain the line X-GNOME-Autostart-Delay=0.
-# Why?
-# If I do an install of a new version over an existing version (using a DEB file), does the config file get overwritten?
-#
-#TODO If I unset the autostart the config file is removed.
-# That will remove the autostart delay, if set/present.
-# Need to instead ensure that config file is in the user directory and then add/remove the autostart line as required. 
-    def setAutoStart( self, isSet ):
-        if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
-            os.makedirs( IndicatorBase.__AUTOSTART_PATH )
-
-        try:
-            if isSet:
-                shutil.copy( "/usr/share/applications/" + self.desktopFile, IndicatorBase.__AUTOSTART_PATH + self.desktopFile )
-
-            else:
-                if os.path.exists( IndicatorBase.__AUTOSTART_PATH + self.desktopFile ):
-                    os.remove( IndicatorBase.__AUTOSTART_PATH + self.desktopFile )
-
-        except Exception as e:
-            logging.exception( e )
-
-
     def getLogging( self ): return logging
 
 
