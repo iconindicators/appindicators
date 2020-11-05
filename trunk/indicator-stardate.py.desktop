@@ -6,3 +6,4 @@ Icon=indicator-stardate
 Exec=/usr/share/indicator-stardate/indicator-stardate.py
 Categories=Utility;Amusement;
 X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0

@@ -42,7 +42,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.39",
+            version = "1.0.40",
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [ _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
@@ -143,9 +143,6 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
 
         showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 3, 1, 1 )
-
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
@@ -154,7 +151,6 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             self.padInteger = padIntegerCheckbox.get_active()
             self.showClassic = showClassicCheckbox.get_active()
             self.showIssue = showIssueCheckbox.get_active()
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 
