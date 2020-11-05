@@ -1,13 +1,26 @@
 indicator-lunar (1.0.85-1) xenial; urgency=low
 
-  * On autostart, sometimes the indicator can become unresponsive.
-    Setting a value, say 120 (seconds), for the attribute
+  * On computer startup when the indicator is set to autostart,
+    sometimes the indicator can become unresponsive.
+    Setting the following
 
-        X-GNOME-Autostart-Delay
+        X-GNOME-Autostart-Delay=120
     in
         ~/.config/autostart/indicator-lunar.py.desktop
 
-    start up is delayed sufficiently to avoid this issue.
+    delays the indicator startup (for two minutes) avoiding the issue.
+    For new installations, by default, the value will be set to zero.
+  * Removed the preference for autostart.
+    To change the autostart value use a text editor and open the file
+
+        ~/.config/autostart/indicator-lunar.py.desktop
+
+    and add the setting
+
+        X-GNOME-Autostart-enabled
+
+    or add the indicator to the Startup Applications.
+    For new installations, by default, the autostart will be set to true.
   * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 31 May 2020 13:33:01 +1000

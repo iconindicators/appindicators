@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -1332,9 +1332,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         longitude.set_text( str( self.longitude ) )
         elevation.set_text( str( self.elevation ) )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -1424,7 +1421,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.longitude = float( longitudeValue )
             self.elevation = float( elevationValue )
 
-            self.setAutoStart( autostartCheckbox.get_active() )
             break
 
         return responseType
