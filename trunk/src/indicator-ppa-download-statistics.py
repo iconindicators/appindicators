@@ -64,7 +64,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.72",
+            version = "1.0.73",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 
@@ -599,9 +599,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         lowBandwitdhCheckbox.set_margin_top( 10 )
         grid.attach( lowBandwitdhCheckbox, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -615,7 +612,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.lowBandwidth = lowBandwitdhCheckbox.get_active()
             self.sortByDownload = sortByDownloadCheckbox.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
-            self.setAutoStart( autostartCheckbox.get_active() )
 
             self.ppas = [ ]
             treeiter = ppaStore.get_iter_first()
