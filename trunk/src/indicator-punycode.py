@@ -46,7 +46,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.10",
+            version = "1.0.11",
             copyrightStartYear = "2016",
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
@@ -210,9 +210,6 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
-
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
@@ -222,7 +219,6 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
             self.outputBoth = outputBothCheckbox.get_active()
             self.dropPathQuery = dropPathQueryCheckbox.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 
