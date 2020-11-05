@@ -6,3 +6,4 @@ Icon=indicator-script-runner
 Exec=/usr/share/indicator-script-runner/indicator-script-runner.py
 Categories=Utility;
 X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0

@@ -36,7 +36,6 @@
 # If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
 
 
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -67,7 +66,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.12",
+            version = "1.0.13",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script from an indicator." ) )
 
@@ -288,9 +287,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         radioShowScriptsSubmenu.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
         radioShowScriptsIndented.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 4, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         scriptGroupComboBox.connect( "changed", self.onScriptGroup, copyOfScripts, scriptNameListStore, scriptNameTreeView )
@@ -312,8 +308,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             else:
                 self.scriptGroupDefault = self.defaultScriptGroupCurrent
                 self.scriptNameDefault = self.defaultScriptNameCurrent
-
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 
