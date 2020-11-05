@@ -56,7 +56,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.22",
+            version = "1.0.23",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
@@ -333,9 +333,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -368,8 +365,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
             else:
                 self.menuItemTideFormatSansTime = IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME
-
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 
