@@ -19,7 +19,7 @@ indicator-virtual-box (1.0.66-1) xenial; urgency=low
 
         X-GNOME-Autostart-enabled
 
-    or add the indicator to the Startup Applications.
+    or add the indicator using Startup Applications.
     For new installations, by default, the autostart will be set to true.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 5 Nov 2020 21:08:19 +1000
