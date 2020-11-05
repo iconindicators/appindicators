@@ -169,7 +169,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     #TODO Start of temporary hack...remove in later release.
-    # Cache data formats for comets and minor planets changed between version 84 and 85, so remove old format files.
+    # Cache data formats for comets and minor planets changed between version 84 and 85, so remove old format files.  #TODO Is this still the case?  Verify with data from version 84...
     #
     # A new attribute, dataType, and a new inner class, DataType, were added to orbitalelement.
     # Need to remove old versions of data in this format.
