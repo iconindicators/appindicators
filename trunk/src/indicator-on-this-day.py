@@ -51,7 +51,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.8",
+            version = "1.0.9",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
@@ -291,9 +291,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         notifyCheckbox.set_margin_top( 10 )
         grid.attach( notifyCheckbox, 0, 5, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 6, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -314,7 +311,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             self.copyToClipboard = radioCopyToClipboard.get_active()
             self.searchURL = searchEngineEntry.get_text().strip()
             self.notify = notifyCheckbox.get_active()
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 
