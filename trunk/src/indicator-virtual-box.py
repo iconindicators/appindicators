@@ -51,7 +51,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.65",
+            version = "1.0.66",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -508,9 +508,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, row, 1, 1 )
         row += 1
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, row, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -524,7 +521,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
             self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 

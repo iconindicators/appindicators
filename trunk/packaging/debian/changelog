@@ -1,3 +1,30 @@
+indicator-virtual-box (1.0.66-1) xenial; urgency=low
+
+  * On computer startup when the indicator is set to autostart,
+    sometimes the indicator can become unresponsive.
+    Setting the following
+
+        X-GNOME-Autostart-Delay=120
+    in
+        ~/.config/autostart/indicator-lunar.py.desktop
+
+    delays the indicator startup (for two minutes) avoiding the issue.
+    For new installations, by default, the value will be set to zero.
+  * Removed the preference for autostart.
+    To change the autostart value use a text editor and open the file
+
+        ~/.config/autostart/indicator-lunar.py.desktop
+
+    and add the setting
+
+        X-GNOME-Autostart-enabled
+
+    or add the indicator to the Startup Applications.
+    For new installations, by default, the autostart will be set to true.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 5 Nov 2020 21:08:19 +1000
+
+
 indicator-virtual-box (1.0.65-1) xenial; urgency=low
 
   * Added Yaru icon.
