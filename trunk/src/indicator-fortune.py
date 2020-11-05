@@ -54,7 +54,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.34",
+            version = "1.0.35",
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
@@ -330,9 +330,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         radioMiddleMouseClickShowLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
-        autostartCheckbox = self.createAutostartCheckbox()
-        grid.attach( autostartCheckbox, 0, 7, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -363,8 +360,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                     self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
 
                 treeiter = store.iter_next( treeiter )
-
-            self.setAutoStart( autostartCheckbox.get_active() )
 
         return responseType
 
