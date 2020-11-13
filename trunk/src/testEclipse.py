@@ -41,6 +41,46 @@ def getMoonDatesForOneYearPyEphem( utcNow, isFullMoon, latitude, longitude, elev
     return dates
 
 
+#TODO Use this to calculate full moon and new moon dates rather than use PyEphem.
+    def __calculateMoon( utcNow, data, timeScale, topos, ephemerisPlanets ):
+        key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+        moon = ephemerisPlanets[ AstroSkyfield.__MOON ]
+
+        t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, t0 ) * 100 )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+
+        observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos )
+        sunRA, sunDec, earthDistance = observer.at( t0 ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
+        moonRA, moonDec, earthDistance = observer.at( t0 ).observe( moon ).apparent().radec()
+        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
+                                                                     sunRA.radians, sunDec.radians, 
+                                                                     moonRA.radians, moonDec.radians, 
+                                                                     observer.target.latitude.radians, observer.target.longitude.radians )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
+
+        t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 )
+        t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemerisPlanets ) )
+        moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
+        moonPhaseDateTimes = t.utc_datetime()
+        nextNewMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] # New moon.
+        nextFullMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] # Full moon.
+        lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
+
+        neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
+                                                   moon, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+
+        if not neverUp:
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 1 ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] )
+
+            astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+
+
+
 def julianDayToGregorian( julianDay ):
     F, Z = math.modf( julianDay + 0.5 )
     if Z < 2299161:
