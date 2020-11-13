@@ -1,14 +1,14 @@
 # Portable Object Template for indicatorbase.
-# Copyright (C) 2019 Bernard Giannetti
+# Copyright (C) 2017-2020 Bernard Giannetti
 # This file is distributed under the same license as the indicatorbase package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorbase 1.0.0\n"
+"Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"POT-Creation-Date: 2020-11-13 07:21+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,12 +55,4 @@ msgstr ""
 
 #: indicatorbase.py:195
 msgid "error log"
-msgstr ""
-
-#: indicatorbase.py:275
-msgid "Autostart"
-msgstr ""
-
-#: indicatorbase.py:276
-msgid "Run the indicator automatically."
 msgstr ""
