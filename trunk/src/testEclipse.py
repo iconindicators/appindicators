@@ -5,13 +5,9 @@
 from enum import Enum
 
 from skyfield import almanac
-# from skyfield import almanac, constants
 from skyfield.api import load
-# from skyfield.api import EarthSatellite, load, Star, Topos
-# from skyfield.data import hipparcos, mpc
-# from skyfield.magnitudelib import planetary_magnitude
 
-import calendar, datetime, ephem, math
+import calendar, datetime, math
 
 
 class EclipseType( Enum ):
@@ -24,46 +20,20 @@ class EclipseType( Enum ):
     PARTIAL = 6
 
 
-def getMoonDatesForOneYearPyEphem( utcNow, isFullMoon, latitude, longitude, elevation ):
-    city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
-    city.lat = str( latitude )
-    city.lon = str( longitude )
-    city.elev = elevation
-
-    moon = ephem.Moon()
-
-    dates = [ ]
-    date = utcNow
-    for i in range( 12 ):
-        city.date = ephem.Date( date )
-        moon.compute( city )
-        if isFullMoon:
-            dates.append( ephem.next_full_moon( date ).datetime() )
-
-        else:
-            dates.append( ephem.next_new_moon( date ).datetime() )
-
-        date = dates[ -1 ] + datetime.timedelta( days = 1 ) # Look for next full/new moon one starting one day later.
-
-    return dates
-
-
-def getMoonDatesForOneYearSkyfield( utcNow, timeScale, ephemeris, isFullMoon ):
-    t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+def getMoonDatesForOneYear( utcNow, timeScale, ephemeris ):
+    t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day )
     t1 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 366 )
     t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemeris ) )
     moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
     moonPhaseDateTimes = t.utc_datetime()
-    nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 0 ] ) : : 4 ].tolist() # New moon.
-    nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 2 ] ) : : 4 ].tolist() # Full moon.
-
-    if isFullMoon:
-        return nextFullMoonDateTime
-
-    else:
-        return nextNewMoonDateTime
+    nextNewMoonDateTimes = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 0 ] ) : : 4 ].tolist() # New moon.
+    nextFullMoonDateTimes = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 2 ] ) : : 4 ].tolist() # Full moon.
+    return nextFullMoonDateTimes, nextNewMoonDateTimes
 
 
+# Chapter 5
+# Practical Astronomy with your Calculator or Spreadsheet, Fourth Edition
+# Peter Duffett-Smith, Jonathan Zwart
 def julianDayToGregorian( julianDay ):
     F, Z = math.modf( julianDay + 0.5 )
     if Z < 2299161:
@@ -95,7 +65,10 @@ def julianDayToGregorian( julianDay ):
     return datetime.datetime( year, month, 1 ) + datetime.timedelta( days = dayOfMonth - 1 )
 
 
-# Sample implementations...not sure which is correct, if any!
+# This function is unfinished...and likely very wrong!
+# Cannot make sense of the way to determine eclipse type.
+#
+# Sample implementations...not sure which is correct, if any.
 # https://github.com/pavolgaj/AstroAlgorithms4Python/blob/master/eclipse.py
 # https://github.com/soniakeys/meeus/blob/master/v3/eclipse/eclipse.go
 # https://github.com/soniakeys/meeus/blob/master/v3/eclipse/eclipse_test.go
@@ -129,8 +102,9 @@ def getType( gamma, u ):
     return eclipseType
 
 
-# Chapter 54 Astronomical Algorithms, Jean Meeus.
-# http://www.agopax.it/Libri_astronomia/Libri_astronomia.html
+# Chapter 54
+# Astronomical Algorithms, Second Edition
+# Jean Meeus
 def getEclipse( utcNow, isSolar, upcomingMoonDates ):
     eclipseDate = None
     date = utcNow
@@ -248,29 +222,12 @@ def getEclipse( utcNow, isSolar, upcomingMoonDates ):
     return eclipseDate, eclipseType
 
 
-latitude = -33
-longitude = 151
-elevation = 0
-
-# now = datetime.datetime.strptime( "1997-07-01", "%Y-%m-%d" )
+# Verify
+#    lunar: https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
+#    solar: https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 now = datetime.datetime.utcnow()
-fullMoonDates = getMoonDatesForOneYearPyEphem( now, True, latitude, longitude, elevation )
-newMoonDates = getMoonDatesForOneYearPyEphem( now, False, latitude, longitude, elevation )
-# print( fullMoonDates )
-# print( newMoonDates )
-# print( len( fullMoonDates ) )
-# print( len( newMoonDates ) )
-print( "Meeus solar eclipse:", getEclipse( now, True, newMoonDates ) )
-print( "Meeus lunar eclipse:", getEclipse( now, False, fullMoonDates ) )
 timeScale = load.timescale( builtin = True )
-# topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
-ephemeris = load( "planets.bsp" )
-fullMoonDates = getMoonDatesForOneYearSkyfield( now, timeScale, ephemeris, True )
-newMoonDates = getMoonDatesForOneYearSkyfield( now, timeScale, ephemeris, False )
-# print( fullMoonDates )
-# print( newMoonDates )
-# print( len( fullMoonDates ) )
-# print( len( newMoonDates ) )
-
+ephemeris = load( "de421.bsp" )
+fullMoonDates, newMoonDates = getMoonDatesForOneYear( now, timeScale, ephemeris )
 print( "Meeus solar eclipse:", getEclipse( now, True, newMoonDates ) )
 print( "Meeus lunar eclipse:", getEclipse( now, False, fullMoonDates ) )
