@@ -933,7 +933,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, t0 ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos )
+        observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ) #TODO Need the extra ( ) ?
         sunRA, sunDec, earthDistance = observer.at( t0 ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = observer.at( t0 ).observe( moon ).apparent().radec()
         brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
@@ -946,8 +946,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
-        nextNewMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] # New moon.
-        nextFullMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] # Full moon.
+        nextNewMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] # New moon.   #TODO Need the extra ( ) ?
+        nextFullMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] # Full moon.   #TODO Need the extra ( ) ?
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
 
