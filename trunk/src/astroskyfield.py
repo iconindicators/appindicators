@@ -757,21 +757,29 @@ class AstroSkyfield( astrobase.AstroBase ):
             f.seek( 0 )
 #         with io.BytesIO( str( list( orbitalElementData.values() ) ).encode() ) as f:
             if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: #TODO Need to ensure that at least one element exists!
-                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-                for name, row in dataframe.iterrows():
-                    body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-                    ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
-                    ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False ) #TODO Test without the set_index
+                functionToCall = "comet_orbit"
 
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], 
-                                                                                     row[ "magnitude_G" ], 
-                                                                                     earthBodyDistance.au, 
-                                                                                     sunBodyDistance.au, 
-                                                                                     earthSunDistance.au )
+            else:
+                dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False ) #TODO Test without the set_index
+                functionToCall = "mpcorb_orbit"
 
-                    if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                        results[ name.upper() ] = orbitalElementData[ name.upper() ]
-                        print( name )
+        for name, row in dataframe.iterrows():
+#             body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            body = sun + getattr( __import__( "mpc", fromlist = [ "skyfield.data" ] ), functionToCall )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+#             body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
+            ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+
+            apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], 
+                                                                             row[ "magnitude_G" ], 
+                                                                             earthBodyDistance.au, 
+                                                                             sunBodyDistance.au, 
+                                                                             earthSunDistance.au )
+
+            if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                results[ name.upper() ] = orbitalElementData[ name.upper() ]
+                print( name )
 
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
