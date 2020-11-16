@@ -960,6 +960,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] )
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] )
 
+#TODO Skyfield will eventually calculate eclipses...
+# https://github.com/skyfielders/python-skyfield/blob/master/skyfield/documentation/almanac.rst
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
 
