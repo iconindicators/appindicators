@@ -967,6 +967,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, topos, ephemerisPlanets ):
+#TODO Use the link below to calculate sunrise and sunset and see how it compares against what is calculated in common.
+# https://rhodesmill.org/skyfield/almanac.html
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
                                                    ephemerisPlanets[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
