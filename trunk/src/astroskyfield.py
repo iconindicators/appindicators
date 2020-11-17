@@ -765,8 +765,13 @@ class AstroSkyfield( astrobase.AstroBase ):
                 functionToCall = "mpcorb_orbit"
 
         for name, row in dataframe.iterrows():
+            if not( name == "141P/Machholz" or name == "141P-H/Machholz" ): continue
+            
+            
 #             body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            body = sun + getattr( __import__( "mpc", fromlist = [ "skyfield.data" ] ), functionToCall )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            import importlib
+            body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), functionToCall )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+
 #             body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
@@ -777,12 +782,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                                              sunBodyDistance.au, 
                                                                              earthSunDistance.au )
 
-            if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ name.upper() ] = orbitalElementData[ name.upper() ]
                 print( name )
 
-            else:
-                dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+#             else:
+#                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
 #                 body = sun + mpc.mpcorb_orbit( dataframe.loc[ orbitalElementData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
         
