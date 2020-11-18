@@ -739,6 +739,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         results = { }
 
+#TODO Noted the comets file is MUCH larger than that when done with PyEphem!
         with io.BytesIO() as f:
             for value in orbitalElementData.values():
                 f.write( ( value.getData() + '\n' ).encode() )
