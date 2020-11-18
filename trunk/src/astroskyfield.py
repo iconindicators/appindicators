@@ -30,7 +30,7 @@
 
 
 try:
-    from skyfield import almanac, constants
+    from skyfield import almanac, constants, eclipselib
     from skyfield.api import EarthSatellite, load, Star, Topos
     from skyfield.data import hipparcos, mpc
     from skyfield.magnitudelib import planetary_magnitude
@@ -757,6 +757,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
+            #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
+            # https://github.com/skyfielders/python-skyfield/issues/416
             apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
                                                                              row[ "magnitude_G" ], 
                                                                              earthBodyDistance.au,
@@ -765,9 +767,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ name.upper() ] = orbitalElementData[ name.upper() ]
-                print( "\t", name )
 
-        print( len( orbitalElementData ), len( results ) )#TODO Testing
         return results
 
 
@@ -828,8 +828,13 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] )
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] )
 
-#TODO Skyfield will eventually calculate eclipses...
-# https://github.com/skyfielders/python-skyfield/blob/master/skyfield/documentation/almanac.rst
+#TODO Skyfield can calculate lunar eclipses...
+# https://github.com/skyfielders/python-skyfield/commit/263311586aa6339a817631eb619fcbc398433c7c
+# https://github.com/skyfielders/python-skyfield/issues/445
+#             t, y, details = eclipselib.lunar_eclipses( t0, timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day ), ephemerisPlanets )
+#             for ti, yi in zip(t, y):
+#                 print( ti.utc_strftime( "%Y-%m-%d %H:%M" ), "y={}".format( yi ), eclipselib.LUNAR_ECLIPSES[ yi ] )
+
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
 
 
@@ -902,36 +907,47 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                      Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
 
 
+#TODO Should this be renamed similarly to the getOrbitalElementsLessThanMagnitude as above to __calculateOrbitalElements?
+# If so, need to rename in base class and pyephem library.
+# Maybe run past Oleg.
     @staticmethod
     def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
 #TODO See if some of this code can be put into a function to be shared with the magnitude filter function.
+# If not, need to rewrite the loop(s) such that the dataframe is loaded ONCE!
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         sun = ephemerisPlanets[ "sun" ]
         earth = ephemerisPlanets[ "earth" ]
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
-        for key in cometsOrMinorPlanets:
-            if key in cometOrMinorPlanetData:
-                with io.BytesIO( cometOrMinorPlanetData[ key ].getData().encode() ) as f:
-                    if cometOrMinorPlanetData[ key ].getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET:
-                        dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-                        body = sun + mpc.comet_orbit( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+        with io.BytesIO() as f:
+            for key in cometsOrMinorPlanets:
+                if key in cometOrMinorPlanetData:
+                    f.write( ( cometOrMinorPlanetData[ key ].getData() + '\n' ).encode() )
+            f.seek( 0 )
+            if bodyType == astrobase.AstroBase.BodyType.COMET:
+                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                orbitCalculationFunction = "comet_orbit"
+ 
+            else:
+                dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                orbitCalculationFunction = "mpcorb_orbit"
 
-                    else:
-                        dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
-                        body = sun + mpc.mpcorb_orbit( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ], timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+        for name, row in dataframe.iterrows():
+            body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+ 
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
+            ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+ 
+            #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
+            # https://github.com/skyfielders/python-skyfield/issues/416
+            apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
+                                                                             row[ "magnitude_G" ], 
+                                                                             earthBodyDistance.au,
+                                                                             sunBodyDistance.au,
+                                                                             earthSunDistance.au )
 
-                ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
-                ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
-
-                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_H" ], 
-                                                                                 dataframe.loc[ cometOrMinorPlanetData[ key ].getName() ][ "magnitude_G" ], 
-                                                                                 earthBodyDistance.au,
-                                                                                 sunBodyDistance.au,
-                                                                                 earthSunDistance.au )
-
-                if apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                    AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
-                    print( cometOrMinorPlanetData[ key ].getName(), apparentMagnitude )#TODO Testing
+            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
+                print( cometOrMinorPlanetData[ key ].getName(), apparentMagnitude )#TODO Testing
 
 
     @staticmethod
