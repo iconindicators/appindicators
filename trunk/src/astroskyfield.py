@@ -765,6 +765,9 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                                              sunBodyDistance.au,
                                                                              earthSunDistance.au )
 
+            if apparentMagnitude and row[ "magnitude_H" ] > apparentMagnitude:
+                print( row[ "magnitude_H" ], apparentMagnitude )
+
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ name.upper() ] = orbitalElementData[ name.upper() ]
 
