@@ -883,7 +883,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 apparentMagnitude = planetary_magnitude( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( t ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
 
             else:
-                #TODO Hard coded for now until Skyfield can provide calculated apparent magnitude...
+                #TODO Hard coded until Skyfield calculates apparent magnitude...
                 # https://github.com/skyfielders/python-skyfield/issues/210
                 # https://rhodesmill.org/skyfield/api.html#skyfield.magnitudelib.planetary_magnitude
                 if planet == astrobase.AstroBase.PLANET_MARS:
@@ -933,7 +933,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             if bodyType == astrobase.AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False ) #TODO See above in getOrbitalElementsLessThanMagnitude if we still need designation.
                 orbitCalculationFunction = "comet_orbit"
- 
+
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "mpcorb_orbit"
@@ -942,7 +942,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
- 
+
             apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
                                                                              row[ "magnitude_G" ], 
                                                                              earthBodyDistance.au,
