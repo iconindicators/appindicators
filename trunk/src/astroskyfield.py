@@ -929,9 +929,11 @@ class AstroSkyfield( astrobase.AstroBase ):
             for key in orbitalElements:
                 if key in orbitalElementData:
                     f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+
             f.seek( 0 )
+
             if bodyType == astrobase.AstroBase.BodyType.COMET:
-                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False ) #TODO See above in getOrbitalElementsLessThanMagnitude if we still need designation.
                 orbitCalculationFunction = "comet_orbit"
  
             else:
@@ -940,12 +942,9 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         for name, row in dataframe.iterrows():
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
- 
-            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
  
-            #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
-            # https://github.com/skyfielders/python-skyfield/issues/416
             apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
                                                                              row[ "magnitude_G" ], 
                                                                              earthBodyDistance.au,
@@ -954,7 +953,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
-                print( orbitalElementData[ key ].getName(), apparentMagnitude )#TODO Testing
 
 
     @staticmethod
@@ -990,6 +988,10 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
+#TODO Getting
+# /usr/local/lib/python3.6/dist-packages/skyfield/functions.py:78: RuntimeWarning: invalid value encountered in remainder
+#   phi = arctan2(y, x) % tau
+#
     # https://spotthestation.nasa.gov/sightings/index.cfm
     # https://www.heavens-above.com/PassSummary.aspx
     # https://www.n2yo.com/passes/?s=25544
