@@ -689,6 +689,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                    minorPlanets, minorPlanetData,
                    magnitudeMaximum ):
 
+        print( "Calculating..." ) #TODO Testing
         data = { }
         timeScale = load.timescale( builtin = True )
         topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
@@ -706,8 +707,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         AstroSkyfield.__calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets,
                                                        astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
 
-        AstroSkyfield.__calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets,
-                                                       astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+#TODO Comment out for now...
+#         AstroSkyfield.__calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets,
+#                                                        astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
 
         AstroSkyfield.__calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData )
 
@@ -757,6 +759,9 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+            if earthBodyDistance.au >= 1.0 and row[ "magnitude_H" ] >= magnitudeMaximum:
+#                 print( "\t\tDropping", name )#TODO Testing
+                continue
 
             #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
             # https://github.com/skyfielders/python-skyfield/issues/416
@@ -766,12 +771,13 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                                              sunBodyDistance.au,
                                                                              earthSunDistance.au )
 
-            if apparentMagnitude and row[ "magnitude_H" ] > apparentMagnitude:
-                print( row[ "magnitude_H" ], apparentMagnitude )
-
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ name.upper() ] = orbitalElementData[ name.upper() ]
+#                 print( "Keeping:", name ) #TODO Testing
 
+            print( name, row[ "magnitude_H" ], apparentMagnitude )
+
+        print( len( orbitalElementData ), print( len( results ) ) )
         return results
 
 
