@@ -919,8 +919,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
-#TODO See if some of this code can be put into a function to be shared with the magnitude filter function.
-# If not, need to rewrite the loop(s) such that the dataframe is loaded ONCE!
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         sun = ephemerisPlanets[ "sun" ]
         earth = ephemerisPlanets[ "earth" ]
