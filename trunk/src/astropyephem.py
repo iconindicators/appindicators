@@ -575,10 +575,10 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     # Compute data for comets or minor planets.
     @staticmethod
-    def __calculateOrbitalElements( ephemNow, data, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
-        for key in cometsOrMinorPlanets:
-            if key in cometOrMinorPlanetData:
-                body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
+    def __calculateOrbitalElements( ephemNow, data, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
+        for key in orbitalElements:
+            if key in orbitalElementData:
+                body = ephem.readdb( orbitalElementData[ key ].getData() )
                 body.compute( AstroPyEphem.__getCity( data, ephemNow ) )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
                 if not bad and body.mag <= magnitudeMaximum:

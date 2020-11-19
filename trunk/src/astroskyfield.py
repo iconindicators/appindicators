@@ -918,7 +918,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+    def __calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
 #TODO See if some of this code can be put into a function to be shared with the magnitude filter function.
 # If not, need to rewrite the loop(s) such that the dataframe is loaded ONCE!
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
@@ -926,9 +926,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         earth = ephemerisPlanets[ "earth" ]
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         with io.BytesIO() as f:
-            for key in cometsOrMinorPlanets:
-                if key in cometOrMinorPlanetData:
-                    f.write( ( cometOrMinorPlanetData[ key ].getData() + '\n' ).encode() )
+            for key in orbitalElements:
+                if key in orbitalElementData:
+                    f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
             f.seek( 0 )
             if bodyType == astrobase.AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
@@ -954,7 +954,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
-                print( cometOrMinorPlanetData[ key ].getName(), apparentMagnitude )#TODO Testing
+                print( orbitalElementData[ key ].getName(), apparentMagnitude )#TODO Testing
 
 
     @staticmethod
