@@ -704,12 +704,11 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         AstroSkyfield.__calculateStars( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
 
-        AstroSkyfield.__calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets,
-                                                       astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+        AstroSkyfield.__calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets,
+                                                  astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
 
-#TODO Comment out for now...
-#         AstroSkyfield.__calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets,
-#                                                        astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+        AstroSkyfield.__calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets,
+                                                  astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
 
         AstroSkyfield.__calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData )
 
@@ -726,10 +725,9 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                       AstroSkyfield._city_data.get( city )[ 2 ]
 
 
-#TODO Hit an exception and logged it
-# https://github.com/skyfielders/python-skyfield/issues/449
-# So need to reproduce (maybe in test code)
-# but also see if the suggestion of using the dataframe loaded once makes a difference (may need a new issue logged for that).
+#TODO As per
+# https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+# maybe log another issue because the dataframe might be slowing things down.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
         timeScale = load.timescale( builtin = True )
@@ -741,11 +739,12 @@ class AstroSkyfield( astrobase.AstroBase ):
         alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
         results = { }
 
-#TODO Noted the comets file is MUCH larger than that when done with PyEphem!
         with io.BytesIO() as f:
             for value in orbitalElementData.values():
                 f.write( ( value.getData() + '\n' ).encode() )
+
             f.seek( 0 )
+
             if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: #TODO Need to ensure that at least one element exists!
                 dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "comet_orbit"
@@ -754,30 +753,31 @@ class AstroSkyfield( astrobase.AstroBase ):
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "mpcorb_orbit"
 
+                # Have found that bad data can cause an exception, so remove some data as per
+                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+
+#TODO By setting the index above for designation it allows access to the name below in the loop.
+# Does this slow things down?  Is there another way to get the name?
         for name, row in dataframe.iterrows():
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-
-            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
-            if earthBodyDistance.au >= 1.0 and row[ "magnitude_H" ] >= magnitudeMaximum:
-#                 print( "\t\tDropping", name )#TODO Testing
-                continue
 
-            #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
-            # https://github.com/skyfielders/python-skyfield/issues/416
-            apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
-                                                                             row[ "magnitude_G" ], 
-                                                                             earthBodyDistance.au,
-                                                                             sunBodyDistance.au,
-                                                                             earthSunDistance.au )
+            # Skip a body if its absolute magnitude exceeds the maximum magnitude and is more than 1AU from Earth.
+            if earthBodyDistance.au <= 1.0 and row[ "magnitude_H" ] <= magnitudeMaximum:
+                ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                results[ name.upper() ] = orbitalElementData[ name.upper() ]
-#                 print( "Keeping:", name ) #TODO Testing
+                #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
+                # https://github.com/skyfielders/python-skyfield/issues/416
+                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
+                                                                                 row[ "magnitude_G" ], 
+                                                                                 earthBodyDistance.au,
+                                                                                 sunBodyDistance.au,
+                                                                                 earthSunDistance.au )
 
-            print( name, row[ "magnitude_H" ], apparentMagnitude )
+                if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                    results[ name.upper() ] = orbitalElementData[ name.upper() ]
 
-        print( len( orbitalElementData ), print( len( results ) ) )
         return results
 
 
@@ -917,11 +917,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                      Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
 
 
-#TODO Should this be renamed similarly to the getOrbitalElementsLessThanMagnitude as above to __calculateOrbitalElements?
-# If so, need to rename in base class and pyephem library.
-# Maybe run past Oleg.
     @staticmethod
-    def __calculateCometsOrMinorPlanets( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+    def __calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
 #TODO See if some of this code can be put into a function to be shared with the magnitude filter function.
 # If not, need to rewrite the loop(s) such that the dataframe is loaded ONCE!
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )

@@ -452,8 +452,8 @@ class AstroPyEphem( astrobase.AstroBase ):
         AstroPyEphem.__calculateSun( ephemNow, data )
         AstroPyEphem.__calculatePlanets( ephemNow, data, planets, magnitudeMaximum )
         AstroPyEphem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
-        AstroPyEphem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
-        AstroPyEphem.__calculateCometsOrMinorPlanets( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
         AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
@@ -575,7 +575,7 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     # Compute data for comets or minor planets.
     @staticmethod
-    def __calculateCometsOrMinorPlanets( ephemNow, data, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
+    def __calculateOrbitalElements( ephemNow, data, bodyType, cometsOrMinorPlanets, cometOrMinorPlanetData, magnitudeMaximum ):
         for key in cometsOrMinorPlanets:
             if key in cometOrMinorPlanetData:
                 body = ephem.readdb( cometOrMinorPlanetData[ key ].getData() )
