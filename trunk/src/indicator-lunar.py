@@ -97,8 +97,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
 
     else:
-#         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
-        COMET_DATA_URL = "file:///home/bernard/Desktop/Soft00Cmt.txt" #TODO Testing
+        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
 
 
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
@@ -168,7 +167,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
 
-#TODO Test this before doing a release!!!!
     #TODO Start of temporary hack...remove in later release.
     # Cache data formats for comets and minor planets changed between version 84 and 85, so remove old format files.
     #
@@ -183,7 +181,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     data = pickle.load( f )
                     if data and not hasattr( next( iter( data.values() ) ), "dataType" ): 
                         os.remove( cachePath + file )
-                        print( "Removing previous version cache file", cachePath + file )#TODO Testing
 
 
     #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center.
@@ -353,26 +350,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
-
-#TODO Testing
-#         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and not( cacheBaseName == "comet-oe-" or cacheBaseName == "satellite-tle-" ):
-#             return { }, cacheDateTime, downloadCount, nextDownloadTime
-#TODO End testing.
-
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
         else:
             data = { }
             if nextDownloadTime < utcNow:
-                print( "Downloading:", cacheBaseName )#TODO Debug
                 data = downloadDataFunction( *downloadDataArguments )
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
-                        now = datetime.datetime.utcnow()#TODO Testing
                         data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
-                        print( cacheBaseName, "magnitude filter:", str( datetime.datetime.utcnow() - now ) )#TODO Testing
  
                     self.writeCacheBinary( cacheBaseName, data )
                     downloadCount = 0
@@ -382,40 +370,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 else:
                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
  
-        return data, cacheDateTime, downloadCount, nextDownloadTime
-
-
-#TODO Remove
-    def updateDataORIGINAL( self, utcNow, cacheDateTime, cacheMaximumAge, cacheBaseName, downloadDataFunction, dataURL, dataType, downloadCount, nextDownloadTime, magnitudeFilterFunction = None ):
-        if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            data = self.readCacheBinary( cacheBaseName )
-
-        else:
-            data = { }
-            if nextDownloadTime < utcNow:
-                data = downloadDataFunction( dataURL, dataType, self.getLogging() ) #TODO Need to fix for TLE download function.
-                downloadCount += 1
-                if data:
-                    if magnitudeFilterFunction:
-                        data = magnitudeFilterFunction( data, astrobase.AstroBase.MAGNITUDE_MAXIMUM )
-
-                    if data:
-                        self.writeCacheBinary( cacheBaseName, data )
-                        downloadCount = 0
-                        cacheDateTime = self.getCacheDateTime( cacheBaseName )
-                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-
-                    else:
-                        # Data was filtered out, so do not write out an empty file.
-                        # Ensure the cache read is not attempted on the next update, as the cache will be empty.
-                        # Ensure the next download attempt happens at a time in the future such that the cache would have expired.
-                        # If a new body appears within that period, it will be missed, but c'est la vie.
-                        cacheDateTime = utcNow - datetime.timedelta( hours = cacheMaximumAge )
-                        nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-
-                else:
-                    nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
-
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
