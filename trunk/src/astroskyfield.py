@@ -689,7 +689,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                    minorPlanets, minorPlanetData,
                    magnitudeMaximum ):
 
-        print( "Calculating..." ) #TODO Testing
         data = { }
         timeScale = load.timescale( builtin = True )
         topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
@@ -811,7 +810,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, t0 ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        observer = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos ) #TODO Need the extra ( ) ?
+        observer = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + topos
         sunRA, sunDec, earthDistance = observer.at( t0 ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = observer.at( t0 ).observe( moon ).apparent().radec()
         brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow, 
@@ -824,8 +823,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( t0, t1, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
-        nextNewMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] # New moon.   #TODO Need the extra ( ) ?
-        nextFullMoonDateTime = moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] # Full moon.   #TODO Need the extra ( ) ?
+        nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ] # New moon.
+        nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ] # Full moon.
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
 
@@ -841,17 +840,23 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Skyfield can calculate lunar eclipses...
 # https://github.com/skyfielders/python-skyfield/commit/263311586aa6339a817631eb619fcbc398433c7c
 # https://github.com/skyfielders/python-skyfield/issues/445
+# Before this can be used, need to figure out how to retain the Eclipse class for PyEphem (and it's eclipse types) and also allow Skyfield's way of doing things.
 #             t, y, details = eclipselib.lunar_eclipses( t0, timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day ), ephemerisPlanets )
 #             for ti, yi in zip(t, y):
 #                 print( ti.utc_strftime( "%Y-%m-%d %H:%M" ), "y={}".format( yi ), eclipselib.LUNAR_ECLIPSES[ yi ] )
-
+# 
+#             print( "-------------")
+# 
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+#             key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] )
+#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] )
+#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
+#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
 
 
     @staticmethod
     def __calculateSun( utcNow, data, timeScale, topos, ephemerisPlanets ):
-#TODO Use the link below to calculate sunrise and sunset and see how it compares against what is calculated in common.
-# https://rhodesmill.org/skyfield/almanac.html
         neverUp = AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets,
                                                    ephemerisPlanets[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
