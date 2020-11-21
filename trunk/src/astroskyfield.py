@@ -837,22 +837,10 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] )
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] )
 
-#TODO Skyfield can calculate lunar eclipses...
-# https://github.com/skyfielders/python-skyfield/commit/263311586aa6339a817631eb619fcbc398433c7c
-# https://github.com/skyfielders/python-skyfield/issues/445
-# Before this can be used, need to figure out how to retain the Eclipse class for PyEphem (and it's eclipse types) and also allow Skyfield's way of doing things.
-#             t, y, details = eclipselib.lunar_eclipses( t0, timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day ), ephemerisPlanets )
-#             for ti, yi in zip(t, y):
-#                 print( ti.utc_strftime( "%Y-%m-%d %H:%M" ), "y={}".format( yi ), eclipselib.LUNAR_ECLIPSES[ yi ] )
-# 
-#             print( "-------------")
-# 
-            astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-#             key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] )
-#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] )
-#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
-#             print( data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
+            t, y, details = eclipselib.lunar_eclipses( t0, timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day ), ephemerisPlanets )
+            key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( "%Y-%m-%d %H:%M:%S" )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
     @staticmethod
@@ -874,6 +862,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
+#TODO Once solar eclipses are implemented in Skyfield, replace the line below with similar functionality to lunar eclipses above.            
             astrobase.AstroBase.getEclipse( utcNow, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 

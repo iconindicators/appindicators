@@ -608,10 +608,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         key = ( bodyType, nameTag )
         self.createMenuItem( menu, self.indent( 0, 1 ) + _( "Eclipse" ), url )
         self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ), url )
-        latitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) )
-        longitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) )
-        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url )
         self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ), url )
+        if key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
+            latitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) )
+            longitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) )
+            self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url )
 
 
     def updateMenuPlanets( self, menu ):
