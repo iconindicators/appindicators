@@ -32,7 +32,7 @@ def testSkyfield( orbitalElementData, utcNow, latitude, longitude, elevation ):
 
     for name, row in dataframe.iterrows():
         try:
-            body = sun + skyfield.data.mpc.mpcorb_orbit( dataframe.loc[ name ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            body = sun + skyfield.data.mpc.mpcorb_orbit( row, timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
