@@ -744,6 +744,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             f.seek( 0 )
 
+#TODO Instead of doing the check if the data is a comet, pass in an argument say isComet?
             if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: #TODO Need to ensure that at least one element exists!
                 dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "comet_orbit"
