@@ -26,15 +26,17 @@ def testSkyfield( orbitalElementData, utcNow, latitude, longitude, elevation ):
 
         dataframe = skyfield.data.mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
 
-        for name, row in dataframe.iterrows():
-            try:
-                body = sun + skyfield.data.mpc.comet_orbit( dataframe.loc[ name ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
-                ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
-                ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
+    start = datetime.datetime.utcnow()
+    for name, row in dataframe.iterrows():
+        try:
+            body = sun + skyfield.data.mpc.comet_orbit( dataframe.loc[ name ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-            except Exception as e:
-                print( name )
-                print( e )
+        except Exception as e:
+            print( name )
+            print( e )
+    print( "Skyfield2:", skyfield.__version__, '\n', "Duration:", datetime.datetime.utcnow() - start, '\n' )
 
 
 def testPyEphem( orbitalElementData, utcNow, latitude, longitude, elevation ):

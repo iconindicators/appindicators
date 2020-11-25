@@ -30,15 +30,15 @@ def testSkyfield( orbitalElementData, utcNow, latitude, longitude, elevation ):
         # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
         dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
-        for name, row in dataframe.iterrows():
-            try:
-                body = sun + skyfield.data.mpc.mpcorb_orbit( dataframe.loc[ name ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
-                ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
-                ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
+    for name, row in dataframe.iterrows():
+        try:
+            body = sun + skyfield.data.mpc.mpcorb_orbit( dataframe.loc[ name ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-            except Exception as e:
-                print( name )
-                print( e )
+        except Exception as e:
+            print( name )
+            print( e )
 
 
 def testPyEphem( orbitalElementData, utcNow, latitude, longitude, elevation ):
