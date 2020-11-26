@@ -24,14 +24,14 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     sun.compute( observer )
 
     if isComet:
-        apparentMagnitude = calculateApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
+        apparentMagnitude = getApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
         print( "PyEphem", name,
                "\n\tMagnitude (from PyEphem):", body.mag,
                "\n\tEarth Body Disance AU:", body.earth_distance,
                "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
     else:
-        apparentMagnitude = calculateApparentMagnitude_HG( body._H, body._G, body.earth_distance, body.sun_distance, sun.earth_distance )
+        apparentMagnitude = getApparentMagnitude_HG( body._H, body._G, body.earth_distance, body.sun_distance, sun.earth_distance )
         print( "PyEphem", name,
                "\n\tMagnitude (from PyEphem):", body.mag,
                "\n\tAbsolute Magnitude (H from data file):", body._H,
@@ -61,7 +61,7 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     alt, az, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
     ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
 
-    apparentMagnitude = calculateApparentMagnitude_HG( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+    apparentMagnitude = getApparentMagnitude_HG( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
     print( "Skyfield", name,
            "\n\tAbsolute Magnitude (H from data file):", dataframe.loc[ name ][ "magnitude_H" ],
@@ -70,19 +70,39 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
 
 
 # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-def calculateApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistance, bodySunDistance ):
-    return g_absoluteMagnitude + 5 * math.log10( bodyEarthDistance ) + 2.5 * k_luminosityIndex * math.log10( bodySunDistance )
+def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
+    return g_absoluteMagnitude + \
+           5 * math.log10( bodyEarthDistanceAU ) + \
+           2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
 
 
+# Calculate apparent magnitude (returns None on error).
+#
 # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
 # https://www.britastro.org/asteroids/dymock4.pdf
-def calculateApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistance, bodySunDistance, earthSunDistance ):
-    beta = math.acos( ( bodySunDistance * bodySunDistance + bodyEarthDistance * bodyEarthDistance - earthSunDistance * earthSunDistance ) / ( 2 * bodySunDistance * bodyEarthDistance ) )
+def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
+    beta = math.acos( \
+                        ( bodySunDistanceAU * bodySunDistanceAU + \
+                          bodyEarthDistanceAU * bodyEarthDistanceAU - \
+                          earthSunDistanceAU * earthSunDistanceAU ) / \
+                        ( 2 * bodySunDistanceAU * bodyEarthDistanceAU ) \
+                    )
+
     psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
     Psi_1 = math.exp( -3.33 * psi_t )
     psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
     Psi_2 = math.exp( -1.87 * psi_t )
-    return H_absoluteMagnitude + 5.0 * math.log10( bodySunDistance * bodyEarthDistance ) - 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
+
+    # Have found a combination of G_slope, Psi_1 and Psi_2 can lead to a negative value in the log calculation.
+    try:
+        apparentMagnitude = H_absoluteMagnitude + \
+                            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
+                            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
+
+    except:
+        apparentMagnitude = None
+
+    return apparentMagnitude
 
 
 now = datetime.datetime.strptime( "2020-11-26", "%Y-%m-%d" )
