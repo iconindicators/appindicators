@@ -33,13 +33,13 @@ tle = [ "ISS (ZARYA)",
 # https://stackoverflow.com/questions/25966098/pyephem-next-pass-function-returns-different-result
 def getPassesPyEphem():
     print( "ISS passes calculated from PyEphem:" )
-    now = start
-    while( now < ( start + datetime.timedelta( days = duration ) ) ):
+    utcNow = start
+    while( utcNow < ( start + datetime.timedelta( days = duration ) ) ):
         observer = ephem.Observer()
         observer.lat = str( lat )
         observer.long = str( lon )
         observer.elevation = elev
-        observer.date = now
+        observer.date = utcNow
 
         sat = ephem.readtle( tle[ 0 ], tle[ 1 ], tle[ 2 ] )                 
         tr, azr, tt, altt, ts, azs = observer.next_pass( sat )
@@ -51,7 +51,7 @@ def getPassesPyEphem():
         if sat.eclipsed is False and ephem.degrees( '-18' ) < sun.alt < ephem.degrees( '-6' ):
             print( tr.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), azr, "\t", ts.datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ), azs )
 
-        now = observer.date.datetime() + datetime.timedelta( minutes = 90 )
+        utcNow = observer.date.datetime() + datetime.timedelta( minutes = 90 )
 
 
 # https://rhodesmill.org/skyfield/earth-satellites.html

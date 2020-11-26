@@ -225,9 +225,9 @@ def getEclipse( utcNow, isSolar, upcomingMoonDates ):
 # Verify
 #    lunar: https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 #    solar: https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
-now = datetime.datetime.utcnow()
+utcNow = datetime.datetime.utcnow()
 timeScale = load.timescale( builtin = True )
 ephemeris = load( "de421.bsp" )
-fullMoonDates, newMoonDates = getMoonDatesForOneYear( now, timeScale, ephemeris )
-print( "Meeus solar eclipse:", getEclipse( now, True, newMoonDates ) )
-print( "Meeus lunar eclipse:", getEclipse( now, False, fullMoonDates ) )
+fullMoonDates, newMoonDates = getMoonDatesForOneYear( utcNow, timeScale, ephemeris )
+print( "Meeus solar eclipse:", getEclipse( utcNow, True, newMoonDates ) )
+print( "Meeus lunar eclipse:", getEclipse( utcNow, False, fullMoonDates ) )

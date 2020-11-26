@@ -73,10 +73,10 @@ elevation = 100
 
 # Skyfield COMET
 t = datetime.datetime.utcnow()
- 
+
 with open( "Soft00Cmt.txt" ) as f:
     orbitalElementData = f.readlines()
- 
+
 testSkyfield( orbitalElementData, utcNow, latitude, longitude, elevation, isComet = True )
 print( "Skyfield COMET:", skyfield.__version__, '\n', "Duration:", datetime.datetime.utcnow() - t, '\n' )
 
