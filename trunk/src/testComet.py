@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 
+# Refer to https://github.com/skyfielders/python-skyfield/issues/490
+
+
 # Download and save 
 #     https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
 #     https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
@@ -52,7 +55,13 @@ def testPyEphem( orbitalElementData, utcNow, latitude, longitude, elevation ):
             observer.lon = str( longitude )
             observer.elev = elevation
             comet = ephem.readdb( line )
-            comet.compute( observer )
+            comet.compute( observer ) # Actually does very little under the covers...
+
+            # ...so force some actual work to be done.
+            comet.a_ra
+            comet.a_dec
+            comet.hlon
+            comet.hlat
 
 
 utcNow = datetime.datetime.strptime( "2020-11-24", "%Y-%m-%d" ) # Set to the date of the data files.
@@ -70,14 +79,14 @@ with open( "Soft00Cmt.txt" ) as f:
  
 testSkyfield( orbitalElementData, utcNow, latitude, longitude, elevation, isComet = True )
 print( "Skyfield COMET:", skyfield.__version__, '\n', "Duration:", datetime.datetime.utcnow() - t, '\n' )
- 
- 
+
+
 # PyEphem COMET
 t = datetime.datetime.utcnow()
- 
+
 with open( "Soft03Cmt.txt" ) as f:
     orbitalElementData = f.readlines()
- 
+
 testPyEphem( orbitalElementData, utcNow, latitude, longitude, elevation )
 print( "PyEphem COMET:", ephem.__version__, '\n', "Duration:", datetime.datetime.utcnow() - t, '\n' )
 
