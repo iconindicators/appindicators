@@ -26,17 +26,16 @@ def pyephemCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     if isComet:
         apparentMagnitude = calculateApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
         print( "PyEphem", name,
-               "\n\tMagnitude:", body.mag,
-               "\n\tg:", body._g,
-               "\n\tk:", body._k,
+               "\n\tMagnitude (from PyEphem):", body.mag,
+               "\n\tEarth Body Disance AU:", body.earth_distance,
                "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
     else:
         apparentMagnitude = calculateApparentMagnitude_HG( body._H, body._G, body.earth_distance, body.sun_distance, sun.earth_distance )
         print( "PyEphem", name,
-               "\n\tMagnitude:", body.mag,
-               "\n\tH:", body._H,
-               "\n\tG:", body._G,
+               "\n\tMagnitude (from PyEphem):", body.mag,
+               "\n\tAbsolute Magnitude (H from data file):", body._H,
+               "\n\tEarth Body Disance AU:", body.earth_distance,
                "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
 
@@ -44,7 +43,6 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     timeScale = skyfield.api.load.timescale( builtin = True )
     topos = skyfield.api.Topos( latitude_degrees = latitude, longitude_degrees = longitude )
     ephemeris = skyfield.api.load( "de421.bsp" )
-
     sun = ephemeris[ "sun" ]
     earth = ephemeris[ "earth" ]
 
@@ -66,9 +64,8 @@ def skyfieldCometMinorPlanet( now, latitude, longitude, name, data, isComet ):
     apparentMagnitude = calculateApparentMagnitude_HG( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
     print( "Skyfield", name,
-           "\n\tAbsolute Magnitude (from data file):", dataframe.loc[ name ][ "magnitude_H" ],
-           "\n\tH:", dataframe.loc[ name ][ "magnitude_H" ],
-           "\n\tG:", dataframe.loc[ name ][ "magnitude_G" ],
+           "\n\tAbsolute Magnitude (H from data file):", dataframe.loc[ name ][ "magnitude_H" ],
+           "\n\tEarth Body Distance AU:", earthBodyDistance.au,
            "\n\tApparent Magnitude (calculated):", apparentMagnitude )
 
 
@@ -88,18 +85,18 @@ def calculateApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistan
     return H_absoluteMagnitude + 5.0 * math.log10( bodySunDistance * bodyEarthDistance ) - 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
 
-now = datetime.datetime.strptime( "2020-07-27", "%Y-%m-%d" )
+now = datetime.datetime.strptime( "2020-11-26", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
 
 cometName = "88P/Howell"
 
 # https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-cometDataPyEphem = "88P/Howell,e,4.3838,56.6855,235.9158,3.105749,0.1800755,0.56433269,348.3628,07/24.0/2020,2000,g 11.0,6.0"
+cometDataPyEphem = "88P/Howell,e,4.3836,56.6820,235.9074,3.105705,0.1800793,0.56432890,10.6951,11/25.0/2020,2000,g 11.0,6.0"
 
 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
 # https://minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
-cometDataSkyfield = "0088P         2020 09 26.6239  1.353073  0.564333  235.9158   56.6855    4.3838  20200724  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
+cometDataSkyfield = "0088P         2020 09 26.6087  1.353066  0.564329  235.9074   56.6820    4.3836  20201125  11.0  6.0  88P/Howell                                               MPEC 2019-JE2"
 
 minorPlanetName = "(1) Ceres"
 
