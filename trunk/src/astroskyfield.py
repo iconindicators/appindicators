@@ -724,9 +724,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                       AstroSkyfield._city_data.get( city )[ 2 ]
 
 
-#TODO As per
-# https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-# maybe log another issue because the dataframe might be slowing things down.
+#TODO Issed logged with regard to slow speed of processing comets / minor planets:
+# https://github.com/skyfielders/python-skyfield/issues/490
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
         timeScale = load.timescale( builtin = True )
@@ -745,6 +744,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             f.seek( 0 )
 
 #TODO Instead of doing the check if the data is a comet, pass in an argument say isComet?
+# Use default argument on the base class definition of the function:
+#     def defaultArg(name, foo='Come here!'):
             if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: #TODO Need to ensure that at least one element exists!
                 dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "comet_orbit"
