@@ -724,60 +724,115 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                       AstroSkyfield._city_data.get( city )[ 2 ]
 
 
-#TODO Issed logged with regard to slow speed of processing comets / minor planets:
-# https://github.com/skyfielders/python-skyfield/issues/490
-    @staticmethod
-    def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
-        timeScale = load.timescale( builtin = True )
-        t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
-        sun = ephemerisPlanets[ "sun" ]
-        earth = ephemerisPlanets[ "earth" ]
-        topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
-        alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
-        results = { }
+    def __isOrbitalElementWithinMagnitude( orbitalElementData, magnitudeMaxiumu, utcNow, latitude, longitude, elevation ):
+        if len( orbitalElementData ):
+            timeScale = load.timescale( builtin = True )
+            t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+            ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
+            sun = ephemerisPlanets[ "sun" ]
+            earth = ephemerisPlanets[ "earth" ]
+            topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+            alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
 
-        with io.BytesIO() as f:
-            for value in orbitalElementData.values():
-                f.write( ( value.getData() + '\n' ).encode() )
+            with io.BytesIO() as f:
+                for value in orbitalElementData.values():
+                    f.write( ( value.getData() + '\n' ).encode() )
 
-            f.seek( 0 )
+                f.seek( 0 )
 
-#TODO Instead of doing the check if the data is a comet, pass in an argument say isComet?
-# Use default argument on the base class definition of the function:
-#     def defaultArg(name, foo='Come here!'):
-            if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: #TODO Need to ensure that at least one element exists!
-                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
-                orbitCalculationFunction = "comet_orbit"
+                if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: 
+                    dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                    orbitCalculationFunction = "comet_orbit"
 
-            else:
-                dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
-                orbitCalculationFunction = "mpcorb_orbit"
+                else:
+                    dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                    orbitCalculationFunction = "mpcorb_orbit"
 
-                # Have found that bad data can cause an exception, so remove some data as per
-                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-                dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+                    # Have found that bad data can cause an exception, so remove some data as per
+                    # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                    dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
 #TODO By setting the index above for designation it allows access to the name below in the loop.
 # Does this slow things down?  Is there another way to get the name?
         for name, row in dataframe.iterrows():
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-            # Skip a body if its absolute magnitude exceeds the maximum magnitude and is more than 1AU from Earth.
-            if earthBodyDistance.au <= 1.0 and row[ "magnitude_H" ] <= magnitudeMaximum:
-                ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
-
-                #TODO This is a slow calculation...not sure if/when Skyfield can provide something faster.
+            if orbitCalculationFunction == "comet_orbit":
+                # TODO The fields "magnitude_H" and "magnitude_G" really should be called "magnitude_g" and "magnitude_k".
                 # https://github.com/skyfielders/python-skyfield/issues/416
+                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_H" ],
+                                                                                 row[ "magnitude_G" ], 
+                                                                                 earthBodyDistance.au, 
+                                                                                 sunBodyDistance.au )
+
+            else:
                 apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
                                                                                  row[ "magnitude_G" ], 
                                                                                  earthBodyDistance.au,
                                                                                  sunBodyDistance.au,
                                                                                  earthSunDistance.au )
 
-                if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                    results[ name.upper() ] = orbitalElementData[ name.upper() ]
+            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+
+
+#TODO Issue logged with regard to slow speed of processing comets / minor planets:
+# https://github.com/skyfielders/python-skyfield/issues/490
+    @staticmethod
+    def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum, utcNow, latitude, longitude, elevation ):
+        results = { }
+        if len( orbitalElementData ):
+            timeScale = load.timescale( builtin = True )
+            t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+            ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
+            sun = ephemerisPlanets[ "sun" ]
+            earth = ephemerisPlanets[ "earth" ]
+            topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
+            alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
+
+            with io.BytesIO() as f:
+                for value in orbitalElementData.values():
+                    f.write( ( value.getData() + '\n' ).encode() )
+
+                f.seek( 0 )
+
+                if next( iter( orbitalElementData.values() ) ).getDataType() == orbitalelement.OE.DataType.SKYFIELD_COMET: 
+                    dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                    orbitCalculationFunction = "comet_orbit"
+
+                else:
+                    dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                    orbitCalculationFunction = "mpcorb_orbit"
+
+                    # Have found that bad data can cause an exception, so remove some data as per
+                    # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                    dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+
+#TODO By setting the index above for designation it allows access to the name below in the loop.
+# Does this slow things down?  Is there another way to get the name?
+        for name, row in dataframe.iterrows():
+            body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
+
+            if orbitCalculationFunction == "comet_orbit":
+                # TODO The fields "magnitude_H" and "magnitude_G" really should be called "magnitude_g" and "magnitude_k".
+                # https://github.com/skyfielders/python-skyfield/issues/416
+                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_H" ],
+                                                                                 row[ "magnitude_G" ], 
+                                                                                 earthBodyDistance.au, 
+                                                                                 sunBodyDistance.au )
+
+            else:
+                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
+                                                                                 row[ "magnitude_G" ], 
+                                                                                 earthBodyDistance.au,
+                                                                                 sunBodyDistance.au,
+                                                                                 earthSunDistance.au )
+
+            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                results[ name.upper() ] = orbitalElementData[ name.upper() ]
 
         return results
 
