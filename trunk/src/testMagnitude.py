@@ -37,6 +37,7 @@ def pyephemCometMinorPlanet( utcNow, latitude, longitude, name, data, isComet ):
         apparentMagnitude = getApparentMagnitude_gk( body._g, body._k, body.earth_distance, body.sun_distance )
         print( "PyEphem", name,
                "\n\tMagnitude (from PyEphem):", body.mag,
+               "\n\tAbsolute Magnitude (g from data file):", body._g,
                "\n\tEarth Body Distance AU:", body.earth_distance,
                "\n\tApparent Magnitude (calculated):", apparentMagnitude,
                "\n" )
@@ -52,11 +53,14 @@ def pyephemCometMinorPlanet( utcNow, latitude, longitude, name, data, isComet ):
 
 
 def skyfieldCometMinorPlanet( utcNow, latitude, longitude, name, data, isComet ):
-    timeScale = skyfield.api.load.timescale( builtin = True )
     topos = skyfield.api.Topos( latitude_degrees = latitude, longitude_degrees = longitude )
     ephemeris = skyfield.api.load( "de421.bsp" )
     sun = ephemeris[ "sun" ]
     earth = ephemeris[ "earth" ]
+
+    timeScale = skyfield.api.load.timescale( builtin = True )
+    t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+    alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
 
     with io.BytesIO( getData( name, data ).encode() ) as f:
         if isComet:
@@ -67,18 +71,26 @@ def skyfieldCometMinorPlanet( utcNow, latitude, longitude, name, data, isComet )
             dataframe = skyfield.data.mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
             body = sun + skyfield.data.mpc.mpcorb_orbit( dataframe.loc[ name ], timeScale, skyfield.constants.GM_SUN_Pitjeva_2005_km3_s2 )
 
-    t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-    alt, az, earthSunDistance = ( earth + topos ).at( t ).observe( sun ).apparent().altaz()
     ra, dec, sunBodyDistance = ( sun ).at( t ).observe( body ).radec()
     alt, az, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).apparent().altaz()
 
-    apparentMagnitude = getApparentMagnitude_HG( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+    if isComet:
+        # The fields "magnitude_H" and "magnitude_G" really should be called "magnitude_g" and "magnitude_k".
+        apparentMagnitude = getApparentMagnitude_gk( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au )
+        print( "Skyfield", name,
+               "\n\tAbsolute Magnitude (g from data file):", dataframe.loc[ name ][ "magnitude_H" ],
+               "\n\tEarth Body Distance AU:", earthBodyDistance.au,
+               "\n\tApparent Magnitude (calculated):", apparentMagnitude,
+               "\n" )
 
-    print( "Skyfield", name,
-           "\n\tAbsolute Magnitude (H from data file):", dataframe.loc[ name ][ "magnitude_H" ],
-           "\n\tEarth Body Distance AU:", earthBodyDistance.au,
-           "\n\tApparent Magnitude (calculated):", apparentMagnitude,
-           "\n" )
+    else:
+        apparentMagnitude = getApparentMagnitude_HG( dataframe.loc[ name ][ "magnitude_H" ], dataframe.loc[ name ][ "magnitude_G" ], earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+
+        print( "Skyfield", name,
+               "\n\tAbsolute Magnitude (H from data file):", dataframe.loc[ name ][ "magnitude_H" ],
+               "\n\tEarth Body Distance AU:", earthBodyDistance.au,
+               "\n\tApparent Magnitude (calculated):", apparentMagnitude,
+               "\n" )
 
 
 # https://stackoverflow.com/a/30197797/2156453
@@ -122,7 +134,7 @@ def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, 
     return apparentMagnitude
 
 
-utcNow = datetime.datetime.strptime( "2020-11-26", "%Y-%m-%d" )
+utcNow = datetime.datetime.strptime( "2020-11-29", "%Y-%m-%d" )
 latitude = -33
 longitude = 151
 
