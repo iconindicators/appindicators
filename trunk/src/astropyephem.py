@@ -474,11 +474,13 @@ class AstroPyEphem( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getOrbitalElementsLessThanMagnitude( orbitalElementData, magnitudeMaximum ):
+    def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ):
         results = { }
         for key in orbitalElementData:
+            city = ephem.city( "London" ) # Use any city; makes no difference to obtain the magnitude.
+            city.date = utcNow
             body = ephem.readdb( orbitalElementData[ key ].getData() )
-            body.compute( ephem.city( "London" ) ) # Use any city; makes no difference to obtain the magnitude.
+            body.compute( city )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
             if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitudeMaximum:
                 results[ key ] = orbitalElementData[ key ]
