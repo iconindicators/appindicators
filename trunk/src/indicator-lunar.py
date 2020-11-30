@@ -20,6 +20,9 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Do timing between each set of object types (planets, starts, comets, minor planets and satellites)
+# comparing the time in PyEphem to that in Skyfield.
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
