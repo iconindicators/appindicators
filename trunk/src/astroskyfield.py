@@ -1001,10 +1001,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
-#TODO Getting
-# /usr/local/lib/python3.6/dist-packages/skyfield/functions.py:78: RuntimeWarning: invalid value encountered in remainder
-#   phi = arctan2(y, x) % tau
-#
     # https://spotthestation.nasa.gov/sightings/index.cfm
     # https://www.heavens-above.com/PassSummary.aspx
     # https://www.n2yo.com/passes/?s=25544
