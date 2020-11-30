@@ -1010,11 +1010,11 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://www.calsky.com/cs.cgi?cha=12&sec=4
     @staticmethod
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
+        t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
+        t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
         for satellite in satellites:
             if satellite in satelliteData:
-                t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-                end = utcNow + datetime.timedelta( hours = 100 ) # Stop looking for passes 36 hours from now. #TODO Put back to 36 after testing.
-                t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
                 earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
                 t, events = earthSatellite.find_events( topos, t0, t1, altitude_degrees = 30.0 )
                 rise = None
