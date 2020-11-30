@@ -99,7 +99,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     else:
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
 
-
+#TODO Have noticed the cache file sizes differ between PyEphem and Skyfield.
+# Once Skyfield's orbital element engine is fixed so that it runs in similar time to PyEphem,
+# print out the list of comets / minor planets that make the cut for magnitude filtering and compare.
+# Determine why there are file size differences.
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
