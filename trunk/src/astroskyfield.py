@@ -1009,6 +1009,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://www.amsat.org/track/
     # https://www.calsky.com/cs.cgi?cha=12&sec=4
     @staticmethod
+#TODO Somehow test for circumpolar satellites as per AstroPyEphem.
+#TODO Verify this method and source for code inspiration.
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
@@ -1016,7 +1018,51 @@ class AstroSkyfield( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
-                t, events = earthSatellite.find_events( topos, t0, t1, altitude_degrees = 30.0 )
+                t, events = earthSatellite.find_events( topos, t0, t1, altitude_degrees = 30.0 ) # TODO Could make this 10 instead or a parameter? Test against PyEphen.  https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
+                rise = False
+                culminate = False
+                times = [ ] # Rise, Culminate+
+                for ti, event in zip( t, events ):
+                    if event == 0: # Rise.
+                        rise = True
+                        times.append( ti )
+
+                    elif event == 1: # Culminate (more than one culmination may occur, so take them all).
+                        culminate = True
+                        times.append( ti )
+
+                    else: # Set.
+                        if rise and culminate:
+                            iterTimes = iter( times )
+                            next( iterTimes ) # Skip the rise
+                            for eachCulmination in iterTimes:
+                                if earthSatellite.at( eachCulmination ).is_sunlit( ephemerisPlanets ) and \
+                                   almanac.dark_twilight_day( ephemerisPlanets, topos )( eachCulmination ) < 3: # Satellite is yet to rise or is in transit...
+
+                                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( times[ 0 ].utc_datetime() )
+                                    alt, az, bodyDistance = ( earthSatellite - topos ).at(  times[ 0 ] ).altaz()
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
+                                    alt, az, bodyDistance = ( earthSatellite - topos ).at( ti ).altaz()
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                                    break
+
+                        else:
+                            rise = False
+                            culminate = False
+                            times= [ ]
+
+
+    @staticmethod
+    def __calculateSatellitesORIGINAL( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
+        t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
+        t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
+        for satellite in satellites:
+            if satellite in satelliteData:
+                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
+                t, events = earthSatellite.find_events( topos, t0, t1, altitude_degrees = 30.0 ) # TODO Could make this 10 instead or a parameter? Test against PyEphen.  https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
                 rise = None
                 culminate = None
                 for ti, event in zip( t, events ):
@@ -1046,9 +1092,37 @@ class AstroSkyfield( astrobase.AstroBase ):
 #                             rise = None
 #                             culminate = None
 
+                        else: # Reset for start of new rise/culminate set for this satellite.
+                            rise = None
+                            culminate = None
 
-#TODO This gets the next visible pass...as per AstroPyEphem, take into account a satellite currently in transit.
-#TODO Somehow test for circumpolar satellites as per AstroPyEphem.
+
+#TODO From PyEphem (satellite in transit)...likely need a comparable method for Skyfield.
+#     def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
+#         currentDateTime = ephemNow
+#         endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time.
+#         nextPass = None
+#         while currentDateTime > endDateTime:
+#             city = AstroPyEphem.__getCity( data, currentDateTime )
+#             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+#             satellite.compute( city )
+#             try:
+#                 nextPass = AstroPyEphem.__calculateNextPass( city, satellite )
+#                 if AstroPyEphem.__isSatellitePassIsValid( nextPass ):
+#                     if nextPass[ 0 ] < nextPass[ 4 ]:
+#                         break # Found the rise time!
+# 
+#                     currentDateTime = ephem.Date( currentDateTime - ephem.minute )
+# 
+#                 else:
+#                     nextPass = None
+#                     break # Unlikely to happen but better to be safe and check!
+# 
+#             except:
+#                 nextPass = None
+#                 break # This should never happen as the satellite has a rise and set (is not polar nor never up).
+# 
+#         return nextPass
 
 
     # If all stars in the Hipparcos catalogue were included, capped to magnitude 15,
