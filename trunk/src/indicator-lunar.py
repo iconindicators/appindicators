@@ -757,6 +757,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
 
 
+#TODO Because showing the user a satellite in transit is really an interface issue rather than a backend issue,
+# consider removing the code in the PyEphem backend which finds a rise/set and then checks to find the previous one just to show transits in progress.
+# Instead, perhaps keep a copy of the old data (reassigned at the start of each update)
+# and use that to determine if the current rise/set is the "same" as that in the previous data.
+# A transit (rise/set) can be thought of as the same (given the exact times to the second will not match)
+# by noting:
+#    if not( setNew < riseOld or riseNew > setOld):
+#        overlap = True
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]
