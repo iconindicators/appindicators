@@ -50,7 +50,7 @@ class TLE( object ):
 
 
     def getInternationalDesignator( self ):
-        launchYear = self.line1[ 9 : 11 ]
+        launchYear = self._getLaunchYear()
         if int( launchYear ) < 57:
             launchYear = "20" + launchYear
 
@@ -58,6 +58,23 @@ class TLE( object ):
             launchYear = "19" + launchYear
 
         return launchYear + "-" + self.line1[ 11 : 17 ].strip()
+
+
+    def _getLaunchYear( self ): return self.line1[ 9 : 11 ]
+
+
+    # Have found the launch year is missing and subsequently throws an exception.
+    # Screen out for missing/bad data in the launch year as a first attempt.
+    def _isValid( self ):
+        valid = True
+        try:
+            int( self._getLaunchYear() )
+            valid = True
+
+        except ValueError:
+            valid = False
+
+        return valid
 
 
     def __str__( self ): return str( self.title ) + " | " + str( self.line1 ) + " | " + str( self.line2 )
@@ -79,12 +96,15 @@ def download( url, logging = None ):
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-            if tle.isValid():
+            if tle._isValid():
                 tleData[ ( tle.getNumber() ) ] = tle
 
             else:
                 if logging:
-                    logging.error( "Missing/bad international designator:" + str( data[ i ].strip() ) )
+                    logging.error( "Missing/bad launch year:" )
+                    logging.error( "\t" + data[ i ] )
+                    logging.error( "\t" + data[ i + 1 ] )
+                    logging.error( "\t" + data[ i + 2 ] )
 
         if not tleData and logging:
             logging.error( "No TLE data found at " + str( url ) )
@@ -96,17 +116,3 @@ def download( url, logging = None ):
             logging.exception( e )
 
     return tleData
-
-
-# Have found the international designator is missing and subsequently throws an exception.
-# Screen out for missing/bad data in the international designator as a first attempt.
-def isValid( self ):
-    valid = True
-    try: 
-        int( self.getInternationalDesignator() )
-        valid = True
-
-    except ValueError:
-        valid = False
-
-    return valid
