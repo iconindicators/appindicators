@@ -79,7 +79,12 @@ def download( url, logging = None ):
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
-            tleData[ ( tle.getNumber() ) ] = tle
+            if tle.isValid():
+                tleData[ ( tle.getNumber() ) ] = tle
+
+            else:
+                if logging:
+                    logging.error( "Missing/bad international designator:" + str( data[ i ].strip() ) )
 
         if not tleData and logging:
             logging.error( "No TLE data found at " + str( url ) )
@@ -91,3 +96,17 @@ def download( url, logging = None ):
             logging.exception( e )
 
     return tleData
+
+
+# Have found the international designator is missing and subsequently throws an exception.
+# Screen out for missing/bad data in the international designator as a first attempt.
+def isValid( self ):
+    valid = True
+    try: 
+        int( self.getInternationalDesignator() )
+        valid = True
+
+    except ValueError:
+        valid = False
+
+    return valid
