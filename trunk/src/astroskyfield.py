@@ -1020,7 +1020,17 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://www.calsky.com/cs.cgi?cha=12&sec=4
     @staticmethod
 #TODO Somehow test for circumpolar satellites as per AstroPyEphem.
+#
 #TODO Verify this method and source for code inspiration.
+#
+#TODO Because showing the user a satellite in transit is really an interface issue rather than a backend issue,
+# consider removing the code in the PyEphem backend which finds a rise/set and then checks to find the previous one just to show transits in progress.
+# Instead, perhaps keep a copy of the old data (reassigned at the start of each update)
+# and use that to determine if the current rise/set is the "same" as that in the previous data.
+# A transit (rise/set) can be thought of as the same (given the exact times to the second will not match)
+# by noting:
+#    if not( setNew < riseOld or riseNew > setOld):
+#        overlap = True
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.

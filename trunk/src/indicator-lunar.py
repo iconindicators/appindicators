@@ -253,10 +253,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
-        magnitudeFilterAdditionalArguments = [ self.latitude, self.longitude, self.elevation ] if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield else [ ]
+
+        magnitudeFilterAdditionalArguments = [ ]
+        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
+            magnitudeFilterAdditionalArguments = [ self.latitude, self.longitude, self.elevation ]
 
         # Update comet data.
-        dataType = orbitalelement.OE.DataType.XEPHEM_COMET if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+        dataType = orbitalelement.OE.DataType.XEPHEM_COMET
+        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
+            dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
+
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
             self.updateData( utcNow,
                              self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
@@ -267,9 +273,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
-#TODO Can this section somehow be made into a loop?  Look at zip maybe?        
         self.minorPlanetData = { }
-        dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+
+        dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET
+        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
+            dataType = orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ],
@@ -327,6 +336,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.magnitude )
 
         # Update frontend.
+        menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
         self.updateLabel()
         self.updateIcon()
@@ -424,7 +434,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenu( self, menu ):
-        menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
@@ -747,14 +756,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
 
 
-#TODO Because showing the user a satellite in transit is really an interface issue rather than a backend issue,
-# consider removing the code in the PyEphem backend which finds a rise/set and then checks to find the previous one just to show transits in progress.
-# Instead, perhaps keep a copy of the old data (reassigned at the start of each update)
-# and use that to determine if the current rise/set is the "same" as that in the previous data.
-# A transit (rise/set) can be thought of as the same (given the exact times to the second will not match)
-# by noting:
-#    if not( setNew < riseOld or riseNew > setOld):
-#        overlap = True
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]
