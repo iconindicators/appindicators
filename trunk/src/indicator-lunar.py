@@ -20,9 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Do timing between each set of object types (planets, starts, comets, minor planets and satellites)
-# comparing the time in PyEphem to that in Skyfield.
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -102,10 +99,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     else:
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
 
-#TODO Have noticed the cache file sizes differ between PyEphem and Skyfield.
-# Once Skyfield's orbital element engine is fixed so that it runs in similar time to PyEphem,
-# print out the list of comets / minor planets that make the cut for magnitude filtering and compare.
-# Determine why there are file size differences.
     MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
                                      "minorplanet-oe-" + "critical-",
                                      "minorplanet-oe-" + "distant-",
@@ -196,7 +189,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             import glob, os, shutil
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.XEPHEM_COMET:
-                print( "Swapping Skyfield for XEphem" )#TODO Testing
+                print( "Swapping Skyfield for XEphem" )
                 shutil.rmtree( self.getCachePath( "" ) + "xephem", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "xephem" )
 
@@ -212,7 +205,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
                next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
-                print( "Swapping XEphem for Skyfield" )#TODO Testing
+                print( "Swapping XEphem for Skyfield" )
                 shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
                 os.mkdir( self.getCachePath( "" ) + "skyfield" )
                 for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
@@ -355,9 +348,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadDataFunction, downloadDataArguments,
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
-
-        if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: #TODO Testing
-            return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
