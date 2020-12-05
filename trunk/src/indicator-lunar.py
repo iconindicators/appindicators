@@ -149,7 +149,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.85",
+            version = "1.0.86",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astroBackend.getCredit(),

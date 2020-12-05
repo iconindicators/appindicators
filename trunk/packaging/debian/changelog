@@ -1,3 +1,11 @@
+indicator-lunar (1.0.86-1) xenial; urgency=low
+
+  * Handle when satellite TLE data sometimes omits the launch year which causes a crash.
+  * Removed old eclipse information.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 5 Dec 2020 12:32:42 +1000
+
+
 indicator-lunar (1.0.85-1) xenial; urgency=low
 
   * On computer startup when the indicator is set to autostart,
