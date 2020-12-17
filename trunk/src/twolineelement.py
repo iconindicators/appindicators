@@ -63,7 +63,7 @@ class TLE( object ):
     def _getLaunchYear( self ): return self.line1[ 9 : 11 ]
 
 
-    # Have found the launch year is missing and subsequently throws an exception.
+    # Have found the launch year can be missing and subsequently throws an exception.
     # Screen out for missing/bad data in the launch year as a first attempt.
     def _isValid( self ):
         valid = True
