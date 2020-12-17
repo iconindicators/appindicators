@@ -114,7 +114,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt",
-                                   "file:///home/bernard/Desktop/Soft00Unusual.txt" ] #TODO Testing
+                                   "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
@@ -326,7 +326,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
-        print( "Start backend update" )#TODO Testing
         # Update backend.
         self.data = IndicatorLunar.astroBackend.calculate(
             utcNow,
@@ -339,15 +338,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.magnitude,
             self.getLogging() )
 
-        print( "End backend update" )#TODO Testing
-
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
         self.updateLabel()
         self.updateIcon()
-
-        print( "Menu updated" )#TODO Testing
 
         if self.showWerewolfWarning:
             self.notificationFullMoon()
@@ -1119,7 +1114,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 20 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
-        print( self.cometData ) #TODO Test
         for comet in sorted( self.cometData.keys() ):
             cometStore.append( [ comet in self.comets, comet ] )
 

@@ -742,9 +742,9 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum, bodyType, latitude, longitude, elevation, logging ):
         results = { }
+        ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         timeScale = load.timescale( builtin = True )
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         sun = ephemerisPlanets[ "sun" ]
         earth = ephemerisPlanets[ "earth" ]
         topos = Topos( latitude_degrees = latitude, longitude_degrees = longitude, elevation_m = elevation )
@@ -766,8 +766,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "mpcorb_orbit"
 
-                # Have found that bad data can cause an exception, so remove some data as per
-                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
                 dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
         for name, row in dataframe.iterrows():
@@ -775,7 +774,6 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-#TODO Need to add the try/catch/logging to __calculateOrbitalElements (can we have common code in a private function?).
             try:
                 if orbitCalculationFunction == "comet_orbit":
                     message = "Error computing apparent magnitude for comet: " + name
@@ -787,13 +785,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                     apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
+                if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                    results[ name.upper() ] = orbitalElementData[ name.upper() ]
+
             except Exception as e:
                 logging.error( message )
                 logging.exception( e )
-                continue
-
-            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                results[ name.upper() ] = orbitalElementData[ name.upper() ]
 
         return results
 
@@ -946,41 +943,35 @@ class AstroSkyfield( astrobase.AstroBase ):
             f.seek( 0 )
 
             if bodyType == astrobase.AstroBase.BodyType.COMET:
-                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False ) #TODO See above in getOrbitalElementsLessThanMagnitude if we still need designation.
+                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "comet_orbit"
 
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "mpcorb_orbit"
 
-                # Have found that bad data can cause an exception, so remove some data as per
-                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-                dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
-
         for name, row in dataframe.iterrows():
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-            if orbitCalculationFunction == "comet_orbit":
-                # TODO The fields "magnitude_H" and "magnitude_G" really should be called "magnitude_g" and "magnitude_k".
-                # https://github.com/skyfielders/python-skyfield/issues/416
-                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_H" ],
-                                                                                 row[ "magnitude_G" ], 
-                                                                                 earthBodyDistance.au, 
-                                                                                 sunBodyDistance.au,
-                                                                                 logging )
+            try:
+                if orbitCalculationFunction == "comet_orbit":
+                    message = "Error computing apparent magnitude for comet: " + name
+                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ], 
+                                                                                     earthBodyDistance.au, sunBodyDistance.au )
 
-            else:
-                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
-                                                                                 row[ "magnitude_G" ], 
-                                                                                 earthBodyDistance.au,
-                                                                                 sunBodyDistance.au,
-                                                                                 earthSunDistance.au,
-                                                                                 logging )
+                else:
+                    message = "Error computing apparent magnitude for minor planet: " + name
+                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
+                                                                                     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
-            if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
+                if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                    AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
+
+            except Exception as e:
+                logging.error( message )
+                logging.exception( e )
 
 
     @staticmethod

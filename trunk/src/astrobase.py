@@ -464,7 +464,7 @@ class AstroBase( ABC ):
 
     # Calculate apparent magnitude.
     #
-    # NOTE: May throw a value error if bad numbers/calculations occur.
+    # May throw a value error or similar if bad numbers/calculations occur.
     #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     @staticmethod
@@ -476,18 +476,15 @@ class AstroBase( ABC ):
 
     # Calculate apparent magnitude.
     #
-    # NOTE: May throw a value error if bad numbers/calculations occur.
+    # May throw a value error or similar if bad numbers/calculations occur.
     #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
-        beta = math.acos( \
-                            ( bodySunDistanceAU * bodySunDistanceAU + \
-                              bodyEarthDistanceAU * bodyEarthDistanceAU - \
-                              earthSunDistanceAU * earthSunDistanceAU ) / \
-                            ( 2 * bodySunDistanceAU * bodyEarthDistanceAU ) \
-                        )
+        numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
+        denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
+        beta = math.acos( numerator / denominator )
 
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
         Psi_1 = math.exp( -3.33 * psi_t )
