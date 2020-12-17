@@ -1,6 +1,7 @@
 indicator-lunar (1.0.86-1) xenial; urgency=low
 
-  * Handle exception when satellite TLE data omits the launch year.
+  * Handle exception when OE data contains spurious '****'.
+  * Handle exception when TLE data omits the launch year.
   * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 5 Dec 2020 12:32:42 +1000

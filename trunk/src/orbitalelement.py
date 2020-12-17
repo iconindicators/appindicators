@@ -68,10 +68,6 @@ def download( url, dataType, logging = None ):
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
-#TODO According to this ticket
-# https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-# bad data (****) was appearing.
-# Maybe put in a check here?  But perhaps extend for ALL data (comets and minor planets for both PyEphem and Skyfield)?
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 start = 102
                 end = 158
@@ -82,16 +78,18 @@ def download( url, dataType, logging = None ):
                 end = 194
 
             for i in range( 0, len( data ) ):
-                name = data[ i ][ start : end ].strip()
-                oe = OE( name, data[ i ], dataType )
-                oeData[ oe.getName().upper() ] = oe
+                if "****" not in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+                    name = data[ i ][ start : end ].strip()
+                    oe = OE( name, data[ i ], dataType )
+                    oeData[ oe.getName().upper() ] = oe
 
         elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
             for i in range( 0, len( data ) ):
                 if not data[ i ].startswith( "#" ):
-                    name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
-                    oe = OE( name, data[ i ], dataType )
-                    oeData[ oe.getName().upper() ] = oe
+                    if "****" not in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+                        name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
+                        oe = OE( name, data[ i ], dataType )
+                        oeData[ oe.getName().upper() ] = oe
 
         if not oeData and logging:
             logging.error( "No OE data found at " + str( url ) )
