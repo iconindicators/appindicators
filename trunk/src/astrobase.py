@@ -462,32 +462,25 @@ class AstroBase( ABC ):
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
-    # Calculate absolute magnitude.
+    # Calculate apparent magnitude.
     #
-    # On success, return a tuple of the absolute magnitude and None.  Otherwise, a tuple of None and the exception.
+    # On success, return a tuple of the apparentMagnitude magnitude and None.  Otherwise, a tuple of None and the exception.
     #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     @staticmethod
-    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU, logging = None ):
+    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
         try:
-            absoluteMagnitude = g_absoluteMagnitude + \
+            apparentMagnitude = g_absoluteMagnitude + \
                                 5 * math.log10( bodyEarthDistanceAU ) + \
                                 2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
 
-            e = None
+            exception = None
 
         except Exception as e:
-            absoluteMagnitude = None
-#             
-#             if logging:
-#                 logging.error( "Error computing absolute magnitude..." )
-#                 logging.error( "\tg_absoluteMagnitude: " + str( g_absoluteMagnitude ) )
-#                 logging.error( "\tk_luminosityIndex: " + str( k_luminosityIndex ) )
-#                 logging.error( "\tbodyEarthDistanceAU: " + str( bodyEarthDistanceAU ) )
-#                 logging.error( "\tbodySunDistanceAU: " + str( bodySunDistanceAU ) )
-#                 logging.exception( e )
+            apparentMagnitude = None
+            exception = e
 
-        return absoluteMagnitude, e
+        return apparentMagnitude, exception
 
 
     # Calculate apparent magnitude.
@@ -497,7 +490,7 @@ class AstroBase( ABC ):
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
-    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU, logging = None ):
+    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
         try:
             beta = math.acos( \
                                 ( bodySunDistanceAU * bodySunDistanceAU + \
@@ -514,15 +507,10 @@ class AstroBase( ABC ):
                                 5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
                                 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
+            exception = None
+
         except Exception as e:
             apparentMagnitude = None
-            if logging:
-                logging.error( "Error computing apparent magnitude..." )
-                logging.error( "\tH_absoluteMagnitude: " + str( H_absoluteMagnitude ) )
-                logging.error( "\tG_slope: " + str( G_slope ) )
-                logging.error( "\tbodyEarthDistanceAU: " + str( bodyEarthDistanceAU ) )
-                logging.error( "\tbodySunDistanceAU: " + str( bodySunDistanceAU ) )
-                logging.error( "\tearthSunDistanceAU: " + str( earthSunDistanceAU ) )
-                logging.exception( e )
+            exception = e
 
-        return apparentMagnitude
+        return apparentMagnitude, exception
