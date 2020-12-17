@@ -775,10 +775,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
             if orbitCalculationFunction == "comet_orbit":
-                # TODO The fields "magnitude_H" and "magnitude_G" really should be called "magnitude_g" and "magnitude_k".
-                # https://github.com/skyfielders/python-skyfield/issues/416
-                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_H" ],
-                                                                                 row[ "magnitude_G" ], 
+                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ],
+                                                                                 row[ "magnitude_k" ], 
                                                                                  earthBodyDistance.au, 
                                                                                  sunBodyDistance.au )
 
