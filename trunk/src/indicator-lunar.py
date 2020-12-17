@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -114,7 +114,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt" ]
+                                   "file:///home/bernard/Desktop/Soft00Unusual.txt" ] #TODO Testing
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
@@ -256,18 +256,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         magnitudeFilterAdditionalArguments = [ ]
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
-            magnitudeFilterAdditionalArguments = [ self.latitude, self.longitude, self.elevation ]
+            magnitudeFilterAdditionalArguments = [ self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
         # Update comet data.
         dataType = orbitalelement.OE.DataType.XEPHEM_COMET
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
             dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
+            magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.COMET, self.latitude, self.longitude, self.elevation ]
 
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
             self.updateData( utcNow,
                              self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
                              orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ], self.downloadCountComet, self.nextDownloadTimeComet,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, [ astrobase.AstroBase.BodyType.COMET ] + magnitudeFilterAdditionalArguments )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
@@ -278,12 +279,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
             dataType = orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+            magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 0 ], dataType, self.getLogging() ], self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, [ astrobase.AstroBase.BodyType.MINOR_PLANET ] + magnitudeFilterAdditionalArguments )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -291,7 +293,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 1 ], dataType, self.getLogging( )], self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, [ astrobase.AstroBase.BodyType.MINOR_PLANET ] + magnitudeFilterAdditionalArguments )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -299,7 +301,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 2 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 2 ], dataType, self.getLogging( ) ], self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, [ astrobase.AstroBase.BodyType.MINOR_PLANET ] + magnitudeFilterAdditionalArguments )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -307,7 +309,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 3 ],
                              orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ 3 ], dataType, self.getLogging( ) ], self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, [ astrobase.AstroBase.BodyType.MINOR_PLANET ] + magnitudeFilterAdditionalArguments )
+                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -324,6 +326,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
 
+        print( "Start backend update" )#TODO Testing
         # Update backend.
         self.data = IndicatorLunar.astroBackend.calculate(
             utcNow,
@@ -333,13 +336,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satellites, self.satelliteData,
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
-            self.magnitude )
+            self.magnitude,
+            self.getLogging() )
+
+        print( "End backend update" )#TODO Testing
 
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
         self.updateLabel()
         self.updateIcon()
+
+        print( "Menu updated" )#TODO Testing
 
         if self.showWerewolfWarning:
             self.notificationFullMoon()
@@ -1111,6 +1119,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 20 )
 
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
+        print( self.cometData ) #TODO Test
         for comet in sorted( self.cometData.keys() ):
             cometStore.append( [ comet in self.comets, comet ] )
 

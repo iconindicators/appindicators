@@ -437,7 +437,8 @@ class AstroPyEphem( astrobase.AstroBase ):
                    satellites, satelliteData,
                    comets, cometData,
                    minorPlanets, minorPlanetData,
-                   magnitudeMaximum ):
+                   magnitudeMaximum,
+                   logging ):
 
         data = { }
 

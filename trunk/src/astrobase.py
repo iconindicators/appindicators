@@ -464,53 +464,38 @@ class AstroBase( ABC ):
 
     # Calculate apparent magnitude.
     #
-    # On success, return a tuple of the apparentMagnitude magnitude and None.  Otherwise, a tuple of None and the exception.
+    # NOTE: May throw a value error if bad numbers/calculations occur.
     #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     @staticmethod
     def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
-        try:
-            apparentMagnitude = g_absoluteMagnitude + \
-                                5 * math.log10( bodyEarthDistanceAU ) + \
-                                2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
-
-            exception = None
-
-        except Exception as e:
-            apparentMagnitude = None
-            exception = e
-
-        return apparentMagnitude, exception
+        return g_absoluteMagnitude + \
+               5 * math.log10( bodyEarthDistanceAU ) + \
+               2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
 
 
     # Calculate apparent magnitude.
     #
-    # On success, return a tuple of the apparent magnitude and None.  Otherwise, a tuple of None and the exception.
+    # NOTE: May throw a value error if bad numbers/calculations occur.
     #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
-        try:
-            beta = math.acos( \
-                                ( bodySunDistanceAU * bodySunDistanceAU + \
-                                  bodyEarthDistanceAU * bodyEarthDistanceAU - \
-                                  earthSunDistanceAU * earthSunDistanceAU ) / \
-                                ( 2 * bodySunDistanceAU * bodyEarthDistanceAU ) \
-                            )
+        beta = math.acos( \
+                            ( bodySunDistanceAU * bodySunDistanceAU + \
+                              bodyEarthDistanceAU * bodyEarthDistanceAU - \
+                              earthSunDistanceAU * earthSunDistanceAU ) / \
+                            ( 2 * bodySunDistanceAU * bodyEarthDistanceAU ) \
+                        )
 
-            psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
-            Psi_1 = math.exp( -3.33 * psi_t )
-            psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
-            Psi_2 = math.exp( -1.87 * psi_t )
-            apparentMagnitude = H_absoluteMagnitude + \
-                                5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
-                                2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
+        Psi_1 = math.exp( -3.33 * psi_t )
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+        Psi_2 = math.exp( -1.87 * psi_t )
 
-            exception = None
+        apparentMagnitude = H_absoluteMagnitude + \
+                            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
+                            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
-        except Exception as e:
-            apparentMagnitude = None
-            exception = e
-
-        return apparentMagnitude, exception
+        return apparentMagnitude

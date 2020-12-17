@@ -771,13 +771,11 @@ class AstroSkyfield( astrobase.AstroBase ):
                 dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
         for name, row in dataframe.iterrows():
-#             if name != "2013 XS21":#TODO Testing
-#                 continue
-
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
+#TODO Need to add the try/catch/logging to __calculateOrbitalElements (can we have common code in a private function?).
             try:
                 if orbitCalculationFunction == "comet_orbit":
                     message = "Error computing apparent magnitude for comet: " + name
