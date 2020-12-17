@@ -68,6 +68,10 @@ def download( url, dataType, logging = None ):
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
+#TODO According to this ticket
+# https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+# bad data (****) was appearing.
+# Maybe put in a check here?  But perhaps extend for ALL data (comets and minor planets for both PyEphem and Skyfield)?
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 start = 102
                 end = 158
