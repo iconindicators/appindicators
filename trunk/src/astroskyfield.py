@@ -697,7 +697,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                    satellites, satelliteData,
                    comets, cometData,
                    minorPlanets, minorPlanetData,
-                   magnitudeMaximum ):
+                   magnitudeMaximum,
+                   logging ):
 
         data = { }
         timeScale = load.timescale( builtin = True )
@@ -714,10 +715,12 @@ class AstroSkyfield( astrobase.AstroBase ):
         AstroSkyfield.__calculateStars( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
 
         AstroSkyfield.__calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets,
-                                                  astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+                                                  astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
+                                                  logging )
 
         AstroSkyfield.__calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets,
-                                                  astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+                                                  astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
+                                                  logging )
 
         AstroSkyfield.__calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData )
 
@@ -737,7 +740,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
 # https://github.com/skyfielders/python-skyfield/issues/490
     @staticmethod
-    def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum, bodyType, latitude, longitude, elevation ):
+    def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum, bodyType, latitude, longitude, elevation, logging ):
         results = { }
         timeScale = load.timescale( builtin = True )
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
@@ -767,25 +770,29 @@ class AstroSkyfield( astrobase.AstroBase ):
                 # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
                 dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
-#TODO By setting the index above for designation it allows access to the name below in the loop.
-# Does this slow things down?  Is there another way to get the name?
         for name, row in dataframe.iterrows():
+#             if name != "2013 XS21":#TODO Testing
+#                 continue
+
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + topos ).at( t ).observe( body ).radec()
             ra, dec, sunBodyDistance = sun.at( t ).observe( body ).radec()
 
-            if orbitCalculationFunction == "comet_orbit":
-                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ],
-                                                                                 row[ "magnitude_k" ], 
-                                                                                 earthBodyDistance.au, 
-                                                                                 sunBodyDistance.au )
+            try:
+                if orbitCalculationFunction == "comet_orbit":
+                    message = "Error computing apparent magnitude for comet: " + name
+                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ], 
+                                                                                     earthBodyDistance.au, sunBodyDistance.au )
 
-            else:
-                apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
-                                                                                 row[ "magnitude_G" ], 
-                                                                                 earthBodyDistance.au,
-                                                                                 sunBodyDistance.au,
-                                                                                 earthSunDistance.au )
+                else:
+                    message = "Error computing apparent magnitude for minor planet: " + name
+                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
+                                                                                     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+
+            except Exception as e:
+                logging.error( message )
+                logging.exception( e )
+                continue
 
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 results[ name.upper() ] = orbitalElementData[ name.upper() ]
@@ -925,7 +932,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
+    def __calculateOrbitalElements( utcNow, data, timeScale, topos, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum, logging ):
         t = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         sun = ephemerisPlanets[ "sun" ]
         earth = ephemerisPlanets[ "earth" ]
@@ -963,14 +970,16 @@ class AstroSkyfield( astrobase.AstroBase ):
                 apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_H" ],
                                                                                  row[ "magnitude_G" ], 
                                                                                  earthBodyDistance.au, 
-                                                                                 sunBodyDistance.au )
+                                                                                 sunBodyDistance.au,
+                                                                                 logging )
 
             else:
                 apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ],
                                                                                  row[ "magnitude_G" ], 
                                                                                  earthBodyDistance.au,
                                                                                  sunBodyDistance.au,
-                                                                                 earthSunDistance.au )
+                                                                                 earthSunDistance.au,
+                                                                                 logging )
 
             if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                 AstroSkyfield.__calculateCommon( utcNow, data, timeScale, topos, ephemerisPlanets, body, bodyType, key )
