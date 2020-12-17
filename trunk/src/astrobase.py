@@ -276,7 +276,8 @@ class AstroBase( ABC ):
                    satellites, satelliteData,
                    comets, cometData,
                    minorPlanets, minorPlanetData,
-                   magnitudeMaximum ):
+                   magnitudeMaximum,
+                   logging = None ):
         return { }
 
 
@@ -461,39 +462,67 @@ class AstroBase( ABC ):
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
+    # Calculate absolute magnitude.
+    #
+    # On success, return a tuple of the absolute magnitude and None.  Otherwise, a tuple of None and the exception.
+    #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     @staticmethod
-    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
-        return g_absoluteMagnitude + \
-               5 * math.log10( bodyEarthDistanceAU ) + \
-               2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
+    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU, logging = None ):
+        try:
+            absoluteMagnitude = g_absoluteMagnitude + \
+                                5 * math.log10( bodyEarthDistanceAU ) + \
+                                2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
+
+            e = None
+
+        except Exception as e:
+            absoluteMagnitude = None
+#             
+#             if logging:
+#                 logging.error( "Error computing absolute magnitude..." )
+#                 logging.error( "\tg_absoluteMagnitude: " + str( g_absoluteMagnitude ) )
+#                 logging.error( "\tk_luminosityIndex: " + str( k_luminosityIndex ) )
+#                 logging.error( "\tbodyEarthDistanceAU: " + str( bodyEarthDistanceAU ) )
+#                 logging.error( "\tbodySunDistanceAU: " + str( bodySunDistanceAU ) )
+#                 logging.exception( e )
+
+        return absoluteMagnitude, e
 
 
-    # Calculate apparent magnitude (returns None on error).
+    # Calculate apparent magnitude.
+    #
+    # On success, return a tuple of the apparent magnitude and None.  Otherwise, a tuple of None and the exception.
     #
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
-    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
-        beta = math.acos( \
-                            ( bodySunDistanceAU * bodySunDistanceAU + \
-                              bodyEarthDistanceAU * bodyEarthDistanceAU - \
-                              earthSunDistanceAU * earthSunDistanceAU ) / \
-                            ( 2 * bodySunDistanceAU * bodyEarthDistanceAU ) \
-                        )
-
-        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
-        Psi_1 = math.exp( -3.33 * psi_t )
-        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
-        Psi_2 = math.exp( -1.87 * psi_t )
-
-        # Have found a combination of G_slope, Psi_1 and Psi_2 can lead to a negative value in the log calculation.
+    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU, logging = None ):
         try:
+            beta = math.acos( \
+                                ( bodySunDistanceAU * bodySunDistanceAU + \
+                                  bodyEarthDistanceAU * bodyEarthDistanceAU - \
+                                  earthSunDistanceAU * earthSunDistanceAU ) / \
+                                ( 2 * bodySunDistanceAU * bodyEarthDistanceAU ) \
+                            )
+
+            psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
+            Psi_1 = math.exp( -3.33 * psi_t )
+            psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+            Psi_2 = math.exp( -1.87 * psi_t )
             apparentMagnitude = H_absoluteMagnitude + \
                                 5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
                                 2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
-        except:
+        except Exception as e:
             apparentMagnitude = None
+            if logging:
+                logging.error( "Error computing apparent magnitude..." )
+                logging.error( "\tH_absoluteMagnitude: " + str( H_absoluteMagnitude ) )
+                logging.error( "\tG_slope: " + str( G_slope ) )
+                logging.error( "\tbodyEarthDistanceAU: " + str( bodyEarthDistanceAU ) )
+                logging.error( "\tbodySunDistanceAU: " + str( bodySunDistanceAU ) )
+                logging.error( "\tearthSunDistanceAU: " + str( earthSunDistanceAU ) )
+                logging.exception( e )
 
         return apparentMagnitude
