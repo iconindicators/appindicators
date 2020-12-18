@@ -48,6 +48,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         dialog.destroy()
         sys.exit()
 
+    if astroBackend.getVersionMessage() is not None:
+        dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, astroBackend.getVersionMessage() )
+        dialog.set_title( INDICATOR_NAME )
+        dialog.run()
+        dialog.destroy()
+        sys.exit()
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"

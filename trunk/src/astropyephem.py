@@ -503,6 +503,11 @@ class AstroPyEphem( astrobase.AstroBase ):
         return message
 
 
+    # Returns a message if the minimum version of the third party library is not met; otherwise None.
+    @staticmethod
+    def getVersionMessage(): return None
+
+
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
     # http://futureboy.us/fsp/moon.fsp
     # http://www.geoastro.de/moondata/index.html

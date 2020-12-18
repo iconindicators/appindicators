@@ -315,6 +315,12 @@ class AstroBase( ABC ):
     def getAvailabilityMessage(): return None
 
 
+    # Returns a message if the minimum version of the third party library is not met; otherwise None.
+    @staticmethod
+    @abstractmethod
+    def getVersionMessage(): return None
+
+
     # Get the lunar phase for the given date/time and illumination percentage.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.

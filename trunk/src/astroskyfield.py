@@ -54,6 +54,8 @@ import astrobase, datetime, importlib, io, locale, orbitalelement
 
 class AstroSkyfield( astrobase.AstroBase ):
 
+    __SKYFIELD_REQUIRED_VERSION = 1.34 # Required version, or better.
+
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
 
@@ -805,6 +807,18 @@ class AstroSkyfield( astrobase.AstroBase ):
         if not available:
             message = _( "Skyfield could not be found. Install using:\n\n" + \
                          "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" )
+
+        return message
+
+
+    @staticmethod
+    def getVersionMessage():
+        import skyfield
+        message = None
+        if float( skyfield.__version__ ) < AstroSkyfield.__SKYFIELD_REQUIRED_VERSION:
+            message = _( "Skyfield must be version {0} or greater. Please upgrade:\n\n" + \
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" ).format( str( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ) )
+
         return message
 
 
