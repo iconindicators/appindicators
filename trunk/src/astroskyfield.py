@@ -44,17 +44,20 @@ try:
     from skyfield.api import EarthSatellite, load, Star, Topos
     from skyfield.data import hipparcos, mpc
     from skyfield.magnitudelib import planetary_magnitude
+    import skyfield
     available = True
 
 except ImportError:
     available = False
+
+from distutils.version import LooseVersion
 
 import astrobase, datetime, importlib, io, locale, orbitalelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
 
-    __SKYFIELD_REQUIRED_VERSION = 1.34 # Required version, or better.
+    __SKYFIELD_REQUIRED_VERSION = "1.34" # Required version, or better.
 
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
@@ -813,11 +816,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def getVersionMessage():
-        import skyfield
         message = None
-        if float( skyfield.__version__ ) < AstroSkyfield.__SKYFIELD_REQUIRED_VERSION:
+        if LooseVersion( skyfield.__version__ ) < LooseVersion( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ):
             message = _( "Skyfield must be version {0} or greater. Please upgrade:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" ).format( str( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ) )
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" ).format( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION )
 
         return message
 

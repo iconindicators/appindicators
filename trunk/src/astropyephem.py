@@ -27,10 +27,14 @@ try:
 except ImportError:
     available = False
 
+from distutils.version import LooseVersion
+
 import astrobase, locale, math, orbitalelement
 
 
 class AstroPyEphem( astrobase.AstroBase ):
+
+    __PYEPHEM_REQUIRED_VERSION = "3.7.8.0" # Required version, or better.
 
     # Taken from ephem/stars.py
     astrobase.AstroBase.STARS.extend( [
@@ -505,7 +509,12 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     # Returns a message if the minimum version of the third party library is not met; otherwise None.
     @staticmethod
-    def getVersionMessage(): return None
+    def getVersionMessage():
+        message = None
+        if LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
+            message = _( "PyEphem must be version {0} or greater." ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
+
+        return message
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
