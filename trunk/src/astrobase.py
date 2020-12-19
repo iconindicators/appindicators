@@ -321,6 +321,53 @@ class AstroBase( ABC ):
     def getVersionMessage(): return None
 
 
+    # Calculate apparent magnitude.
+    #
+    # May throw a value error or similar if bad numbers/calculations occur.
+    #
+    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+    @staticmethod
+    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
+        return g_absoluteMagnitude + \
+               5 * math.log10( bodyEarthDistanceAU ) + \
+               2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
+
+
+    # Calculate apparent magnitude.
+    #
+    # May throw a value error or similar if bad numbers/calculations occur.
+    #
+    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+    # https://www.britastro.org/asteroids/dymock4.pdf
+    @staticmethod
+    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
+        numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
+        denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
+        beta = math.acos( numerator / denominator )
+
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
+        Psi_1 = math.exp( -3.33 * psi_t )
+        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
+        Psi_2 = math.exp( -1.87 * psi_t )
+
+        apparentMagnitude = H_absoluteMagnitude + \
+                            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
+                            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
+
+        return apparentMagnitude
+
+
+    # Retrieve the next eclipse for either the Sun or Moon.
+    @staticmethod
+    def getEclipse( utcNow, data, bodyType, dataTag ):
+        eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
+        key = ( bodyType, dataTag )
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+
+
     # Get the lunar phase for the given date/time and illumination percentage.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
@@ -362,17 +409,6 @@ class AstroBase( ABC ):
                 phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         return phase
-
-
-    # Retrieve the next eclipse for either the Sun or Moon.
-    @staticmethod
-    def getEclipse( utcNow, data, bodyType, dataTag ):
-        eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
-        key = ( bodyType, dataTag )
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
     # Compute the sidereal time for the given longitude (floating point radians) as a decimal time.
@@ -462,42 +498,6 @@ class AstroBase( ABC ):
         parallacticAngle = math.atan2( y, x )
 
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
-
-
-    # Calculate apparent magnitude.
-    #
-    # May throw a value error or similar if bad numbers/calculations occur.
-    #
-    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-    @staticmethod
-    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
-        return g_absoluteMagnitude + \
-               5 * math.log10( bodyEarthDistanceAU ) + \
-               2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
-
-
-    # Calculate apparent magnitude.
-    #
-    # May throw a value error or similar if bad numbers/calculations occur.
-    #
-    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-    # https://www.britastro.org/asteroids/dymock4.pdf
-    @staticmethod
-    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
-        numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
-        denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
-        beta = math.acos( numerator / denominator )
-
-        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
-        Psi_1 = math.exp( -3.33 * psi_t )
-        psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
-        Psi_2 = math.exp( -1.87 * psi_t )
-
-        apparentMagnitude = H_absoluteMagnitude + \
-                            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
-                            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
-
-        return apparentMagnitude
 
 
     @staticmethod
