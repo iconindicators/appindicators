@@ -733,7 +733,21 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
+    def getAvailabilityMessage():
+        message = None
+        if not available:
+            message = _( "Skyfield could not be found. Install using:\n\n" + \
+                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" )
+
+        return message
+
+
+    @staticmethod
     def getCities(): return sorted( AstroSkyfield._city_data.keys(), key = locale.strxfrm )
+
+
+    @staticmethod
+    def getCredit(): return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
 
 
     @staticmethod
@@ -798,20 +812,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                 logging.exception( e )
 
         return results
-
-
-    @staticmethod
-    def getCredit(): return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
-
-
-    @staticmethod
-    def getAvailabilityMessage():
-        message = None
-        if not available:
-            message = _( "Skyfield could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" )
-
-        return message
 
 
     @staticmethod

@@ -281,10 +281,23 @@ class AstroBase( ABC ):
         return { }
 
 
+    # Returns None if the backend (and required third party libraries) is available; an error message otherwise.
+    @staticmethod
+    @abstractmethod
+    def getAvailabilityMessage(): return None
+
+
     # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
     @abstractmethod
     def getCities(): return [ ]
+
+
+    # Returns a string specifying third party credit; otherwise an empty string.
+    # Format is a credit string followed by an optional URL.
+    @staticmethod
+    @abstractmethod
+    def getCredit(): return ""
 
 
     # Returns a tuple of floats of the latitude, longitude and elevation for the city.
@@ -302,20 +315,7 @@ class AstroBase( ABC ):
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ): return { }
 
 
-    # Returns a string specifying any third party credit.
-    # Format is a credit string followed by an optional URL.
-    @staticmethod
-    @abstractmethod
-    def getCredit(): return ""
-
-
-    # Returns None if the backend (and required third party libraries) is available; an error message otherwise.
-    @staticmethod
-    @abstractmethod
-    def getAvailabilityMessage(): return None
-
-
-    # Returns a message if the minimum version of the third party library is not met; otherwise None.
+    # Returns None if the minimum version of the third party library is met; an error message otherwise.
     @staticmethod
     @abstractmethod
     def getVersionMessage(): return None
@@ -373,10 +373,6 @@ class AstroBase( ABC ):
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
-
-
-    @staticmethod
-    def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
 
     # Compute the sidereal time for the given longitude (floating point radians) as a decimal time.
@@ -502,3 +498,7 @@ class AstroBase( ABC ):
                             2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
         return apparentMagnitude
+
+
+    @staticmethod
+    def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )

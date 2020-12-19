@@ -34,7 +34,7 @@ import astrobase, locale, math, orbitalelement
 
 class AstroPyEphem( astrobase.AstroBase ):
 
-    __PYEPHEM_REQUIRED_VERSION = "3.7.8.0" # Required version, or better.
+    __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
 
     # Taken from ephem/stars.py
     astrobase.AstroBase.STARS.extend( [
@@ -469,7 +469,21 @@ class AstroPyEphem( astrobase.AstroBase ):
 
 
     @staticmethod
+    def getAvailabilityMessage():
+        message = None
+        if not available:
+            message = _( "PyEphem could not be found. Install using:\n\n" + \
+                         "sudo apt-get install -y python3-ephem" )
+
+        return message
+
+
+    @staticmethod
     def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
+
+
+    @staticmethod
+    def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
 
 
     @staticmethod
@@ -493,21 +507,6 @@ class AstroPyEphem( astrobase.AstroBase ):
         return results
 
 
-    @staticmethod
-    def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
-
-
-    @staticmethod
-    def getAvailabilityMessage():
-        message = None
-        if not available:
-            message = _( "PyEphem could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-ephem" )
-
-        return message
-
-
-    # Returns a message if the minimum version of the third party library is not met; otherwise None.
     @staticmethod
     def getVersionMessage():
         message = None
