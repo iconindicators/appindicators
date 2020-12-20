@@ -80,6 +80,13 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
+#TODO Considering this list
+# https://www.cosmos.esa.int/web/hipparcos/common-star-names
+# has other stars not in the list below (and at least the first star Acamar has magnitude in the visible range)
+# maybe use this list?
+#
+# OR look at the list of stars from PyEphem?
+# 
     # Taken from skyfield/named_stars.py
     astrobase.AstroBase.STARS.extend( [
         "ACHERNAR",
@@ -1032,6 +1039,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     # https://www.calsky.com/cs.cgi?cha=12&sec=4
     @staticmethod
 #TODO Somehow test for circumpolar satellites as per AstroPyEphem.
+# How do we even check for them?
+# What about satellites that are never up?
 #
 #TODO Verify this method and source for code inspiration.
 #
@@ -1039,10 +1048,34 @@ class AstroSkyfield( astrobase.AstroBase ):
 # consider removing the code in the PyEphem backend which finds a rise/set and then checks to find the previous one just to show transits in progress.
 # Instead, perhaps keep a copy of the old data (reassigned at the start of each update)
 # and use that to determine if the current rise/set is the "same" as that in the previous data.
+#
 # A transit (rise/set) can be thought of as the same (given the exact times to the second will not match)
 # by noting:
 #    if not( setNew < riseOld or riseNew > setOld):
 #        overlap = True
+#
+# The frontend which decides for each satellite whether to show the rise time OR the rise/set/az/alt (transit)
+# will have to use both the currently calculated transit information and the previously calculated transit information.
+#
+# On the first run of the indicator:
+#    If rise time > (now + five minutes):
+#        Display rise time
+#    Else
+#        Display rise/set/az/alt
+#
+# On subsequent runs of the indicator (with previous run data available):
+#    If rise time > (now + five minutes):
+#        # It is possible that this satellite could be in transit right now, so check with the previous data...
+#        If previous set time > now:
+#            Display rise/set/az/alt
+#        Else:
+#            Display rise
+#    Else
+#        Display rise/set/az/alt
+#    
+#
+#
+#
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.

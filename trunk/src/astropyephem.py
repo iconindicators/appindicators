@@ -36,6 +36,249 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
 
+#TODO Version 3.7.7.0 added extra stars.
+# Need to add the missing ones to the list for PyEphem.
+# Or should/can we?  By adding stars to this list but using the previous PyEphem version,
+# the new stars will not be known to PyEphem and causes an exception.
+#
+# Can/should this also be used for Skyfield?
+#
+# This is the complete list:
+# Acamar
+# Achernar
+# Acrux
+# Adara
+# Adhara
+# Agena
+# Albereo
+# Alcaid
+# Alcor
+# Alcyone
+# Aldebaran
+# Alderamin
+# Alfirk
+# Algenib
+# Algieba
+# Algol
+# Alhena
+# Alioth
+# Alkaid
+# Almach
+# Alnair
+# Alnilam
+# Alnitak
+# Alphard
+# Alphecca
+# Alpheratz
+# Alshain
+# Altair
+# Ankaa
+# Antares
+# Arcturus
+# Arkab Posterior
+# Arkab Prior
+# Arneb
+# Atlas
+# Atria
+# Avior
+# Bellatrix
+# Betelgeuse
+# Canopus
+# Capella
+# Caph
+# Castor
+# Cebalrai
+# Deneb
+# Denebola
+# Diphda
+# Dubhe
+# Electra
+# Elnath
+# Eltanin
+# Enif
+# Etamin
+# Fomalhaut
+# Formalhaut
+# Gacrux
+# Gienah
+# Gienah Corvi
+# Hadar
+# Hamal
+# Izar
+# Kaus Australis
+# Kochab
+# Maia
+# Markab
+# Megrez
+# Menkalinan
+# Menkar
+# Menkent
+# Merak
+# Merope
+# Miaplacidus
+# Mimosa
+# Minkar
+# Mintaka
+# Mirach
+# Mirfak
+# Mirzam
+# Mizar
+# Naos
+# Nihal
+# Nunki
+# Peacock
+# Phecda
+# Polaris
+# Pollux
+# Procyon
+# Rasalgethi
+# Rasalhague
+# Regulus
+# Rigel
+# Rigil Kentaurus
+# Rukbat
+# Sabik
+# Sadalmelik
+# Sadr
+# Saiph
+# Scheat
+# Schedar
+# Shaula
+# Sheliak
+# Sirius
+# Sirrah
+# Spica
+# Suhail
+# Sulafat
+# Tarazed
+# Taygeta
+# Thuban
+# Unukalhai
+# Vega
+# Vindemiatrix
+# Wezen
+# Zaurak
+# Zubenelgenubi
+
+
+# ACAMAR
+# ACHERNAR
+# ACRUX
+# ADARA
+# ADHARA
+# AGENA
+# ALBEREO
+# ALCAID
+# ALCOR
+# ALCYONE
+# ALDEBARAN
+# ALDERAMIN
+# ALFIRK
+# ALGENIB
+# ALGIEBA
+# ALGOL
+# ALHENA
+# ALIOTH
+# ALKAID
+# ALMACH
+# ALNAIR
+# ALNILAM
+# ALNITAK
+# ALPHARD
+# ALPHECCA
+# ALPHERATZ
+# ALSHAIN
+# ALTAIR
+# ANKAA
+# ANTARES
+# ARCTURUS
+# ARKAB POSTERIOR
+# ARKAB PRIOR
+# ARNEB
+# ATLAS
+# ATRIA
+# AVIOR
+# BELLATRIX
+# BETELGEUSE
+# CANOPUS
+# CAPELLA
+# CAPH
+# CASTOR
+# CEBALRAI
+# DENEB
+# DENEBOLA
+# DIPHDA
+# DUBHE
+# ELECTRA
+# ELNATH
+# ELTANIN
+# ENIF
+# ETAMIN
+# FOMALHAUT
+# FORMALHAUT
+# GACRUX
+# GIENAH
+# GIENAH CORVI
+# HADAR
+# HAMAL
+# IZAR
+# KAUS AUSTRALIS
+# KOCHAB
+# MAIA
+# MARKAB
+# MEGREZ
+# MENKALINAN
+# MENKAR
+# MENKENT
+# MERAK
+# MEROPE
+# MIAPLACIDUS
+# MIMOSA
+# MINKAR
+# MINTAKA
+# MIRACH
+# MIRFAK
+# MIRZAM
+# MIZAR
+# NAOS
+# NIHAL
+# NUNKI
+# PEACOCK
+# PHECDA
+# POLARIS
+# POLLUX
+# PROCYON
+# RASALGETHI
+# RASALHAGUE
+# REGULUS
+# RIGEL
+# RIGIL KENTAURUS
+# RUKBAT
+# SABIK
+# SADALMELIK
+# SADR
+# SAIPH
+# SCHEAT
+# SCHEDAR
+# SHAULA
+# SHELIAK
+# SIRIUS
+# SIRRAH
+# SPICA
+# SUHAIL
+# SULAFAT
+# TARAZED
+# TAYGETA
+# THUBAN
+# UNUKALHAI
+# VEGA
+# VINDEMIATRIX
+# WEZEN
+# ZAURAK
+# ZUBENELGENUBI
+
+
+
     # Taken from ephem/stars.py
     astrobase.AstroBase.STARS.extend( [
         "ACHERNAR",
