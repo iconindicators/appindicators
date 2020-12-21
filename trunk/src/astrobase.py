@@ -119,25 +119,25 @@ class AstroBase( ABC ):
 
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     DATA_TAGS_TRANSLATIONS = {
-        DATA_TAG_ALTITUDE          : _( "ALTITUDE" ),
-        DATA_TAG_AZIMUTH           : _( "AZIMUTH" ),
-        DATA_TAG_BRIGHT_LIMB       : _( "BRIGHT LIMB" ),
-        DATA_TAG_ECLIPSE_DATE_TIME : _( "ECLIPSE DATE TIME" ),
-        DATA_TAG_ECLIPSE_LATITUDE  : _( "ECLIPSE LATITUDE" ),
-        DATA_TAG_ECLIPSE_LONGITUDE : _( "ECLIPSE LONGITUDE" ),
-        DATA_TAG_ECLIPSE_TYPE      : _( "ECLIPSE TYPE" ),
-        DATA_TAG_EQUINOX           : _( "EQUINOX" ),
-        DATA_TAG_FIRST_QUARTER     : _( "FIRST QUARTER" ),
-        DATA_TAG_ILLUMINATION      : _( "ILLUMINATION" ),
-        DATA_TAG_FULL              : _( "FULL" ),
-        DATA_TAG_NEW               : _( "NEW" ),
-        DATA_TAG_PHASE             : _( "PHASE" ),
-        DATA_TAG_RISE_AZIMUTH      : _( "RISE AZIMUTH" ),
-        DATA_TAG_RISE_DATE_TIME    : _( "RISE DATE TIME" ),
-        DATA_TAG_SET_AZIMUTH       : _( "SET AZIMUTH" ),
-        DATA_TAG_SET_DATE_TIME     : _( "SET DATE TIME" ),
-        DATA_TAG_SOLSTICE          : _( "SOLSTICE" ),
-        DATA_TAG_THIRD_QUARTER     : _( "THIRD QUARTER" ) }
+        DATA_TAG_ALTITUDE           : _( "ALTITUDE" ),
+        DATA_TAG_AZIMUTH            : _( "AZIMUTH" ),
+        DATA_TAG_BRIGHT_LIMB        : _( "BRIGHT LIMB" ),
+        DATA_TAG_ECLIPSE_DATE_TIME  : _( "ECLIPSE DATE TIME" ),
+        DATA_TAG_ECLIPSE_LATITUDE   : _( "ECLIPSE LATITUDE" ),
+        DATA_TAG_ECLIPSE_LONGITUDE  : _( "ECLIPSE LONGITUDE" ),
+        DATA_TAG_ECLIPSE_TYPE       : _( "ECLIPSE TYPE" ),
+        DATA_TAG_EQUINOX            : _( "EQUINOX" ),
+        DATA_TAG_FIRST_QUARTER      : _( "FIRST QUARTER" ),
+        DATA_TAG_ILLUMINATION       : _( "ILLUMINATION" ),
+        DATA_TAG_FULL               : _( "FULL" ),
+        DATA_TAG_NEW                : _( "NEW" ),
+        DATA_TAG_PHASE              : _( "PHASE" ),
+        DATA_TAG_RISE_AZIMUTH       : _( "RISE AZIMUTH" ),
+        DATA_TAG_RISE_DATE_TIME     : _( "RISE DATE TIME" ),
+        DATA_TAG_SET_AZIMUTH        : _( "SET AZIMUTH" ),
+        DATA_TAG_SET_DATE_TIME      : _( "SET DATE TIME" ),
+        DATA_TAG_SOLSTICE           : _( "SOLSTICE" ),
+        DATA_TAG_THIRD_QUARTER      : _( "THIRD QUARTER" ) }
 
 
     # Tags used to uniquely name particular objects/items.
@@ -162,25 +162,25 @@ class AstroBase( ABC ):
     PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
     PLANET_NAMES_TRANSLATIONS = {
-        PLANET_MERCURY : _( "Mercury" ),
-        PLANET_VENUS   : _( "Venus" ),
-        PLANET_MARS    : _( "Mars" ),
-        PLANET_JUPITER : _( "Jupiter" ),
-        PLANET_SATURN  : _( "Saturn" ),
-        PLANET_URANUS  : _( "Uranus" ),
-        PLANET_NEPTUNE : _( "Neptune" ),
-        PLANET_PLUTO   : _( "Pluto" ) }
+        PLANET_MERCURY  : _( "Mercury" ),
+        PLANET_VENUS    : _( "Venus" ),
+        PLANET_MARS     : _( "Mars" ),
+        PLANET_JUPITER  : _( "Jupiter" ),
+        PLANET_SATURN   : _( "Saturn" ),
+        PLANET_URANUS   : _( "Uranus" ),
+        PLANET_NEPTUNE  : _( "Neptune" ),
+        PLANET_PLUTO    : _( "Pluto" ) }
 
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     PLANET_TAGS_TRANSLATIONS = {
-        PLANET_MERCURY : _( "MERCURY" ),
-        PLANET_VENUS   : _( "VENUS" ),
-        PLANET_MARS    : _( "MARS" ),
-        PLANET_JUPITER : _( "JUPITER" ),
-        PLANET_SATURN  : _( "SATURN" ),
-        PLANET_URANUS  : _( "URANUS" ),
-        PLANET_NEPTUNE : _( "NEPTUNE" ),
-        PLANET_PLUTO   : _( "PLUTO" ) }
+        PLANET_MERCURY  : _( "MERCURY" ),
+        PLANET_VENUS    : _( "VENUS" ),
+        PLANET_MARS     : _( "MARS" ),
+        PLANET_JUPITER  : _( "JUPITER" ),
+        PLANET_SATURN   : _( "SATURN" ),
+        PLANET_URANUS   : _( "URANUS" ),
+        PLANET_NEPTUNE  : _( "NEPTUNE" ),
+        PLANET_PLUTO    : _( "PLUTO" ) }
 
 
     # Lunar phases.

@@ -36,634 +36,536 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
 
-#TODO Version 3.7.7.0 added extra stars.
-# Need to add the missing ones to the list for PyEphem.
-# Or should/can we?  By adding stars to this list but using the previous PyEphem version,
-# the new stars will not be known to PyEphem and causes an exception.
-#
-# Can/should this also be used for Skyfield?
-#
-# This is the complete list:
-# Acamar
-# Achernar
-# Acrux
-# Adara
-# Adhara
-# Agena
-# Albereo
-# Alcaid
-# Alcor
-# Alcyone
-# Aldebaran
-# Alderamin
-# Alfirk
-# Algenib
-# Algieba
-# Algol
-# Alhena
-# Alioth
-# Alkaid
-# Almach
-# Alnair
-# Alnilam
-# Alnitak
-# Alphard
-# Alphecca
-# Alpheratz
-# Alshain
-# Altair
-# Ankaa
-# Antares
-# Arcturus
-# Arkab Posterior
-# Arkab Prior
-# Arneb
-# Atlas
-# Atria
-# Avior
-# Bellatrix
-# Betelgeuse
-# Canopus
-# Capella
-# Caph
-# Castor
-# Cebalrai
-# Deneb
-# Denebola
-# Diphda
-# Dubhe
-# Electra
-# Elnath
-# Eltanin
-# Enif
-# Etamin
-# Fomalhaut
-# Formalhaut
-# Gacrux
-# Gienah
-# Gienah Corvi
-# Hadar
-# Hamal
-# Izar
-# Kaus Australis
-# Kochab
-# Maia
-# Markab
-# Megrez
-# Menkalinan
-# Menkar
-# Menkent
-# Merak
-# Merope
-# Miaplacidus
-# Mimosa
-# Minkar
-# Mintaka
-# Mirach
-# Mirfak
-# Mirzam
-# Mizar
-# Naos
-# Nihal
-# Nunki
-# Peacock
-# Phecda
-# Polaris
-# Pollux
-# Procyon
-# Rasalgethi
-# Rasalhague
-# Regulus
-# Rigel
-# Rigil Kentaurus
-# Rukbat
-# Sabik
-# Sadalmelik
-# Sadr
-# Saiph
-# Scheat
-# Schedar
-# Shaula
-# Sheliak
-# Sirius
-# Sirrah
-# Spica
-# Suhail
-# Sulafat
-# Tarazed
-# Taygeta
-# Thuban
-# Unukalhai
-# Vega
-# Vindemiatrix
-# Wezen
-# Zaurak
-# Zubenelgenubi
-
-
-# ACAMAR
-# ACHERNAR
-# ACRUX
-# ADARA
-# ADHARA
-# AGENA
-# ALBEREO
-# ALCAID
-# ALCOR
-# ALCYONE
-# ALDEBARAN
-# ALDERAMIN
-# ALFIRK
-# ALGENIB
-# ALGIEBA
-# ALGOL
-# ALHENA
-# ALIOTH
-# ALKAID
-# ALMACH
-# ALNAIR
-# ALNILAM
-# ALNITAK
-# ALPHARD
-# ALPHECCA
-# ALPHERATZ
-# ALSHAIN
-# ALTAIR
-# ANKAA
-# ANTARES
-# ARCTURUS
-# ARKAB POSTERIOR
-# ARKAB PRIOR
-# ARNEB
-# ATLAS
-# ATRIA
-# AVIOR
-# BELLATRIX
-# BETELGEUSE
-# CANOPUS
-# CAPELLA
-# CAPH
-# CASTOR
-# CEBALRAI
-# DENEB
-# DENEBOLA
-# DIPHDA
-# DUBHE
-# ELECTRA
-# ELNATH
-# ELTANIN
-# ENIF
-# ETAMIN
-# FOMALHAUT
-# FORMALHAUT
-# GACRUX
-# GIENAH
-# GIENAH CORVI
-# HADAR
-# HAMAL
-# IZAR
-# KAUS AUSTRALIS
-# KOCHAB
-# MAIA
-# MARKAB
-# MEGREZ
-# MENKALINAN
-# MENKAR
-# MENKENT
-# MERAK
-# MEROPE
-# MIAPLACIDUS
-# MIMOSA
-# MINKAR
-# MINTAKA
-# MIRACH
-# MIRFAK
-# MIRZAM
-# MIZAR
-# NAOS
-# NIHAL
-# NUNKI
-# PEACOCK
-# PHECDA
-# POLARIS
-# POLLUX
-# PROCYON
-# RASALGETHI
-# RASALHAGUE
-# REGULUS
-# RIGEL
-# RIGIL KENTAURUS
-# RUKBAT
-# SABIK
-# SADALMELIK
-# SADR
-# SAIPH
-# SCHEAT
-# SCHEDAR
-# SHAULA
-# SHELIAK
-# SIRIUS
-# SIRRAH
-# SPICA
-# SUHAIL
-# SULAFAT
-# TARAZED
-# TAYGETA
-# THUBAN
-# UNUKALHAI
-# VEGA
-# VINDEMIATRIX
-# WEZEN
-# ZAURAK
-# ZUBENELGENUBI
-
-
-
     # Taken from ephem/stars.py
-    astrobase.AstroBase.STARS.extend( [
-        "ACHERNAR",
-        "ADARA",
-        "AGENA",
-        "ALBEREO",
-        "ALCAID",
-        "ALCOR",
-        "ALCYONE",
-        "ALDEBARAN",
-        "ALDERAMIN",
-        "ALFIRK",
-        "ALGENIB",
-        "ALGIEBA",
-        "ALGOL",
-        "ALHENA",
-        "ALIOTH",
-        "ALMACH",
-        "ALNAIR",
-        "ALNILAM",
-        "ALNITAK",
-        "ALPHARD",
-        "ALPHECCA",
-        "ALSHAIN",
-        "ALTAIR",
-        "ANTARES",
-        "ARCTURUS",
-        "ARKAB POSTERIOR",
-        "ARKAB PRIOR",
-        "ARNEB",
-        "ATLAS",
-        "BELLATRIX",
-        "BETELGEUSE",
-        "CANOPUS",
-        "CAPELLA",
-        "CAPH",
-        "CASTOR",
-        "CEBALRAI",
-        "DENEB",
-        "DENEBOLA",
-        "DUBHE",
-        "ELECTRA",
-        "ELNATH",
-        "ENIF",
-        "ETAMIN",
-        "FOMALHAUT",
-        "GIENAH CORVI",
-        "HAMAL",
-        "IZAR",
-        "KAUS AUSTRALIS",
-        "KOCHAB",
-        "MAIA",
-        "MARKAB",
-        "MEGREZ",
-        "MENKALINAN",
-        "MENKAR",
-        "MERAK",
-        "MEROPE",
-        "MIMOSA",
-        "MINKAR",
-        "MINTAKA",
-        "MIRACH",
-        "MIRZAM",
-        "MIZAR",
-        "NAOS",
-        "NIHAL",
-        "NUNKI",
-        "PEACOCK",
-        "PHECDA",
-        "POLARIS",
-        "POLLUX",
-        "PROCYON",
-        "RASALGETHI",
-        "RASALHAGUE",
-        "REGULUS",
-        "RIGEL",
-        "RUKBAT",
-        "SADALMELIK",
-        "SADR",
-        "SAIPH",
-        "SCHEAT",
-        "SCHEDAR",
-        "SHAULA",
-        "SHELIAK",
-        "SIRIUS",
-        "SIRRAH",
-        "SPICA",
-        "SULAFAT",
-        "TARAZED",
-        "TAYGETA",
-        "THUBAN",
-        "UNUKALHAI",
-        "VEGA",
-        "VINDEMIATRIX",
-        "WEZEN",
-        "ZAURAK" ] )
+    # Version 3.7.7.0 added new stars...
+    if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
+        astrobase.AstroBase.STARS.extend( [
+            "ACHERNAR",
+            "ADARA",
+            "AGENA",
+            "ALBEREO",
+            "ALCAID",
+            "ALCOR",
+            "ALCYONE",
+            "ALDEBARAN",
+            "ALDERAMIN",
+            "ALFIRK",
+            "ALGENIB",
+            "ALGIEBA",
+            "ALGOL",
+            "ALHENA",
+            "ALIOTH",
+            "ALMACH",
+            "ALNAIR",
+            "ALNILAM",
+            "ALNITAK",
+            "ALPHARD",
+            "ALPHECCA",
+            "ALSHAIN",
+            "ALTAIR",
+            "ANTARES",
+            "ARCTURUS",
+            "ARKAB POSTERIOR",
+            "ARKAB PRIOR",
+            "ARNEB",
+            "ATLAS",
+            "BELLATRIX",
+            "BETELGEUSE",
+            "CANOPUS",
+            "CAPELLA",
+            "CAPH",
+            "CASTOR",
+            "CEBALRAI",
+            "DENEB",
+            "DENEBOLA",
+            "DUBHE",
+            "ELECTRA",
+            "ELNATH",
+            "ENIF",
+            "ETAMIN",
+            "FOMALHAUT",
+            "GIENAH CORVI",
+            "HAMAL",
+            "IZAR",
+            "KAUS AUSTRALIS",
+            "KOCHAB",
+            "MAIA",
+            "MARKAB",
+            "MEGREZ",
+            "MENKALINAN",
+            "MENKAR",
+            "MERAK",
+            "MEROPE",
+            "MIMOSA",
+            "MINKAR",
+            "MINTAKA",
+            "MIRACH",
+            "MIRZAM",
+            "MIZAR",
+            "NAOS",
+            "NIHAL",
+            "NUNKI",
+            "PEACOCK",
+            "PHECDA",
+            "POLARIS",
+            "POLLUX",
+            "PROCYON",
+            "RASALGETHI",
+            "RASALHAGUE",
+            "REGULUS",
+            "RIGEL",
+            "RUKBAT",
+            "SADALMELIK",
+            "SADR",
+            "SAIPH",
+            "SCHEAT",
+            "SCHEDAR",
+            "SHAULA",
+            "SHELIAK",
+            "SIRIUS",
+            "SIRRAH",
+            "SPICA",
+            "SULAFAT",
+            "TARAZED",
+            "TAYGETA",
+            "THUBAN",
+            "UNUKALHAI",
+            "VEGA",
+            "VINDEMIATRIX",
+            "WEZEN",
+            "ZAURAK" ] )
 
-    astrobase.AstroBase.STARS_TO_HIP.update( {
-        "ACHERNAR"        : 7588,
-        "ADARA"           : 33579,
-        "AGENA"           : 68702,
-        "ALBEREO"         : 95947,
-        "ALCAID"          : 67301,
-        "ALCOR"           : 65477,
-        "ALCYONE"         : 17702,
-        "ALDEBARAN"       : 21421,
-        "ALDERAMIN"       : 105199,
-        "ALFIRK"          : 106032,
-        "ALGENIB"         : 1067,
-        "ALGIEBA"         : 50583,
-        "ALGOL"           : 14576,
-        "ALHENA"          : 31681,
-        "ALIOTH"          : 62956,
-        "ALMACH"          : 9640,
-        "ALNAIR"          : 109268,
-        "ALNILAM"         : 26311,
-        "ALNITAK"         : 26727,
-        "ALPHARD"         : 46390,
-        "ALPHECCA"        : 76267,
-        "ALSHAIN"         : 98036,
-        "ALTAIR"          : 97649,
-        "ANTARES"         : 80763,
-        "ARCTURUS"        : 69673,
-        "ARKAB POSTERIOR" : 95294,
-        "ARKAB PRIOR"     : 95241,
-        "ARNEB"           : 25985,
-        "ATLAS"           : 17847,
-        "BELLATRIX"       : 25336,
-        "BETELGEUSE"      : 27989,
-        "CANOPUS"         : 30438,
-        "CAPELLA"         : 24608,
-        "CAPH"            : 746,
-        "CASTOR"          : 36850,
-        "CEBALRAI"        : 86742,
-        "DENEB"           : 102098,
-        "DENEBOLA"        : 57632,
-        "DUBHE"           : 54061,
-        "ELECTRA"         : 17499,
-        "ELNATH"          : 25428,
-        "ENIF"            : 107315,
-        "ETAMIN"          : 87833,
-        "FOMALHAUT"       : 113368,
-        "GIENAH CORVI"    : 59803,
-        "HAMAL"           : 9884,
-        "IZAR"            : 72105,
-        "KAUS AUSTRALIS"  : 90185,
-        "KOCHAB"          : 72607,
-        "MAIA"            : 17573,
-        "MARKAB"          : 113963,
-        "MEGREZ"          : 59774,
-        "MENKALINAN"      : 28360,
-        "MENKAR"          : 14135,
-        "MERAK"           : 53910,
-        "MEROPE"          : 17608,
-        "MIMOSA"          : 62434,
-        "MINKAR"          : 59316,
-        "MINTAKA"         : 25930,
-        "MIRACH"          : 5447,
-        "MIRZAM"          : 30324,
-        "MIZAR"           : 65378,
-        "NAOS"            : 39429,
-        "NIHAL"           : 25606,
-        "NUNKI"           : 92855,
-        "PEACOCK"         : 100751,
-        "PHECDA"          : 58001,
-        "POLARIS"         : 11767,
-        "POLLUX"          : 37826,
-        "PROCYON"         : 37279,
-        "RASALGETHI"      : 84345,
-        "RASALHAGUE"      : 86032,
-        "REGULUS"         : 49669,
-        "RIGEL"           : 24436,
-        "RUKBAT"          : 95347,
-        "SADALMELIK"      : 109074,
-        "SADR"            : 100453,
-        "SAIPH"           : 27366,
-        "SCHEAT"          : 113881,
-        "SCHEDAR"         : 3179,
-        "SHAULA"          : 85927,
-        "SHELIAK"         : 92420,
-        "SIRIUS"          : 32349,
-        "SIRRAH"          : 677,
-        "SPICA"           : 65474,
-        "SULAFAT"         : 93194,
-        "TARAZED"         : 97278,
-        "TAYGETA"         : 17531,
-        "THUBAN"          : 68756,
-        "UNUKALHAI"       : 77070,
-        "VEGA"            : 91262,
-        "VINDEMIATRIX"    : 63608,
-        "WEZEN"           : 34444,
-        "ZAURAK"          : 18543 } )
+    else: # 3.7.7.0 or better.
+        astrobase.AstroBase.STARS.extend( [
+            "ACAMAR",
+            "ACHERNAR",
+            "ACRUX",
+            "ADARA",
+            "ADHARA",
+            "AGENA",
+            "ALBEREO",
+            "ALCAID",
+            "ALCOR",
+            "ALCYONE",
+            "ALDEBARAN",
+            "ALDERAMIN",
+            "ALFIRK",
+            "ALGENIB",
+            "ALGIEBA",
+            "ALGOL",
+            "ALHENA",
+            "ALIOTH",
+            "ALKAID",
+            "ALMACH",
+            "ALNAIR",
+            "ALNILAM",
+            "ALNITAK",
+            "ALPHARD",
+            "ALPHECCA",
+            "ALPHERATZ",
+            "ALSHAIN",
+            "ALTAIR",
+            "ANKAA",
+            "ANTARES",
+            "ARCTURUS",
+            "ARKAB POSTERIOR",
+            "ARKAB PRIOR",
+            "ARNEB",
+            "ATLAS",
+            "ATRIA",
+            "AVIOR",
+            "BELLATRIX",
+            "BETELGEUSE",
+            "CANOPUS",
+            "CAPELLA",
+            "CAPH",
+            "CASTOR",
+            "CEBALRAI",
+            "DENEB",
+            "DENEBOLA",
+            "DIPHDA",
+            "DUBHE",
+            "ELECTRA",
+            "ELNATH",
+            "ELTANIN",
+            "ENIF",
+            "ETAMIN",
+            "FOMALHAUT",
+            "FORMALHAUT",
+            "GACRUX",
+            "GIENAH",
+            "GIENAH CORVI",
+            "HADAR",
+            "HAMAL",
+            "IZAR",
+            "KAUS AUSTRALIS",
+            "KOCHAB",
+            "MAIA",
+            "MARKAB",
+            "MEGREZ",
+            "MENKALINAN",
+            "MENKAR",
+            "MENKENT",
+            "MERAK",
+            "MEROPE",
+            "MIAPLACIDUS",
+            "MIMOSA",
+            "MINKAR",
+            "MINTAKA",
+            "MIRACH",
+            "MIRFAK",
+            "MIRZAM",
+            "MIZAR",
+            "NAOS",
+            "NIHAL",
+            "NUNKI",
+            "PEACOCK",
+            "PHECDA",
+            "POLARIS",
+            "POLLUX",
+            "PROCYON",
+            "RASALGETHI",
+            "RASALHAGUE",
+            "REGULUS",
+            "RIGEL",
+            "RIGIL KENTAURUS",
+            "RUKBAT",
+            "SABIK",
+            "SADALMELIK",
+            "SADR",
+            "SAIPH",
+            "SCHEAT",
+            "SCHEDAR",
+            "SHAULA",
+            "SHELIAK",
+            "SIRIUS",
+            "SIRRAH",
+            "SPICA",
+            "SUHAIL",
+            "SULAFAT",
+            "TARAZED",
+            "TAYGETA",
+            "THUBAN",
+            "UNUKALHAI",
+            "VEGA",
+            "VINDEMIATRIX",
+            "WEZEN",
+            "ZAURAK",
+            "ZUBENELGENUBI" ] )
 
+    if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
+        astrobase.AstroBase.STARS_TO_HIP.update( {
+            "ACHERNAR"          :   7588,
+            "ADARA"             :   33579,
+            "AGENA"             :   68702,
+            "ALBEREO"           :   95947,
+            "ALCAID"            :   67301,
+            "ALCOR"             :   65477,
+            "ALCYONE"           :   17702,
+            "ALDEBARAN"         :   21421,
+            "ALDERAMIN"         :   105199,
+            "ALFIRK"            :   106032,
+            "ALGENIB"           :   1067,
+            "ALGIEBA"           :   50583,
+            "ALGOL"             :   14576,
+            "ALHENA"            :   31681,
+            "ALIOTH"            :   62956,
+            "ALMACH"            :   9640,
+            "ALNAIR"            :   109268,
+            "ALNILAM"           :   26311,
+            "ALNITAK"           :   26727,
+            "ALPHARD"           :   46390,
+            "ALPHECCA"          :   76267,
+            "ALSHAIN"           :   98036,
+            "ALTAIR"            :   97649,
+            "ANTARES"           :   80763,
+            "ARCTURUS"          :   69673,
+            "ARKAB POSTERIOR"   :   95294,
+            "ARKAB PRIOR"       :   95241,
+            "ARNEB"             :   25985,
+            "ATLAS"             :   17847,
+            "BELLATRIX"         :   25336,
+            "BETELGEUSE"        :   27989,
+            "CANOPUS"           :   30438,
+            "CAPELLA"           :   24608,
+            "CAPH"              :   746,
+            "CASTOR"            :   36850,
+            "CEBALRAI"          :   86742,
+            "DENEB"             :   102098,
+            "DENEBOLA"          :   57632,
+            "DUBHE"             :   54061,
+            "ELECTRA"           :   17499,
+            "ELNATH"            :   25428,
+            "ENIF"              :   107315,
+            "ETAMIN"            :   87833,
+            "FOMALHAUT"         :   113368,
+            "GIENAH CORVI"      :   59803,
+            "HAMAL"             :   9884,
+            "IZAR"              :   72105,
+            "KAUS AUSTRALIS"    :   90185,
+            "KOCHAB"            :   72607,
+            "MAIA"              :   17573,
+            "MARKAB"            :   113963,
+            "MEGREZ"            :   59774,
+            "MENKALINAN"        :   28360,
+            "MENKAR"            :   14135,
+            "MERAK"             :   53910,
+            "MEROPE"            :   17608,
+            "MIMOSA"            :   62434,
+            "MINKAR"            :   59316,
+            "MINTAKA"           :   25930,
+            "MIRACH"            :   5447,
+            "MIRZAM"            :   30324,
+            "MIZAR"             :   65378,
+            "NAOS"              :   39429,
+            "NIHAL"             :   25606,
+            "NUNKI"             :   92855,
+            "PEACOCK"           :   100751,
+            "PHECDA"            :   58001,
+            "POLARIS"           :   11767,
+            "POLLUX"            :   37826,
+            "PROCYON"           :   37279,
+            "RASALGETHI"        :   84345,
+            "RASALHAGUE"        :   86032,
+            "REGULUS"           :   49669,
+            "RIGEL"             :   24436,
+            "RUKBAT"            :   95347,
+            "SADALMELIK"        :   109074,
+            "SADR"              :   100453,
+            "SAIPH"             :   27366,
+            "SCHEAT"            :   113881,
+            "SCHEDAR"           :   3179,
+            "SHAULA"            :   85927,
+            "SHELIAK"           :   92420,
+            "SIRIUS"            :   32349,
+            "SIRRAH"            :   677,
+            "SPICA"             :   65474,
+            "SULAFAT"           :   93194,
+            "TARAZED"           :   97278,
+            "TAYGETA"           :   17531,
+            "THUBAN"            :   68756,
+            "UNUKALHAI"         :   77070,
+            "VEGA"              :   91262,
+            "VINDEMIATRIX"      :   63608,
+            "WEZEN"             :   34444,
+            "ZAURAK"            :   18543 } )
+
+    else:
+        astrobase.AstroBase.STARS_TO_HIP.update( {
+            "ACAMAR"            :   13847,
+            "ACRUX"             :   60718,
+            "ADHARA"            :   33579,
+            "ALKAID"            :   67301,
+            "ALPHERATZ"         :   677,
+            "ANKAA"             :   2081,
+            "ATRIA"             :   82273,
+            "AVIOR"             :   41037,
+            "DIPHDA"            :   3419,
+            "ELTANIN"           :   87833,
+            "FORMALHAUT"        :   113368,
+            "GACRUX"            :   61084,
+            "GIENAH"            :   59803,
+            "HADAR"             :   68702,
+            "MENKENT"           :   68933,
+            "MIAPLACIDUS"       :   45238,
+            "MIRFAK"            :   15863,
+            "RIGIL KENTAURUS"   :   71683,
+            "SABIK"             :   84012,
+            "SUHAIL"            :   44816,
+            "ZUBENELGENUBI"     :   72603 } )
+    
     astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.update( {
-        astrobase.AstroBase.STARS[ 0 ]  : _( "Achernar" ),
-        astrobase.AstroBase.STARS[ 1 ]  : _( "Adara" ),
-        astrobase.AstroBase.STARS[ 2 ]  : _( "Agena" ),
-        astrobase.AstroBase.STARS[ 3 ]  : _( "Albereo" ),
-        astrobase.AstroBase.STARS[ 4 ]  : _( "Alcaid" ),
-        astrobase.AstroBase.STARS[ 5 ]  : _( "Alcor" ),
-        astrobase.AstroBase.STARS[ 6 ]  : _( "Alcyone" ),
-        astrobase.AstroBase.STARS[ 7 ]  : _( "Aldebaran" ),
-        astrobase.AstroBase.STARS[ 8 ]  : _( "Alderamin" ),
-        astrobase.AstroBase.STARS[ 9 ]  : _( "Alfirk" ),
-        astrobase.AstroBase.STARS[ 10 ] : _( "Algenib" ),
-        astrobase.AstroBase.STARS[ 11 ] : _( "Algieba" ),
-        astrobase.AstroBase.STARS[ 12 ] : _( "Algol" ),
-        astrobase.AstroBase.STARS[ 13 ] : _( "Alhena" ),
-        astrobase.AstroBase.STARS[ 14 ] : _( "Alioth" ),
-        astrobase.AstroBase.STARS[ 15 ] : _( "Almach" ),
-        astrobase.AstroBase.STARS[ 16 ] : _( "Alnair" ),
-        astrobase.AstroBase.STARS[ 17 ] : _( "Alnilam" ),
-        astrobase.AstroBase.STARS[ 18 ] : _( "Alnitak" ),
-        astrobase.AstroBase.STARS[ 19 ] : _( "Alphard" ),
-        astrobase.AstroBase.STARS[ 20 ] : _( "Alphecca" ),
-        astrobase.AstroBase.STARS[ 21 ] : _( "Alshain" ),
-        astrobase.AstroBase.STARS[ 22 ] : _( "Altair" ),
-        astrobase.AstroBase.STARS[ 23 ] : _( "Antares" ),
-        astrobase.AstroBase.STARS[ 24 ] : _( "Arcturus" ),
-        astrobase.AstroBase.STARS[ 25 ] : _( "Arkab Posterior" ),
-        astrobase.AstroBase.STARS[ 26 ] : _( "Arkab Prior" ),
-        astrobase.AstroBase.STARS[ 27 ] : _( "Arneb" ),
-        astrobase.AstroBase.STARS[ 28 ] : _( "Atlas" ),
-        astrobase.AstroBase.STARS[ 29 ] : _( "Bellatrix" ),
-        astrobase.AstroBase.STARS[ 30 ] : _( "Betelgeuse" ),
-        astrobase.AstroBase.STARS[ 31 ] : _( "Canopus" ),
-        astrobase.AstroBase.STARS[ 32 ] : _( "Capella" ),
-        astrobase.AstroBase.STARS[ 33 ] : _( "Caph" ),
-        astrobase.AstroBase.STARS[ 34 ] : _( "Castor" ),
-        astrobase.AstroBase.STARS[ 35 ] : _( "Cebalrai" ),
-        astrobase.AstroBase.STARS[ 36 ] : _( "Deneb" ),
-        astrobase.AstroBase.STARS[ 37 ] : _( "Denebola" ),
-        astrobase.AstroBase.STARS[ 38 ] : _( "Dubhe" ),
-        astrobase.AstroBase.STARS[ 39 ] : _( "Electra" ),
-        astrobase.AstroBase.STARS[ 40 ] : _( "Elnath" ),
-        astrobase.AstroBase.STARS[ 41 ] : _( "Enif" ),
-        astrobase.AstroBase.STARS[ 42 ] : _( "Etamin" ),
-        astrobase.AstroBase.STARS[ 43 ] : _( "Fomalhaut" ),
-        astrobase.AstroBase.STARS[ 44 ] : _( "Gienah Corvi" ),
-        astrobase.AstroBase.STARS[ 45 ] : _( "Hamal" ),
-        astrobase.AstroBase.STARS[ 46 ] : _( "Izar" ),
-        astrobase.AstroBase.STARS[ 47 ] : _( "Kaus Australis" ),
-        astrobase.AstroBase.STARS[ 48 ] : _( "Kochab" ),
-        astrobase.AstroBase.STARS[ 49 ] : _( "Maia" ),
-        astrobase.AstroBase.STARS[ 50 ] : _( "Markab" ),
-        astrobase.AstroBase.STARS[ 51 ] : _( "Megrez" ),
-        astrobase.AstroBase.STARS[ 52 ] : _( "Menkalinan" ),
-        astrobase.AstroBase.STARS[ 53 ] : _( "Menkar" ),
-        astrobase.AstroBase.STARS[ 54 ] : _( "Merak" ),
-        astrobase.AstroBase.STARS[ 55 ] : _( "Merope" ),
-        astrobase.AstroBase.STARS[ 56 ] : _( "Mimosa" ),
-        astrobase.AstroBase.STARS[ 57 ] : _( "Minkar" ),
-        astrobase.AstroBase.STARS[ 58 ] : _( "Mintaka" ),
-        astrobase.AstroBase.STARS[ 59 ] : _( "Mirach" ),
-        astrobase.AstroBase.STARS[ 60 ] : _( "Mirzam" ),
-        astrobase.AstroBase.STARS[ 61 ] : _( "Mizar" ),
-        astrobase.AstroBase.STARS[ 62 ] : _( "Naos" ),
-        astrobase.AstroBase.STARS[ 63 ] : _( "Nihal" ),
-        astrobase.AstroBase.STARS[ 64 ] : _( "Nunki" ),
-        astrobase.AstroBase.STARS[ 65 ] : _( "Peacock" ),
-        astrobase.AstroBase.STARS[ 66 ] : _( "Phecda" ),
-        astrobase.AstroBase.STARS[ 67 ] : _( "Polaris" ),
-        astrobase.AstroBase.STARS[ 68 ] : _( "Pollux" ),
-        astrobase.AstroBase.STARS[ 69 ] : _( "Procyon" ),
-        astrobase.AstroBase.STARS[ 70 ] : _( "Rasalgethi" ),
-        astrobase.AstroBase.STARS[ 71 ] : _( "Rasalhague" ),
-        astrobase.AstroBase.STARS[ 72 ] : _( "Regulus" ),
-        astrobase.AstroBase.STARS[ 73 ] : _( "Rigel" ),
-        astrobase.AstroBase.STARS[ 74 ] : _( "Rukbat" ),
-        astrobase.AstroBase.STARS[ 75 ] : _( "Sadalmelik" ),
-        astrobase.AstroBase.STARS[ 76 ] : _( "Sadr" ),
-        astrobase.AstroBase.STARS[ 77 ] : _( "Saiph" ),
-        astrobase.AstroBase.STARS[ 78 ] : _( "Scheat" ),
-        astrobase.AstroBase.STARS[ 79 ] : _( "Schedar" ),
-        astrobase.AstroBase.STARS[ 80 ] : _( "Shaula" ),
-        astrobase.AstroBase.STARS[ 81 ] : _( "Sheliak" ),
-        astrobase.AstroBase.STARS[ 82 ] : _( "Sirius" ),
-        astrobase.AstroBase.STARS[ 83 ] : _( "Sirrah" ),
-        astrobase.AstroBase.STARS[ 84 ] : _( "Spica" ),
-        astrobase.AstroBase.STARS[ 85 ] : _( "Sulafat" ),
-        astrobase.AstroBase.STARS[ 86 ] : _( "Tarazed" ),
-        astrobase.AstroBase.STARS[ 87 ] : _( "Taygeta" ),
-        astrobase.AstroBase.STARS[ 88 ] : _( "Thuban" ),
-        astrobase.AstroBase.STARS[ 89 ] : _( "Unukalhai" ),
-        astrobase.AstroBase.STARS[ 90 ] : _( "Vega" ),
-        astrobase.AstroBase.STARS[ 91 ] : _( "Vindemiatrix" ),
-        astrobase.AstroBase.STARS[ 92 ] : _( "Wezen" ),
-        astrobase.AstroBase.STARS[ 93 ] : _( "Zaurak" ) } )
+        astrobase.AstroBase.STARS[ 0 ]  :   _( "Achernar" ),
+        astrobase.AstroBase.STARS[ 1 ]  :   _( "Adara" ),
+        astrobase.AstroBase.STARS[ 2 ]  :   _( "Agena" ),
+        astrobase.AstroBase.STARS[ 3 ]  :   _( "Albereo" ),
+        astrobase.AstroBase.STARS[ 4 ]  :   _( "Alcaid" ),
+        astrobase.AstroBase.STARS[ 5 ]  :   _( "Alcor" ),
+        astrobase.AstroBase.STARS[ 6 ]  :   _( "Alcyone" ),
+        astrobase.AstroBase.STARS[ 7 ]  :   _( "Aldebaran" ),
+        astrobase.AstroBase.STARS[ 8 ]  :   _( "Alderamin" ),
+        astrobase.AstroBase.STARS[ 9 ]  :   _( "Alfirk" ),
+        astrobase.AstroBase.STARS[ 10 ] :   _( "Algenib" ),
+        astrobase.AstroBase.STARS[ 11 ] :   _( "Algieba" ),
+        astrobase.AstroBase.STARS[ 12 ] :   _( "Algol" ),
+        astrobase.AstroBase.STARS[ 13 ] :   _( "Alhena" ),
+        astrobase.AstroBase.STARS[ 14 ] :   _( "Alioth" ),
+        astrobase.AstroBase.STARS[ 15 ] :   _( "Almach" ),
+        astrobase.AstroBase.STARS[ 16 ] :   _( "Alnair" ),
+        astrobase.AstroBase.STARS[ 17 ] :   _( "Alnilam" ),
+        astrobase.AstroBase.STARS[ 18 ] :   _( "Alnitak" ),
+        astrobase.AstroBase.STARS[ 19 ] :   _( "Alphard" ),
+        astrobase.AstroBase.STARS[ 20 ] :   _( "Alphecca" ),
+        astrobase.AstroBase.STARS[ 21 ] :   _( "Alshain" ),
+        astrobase.AstroBase.STARS[ 22 ] :   _( "Altair" ),
+        astrobase.AstroBase.STARS[ 23 ] :   _( "Antares" ),
+        astrobase.AstroBase.STARS[ 24 ] :   _( "Arcturus" ),
+        astrobase.AstroBase.STARS[ 25 ] :   _( "Arkab Posterior" ),
+        astrobase.AstroBase.STARS[ 26 ] :   _( "Arkab Prior" ),
+        astrobase.AstroBase.STARS[ 27 ] :   _( "Arneb" ),
+        astrobase.AstroBase.STARS[ 28 ] :   _( "Atlas" ),
+        astrobase.AstroBase.STARS[ 29 ] :   _( "Bellatrix" ),
+        astrobase.AstroBase.STARS[ 30 ] :   _( "Betelgeuse" ),
+        astrobase.AstroBase.STARS[ 31 ] :   _( "Canopus" ),
+        astrobase.AstroBase.STARS[ 32 ] :   _( "Capella" ),
+        astrobase.AstroBase.STARS[ 33 ] :   _( "Caph" ),
+        astrobase.AstroBase.STARS[ 34 ] :   _( "Castor" ),
+        astrobase.AstroBase.STARS[ 35 ] :   _( "Cebalrai" ),
+        astrobase.AstroBase.STARS[ 36 ] :   _( "Deneb" ),
+        astrobase.AstroBase.STARS[ 37 ] :   _( "Denebola" ),
+        astrobase.AstroBase.STARS[ 38 ] :   _( "Dubhe" ),
+        astrobase.AstroBase.STARS[ 39 ] :   _( "Electra" ),
+        astrobase.AstroBase.STARS[ 40 ] :   _( "Elnath" ),
+        astrobase.AstroBase.STARS[ 41 ] :   _( "Enif" ),
+        astrobase.AstroBase.STARS[ 42 ] :   _( "Etamin" ),
+        astrobase.AstroBase.STARS[ 43 ] :   _( "Fomalhaut" ),
+        astrobase.AstroBase.STARS[ 44 ] :   _( "Gienah Corvi" ),
+        astrobase.AstroBase.STARS[ 45 ] :   _( "Hamal" ),
+        astrobase.AstroBase.STARS[ 46 ] :   _( "Izar" ),
+        astrobase.AstroBase.STARS[ 47 ] :   _( "Kaus Australis" ),
+        astrobase.AstroBase.STARS[ 48 ] :   _( "Kochab" ),
+        astrobase.AstroBase.STARS[ 49 ] :   _( "Maia" ),
+        astrobase.AstroBase.STARS[ 50 ] :   _( "Markab" ),
+        astrobase.AstroBase.STARS[ 51 ] :   _( "Megrez" ),
+        astrobase.AstroBase.STARS[ 52 ] :   _( "Menkalinan" ),
+        astrobase.AstroBase.STARS[ 53 ] :   _( "Menkar" ),
+        astrobase.AstroBase.STARS[ 54 ] :   _( "Merak" ),
+        astrobase.AstroBase.STARS[ 55 ] :   _( "Merope" ),
+        astrobase.AstroBase.STARS[ 56 ] :   _( "Mimosa" ),
+        astrobase.AstroBase.STARS[ 57 ] :   _( "Minkar" ),
+        astrobase.AstroBase.STARS[ 58 ] :   _( "Mintaka" ),
+        astrobase.AstroBase.STARS[ 59 ] :   _( "Mirach" ),
+        astrobase.AstroBase.STARS[ 60 ] :   _( "Mirzam" ),
+        astrobase.AstroBase.STARS[ 61 ] :   _( "Mizar" ),
+        astrobase.AstroBase.STARS[ 62 ] :   _( "Naos" ),
+        astrobase.AstroBase.STARS[ 63 ] :   _( "Nihal" ),
+        astrobase.AstroBase.STARS[ 64 ] :   _( "Nunki" ),
+        astrobase.AstroBase.STARS[ 65 ] :   _( "Peacock" ),
+        astrobase.AstroBase.STARS[ 66 ] :   _( "Phecda" ),
+        astrobase.AstroBase.STARS[ 67 ] :   _( "Polaris" ),
+        astrobase.AstroBase.STARS[ 68 ] :   _( "Pollux" ),
+        astrobase.AstroBase.STARS[ 69 ] :   _( "Procyon" ),
+        astrobase.AstroBase.STARS[ 70 ] :   _( "Rasalgethi" ),
+        astrobase.AstroBase.STARS[ 71 ] :   _( "Rasalhague" ),
+        astrobase.AstroBase.STARS[ 72 ] :   _( "Regulus" ),
+        astrobase.AstroBase.STARS[ 73 ] :   _( "Rigel" ),
+        astrobase.AstroBase.STARS[ 74 ] :   _( "Rukbat" ),
+        astrobase.AstroBase.STARS[ 75 ] :   _( "Sadalmelik" ),
+        astrobase.AstroBase.STARS[ 76 ] :   _( "Sadr" ),
+        astrobase.AstroBase.STARS[ 77 ] :   _( "Saiph" ),
+        astrobase.AstroBase.STARS[ 78 ] :   _( "Scheat" ),
+        astrobase.AstroBase.STARS[ 79 ] :   _( "Schedar" ),
+        astrobase.AstroBase.STARS[ 80 ] :   _( "Shaula" ),
+        astrobase.AstroBase.STARS[ 81 ] :   _( "Sheliak" ),
+        astrobase.AstroBase.STARS[ 82 ] :   _( "Sirius" ),
+        astrobase.AstroBase.STARS[ 83 ] :   _( "Sirrah" ),
+        astrobase.AstroBase.STARS[ 84 ] :   _( "Spica" ),
+        astrobase.AstroBase.STARS[ 85 ] :   _( "Sulafat" ),
+        astrobase.AstroBase.STARS[ 86 ] :   _( "Tarazed" ),
+        astrobase.AstroBase.STARS[ 87 ] :   _( "Taygeta" ),
+        astrobase.AstroBase.STARS[ 88 ] :   _( "Thuban" ),
+        astrobase.AstroBase.STARS[ 89 ] :   _( "Unukalhai" ),
+        astrobase.AstroBase.STARS[ 90 ] :   _( "Vega" ),
+        astrobase.AstroBase.STARS[ 91 ] :   _( "Vindemiatrix" ),
+        astrobase.AstroBase.STARS[ 92 ] :   _( "Wezen" ),
+        astrobase.AstroBase.STARS[ 93 ] :   _( "Zaurak" ) } )
 
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
-        astrobase.AstroBase.STARS[ 0 ]  : _( "ACHERNAR" ),
-        astrobase.AstroBase.STARS[ 1 ]  : _( "ADARA" ),
-        astrobase.AstroBase.STARS[ 2 ]  : _( "AGENA" ),
-        astrobase.AstroBase.STARS[ 3 ]  : _( "ALBEREO" ),
-        astrobase.AstroBase.STARS[ 4 ]  : _( "ALCAID" ),
-        astrobase.AstroBase.STARS[ 5 ]  : _( "ALCOR" ),
-        astrobase.AstroBase.STARS[ 6 ]  : _( "ALCYONE" ),
-        astrobase.AstroBase.STARS[ 7 ]  : _( "ALDEBARAN" ),
-        astrobase.AstroBase.STARS[ 8 ]  : _( "ALDERAMIN" ),
-        astrobase.AstroBase.STARS[ 9 ]  : _( "ALFIRK" ),
-        astrobase.AstroBase.STARS[ 10 ] : _( "ALGENIB" ),
-        astrobase.AstroBase.STARS[ 11 ] : _( "ALGIEBA" ),
-        astrobase.AstroBase.STARS[ 12 ] : _( "ALGOL" ),
-        astrobase.AstroBase.STARS[ 13 ] : _( "ALHENA" ),
-        astrobase.AstroBase.STARS[ 14 ] : _( "ALIOTH" ),
-        astrobase.AstroBase.STARS[ 15 ] : _( "ALMACH" ),
-        astrobase.AstroBase.STARS[ 16 ] : _( "ALNAIR" ),
-        astrobase.AstroBase.STARS[ 17 ] : _( "ALNILAM" ),
-        astrobase.AstroBase.STARS[ 18 ] : _( "ALNITAK" ),
-        astrobase.AstroBase.STARS[ 19 ] : _( "ALPHARD" ),
-        astrobase.AstroBase.STARS[ 20 ] : _( "ALPHECCA" ),
-        astrobase.AstroBase.STARS[ 21 ] : _( "ALSHAIN" ),
-        astrobase.AstroBase.STARS[ 22 ] : _( "ALTAIR" ),
-        astrobase.AstroBase.STARS[ 23 ] : _( "ANTARES" ),
-        astrobase.AstroBase.STARS[ 24 ] : _( "ARCTURUS" ),
-        astrobase.AstroBase.STARS[ 25 ] : _( "ARKAB POSTERIOR" ),
-        astrobase.AstroBase.STARS[ 26 ] : _( "ARKAB PRIOR" ),
-        astrobase.AstroBase.STARS[ 27 ] : _( "ARNEB" ),
-        astrobase.AstroBase.STARS[ 28 ] : _( "ATLAS" ),
-        astrobase.AstroBase.STARS[ 29 ] : _( "BELLATRIX" ),
-        astrobase.AstroBase.STARS[ 30 ] : _( "BETELGEUSE" ),
-        astrobase.AstroBase.STARS[ 31 ] : _( "CANOPUS" ),
-        astrobase.AstroBase.STARS[ 32 ] : _( "CAPELLA" ),
-        astrobase.AstroBase.STARS[ 33 ] : _( "CAPH" ),
-        astrobase.AstroBase.STARS[ 34 ] : _( "CASTOR" ),
-        astrobase.AstroBase.STARS[ 35 ] : _( "CEBALRAI" ),
-        astrobase.AstroBase.STARS[ 36 ] : _( "DENEB" ),
-        astrobase.AstroBase.STARS[ 37 ] : _( "DENEBOLA" ),
-        astrobase.AstroBase.STARS[ 38 ] : _( "DUBHE" ),
-        astrobase.AstroBase.STARS[ 39 ] : _( "ELECTRA" ),
-        astrobase.AstroBase.STARS[ 40 ] : _( "ELNATH" ),
-        astrobase.AstroBase.STARS[ 41 ] : _( "ENIF" ),
-        astrobase.AstroBase.STARS[ 42 ] : _( "ETAMIN" ),
-        astrobase.AstroBase.STARS[ 43 ] : _( "FOMALHAUT" ),
-        astrobase.AstroBase.STARS[ 44 ] : _( "GIENAH CORVI" ),
-        astrobase.AstroBase.STARS[ 45 ] : _( "HAMAL" ),
-        astrobase.AstroBase.STARS[ 46 ] : _( "IZAR" ),
-        astrobase.AstroBase.STARS[ 47 ] : _( "KAUS AUSTRALIS" ),
-        astrobase.AstroBase.STARS[ 48 ] : _( "KOCHAB" ),
-        astrobase.AstroBase.STARS[ 49 ] : _( "MAIA" ),
-        astrobase.AstroBase.STARS[ 50 ] : _( "MARKAB" ),
-        astrobase.AstroBase.STARS[ 51 ] : _( "MEGREZ" ),
-        astrobase.AstroBase.STARS[ 52 ] : _( "MENKALINAN" ),
-        astrobase.AstroBase.STARS[ 53 ] : _( "MENKAR" ),
-        astrobase.AstroBase.STARS[ 54 ] : _( "MERAK" ),
-        astrobase.AstroBase.STARS[ 55 ] : _( "MEROPE" ),
-        astrobase.AstroBase.STARS[ 56 ] : _( "MIMOSA" ),
-        astrobase.AstroBase.STARS[ 57 ] : _( "MINKAR" ),
-        astrobase.AstroBase.STARS[ 58 ] : _( "MINTAKA" ),
-        astrobase.AstroBase.STARS[ 59 ] : _( "MIRACH" ),
-        astrobase.AstroBase.STARS[ 60 ] : _( "MIRZAM" ),
-        astrobase.AstroBase.STARS[ 61 ] : _( "MIZAR" ),
-        astrobase.AstroBase.STARS[ 62 ] : _( "NAOS" ),
-        astrobase.AstroBase.STARS[ 63 ] : _( "NIHAL" ),
-        astrobase.AstroBase.STARS[ 64 ] : _( "NUNKI" ),
-        astrobase.AstroBase.STARS[ 65 ] : _( "PEACOCK" ),
-        astrobase.AstroBase.STARS[ 66 ] : _( "PHECDA" ),
-        astrobase.AstroBase.STARS[ 67 ] : _( "POLARIS" ),
-        astrobase.AstroBase.STARS[ 68 ] : _( "POLLUX" ),
-        astrobase.AstroBase.STARS[ 69 ] : _( "PROCYON" ),
-        astrobase.AstroBase.STARS[ 70 ] : _( "RASALGETHI" ),
-        astrobase.AstroBase.STARS[ 71 ] : _( "RASALHAGUE" ),
-        astrobase.AstroBase.STARS[ 72 ] : _( "REGULUS" ),
-        astrobase.AstroBase.STARS[ 73 ] : _( "RIGEL" ),
-        astrobase.AstroBase.STARS[ 74 ] : _( "RUKBAT" ),
-        astrobase.AstroBase.STARS[ 75 ] : _( "SADALMELIK" ),
-        astrobase.AstroBase.STARS[ 76 ] : _( "SADR" ),
-        astrobase.AstroBase.STARS[ 77 ] : _( "SAIPH" ),
-        astrobase.AstroBase.STARS[ 78 ] : _( "SCHEAT" ),
-        astrobase.AstroBase.STARS[ 79 ] : _( "SCHEDAR" ),
-        astrobase.AstroBase.STARS[ 80 ] : _( "SHAULA" ),
-        astrobase.AstroBase.STARS[ 81 ] : _( "SHELIAK" ),
-        astrobase.AstroBase.STARS[ 82 ] : _( "SIRIUS" ),
-        astrobase.AstroBase.STARS[ 83 ] : _( "SIRRAH" ),
-        astrobase.AstroBase.STARS[ 84 ] : _( "SPICA" ),
-        astrobase.AstroBase.STARS[ 85 ] : _( "SULAFAT" ),
-        astrobase.AstroBase.STARS[ 86 ] : _( "TARAZED" ),
-        astrobase.AstroBase.STARS[ 87 ] : _( "TAYGETA" ),
-        astrobase.AstroBase.STARS[ 88 ] : _( "THUBAN" ),
-        astrobase.AstroBase.STARS[ 89 ] : _( "UNUKALHAI" ),
-        astrobase.AstroBase.STARS[ 90 ] : _( "VEGA" ),
-        astrobase.AstroBase.STARS[ 91 ] : _( "VINDEMIATRIX" ),
-        astrobase.AstroBase.STARS[ 92 ] : _( "WEZEN" ),
-        astrobase.AstroBase.STARS[ 93 ] : _( "ZAURAK" ) } )
+        astrobase.AstroBase.STARS[ 0 ]  :   _( "ACHERNAR" ),
+        astrobase.AstroBase.STARS[ 1 ]  :   _( "ADARA" ),
+        astrobase.AstroBase.STARS[ 2 ]  :   _( "AGENA" ),
+        astrobase.AstroBase.STARS[ 3 ]  :   _( "ALBEREO" ),
+        astrobase.AstroBase.STARS[ 4 ]  :   _( "ALCAID" ),
+        astrobase.AstroBase.STARS[ 5 ]  :   _( "ALCOR" ),
+        astrobase.AstroBase.STARS[ 6 ]  :   _( "ALCYONE" ),
+        astrobase.AstroBase.STARS[ 7 ]  :   _( "ALDEBARAN" ),
+        astrobase.AstroBase.STARS[ 8 ]  :   _( "ALDERAMIN" ),
+        astrobase.AstroBase.STARS[ 9 ]  :   _( "ALFIRK" ),
+        astrobase.AstroBase.STARS[ 10 ] :   _( "ALGENIB" ),
+        astrobase.AstroBase.STARS[ 11 ] :   _( "ALGIEBA" ),
+        astrobase.AstroBase.STARS[ 12 ] :   _( "ALGOL" ),
+        astrobase.AstroBase.STARS[ 13 ] :   _( "ALHENA" ),
+        astrobase.AstroBase.STARS[ 14 ] :   _( "ALIOTH" ),
+        astrobase.AstroBase.STARS[ 15 ] :   _( "ALMACH" ),
+        astrobase.AstroBase.STARS[ 16 ] :   _( "ALNAIR" ),
+        astrobase.AstroBase.STARS[ 17 ] :   _( "ALNILAM" ),
+        astrobase.AstroBase.STARS[ 18 ] :   _( "ALNITAK" ),
+        astrobase.AstroBase.STARS[ 19 ] :   _( "ALPHARD" ),
+        astrobase.AstroBase.STARS[ 20 ] :   _( "ALPHECCA" ),
+        astrobase.AstroBase.STARS[ 21 ] :   _( "ALSHAIN" ),
+        astrobase.AstroBase.STARS[ 22 ] :   _( "ALTAIR" ),
+        astrobase.AstroBase.STARS[ 23 ] :   _( "ANTARES" ),
+        astrobase.AstroBase.STARS[ 24 ] :   _( "ARCTURUS" ),
+        astrobase.AstroBase.STARS[ 25 ] :   _( "ARKAB POSTERIOR" ),
+        astrobase.AstroBase.STARS[ 26 ] :   _( "ARKAB PRIOR" ),
+        astrobase.AstroBase.STARS[ 27 ] :   _( "ARNEB" ),
+        astrobase.AstroBase.STARS[ 28 ] :   _( "ATLAS" ),
+        astrobase.AstroBase.STARS[ 29 ] :   _( "BELLATRIX" ),
+        astrobase.AstroBase.STARS[ 30 ] :   _( "BETELGEUSE" ),
+        astrobase.AstroBase.STARS[ 31 ] :   _( "CANOPUS" ),
+        astrobase.AstroBase.STARS[ 32 ] :   _( "CAPELLA" ),
+        astrobase.AstroBase.STARS[ 33 ] :   _( "CAPH" ),
+        astrobase.AstroBase.STARS[ 34 ] :   _( "CASTOR" ),
+        astrobase.AstroBase.STARS[ 35 ] :   _( "CEBALRAI" ),
+        astrobase.AstroBase.STARS[ 36 ] :   _( "DENEB" ),
+        astrobase.AstroBase.STARS[ 37 ] :   _( "DENEBOLA" ),
+        astrobase.AstroBase.STARS[ 38 ] :   _( "DUBHE" ),
+        astrobase.AstroBase.STARS[ 39 ] :   _( "ELECTRA" ),
+        astrobase.AstroBase.STARS[ 40 ] :   _( "ELNATH" ),
+        astrobase.AstroBase.STARS[ 41 ] :   _( "ENIF" ),
+        astrobase.AstroBase.STARS[ 42 ] :   _( "ETAMIN" ),
+        astrobase.AstroBase.STARS[ 43 ] :   _( "FOMALHAUT" ),
+        astrobase.AstroBase.STARS[ 44 ] :   _( "GIENAH CORVI" ),
+        astrobase.AstroBase.STARS[ 45 ] :   _( "HAMAL" ),
+        astrobase.AstroBase.STARS[ 46 ] :   _( "IZAR" ),
+        astrobase.AstroBase.STARS[ 47 ] :   _( "KAUS AUSTRALIS" ),
+        astrobase.AstroBase.STARS[ 48 ] :   _( "KOCHAB" ),
+        astrobase.AstroBase.STARS[ 49 ] :   _( "MAIA" ),
+        astrobase.AstroBase.STARS[ 50 ] :   _( "MARKAB" ),
+        astrobase.AstroBase.STARS[ 51 ] :   _( "MEGREZ" ),
+        astrobase.AstroBase.STARS[ 52 ] :   _( "MENKALINAN" ),
+        astrobase.AstroBase.STARS[ 53 ] :   _( "MENKAR" ),
+        astrobase.AstroBase.STARS[ 54 ] :   _( "MERAK" ),
+        astrobase.AstroBase.STARS[ 55 ] :   _( "MEROPE" ),
+        astrobase.AstroBase.STARS[ 56 ] :   _( "MIMOSA" ),
+        astrobase.AstroBase.STARS[ 57 ] :   _( "MINKAR" ),
+        astrobase.AstroBase.STARS[ 58 ] :   _( "MINTAKA" ),
+        astrobase.AstroBase.STARS[ 59 ] :   _( "MIRACH" ),
+        astrobase.AstroBase.STARS[ 60 ] :   _( "MIRZAM" ),
+        astrobase.AstroBase.STARS[ 61 ] :   _( "MIZAR" ),
+        astrobase.AstroBase.STARS[ 62 ] :   _( "NAOS" ),
+        astrobase.AstroBase.STARS[ 63 ] :   _( "NIHAL" ),
+        astrobase.AstroBase.STARS[ 64 ] :   _( "NUNKI" ),
+        astrobase.AstroBase.STARS[ 65 ] :   _( "PEACOCK" ),
+        astrobase.AstroBase.STARS[ 66 ] :   _( "PHECDA" ),
+        astrobase.AstroBase.STARS[ 67 ] :   _( "POLARIS" ),
+        astrobase.AstroBase.STARS[ 68 ] :   _( "POLLUX" ),
+        astrobase.AstroBase.STARS[ 69 ] :   _( "PROCYON" ),
+        astrobase.AstroBase.STARS[ 70 ] :   _( "RASALGETHI" ),
+        astrobase.AstroBase.STARS[ 71 ] :   _( "RASALHAGUE" ),
+        astrobase.AstroBase.STARS[ 72 ] :   _( "REGULUS" ),
+        astrobase.AstroBase.STARS[ 73 ] :   _( "RIGEL" ),
+        astrobase.AstroBase.STARS[ 74 ] :   _( "RUKBAT" ),
+        astrobase.AstroBase.STARS[ 75 ] :   _( "SADALMELIK" ),
+        astrobase.AstroBase.STARS[ 76 ] :   _( "SADR" ),
+        astrobase.AstroBase.STARS[ 77 ] :   _( "SAIPH" ),
+        astrobase.AstroBase.STARS[ 78 ] :   _( "SCHEAT" ),
+        astrobase.AstroBase.STARS[ 79 ] :   _( "SCHEDAR" ),
+        astrobase.AstroBase.STARS[ 80 ] :   _( "SHAULA" ),
+        astrobase.AstroBase.STARS[ 81 ] :   _( "SHELIAK" ),
+        astrobase.AstroBase.STARS[ 82 ] :   _( "SIRIUS" ),
+        astrobase.AstroBase.STARS[ 83 ] :   _( "SIRRAH" ),
+        astrobase.AstroBase.STARS[ 84 ] :   _( "SPICA" ),
+        astrobase.AstroBase.STARS[ 85 ] :   _( "SULAFAT" ),
+        astrobase.AstroBase.STARS[ 86 ] :   _( "TARAZED" ),
+        astrobase.AstroBase.STARS[ 87 ] :   _( "TAYGETA" ),
+        astrobase.AstroBase.STARS[ 88 ] :   _( "THUBAN" ),
+        astrobase.AstroBase.STARS[ 89 ] :   _( "UNUKALHAI" ),
+        astrobase.AstroBase.STARS[ 90 ] :   _( "VEGA" ),
+        astrobase.AstroBase.STARS[ 91 ] :   _( "VINDEMIATRIX" ),
+        astrobase.AstroBase.STARS[ 92 ] :   _( "WEZEN" ),
+        astrobase.AstroBase.STARS[ 93 ] :   _( "ZAURAK" ) } )
 
 
     # Internally used for city.
