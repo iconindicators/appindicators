@@ -1246,7 +1246,7 @@ msgid "Van Maanen 2"
 msgstr ""
 
 #: astroskyfield.py:383
-msgid "3c 273"
+msgid "3C 273"
 msgstr ""
 
 #: astroskyfield.py:392

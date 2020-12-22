@@ -80,13 +80,13 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
-    # Skyfield does not provide a list of stars, as does PyEphem.
+    # Unlike PyEphem, Skyfield does not provide a list of stars.
     # However there is a list of named stars in the file skyfield/named_stars.py
     # which was sourced from a now deleted Wikipedia page "Hipparcos Catalogue":
     #    https://web.archive.org/web/20131012032059/https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
-    # This list contains duplicates and misspellings of names and is not in use per se:
+    # This list contains duplicates, misspellings and is not in use per se:
     #    https://github.com/skyfielders/python-skyfield/issues/304
-    # Instead, use the more reliable source from ESA Hipparcos catalogue:
+    # Therefore, use a more reliable and recent source from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     astrobase.AstroBase.STARS.extend( [
         "ACAMAR",
@@ -380,7 +380,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 92 ] :   _( "Vega" ),
         astrobase.AstroBase.STARS[ 93 ] :   _( "Vindemiatrix" ),
         astrobase.AstroBase.STARS[ 94 ] :   _( "Zaurak" ),
-        astrobase.AstroBase.STARS[ 95 ] :   _( "3c 273" ) } )
+        astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
@@ -481,6 +481,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 94 ] :   _( "ZAURAK" ),
         astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
+#TODO When Oleg returns the new PO file,
+# find 3c 273 and fix to be 3C 273.
 
     # Taken from ephem/cities.py as Skyfield does not provide a list of cities.
     #    https://github.com/skyfielders/python-skyfield/issues/316
