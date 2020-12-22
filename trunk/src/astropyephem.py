@@ -425,7 +425,6 @@ class AstroPyEphem( astrobase.AstroBase ):
             astrobase.AstroBase.STARS[ 93 ] :   _( "ZAURAK" ) } )
 
     else: # 3.7.7.0 or better.
-#TODO Test this on Ubuntu 20.04 or better.
         astrobase.AstroBase.STARS.extend( [
             "ACAMAR",
             "ACHERNAR",
