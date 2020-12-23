@@ -849,10 +849,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                  ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
 
 
-    #TODO According to
-    #     https://github.com/skyfielders/python-skyfield/issues/39
-    #     https://github.com/skyfielders/python-skyfield/pull/40
-    # Skyfield might eventually support star names out of the box.
     @staticmethod
     def __calculateStars( utcNow, data, timeScale, topos, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
         for star in stars:
