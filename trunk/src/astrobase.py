@@ -281,7 +281,7 @@ class AstroBase( ABC ):
         return { }
 
 
-    # Returns None if the backend (and required third party libraries) is available; an error message otherwise.
+    # Returns None if the backend and third party library is available; an error message otherwise.
     @staticmethod
     @abstractmethod
     def getAvailabilityMessage(): return None
@@ -357,7 +357,7 @@ class AstroBase( ABC ):
         return apparentMagnitude
 
 
-    # Retrieve the next eclipse for either the Sun or Moon.
+    # Retrieve the next Lunar/Solar eclipse from tables.
     @staticmethod
     def getEclipse( utcNow, data, bodyType, dataTag ):
         eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
