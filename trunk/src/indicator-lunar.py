@@ -678,16 +678,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateMenuCometsMinorPlanets( self, menu, bodyType ):
-        bodies = [ ]
+        orbitalElements = [ ]
         for body in ( self.comets if bodyType == astrobase.AstroBase.BodyType.COMET else self.minorPlanets ):
             if self.display( bodyType, body ):
-                bodies.append( body )
+                orbitalElements.append( body )
 
-        if bodies:
+        if orbitalElements:
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == astrobase.AstroBase.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            for name in sorted( bodies ):
+            for name in sorted( orbitalElements ):
                 url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + self.getCometMinorPlanetOnClickURL( name, bodyType )
                 self.createMenuItem( subMenu, self.indent( 0, 1 ) + name, url )
                 self.updateMenuCommon( subMenu, bodyType, name, 1, 2, url )
