@@ -951,6 +951,11 @@ class AstroSkyfield( astrobase.AstroBase ):
 #TODO Somehow test for circumpolar satellites as per AstroPyEphem.
 # How do we even check for them?
 # What about satellites that are never up?
+# Determine a satellite and lat/long in PyEphem for each of circumpolar and never up
+# and then run the same within Skyfield to see what happens.
+# May need to refer to 
+#    https://github.com/brandon-rhodes/pyephem/issues/45
+# if creating a request in Skyfield.
 #
 #TODO Verify this method and source for code inspiration.
 #
@@ -975,18 +980,13 @@ class AstroSkyfield( astrobase.AstroBase ):
 #        Display rise/set/az/alt
 #
 # On subsequent runs of the indicator (with previous run data available):
-#    If rise time > (now + five minutes):
-#        # It is possible that this satellite could be in transit right now, so check with the previous data...
-#        If previous set time > now:
-#            Display rise/set/az/alt
-#        Else:
-#            Display rise
-#    Else
+#    If previous rise time < (now + five minutes) AND previous set > now:
 #        Display rise/set/az/alt
-#    
+#    Else:
+#        Display rise
 #
-#
-#
+#Rather than have a special case for when we first run,
+# simply copy (pass in) the current data as if it's the previous data.
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
