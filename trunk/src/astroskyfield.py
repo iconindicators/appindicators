@@ -987,6 +987,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 #
 #Rather than have a special case for when we first run,
 # simply copy (pass in) the current data as if it's the previous data.
+#
+# In PyEphem, need to remove the code which corrects for a transit result with the next set, current transit, current set.
+# Instead keep looking for a transit result in which rise > transit > set.
+#
     def __calculateSatellites( utcNow, data, timeScale, topos, ephemerisPlanets, satellites, satelliteData ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
