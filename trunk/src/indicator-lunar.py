@@ -836,7 +836,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.__updateMenuSatellitesNEW( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
-#TODO See astroskyfield on what to implement!
+#TODO 
+#    If previous rise time < (now + five minutes) AND previous set > now:
+#        Display rise/set/az/alt
+#    Else:
+#        Display rise
+
     def __updateMenuSatellitesNEW( self, menu, label, satellites ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
