@@ -838,10 +838,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO 
 #    If previous rise time < (now + five minutes) AND previous set > now:
-#        Display rise/set/az/alt
+#        Display previous rise/set/az/alt
 #    Else:
-#        Display rise
-
+#        Display current rise
     def __updateMenuSatellitesNEW( self, menu, label, satellites ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
@@ -852,6 +851,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite will rise or is in transit.
+
+#                 if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
+
 
                 if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
                     self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
