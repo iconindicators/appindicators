@@ -226,8 +226,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def flushCache( self ):
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+#TODO Testing...put back!        
+#         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+#         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
         for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
@@ -368,7 +369,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
-        if True: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
+        if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )

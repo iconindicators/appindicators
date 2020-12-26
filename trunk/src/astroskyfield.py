@@ -957,7 +957,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 #    https://github.com/brandon-rhodes/pyephem/issues/45
 # if creating a request in Skyfield.
 #
-#TODO Verify this method and source for code inspiration.
 #
 #TODO Because showing the user a satellite in transit is really an interface issue rather than a backend issue,
 # consider removing the code in the PyEphem backend which finds a rise/set and 
