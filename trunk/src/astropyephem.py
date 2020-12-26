@@ -1123,8 +1123,8 @@ class AstroPyEphem( astrobase.AstroBase ):
                     earthSatellite.compute( city )
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
-                        nextPass = AstroPyEphem.__calculateNextPass( city, earthSatellite )
-                        if AstroPyEphem.__isSatellitePassIsValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
+                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
                             if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
                                 setTime = nextPass[ 4 ]
                                 nextPass = AstroPyEphem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle )
@@ -1164,19 +1164,8 @@ class AstroPyEphem( astrobase.AstroBase ):
                     earthSatellite.compute( city )
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
-                        nextPass = city.next_pass( satellite ) #TODO If we use this as is (for 3.7.7.0 there is singlepass = True by default),
-                        # is it safe to use?
-                        # That is, if next_pass determines rise > set, what happens?  Will it return the NEXT transit or go back in time to find the prior rise?
-# https://github.com/brandon-rhodes/pyephem/pull/85/files
+                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
                         if AstroPyEphem.__isSatellitePassValidNEW( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
-                            if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-                                setTime = nextPass[ 4 ]
-                                nextPass = AstroPyEphem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle )
-                                if nextPass is None:
-                                    currentDateTime = ephem.Date( setTime + ephem.minute * 60 ) # Could not determine the rise, so look for the next pass.
-                                    continue
-
-                            # Satellite is yet to rise or is in transit...
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
@@ -1204,8 +1193,8 @@ class AstroPyEphem( astrobase.AstroBase ):
             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
             satellite.compute( city )
             try:
-                nextPass = AstroPyEphem.__calculateNextPass( city, satellite )
-                if AstroPyEphem.__isSatellitePassIsValid( nextPass ):
+                nextPass = AstroPyEphem.__calculateNextSatellitePass( city, satellite )
+                if AstroPyEphem.__isSatellitePassValid( nextPass ):
                     if nextPass[ 0 ] < nextPass[ 4 ]:
                         break # Found the rise time!
 
@@ -1226,12 +1215,16 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://rhodesmill.org/pyephem/CHANGELOG.html#version-3-7-7-0-2019-august-18
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
-    def __calculateNextPass( city, satellite ):
+    def __calculateNextSatellitePass( city, satellite ):
         version = int( ephem.__version__.split( '.' )[ 2 ] )
         if version <= 6:
             nextPass = city.next_pass( satellite )
 
         else:
+            # Must set singlepass = False to avoid the new code in PyEphem (and so behave prior to this change).
+            # It is possible a pass is too quick/low and an exception is thrown.
+            # https://github.com/brandon-rhodes/pyephem/issues/164
+            # https://github.com/brandon-rhodes/pyephem/pull/85/files
             nextPass = city.next_pass( satellite, singlepass = False )
 
         return nextPass
@@ -1239,31 +1232,34 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     # Guard against bad TLE data causing spurious results.
     @staticmethod
-    def __isSatellitePassIsValid( satellitePass ):
+    def __isSatellitePassValid( satellitePass ):
         return satellitePass and \
                len( satellitePass ) == 6 and \
-                satellitePass[ 0 ] and \
-                satellitePass[ 1 ] and \
-                satellitePass[ 2 ] and \
-                satellitePass[ 3 ] and \
-                satellitePass[ 4 ] and \
-                satellitePass[ 5 ]
+               satellitePass[ 0 ] and \
+               satellitePass[ 1 ] and \
+               satellitePass[ 2 ] and \
+               satellitePass[ 3 ] and \
+               satellitePass[ 4 ] and \
+               satellitePass[ 5 ]
 
 
 #TODO Testing
     @staticmethod
-    # Ensure the satellite pass is numerically valid and the rise time exceeds the transit time which exceeds the set time.
+    # Ensure:
+    #    The satellite pass is numerically valid.
+    #    Rise time exceeds transit time.
+    #    Transit time exceeds set time.
     def __isSatellitePassValidNEW( satellitePass ):
         return satellitePass and \
                len( satellitePass ) == 6 and \
-                satellitePass[ 0 ] and \
-                satellitePass[ 1 ] and \
-                satellitePass[ 2 ] and \
-                satellitePass[ 3 ] and \
-                satellitePass[ 4 ] and \
-                satellitePass[ 5 ] and \
-                satellitePass[ 0 ] > satellitePass[ 2 ] and \
-                satellitePass[ 2 ] > satellitePass[ 4 ]
+               satellitePass[ 0 ] and \
+               satellitePass[ 1 ] and \
+               satellitePass[ 2 ] and \
+               satellitePass[ 3 ] and \
+               satellitePass[ 4 ] and \
+               satellitePass[ 5 ] and \
+               satellitePass[ 2 ] > satellitePass[ 0 ] and \
+               satellitePass[ 4 ] > satellitePass[ 2 ]
 
 
     # Determine if a satellite pass is visible.
