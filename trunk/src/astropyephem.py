@@ -1167,6 +1167,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                         nextPass = city.next_pass( satellite ) #TODO If we use this as is (for 3.7.7.0 there is singlepass = True by default),
                         # is it safe to use?
                         # That is, if next_pass determines rise > set, what happens?  Will it return the NEXT transit or go back in time to find the prior rise?
+# https://github.com/brandon-rhodes/pyephem/pull/85/files
                         if AstroPyEphem.__isSatellitePassValidNEW( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
                             if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
                                 setTime = nextPass[ 4 ]
