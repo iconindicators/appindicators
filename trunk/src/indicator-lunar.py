@@ -159,6 +159,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         utcNow = datetime.datetime.utcnow()
 
+        self.data = None
+        self.dataPrevious = None
+
         self.cometData = { } # Key: comet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name, upper cased; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
@@ -334,6 +337,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.addNewBodies( self.satelliteData, self.satellites )
 
         # Update backend.
+        self.dataPrevious = self.data
         self.data = IndicatorLunar.astroBackend.calculate(
             utcNow,
             self.latitude, self.longitude, self.elevation,
@@ -344,6 +348,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanets, self.minorPlanetData,
             self.magnitude,
             self.getLogging() )
+
+        if self.dataPrevious is None:
+            self.dataPrevious = self.data
 
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
@@ -796,6 +803,70 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if satellitesPolar:
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
+
+
+    def updateMenuSatellitesNEW( self, menu ):
+        satellites = [ ]
+        satellitesPolar = [ ]
+        if self.satellitesSortByDateTime:
+            for number in self.satellites:
+                key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
+                if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
+                    satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+
+                elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.dataPrevious:
+                    satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), None ] )
+
+            satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 0 ], x[ 1 ] ) )
+            satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
+
+        else:
+            for number in self.satellites:
+                key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
+                if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data or key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data ) and \
+                   ( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious or key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.dataPrevious ):
+                    satellites.append( [ number, self.satelliteData[ number ].getName(), None ] )
+
+            satellites = sorted( satellites, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
+
+        if satellites:
+            self.__updateMenuSatellitesNEW( menu, _( "Satellites" ), satellites )
+
+        if satellitesPolar:
+            self.__updateMenuSatellitesNEW( menu, _( "Satellites (Polar)" ), satellitesPolar )
+
+
+#TODO See astroskyfield on what to implement!
+    def __updateMenuSatellitesNEW( self, menu, label, satellites ):
+        menuItem = self.createMenuItem( menu, label )
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
+        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 )
+        for number, name, riseDateTime in satellites:
+            url = IndicatorLunar.SEARCH_URL_SATELLITE + number
+            menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
+            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite will rise or is in transit.
+
+                if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ), url )
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), url )
+                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ), url )
+
+                else:
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
+
+            else: # Polar (always up).
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), url )
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), url )
+
+            separator = Gtk.SeparatorMenuItem()
+            subMenu.append( separator )
+
+        subMenu.remove( separator )
 
 
     def __updateMenuSatellites( self, menu, label, satellites ):
