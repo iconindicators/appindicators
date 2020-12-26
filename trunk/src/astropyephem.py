@@ -931,7 +931,8 @@ class AstroPyEphem( astrobase.AstroBase ):
         AstroPyEphem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
-        AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
+#         AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
+        AstroPyEphem.__calculateSatellitesNEW( ephemNow, data, satellites, satelliteData ) #TODO Testing
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ]
@@ -1149,6 +1150,49 @@ class AstroPyEphem( astrobase.AstroBase ):
                         break
 
 
+#TODO Testing
+    @staticmethod
+    def __calculateSatellitesNEW( ephemNow, data, satellites, satelliteData ):
+        for satellite in satellites:
+            if satellite in satelliteData:
+                tle = satelliteData[ satellite ]
+                currentDateTime = ephemNow
+                endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
+                while currentDateTime < endDateTime:
+                    city = AstroPyEphem.__getCity( data, currentDateTime )
+                    earthSatellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+                    earthSatellite.compute( city )
+                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
+                    try:
+                        nextPass = city.next_pass( satellite ) #TODO If we use this as is (for 3.7.7.0 there is singlepass = True by default),
+                        # is it safe to use?
+                        # That is, if next_pass determines rise > set, what happens?  Will it return the NEXT transit or go back in time to find the prior rise?
+                        if AstroPyEphem.__isSatellitePassValidNEW( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
+                            if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
+                                setTime = nextPass[ 4 ]
+                                nextPass = AstroPyEphem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle )
+                                if nextPass is None:
+                                    currentDateTime = ephem.Date( setTime + ephem.minute * 60 ) # Could not determine the rise, so look for the next pass.
+                                    continue
+
+                            # Satellite is yet to rise or is in transit...
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
+                            break
+
+                        else:
+                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Look for the next pass.
+
+                    except ValueError:
+                        if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
+
+                        break
+
+
     @staticmethod
     def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
         currentDateTime = ephemNow
@@ -1203,6 +1247,22 @@ class AstroPyEphem( astrobase.AstroBase ):
                 satellitePass[ 3 ] and \
                 satellitePass[ 4 ] and \
                 satellitePass[ 5 ]
+
+
+#TODO Testing
+    @staticmethod
+    # Ensure the satellite pass is numerically valid and the rise time exceeds the transit time which exceeds the set time.
+    def __isSatellitePassValidNEW( satellitePass ):
+        return satellitePass and \
+               len( satellitePass ) == 6 and \
+                satellitePass[ 0 ] and \
+                satellitePass[ 1 ] and \
+                satellitePass[ 2 ] and \
+                satellitePass[ 3 ] and \
+                satellitePass[ 4 ] and \
+                satellitePass[ 5 ] and \
+                satellitePass[ 0 ] > satellitePass[ 2 ] and \
+                satellitePass[ 2 ] > satellitePass[ 4 ]
 
 
     # Determine if a satellite pass is visible.
