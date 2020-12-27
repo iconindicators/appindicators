@@ -852,9 +852,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite will rise or is in transit.
 
-#                 if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
-
-
                 if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
                     self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
                     self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
