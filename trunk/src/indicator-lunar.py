@@ -468,7 +468,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
-                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.getDisplayData( key ) )
+                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -568,10 +568,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ 1 ], x[ 0 ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
-            riseTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            riseAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            setTime = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            setAzimuth = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            riseTime = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            riseAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            setTime = self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            setAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
             summary = self.satelliteNotificationSummary. \
                       replace( astrobase.AstroBase.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
@@ -602,7 +602,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, 0, 1, IndicatorLunar.SEARCH_URL_MOON )
-            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Phase: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ), IndicatorLunar.SEARCH_URL_MOON )
+            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Phase: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_PHASE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ], IndicatorLunar.SEARCH_URL_MOON ) )
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Next Phases" ), IndicatorLunar.SEARCH_URL_MOON )
 
             # Determine which phases occur by date rather than using the phase calculated.
@@ -614,7 +614,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             indent = self.indent( 1, 2 )
             for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ 0 ] ):
-                self.createMenuItem( subMenu, indent + displayText + self.getDisplayData( key ), IndicatorLunar.SEARCH_URL_MOON )
+                self.createMenuItem( subMenu, indent + displayText + self.formatData( key[ 2 ], self.data[ key ] ), IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
@@ -626,19 +626,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, 0, 1, IndicatorLunar.SEARCH_URL_SUN )
-            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Equinox: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ), IndicatorLunar.SEARCH_URL_SUN )
-            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Solstice: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ), IndicatorLunar.SEARCH_URL_SUN )
+            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Equinox: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_EQUINOX, self.data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] ), IndicatorLunar.SEARCH_URL_SUN )
+            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Solstice: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SOLSTICE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] ), IndicatorLunar.SEARCH_URL_SUN )
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
 
     def updateMenuEclipse( self, menu, bodyType, nameTag, url ):
         key = ( bodyType, nameTag )
         self.createMenuItem( menu, self.indent( 0, 1 ) + _( "Eclipse" ), url )
-        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ), url )
-        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Type: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ), url )
+        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ), url )
+        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Type: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] ), url )
         if key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
-            latitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) )
-            longitude = self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) )
+            latitude = self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
+            longitude = self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
             self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url )
 
 
@@ -763,16 +763,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         indent = self.indent( indentUnity, indentGnomeShell )
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
             if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-                self.createMenuItem( menu, indent + _( "Rise: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), onClickURL )
+                self.createMenuItem( menu, indent + _( "Rise: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ), onClickURL )
 
             else:
-                self.createMenuItem( menu, indent + _( "Set: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), onClickURL )
-                self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), onClickURL )
-                self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
+                self.createMenuItem( menu, indent + _( "Set: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ), onClickURL )
+                self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
+                self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
 
         else: # Body is always up.
-            self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), onClickURL )
-            self.createMenuItem( menu, indent + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), onClickURL )
+            self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
+            self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
 
 
     def updateMenuSatellites( self, menu ):
@@ -918,6 +918,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
 
 
+#TODO Remove after satellites are sorted out.
     def getDisplayData( self, key, dateTimeFormat = None ):
         displayData = None
 
@@ -986,6 +987,78 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if displayData is None:
             displayData = "" # Better to show nothing than let None slip through and crash.
             self.getLogging().error( "Unknown key: " + str( key ) )
+
+        return displayData
+
+
+    def formatData( self, dataTag, data, dateTimeFormat = None ):
+        displayData = None
+
+        if dataTag == astrobase.AstroBase.DATA_TAG_ALTITUDE or \
+           dataTag == astrobase.AstroBase.DATA_TAG_AZIMUTH or \
+           dataTag == astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH or \
+           dataTag == astrobase.AstroBase.DATA_TAG_SET_AZIMUTH:
+            displayData = str( round( math.degrees( float( data ) ) ) ) + "°"
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB:
+            displayData = str( int( float( data ) ) ) + "°"
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+             dataTag == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+             dataTag == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+             dataTag == astrobase.AstroBase.DATA_TAG_FULL or \
+             dataTag == astrobase.AstroBase.DATA_TAG_NEW or \
+             dataTag == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
+             dataTag == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+             dataTag == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+             dataTag == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
+                if dateTimeFormat is None:
+                    displayData = self.toLocalDateTimeString( data, IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM )
+
+                else:
+                    displayData = self.toLocalDateTimeString( data, dateTimeFormat )
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE:
+            latitude = data
+            if latitude[ 0 ] == "-":
+                displayData = latitude[ 1 : ] + "° " + _( "S" )
+
+            else:
+                displayData = latitude + "° " +_( "N" )
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE:
+            longitude = data
+            if longitude[ 0 ] == "-":
+                displayData = longitude[ 1 : ] + "° " + _( "E" )
+
+            else:
+                displayData = longitude + "° " +_( "W" )
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE:
+            if data == eclipse.ECLIPSE_TYPE_ANNULAR:
+                displayData = _( "Annular" )
+
+            elif data == eclipse.ECLIPSE_TYPE_HYBRID:
+                displayData = _( "Hybrid (Annular/Total)" )
+
+            elif data == eclipse.ECLIPSE_TYPE_PARTIAL:
+                displayData = _( "Partial" )
+
+            elif data == eclipse.ECLIPSE_TYPE_PENUMBRAL:
+                displayData = _( "Penumbral" )
+
+            else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
+                displayData = _( "Total" )
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_ILLUMINATION:
+            displayData = data + "%"
+
+        elif dataTag == astrobase.AstroBase.DATA_TAG_PHASE:
+            displayData = astrobase.AstroBase.LUNAR_PHASE_NAMES_TRANSLATIONS[ data ]
+
+        if displayData is None:
+            displayData = "" # Better to show nothing than let None slip through and crash.
+            self.getLogging().error( "Unknown data tag: " + dataTag )
 
         return displayData
 
@@ -1491,7 +1564,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     value = ""
                     key = ( bodyType, bodyTag, dataTag )
                     if key in self.data:
-                        value = self.getDisplayData( key )
+                        value = self.formatData( dataTag, self.data[ key ] )
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ astrobase.AstroBase.BodyType.PLANET, astrobase.AstroBase.PLANETS, astrobase.AstroBase.DATA_TAGS_PLANET ],
@@ -1508,7 +1581,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         value = ""
                         key = ( bodyType, bodyTag, dataTag )
                         if key in self.data:
-                            value = self.getDisplayData( key )
+                            value = self.formatData( dataTag, self.data[ key ] )
                             displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ astrobase.AstroBase.BodyType.COMET, self.cometData, astrobase.AstroBase.DATA_TAGS_COMET ],
@@ -1525,7 +1598,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         value = ""
                         key = ( bodyType, bodyTag, dataTag )
                         if key in self.data:
-                            value = self.getDisplayData( key )
+                            value = self.formatData( dataTag, self.data[ key ] )
                             displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         bodyType = astrobase.AstroBase.BodyType.SATELLITE
@@ -1538,7 +1611,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, bodyTag, dataTag )
                     if key in self.data:
-                        value = self.getDisplayData( key )
+                        value = self.formatData( dataTag, self.data[ key ] )
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
 
