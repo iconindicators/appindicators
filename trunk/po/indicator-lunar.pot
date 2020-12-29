@@ -1202,7 +1202,7 @@ msgid "Kocab"
 msgstr ""
 
 #: astroskyfield.py:343
-msgid "Kruger 6"
+msgid "Kruger 60"
 msgstr ""
 
 #: astroskyfield.py:344
@@ -1298,7 +1298,7 @@ msgid "KOCAB"
 msgstr ""
 
 #: astroskyfield.py:442
-msgid "KRUGER 6"
+msgid "KRUGER 60"
 msgstr ""
 
 #: astroskyfield.py:443
