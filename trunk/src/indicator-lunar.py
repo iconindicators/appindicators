@@ -422,9 +422,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def getNextUpdateTimeInSeconds( self ):
         utcNow = datetime.datetime.utcnow()
 
-        # Do an update at least hourly so the moon icon reflects reality.
-        # This also ensures the download of comet/minor planet/satellite data occurs no more than an hour from when they are supposed to happen.
-        nextUpdateTime = utcNow + datetime.timedelta( hours = 1 )
+        # Do an update at least every twenty minutes to ensure:
+        #    The moon icon reflects reality
+        #    Objects don't move too much between updates.
+        #    Download of comet/minor planet/satellite data occurs no more than twenty minutes from when they are supposed to happen.
+        nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
 
         for key in self.data:
             dateTimeAttributeExceptRiseDateTime = \
