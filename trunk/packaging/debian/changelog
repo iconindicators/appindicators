@@ -3,7 +3,7 @@ indicator-lunar (1.0.86-1) xenial; urgency=low
   * Handle exception when OE data contains spurious '****'.
   * Handle exception when TLE data omits the launch year.
   * PyEphem 3.7.7.0 added additional stars, with some duplicates/errors.
-    The list of stars will appear as defined by PyEphem for 3.7.7.0 or greater.
+    The list of stars will appear as defined by PyEphem for 3.7.7.0 .
   * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 5 Dec 2020 12:32:42 +1000
