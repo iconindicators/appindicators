@@ -58,7 +58,7 @@ import astrobase, datetime, importlib, io, locale, orbitalelement
 
 class AstroSkyfield( astrobase.AstroBase ):
 
-    __SKYFIELD_REQUIRED_VERSION = "1.34" # Required version, or better.
+    __SKYFIELD_REQUIRED_VERSION = "1.35" # Required version, or better.
 
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
