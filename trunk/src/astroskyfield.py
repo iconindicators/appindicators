@@ -627,7 +627,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                    logging ):
 
         data = { }
-        timeScale = load.timescale( builtin = True )
+        timeScale = load.timescale( builtin = True ) #TODO Once the code is ready for release, do timing tests to see if passing in timescale.utc() to each function is worthwhile.
         location = wgs84.latlon( latitude, longitude, elevation )
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
 
