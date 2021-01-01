@@ -89,7 +89,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     #
     # This list contains duplicates, misspellings and is not in use per se:
     #    https://github.com/skyfielders/python-skyfield/issues/304
-    
+    #
     # Instead, use the more reliable and recent source from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
@@ -1107,15 +1107,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 #         return nextPass
 
 
-    # If all stars in the Hipparcos catalogue were included, capped to magnitude 15,
-    # there would be over 100,000 stars which is impractical.
-    #
-    # Instead, could use a list of "common name" stars, referred to in
-    #     https://www.cosmos.esa.int/web/hipparcos/common-star-names.
-    #
-    # However, Skyfield also has an internal list of named stars so use that for now.
-    #
-    # Load the Hipparcos catalogue and filter out stars that are not on our list (common name or named).
+    # Load the Hipparcos catalogue and filter out stars not on common name list:
+    #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # Format of Hipparcos catalogue:
     #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
