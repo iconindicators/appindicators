@@ -52,7 +52,7 @@ def getEclipse( dateTimeUTC, isLunar ):
     for eclipse in eclipseData:
         dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
         dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) ) # Need to subtract delta T (https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
-        if dateTimeUTC <= dateTime:
+        if dateTimeUTC.timestamp() <= dateTime.timestamp():
             latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ]
             if eclipse[ 6 ][ -1 ] == "S":
                 latitude = "-" + latitude
