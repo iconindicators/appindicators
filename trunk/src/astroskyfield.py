@@ -639,9 +639,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         utcNowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.day )
         utcNowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day )
 
-        AstroSkyfield.__calculateMoon( utcNow, utcNowPlusTwoDays, utcNowPlusThirtyOneDays, utcNowPlusOneYear, data, timeScale, location, ephemerisPlanets )
-        AstroSkyfield.__calculateSun( utcNow, utcNowPlusTwoDays, utcNowPlusSevenMonths, data, timeScale, location, ephemerisPlanets )
-        AstroSkyfield.__calculatePlanets( utcNow, data, timeScale, location, ephemerisPlanets, planets, magnitudeMaximum )
+        AstroSkyfield.__calculateMoon( utcNow, utcNowPlusTwoDays, utcNowPlusThirtyOneDays, utcNowPlusOneYear, data, location, ephemerisPlanets )
+        AstroSkyfield.__calculateSun( utcNow, utcNowPlusTwoDays, utcNowPlusSevenMonths, data, location, ephemerisPlanets )
+        AstroSkyfield.__calculatePlanets( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets, planets, magnitudeMaximum )
 
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
