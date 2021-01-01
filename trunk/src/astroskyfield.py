@@ -92,6 +92,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     
     # Instead, use the more reliable and recent source from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
+    #
+    # If this list is modified, regenerate the stars.dat.gz file.
     astrobase.AstroBase.STARS.extend( [
         "ACAMAR",
         "ACHERNAR",
@@ -632,31 +634,31 @@ class AstroSkyfield( astrobase.AstroBase ):
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         timeScale = load.timescale( builtin = True )
-        utcNow = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        utcNowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hours + 36 )
-        utcNowPlusTwoDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 2 )
-        utcNowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 )
-        utcNowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.day )
-        utcNowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day )
+        now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36 )
+        nowPlusTwoDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 2 )
+        nowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 )
+        nowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.day )
+        nowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day )
 
-        AstroSkyfield.__calculateMoon( utcNow, utcNowPlusTwoDays, utcNowPlusThirtyOneDays, utcNowPlusOneYear, data, location, ephemerisPlanets )
-        AstroSkyfield.__calculateSun( utcNow, utcNowPlusTwoDays, utcNowPlusSevenMonths, data, location, ephemerisPlanets )
-        AstroSkyfield.__calculatePlanets( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets, planets, magnitudeMaximum )
+        AstroSkyfield.__calculateMoon( now, nowPlusTwoDays, nowPlusThirtyOneDays, nowPlusOneYear, data, location, ephemerisPlanets )
+        AstroSkyfield.__calculateSun( now, nowPlusTwoDays, nowPlusSevenMonths, data, location, ephemerisPlanets )
+        AstroSkyfield.__calculatePlanets( now, nowPlusTwoDays, data, location, ephemerisPlanets, planets, magnitudeMaximum )
 
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
 
-        AstroSkyfield.__calculateStars( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
+        AstroSkyfield.__calculateStars( now, nowPlusTwoDays, data, location, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
 
-        AstroSkyfield.__calculateOrbitalElements( utcNow, utcNowPlusTwoDays, data, timeScale, location, ephemerisPlanets,
+        AstroSkyfield.__calculateOrbitalElements( now, nowPlusTwoDays, data, timeScale, location, ephemerisPlanets,
                                                   astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
                                                   logging )
 
-        AstroSkyfield.__calculateOrbitalElements( utcNow, utcNowPlusTwoDays, data, timeScale, location, ephemerisPlanets,
+        AstroSkyfield.__calculateOrbitalElements( now, nowPlusTwoDays, data, timeScale, location, ephemerisPlanets,
                                                   astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
                                                   logging )
 
-        AstroSkyfield.__calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
+        AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
 
         return data
 
@@ -819,6 +821,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
 #TODO Once solar eclipses are implemented in Skyfield, replace the line below with similar functionality to lunar eclipses above.        
+
+#             utcNowNoTimezone = utcNow.utc_datetime()
+#             utcNowNoTimezone.replace( tzinfo = None )
+#             astrobase.AstroBase.getEclipse( utcNowNoTimezone, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime(), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
@@ -1127,7 +1133,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_STARS )
 
         print( "Creating list of stars..." )
-        with gzip.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
+        with load.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
                 if hip in hipparcosIdentifiers:
