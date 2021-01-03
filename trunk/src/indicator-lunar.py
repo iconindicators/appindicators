@@ -806,7 +806,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if satellitesPolar:
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
-
+#TODO If this satellite code is finalised,
+# ensure that the next update somehow makes use of any satellite data we used from dataPrevious.
     def updateMenuSatellitesNEW( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]
