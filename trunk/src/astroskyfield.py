@@ -962,9 +962,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
-                tle = satelliteData[ satellite ]
-                earthSatellite = EarthSatellite( tle.getLine1(), tle.getLine2(), tle.getName(), timeScale )
-                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 )
+                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
+                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 10.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
                 rise = False
                 culminate = False
                 times = [ ] # Rise, Culminate+

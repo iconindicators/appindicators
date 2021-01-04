@@ -1160,11 +1160,10 @@ class AstroPyEphem( astrobase.AstroBase ):
         endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
         for satellite in satellites:
             if satellite in satelliteData:
-                tle = satelliteData[ satellite ]
                 currentDateTime = ephemNow
                 while currentDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, currentDateTime )
-                    earthSatellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+                    earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     earthSatellite.compute( city )
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
