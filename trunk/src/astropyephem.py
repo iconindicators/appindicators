@@ -931,8 +931,7 @@ class AstroPyEphem( astrobase.AstroBase ):
         AstroPyEphem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
-#         AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
-        AstroPyEphem.__calculateSatellitesNEW( ephemNow, data, satellites, satelliteData ) #TODO Testing
+        AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ]
@@ -1116,47 +1115,6 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
-        for satellite in satellites:
-            if satellite in satelliteData:
-                tle = satelliteData[ satellite ]
-                currentDateTime = ephemNow
-                endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
-                while currentDateTime < endDateTime:
-                    city = AstroPyEphem.__getCity( data, currentDateTime )
-                    earthSatellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-                    earthSatellite.compute( city )
-                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                    try:
-                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
-                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
-                            if nextPass[ 0 ] > nextPass[ 4 ]: # The rise time is after set time, so the satellite is currently passing.
-                                setTime = nextPass[ 4 ]
-                                nextPass = AstroPyEphem.__calculateSatellitePassForRisingPriorToNow( currentDateTime, data, tle )
-                                if nextPass is None:
-                                    currentDateTime = ephem.Date( setTime + ephem.minute * 60 ) # Could not determine the rise, so look for the next pass.
-                                    continue
-
-                            # Satellite is yet to rise or is in transit...
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
-                            break
-
-                        else:
-                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Look for the next pass.
-
-                    except ValueError:
-                        if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
-
-                        break
-
-
-#TODO Testing
-    @staticmethod
-    def __calculateSatellitesNEW( ephemNow, data, satellites, satelliteData ):
         endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
         for satellite in satellites:
             if satellite in satelliteData:
@@ -1186,34 +1144,6 @@ class AstroPyEphem( astrobase.AstroBase ):
                         break
 
 
-    @staticmethod
-    def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
-        currentDateTime = ephemNow
-        endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time.
-        nextPass = None
-        while currentDateTime > endDateTime:
-            city = AstroPyEphem.__getCity( data, currentDateTime )
-            satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-            satellite.compute( city )
-            try:
-                nextPass = AstroPyEphem.__calculateNextSatellitePass( city, satellite )
-                if AstroPyEphem.__isSatellitePassValid( nextPass ):
-                    if nextPass[ 0 ] < nextPass[ 4 ]:
-                        break # Found the rise time!
-
-                    currentDateTime = ephem.Date( currentDateTime - ephem.minute )
-
-                else:
-                    nextPass = None
-                    break # Unlikely to happen but better to be safe and check!
-
-            except:
-                nextPass = None
-                break # This should never happen as the satellite has a rise and set (is not polar nor never up).
-
-        return nextPass
-
-
     # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
     #    https://rhodesmill.org/pyephem/CHANGELOG.html#version-3-7-7-0-2019-august-18
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
@@ -1233,26 +1163,12 @@ class AstroPyEphem( astrobase.AstroBase ):
         return nextPass
 
 
-    # Guard against bad TLE data causing spurious results.
-    @staticmethod
-    def __isSatellitePassValid( satellitePass ):
-        return satellitePass and \
-               len( satellitePass ) == 6 and \
-               satellitePass[ 0 ] and \
-               satellitePass[ 1 ] and \
-               satellitePass[ 2 ] and \
-               satellitePass[ 3 ] and \
-               satellitePass[ 4 ] and \
-               satellitePass[ 5 ]
-
-
-#TODO Testing
     @staticmethod
     # Ensure:
     #    The satellite pass is numerically valid.
     #    Rise time exceeds transit time.
     #    Transit time exceeds set time.
-    def __isSatellitePassValidNEW( satellitePass ):
+    def __isSatellitePassValid( satellitePass ):
         return satellitePass and \
                len( satellitePass ) == 6 and \
                satellitePass[ 0 ] and \
