@@ -946,17 +946,22 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
-#TODO Somehow test for circumpolar satellites as per AstroPyEphem.
-# How do we even check for them?
-# What about satellites that are never up?
-# Determine a satellite and lat/long in PyEphem for each of circumpolar and never up
-# and then run the same within Skyfield to see what happens.
-# May need to refer to 
-#    https://github.com/brandon-rhodes/pyephem/issues/45
-# if creating a request in Skyfield.
-#
-#
-#TODO Seems that all passes are shown, not just visible ones.
+    # Refer to
+    #    https://github.com/skyfielders/python-skyfield/issues/327
+    #
+    # Use TLE data collated by Dr T S Kelso
+    # http://celestrak.com/NORAD/elements
+    #
+    # Other sources/background:
+    #    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+    #    http://spotthestation.nasa.gov/sightings
+    #    http://www.n2yo.com
+    #    http://www.heavens-above.com
+    #    http://in-the-sky.org
+    #    https://uphere.space/satellites
+    #    https://www.amsat.org/track
+    #    https://tracksat.space
+    #    https://g7vrd.co.uk/public-satellite-pass-rest-api    
     @staticmethod
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
         for satellite in satellites:
@@ -982,7 +987,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                             next( iterTimes ) # Skip the rise
                             for culmination in iterTimes:
                                 if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and \
-                                   almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) < 4: # Satellite is yet to rise or is in transit...
+                                   almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) < 4:
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( times[ 0 ].utc_datetime() )
                                     alt, az, bodyDistance = ( earthSatellite - location ).at( times[ 0 ] ).altaz()
