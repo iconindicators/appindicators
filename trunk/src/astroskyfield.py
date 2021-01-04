@@ -946,14 +946,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         return neverUp
 
 
-    # https://spotthestation.nasa.gov/sightings/index.cfm
-    # https://www.heavens-above.com/PassSummary.aspx
-    # https://www.n2yo.com/passes/?s=25544
-    # https://www.satflare.com/track.asp?q=iss
-    # https://uphere.space/
-    # https://www.amsat.org/track/
-    # https://www.calsky.com/cs.cgi?cha=12&sec=4
-    @staticmethod
 #TODO Somehow test for circumpolar satellites as per AstroPyEphem.
 # How do we even check for them?
 # What about satellites that are never up?
@@ -964,49 +956,15 @@ class AstroSkyfield( astrobase.AstroBase ):
 # if creating a request in Skyfield.
 #
 #
-#TODO Because showing the user a satellite in transit is really an interface issue rather than a backend issue,
-# consider removing the code in the PyEphem backend which finds a rise/set and 
-# then checks to find the previous one just to show transits in progress.
-# Instead, perhaps keep a copy of the old data (reassigned at the start of each update)
-# and use that to determine if the current rise/set is the "same" as that in the previous data.
-#
-# A transit (rise/set) can be thought of as the same (given the exact times to the second will not match)
-# by noting:
-#    if not( setNew < riseOld or riseNew > setOld):
-#        overlap = True
-#
-# The frontend which decides for each satellite whether to show the rise time OR the rise/set/az/alt (transit)
-# will have to use both the currently calculated transit information and the previously calculated transit information.
-#
-# On the first run of the indicator:
-#    If rise time > (now + five minutes):
-#        Display rise time
-#    Else
-#        Display rise/set/az/alt
-#
-# On subsequent runs of the indicator (with previous run data available):
-#    If previous rise time < (now + five minutes) AND previous set > now:
-#        Display rise/set/az/alt
-#    Else:
-#        Display rise
-#
-#Rather than have a special case for when we first run,
-# simply copy (pass in) the current data as if it's the previous data.
-#
-# In PyEphem, need to remove the code which corrects for a transit result with the next set, current transit, current set.
-# Instead keep looking for a transit result in which rise > transit > set.
-#
-#
 #TODO Seems that all passes are shown, not just visible ones.
+    @staticmethod
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
-        #TODO Not sure if this should be a parameter or not...
-        altitudeDegrees = 30.0
-        print( altitudeDegrees )
-
         for satellite in satellites:
             if satellite in satelliteData:
-                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
-                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = altitudeDegrees ) # TODO Test if 10 is used instead of 30 makes a difference.  If so, could make this a parameter? Test against PyEphen.  https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
+                foundVisiblePass = False
+                tle = satelliteData[ satellite ]
+                earthSatellite = EarthSatellite( tle.getLine1(), tle.getLine2(), tle.getName(), timeScale )
+                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 )
                 rise = False
                 culminate = False
                 times = [ ] # Rise, Culminate+
@@ -1023,17 +981,17 @@ class AstroSkyfield( astrobase.AstroBase ):
                         if rise and culminate:
                             iterTimes = iter( times )
                             next( iterTimes ) # Skip the rise
-                            for eachCulmination in iterTimes:
-                                if earthSatellite.at( eachCulmination ).is_sunlit( ephemerisPlanets ) and \
-                                   almanac.dark_twilight_day( ephemerisPlanets, location )( eachCulmination ) < 3: # Satellite is yet to rise or is in transit...
-
+                            for culmination in iterTimes:
+                                if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and \
+                                   almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) < 4: # Satellite is yet to rise or is in transit...
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( times[ 0 ].utc_datetime() )
-                                    alt, az, bodyDistance = ( earthSatellite - location ).at(  times[ 0 ] ).altaz()
+                                    alt, az, bodyDistance = ( earthSatellite - location ).at( times[ 0 ] ).altaz()
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
                                     alt, az, bodyDistance = ( earthSatellite - location ).at( ti ).altaz()
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                                    foundVisiblePass = True
                                     break
 
                         else:
@@ -1041,49 +999,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                             culminate = False
                             times= [ ]
 
-
-#TODO Needed?
-    @staticmethod
-    def __calculateSatellitesORIGINAL( utcNow, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
-        t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        end = utcNow + datetime.timedelta( hours = 36 ) # Stop looking for passes 36 hours from now.
-        t1 = timeScale.utc( end.year, end.month, end.day, end.hour, end.minute, end.second )
-        for satellite in satellites:
-            if satellite in satelliteData:
-                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
-                t, events = earthSatellite.find_events( location, t0, t1, altitude_degrees = 30.0 ) # TODO Could make this 10 instead or a parameter? Test against PyEphen.  https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
-                rise = None
-                culminate = None
-                for ti, event in zip( t, events ):
-                    if event == 0: # Rise.
-                        rise = ti
-
-                    elif event == 1: # Culminate (only the last culmination is taken if there happens to be more than one).
-                        culminate = ti
-
-                    else: # Set.
-                        if rise is not None and \
-                           culminate is not None and \
-                           earthSatellite.at( culminate ).is_sunlit( ephemerisPlanets ) and \
-                           almanac.dark_twilight_day( ephemerisPlanets, location )( culminate ) < 3:
-                            # Satellite is yet to rise or is in transit...
-
-                            key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise.utc_datetime() )
-                            alt, az, bodyDistance = ( earthSatellite - location ).at( rise ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
-                            alt, az, bodyDistance = ( earthSatellite - location ).at( ti ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
-                            x = data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
-                            break
-#                             print( rise.utc_datetime().replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ) )
-#                             rise = None
-#                             culminate = None
-
-                        else: # Reset for start of new rise/culminate set for this satellite.
-                            rise = None
-                            culminate = None
+                    if foundVisiblePass:
+                        break
 
 
     # Load the Hipparcos catalogue and filter out stars not on common name list:
