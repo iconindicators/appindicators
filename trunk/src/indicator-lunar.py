@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -810,6 +810,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO If this satellite code is finalised,
 # ensure that the next update somehow makes use of any satellite data we used from dataPrevious.
+#
+#TODO Noticed that PyEphem and SKyfield generate different results...and Skyfield shows all satellite passes not just visible ones.
+# So perhaps for both PyEphem and Skyfield, show all satellite passes and ensure we have matches.
+# Perhaps also compare against an online reference.
+# Then move on to visible passes.
     def updateMenuSatellitesNEW( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]

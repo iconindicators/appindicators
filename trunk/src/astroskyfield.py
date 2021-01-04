@@ -996,11 +996,17 @@ class AstroSkyfield( astrobase.AstroBase ):
 # In PyEphem, need to remove the code which corrects for a transit result with the next set, current transit, current set.
 # Instead keep looking for a transit result in which rise > transit > set.
 #
+#
+#TODO Seems that all passes are shown, not just visible ones.
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
+        #TODO Not sure if this should be a parameter or not...
+        altitudeDegrees = 30.0
+        print( altitudeDegrees )
+
         for satellite in satellites:
             if satellite in satelliteData:
                 earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
-                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 ) # TODO Test if 10 is used instead of 30 makes a difference.  If so, could make this a parameter? Test against PyEphen.  https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
+                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = altitudeDegrees ) # TODO Test if 10 is used instead of 30 makes a difference.  If so, could make this a parameter? Test against PyEphen.  https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
                 rise = False
                 culminate = False
                 times = [ ] # Rise, Culminate+
@@ -1036,6 +1042,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                             times= [ ]
 
 
+#TODO Needed?
     @staticmethod
     def __calculateSatellitesORIGINAL( utcNow, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
         t0 = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
@@ -1077,34 +1084,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                         else: # Reset for start of new rise/culminate set for this satellite.
                             rise = None
                             culminate = None
-
-
-#TODO From PyEphem (satellite in transit)...likely need a comparable method for Skyfield.
-#     def __calculateSatellitePassForRisingPriorToNow( ephemNow, data, satelliteTLE ):
-#         currentDateTime = ephemNow
-#         endDateTime = ephem.Date( ephemNow - ephem.hour ) # Only look back an hour for the rise time.
-#         nextPass = None
-#         while currentDateTime > endDateTime:
-#             city = AstroPyEphem.__getCity( data, currentDateTime )
-#             satellite = ephem.readtle( satelliteTLE.getName(), satelliteTLE.getLine1(), satelliteTLE.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-#             satellite.compute( city )
-#             try:
-#                 nextPass = AstroPyEphem.__calculateNextPass( city, satellite )
-#                 if AstroPyEphem.__isSatellitePassIsValid( nextPass ):
-#                     if nextPass[ 0 ] < nextPass[ 4 ]:
-#                         break # Found the rise time!
-# 
-#                     currentDateTime = ephem.Date( currentDateTime - ephem.minute )
-# 
-#                 else:
-#                     nextPass = None
-#                     break # Unlikely to happen but better to be safe and check!
-# 
-#             except:
-#                 nextPass = None
-#                 break # This should never happen as the satellite has a rise and set (is not polar nor never up).
-# 
-#         return nextPass
 
 
     # Load the Hipparcos catalogue and filter out stars not on common name list:
