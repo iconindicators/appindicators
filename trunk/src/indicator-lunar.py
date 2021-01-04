@@ -461,7 +461,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuStars( menu )
         self.updateMenuCometsMinorPlanets( menu, astrobase.AstroBase.BodyType.COMET )
         self.updateMenuCometsMinorPlanets( menu, astrobase.AstroBase.BodyType.MINOR_PLANET)
-        self.updateMenuSatellites( menu )
+#         self.updateMenuSatellites( menu ) #TODO Testing
+        self.updateMenuSatellitesNEW( menu )
 
 
     def updateLabel( self ):
@@ -805,6 +806,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if satellitesPolar:
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
+
 
 #TODO If this satellite code is finalised,
 # ensure that the next update somehow makes use of any satellite data we used from dataPrevious.
