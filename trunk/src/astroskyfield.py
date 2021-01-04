@@ -1055,11 +1055,11 @@ class AstroSkyfield( astrobase.AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         today = datetime.date.today()
-        tenYearsFromToday = today.replace( year = today.year + 10 )
+        fiveYearsFromToday = today.replace( year = today.year + 5 )
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
                   today.strftime( dateFormat ) + " " + \
-                  tenYearsFromToday.strftime( dateFormat ) + " " + \
+                  fiveYearsFromToday.strftime( dateFormat ) + " " + \
                   ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
