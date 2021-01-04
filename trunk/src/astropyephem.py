@@ -1105,11 +1105,15 @@ class AstroPyEphem( astrobase.AstroBase ):
     # http://celestrak.com/NORAD/elements
     #
     # Other sources/background:
-    #   http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
-    #   http://spotthestation.nasa.gov/sightings
-    #   http://www.n2yo.com
-    #   http://www.heavens-above.com
-    #   http://in-the-sky.org
+    #    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+    #    http://spotthestation.nasa.gov/sightings
+    #    http://www.n2yo.com
+    #    http://www.heavens-above.com
+    #    http://in-the-sky.org
+    #    https://uphere.space/satellites
+    #    https://www.amsat.org/track
+    #    https://tracksat.space
+    #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
         for satellite in satellites:
@@ -1153,11 +1157,11 @@ class AstroPyEphem( astrobase.AstroBase ):
 #TODO Testing
     @staticmethod
     def __calculateSatellitesNEW( ephemNow, data, satellites, satelliteData ):
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
         for satellite in satellites:
             if satellite in satelliteData:
                 tle = satelliteData[ satellite ]
                 currentDateTime = ephemNow
-                endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
                 while currentDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, currentDateTime )
                     earthSatellite = ephem.readtle( tle.getName(), tle.getLine1(), tle.getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
@@ -1269,6 +1273,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
+#         if True: return True #TODO Testing
         city = AstroPyEphem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
