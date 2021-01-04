@@ -1126,7 +1126,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
                         nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
-                        if AstroPyEphem.__isSatellitePassValidNEW( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
