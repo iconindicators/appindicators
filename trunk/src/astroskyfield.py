@@ -803,6 +803,13 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
+    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+    # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
+    # http://www.geoastro.de/elevaz/index.htm
+    # http://www.geoastro.de/SME/index.htm
+    # http://www.geoastro.de/altazsunmoon/index.htm
+    # http://futureboy.us/fsp/sun.fsp
+    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( utcNow, utcNowPlusTwoDays, utcNowPlusSevenMonths, data, location, ephemerisPlanets ):
         neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets,
@@ -828,6 +835,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.getEclipse( utcNow.utc_datetime(), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
+    # http://www.geoastro.de/planets/index.html
+    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
     def __calculatePlanets( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets, planets, magnitudeMaximum ):
         for planet in planets:
