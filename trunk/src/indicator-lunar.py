@@ -822,27 +822,27 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        utcNowPlusFiveMinutes = datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 )
-        for number, name, riseDateTime in satellites:
+        for info in satellites:
+            number = info [ 0 ]
+            name = info [ 1 ]
+            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
-            key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
-            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite will rise or is in transit.
 
-                if datetime.datetime.strptime( riseDateTime, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS ) < utcNowPlusFiveMinutes:
-                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
-                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
-                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ), url )
-                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
-                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ), url )
-                    self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ), url )
+            if len( info ) == 3: # Satellite yet to rise.
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ) )
 
-                else:
-                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ), url )
+            elif len( info ) == 4: # Circumpolar (always up).
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), url )
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), url )
 
-            else: # Polar (always up).
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Azimuth: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ), url )
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.getDisplayData( key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ), url )
+            else: # Satellite is in transit.
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
+                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ), url )
+                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] ), url )
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
+                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ), url )
+                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ), url )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
@@ -861,79 +861,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def onMenuItemClick( self, widget ): webbrowser.open( widget.props.name )
-
-
-#TODO Remove after satellites are sorted out.
-    def getDisplayData( self, key, dateTimeFormat = None ):
-        displayData = None
-
-        if key[ 2 ] == astrobase.AstroBase.DATA_TAG_ALTITUDE or \
-           key[ 2 ] == astrobase.AstroBase.DATA_TAG_AZIMUTH or \
-           key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH or \
-           key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_AZIMUTH:
-            displayData = str( round( math.degrees( float( self.data[ key ] ) ) ) ) + "°"
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB:
-            displayData = str( int( float( self.data[ key ] ) ) ) + "°"
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
-             key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER:
-                if dateTimeFormat is None:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM )
-
-                else:
-                    displayData = self.toLocalDateTimeString( self.data[ key ], dateTimeFormat )
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE:
-            latitude = self.data[ key ]
-            if latitude[ 0 ] == "-":
-                displayData = latitude[ 1 : ] + "° " + _( "S" )
-
-            else:
-                displayData = latitude + "° " +_( "N" )
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE:
-            longitude = self.data[ key ]
-            if longitude[ 0 ] == "-":
-                displayData = longitude[ 1 : ] + "° " + _( "E" )
-
-            else:
-                displayData = longitude + "° " +_( "W" )
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE:
-            if self.data[ key ] == eclipse.ECLIPSE_TYPE_ANNULAR:
-                displayData = _( "Annular" )
-
-            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_HYBRID:
-                displayData = _( "Hybrid (Annular/Total)" )
-
-            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PARTIAL:
-                displayData = _( "Partial" )
-
-            elif self.data[ key ] == eclipse.ECLIPSE_TYPE_PENUMBRAL:
-                displayData = _( "Penumbral" )
-
-            else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
-                displayData = _( "Total" )
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_ILLUMINATION:
-            displayData = self.data[ key ] + "%"
-
-        elif key[ 2 ] == astrobase.AstroBase.DATA_TAG_PHASE:
-            displayData = astrobase.AstroBase.LUNAR_PHASE_NAMES_TRANSLATIONS[ self.data[ key ] ]
-
-        if displayData is None:
-            displayData = "" # Better to show nothing than let None slip through and crash.
-            self.getLogging().error( "Unknown key: " + str( key ) )
-
-        return displayData
 
 
     def formatData( self, dataTag, data, dateTimeFormat = None ):
