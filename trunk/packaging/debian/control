@@ -9,6 +9,6 @@ X-Python3-Version: >= 3.2
 Package: indicator-lunar
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-ephem, python3-notify2
-Description: Application indicator for astronomy.
- Allows a user to show astronomical information for all planets and their
- moons, the sun and stars, comets, minor planets and satellites.
+Description: Application indicator for the home astronomer.
+ Displays lunar, solar, planetary, star, comet, minor planet and
+ satellite information. 
