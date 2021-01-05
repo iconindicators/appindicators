@@ -1057,11 +1057,13 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createEphemerisPlanets():
+        from dateutil.relativedelta import relativedelta
         import os, subprocess, urllib
 
         ephemerisFile = "de438.bsp"
         ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
         if not os.path.isfile( ephemerisFile ):
+            print( "Could not locate", ephemerisFile )
             print( "Downloading planet ephemeris..." )
             urllib.request.urlretrieve ( ephemerisURL, ephemerisFile )
 
@@ -1069,15 +1071,17 @@ class AstroSkyfield( astrobase.AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         today = datetime.date.today()
+        oneMonthPriorToToday = today - relativedelta( months = 1 ) # Start earlier as lunar eclipses search from prior to the start date.
         fiveYearsFromToday = today.replace( year = today.year + 5 )
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
-                  today.strftime( dateFormat ) + " " + \
+                  oneMonthPriorToToday.strftime( dateFormat ) + " " + \
                   fiveYearsFromToday.strftime( dateFormat ) + " " + \
                   ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
             print( "Creating planet ephemeris..." )
+            print( "\t", command )
             subprocess.call( command, shell = True )
             completed = True
 
