@@ -776,11 +776,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
 
 
-#TODO Something odd is happening...
-# At 11pm, no satellites appeared in the menu.
-# The Sun appeared (but should have been hidden), didn't show rise/set, but did show other stuff.
-# I suspect this occurred because the latitude was set to -88 or similar...so the sun was always up (no rise/set to show)
-# and no satellites would have (likely) been visible.
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]
