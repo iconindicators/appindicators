@@ -973,6 +973,9 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api    
     @staticmethod
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
+#TODO Ran the indicator at 9am and noticed the satellite 25732
+# which rises UTC 2021-01-05 22:00:16 and sets UTC 2021-01-06 10:27:11
+# which cannot be correct!
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
