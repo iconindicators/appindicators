@@ -229,9 +229,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def flushCache( self ):
-#TODO Testing...put back!        
-#         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-#         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
         for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
