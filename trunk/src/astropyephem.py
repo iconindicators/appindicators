@@ -1163,11 +1163,11 @@ class AstroPyEphem( astrobase.AstroBase ):
         return nextPass
 
 
-    @staticmethod
     # Ensure:
     #    The satellite pass is numerically valid.
     #    Rise time exceeds transit time.
     #    Transit time exceeds set time.
+    @staticmethod
     def __isSatellitePassValid( satellitePass ):
         return satellitePass and \
                len( satellitePass ) == 6 and \
