@@ -972,37 +972,30 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api    
     @staticmethod
+#TODO This is showing (apparently) all passes...not just the visible passes.    
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
-#TODO Ran the indicator at 9am and noticed the satellite 25732
-# which rises UTC 2021-01-05 22:00:16 and sets UTC 2021-01-06 10:27:11
-# which cannot be correct!
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
                 earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
-                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
-                rise = False
-                culminate = False
-                times = [ ] # Rise, Culminate+
+                t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 10.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
+                riseTime = None
+                culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
                 for ti, event in zip( t, events ):
-                    if event == 0: # Rise.
-                        rise = True
-                        times.append( ti )
+                    if event == 0: # Rise
+                        riseTime = ti
 
-                    elif event == 1: # Culminate (more than one culmination may occur, so take them all).
-                        culminate = True
-                        times.append( ti )
+                    elif event == 1: # Culminate
+                        culminateTimes.append( ti )
 
-                    else: # Set.
-                        if rise and culminate:
-                            iterTimes = iter( times )
-                            next( iterTimes ) # Skip the rise
-                            for culmination in iterTimes:
+                    else: # Set
+                        if riseTime is not None and len( culminateTimes ) > 0:
+                            for culmination in culminateTimes:
                                 if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and \
                                    almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) < 4:
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( times[ 0 ].utc_datetime() )
-                                    alt, az, bodyDistance = ( earthSatellite - location ).at( times[ 0 ] ).altaz()
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
+                                    alt, az, bodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
                                     alt, az, bodyDistance = ( earthSatellite - location ).at( ti ).altaz()
@@ -1010,10 +1003,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                                     foundVisiblePass = True
                                     break
 
+                            riseTime = None
+                            culminateTimes = [ ]
+
                         else:
-                            rise = False
-                            culminate = False
-                            times= [ ]
+                            riseTime = None
+                            culminateTimes = [ ]
 
                     if foundVisiblePass:
                         break
