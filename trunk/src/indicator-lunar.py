@@ -937,6 +937,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return localDateTime.strftime( outputFormat )
 
 
+
     # Creates the SVG icon text representing the moon given the illumination and bright limb angle.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.

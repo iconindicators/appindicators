@@ -1014,6 +1014,22 @@ class AstroSkyfield( astrobase.AstroBase ):
                         break
 
 
+        AstroSkyfield.__printSatelliteResults( data )
+
+
+    @staticmethod
+    def __printSatelliteResults( data ):
+        satelliteNumbers = [ ]
+        for key in data:
+            if key[ 0 ] == astrobase.AstroBase.BodyType.SATELLITE and key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME:
+                satelliteNumbers.append( key[ 1 ] )
+
+        for satelliteNumber in sorted( satelliteNumbers ):
+            print( satelliteNumber )
+            print( data[ ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) ] )
+            print( data[ ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber, astrobase.AstroBase.DATA_TAG_SET_DATE_TIME ) ] )
+
+
     # Load the Hipparcos catalogue and filter out stars not on common name list:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #

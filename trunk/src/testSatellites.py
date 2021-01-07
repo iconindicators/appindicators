@@ -210,10 +210,23 @@ def printOverlap( pyephemResults, skyfieldResults ):
            skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] > pyephemResults[ numberTag ] and \
            skyfieldResults[ numberTag ] < pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ]:
             overlap += 1
+#             print( pyephemResults[ ( numberTag[ 0 ], DATA_TAG_RISE_DATE_TIME ) ] )
+#             print( pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] )
+#             print()
 
     print( "Satellites:", int( len( skyfieldResults ) / 4 ) )
     print( "Overlap:", overlap )
     print( "Percentage overlap:", int( overlap / ( len( skyfieldResults ) / 4 ) * 100 ) )
+
+
+def printOverlapNot( pyephemResults, skyfieldResults ):
+    for numberTag in pyephemResults:
+        if numberTag[ 1 ] == DATA_TAG_RISE_DATE_TIME and numberTag in skyfieldResults:
+            if skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] < pyephemResults[ numberTag ] or \
+               skyfieldResults[ numberTag ] > pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ]:
+                print( pyephemResults[ ( numberTag[ 0 ], DATA_TAG_RISE_DATE_TIME ) ], pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] )
+                print( skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_RISE_DATE_TIME ) ], skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] )
+                print()
 
 
 def printMissing( pyephemResults, skyfieldResults ):
@@ -260,5 +273,14 @@ utcNow = datetime.datetime.utcnow()
 pyephemResults = calculateSatellitesPyEphem( ephem.Date( utcNow ), tleData, visible )
 skyfieldResults = calculateSatellitesSkyfield( utcNow, tleData, visible )
 # printOverlap( pyephemResults, skyfieldResults )
+printOverlapNot( pyephemResults, skyfieldResults )
 # printMissing( pyephemResults, skyfieldResults )
-printLongTransits( pyephemResults, skyfieldResults, 60 * 20 )
+# printLongTransits( pyephemResults, skyfieldResults, 60 * 20 )
+# printRiseSet( pyephemResults, skyfieldResults )
+
+#TODO Look at where there is no overlap and see if all those passes are at sunrise or sunset.
+
+#TODO Look at the overlaps and ensure they are at either sunrise or sunset.
+
+
+
