@@ -150,7 +150,7 @@ def calculateSatellitesSkyfield( utcNow, tleData, visible ):
         tle = tleData[ number ]
         foundPass = False
         earthSatellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], timeScale )
-        t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 10.0 )
+        t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 )
         riseTime = None
         culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
         for ti, event in zip( t, events ):
@@ -210,6 +210,7 @@ def printOverlap( pyephemResults, skyfieldResults ):
            skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] > pyephemResults[ numberTag ] and \
            skyfieldResults[ numberTag ] < pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ]:
             overlap += 1
+#             print( numberTag[ 0 ] )
 #             print( pyephemResults[ ( numberTag[ 0 ], DATA_TAG_RISE_DATE_TIME ) ] )
 #             print( pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] )
 #             print()
@@ -224,6 +225,7 @@ def printOverlapNot( pyephemResults, skyfieldResults ):
         if numberTag[ 1 ] == DATA_TAG_RISE_DATE_TIME and numberTag in skyfieldResults:
             if skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] < pyephemResults[ numberTag ] or \
                skyfieldResults[ numberTag ] > pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ]:
+                print( numberTag[ 0 ] )
                 print( pyephemResults[ ( numberTag[ 0 ], DATA_TAG_RISE_DATE_TIME ) ], pyephemResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] )
                 print( skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_RISE_DATE_TIME ) ], skyfieldResults[ ( numberTag[ 0 ], DATA_TAG_SET_DATE_TIME ) ] )
                 print()
@@ -281,4 +283,8 @@ printOverlapNot( pyephemResults, skyfieldResults )
 
 #TODO Look at where there is no overlap and see if all those passes are at sunrise or sunset.
 
+
 #TODO Look at the overlaps and ensure they are at either sunrise or sunset.
+
+
+#TODO Maybe print all visible passes for the next 36 hours?
