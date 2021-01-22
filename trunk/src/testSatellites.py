@@ -272,6 +272,7 @@ utcNow = datetime.datetime.utcnow()
 
 pyephemResults = calculateSatellitesPyEphem( ephem.Date( utcNow ), tleData, visible )
 skyfieldResults = calculateSatellitesSkyfield( utcNow, tleData, visible )
+
 # printOverlap( pyephemResults, skyfieldResults )
 printOverlapNot( pyephemResults, skyfieldResults )
 # printMissing( pyephemResults, skyfieldResults )
@@ -281,6 +282,3 @@ printOverlapNot( pyephemResults, skyfieldResults )
 #TODO Look at where there is no overlap and see if all those passes are at sunrise or sunset.
 
 #TODO Look at the overlaps and ensure they are at either sunrise or sunset.
-
-
-
