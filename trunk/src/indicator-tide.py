@@ -52,13 +52,16 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     CACHE_BASENAME = "tidal-"
     CACHE_MAXIMUM_AGE_HOURS = 24
 
+    COMMENTS_LINE_FIRST = _( "Displays tidal information." )
+    COMMENTS_LINE_LAST = _( "Port data is licensed and will expire after {0}." ).format( ports.getExpiry() )
+
 
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
             version = "1.0.23",
             copyrightStartYear = "2015",
-            comments = _( "Displays tidal information.\nPort data is licensed and will expire after {0}." ).format( ports.getExpiry() ),
+            comments = IndicatorTide.COMMENTS_LINE_FIRST + '\n' + IndicatorTide.COMMENTS_LINE_LAST,
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
                         _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
 
@@ -74,18 +77,19 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             tidalReadings = self.getTidalData( self.portID )
             if tidalReadings:
                 self.buildMenu( menu, tidalReadings )
-                summary = _( "Tidal data ready" )
+#                 summary = _( "Tidal data ready" )
                 message = _( "Tidal data is presented in the time zone of the port." )
-                if self.tidalReadingsAreAllDateTimes( tidalReadings ):
+                if not self.tidalReadingsAreAllDateTimes( tidalReadings ):
                     message = _( "Tidal data is presented in your local time zone." )
+
+                self.setAboutComments( IndicatorTide.COMMENTS_LINE_FIRST + '\n' + message + '\n' + IndicatorTide.COMMENTS_LINE_LAST )
 
             else:
                 menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
                 self.getLogging().error( message )
-
-            Notify.Notification.new( summary, message, self.icon ).show()
+                Notify.Notification.new( summary, message, self.icon ).show()
 
             return self.getNextUpdateTimeInSeconds( tidalReadings )
 
