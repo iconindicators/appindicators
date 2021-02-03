@@ -1,14 +1,14 @@
 # Russian translation for indicator-tide.
-# Copyright (C) 2015-2020 Bernard Giannetti
+# Copyright (C) 2015-2021 Bernard Giannetti
 # This file is distributed under the same license as the indicator-tide package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2020.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2021.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-tide 1.0.23\n"
+"Project-Id-Version: indicator-tide 1.0.24\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2020-09-10 00:13+1000\n"
-"PO-Revision-Date: 2020-09-10 10:41+0300\n"
+"POT-Creation-Date: 2021-02-02 13:06+1000\n"
+"PO-Revision-Date: 2021-02-02 13:06+1000\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,12 +18,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-tide.py:61
 msgid ""
 "Displays tidal information.\n"
+msgstr ""
+"Показывает сведения о приливах."
+
+msgid ""
 "Port data is licensed and will expire after {0}."
 msgstr ""
-"Показывает сведения о приливах.\n"
 "Лицензия на данные о портах истекает с {0}."
 
 #: indicator-tide.py:62
@@ -56,10 +58,6 @@ msgstr ""
 #: indicator-tide.py:69
 msgid "License has expired"
 msgstr "Лицензия истекла"
-
-#: indicator-tide.py:77
-msgid "Tidal data ready"
-msgstr "Данные о приливах получены"
 
 #: indicator-tide.py:78
 msgid "Tidal data is presented in the time zone of the port."

@@ -1,3 +1,13 @@
+indicator-tide (1.0.24-1) xenial; urgency=low
+
+  * Removed the notification when the tidal data is (successfully) updated.
+    Instead a message is presented on the About dialog to inform the user
+    if the tidal data is in user local time or the time zone of the port.
+    Any errors are shown as a notification to the user and logged to file.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 3 Feb 2021 13:07:46 +1000
+
+
 indicator-tide (1.0.23-1) xenial; urgency=low
 
   * On computer startup when the indicator is set to autostart,

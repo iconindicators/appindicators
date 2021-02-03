@@ -59,7 +59,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.23",
+            version = "1.0.24",
             copyrightStartYear = "2015",
             comments = IndicatorTide.COMMENTS_LINE_FIRST + '\n' + IndicatorTide.COMMENTS_LINE_LAST,
             creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
@@ -77,7 +77,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             tidalReadings = self.getTidalData( self.portID )
             if tidalReadings:
                 self.buildMenu( menu, tidalReadings )
-#                 summary = _( "Tidal data ready" )
                 message = _( "Tidal data is presented in the time zone of the port." )
                 if not self.tidalReadingsAreAllDateTimes( tidalReadings ):
                     message = _( "Tidal data is presented in your local time zone." )
