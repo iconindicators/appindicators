@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -787,18 +787,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 # Satellite rises/sets...
                 if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes and \
                    self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > utcNow:
-                    # Satellite is in transit...  #TODO Add the sat number, sat name, previous rise time, previous rise az, previous set time, previous set az.
+                    # Satellite is in transit...
                     satellites.append( [ number, self.satelliteData[ number ].getName(), self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
 
                 else:
-                    # Satellite is yet to rise...   #TODO Add the sat number, sat name, current rise.
+                    # Satellite is yet to rise...
                     satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
             elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.dataPrevious:
-                # Satellite is circumpolar (always up)...   #TODO Add sat number, sat name, current az, current alt.
+                # Satellite is circumpolar (always up)...
                 satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
-
-        satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
 
         if self.satellitesSortByDateTime:
             satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 1 ], x[ 0 ] ) )
@@ -808,6 +806,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if satellites:
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
+
+        satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
 
         if satellitesPolar:
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
