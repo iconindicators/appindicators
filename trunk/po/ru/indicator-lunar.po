@@ -1346,10 +1346,6 @@ msgstr "ШЕДАР"
 msgid "VAN MAANEN 2"
 msgstr "ЗВЕЗДА ВАН МААНЕНА"
 
-#: astroskyfield.py:482
-msgid "3C 273"
-msgstr "3C 273"
-
 #: astroskyfield.py:654
 msgid ""
 "Skyfield could not be found. Install using:\n"

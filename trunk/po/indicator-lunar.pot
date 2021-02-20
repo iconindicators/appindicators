@@ -1341,10 +1341,6 @@ msgstr ""
 msgid "VAN MAANEN 2"
 msgstr ""
 
-#: astroskyfield.py:482
-msgid "3C 273"
-msgstr ""
-
 #: astroskyfield.py:654
 msgid ""
 "Skyfield could not be found. Install using:\n"
