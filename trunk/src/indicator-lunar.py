@@ -170,12 +170,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
         self.__removePreviousVersionCacheFiles()
-        self.__swapCacheFiles() #TODO Only for me!
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
 
-    #TODO Start of temporary hack...remove in later release.
+    # Start of temporary hack...remove in later release.
     # Cache data formats for comets and minor planets changed between version 84 and 85, so remove old format files.
     #
     # A new attribute, dataType, and a new inner class, DataType, were added to orbitalelement.
@@ -189,43 +188,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     data = pickle.load( f )
                     if data and not hasattr( next( iter( data.values() ) ), "dataType" ): 
                         os.remove( cachePath + file )
-
-
-    #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center.
-    def __swapCacheFiles( self ):
-        data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
-        if data is not None:
-            import glob, os, shutil
-            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and \
-               next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.XEPHEM_COMET:
-                print( "Swapping Skyfield for XEphem" )
-                shutil.rmtree( self.getCachePath( "" ) + "xephem", ignore_errors = True )
-                os.mkdir( self.getCachePath( "" ) + "xephem" )
-
-                for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "xephem" )
-
-                for data in glob.glob( self.getCachePath( "" ) + "minorplanet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "xephem" )
-
-                if os.path.isdir( self.getCachePath( "" ) + "skyfield" ):
-                    for data in glob.glob( self.getCachePath( "" ) + "skyfield/*" ):
-                        shutil.move( data, self.getCachePath( "" ) )
-
-            elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
-               next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
-                print( "Swapping XEphem for Skyfield" )
-                shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
-                os.mkdir( self.getCachePath( "" ) + "skyfield" )
-                for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "skyfield" )
-
-                for data in glob.glob( self.getCachePath( "" ) + "minorplanet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "skyfield" )
-
-                if os.path.isdir( self.getCachePath( "" ) + "xephem" ):
-                    for data in glob.glob( self.getCachePath( "" ) + "xephem/*" ):
-                        shutil.move( data, self.getCachePath( "" ) )
 
 
     def flushCache( self ):
@@ -352,7 +314,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.dataPrevious = self.data
 
         # Update frontend.
-        menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
         self.updateLabel()
         self.updateIcon()
@@ -374,8 +335,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadDataFunction, downloadDataArguments,
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
-
-        if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
