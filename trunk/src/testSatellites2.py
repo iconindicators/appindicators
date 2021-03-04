@@ -181,8 +181,10 @@ def toDateTimeLocal( utcDateTime ): return utcDateTime.replace( tzinfo = datetim
 
 def validatePasses( number, riseSets, sunrise, sunset, isSkyfield ):
     timeScale = load.timescale( builtin = True )
-    beforeSunrise = timeScale.from_datetime( sunrise - datetime.timedelta( hours = 2 ) )
-    afterSunset = timeScale.from_datetime( sunset + datetime.timedelta( hours = 2 ) )
+    beforeSunrise = timeScale.from_datetime( sunrise - datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
+    afterSunset = timeScale.from_datetime( sunset + datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
+    beforeSunriseLocal = toDateTimeLocal( beforeSunrise.utc_datetime() )
+    afterSunsetLocal = toDateTimeLocal( afterSunset.utc_datetime() )
     for riseSet in riseSets:
         valid = ( riseSet[ 0 ].time() > beforeSunrise and riseSet[ 0 ].time() < sunrise ) or \
                 ( riseSet[ 0 ].time() > sunset and riseSet[ 0 ].time() < afterSunset )
