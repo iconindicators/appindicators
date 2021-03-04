@@ -10,7 +10,7 @@ from datetime import  timezone
 from skyfield.api import EarthSatellite, load, wgs84
 from skyfield import almanac
 from urllib.request import urlopen
-import datetime, ephem, math, skyfield
+import datetime, ephem, skyfield
 
 
 def getTLEData():
@@ -47,10 +47,10 @@ def calculateVisiblePassesPyEphem( utcNow, tle ):
 
                 results.append( riseSet )
 
-            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Look for the next pass.
-
         except ValueError:
             pass # Satellite is circumpolar so ignore as Skyfield does not distinguish such satellites.
+
+        currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 15 ) # Look for the next pass starting after current set.
 
     return results
 
@@ -125,9 +125,9 @@ def calculateVisiblePassesSkyfield( utcNow, tle ):
     ephemerisPlanets = load( "de421.bsp" )
     timeScale = load.timescale( builtin = True )
     now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-    nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + searchDurationInHours )
+    nowPlusSearchDuration = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + searchDurationInHours )
     earthSatellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], timeScale )
-    t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 )
+    t, events = earthSatellite.find_events( location, now, nowPlusSearchDuration, altitude_degrees = 30.0 )
     riseTime = None
     culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
     for ti, event in zip( t, events ):
@@ -173,27 +173,30 @@ def getSunriseSunset( utcNow ):
         sunrise = t.utc_datetime()[ 0 ]
         sunset = t.utc_datetime()[ 1 ]
 
-    return sunrise, sunset
+    beforeSunrise = ( sunrise - datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
+    afterSunset = ( sunset + datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
+
+    return beforeSunrise, sunrise, sunset, afterSunset
 
 
 def toDateTimeLocal( utcDateTime ): return utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
 
 
-def validatePasses( number, riseSets, sunrise, sunset, isSkyfield ):
-    timeScale = load.timescale( builtin = True )
-    beforeSunrise = timeScale.from_datetime( sunrise - datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
-    afterSunset = timeScale.from_datetime( sunset + datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
-    beforeSunriseLocal = toDateTimeLocal( beforeSunrise.utc_datetime() )
-    afterSunsetLocal = toDateTimeLocal( afterSunset.utc_datetime() )
+def validatePasses( number, riseSets, beforeSunrise, sunrise, sunset, afterSunset, isSkyfield ):
+    beforeSunrise = toDateTimeLocal( beforeSunrise ).time()
+    sunrise = toDateTimeLocal( sunrise ).time()
+    sunset = toDateTimeLocal( sunset ).time()
+    afterSunset = toDateTimeLocal( afterSunset ).time()
     for riseSet in riseSets:
-        valid = ( riseSet[ 0 ].time() > beforeSunrise and riseSet[ 0 ].time() < sunrise ) or \
-                ( riseSet[ 0 ].time() > sunset and riseSet[ 0 ].time() < afterSunset )
+        satelliteRiseTimeLocal = toDateTimeLocal( riseSet[ 0 ] ).time()
+        valid = ( satelliteRiseTimeLocal > beforeSunrise and satelliteRiseTimeLocal < sunrise ) or \
+                ( satelliteRiseTimeLocal > sunset and satelliteRiseTimeLocal < afterSunset )
 
         if not valid:
             print( "Skyfield" if isSkyfield else "PyEphem", number, riseSet )
 
 
-utcNow = datetime.datetime.strptime( "2021-03-01", "%Y-%m-%d" ).replace( tzinfo = timezone.utc )
+utcNow = datetime.datetime.strptime( "2021-03-04", "%Y-%m-%d" ).replace( tzinfo = timezone.utc )
 lat = -33.8
 lon = 151.2
 elev = 0.0
@@ -203,13 +206,15 @@ sunriseSunsetWindowInHours = 2
 print( "pyephem:", ephem.__version__ )
 print( "skyfield:", skyfield.__version__ )
 
-sunrise, sunset = getSunriseSunset( utcNow )
+beforeSunrise, sunrise, sunset, afterSunset = getSunriseSunset( utcNow )
+print( "Local before sunrise:", toDateTimeLocal( beforeSunrise ) )
 print( "Local sunrise:", toDateTimeLocal( sunrise ) )
 print( "Local sunset", toDateTimeLocal( sunset ) )
+print( "Local after sunset", toDateTimeLocal( afterSunset ) )
 
 tleData = getTLEData()
 for number in tleData:
     riseSetsPyephem = calculateVisiblePassesPyEphem( utcNow, tleData[ number ] )
-    validatePasses( number, riseSetsPyephem, sunrise, sunset, False )
+    validatePasses( number, riseSetsPyephem, beforeSunrise, sunrise, sunset, afterSunset, False )
     riseSetsSkyfield = calculateVisiblePassesSkyfield( utcNow, tleData[ number ] )
-    validatePasses( number, riseSetsPyephem, sunrise, sunset, True )    
+    validatePasses( number, riseSetsPyephem, beforeSunrise, sunrise, sunset, afterSunset, True )    
