@@ -1134,7 +1134,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                             break
 
                         else:
-                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Look for the next pass.
+                            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
