@@ -6,7 +6,7 @@
 #    https://celestrak.com/NORAD/elements/visual.txt
 
 
-from datetime import  timezone
+from datetime import timezone
 from skyfield.api import EarthSatellite, load, wgs84
 from skyfield import almanac
 from urllib.request import urlopen
@@ -17,8 +17,8 @@ utcNow = datetime.datetime.strptime( "2021-03-04", "%Y-%m-%d" ).replace( tzinfo 
 lat = -33.8
 lon = 151.2
 elev = 0.0
-searchDurationInHours = 48
-sunriseSunsetWindowInHours = 1.5
+searchDuration = 48 # Hours
+sunriseSunsetWindow = 1.5 # Hours
 
 
 def getTLEData():
@@ -37,7 +37,7 @@ def getTLEData():
 def calculateVisiblePassesPyEphem( utcNow, tle ):
     results = [ ]
     ephemNow = ephem.Date( utcNow )
-    endDateTime = ephem.Date( ephemNow + ephem.hour * searchDurationInHours ) # Stop looking for passes 36 hours from now.
+    endDateTime = ephem.Date( ephemNow + ephem.hour * searchDuration ) # Stop looking for passes 36 hours from now.
     currentDateTime = ephemNow
     while currentDateTime < endDateTime:
         city = getCity( currentDateTime )
@@ -121,7 +121,7 @@ def getCity( date ):
     city.date = date
     city.lat = str( lat )
     city.lon = str( lon )
-    city.elev = 0.0
+    city.elev = elev
 
     return city
 
@@ -131,7 +131,7 @@ def calculateVisiblePassesSkyfield( utcNow, tle ):
     location = wgs84.latlon( lat, lon, elev )
     timeScale = load.timescale( builtin = True )
     now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-    nowPlusSearchDuration = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + searchDurationInHours )
+    nowPlusSearchDuration = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + searchDuration )
     earthSatellite = EarthSatellite( tle[ 1 ], tle[ 2 ], tle[ 0 ], timeScale )
     t, events = earthSatellite.find_events( location, now, nowPlusSearchDuration, altitude_degrees = 30.0 )
     riseTime = None
@@ -179,10 +179,13 @@ def getSunriseSunset( utcNow ):
         sunrise = t.utc_datetime()[ 0 ]
         sunset = t.utc_datetime()[ 1 ]
 
-    beforeSunrise = ( sunrise - datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
-    afterSunset = ( sunset + datetime.timedelta( hours = sunriseSunsetWindowInHours ) )
+    beforeSunrise = ( sunrise - datetime.timedelta( hours = sunriseSunsetWindow ) )
+    afterSunset = ( sunset + datetime.timedelta( hours = sunriseSunsetWindow ) )
 
-    return toDateTimeLocal( beforeSunrise ).time(), toDateTimeLocal( sunrise ).time(), toDateTimeLocal( sunset ).time(), toDateTimeLocal( afterSunset ).time()
+    return toDateTimeLocal( beforeSunrise ).time(), \
+           toDateTimeLocal( sunrise ).time(), \
+           toDateTimeLocal( sunset ).time(), \
+           toDateTimeLocal( afterSunset ).time()
 
 
 def toDateTimeLocal( utcDateTime ): return utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
