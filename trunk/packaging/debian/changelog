@@ -1,6 +1,7 @@
 indicator-lunar (1.0.87-1) xenial; urgency=low
 
-  * Reduce search time for visible satellite passes.
+  * Reduce search time for visible satellite passes by searching for the next
+    pass after the set time of the current (non-visible) pass.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 4 Mar 2021 22:24:19 +1000
 
