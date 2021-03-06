@@ -1133,8 +1133,16 @@ class AstroPyEphem( astrobase.AstroBase ):
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
                             break
 
-                        else:
+#TODO Run the indicator (from Eclipse, using latest code) whilst the released indicator (or any other) is NOT running.
+# Start with nothing selected (no satellites, etc).
+# Then add in satellites (auto-add) and hit OK and notice if the satellites are shown. 
+                        # Look for the next pass after the current pass...
+                        if nextPass[ 4 ]: # ...but occasionally pass data is bad.
                             currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
+
+                        else:
+                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after current time.
+                            print( satellite, nextPass )
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
