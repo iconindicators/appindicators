@@ -1139,7 +1139,6 @@ class AstroPyEphem( astrobase.AstroBase ):
 
                         else:
                             currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after current time.
-                            print( satellite, nextPass )
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
