@@ -1381,6 +1381,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if row[ 0 ]:
                     self.stars.append( row[ 1 ] )
 
+            # If the option to add new comets is checked, this will be handled out in the main update loop.
+            # Otherwise, update the list of checked comets (ditto for minor planets and satellites).
             self.comets = [ ]
             if not self.cometsAddNew:
                 for comet in cometStore:
