@@ -775,7 +775,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
 
-
+#TODO Run the indicator (from Eclipse, using latest code) whilst the released indicator (or any other) is NOT running.
+# Start with nothing selected (no satellites, etc).
+# Then add in satellites (auto-add) and hit OK and notice if the satellites are shown. 
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]
