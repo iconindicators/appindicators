@@ -855,7 +855,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
            dataTag == astrobase.AstroBase.DATA_TAG_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( data ) ) ) ) + "°"
 
-        elif dataTag == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB:
+        elif dataTag == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB: #TODO Is this needed?  We don't display the bright limb value; rather only use it to create the icon.
             displayData = str( int( float( data ) ) ) + "°"
 
         elif dataTag == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
