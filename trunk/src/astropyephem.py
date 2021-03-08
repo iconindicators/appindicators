@@ -1018,8 +1018,6 @@ class AstroPyEphem( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
 
-#TODO Wait until the moon is up and compare the results from here with that in the indicator currently installed and ensure they match!
-#If so, then remove the eclipse function from astrobase and implement the code below also in skyfield.
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( ephemNow.datetime(), True )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
@@ -1038,17 +1036,16 @@ class AstroPyEphem( astrobase.AstroBase ):
     def __calculateSun( ephemNow, data ):
         if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Sun(), astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ):
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
-#TODO Wait until the sun is up and compare the results from here with that in the indicator currently installed and ensure they match!
+            equinox = ephem.next_equinox( ephemNow )
+            solstice = ephem.next_solstice( ephemNow )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
+
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( ephemNow.datetime(), False )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
-
-            equinox = ephem.next_equinox( ephemNow )
-            solstice = ephem.next_solstice( ephemNow )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
 
 
     # http://www.geoastro.de/planets/index.html
