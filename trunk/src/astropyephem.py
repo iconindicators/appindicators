@@ -29,7 +29,7 @@ except ImportError:
 
 from distutils.version import LooseVersion
 
-import astrobase, locale, math, orbitalelement
+import astrobase, eclipse, locale, math, orbitalelement
 
 
 class AstroPyEphem( astrobase.AstroBase ):
@@ -1017,7 +1017,14 @@ class AstroPyEphem( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
             data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
-            astrobase.AstroBase.getEclipse( ephemNow.datetime(), data, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+
+#TODO Wait until the moon is up and compare the results from here with that in the indicator currently installed and ensure they match!
+#If so, then remove the eclipse function from astrobase and implement the code below also in skyfield.
+            dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( ephemNow.datetime(), True )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html

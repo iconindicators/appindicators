@@ -799,7 +799,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             t, y, details = eclipselib.lunar_eclipses( utcNow, utcNowPlusOneYear, ephemerisPlanets )
             key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( "%Y-%m-%d %H:%M:%S" )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( "%Y-%m-%d %H:%M:%S" ) #TODO This format should come from astrobase ... but may not store strings in the future, but the actual object.
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
@@ -827,12 +827,14 @@ class AstroSkyfield( astrobase.AstroBase ):
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
-#TODO Once solar eclipses are implemented in Skyfield, replace the line below with similar functionality to lunar eclipses above.        
+#TODO Once solar eclipses are implemented in Skyfield, replace the code below with similar functionality to lunar eclipses above.        
+#TODO Wait until the sun is up and compare the results from here with that in the indicator currently installed and ensure they match!
+            dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( utcNow.utc_datetime(), False )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
-#             utcNowNoTimezone = utcNow.utc_datetime()
-#             utcNowNoTimezone.replace( tzinfo = None )
-#             astrobase.AstroBase.getEclipse( utcNowNoTimezone, data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
-            astrobase.AstroBase.getEclipse( utcNow.utc_datetime(), data, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
 
 
     # http://www.geoastro.de/planets/index.html

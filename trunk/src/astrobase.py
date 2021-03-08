@@ -357,15 +357,17 @@ class AstroBase( ABC ):
         return apparentMagnitude
 
 
-    # Retrieve the next Lunar/Solar eclipse from tables.
-    @staticmethod
-    def getEclipse( utcNow, data, bodyType, dataTag ):
-        eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
-        key = ( bodyType, dataTag )
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
+#TODO Hoping to remove this. 
+# 
+#     # Retrieve the next Lunar/Solar eclipse from tables.
+#     @staticmethod
+#     def getEclipse( utcNow, data, bodyType, dataTag ):
+#         eclipseInformation = eclipse.getEclipse( utcNow, bodyType == AstroBase.BodyType.MOON )
+#         key = ( bodyType, dataTag )
+#         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = eclipseInformation[ 0 ]
+#         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseInformation[ 1 ]
+#         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = eclipseInformation[ 2 ]
+#         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = eclipseInformation[ 3 ]
 
 
     # Get the lunar phase for the given date/time and illumination percentage.

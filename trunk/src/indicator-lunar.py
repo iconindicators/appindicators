@@ -169,7 +169,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
-        self.__swapCacheFiles() #TODO Only for me!
+#         self.__swapCacheFiles() #TODO Only for me!
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
@@ -346,7 +346,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites()
 
-        print( datetime.datetime.utcnow() - utcNow )#TODO Testing
+        print( datetime.datetime.utcnow() - utcNow )#TODO Testing  33seconds.
         return self.getNextUpdateTimeInSeconds()
 
 

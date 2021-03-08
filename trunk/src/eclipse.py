@@ -61,7 +61,7 @@ def getEclipse( dateTimeUTC, isLunar ):
             if eclipse[ 7 ][ -1 ] == "E":
                 longitude = "-" + longitude
 
-            eclipseInfo = ( str( dateTime ), eclipse[ 5 ], latitude, longitude )
+            eclipseInfo = str( dateTime ), eclipse[ 5 ], latitude, longitude
             break
 
     return eclipseInfo
