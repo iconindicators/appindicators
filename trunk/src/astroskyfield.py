@@ -53,7 +53,7 @@ except ImportError:
 
 from distutils.version import LooseVersion
 
-import astrobase, datetime, importlib, io, locale, orbitalelement
+import astrobase, datetime, eclipse, importlib, io, locale, orbitalelement
 
 
 class AstroSkyfield( astrobase.AstroBase ):
@@ -828,7 +828,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
 #TODO Once solar eclipses are implemented in Skyfield, replace the code below with similar functionality to lunar eclipses above.        
-#TODO Wait until the sun is up and compare the results from here with that in the indicator currently installed and ensure they match!
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( utcNow.utc_datetime(), False )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
