@@ -972,7 +972,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api    
     @staticmethod
-#TODO This is showing (apparently) all passes...not just the visible passes.    
+#TODO Seems to calculate some passes very late after sunset (or very early before sunrise) when the satellite surely cannot be sunlit.
+# https://github.com/skyfielders/python-skyfield/issues/558    
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
         for satellite in satellites:
             if satellite in satelliteData:
@@ -1017,6 +1018,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         AstroSkyfield.__printSatelliteResults( data )
 
 
+#TODO Testing
     @staticmethod
     def __printSatelliteResults( data ):
         satelliteNumbers = [ ]
