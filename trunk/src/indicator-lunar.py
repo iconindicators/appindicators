@@ -785,40 +785,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         utcNowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 ) )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
-
-            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: and key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
-
-            
-            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
-                # Satellite rises/sets...
-                if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes and \
-                   self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > utcNow:
-                    # Satellite is in transit...
-                    satellites.append( [ number, self.satelliteData[ number ].getName(), self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
-
-                else:
-                    # Satellite is yet to rise...
-                    satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
-
-            elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.dataPrevious:
-                # Satellite is circumpolar (always up)...
-                satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
-
-
-            
-            
-            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
-                # Satellite rises/sets...
-                if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes and \
-                   self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > utcNow:
-                    # Satellite is in transit...
-                    satellites.append( [ number, self.satelliteData[ number ].getName(), self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
+            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
+                if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
+                    if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes and \
+                       self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > utcNow:
+                        # Satellite is in transit...
+                        satellites.append( [ number, self.satelliteData[ number ].getName(), self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
+    
+                    else:
+                        # Satellite is yet to rise...
+                        satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                 else:
-                    # Satellite is yet to rise...
+                    # Not present in previous data (the user went from no satellites checked to all satellites checked in the preferences). 
+                    # Assume the satellite is yet to rise...
                     satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-            elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data and key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.dataPrevious:
+            elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data:
                 # Satellite is circumpolar (always up)...
                 satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
 
