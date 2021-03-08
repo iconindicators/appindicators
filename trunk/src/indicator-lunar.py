@@ -169,26 +169,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
-        self.__removePreviousVersionCacheFiles()
         self.__swapCacheFiles() #TODO Only for me!
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
-
-
-    #TODO Start of temporary hack...remove in later release.
-    # Cache data formats for comets and minor planets changed between version 84 and 85, so remove old format files.
-    #
-    # A new attribute, dataType, and a new inner class, DataType, were added to orbitalelement.
-    # Need to remove old versions of data in this format.
-    def __removePreviousVersionCacheFiles( self ):
-        import os, pickle
-        cachePath = self.getCachePath( "" )
-        for file in os.listdir( cachePath ):
-            if file.startswith( IndicatorLunar.COMET_CACHE_BASENAME ) or file[ 0 : file.rfind( "-" ) + 1 ] in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
-                with open( cachePath + file, "rb" ) as f:
-                    data = pickle.load( f )
-                    if data and not hasattr( next( iter( data.values() ) ), "dataType" ): 
-                        os.remove( cachePath + file )
 
 
     #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center.
@@ -363,6 +346,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites()
 
+        print( datetime.datetime.utcnow() - utcNow )#TODO Testing
         return self.getNextUpdateTimeInSeconds()
 
 
@@ -375,7 +359,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
-        if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
+#         if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
