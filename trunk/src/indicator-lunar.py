@@ -346,7 +346,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if self.showSatelliteNotification:
             self.notificationSatellites()
 
-        print( datetime.datetime.utcnow() - utcNow )#TODO Testing  33seconds.
         return self.getNextUpdateTimeInSeconds()
 
 
@@ -855,7 +854,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
            dataTag == astrobase.AstroBase.DATA_TAG_SET_AZIMUTH:
             displayData = str( round( math.degrees( float( data ) ) ) ) + "°"
 
-        elif dataTag == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB: #TODO Is this needed?  We don't display the bright limb value; rather only use it to create the icon.
+        elif dataTag == astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB:
             displayData = str( int( float( data ) ) ) + "°"
 
         elif dataTag == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
