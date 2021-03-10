@@ -523,11 +523,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.lastFullMoonNotfication = utcNow
 
 
-    def createFullMoonIcon( self ):
-        return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON,
-                                    self.createIconText( 100, None ),
-                                    False,
-                                    IndicatorLunar.ICON_EXTENSION )
+    def createFullMoonIcon( self ): return self.writeCacheText( IndicatorLunar.ICON_FULL_MOON,
+                                                                self.createIconText( 100, None ),
+                                                                False,
+                                                                IndicatorLunar.ICON_EXTENSION )
 
 
     def notificationSatellites( self ):
@@ -726,10 +725,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Determine if a body should be displayed taking into account:
     #
     #    The user preference for hiding a body if the body is below the horizon.
+    #
     #    The astro backend behaviour:
-    #        The rise/set/az/alt is present for a body which will rise and set.
-    #        The az/alt is present for a body which is always up.
-    #        No data will be present for a body which is never up.
+    #        The rise/set/az/alt is present for a body which rises and sets.
+    #        The az/alt is present for a body 'always up'.
+    #        No data is present for a body 'never up'.
     def display( self, bodyType, nameTag ):
         displayBody = False
         key = ( bodyType, nameTag )
@@ -757,6 +757,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         else: # Body is always up.
             self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
+
 
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
