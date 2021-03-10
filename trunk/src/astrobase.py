@@ -341,6 +341,9 @@ class AstroBase( ABC ):
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
+        # Have seen the division resolve to a number that is greater than 1 in the fifth or sixth decimal place,
+        # which subsequently throws a 'ValueError: math domain error' when arccos is executed.
+        # Not much can be done about this unfortunately.
         numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
         beta = math.acos( numerator / denominator )

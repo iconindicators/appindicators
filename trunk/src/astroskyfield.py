@@ -898,6 +898,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "mpcorb_orbit"
 
+#TODO The block below is identical save for one line in the above function getOrbitalElementsLessThanMagnitude.
+# Maybe have a nested function in each which implements the single differing line and pass that in to a third function which implements the common code block?
         for name, row in dataframe.iterrows():
             body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = ( earth + location ).at( utcNow ).observe( body ).radec()

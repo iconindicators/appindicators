@@ -156,7 +156,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                         _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
 
-
         utcNow = datetime.datetime.utcnow()
 
         self.data = None
