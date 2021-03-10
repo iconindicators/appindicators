@@ -38,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -169,7 +169,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
-#         self.__swapCacheFiles() #TODO Only for me!
+        self.__swapCacheFiles() #TODO Only for me!
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
@@ -246,15 +246,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
 
-        magnitudeFilterAdditionalArguments = [ ]
-        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
-            magnitudeFilterAdditionalArguments = [ self.latitude, self.longitude, self.elevation, self.getLogging() ]
-
         # Update comet data.
+        magnitudeFilterAdditionalArguments = [ ]
         dataType = orbitalelement.OE.DataType.XEPHEM_COMET
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
             dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
-            magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.COMET, self.latitude, self.longitude, self.elevation ]
+            magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
             self.updateData( utcNow,
@@ -267,7 +264,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         # Update minor planet data.
         self.minorPlanetData = { }
-
+        magnitudeFilterAdditionalArguments = [ ]
         dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
             dataType = orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
