@@ -120,7 +120,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Unusual.txt" ]
+                                   "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt" ]
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
