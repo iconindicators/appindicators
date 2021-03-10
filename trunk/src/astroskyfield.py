@@ -87,10 +87,10 @@ class AstroSkyfield( astrobase.AstroBase ):
     # which was sourced from the (now deleted) Wikipedia page "Hipparcos Catalogue":
     #    https://web.archive.org/web/20131012032059/https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
     #
-    # This list contains duplicates, misspellings and is not in use per se:
+    # This list contains duplicates, misspellings and is not in use:
     #    https://github.com/skyfielders/python-skyfield/issues/304
     #
-    # Instead, use the more reliable and recent source from the ESA Hipparcos catalogue:
+    # Consequently, use the more reliable and recent source from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # If this list is modified, regenerate the stars.dat.gz file.
@@ -487,9 +487,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 94 ] :   _( "ZAURAK" ),
         astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
-#TODO When Oleg returns the new PO file,
-# find 3c 273 and fix to be 3C 273.
-
     # Taken from ephem/cities.py as Skyfield does not provide a list of cities.
     #    https://github.com/skyfielders/python-skyfield/issues/316
     _city_data = {
@@ -799,7 +796,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             t, y, details = eclipselib.lunar_eclipses( utcNow, utcNowPlusOneYear, ephemerisPlanets )
             key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( "%Y-%m-%d %H:%M:%S" ) #TODO This format should come from astrobase ... but may not store strings in the future, but the actual object.
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
@@ -1016,23 +1013,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                         break
 
 
-        AstroSkyfield.__printSatelliteResults( data )
-
-
-#TODO Testing
-    @staticmethod
-    def __printSatelliteResults( data ):
-        satelliteNumbers = [ ]
-        for key in data:
-            if key[ 0 ] == astrobase.AstroBase.BodyType.SATELLITE and key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME:
-                satelliteNumbers.append( key[ 1 ] )
-
-        for satelliteNumber in sorted( satelliteNumbers ):
-            print( satelliteNumber )
-            print( data[ ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber, astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME ) ] )
-            print( data[ ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber, astrobase.AstroBase.DATA_TAG_SET_DATE_TIME ) ] )
-
-
     # Load the Hipparcos catalogue and filter out stars not on common name list:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
@@ -1088,7 +1068,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         today = datetime.date.today()
-        oneMonthPriorToToday = today - relativedelta( months = 1 ) # Start earlier as lunar eclipses search from prior to the start date.
+        oneMonthPriorToToday = today - relativedelta( months = 1 ) # Start earlier than today (calculations such as lunar eclipses search from prior to the start date).
         fiveYearsFromToday = today.replace( year = today.year + 5 )
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
