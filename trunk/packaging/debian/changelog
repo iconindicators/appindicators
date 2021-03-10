@@ -2,8 +2,7 @@ indicator-lunar (1.0.87-1) xenial; urgency=low
 
   * Bug fix: Satellites would not display if the user changed the preferences
     from no satellites checked to one or more satellites checked.
-  * Reduce search time for visible satellite passes by searching for the next
-    pass after the set time of the current (non-visible) pass.
+  * Reduced search time for visible satellite passes.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 4 Mar 2021 22:24:19 +1000
 
