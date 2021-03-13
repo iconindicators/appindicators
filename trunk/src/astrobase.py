@@ -346,6 +346,10 @@ class AstroBase( ABC ):
         # Not much can be done about this unfortunately.
         numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
+        
+        if ( numerator / denominator ) > 1.0:
+            print( numerator, denominator, ( numerator / denominator ) )
+        
         beta = math.acos( numerator / denominator )
 
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
