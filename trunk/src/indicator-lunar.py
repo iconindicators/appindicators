@@ -156,20 +156,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                         _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
 
-        n = 6.272370848320445
-        d = 6.2723697617591405
-        orig = 1.0000001732297912
-        
-        r = n / d
-
-        c = math.ceil( orig )
-
-        decimals = 4
-        factor = 10.0 ** decimals
-        t = math.trunc(orig * factor) / factor
-
-        
-        
         utcNow = datetime.datetime.utcnow()
 
         self.data = None

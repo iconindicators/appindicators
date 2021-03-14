@@ -347,6 +347,7 @@ class AstroBase( ABC ):
         numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
         
+#TODO https://math.stackexchange.com/questions/4060964/floating-point-division-resulting-in-a-value-exceeding-1-but-should-be-equal-to
         if ( numerator / denominator ) > 1.0:
             print( numerator, denominator, ( numerator / denominator ) )
         

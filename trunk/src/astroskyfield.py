@@ -740,31 +740,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                 logging.exception( e )
 
         return results
-#TODO The except above was hit when processing the Unusual minor planet file for two minor planets...
-#
-# 2021-03-11 15:12:21,076 - root - ERROR - Error computing apparent magnitude for minor planet: 2006 DC158
-# 2021-03-11 15:12:21,077 - root - ERROR - math domain error
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astroskyfield.py", line 733, in getOrbitalElementsLessThanMagnitude
-#     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astrobase.py", line 349, in getApparentMagnitude_HG
-#     beta = math.acos( numerator / denominator )
-# ValueError: math domain error
-# 2021-03-11 15:13:45,192 - root - ERROR - Error computing apparent magnitude for minor planet: 2008 BC22
-# 2021-03-11 15:13:45,192 - root - ERROR - math domain error
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astroskyfield.py", line 733, in getOrbitalElementsLessThanMagnitude
-#     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astrobase.py", line 349, in getApparentMagnitude_HG
-#     beta = math.acos( numerator / denominator )
-# ValueError: math domain error
-#
-#
-# It arises because the numerator and denomintor in the magnitude function getApparentMagnitude_HG resolves to a number slightly greater than 1.0
-# only due to a quirk of the floating point arithmetic.
-#
-# Maybe post this to StackExchange or even Skyfield and ask if there is a workaround...or even worth trying it.
-
 
 
     @staticmethod
