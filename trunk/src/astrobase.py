@@ -343,17 +343,14 @@ class AstroBase( ABC ):
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
         # Have seen the division resolve to a number that is greater than 1 in the fifth or sixth decimal place,
         # which subsequently throws a 'ValueError: math domain error' when arccos is executed.
-        # Although a solution posted in
+        # A solution posted in
+        #
         #    https://math.stackexchange.com/questions/4060964/floating-point-division-resulting-in-a-value-exceeding-1-but-should-be-equal-to
-        # suggests to set an upper bound to the division of a value +/- 1.0.
-        # The subsequent value for beta is zero feeding into tan( 0 ) which is zero.
-        # Taking the logarithm is undefined!
-        # Not really sure what can be done, or should be done; so leave things as they are and catch the error/exception and move on.
-        decimals = 4
-        bodySunDistanceAU = AstroBase.__truncate( bodySunDistanceAU, decimals )
-        bodyEarthDistanceAU = AstroBase.__truncate( bodyEarthDistanceAU, decimals )
-        earthSunDistanceAU = AstroBase.__truncate( earthSunDistanceAU, decimals )
-        
+        #
+        # suggests setting an upper bound to the division with a value +/- 1.0.
+        # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero.
+        # Taking the subsequent logarithm is undefined!
+        # Not really sure what can be done, or should be done; leave things as they are and catch the error/exception.
         numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
         beta = math.acos( numerator / denominator )
@@ -368,14 +365,6 @@ class AstroBase( ABC ):
                             2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
         return apparentMagnitude
-
-
-#TODO Testing
-    # Takes a number and returns either the number or +/- 1, whichever is smaller.
-    @staticmethod
-    def __truncate( number, decimals ):
-        factor = 10.0 ** decimals
-        return math.trunc( number * factor) / factor
 
 
     # Get the lunar phase for the given date/time and illumination percentage.
