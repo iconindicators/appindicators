@@ -707,6 +707,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
                 dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
+#TODO Can this be rewritten as per the calculate orbital elements function below?
         results = { }
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         timeScale = load.timescale( builtin = True )
@@ -875,7 +876,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateOrbitalElements( utcNow, utcNowPlusTwoDays, data, timeScale, location, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum, logging ):
-        AstroSkyfield.__xxx()
         # Skyfield loads the orbital element data into a dataframe from a file.
         # Need to take the orbital element data and write to a memory file object.
         with io.BytesIO() as f:
@@ -888,10 +888,14 @@ class AstroSkyfield( astrobase.AstroBase ):
             if bodyType == astrobase.AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "comet_orbit"
+                apparentMagnitudeFunction = "getApparentMagnitude_gk"
+                message = "Error computing apparent magnitude for comet: "
 
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
                 orbitCalculationFunction = "mpcorb_orbit"
+                apparentMagnitudeFunction = "getApparentMagnitude_HG"
+                message = "Error computing apparent magnitude for minor planet: "
 
 #TODO The block below is identical save for one line in the above function getOrbitalElementsLessThanMagnitude.
 # Maybe have a nested function in each which implements the single differing line and pass that in to a third function which implements the common code block?
@@ -904,13 +908,14 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, sunBodyDistance = sun.at( utcNow ).observe( body ).radec()
 
             try:
+#                 apparentMagnitude = getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+
+                
                 if orbitCalculationFunction == "comet_orbit":
-                    message = "Error computing apparent magnitude for comet: " + name
                     apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ], 
                                                                                      earthBodyDistance.au, sunBodyDistance.au )
 
                 else:
-                    message = "Error computing apparent magnitude for minor planet: " + name
                     apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
@@ -918,38 +923,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets, body, bodyType, key )
 
             except Exception as e:
-                logging.error( message )
-                logging.exception( e )
-
-
-    @staticmethod
-    def __test( utcNow, timeScale, location, ephemerisPlanets, dataframe, orbitCalculationFunction, magnitudeMaximum, magnitudePassFunction, magnitudePassArguments, logging ):
-        sun = ephemerisPlanets[ "sun" ]
-        earth = ephemerisPlanets[ "earth" ]
-        alt, az, earthSunDistance = ( earth + location ).at( utcNow ).observe( sun ).apparent().altaz()
-        for name, row in dataframe.iterrows():
-            body = sun + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            ra, dec, earthBodyDistance = ( earth + location ).at( utcNow ).observe( body ).radec()
-            ra, dec, sunBodyDistance = sun.at( utcNow ).observe( body ).radec()
-
-            try:
-                if orbitCalculationFunction == "comet_orbit":
-                    message = "Error computing apparent magnitude for comet: " + name
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ], 
-                                                                                     earthBodyDistance.au, sunBodyDistance.au )
-
-                else:
-                    message = "Error computing apparent magnitude for minor planet: " + name
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
-                                                                                     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
-
-                if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                    magnitudePassFunction( magnitudePassArguments )
-#                     AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, ephemerisPlanets, body, bodyType, key )
-#                     results[ name.upper() ] = orbitalElementData[ name.upper() ]
-
-            except Exception as e:
-                logging.error( message )
+                logging.error( message + name )
                 logging.exception( e )
 
 
