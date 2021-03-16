@@ -656,7 +656,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                   astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
                                                   logging )
 
-        AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, locationAtNow, ephemerisPlanets, satellites, satelliteData )
+        AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
 
         return data
 
