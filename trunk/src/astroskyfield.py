@@ -904,10 +904,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO The block below is identical save for one line in the above function getOrbitalElementsLessThanMagnitude.
 # Maybe have a nested function in each which implements the single differing line and pass that in to a third function which implements the common code block?
-        alt, az, earthSunDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + location ).at( utcNow ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
+        alt, az, earthSunDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + locationAtNow.target ).at( utcNow ).observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
         for name, row in dataframe.iterrows():
             body = ephemerisPlanets[ AstroSkyfield.__SUN ] + getattr( importlib.import_module( "skyfield.data.mpc" ), orbitCalculationFunction )( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            ra, dec, earthBodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + location ).at( utcNow ).observe( body ).radec()
+            ra, dec, earthBodyDistance = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + locationAtNow.target ).at( utcNow ).observe( body ).radec()
             ra, dec, sunBodyDistance = ephemerisPlanets[ AstroSkyfield.__SUN ].at( utcNow ).observe( body ).radec()
 
             try:
@@ -930,7 +930,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateCommon( utcNow, utcNowPlusTwoDays, data, key, location, locationAtNow, ephemerisPlanets, body ):
         neverUp = False
-        t, y = almanac.find_discrete( utcNow, utcNowPlusTwoDays, almanac.risings_and_settings( ephemerisPlanets, body, location ) )
+        t, y = almanac.find_discrete( utcNow, utcNowPlusTwoDays, almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target ) )
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
             if y[ 0 ]:
@@ -946,7 +946,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
-            if almanac.risings_and_settings( ephemerisPlanets, body, location )( utcNow ): # Body is up (and so always up).
+            if almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target )( utcNow ): # Body is up (and so always up).
                 alt, az, bodyDistance = locationAtNow.observe( body ).apparent().altaz()
                 data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
