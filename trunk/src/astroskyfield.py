@@ -783,8 +783,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
 
-        neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, locationAtNow, ephemerisPlanets,
-                                                   ephemerisPlanets[ AstroSkyfield.__MOON ], astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+        neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays,
+                                                   data, ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ),
+                                                   location, locationAtNow,
+                                                   ephemerisPlanets,
+                                                   ephemerisPlanets[ AstroSkyfield.__MOON ] )
 
         if not neverUp:
             data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 1 ] ) ) ] )
@@ -806,8 +809,10 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( utcNow, utcNowPlusTwoDays, utcNowPlusSevenMonths, data, location, locationAtNow, ephemerisPlanets ):
-        neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, locationAtNow, ephemerisPlanets,
-                                                   ephemerisPlanets[ AstroSkyfield.__SUN ], astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+        neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, 
+                                                   data, ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ), 
+                                                   location, locationAtNow,
+                                                   ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__SUN ] )
 
         if not neverUp:
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
@@ -858,8 +863,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                     apparentMagnitude = 14.0
 
             if apparentMagnitude <= magnitudeMaximum:
-                AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, locationAtNow, ephemerisPlanets,
-                                                 ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ], astrobase.AstroBase.BodyType.PLANET, planet )
+                AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays,
+                                                 data, ( astrobase.AstroBase.BodyType.PLANET, planet ),
+                                                 location, locationAtNow,
+                                                 ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] )
 
 
     @staticmethod
@@ -868,8 +875,10 @@ class AstroSkyfield( astrobase.AstroBase ):
             if star in astrobase.AstroBase.STARS:
                 theStar = ephemerisStars.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ]
                 if theStar.magnitude <= magnitudeMaximum:
-                    AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, locationAtNow, ephemerisPlanets,
-                                                     Star.from_dataframe( theStar ), astrobase.AstroBase.BodyType.STAR, star )
+                    AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays,
+                                                     data, ( astrobase.AstroBase.BodyType.STAR, star ),
+                                                     location, locationAtNow,
+                                                     ephemerisPlanets, Star.from_dataframe( theStar ) )
 
 
     @staticmethod
@@ -911,7 +920,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
                 if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
-                    AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, location, locationAtNow, ephemerisPlanets, body, bodyType, key )
+                    AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, ( bodyType, key ), location, locationAtNow, ephemerisPlanets, body )
 
             except Exception as e:
                 logging.error( message + name )
@@ -919,9 +928,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateCommon( utcNow, utcNowPlusTwoDays, data, location, locationAtNow, ephemerisPlanets, body, bodyType, nameTag ):
+    def __calculateCommon( utcNow, utcNowPlusTwoDays, data, key, location, locationAtNow, ephemerisPlanets, body ):
         neverUp = False
-        key = ( bodyType, nameTag )
         t, y = almanac.find_discrete( utcNow, utcNowPlusTwoDays, almanac.risings_and_settings( ephemerisPlanets, body, location ) )
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
