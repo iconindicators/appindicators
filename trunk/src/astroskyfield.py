@@ -707,7 +707,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                 message = "Unable to compute apparent magnitude for minor planet: "
 
         # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-        dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+        if bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET:
+            dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
         results = { }
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
@@ -898,7 +899,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 message = "Error computing apparent magnitude for minor planet: "
 
         alt, az, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
-        sunAtNow = ephemerisPlanets[ AstroSkyfield.__SUN ].at( now )
+        sunAtNow = ephemerisPlanets[ AstroSkyfield.__SUN ].at( utcNow )
         for name, row in dataframe.iterrows():
             body = ephemerisPlanets[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
