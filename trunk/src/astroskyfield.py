@@ -1045,8 +1045,6 @@ class AstroSkyfield( astrobase.AstroBase ):
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
     #
-    # The ephemeris date range is from the date of creation plus ten years.
-    #
     # Alternate method to create the ephemeris, download a .bsp and use spkmerge to create a smaller subset.
     # Refer to
     #    https://github.com/skyfielders/python-skyfield/issues/123
@@ -1056,23 +1054,23 @@ class AstroSkyfield( astrobase.AstroBase ):
         from dateutil.relativedelta import relativedelta
         import os, subprocess, urllib
 
-        ephemerisFile = "de438.bsp"
+        ephemerisFile = "de440s.bsp"
         ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
         if not os.path.isfile( ephemerisFile ):
-            print( "Could not locate", ephemerisFile )
-            print( "Downloading planet ephemeris..." )
+            print( "Unable to locate", ephemerisFile, "on the file system.  Downloading planet ephemeris..." )
             urllib.request.urlretrieve ( ephemerisURL, ephemerisFile )
 
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
+        numberOfYearsIntoFuture = 5
         today = datetime.date.today()
-        oneMonthPriorToToday = today - relativedelta( months = 1 ) # Start earlier than today (calculations such as lunar eclipses search from prior to the start date).
-        fiveYearsFromToday = today.replace( year = today.year + 5 )
+        startDate = today - relativedelta( months = 1 ) # Commence earlier as lunar eclipse code starts searching prior to the search date.
+        endDate = today.replace( year = today.year + numberOfYearsIntoFuture )
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
-                  oneMonthPriorToToday.strftime( dateFormat ) + " " + \
-                  fiveYearsFromToday.strftime( dateFormat ) + " " + \
+                  startDate.strftime( dateFormat ) + " " + \
+                  endDate.strftime( dateFormat ) + " " + \
                   ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
