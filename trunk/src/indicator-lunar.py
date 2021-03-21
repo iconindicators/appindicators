@@ -355,7 +355,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
 #         if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
-
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
