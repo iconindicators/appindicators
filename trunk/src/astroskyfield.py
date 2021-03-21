@@ -689,8 +689,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 # https://github.com/skyfielders/python-skyfield/issues/490
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum, bodyType, latitude, longitude, elevation, logging ):
-        # Skyfield loads the orbital element data into a dataframe from a file.
-        # Need to take the orbital element data and write to a memory file object.
+        # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for value in orbitalElementData.values():
                 f.write( ( value.getData() + '\n' ).encode() )
@@ -707,8 +706,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
                 message = "Unable to compute apparent magnitude for minor planet: "
 
-                # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-                dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+        # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+        dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
 
         results = { }
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
@@ -716,10 +715,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
         locationAtNow = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + wgs84.latlon( latitude, longitude, elevation ) ).at( now )
         alt, az, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
+        sunAtNow = ephemerisPlanets[ AstroSkyfield.__SUN ].at( now )
         for name, row in dataframe.iterrows():
             body = ephemerisPlanets[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
-            ra, dec, sunBodyDistance = ephemerisPlanets[ AstroSkyfield.__SUN ].at( now ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
 
             try:
                 if bodyType == astrobase.AstroBase.BodyType.COMET:
@@ -879,8 +879,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def __calculateOrbitalElements( utcNow, utcNowPlusTwoDays, data, timeScale, locationAtNow, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum, logging ):
-        # Skyfield loads the orbital element data into a dataframe from a file.
-        # Need to take the orbital element data and write to a memory file object.
+        # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for key in orbitalElements:
                 if key in orbitalElementData:
@@ -898,13 +897,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
                 message = "Error computing apparent magnitude for minor planet: "
 
-#TODO The block below is identical save for one line in the above function getOrbitalElementsLessThanMagnitude.
-# Maybe have a nested function in each which implements the single differing line and pass that in to a third function which implements the common code block?
         alt, az, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
+        sunAtNow = ephemerisPlanets[ AstroSkyfield.__SUN ].at( now )
         for name, row in dataframe.iterrows():
             body = ephemerisPlanets[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
-            ra, dec, sunBodyDistance = ephemerisPlanets[ AstroSkyfield.__SUN ].at( utcNow ).observe( body ).radec()
+            ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
 
             try:
                 if bodyType == astrobase.AstroBase.BodyType.COMET:
