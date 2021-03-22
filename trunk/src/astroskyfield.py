@@ -697,14 +697,16 @@ class AstroSkyfield( astrobase.AstroBase ):
             f.seek( 0 )
 
             if bodyType == astrobase.AstroBase.BodyType.COMET:
-                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                dataframe = mpc.load_comets_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
                 message = "Unable to compute apparent magnitude for comet: "
 
             else:
-                dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                dataframe = mpc.load_mpcorb_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
                 message = "Unable to compute apparent magnitude for minor planet: "
+
+        dataframe = dataframe.set_index( "designation", drop = False )
 
         # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
         if bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET:
@@ -889,14 +891,16 @@ class AstroSkyfield( astrobase.AstroBase ):
             f.seek( 0 )
 
             if bodyType == astrobase.AstroBase.BodyType.COMET:
-                dataframe = mpc.load_comets_dataframe( f ).set_index( "designation", drop = False )
+                dataframe = mpc.load_comets_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
                 message = "Error computing apparent magnitude for comet: "
 
             else:
-                dataframe = mpc.load_mpcorb_dataframe( f ).set_index( "designation", drop = False )
+                dataframe = mpc.load_mpcorb_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
                 message = "Error computing apparent magnitude for minor planet: "
+
+        dataframe = dataframe.set_index( "designation", drop = False )
 
         alt, az, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
         sunAtNow = ephemerisPlanets[ AstroSkyfield.__SUN ].at( utcNow )
