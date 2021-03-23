@@ -34,6 +34,14 @@
 # Determine why there are file size differences.
 
 
+#TODO If/When Skyfield becomes available, it is likely that both PyEphem and Skyfield will available to the use.
+# The user will/should be able to select which backend to use.
+# Therefore, checking if one backend is available and failing at that point should not terminate the indicator.
+# Instead maybe (somehow) run the indicator to allow the user to switch to the other backend.
+# What if somehow both backends are absent?
+# Need more thinking...
+
+
 # When creating the stars/planets ephemerides (functions at the end of the file),
 # uncomment the lines below as they are required!
 # import gettext
