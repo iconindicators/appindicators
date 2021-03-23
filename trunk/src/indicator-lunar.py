@@ -20,6 +20,20 @@
 # comet, minor planet and satellite information.
 
 
+#TODO PyEphem comets / minor planets which passed the magnitude filter cull:
+# ['C/2017 K2 (PANSTARRS)', 'C/2019 F1 (ATLAS-AFRICANO)', 'C/2019 L3 (ATLAS)', 'C/2019 N1 (ATLAS)', 'C/2020 N1 (PANSTARRS)', 'C/2020 R4 (ATLAS)', 'C/2017 T2 (PANSTARRS)', 'C/2021 D1 (SWAN)', "6P/D'ARREST", '7P/PONS-WINNECKE', '10P/TEMPEL', '11P/TEMPEL-SWIFT-LINEAR', '28P/NEUJMIN']
+# ['1 CERES', '3 JUNO', '4 VESTA', '5 ASTRAEA', '6 HEBE', '8 FLORA', '9 METIS', '10 HYGIEA', '11 PARTHENOPE', '12 VICTORIA', '13 EGERIA', '14 IRENE', '15 EUNOMIA', '16 PSYCHE', '18 MELPOMENE', '19 FORTUNA', '21 LUTETIA', '22 KALLIOPE', '23 THALIA', '26 PROSERPINA', '27 EUTERPE', '29 AMPHITRITE', '30 URANIA', '32 POMONA', '37 FIDES', '39 LAETITIA', '40 HARMONIA', '43 ARIADNE', '45 EUGENIA', '46 HESTIA', '47 AGLAJA', '51 NEMAUSA', '52 EUROPA', '63 AUSONIA', '70 PANOPAEA', '80 SAPPHO', '88 THISBE', '115 THYRA', '128 NEMESIS', '140 SIWA', '144 VIBILIA', '145 ADEONA', '148 GALLIA', '173 INO', '187 LAMBERTA', '192 NAUSIKAA', '196 PHILOMELA', '198 AMPELLA', '230 ATHAMANTIS', '346 HERMENTARIA', '354 ELEONORA', '511 DAVIDA', '584 SEMIRAMIS', '674 RACHELE', '134340 PLUTO', '2010 LG61', '433 EROS', '1036 GANYMED', '2010 AZ85', '2010 AY95', '2010 AW108', '2010 AU118', '2010 BD33', '2010 BF35', '2010 BE66', '2010 BM116', '2010 CV185', '2010 CR211', '2010 CD214', '2010 DC24', '2010 DR53', '2010 DK71', '2010 DL73', '2010 EW143', '2010 EX149', '2010 FV108', '2010 GT42', '2010 GK68', '2010 GJ81', '2010 GM165', '2010 HJ24', '2010 HE30', '2010 HV33', '2010 HQ39', '2010 HW64', '2010 HC82', '2010 HV83', '2010 HY83', '2010 HY84', '2010 JD54', '2010 JB86', '2010 JD125', '2010 JH129', '2010 JW141', '2010 KH49', '2010 KF58', '2010 KH60', '2010 KF64', '2010 KL66', '2010 LT2', '2010 LZ48', '2010 LB67', '2010 LF74', '2010 LV74', '2010 LE80', '2010 LF85', '2010 LV86', '2010 ME11', '2010 MF15', '2010 MJ25', '2010 MT73', '2010 MR97', '2010 NM2', '2010 NU2', '2010 NT18', '2010 NU20', '2010 NS22', '2010 NZ46', '2010 NT78', '2010 NG97', '2010 NE104', '2010 OX3', '2010 OS10', '2010 OV48', '2010 OR77', '2010 OU100', '2010 PK15', '2010 PP44', '2010 PN67', '2010 PC68', '231937 2001 FO32']
+# Skyfield equivalent:
+# ['C/2017 K2 (PANSTARRS)', 'C/2019 F1 (ATLAS-AFRICANO)', 'C/2019 L3 (ATLAS)', 'C/2019 N1 (ATLAS)', 'C/2020 N1 (PANSTARRS)', 'C/2020 R4 (ATLAS)', 'C/2017 T2 (PANSTARRS)', 'C/2021 D1 (SWAN)', "6P/D'ARREST", '7P/PONS-WINNECKE', '10P/TEMPEL', '11P/TEMPEL-SWIFT-LINEAR', '28P/NEUJMIN']
+# ['(1) CERES', '(3) JUNO', '(4) VESTA', '(5) ASTRAEA', '(6) HEBE', '(8) FLORA', '(9) METIS', '(10) HYGIEA', '(11) PARTHENOPE', '(12) VICTORIA', '(13) EGERIA', '(14) IRENE', '(15) EUNOMIA', '(16) PSYCHE', '(18) MELPOMENE', '(19) FORTUNA', '(21) LUTETIA', '(22) KALLIOPE', '(23) THALIA', '(26) PROSERPINA', '(27) EUTERPE', '(29) AMPHITRITE', '(30) URANIA', '(32) POMONA', '(37) FIDES', '(39) LAETITIA', '(40) HARMONIA', '(43) ARIADNE', '(45) EUGENIA', '(46) HESTIA', '(47) AGLAJA', '(51) NEMAUSA', '(52) EUROPA', '(63) AUSONIA', '(70) PANOPAEA', '(80) SAPPHO', '(88) THISBE', '(115) THYRA', '(128) NEMESIS', '(140) SIWA', '(144) VIBILIA', '(145) ADEONA', '(148) GALLIA', '(173) INO', '(187) LAMBERTA', '(192) NAUSIKAA', '(196) PHILOMELA', '(198) AMPELLA', '(230) ATHAMANTIS', '(346) HERMENTARIA', '(354) ELEONORA', '(511) DAVIDA', '(584) SEMIRAMIS', '(674) RACHELE', '(134340) PLUTO', '(433) EROS', '(1036) GANYMED', '(231937)']
+#
+# 1) Why are the filtered lists different between the two backends?  PyEhphem and Skyfield have the same number of comets, but differing number of minor planets.
+# Is it because the original data file is missing bodies in the Skyfield versin compared with the PyEphem version?
+#
+# 2) After each update, the list of minor planets shown by PyEphem is different to that in Skyfield.  
+# Not sure if this also applies to comets too as none seem to be within range/magnitude.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -38,7 +52,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -341,6 +355,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if self.showSatelliteNotification:
             self.notificationSatellites()
+
+        print( self.comets ) #TODO Testing
+        print( self.minorPlanets ) #TODO Testing
 
         return self.getNextUpdateTimeInSeconds()
 
