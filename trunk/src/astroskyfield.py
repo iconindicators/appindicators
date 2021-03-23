@@ -58,7 +58,7 @@ import astrobase, datetime, eclipse, importlib, io, locale, math, orbitalelement
 
 class AstroSkyfield( astrobase.AstroBase ):
 
-    __SKYFIELD_REQUIRED_VERSION = "1.35" # Required version, or better.
+    __SKYFIELD_REQUIRED_VERSION = "1.37" # Required version, or better.
 
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
@@ -87,13 +87,13 @@ class AstroSkyfield( astrobase.AstroBase ):
     # which was sourced from the (now deleted) Wikipedia page "Hipparcos Catalogue":
     #    https://web.archive.org/web/20131012032059/https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
     #
-    # This list contains duplicates, misspellings and is not in use:
+    # Unfortunately, this list contains duplicates, misspellings and is not in use:
     #    https://github.com/skyfielders/python-skyfield/issues/304
     #
     # Consequently, use the more reliable and recent source from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
-    # If this list is modified, regenerate the stars.dat.gz file.
+    # If the list below is ever modified, regenerate the stars.dat.gz file.
     astrobase.AstroBase.STARS.extend( [
         "ACAMAR",
         "ACHERNAR",
@@ -933,12 +933,15 @@ class AstroSkyfield( astrobase.AstroBase ):
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
             if y[ 0 ]:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+                rise = t[ 0 ]
+                set = t[ 1 ]
 
             else:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
+                rise = t[ 1 ]
+                set = t[ 0 ]
+
+            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( set )
 
             alt, az, bodyDistance = locationAtNow.observe( body ).apparent().altaz()
             data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
