@@ -926,6 +926,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
+                print( name, apparentMagnitude )#TODO Testing
                 if apparentMagnitude and apparentMagnitude <= magnitudeMaximum: # Minimum magnitudes have already been screened out in the filtering.
                     AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, ( bodyType, name ), locationAtNow, ephemerisPlanets, body )
 
