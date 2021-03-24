@@ -67,18 +67,13 @@ def download( url, dataType, logging = None ):
     try:
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
 
-#TODO 
-#             dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
-#     ('semimajor_axis_au', (92, 103)),
-#
-#Need to remove this for Skyfield data...what about PyEphem too?        
-        
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 start = 102
                 end = 158
 
+                # Drop data if magnitude is missing.
                 firstMagnitudeFieldStart = 91
                 firstMagnitudeFieldEnd = 95
 
@@ -90,11 +85,17 @@ def download( url, dataType, logging = None ):
                 start = 166
                 end = 194
 
+                # Drop data if magnitude is missing.
                 firstMagnitudeFieldStart = 8
                 firstMagnitudeFieldEnd = 13
 
                 secondMagnitudeFieldStart = 14
                 secondMagnitudeFieldEnd = 19
+
+                # Drop data when semi-major-axis is missing.
+                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                semiMajorAxisFieldStart = 92
+                semiMajorAxisFieldEnd = 103
 
             for i in range( 0, len( data ) ):
                 if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
@@ -106,11 +107,12 @@ def download( url, dataType, logging = None ):
                 if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
                     continue
 
+                if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
+                    continue
+
                 name = data[ i ][ start : end ].strip()
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
-
-            print( url, len( data ), len( oeData ) )
 
         elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
             # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
@@ -162,8 +164,6 @@ def download( url, dataType, logging = None ):
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
 
-            print( url, len( data ) / 2, len( oeData ) )
-
         if not oeData and logging:
             logging.error( "No OE data found at " + str( url ) )
 
@@ -175,14 +175,14 @@ def download( url, dataType, logging = None ):
 
     return oeData
 
-download( "file:///home/bernard/Desktop/Soft00Cmt.txt", OE.DataType.SKYFIELD_COMET, None )
-download( "file:///home/bernard/Desktop/Soft00Bright.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft00CritList.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft00Distant.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft00Unusual.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-
-download( "file:///home/bernard/Desktop/Soft03Cmt.txt", OE.DataType.XEPHEM_COMET, None )
-download( "file:///home/bernard/Desktop/Soft03Bright.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft03CritList.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft03Distant.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft03Unusual.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00Cmt.txt", OE.DataType.SKYFIELD_COMET, None )
+# download( "file:///home/bernard/Desktop/Soft00Bright.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00CritList.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00Distant.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00Unusual.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# 
+# download( "file:///home/bernard/Desktop/Soft03Cmt.txt", OE.DataType.XEPHEM_COMET, None )
+# download( "file:///home/bernard/Desktop/Soft03Bright.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft03CritList.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft03Distant.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft03Unusual.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
