@@ -716,17 +716,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         dataframe = dataframe.set_index( "designation", drop = False )
 
-#TODO In theory no longer needed as removed by the download process..
-        # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-#         if bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET:
-#             dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
-#             dataframe = dataframe[ ~dataframe.magnitude_H.isnull() ]
-#             dataframe = dataframe[ ~dataframe.magnitude_G.isnull() ]
-# 
-#         if bodyType == astrobase.AstroBase.BodyType.COMET:
-#             dataframe = dataframe[ ~dataframe.magnitude_g.isnull() ]
-#             dataframe = dataframe[ ~dataframe.magnitude_k.isnull() ]
-
         results = { }
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         timeScale = load.timescale( builtin = True )
