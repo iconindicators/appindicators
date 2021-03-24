@@ -66,6 +66,13 @@ def download( url, dataType, logging = None ):
     oeData = { }
     try:
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+
+#TODO 
+#             dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+#     ('semimajor_axis_au', (92, 103)),
+#
+#Need to remove this for Skyfield data...what about PyEphem too?        
+        
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
