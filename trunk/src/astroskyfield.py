@@ -716,9 +716,16 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         dataframe = dataframe.set_index( "designation", drop = False )
 
+#TODO In theory no longer needed as removed by the download process..
         # Remove bad data https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-        if bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET:
-            dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+#         if bodyType == astrobase.AstroBase.BodyType.MINOR_PLANET:
+#             dataframe = dataframe[ ~dataframe.semimajor_axis_au.isnull() ]
+#             dataframe = dataframe[ ~dataframe.magnitude_H.isnull() ]
+#             dataframe = dataframe[ ~dataframe.magnitude_G.isnull() ]
+# 
+#         if bodyType == astrobase.AstroBase.BodyType.COMET:
+#             dataframe = dataframe[ ~dataframe.magnitude_g.isnull() ]
+#             dataframe = dataframe[ ~dataframe.magnitude_k.isnull() ]
 
         results = { }
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
@@ -926,7 +933,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                     apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
-                print( name, apparentMagnitude )#TODO Testing
                 if apparentMagnitude and apparentMagnitude <= magnitudeMaximum: # Minimum magnitudes have already been screened out in the filtering.
                     AstroSkyfield.__calculateCommon( utcNow, utcNowPlusTwoDays, data, ( bodyType, name ), locationAtNow, ephemerisPlanets, body )
 
