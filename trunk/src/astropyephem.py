@@ -1078,7 +1078,6 @@ class AstroPyEphem( astrobase.AstroBase ):
                 body = ephem.readdb( orbitalElementData[ key ].getData() )
                 body.compute( AstroPyEphem.__getCity( data, ephemNow ) )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-                print( key, body.mag )#TODO Testing
                 if not bad and body.mag <= magnitudeMaximum:
                     AstroPyEphem.__calculateCommon( ephemNow, data, body, bodyType, key )
 
