@@ -126,6 +126,7 @@ def download( url, dataType, logging = None ):
                 # Drop lines with missing magnitude component.
                 # There are three possible data formats depending on the second field value: either 'e', 'p' or 'h'.
                 # Have noticed for format 'e' the magnitude component may be absent.
+                # https://github.com/brandon-rhodes/pyephem/issues/196
                 # Good data:
                 #    413P/Larson,e,15.9772,39.0258,186.0334,3.711010,0.1378687,0.42336952,343.5677,03/23.0/2021,2000,g 14.0,4.0
                 # Bad data:
