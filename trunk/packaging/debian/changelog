@@ -3,7 +3,7 @@ indicator-lunar (1.0.87-1) xenial; urgency=low
   * Bug fix: Missing magnitude values in the Minor Planet Center data files
     coupled incorrect handling within PyEphem produced spurious magnitude
     values, causing comets and minor planets to appear when they should not.
-    Will take up to four days for your cache to clear to see changes.
+    Will take up to four days for your cache to clear and see changes.
   * Bug fix: Satellites would not display if the user changed the preferences
     from no satellites checked to one or more satellites checked.
   * Reduced search time for visible satellite passes.
