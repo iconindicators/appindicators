@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Orbital Element - holds parameters to compute orbits for comets, minor planets, near earth objects, et al.
+# Orbital Element - holds parameters to compute orbits for comets and minor planets.
 
 
 from enum import Enum
@@ -55,7 +55,7 @@ class OE( object ):
     def __repr__( self ): return self.__str__()
 
 
-# Download OE data; drops bad/missing data.
+# Download OE data; drop bad/missing data.
 #
 # Returns a dictionary:
 #    Key: object name (upper cased)
