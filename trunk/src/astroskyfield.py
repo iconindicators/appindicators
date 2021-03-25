@@ -33,6 +33,14 @@
 # Instead maybe (somehow) run the indicator to allow the user to switch to the other backend.
 # What if somehow both backends are absent?
 # Need more thinking...
+#
+# Perhaps store the PyEphem comet and minor planet cache files in a subdirectory called pyephem.
+# Ditto for Skyfield.
+# This means we can keep the file names the same, and no need to swap files when the backend is changed.
+# Will need to move PyEphem files to the subdirectory on the first run for migration.
+#
+# If the user changes the backend and all stars are selected then select all stars (somehow) if the backend is changed.
+# Need to (try and) do this as some stars appear in one backend but not another.
 
 
 # When creating the stars/planets ephemerides (functions at the end of the file),
