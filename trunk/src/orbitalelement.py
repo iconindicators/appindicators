@@ -99,21 +99,27 @@ def download( url, dataType, logging = None ):
 
             for i in range( 0, len( data ) ):
                 if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+                    print( data[ i ][ start : end ].strip() )#TODO Testing
                     continue
 
                 if data[ i ][ firstMagnitudeFieldStart : firstMagnitudeFieldEnd + 1 ].isspace():
+                    print( data[ i ][ start : end ].strip() )#TODO Testing
                     continue
 
                 if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
+                    print( data[ i ][ start : end ].strip() )#TODO Testing
                     continue
 
                 if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
+                    print( data[ i ][ start : end ].strip() )#TODO Testing
                     continue
 
                 name = data[ i ][ start : end ].strip()
 
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
+
+            print( url, len( data ), len( oeData ) ) #TODO Testing
 
         elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
             # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
@@ -139,17 +145,21 @@ def download( url, dataType, logging = None ):
                     secondLastComma = data[ i ][ : lastComma ].rindex( "," )
                     fieldSecondToLast = data[ i ][ secondLastComma + 1 : lastComma ]
                     if len( fieldSecondToLast ) == 1 and fieldSecondToLast.isalpha():
+                        print( re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) ) #TODO Testing
                         continue
 
                 # Drop if spurious "****" is present.
                 # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
                 if "****" in data[ i ]:
+                    print( re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) ) #TODO Testing
                     continue
 
                 name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
 
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
+
+            print( url, int( len( data ) / 2 ), len( oeData ) ) #TODO Testing
 
         if not oeData and logging:
             logging.error( "No OE data found at " + str( url ) )
