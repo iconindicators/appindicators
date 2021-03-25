@@ -1,7 +1,7 @@
 indicator-lunar (1.0.87-1) xenial; urgency=low
 
   * Bug fix: Missing magnitude values in the Minor Planet Center data files
-    coupled with PyEphem incorrectly handling, produced spurious magnitude
+    coupled incorrect handling within PyEphem produced spurious magnitude
     values, causing comets and minor planets to appear when they should not.
     May take up to four days for cache to clear and see the bug fix appear.
   * Bug fix: Satellites would not display if the user changed the preferences
