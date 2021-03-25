@@ -633,8 +633,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36 ) # Satellite search window.
         nowPlusTwoDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 2 )
         nowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31 ) # Used to find moon phases.
-        nowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.day ) # Used to find solstice/equinox. #TODO Verfiy if the day needs to be put in also.
-        nowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day ) # Used to find lunar eclipses. #TODO Verfiy if the month/day need to be put in also.
+        nowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.day ) # Used to find solstice/equinox.
+        nowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.day ) # Used to find lunar eclipses.
 
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
