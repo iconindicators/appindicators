@@ -20,70 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-
-# file:///home/bernard/Desktop/Soft03Cmt.txt 913 901
-# file:///home/bernard/Desktop/Soft03Cmt.txt 901 13
-# file:///home/bernard/Desktop/Soft03Bright.txt 54 54
-# file:///home/bernard/Desktop/Soft03Bright.txt 54 54
-# file:///home/bernard/Desktop/Soft03CritList.txt 650 650
-# file:///home/bernard/Desktop/Soft03CritList.txt 650 0
-# file:///home/bernard/Desktop/Soft03Distant.txt 3747 3745
-# file:///home/bernard/Desktop/Soft03Distant.txt 3745 1
-# file:///home/bernard/Desktop/Soft03Unusual.txt 18169 18097
-# file:///home/bernard/Desktop/Soft03Unusual.txt 18097 2
-# https://celestrak.com/NORAD/elements/visual.txt 165 165
-
-# 2004 PC112
-# 2010 LG61
-
-
-# file:///home/bernard/Desktop/Soft00Cmt.txt 913 901
-# file:///home/bernard/Desktop/Soft00Cmt.txt 901 13
-# file:///home/bernard/Desktop/Soft00Bright.txt 54 54
-# file:///home/bernard/Desktop/Soft00Bright.txt 54 54
-# file:///home/bernard/Desktop/Soft00CritList.txt 650 650
-# file:///home/bernard/Desktop/Soft00CritList.txt 650 0
-# file:///home/bernard/Desktop/Soft00Distant.txt 3747 3740
-# file:///home/bernard/Desktop/Soft00Distant.txt 3740 1
-# file:///home/bernard/Desktop/Soft00Unusual.txt 18169 18097
-# file:///home/bernard/Desktop/Soft00Unusual.txt 18097 2
-# https://celestrak.com/NORAD/elements/visual.txt 165 165
-
-2004 PC112
-2010 LG61
-2012 DR30
-2014 FE72
-2015 TG387
-2016 FL59
-2017 MB7
-
-
-
-# 2021-03-25 14:56:16,985 - root - ERROR - Unable to compute apparent magnitude for minor planet: 2004 BN41
-# 2021-03-25 14:56:16,985 - root - ERROR - math domain error
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astroskyfield.py", line 738, in getOrbitalElementsLessThanMagnitude
-#     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astrobase.py", line 356, in getApparentMagnitude_HG
-#     beta = math.acos( numerator / denominator )
-# ValueError: math domain error
-# 2021-03-25 15:01:29,872 - root - ERROR - Unable to compute apparent magnitude for minor planet: 2009 TP
-# 2021-03-25 15:01:29,872 - root - ERROR - math domain error
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astroskyfield.py", line 738, in getOrbitalElementsLessThanMagnitude
-#     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astrobase.py", line 356, in getApparentMagnitude_HG
-#     beta = math.acos( numerator / denominator )
-# ValueError: math domain error
-# 2021-03-25 15:08:38,772 - root - ERROR - Unable to compute apparent magnitude for minor planet: 2014 SB224
-# 2021-03-25 15:08:38,772 - root - ERROR - math domain error
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astroskyfield.py", line 738, in getOrbitalElementsLessThanMagnitude
-#     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
-#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/astrobase.py", line 356, in getApparentMagnitude_HG
-#     beta = math.acos( numerator / denominator )
-# ValueError: math domain error
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -102,7 +38,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -438,11 +374,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 data = downloadDataFunction( *downloadDataArguments )
                 downloadCount += 1
                 if data:
-                    l = len( data )#TODO Testing
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( utcNow, data, astrobase.AstroBase.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
-                    print( downloadDataArguments[ 0 ], l, len( data ) )#TODO Testing
                     self.writeCacheBinary( cacheBaseName, data )
                     downloadCount = 0
                     cacheDateTime = self.getCacheDateTime( cacheBaseName )

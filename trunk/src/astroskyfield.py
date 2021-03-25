@@ -19,19 +19,12 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO If/when Skyfield replaces PyEphem, need to remove python3-ephem from debian/control.
-# Need to add anything else, say pip3?
-# sudo apt install python3-pip
+#TODO If Skyfield REPLACES PyEphem, remove python3-ephem from debian/control.
+# Ignore if both Skyfield and PyEphem are available.
 
 
 #TODO Do timing between each set of object types (planets, starts, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
-
-
-#TODO Have noticed the cache file sizes differ between PyEphem and Skyfield (comets / minor planets).
-# Once Skyfield's orbital element engine is fixed so that it runs in similar time to PyEphem,
-# print out the list of comets / minor planets that make the cut for magnitude filtering and compare.
-# Determine why there are file size differences.
 
 
 #TODO If/When Skyfield becomes available, it is likely that both PyEphem and Skyfield will available to the use.
