@@ -1086,8 +1086,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                   ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         try:
-            print( "Creating planet ephemeris..." )
-            print( "\t", command )
+            print( "Creating planet ephemeris...\n\t", command )
             subprocess.call( command, shell = True )
             completed = True
 
