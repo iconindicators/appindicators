@@ -1024,7 +1024,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                         break
 
 
-    # Load the Hipparcos catalogue and filter out stars not on common name list:
+    # Create a subset of the Hipparcos catalogue by filtering out stars not listed at:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # Format of Hipparcos catalogue:
@@ -1069,7 +1069,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         ephemerisFile = "de440s.bsp"
         ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
         if not os.path.isfile( ephemerisFile ):
-            print( "Unable to locate", ephemerisFile, "on the file system.  Downloading planet ephemeris..." )
+            print( "Unable to locate", ephemerisFile, "on the file system.  Downloading..." )
             urllib.request.urlretrieve ( ephemerisURL, ephemerisFile )
 
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
@@ -1085,17 +1085,9 @@ class AstroSkyfield( astrobase.AstroBase ):
                   endDate.strftime( dateFormat ) + " " + \
                   ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
-        try:
-            print( "Creating planet ephemeris...\n\t", command )
-            subprocess.call( command, shell = True )
-            completed = True
-
-        except subprocess.CalledProcessError as e:
-            print( e )
-            completed = False
-
-        if completed:
-            print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
+        print( "Creating planet ephemeris...\n\t", command )
+        subprocess.call( command, shell = True )
+        print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
 
 # Functions to create the stars/planets ephemerides.
