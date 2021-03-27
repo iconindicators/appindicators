@@ -23,8 +23,10 @@
 # Ignore if both Skyfield and PyEphem are available.
 
 
-#TODO Do timing between each set of object types (planets, starts, comets, minor planets and satellites)
+#TODO Do timing between each set of object types
+# (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
+# Should be similar if astroskyfield is to be publically released.
 
 
 #TODO If/When Skyfield becomes available, it is likely that both PyEphem and Skyfield will available to the use.
@@ -772,6 +774,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, utcNow ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
+#TODO We pass sunRA.radians into the bright limb function.  
+#Why?  Isn't sunRA already in radians?
         sunRA, sunDec, earthDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
         brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), 
