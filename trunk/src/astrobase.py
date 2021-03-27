@@ -247,7 +247,7 @@ class AstroBase( ABC ):
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
-    MAGNITUDE_MINIMUM = -10.0 # Have found magnitudes in comet OE data which are, erroneously, brighter than the sun, so set a lower limit.
+    MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which brighter than the sun, so set a lower limit.
 
 
     # Returns a dictionary with astronomical information:
@@ -256,13 +256,13 @@ class AstroBase( ABC ):
     #
     # Latitude, longitude are floating point numbers representing decimal degrees.
     # Elevation is a floating point number representing metres above sea level.
-    # Maximum magnitude will applies to planets, stars, comets and minor planets.
+    # Maximum magnitude applies to planets, stars, comets and minor planets.
     #
     # If a body is never up, no data is added.
     # If a body is always up, the current azimuth/altitude are added.
     # If the body will rise/set, the next rise date/time, next set date/time and current azimuth/altitude are added.
     # For satellites, a satellite which is yet to rise or in transit will have the rise and set date/time and azimuth/altitude.
-    # For a polar satellite, only the azimuth/altitude  is added.
+    # For a polar satellite, only the azimuth/altitude is added.
     #
     # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
     #
