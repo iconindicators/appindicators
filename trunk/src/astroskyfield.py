@@ -778,8 +778,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, utcNow ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-#TODO We pass sunRA.radians into the bright limb function.  
-#Why?  Isn't sunRA already in radians?
         sunRA, sunDec, earthDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         moonRA, moonDec, earthDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
         brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), 
