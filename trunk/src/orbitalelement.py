@@ -169,18 +169,22 @@ def download( url, dataType, logging = None ):
     return oeData
 
 
-# download( "file:///home/bernard/Desktop/Soft03Bright.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
-# download( "file:///home/bernard/Desktop/Soft03CritList.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
-# download( "file:///home/bernard/Desktop/Soft03Distant.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
-# download( "file:///home/bernard/Desktop/Soft03Unusual.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft03Cmt.txt", OE.DataType.XEPHEM_COMET, None )
+download( "file:///home/bernard/Desktop/Soft03Bright.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft03CritList.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft03Distant.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft03Unusual.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
 
-download( "file:///home/bernard/Desktop/Soft00Bright.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft00CritList.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft00Distant.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
-download( "file:///home/bernard/Desktop/Soft00Unusual.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00Cmt.txt", OE.DataType.XEPHEM_COMET, None )
+# download( "file:///home/bernard/Desktop/Soft00Bright.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00CritList.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00Distant.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft00Unusual.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
 
 
-K17M07B 14.2   0.15 K1794   0.00140   80.46498   58.25502   55.71379  0.9987471  0.00000466                MPO435133    33   1  174 days 0.34         MPC        0000         2017 MB7
+# K17M07B 14.2   0.15 K1794   0.00140   80.46498   58.25502   55.71379  0.9987471  0.00000466                MPO435133    33   1  174 days 0.34         MPC        0000         2017 MB7
+# K10A85Z             K1014 177.05658  265.65797   63.71372   17.76664  0.0000826  0.56584942   1.4476674  E MPO221139     9   1    1 days 0.47         MPC        0000         2010 AZ85
+
 # 
 # 1 -   7    Number or provisional designation
 # 9 -  13    Absolute magnitude, H
@@ -211,7 +215,10 @@ K17M07B 14.2   0.15 K1794   0.00140   80.46498   58.25502   55.71379  0.9987471 
 # 
 #    1     2    3       4       5     6       7        8         9         10          11   12    13
 # 2017 MB7,e,55.7138,58.2550,80.4650,3549,0.0000047,0.99874708,0.0000,11/08.6577/2016,2000,H14.2,0.15
-# 
+#
+#     1     2    3       4        5         6        7         8        9        10        11   12  13
+# 2010 AZ85,e,17.7666,63.7137,265.6580,1.447667,0.5658494,0.00008261,177.0566,01/04.0/2010,2000,H,0.15
+#
 # Field 1 One or more object names
 # Field 2 Type designation, e the object type is elliptical heliocentric
 # Field 3 i = inclination, degrees
@@ -232,6 +239,42 @@ K17M07B 14.2   0.15 K1794   0.00140   80.46498   58.25502   55.71379  0.9987471 
 # Field 6 = 3549
 # 93 - 103 = <blank>
 
+# Mean anomaly
+# Field 9 = 0.0000
+# 27 -  35 = 0.00140
 
 
+# First component of magnitude model, either g from (g,k) or H from (H,G)
+# Field 12 = <blank>
+#  9 -  13 = <blank>
 
+# Second component of magnitude model, either k or G
+# Field 13 = 0.15
+# 15 -  19 = <blank>
+
+
+# Discrepancies between the MPC and XEphem format for Minor Planets
+# 
+# 
+# I have noticed data in fields which don't correlate but assume should for the same body and attribute, irrespective of format.
+# 
+# 
+# Example 1:  2017 MB7 found in  Soft00Distant.txt and Soft03Distant.txt
+# 
+# For the attribute of Mean distance / Semi-major axis, there are differences in values:
+#     Field 6 = 3549 versus columns 93 - 103 = <blank>
+# 
+# For the attribute of Mean anomaly, again another difference:
+#     Field 9 = 0.0000 versus columns 27 -  35 = 0.00140
+# 
+# 
+# Example 2:  2010 AZ85 found in Soft00Unusual.txt and Soft03Unusual.txt
+# 
+# For the attribute of Second component of magnitude model, either k or G:
+#     Field 13 = 0.15 versus columns 15 -  19 = <blank>
+# 
+# Could someone please look into this and let me know if I've made a mistake or if there is indeed a data error.
+# 
+# Thanks,
+# 
+# Bernard.
