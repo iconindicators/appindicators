@@ -66,7 +66,7 @@ def download( url, dataType, logging = None ):
     oeData = { }
     try:
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-
+        print( url )
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
@@ -99,15 +99,19 @@ def download( url, dataType, logging = None ):
 
             for i in range( 0, len( data ) ):
                 if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+                    print( data[ i ][ start : end ].strip() )
                     continue
 
                 if data[ i ][ firstMagnitudeFieldStart : firstMagnitudeFieldEnd + 1 ].isspace():
+                    print( data[ i ][ start : end ].strip() )
                     continue
 
                 if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
+                    print( data[ i ][ start : end ].strip() )
                     continue
 
                 if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
+                    print( data[ i ][ start : end ].strip() )
                     continue
 
                 name = data[ i ][ start : end ].strip()
@@ -139,11 +143,13 @@ def download( url, dataType, logging = None ):
                     secondLastComma = data[ i ][ : lastComma ].rindex( "," )
                     fieldSecondToLast = data[ i ][ secondLastComma + 1 : lastComma ]
                     if len( fieldSecondToLast ) == 1 and fieldSecondToLast.isalpha():
+                        print( re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) )
                         continue
 
                 # Drop if spurious "****" is present.
                 # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
                 if "****" in data[ i ]:
+                    print( re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) )
                     continue
 
                 name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
@@ -161,3 +167,71 @@ def download( url, dataType, logging = None ):
             logging.exception( e )
 
     return oeData
+
+
+# download( "file:///home/bernard/Desktop/Soft03Bright.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft03CritList.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft03Distant.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+# download( "file:///home/bernard/Desktop/Soft03Unusual.txt", OE.DataType.XEPHEM_MINOR_PLANET, None )
+
+download( "file:///home/bernard/Desktop/Soft00Bright.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft00CritList.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft00Distant.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+download( "file:///home/bernard/Desktop/Soft00Unusual.txt", OE.DataType.SKYFIELD_MINOR_PLANET, None )
+
+
+K17M07B 14.2   0.15 K1794   0.00140   80.46498   58.25502   55.71379  0.9987471  0.00000466                MPO435133    33   1  174 days 0.34         MPC        0000         2017 MB7
+# 
+# 1 -   7    Number or provisional designation
+# 9 -  13    Absolute magnitude, H
+# 15 -  19   Slope parameter, G
+# 21 -  25   Epoch (packed form)
+# 27 -  35   Mean anomaly
+# 38 -  46   Argument of perihelion
+# 49 -  57   Longitude of the ascending node
+# 60 -  68   Inclination to the ecliptic
+# 71 -  79   Orbital eccentricity
+# 81 -  91   Mean daily motion
+# 93 - 103   Semimajor axis
+# 106        Uncertainty parameter
+# 108 - 116  Reference
+# 118 - 122  Number of observations
+# 124 - 126  Number of oppositions
+# 128 - 131  Year of first observation
+# 132        '-'
+# 133 - 136  Year of last observation
+# 138 - 141  r.m.s residual (")
+# 143 - 145  Coarse indicator of perturbers
+# 147 - 149  Precise indicator of perturbers
+# 151 - 160  Computer name
+# 162 - 165  4-hexdigit flags
+# 167 - 194  Readable designation
+# 195 - 202  Date of last observation included in
+# 
+# 
+#    1     2    3       4       5     6       7        8         9         10          11   12    13
+# 2017 MB7,e,55.7138,58.2550,80.4650,3549,0.0000047,0.99874708,0.0000,11/08.6577/2016,2000,H14.2,0.15
+# 
+# Field 1 One or more object names
+# Field 2 Type designation, e the object type is elliptical heliocentric
+# Field 3 i = inclination, degrees
+# Field 4 O = longitude of ascending node, degrees
+# Field 5 o = argument of perihelion, degrees
+# Field 6 a = mean distance (aka semi-major axis), AU
+# Field 7 n = mean daily motion, degrees per day (computed from a**3/2 if omitted)
+# Field 8 e = eccentricity, must be < 1
+# Field 9 M = mean anomaly, i.e., degrees from perihelion
+# Field 10 E = epoch date, i.e., time of M
+# Field 11 D = the equinox year, i.e., time of i, O and o
+# Field 12 First component of magnitude model, either g from (g,k) or H from (H,G)
+# Field 13 Second component of magnitude model, either k or G
+# Field 14 s = angular size at 1 AU, arc seconds, optional
+
+
+# Mean distance / Semi-major axis
+# Field 6 = 3549
+# 93 - 103 = <blank>
+
+
+
+
