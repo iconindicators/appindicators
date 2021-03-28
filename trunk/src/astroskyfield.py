@@ -64,7 +64,7 @@ except ImportError:
 
 from distutils.version import LooseVersion
 
-import astrobase, datetime, eclipse, importlib, io, locale, math, orbitalelement
+import astrobase, datetime, eclipse, importlib, io, locale, math
 
 
 class AstroSkyfield( astrobase.AstroBase ):
