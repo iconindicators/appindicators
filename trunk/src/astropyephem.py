@@ -29,7 +29,7 @@ except ImportError:
 
 from distutils.version import LooseVersion
 
-import astrobase, eclipse, locale, math, orbitalelement
+import astrobase, eclipse, locale, math
 
 
 class AstroPyEphem( astrobase.AstroBase ):
