@@ -24,6 +24,9 @@
 # Perhaps add python3-pip for when Skyfield does become available?
 
 
+#TODO When released, add astroskyfield.py to build-debian.
+
+
 #TODO Do timing between each set of object types
 # (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
