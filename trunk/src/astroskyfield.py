@@ -21,6 +21,7 @@
 
 #TODO If Skyfield REPLACES PyEphem, remove python3-ephem from debian/control.
 # Ignore if both Skyfield and PyEphem are available.
+# Perhaps add python3-pip for when Skyfield does become available?
 
 
 #TODO Do timing between each set of object types
