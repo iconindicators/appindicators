@@ -1030,34 +1030,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                         break
 
 
-    # Create a subset of the Hipparcos catalogue by filtering out stars not listed at:
-    #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
-    #
-    # Format of Hipparcos catalogue:
-    #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
-    @staticmethod
-    def createEphemerisStars():
-        import gzip, os
-
-        catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
-        if not os.path.isfile( catalogue ):
-            print( "Downloading star catalogue..." )
-            load.open( hipparcos.URL )
-
-        hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
-        if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS ):
-            os.remove( AstroSkyfield.__EPHEMERIS_STARS )
-
-        print( "Creating list of stars..." )
-        with load.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
-            for line in inFile:
-                hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
-                if hip in hipparcosIdentifiers:
-                    outFile.write( line )
-
-        print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
-
-
     # Create the planet ephemeris from online source:
     #     https://github.com/skyfielders/python-skyfield/issues/123
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
@@ -1096,7 +1068,35 @@ class AstroSkyfield( astrobase.AstroBase ):
         print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
 
+    # Create a subset of the Hipparcos catalogue by filtering out stars not listed at:
+    #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
+    #
+    # Format of Hipparcos catalogue:
+    #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
+    @staticmethod
+    def createEphemerisStars():
+        import gzip, os
+
+        catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
+        if not os.path.isfile( catalogue ):
+            print( "Downloading star catalogue..." )
+            load.open( hipparcos.URL )
+
+        hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
+        if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS ):
+            os.remove( AstroSkyfield.__EPHEMERIS_STARS )
+
+        print( "Creating list of stars..." )
+        with load.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
+            for line in inFile:
+                hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
+                if hip in hipparcosIdentifiers:
+                    outFile.write( line )
+
+        print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
+
+
 # Functions to create the stars/planets ephemerides.
 # Must uncomment the gettext lines at the top of the file!
-# AstroSkyfield.createEphemerisStars()
 # AstroSkyfield.createEphemerisPlanets()
+# AstroSkyfield.createEphemerisStars()
