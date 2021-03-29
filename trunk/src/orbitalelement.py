@@ -69,43 +69,31 @@ def download( url, dataType, logging = None ):
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-                start = 102
-                end = 158
-
-                # Drop data if magnitude is missing.
-                firstMagnitudeFieldStart = 91
-                firstMagnitudeFieldEnd = 95
-
-                secondMagnitudeFieldStart = 96
-                secondMagnitudeFieldEnd = 100
+                start = 102, end = 158
+                firstMagnitudeFieldStart = 91, firstMagnitudeFieldEnd = 95
+                secondMagnitudeFieldStart = 96, secondMagnitudeFieldEnd = 100
 
             else:
                 # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                start = 166
-                end = 194
-
-                # Drop data if magnitude is missing.
-                firstMagnitudeFieldStart = 8
-                firstMagnitudeFieldEnd = 13
-
-                secondMagnitudeFieldStart = 14
-                secondMagnitudeFieldEnd = 19
-
-                # Drop data when semi-major-axis is missing (only applies to minor planets).
-                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-                semiMajorAxisFieldStart = 92
-                semiMajorAxisFieldEnd = 103
+                start = 166 ,end = 194
+                firstMagnitudeFieldStart = 8, firstMagnitudeFieldEnd = 13
+                secondMagnitudeFieldStart = 14, secondMagnitudeFieldEnd = 19
+                semiMajorAxisFieldStart = 92, semiMajorAxisFieldEnd = 103
 
             for i in range( 0, len( data ) ):
                 if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
                     continue
 
+                # Missing absolute magnitude.
                 if data[ i ][ firstMagnitudeFieldStart : firstMagnitudeFieldEnd + 1 ].isspace():
                     continue
 
+                # Missing slope parameter.
                 if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
                     continue
 
+                # Missing semi-major-axis (only applies to minor planets).
+                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
                 if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
                     continue
 
@@ -122,12 +110,17 @@ def download( url, dataType, logging = None ):
                 if data[ i ].startswith( "#" ):
                     continue
 
+                # Drop if spurious "****" is present.
+                # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+                if "****" in data[ i ]:
+                    continue
+
                 # Drop lines with missing magnitude component.
                 # There are three possible data formats depending on the second field value: either 'e', 'p' or 'h'.
                 # Have noticed for format 'e' the magnitude component may be absent.
                 # https://github.com/brandon-rhodes/pyephem/issues/196
                 # Good data:
-                #    413P/Larson,e,15.9772,39.0258,186.0334,3.711010,0.1378687,0.42336952,343.5677,03/23.0/2021,2000,g 14.0,4.0
+                #    2010 LO33,e,17.8383,241.0811,80.8229,23.10129,0.0088767,0.31984018,339.3447,04/27.0/2019,2000,H 8.5,0.15
                 # Bad data:
                 #    2010 LG61,e,123.8859,317.3744,352.1688,7.366687,0.0492942,0.81371070,163.4277,04/27.0/2019,2000,H,0.15
                 firstComma = data[ i ].index( "," )
@@ -137,13 +130,8 @@ def download( url, dataType, logging = None ):
                     lastComma = data[ i ].rindex( "," )
                     secondLastComma = data[ i ][ : lastComma ].rindex( "," )
                     fieldSecondToLast = data[ i ][ secondLastComma + 1 : lastComma ]
-                    if len( fieldSecondToLast ) == 1 and fieldSecondToLast.isalpha():
+                    if len( fieldSecondToLast ) == 1 and fieldSecondToLast.isalpha(): # Missing magnitude component.
                         continue
-
-                # Drop if spurious "****" is present.
-                # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-                if "****" in data[ i ]:
-                    continue
 
                 name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
 
