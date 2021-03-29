@@ -105,7 +105,6 @@ def download( url, dataType, logging = None ):
         elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
             # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
             for i in range( 0, len( data ) ):
-
                 # Skip comment lines.
                 if data[ i ].startswith( "#" ):
                     continue
