@@ -69,16 +69,23 @@ def download( url, dataType, logging = None ):
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-                start = 102, end = 158
-                firstMagnitudeFieldStart = 91, firstMagnitudeFieldEnd = 95
-                secondMagnitudeFieldStart = 96, secondMagnitudeFieldEnd = 100
+                start = 102
+                end = 158
+                firstMagnitudeFieldStart = 91
+                firstMagnitudeFieldEnd = 95
+                secondMagnitudeFieldStart = 96
+                secondMagnitudeFieldEnd = 100
 
             else:
                 # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                start = 166 ,end = 194
-                firstMagnitudeFieldStart = 8, firstMagnitudeFieldEnd = 13
-                secondMagnitudeFieldStart = 14, secondMagnitudeFieldEnd = 19
-                semiMajorAxisFieldStart = 92, semiMajorAxisFieldEnd = 103
+                start = 166
+                end = 194
+                firstMagnitudeFieldStart = 8
+                firstMagnitudeFieldEnd = 13
+                secondMagnitudeFieldStart = 14
+                secondMagnitudeFieldEnd = 19
+                semiMajorAxisFieldStart = 92
+                semiMajorAxisFieldEnd = 103
 
             for i in range( 0, len( data ) ):
                 if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
