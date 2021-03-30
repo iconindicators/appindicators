@@ -49,6 +49,25 @@
 # Need to (try and) do this as some stars appear in one backend but not another.
 
 
+#TODO Not sure how to automatically install skyfield and other python modules during the installation process...
+#
+# https://stackoverflow.com/questions/12210389/how-to-add-pypi-dependencies-to-deb-package
+# https://askubuntu.com/questions/327543/how-can-a-debian-package-install-python-modules-from-pypi
+# https://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
+# https://askubuntu.com/questions/576976/how-to-create-a-debian-package-to-install-a-python-module
+# https://www.debian.org/doc/manuals/maint-guide/
+# https://wiki.debian.org/Python/Pybuild
+# https://askubuntu.com/questions/233483/python-dependencies-in-debian-packages
+# https://askubuntu.com/questions/62534/adding-post-deb-install-scripts
+# https://unix.stackexchange.com/questions/352952/postinst-script-doesnt-run-after-installation
+# https://unix.stackexchange.com/questions/21026/how-do-i-add-a-postinst-file-to-my-debian-package?rq=1
+# https://unix.stackexchange.com/questions/347649/how-to-add-a-python-package-dependance-to-a-debian-package
+# https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
+# https://stackoverflow.com/questions/35971583/debian-package-creation-postinst-as-non-root
+# https://stackoverflow.com/questions/11274290/why-is-my-debian-postinst-script-not-being-run
+# https://askubuntu.com/questions/199557/how-can-i-include-a-custom-command-in-deb-file-to-be-executed-at-the-end-of-ins
+
+
 # When creating the stars/planets ephemerides (functions at the end of the file),
 # uncomment the lines below as they are required!
 # import gettext
