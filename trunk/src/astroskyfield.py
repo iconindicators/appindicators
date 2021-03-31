@@ -797,8 +797,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, utcNow ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        sunRA, sunDec, earthDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
-        moonRA, moonDec, earthDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
+        moonRA, moonDec, earthMoonDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
+        sunRA, sunDec, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
         brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( utcNow.utc_datetime(), 
                                                                      sunRA.radians, sunDec.radians, 
                                                                      moonRA.radians, moonDec.radians, 
@@ -963,23 +963,23 @@ class AstroSkyfield( astrobase.AstroBase ):
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
             if y[ 0 ]:
-                rise = t[ 0 ]
-                set = t[ 1 ]
+                riseDateTime = t[ 0 ]
+                setDateTime = t[ 1 ]
 
             else:
-                rise = t[ 1 ]
-                set = t[ 0 ]
+                riseDateTime = t[ 1 ]
+                setDateTime = t[ 0 ]
 
-            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( rise )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( set )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseDateTime )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setDateTime )
 
-            alt, az, bodyDistance = locationAtNow.observe( body ).apparent().altaz()
+            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
             data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
             if almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target )( utcNow ): # Body is up (and so always up).
-                alt, az, bodyDistance = locationAtNow.observe( body ).apparent().altaz()
+                alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
                 data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
@@ -1030,10 +1030,10 @@ class AstroSkyfield( astrobase.AstroBase ):
                                    almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) < 4:
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
-                                    alt, az, bodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
+                                    alt, az, earthBodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
-                                    alt, az, bodyDistance = ( earthSatellite - location ).at( ti ).altaz()
+                                    alt, az, earthBodyDistance = ( earthSatellite - location ).at( ti ).altaz()
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
                                     foundVisiblePass = True
                                     break
