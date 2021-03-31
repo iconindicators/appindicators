@@ -33,7 +33,7 @@
 # Should be similar if astroskyfield is to be publically released.
 
 
-#TODO If/When Skyfield becomes available, it is likely that both PyEphem and Skyfield will available to the use.
+#TODO If/When Skyfield becomes available, it is likely that both PyEphem and Skyfield will available to the user.
 # The user will/should be able to select which backend to use.
 # Therefore, checking if one backend is available and failing at that point should not terminate the indicator.
 # Instead maybe (somehow) run the indicator to allow the user to switch to the other backend.
@@ -47,6 +47,13 @@
 #
 # If the user changes the backend and all stars are selected then select all stars (somehow) if the backend is changed.
 # Need to (try and) do this as some stars appear in one backend but not another.
+#
+# Instead of having both PyEphem and Skyfield available to the user, instead switch soley/exclusively to Skyfield?
+# Makes things simpler in some ways.
+# Need to remove the cache of PyEphem files (code already exists for this).
+# In terms of installing Skyfield automatically via LaunchPad/PPA install,
+# do we need to make sure that Skyfield is installed/upgraded but only the other packages are installed?
+# In other words, is there a problem with automatically upgrading the other packages if they are already installed?
 
 
 #TODO Not sure how to automatically install skyfield and other python modules during the installation process...
