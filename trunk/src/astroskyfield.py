@@ -966,6 +966,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateCommon( utcNow, utcNowPlusTwoDays, data, key, locationAtNow, ephemerisPlanets, body ):
         neverUp = False
+#TODO Using the target field...it is safe, but keep an eye out for any future documentation:
+# https://github.com/skyfielders/python-skyfield/issues/567        
         t, y = almanac.find_discrete( utcNow, utcNowPlusTwoDays, almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target ) )
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
