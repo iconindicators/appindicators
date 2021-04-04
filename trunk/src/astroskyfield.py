@@ -99,7 +99,7 @@ import astrobase, datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( astrobase.AstroBase ):
 
-    __SKYFIELD_REQUIRED_VERSION = "1.37" # Required version, or better.
+    __SKYFIELD_REQUIRED_VERSION = "1.38" # Required version, or better.
 
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
