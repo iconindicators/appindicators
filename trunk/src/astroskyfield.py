@@ -19,60 +19,40 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO If Skyfield REPLACES PyEphem, remove python3-ephem from debian/control.
-# Ignore if both Skyfield and PyEphem are available.
-# Perhaps add python3-pip for when Skyfield does become available?
-
-
-#TODO When released, add astroskyfield.py to build-debian.
-
-
 #TODO Do timing between each set of object types
 # (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
 # Should be similar if astroskyfield is to be publically released.
 
 
-#TODO If/When Skyfield becomes available, it is likely that both PyEphem and Skyfield will available to the user.
-# The user will/should be able to select which backend to use.
-# Therefore, checking if one backend is available and failing at that point should not terminate the indicator.
-# Instead maybe (somehow) run the indicator to allow the user to switch to the other backend.
-# What if somehow both backends are absent?
-# Need more thinking...
+#TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
+# switch completely to Skyfield.  Will need several changes:
 #
-# Perhaps store the PyEphem comet and minor planet cache files in a subdirectory called pyephem.
-# Ditto for Skyfield.
-# This means we can keep the file names the same, and no need to swap files when the backend is changed.
-# Will need to move PyEphem files to the subdirectory on the first run for migration.
+#    Will need a temporary function to detect if the cache contains PyEphem specific files
+#    and if so, delete them.
 #
-# If the user changes the backend and all stars are selected then select all stars (somehow) if the backend is changed.
-# Need to (try and) do this as some stars appear in one backend but not another.
+#    Remove python3-ephem from debian/control Depends.
 #
-# Instead of having both PyEphem and Skyfield available to the user, instead switch soley/exclusively to Skyfield?
-# Makes things simpler in some ways.
-# Need to remove the cache of PyEphem files (code already exists for this).
-# In terms of installing Skyfield automatically via LaunchPad/PPA install,
-# do we need to make sure that Skyfield is installed/upgraded but only the other packages are installed?
-# In other words, is there a problem with automatically upgrading the other packages if they are already installed?
-
-
-#TODO Not sure how to automatically install skyfield and other python modules during the installation process...
+#    Add python3-pip to debian/control Depends.
 #
-# https://stackoverflow.com/questions/12210389/how-to-add-pypi-dependencies-to-deb-package
-# https://askubuntu.com/questions/327543/how-can-a-debian-package-install-python-modules-from-pypi
-# https://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
-# https://askubuntu.com/questions/576976/how-to-create-a-debian-package-to-install-a-python-module
-# https://www.debian.org/doc/manuals/maint-guide/
-# https://wiki.debian.org/Python/Pybuild
-# https://askubuntu.com/questions/233483/python-dependencies-in-debian-packages
-# https://askubuntu.com/questions/62534/adding-post-deb-install-scripts
-# https://unix.stackexchange.com/questions/352952/postinst-script-doesnt-run-after-installation
-# https://unix.stackexchange.com/questions/21026/how-do-i-add-a-postinst-file-to-my-debian-package?rq=1
-# https://unix.stackexchange.com/questions/347649/how-to-add-a-python-package-dependance-to-a-debian-package
+#    Add dh-python to debian/control Build-Depends.
+#
+#    Add astroskyfield.py to build-debian.
+#
+#    Remove astropyephem.py from build-debian.
+#
+#    Create the file debian/postinst with permissions rwx for Owner and r/x for Group and Others (755).
+#    Add content as follows:
+#         #!/bin/bash
+#         
+#         set -e
+#         
+#         sudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield
+#         
+#         #DEBHELPER#
+#
 # https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
-# https://stackoverflow.com/questions/35971583/debian-package-creation-postinst-as-non-root
-# https://stackoverflow.com/questions/11274290/why-is-my-debian-postinst-script-not-being-run
-# https://askubuntu.com/questions/199557/how-can-i-include-a-custom-command-in-deb-file-to-be-executed-at-the-end-of-ins
+# https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
 
 
 # When creating the stars/planets ephemerides (functions at the end of the file),
