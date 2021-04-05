@@ -20,6 +20,10 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Before any next release, create a new POT and have Oleg do a translation
+# (due to changes in install/upgrade text).
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
