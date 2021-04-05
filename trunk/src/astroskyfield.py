@@ -25,27 +25,6 @@
 # Should be similar if astroskyfield is to be publically released.
 
 
-#TODO Figure out which Python3 packages (via PIP) are required:
-#    pip            <-- Best to use latest PIP (so add to OUR list of dependencies)
-#    skyfield        <-- Obviously needed (so add to OUR list of dependencies)
-#    jplephem        <-- See the setup.py file (looks like it is a dependency pulled in by skyfield)
-#    numpy        <-- See the setup.py file (looks like it is a dependency pulled in by skyfield)
-#    pandas    <-- Needed for DataFrame for MPC and stars.  So MUST be added to OUR list of dependencies.
-#    pytz     <-- Where/how is this used?  Timezones...see below.
-#
-# According to 
-# https://github.com/skyfielders/python-skyfield/blob/master/setup.py
-# installing the package skyfield SHOULD also drag in the other needed stuff (numpy, jplephem, and other stuff not listed above).
-# So test that...maybe can use a virtualenv for ease?
-#
-# pytz is/was used in timezone stuff:
-# https://rhodesmill.org/skyfield/time.html
-# However as of Python 3.6, timezone stuff is now incorporated into python itself,
-# and so pytz should not be required.
-# So test this by removing pytz!
-# Will only work on Ubuntu 18.04 and greater.
-
-
 #TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
 # switch completely to Skyfield.  Will need several changes:
 #
@@ -100,7 +79,7 @@ import astrobase, datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( astrobase.AstroBase ):
 
-    __SKYFIELD_INSTALLATION_COMMAND = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" #TODO Check if all dependencies are required.
+    __SKYFIELD_INSTALLATION_COMMAND = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas skyfield"
     __SKYFIELD_REQUIRED_VERSION = "1.38" # Required version, or better.
 
 
