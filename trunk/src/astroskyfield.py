@@ -101,6 +101,8 @@ import astrobase, datetime, eclipse, importlib, io, locale, math
 class AstroSkyfield( astrobase.AstroBase ):
 
     __SKYFIELD_REQUIRED_VERSION = "1.38" # Required version, or better.
+    __SKYFIELD_INSTALLATION_COMMAND = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" #TODO Check if all dependencies are required.
+
 
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
@@ -707,8 +709,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     def getAvailabilityMessage():
         message = None
         if not available:
-            message = _( "Skyfield could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" )
+            message = _( "Skyfield could not be found. Install using:\n\n" + AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND )
 
         return message
 
@@ -786,7 +787,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         message = None
         if LooseVersion( skyfield.__version__ ) < LooseVersion( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ):
             message = _( "Skyfield must be version {0} or greater. Please upgrade:\n\n" + \
-                         "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield" ).format( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION )
+                         AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND ).format( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION )
 
         return message
 

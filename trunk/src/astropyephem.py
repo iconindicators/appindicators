@@ -35,6 +35,8 @@ import astrobase, eclipse, locale, math
 class AstroPyEphem( astrobase.AstroBase ):
 
     __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
+    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem"
+
 
     # Taken from ephem/stars.py
     # Version 3.7.7.0 added new stars but must still support 3.7.6.0 for Ubuntu 16.04/18.04.
@@ -944,8 +946,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     def getAvailabilityMessage():
         message = None
         if not available:
-            message = _( "PyEphem could not be found. Install using:\n\n" + \
-                         "sudo apt-get install -y python3-ephem" )
+            message = _( "PyEphem could not be found. Install using:\n\n" + AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND )
 
         return message
 
@@ -983,7 +984,8 @@ class AstroPyEphem( astrobase.AstroBase ):
     def getVersionMessage():
         message = None
         if LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
-            message = _( "PyEphem must be version {0} or greater." ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
+            message = _( "PyEphem must be version {0} or greater. Please upgrade:\n\n" + \
+                         AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
 
         return message
 
