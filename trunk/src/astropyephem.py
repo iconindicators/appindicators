@@ -34,8 +34,8 @@ import astrobase, eclipse, locale, math
 
 class AstroPyEphem( astrobase.AstroBase ):
 
-    __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
     __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem"
+    __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
 
 
     # Taken from ephem/stars.py
