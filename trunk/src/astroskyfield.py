@@ -944,6 +944,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 logging.exception( e )
 
 
+#TODO Why are we looking two days into the future?  Why not 24 hours?
     @staticmethod
     def __calculateCommon( utcNow, utcNowPlusTwoDays, data, key, locationAtNow, ephemerisPlanets, body ):
         neverUp = False
