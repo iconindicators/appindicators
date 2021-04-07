@@ -238,7 +238,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     names.append( info[ 0 ] )
                     uuids.append( info[ 1 ] )
 
-                except:
+                except Exception:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         return names, uuids
@@ -286,7 +286,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     virtualMachine = virtualmachine.Info( info[ 0 ], False, info[ 1 ], 0 )
                     virtualMachines.append( virtualMachine )
 
-                except:
+                except Exception:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         return virtualMachines
