@@ -80,7 +80,7 @@ import astrobase, datetime, eclipse, importlib, io, locale, math
 class AstroSkyfield( astrobase.AstroBase ):
 
     __SKYFIELD_INSTALLATION_COMMAND = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas skyfield"
-    __SKYFIELD_REQUIRED_VERSION = "1.38" # Required version, or better.
+    __SKYFIELD_REQUIRED_VERSION = "1.39" # Required version, or better.
 
 
     __EPHEMERIS_PLANETS = "planets.bsp"
