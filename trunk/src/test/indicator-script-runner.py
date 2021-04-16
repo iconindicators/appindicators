@@ -721,19 +721,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         self.scripts = [ ]
         if config:
-            self.__upgradeScripts( config )
+            self.__upgradeScripts( config ) #TODO Handle the change in format from version 1.0.14 onwards.
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
             defaultScriptFound = False
             for script in scripts:
                 if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
                     defaultScriptFound = True
 
-                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
-
-                # Handle additions to scripts: show notification and play sound.
-                if len( script ) == 7:
-                    self.scripts[ -1 ].setPlaySound( script[ 5 ] )
-                    self.scripts[ -1 ].setShowNotification( script[ 6 ] )
+                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ), bool( script[ 7 ] ) ) )
 
             if not defaultScriptFound:
                 self.scriptGroupDefault = ""
@@ -746,27 +741,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade" ) )
+#TODO Eventually need example of background script(s).
 
 
     def __upgradeScripts( self, config ):
         scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
         if scripts and len( scripts[ 0 ] ) == 7:
             for script in scripts:
-                print( script )
                 self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 3 ], script[ 2 ], False, bool( script[ 4 ] ), script[ 5 ], script[ 6 ] ) )
 
-                x = self.scripts[ -1 ].playSound()
-                
-                print( self.scripts[ -1 ] )
-
-            self.__saveConfig()
+            self._IndicatorBase__saveConfig()
             self.scripts = [ ]
 
 
     def saveConfig( self ):
         scripts = [ ]
         for script in self.scripts:
-            scripts.append( [ script.getGroup(), script.getName(), script.getCommand(), script.getDirectory(), script.isBackground(), script.isTerminalOpen(), script.playSound(), script.showNotification() ] )
+            scripts.append( [ script.getGroup(), script.getName(), script.getCommand(), script.getDirectory(), script.getRunInBackground(), script.getTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
         return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,

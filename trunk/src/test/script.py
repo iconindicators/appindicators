@@ -27,12 +27,12 @@ class Info( object ):
     # Working/starting directory.
     # Terminal open - If True, the terminal used to run the script will be left open at the end of script/command execution.
 #TODO Document all parameters.
-    def __init__( self, group, name, command, directory = "", background = False, terminalOpen = False, playSound = False, showNotification = False ):
+    def __init__( self, group, name, command, directory = "", runInBackground = False, terminalOpen = False, playSound = False, showNotification = False ):
         self.group = group
         self.name = name
         self.command = command
         self.directory = directory
-        self.background = background
+        self.runInBackground = runInBackground
         self.terminalOpen = terminalOpen
         self.playSound = playSound
         self.showNotification = showNotification
@@ -50,16 +50,16 @@ class Info( object ):
     def getDirectory( self ): return self.directory
 
 
-    def isBackground( self ): return self.background
+    def getRunInBackground( self ): return self.runInBackground
 
 
-    def isTerminalOpen( self ): return self.terminalOpen
+    def getTerminalOpen( self ): return self.terminalOpen
 
 
-    def playSound( self ): return self.playSound
+    def getPlaySound( self ): return self.playSound
 
 
-    def showNotification( self ): return self.showNotification
+    def getShowNotification( self ): return self.showNotification
 
 
     def isIdentical( self, script ):
@@ -67,10 +67,10 @@ class Info( object ):
                self.name == script.getName() and \
                self.command == script.getCommand() and \
                self.directory == script.getDirectory() and \
-               self.background == script.isBackground() and \
-               self.terminalOpen == script.isTerminalOpen() and \
-               self.playSound == script.playSound() and \
-               self.showNotification == script.showNotification()
+               self.background == script.getRunInBackground() and \
+               self.terminalOpen == script.getTerminalOpen() and \
+               self.playSound == script.getPlaySound() and \
+               self.showNotification == script.getShowNotification()
 
 
     def __str__( self ):
@@ -78,10 +78,10 @@ class Info( object ):
                self.getName() + " | " + \
                self.getCommand() + " | " + \
                self.getDirectory() + " | " + \
-               str( self.isBackground() ) + " | " + \
-               str( self.isTerminalOpen() ) + " | " + \
-               str( self.playSound() ) + " | " + \
-               str( self.showNotification() )
+               str( self.getRunInBackground() ) + " | " + \
+               str( self.getTerminalOpen() ) + " | " + \
+               str( self.getPlaySound() ) + " | " + \
+               str( self.getShowNotification() )
 
 
     def __repr__( self ): return self.__str__()
