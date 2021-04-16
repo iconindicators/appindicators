@@ -30,12 +30,12 @@ class Info( object ):
     def __init__( self, group, name, command, directory = "", background = False, terminalOpen = False, playSound = False, showNotification = False ):
         self.group = group
         self.name = name
-        self.directory = directory
         self.command = command
+        self.directory = directory
+        self.background = background
         self.terminalOpen = terminalOpen
         self.playSound = playSound
         self.showNotification = showNotification
-        self.background = background
 
 
     def getGroup( self ): return self.group
@@ -50,6 +50,9 @@ class Info( object ):
     def getDirectory( self ): return self.directory
 
 
+    def isBackground( self ): return self.background
+
+
     def isTerminalOpen( self ): return self.terminalOpen
 
 
@@ -59,15 +62,12 @@ class Info( object ):
     def showNotification( self ): return self.showNotification
 
 
-    def isBackground( self ): return self.background
-
-
     def isIdentical( self, script ):
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
                self.command == script.getCommand() and \
                self.directory == script.getDirectory() and \
-               self.getBackground() == script.isBackground() and \
+               self.background == script.isBackground() and \
                self.terminalOpen == script.isTerminalOpen() and \
                self.playSound == script.playSound() and \
                self.showNotification == script.showNotification()
@@ -78,10 +78,10 @@ class Info( object ):
                self.getName() + " | " + \
                self.getCommand() + " | " + \
                self.getDirectory() + " | " + \
-               str( self.getTerminalOpen() ) + " | " + \
-               str( self.getPlaySound() ) + " | " + \
-               str( self.getShowNotification() ) + " | " + \
-               str( self.getBackground() )
+               str( self.isBackground() ) + " | " + \
+               str( self.isTerminalOpen() ) + " | " + \
+               str( self.playSound() ) + " | " + \
+               str( self.showNotification() )
 
 
     def __repr__( self ): return self.__str__()

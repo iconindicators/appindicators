@@ -750,9 +750,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def __upgradeScripts( self, config ):
         scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
-        if scripts and len( scripts[ 0 ] == 7 ):
+        if scripts and len( scripts[ 0 ] ) == 7:
             for script in scripts:
+                print( script )
                 self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 3 ], script[ 2 ], False, bool( script[ 4 ] ), script[ 5 ], script[ 6 ] ) )
+
+                x = self.scripts[ -1 ].playSound()
+                
+                print( self.scripts[ -1 ] )
 
             self.__saveConfig()
             self.scripts = [ ]
