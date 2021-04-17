@@ -27,14 +27,17 @@
 # Rather than background, perhaps use active instead and passive?
 # 
 # Add Ability to Write to Indicator Label
-# 
-# Use a similar system as Indicator Lunar when adding items to the icon text.
-# 
+#
 # Add Ability to Write to Indicator Menu Items...why?  How would this be used?
 # 
 # How to show in the menu the available scripts, yet distinguish from script results written to menu items?
 # If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-
+#
+# Uses for background scripts...
+#    Show current BTC price/details in label.
+#    Show current TPG usage in label.
+#    Run some process hourly without writing to the label (maybe show a notification).
+#    Run some process on indicator startup (with or without label).
 
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
@@ -66,34 +69,44 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.13",
+            version = "1.0.14",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script from an indicator." ) )
 
 
+# TODO NOT CHECKED
     def update( self, menu ):
-        if self.showScriptsInSubmenus:
-            scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-            indent = self.indent( 0, 1 )
-            for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                menuItem = Gtk.MenuItem( group )
-                menu.append( menuItem )
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
-                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
-        else:
-            if self.hideGroups:
-                for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
-                    self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+#         if self.showScriptsInSubmenus:
+#             scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+#             indent = self.indent( 0, 1 )
+#             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+#                 menuItem = Gtk.MenuItem( group )
+#                 menu.append( menuItem )
+#                 subMenu = Gtk.Menu()
+#                 menuItem.set_submenu( subMenu )
+#                 self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
+#         else:
+#             if self.hideGroups:
+#                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
+#                     self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+# 
+#             else:
+#                 scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+#                 indent = self.indent( 1, 1 )
+#                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+#                     menu.append( Gtk.MenuItem( group + "..." ) )
+#                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
-            else:
-                scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-                indent = self.indent( 1, 1 )
-                for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                    menu.append( Gtk.MenuItem( group + "..." ) )
-                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
+
+    def updateLabel( self ):
+        for script self.scripts:
+            if script.getRunInBackground()
+
+        self.indicator.set_label( "Hello", "" )
+#         self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
 
 
+# TODO NOT CHECKED
     def addScriptsToMenu( self, scripts, group, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
         for script in scripts:
@@ -104,6 +117,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.secondaryActivateTarget = menuItem
 
 
+# TODO NOT CHECKED
     def onScript( self, menuItem, script ):
         terminal = self.getTerminal()
         terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
@@ -128,6 +142,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         Thread( target = self.processCall, args = ( command, ) ).start()
 
 
+# TODO NOT CHECKED
     def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
@@ -312,10 +327,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return responseType
 
 
+# TODO NOT CHECKED
     def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
         hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
+# TODO NOT CHECKED
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         scriptNameListStore.clear()
@@ -350,6 +367,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
 
 
+# TODO NOT CHECKED
     def onScriptName( self, scriptNameTreeSelection, scriptGroupComboBox, directoryEntry, commandTextView, scripts ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeSelection.get_selected()
@@ -361,6 +379,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
 
 
+# TODO NOT CHECKED
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
@@ -437,6 +456,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
+# TODO NOT CHECKED
     def onScriptRemove( self, button, scripts, scriptGroupComboBox, scriptNameTreeView, directoryEntry, commandTextView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
@@ -460,14 +480,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     i += 1
 
 
+# TODO NOT CHECKED
     def onScriptAdd( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         self.addEditScript( Info( "", "", "", "", False ), scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
+# TODO NOT CHECKED
     def onScriptNameDoubleClick( self, scriptNameTreeView, scriptNameTreePath, scriptNameTreeViewColumn, scriptGroupComboBox, scripts ):
         self.onScriptEdit( None, scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
+# TODO NOT CHECKED
     def onScriptEdit( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
@@ -477,6 +500,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.addEditScript( theScript, scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
+# TODO NOT CHECKED
     def addEditScript( self, script, scripts, scriptGroupComboBox, scriptNameTreeView ):
         grid = self.createGrid()
 
@@ -662,6 +686,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.destroy()
 
 
+# TODO NOT CHECKED
     def getScript( self, scripts, scriptGroup, scriptName ):
         theScript = None
         for script in scripts:
@@ -672,6 +697,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return theScript
 
 
+# TODO NOT CHECKED
     # Script group/name must be valid OR group is None (name is ignored) OR group is valid and name is None.
     def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, scriptName ):
         scriptGroupComboBox.remove_all()
@@ -702,6 +728,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.get_selection().select_path( scriptIndex )
 
 
+# TODO NOT CHECKED
     def getScriptsByGroup( self, scripts ):
         scriptsGroupedByName = { }
         for script in scripts:
@@ -721,7 +748,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         self.scripts = [ ]
         if config:
-            self.__upgradeScripts( config ) #TODO Handle the change in format from version 1.0.14 onwards.
+            self.__upgradeScripts( config )
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
             defaultScriptFound = False
             for script in scripts:
@@ -735,6 +762,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
+            # Add in some examples of scripts.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com" ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"" ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi" ) )
@@ -744,6 +772,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Eventually need example of background script(s).
 
 
+    #TODO Script format was changed in version 1.0.14 so update prior version scripts.
     def __upgradeScripts( self, config ):
         scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
         if scripts and len( scripts[ 0 ] ) == 7:
