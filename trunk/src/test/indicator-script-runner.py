@@ -76,33 +76,34 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 # TODO NOT CHECKED
     def update( self, menu ):
-#         if self.showScriptsInSubmenus:
-#             scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-#             indent = self.indent( 0, 1 )
-#             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-#                 menuItem = Gtk.MenuItem( group )
-#                 menu.append( menuItem )
-#                 subMenu = Gtk.Menu()
-#                 menuItem.set_submenu( subMenu )
-#                 self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
-#         else:
-#             if self.hideGroups:
-#                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
-#                     self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+        if self.showScriptsInSubmenus:
+            scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+            indent = self.indent( 0, 1 )
+            for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+                menuItem = Gtk.MenuItem( group )
+                menu.append( menuItem )
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
+                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
+
+        else:
+            if self.hideGroups:
+                for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
+                    self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+
+            else:
+                scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+                indent = self.indent( 1, 1 )
+                for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+                    menu.append( Gtk.MenuItem( group + "..." ) )
+                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
+
+
+#     def updateLabel( self ):
+#         for script self.scripts:
+#             if script.getRunInBackground()
 # 
-#             else:
-#                 scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
-#                 indent = self.indent( 1, 1 )
-#                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-#                     menu.append( Gtk.MenuItem( group + "..." ) )
-#                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
-
-
-    def updateLabel( self ):
-        for script self.scripts:
-            if script.getRunInBackground()
-
-        self.indicator.set_label( "Hello", "" )
+#         self.indicator.set_label( "Hello", "" )
 #         self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
 
 
@@ -748,7 +749,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         self.scripts = [ ]
         if config:
-            self.__upgradeScripts( config )
+            self.__upgradeScripts( config ) #TODO Script format was changed in version 1.0.14 so update prior version scripts.
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
             defaultScriptFound = False
             for script in scripts:
@@ -780,6 +781,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 3 ], script[ 2 ], False, bool( script[ 4 ] ), script[ 5 ], script[ 6 ] ) )
 
             self._IndicatorBase__saveConfig()
+
+            scripts = [ ]
+            for script in self.scripts:
+                scripts.append( [ script.getGroup(), script.getName(), script.getCommand(), script.getDirectory(), script.getRunInBackground(), script.getTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
+
+            config[ IndicatorScriptRunner.CONFIG_SCRIPTS ] = scripts
+
             self.scripts = [ ]
 
 
