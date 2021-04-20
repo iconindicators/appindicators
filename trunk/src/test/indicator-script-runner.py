@@ -815,6 +815,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade" ) )
 #TODO Eventually need example of background script(s).
+#TODO Add "gnome-system-monitor &" as a sample script?
 
 
     #TODO Script format was changed in version 1.0.14 so update prior version scripts.
