@@ -485,6 +485,50 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
 
 
+    def updateLabelORIGINAL( self ):
+        # Substitute data tags '[' and ']' for values.
+        label = self.indicatorText
+
+        for key in self.data.keys():
+            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
+                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
+
+        # Handle any free text '{' and '}'.
+        i = 0
+        start = i
+        result = ""
+        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
+        while( i < len( label ) ):
+            if label[ i ] == '{':
+                j = i + 1
+                while( j < len( label ) ):
+                    if label[ j ] == '}':
+                        freeText = label[ i + 1 : j ]
+                        freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
+                        if freeText == freeTextMinusUnknownTags: # No unused tags were found.
+                            result += label[ start : i ] + freeText + self.indicatorTextSeparator
+                            lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
+
+                        else:
+                            result += label[ start : i ]
+
+                        i = j
+                        start = i + 1
+                        break
+
+                    j += 1
+
+            i += 1
+
+        if lastSeparatorIndex > -1:
+            result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
+
+        result += label[ start : i ]
+
+        self.indicator.set_label( result, "" )
+        self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
+
+
     def updateIcon( self ):
         # Ideally overwrite the icon with the same name each time.
         # Due to a bug, the icon name must change between calls to setting the icon.
