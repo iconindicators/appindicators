@@ -108,9 +108,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Need to implement!
     def updateLabel( self ):
-        # Substitute data tags '[' and ']' for values.
         label = self.indicatorText
 
+        # Capture any whitespace at the start which the user intends for padding.
+        whitespaceAtStart = ""
+        match = re.search( "^\s*", label )
+        if match:
+            whitespaceAtStart = match.group( 0 )
+
+        # Capture any whitespace at the end which the user intends for padding.
+        whitespaceAtEnd = ""
+        match = re.search( "\s*$", label )
+        if match:
+            whitespaceAtEnd = match.group( 0 )
+
+        # Substitute data tags '[' and ']' for values.
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
                 label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
@@ -120,13 +132,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         start = i
         result = ""
         lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
+        tagRegularExpression = "\[[^\[^\]]*\]"
         while( i < len( label ) ):
             if label[ i ] == '{':
                 j = i + 1
                 while( j < len( label ) ):
                     if label[ j ] == '}':
                         freeText = label[ i + 1 : j ]
-                        freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
+                        freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
                         if freeText == freeTextMinusUnknownTags: # No unused tags were found.
                             result += label[ start : i ] + freeText + self.indicatorTextSeparator
                             lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
@@ -146,6 +159,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
 
         result += label[ start : i ]
+
+        # Remove remaining tags and any whitespace resulting from removed tags.
+        result = re.sub( tagRegularExpression, "", result ).strip()
+
+        # Replace start and end whitespace.
+        result = whitespaceAtStart + result + whitespaceAtEnd
 
         self.indicator.set_label( result, "" )
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
