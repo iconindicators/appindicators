@@ -148,7 +148,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.87",
+            version = "1.0.88",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz = [ IndicatorLunar.astroBackend.getCredit(),
@@ -442,9 +442,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def updateLabel( self ):
-        # Substitute data tags '[' and ']' for values.
         label = self.indicatorText
 
+        # Capture any whitespace at the start which the user intends for padding.
+        whitespaceAtStart = ""
+        match = re.search( "^\s*", label )
+        if match:
+            whitespaceAtStart = match.group( 0 )
+
+        # Capture any whitespace at the end which the user intends for padding.
+        whitespaceAtEnd = ""
+        match = re.search( "\s*$", label )
+        if match:
+            whitespaceAtEnd = match.group( 0 )
+
+        # Substitute data tags '[' and ']' for values.
         for key in self.data.keys():
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
                 label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
@@ -454,13 +466,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         start = i
         result = ""
         lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
+        tagRegularExpression = "\[[^\[^\]]*\]"
         while( i < len( label ) ):
             if label[ i ] == '{':
                 j = i + 1
                 while( j < len( label ) ):
                     if label[ j ] == '}':
                         freeText = label[ i + 1 : j ]
-                        freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
+                        freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
                         if freeText == freeTextMinusUnknownTags: # No unused tags were found.
                             result += label[ start : i ] + freeText + self.indicatorTextSeparator
                             lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
@@ -481,49 +494,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         result += label[ start : i ]
 
-        self.indicator.set_label( result, "" )
-        self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
+        # Remove remaining tags and any whitespace resulting from removed tags.
+        result = re.sub( tagRegularExpression, "", result ).strip()
 
-
-    def updateLabelORIGINAL( self ):
-        # Substitute data tags '[' and ']' for values.
-        label = self.indicatorText
-
-        for key in self.data.keys():
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
-                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
-
-        # Handle any free text '{' and '}'.
-        i = 0
-        start = i
-        result = ""
-        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
-        while( i < len( label ) ):
-            if label[ i ] == '{':
-                j = i + 1
-                while( j < len( label ) ):
-                    if label[ j ] == '}':
-                        freeText = label[ i + 1 : j ]
-                        freeTextMinusUnknownTags = re.sub( "\[[^\[^\]]*\]", "", freeText )
-                        if freeText == freeTextMinusUnknownTags: # No unused tags were found.
-                            result += label[ start : i ] + freeText + self.indicatorTextSeparator
-                            lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
-
-                        else:
-                            result += label[ start : i ]
-
-                        i = j
-                        start = i + 1
-                        break
-
-                    j += 1
-
-            i += 1
-
-        if lastSeparatorIndex > -1:
-            result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
-
-        result += label[ start : i ]
+        # Replace start and end whitespace.
+        result = whitespaceAtStart + result + whitespaceAtEnd
 
         self.indicator.set_label( result, "" )
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
