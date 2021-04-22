@@ -26,7 +26,15 @@ class Info( object ):
     # The command or script with any arguments as needed.
     # Working/starting directory.
     # Terminal open - If True, the terminal used to run the script will be left open at the end of script/command execution.
+#
 #TODO Document all parameters.
+#
+#TODO Figure out which parameters apply to both passive/background and active scripts and put those first.
+# Then after the runInBackgroudFlag list the attributes for active scripts first followed by the background attributes.
+# Or, can we have two factory methods and a hidden constructor?
+# https://www.geeksforgeeks.org/what-is-a-clean-pythonic-way-to-have-multiple-constructors-in-python/
+# https://stackoverflow.com/questions/44726196/how-to-implement-multiple-constructors-in-python
+# https://stackoverflow.com/questions/44765482/multiple-constructors-the-pythonic-way
     def __init__( self, group, name, command, directory = "", runInBackground = False, terminalOpen = False, playSound = False, showNotification = False ):
         self.group = group
         self.name = name

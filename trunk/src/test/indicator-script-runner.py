@@ -38,6 +38,11 @@
 #    Show current TPG usage in label.
 #    Run some process hourly without writing to the label (maybe show a notification).
 #    Run some process on indicator startup (with or without label).
+#
+# Need a separate timer for each background script.
+# Run each script on startup, or just start the timer at startup (or run at startup and also run the timer)? 
+# Need to keep the timer interval (in minutes) in the script object (so need to add an attribute for that).
+
 
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
