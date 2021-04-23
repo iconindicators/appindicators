@@ -35,29 +35,35 @@ class Info( object ):
 # https://www.geeksforgeeks.org/what-is-a-clean-pythonic-way-to-have-multiple-constructors-in-python/
 # https://stackoverflow.com/questions/44726196/how-to-implement-multiple-constructors-in-python
 # https://stackoverflow.com/questions/44765482/multiple-constructors-the-pythonic-way
-    def __init__( self, group, name, command, directory = "", runInBackground = False, terminalOpen = False, playSound = False, showNotification = False, intervalInMinutes = 5 ):
+#
+#TODO If the attributes of terminalOpen, playSound and showNotification ultimately also apply to background scripts,
+# move the runInBackgroud parameter to just before intervalInMinutes.
+# Also, maybe then drop the classmethods?
+    def __init__( self, group, name, command, directory = "", runInBackground = False, terminalOpen = False, playSound = False, showNotification = False, intervalInMinutes = 0 ):
         self.group = group
         self.name = name
         self.command = command
+
         self.directory = directory #TODO Check to see if we can drop this by prepending any existing directory value to the command.  
         self.runInBackground = runInBackground
-        self.terminalOpen = terminalOpen
-        self.playSound = playSound
-        self.showNotification = showNotification
-        
-        # TODO This can be None (for foreground scripts)...so the __str__ will need to handle this).
-        # TODO Need getter.
+
+        # Apply only to foreground scripts.
+        self.terminalOpen = terminalOpen #TODO Can this be used to let the user know when a background script has run?
+        self.playSound = playSound #TODO Can this be used to let the user know when a background script has run?
+        self.showNotification = showNotification #TODO Can this be used to let the user know when a background script has run?
+
+        # Apply only to background scripts.
         self.intervalInMinutes = intervalInMinutes
 
 
     @classmethod
-    def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ) -> 'Info':
+    def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ):
 #TODO Remove directory eventually.        
-        return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification, None )
+        return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification )
 
 
     @classmethod
-    def backgroundScript( cls, group, name, command, intervalInMinutes = 5 ) -> 'Info':
+    def backgroundScript( cls, group, name, command, intervalInMinutes = 60 ):
 #TODO Remove directory eventually.        
         return cls( group, name, command, None, True, False, False, False, intervalInMinutes )
 
@@ -72,6 +78,7 @@ class Info( object ):
 
 
 #TODO May not make the final cut.
+# If so, remove from isIdentical() and __str__.
     def getDirectory( self ): return self.directory
 
 
@@ -87,6 +94,9 @@ class Info( object ):
     def getShowNotification( self ): return self.showNotification
 
 
+    def getIntervalInMinutes( self ): return self.intervalInMinutes
+
+
     def isIdentical( self, script ):
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
@@ -95,7 +105,8 @@ class Info( object ):
                self.background == script.getRunInBackground() and \
                self.terminalOpen == script.getTerminalOpen() and \
                self.playSound == script.getPlaySound() and \
-               self.showNotification == script.getShowNotification()
+               self.showNotification == script.getShowNotification() and \
+               self.intervalInMinutes == script.getIntervalInMinutes()
 
 
     def __str__( self ):
@@ -106,7 +117,8 @@ class Info( object ):
                str( self.getRunInBackground() ) + " | " + \
                str( self.getTerminalOpen() ) + " | " + \
                str( self.getPlaySound() ) + " | " + \
-               str( self.getShowNotification() )
+               str( self.getShowNotification() ) + " | " + \
+               str( self.getIntervalInMinutes() )
 
 
     def __repr__( self ): return self.__str__()
