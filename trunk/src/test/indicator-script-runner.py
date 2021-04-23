@@ -42,7 +42,15 @@
 # Need a separate timer for each background script.
 # Run each script on startup, or just start the timer at startup (or run at startup and also run the timer)? 
 # Need to keep the timer interval (in minutes) in the script object (so need to add an attribute for that).
-
+#
+# Want an option to limit the output of background scripts to say 100 chars?
+# If exceeding that amount, then don't write output to label but instead to the log file.
+#
+# What about a background script which in not intended to write to the label but errors when running?
+# How to log that?
+# Maybe have another option somehow?
+# Or if a background script is NOT added to the label, then always write the output to the log?
+ 
 
 INDICATOR_NAME = "indicator-script-runner"
 import gettext

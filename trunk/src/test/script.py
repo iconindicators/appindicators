@@ -35,15 +35,31 @@ class Info( object ):
 # https://www.geeksforgeeks.org/what-is-a-clean-pythonic-way-to-have-multiple-constructors-in-python/
 # https://stackoverflow.com/questions/44726196/how-to-implement-multiple-constructors-in-python
 # https://stackoverflow.com/questions/44765482/multiple-constructors-the-pythonic-way
-    def __init__( self, group, name, command, directory = "", runInBackground = False, terminalOpen = False, playSound = False, showNotification = False ):
+    def __init__( self, group, name, command, directory = "", runInBackground = False, terminalOpen = False, playSound = False, showNotification = False, intervalInMinutes = 5 ):
         self.group = group
         self.name = name
         self.command = command
-        self.directory = directory
+        self.directory = directory #TODO Check to see if we can drop this by prepending any existing directory value to the command.  
         self.runInBackground = runInBackground
         self.terminalOpen = terminalOpen
         self.playSound = playSound
         self.showNotification = showNotification
+        
+        # TODO This can be None (for foreground scripts)...so the __str__ will need to handle this).
+        # TODO Need getter.
+        self.intervalInMinutes = intervalInMinutes
+
+
+    @classmethod
+    def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ) -> 'Info':
+#TODO Remove directory eventually.        
+        return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification, None )
+
+
+    @classmethod
+    def backgroundScript( cls, group, name, command, intervalInMinutes = 5 ) -> 'Info':
+#TODO Remove directory eventually.        
+        return cls( group, name, command, None, True, False, False, False, intervalInMinutes )
 
 
     def getGroup( self ): return self.group
@@ -55,6 +71,7 @@ class Info( object ):
     def getCommand( self ): return self.command
 
 
+#TODO May not make the final cut.
     def getDirectory( self ): return self.directory
 
 
