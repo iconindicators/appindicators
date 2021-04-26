@@ -50,7 +50,10 @@
 # How to log that?
 # Maybe have another option somehow?
 # Or if a background script is NOT added to the label, then always write the output to the log?
- 
+#
+# When the preferences are opened and hit OK, what happens to all background scripts?
+# Should each background script be run again...or just resume the timers? 
+
 
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
