@@ -63,6 +63,33 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         self.buildMenu( menu )
+
+#TODO Consider detecting if the screensaver is active and if so, don't show a fortune.
+# https://askubuntu.com/questions/1229618/detect-that-the-system-is-locked
+# Need to
+#     sudo apt-get install gnome-screensaver
+# which means adding gnome-screensaver to the control file under debian.
+# Then can run something like:
+#         print( self.processGet( "gnome-screensaver-command -t" ) )
+# and get either
+#     The screensaver is not currently active.
+# or
+#     The screensaver has been active for 5 seconds.
+# Need to see what it says under Russian so ask Oleg.
+# Hopefully all that is required is to detect if there is a number present in the output.        
+#
+# If the output is always in English maybe use instead the -q option:
+#     The screensaver is inactive
+# versus
+#     The screensaver is active
+#
+# Maybe also possible to run the command but set the language to Enlgish before hand?
+#     https://askubuntu.com/questions/264283/switch-command-output-language-from-native-language-to-english
+#     https://askubuntu.com/questions/133318/how-do-i-change-the-language-via-a-terminal
+#     https://askubuntu.com/questions/673741/how-to-change-language-only-for-terminal
+#     https://unix.stackexchange.com/questions/576701/what-is-the-difference-between-lang-c-and-lc-all-c
+#     https://stackoverflow.com/questions/30479607/explain-the-effects-of-export-lang-lc-ctype-and-lc-all
+
         self.refreshAndShowFortune()
         return int( self.refreshIntervalInMinutes ) * 60
 
