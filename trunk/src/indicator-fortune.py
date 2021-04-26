@@ -84,11 +84,15 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 #     The screensaver is active
 #
 # Maybe also possible to run the command but set the language to Enlgish before hand?
+#     https://makandracards.com/makandra/28205-linux-running-a-program-with-a-different-locale-than-your-default
 #     https://askubuntu.com/questions/264283/switch-command-output-language-from-native-language-to-english
 #     https://askubuntu.com/questions/133318/how-do-i-change-the-language-via-a-terminal
 #     https://askubuntu.com/questions/673741/how-to-change-language-only-for-terminal
 #     https://unix.stackexchange.com/questions/576701/what-is-the-difference-between-lang-c-and-lc-all-c
 #     https://stackoverflow.com/questions/30479607/explain-the-effects-of-export-lang-lc-ctype-and-lc-all
+#
+# If this is all possible, then create a function in indicatorbase which returns a boolean (isScreenSaverActive).
+# Can then also use potentially in indicator-lunar so as to not notify for satellites and full moon.
 
         self.refreshAndShowFortune()
         return int( self.refreshIntervalInMinutes ) * 60
