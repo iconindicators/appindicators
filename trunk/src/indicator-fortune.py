@@ -94,8 +94,22 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 # If this is all possible, then create a function in indicatorbase which returns a boolean (isScreenSaverActive).
 # Can then also use potentially in indicator-lunar so as to not notify for satellites and full moon.
 
-        self.refreshAndShowFortune()
-        return int( self.refreshIntervalInMinutes ) * 60
+
+
+#         self.refreshAndShowFortune()
+#         return int( self.refreshIntervalInMinutes ) * 60
+#         print( self.processGet( "gnome-screensaver-command -t" ) )
+
+#         if not self.isScreensaverEnabled():
+#             self.refreshAndShowFortune()
+
+        import datetime
+        if self.isScreensaverEnabled():
+            print( "Skipping", datetime.datetime.now() )
+        else:
+            self.refreshAndShowFortune()
+
+        return 75
 
 
     def buildMenu( self, menu ):
@@ -185,16 +199,12 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                     if history is None:
                         history = ""
 
-                    # Fix an issue: unknown characters/glyphs appear as hexadecimal.  Refer to:
-                    #
+                    # Remove characters/glyphs which appear as hexadecimal.  Refer to:
                     #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
                     #
                     # Examples:
-                    # 
                     #     Ask not for whom the <CONTROL-G> tolls.
-                    # 
                     #         *** System shutdown message from root ***
-                    #
                     output = ""
                     for c in self.fortune:
                         if codecs.encode( str.encode( c ), "hex" ) == b'07':
@@ -203,7 +213,10 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                         output += c                   
 
                     self.fortune = output
-                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
+#                     self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
+                    import datetime
+                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, str( datetime.datetime.now()) + "\n\n" )
+
                     break
 
 
@@ -216,7 +229,9 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             if notificationSummary == "":
                 notificationSummary = " "
 
-        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
+#         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
+        import datetime
+        Notify.Notification.new( notificationSummary, str( datetime.datetime.now()), self.icon ).show()
 
 
     def refreshAndShowFortune( self ):
