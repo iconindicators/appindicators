@@ -94,8 +94,6 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 # If this is all possible, then create a function in indicatorbase which returns a boolean (isScreenSaverActive).
 # Can then also use potentially in indicator-lunar so as to not notify for satellites and full moon.
 
-
-
 #         self.refreshAndShowFortune()
 #         return int( self.refreshIntervalInMinutes ) * 60
 #         print( self.processGet( "gnome-screensaver-command -t" ) )
@@ -105,11 +103,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         import datetime
         self.now = datetime.datetime.now()
-#         if self.isScreensaverEnabled():
-#             print( "Skipping", self.now )
-#         else:
-#             self.refreshAndShowFortune()
-        self.refreshAndShowFortune()
+        if not self.isScreensaverEnabled():
+            self.refreshAndShowFortune()
 
         return 90
 
