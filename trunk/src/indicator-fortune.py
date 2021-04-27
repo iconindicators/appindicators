@@ -58,7 +58,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
-        self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
+#         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
 
     def update( self, menu ):
@@ -104,12 +104,14 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 #             self.refreshAndShowFortune()
 
         import datetime
-        if self.isScreensaverEnabled():
-            print( "Skipping", datetime.datetime.now() )
-        else:
-            self.refreshAndShowFortune()
+        self.now = datetime.datetime.now()
+#         if self.isScreensaverEnabled():
+#             print( "Skipping", self.now )
+#         else:
+#             self.refreshAndShowFortune()
+        self.refreshAndShowFortune()
 
-        return 75
+        return 90
 
 
     def buildMenu( self, menu ):
@@ -214,8 +216,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
                     self.fortune = output
 #                     self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
-                    import datetime
-                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, str( datetime.datetime.now()) + "\n\n" )
+                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, str( self.now ) + "\n\n" )
 
                     break
 
@@ -230,8 +231,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
                 notificationSummary = " "
 
 #         Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
-        import datetime
-        Notify.Notification.new( notificationSummary, str( datetime.datetime.now()), self.icon ).show()
+        Notify.Notification.new( notificationSummary, str( self.now ), self.icon ).show()
 
 
     def refreshAndShowFortune( self ):
