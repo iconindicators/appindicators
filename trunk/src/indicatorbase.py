@@ -498,7 +498,7 @@ class IndicatorBase( ABC ):
         return executionFlag
 
 
-    # Returns True if the screensaver is showing (or screen is blank).  False otherwise.
+    # Returns True if the screensaver is showing (or screen is blank); False otherwise.
     # NOTE: Must have gnome-screensaver installed otherwise this function WILL exception!
     def isScreensaverEnabled( self ): return any( char.isdigit() for char in self.processGet( "gnome-screensaver-command -t" ) )
 
