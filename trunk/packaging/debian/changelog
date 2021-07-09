@@ -1,3 +1,11 @@
+indicator-lunar (1.0.89-1) bionic; urgency=low
+
+  * Added dh-python to debian/control Build-Depends to satisfy LaunchPad:
+      https://askubuntu.com/q/1263305/67335
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 9 Jul 2021 21:03:37 +1000
+
+
 indicator-lunar (1.0.88-1) bionic; urgency=low
 
   * Bug fix: Tags not enclosed by surrounding { } were left in the label.
