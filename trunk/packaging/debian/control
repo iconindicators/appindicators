@@ -2,7 +2,7 @@ Source: indicator-tide
 Maintainer: Bernard Giannetti <thebernmeister@hotmail.com>
 Section: python
 Priority: optional
-Build-Depends: python3 (>= 3.2), debhelper (>= 7)
+Build-Depends: python3 (>= 3.2), debhelper (>= 7), dh-python
 Standards-Version: 3.9.7
 X-Python3-Version: >= 3.2
 
@@ -11,4 +11,4 @@ Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
 Description: Application indicator which displays tidal information.
  A user can select from a list of ports from around the globe and obtain tidal
- information for up to one week in advance. 
+ information for up to one week in advance.
