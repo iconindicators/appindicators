@@ -2,6 +2,7 @@ indicator-lunar (1.0.88-1) bionic; urgency=low
 
   * Bug fix: Tags not enclosed by surrounding { } were left in the label.
   * Update release to bionic as xenial is end of life.
+  * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000
 
