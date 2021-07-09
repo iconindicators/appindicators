@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-lunar 1.0.87\n"
+"Project-Id-Version: indicator-lunar 1.0.88\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2021-04-05 12:20+1000\n"
 "PO-Revision-Date: 2021-04-30 16:41+0300\n"
@@ -1942,4 +1942,3 @@ msgstr "Долгота должна быть числом от -180 до 180 в�
 #: indicator-lunar.py:1348
 msgid "Elevation must be a number between 0 and 10000 inclusive."
 msgstr "Высота должна быть числом от 0 до 10000 включительно."
-
