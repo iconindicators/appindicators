@@ -32,7 +32,12 @@
 # 
 # How to show in the menu the available scripts, yet distinguish from script results written to menu items?
 # If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-#
+# What does the above really mean?
+# Why have a list in the menu of the background scripts?
+# If the user wants to kick off a script, that should be an active/foreground script, not a background script.
+# Background scripts run at intervals (every x minutes) and either write the output to the label or don't write any output.
+# So no need for listing background scripts in the menu...correct?
+# 
 # Uses for background scripts...
 #    Show current BTC price/details in label.
 #    Show current TPG usage in label.
