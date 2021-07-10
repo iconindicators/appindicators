@@ -12,7 +12,7 @@ changeLogPath = "/packaging/debian/changelog"
 sourcePath = "/src/"
 indicators = [
     [ "IndicatorFortune", "indicator-fortune", "1.0.35" ],
-    [ "IndicatorLunar", "indicator-lunar", "1.0.87" ],
+    [ "IndicatorLunar", "indicator-lunar", "1.0.89" ],
     [ "IndicatorOnThisDay", "indicator-on-this-day", "1.0.9" ],
     [ "IndicatorPPADownloadStatistics", "indicator-ppa-download-statistics", "1.0.73" ],
     [ "IndicatorPunycode", "indicator-punycode", "1.0.11" ],
