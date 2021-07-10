@@ -868,7 +868,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                 apparentMagnitude = planetary_magnitude( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( utcNow ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
 
             else:
-                #TODO Hard coded until Skyfield calculates apparent magnitude...
+                #TODO Skyfield does not calculate apparent magnitude for all bodies as yet, so hard code for now...
                 # https://github.com/skyfielders/python-skyfield/issues/210
                 # https://rhodesmill.org/skyfield/api.html#skyfield.magnitudelib.planetary_magnitude
                 if planet == astrobase.AstroBase.PLANET_MARS:
@@ -951,9 +951,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateCommon( utcNow, utcNowPlusOneDay, data, key, locationAtNow, ephemerisPlanets, body ):
         neverUp = False
-#TODO Using the target field...it is safe, but keep an eye out for any future documentation:
-# https://github.com/skyfielders/python-skyfield/issues/567        
-        t, y = almanac.find_discrete( utcNow, utcNowPlusOneDay, almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target ) )
+        t, y = almanac.find_discrete( utcNow, utcNowPlusOneDay, almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
             if y[ 0 ]:
