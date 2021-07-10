@@ -1039,13 +1039,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                         break
 
 
-    # Create the planet ephemeris from online source:
+    # Create a planet ephemeris from NASA filtering by date range:
     #     https://github.com/skyfielders/python-skyfield/issues/123
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
     #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
     #
-    # Alternate method to create the ephemeris, download a .bsp and use spkmerge to create a smaller subset.
-    # Refer to
+    # Alternate method: Download a .bsp and use spkmerge to create a smaller subset:
     #    https://github.com/skyfielders/python-skyfield/issues/123
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
@@ -1054,18 +1053,22 @@ class AstroSkyfield( astrobase.AstroBase ):
         import os, subprocess, urllib
 
         ephemerisFile = "de440s.bsp"
-        ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
         if not os.path.isfile( ephemerisFile ):
             print( "Unable to locate", ephemerisFile, "on the file system.  Downloading..." )
+            ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
             urllib.request.urlretrieve ( ephemerisURL, ephemerisFile )
 
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
-        numberOfYearsIntoFuture = 5
         today = datetime.date.today()
-        startDate = today - relativedelta( months = 1 ) # Commence earlier as lunar eclipse code starts searching prior to the search date.
-        endDate = today.replace( year = today.year + numberOfYearsIntoFuture )
+
+        # Set the start date a little earlier to avoid sticky situations...
+        # For example, the lunar eclipse code starts searching prior to the search date.
+        # https://github.com/skyfielders/python-skyfield/issues/531
+        startDate = today - relativedelta( months = 1 ) 
+
+        endDate = today.replace( year = today.year + 5 ) # Five years should be enough data.
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
                   startDate.strftime( dateFormat ) + " " + \
@@ -1077,11 +1080,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
 
-    # Create a subset of the Hipparcos catalogue by filtering out stars not listed at:
+    # Create a star ephemeris from the Hipparcos catalogue and filtering out stars not listed at:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # Format of Hipparcos catalogue:
-    #     ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
+    #    ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
     @staticmethod
     def createEphemerisStars():
         import gzip, os
