@@ -41,6 +41,10 @@
 #
 #    Remove astropyephem.py from build-debian.
 #
+#    Remove astropyephem.py from debian/install.
+#
+#    Add astroskyfield.py to debian/install.
+#
 #    Create the file debian/postinst with permissions rwx for Owner and r/x for Group and Others (755).
 #    Add content as follows:
 #         #!/bin/bash
