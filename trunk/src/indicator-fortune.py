@@ -58,7 +58,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
-#         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
+#         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE ) #TODO Why is this commented out?  Should it be in or out?
 
 
     def update( self, menu ):
