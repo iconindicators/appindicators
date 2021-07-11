@@ -89,9 +89,10 @@ class IndicatorBase( ABC ):
         menu.show_all()
 
         self.indicator = AppIndicator3.Indicator.new(
-                            self.indicatorName, #ID
-                            self.indicatorName, # Icon name
-                            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+            self.indicatorName, #ID
+            self.indicatorName, # Icon name
+            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
@@ -339,11 +340,11 @@ class IndicatorBase( ABC ):
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
     def showOKCancel( self, parentWidget, message, title = None ):
         dialog = Gtk.MessageDialog(
-                    self.__getParent( parentWidget ),
-                    Gtk.DialogFlags.MODAL,
-                    Gtk.MessageType.QUESTION,
-                    Gtk.ButtonsType.OK_CANCEL,
-                    message )
+            self.__getParent( parentWidget ),
+            Gtk.DialogFlags.MODAL,
+            Gtk.MessageType.QUESTION,
+            Gtk.ButtonsType.OK_CANCEL,
+            message )
 
         if title is None:
             dialog.set_title( self.indicatorName )
