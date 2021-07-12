@@ -110,8 +110,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
 
-        if script.getDirectory() != "":
-            command += "cd " + script.getDirectory() + "; "
+#TODO No longer needed.
+        # if script.getDirectory() != "":
+        #     command += "cd " + script.getDirectory() + "; "
 
         command += script.getCommand()
 
@@ -121,11 +122,36 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if script.getPlaySound():
             command += "; " + IndicatorScriptRunner.COMMAND_SOUND
 
-        if script.isTerminalOpen():
+        if script.getTerminalOpen():
             command += "; ${SHELL}"
 
         command += "'"
         Thread( target = self.processCall, args = ( command, ) ).start()
+
+
+#TODO Original
+    # def onScript( self, menuItem, script ):
+    #     terminal = self.getTerminal()
+    #     terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
+    #
+    #     command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
+    #
+    #     if script.getDirectory() != "":
+    #         command += "cd " + script.getDirectory() + "; "
+    #
+    #     command += script.getCommand()
+    #
+    #     if script.getShowNotification():
+    #         command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+    #
+    #     if script.getPlaySound():
+    #         command += "; " + IndicatorScriptRunner.COMMAND_SOUND
+    #
+    #     if script.isTerminalOpen():
+    #         command += "; ${SHELL}"
+    #
+    #     command += "'"
+    #     Thread( target = self.processCall, args = ( command, ) ).start()
 
 
     def onPreferences( self, dialog ):
@@ -329,7 +355,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         for scriptName in scriptNames:
             terminalOpen = None
-            if self.getScript( scripts, scriptGroup, scriptName ).isTerminalOpen():
+            if self.getScript( scripts, scriptGroup, scriptName ).getTerminalOpen():
                 terminalOpen = Gtk.STOCK_APPLY
 
             playSound = None
@@ -424,10 +450,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                                       scriptNameEntry.get_text().strip(),
                                       script.getDirectory(),
                                       script.getCommand(),
-                                      script.isTerminalOpen() )
-
-                    newScript.setPlaySound( script.getPlaySound() )
-                    newScript.setShowNotification( script.getShowNotification() )
+                                      script.getTerminalOpen(),
+                                      script.getPlaySound(),
+                                      script.getShowNotification() )
 
                     scripts.append( newScript )
                     self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, newScript.getGroup(), newScript.getName() )
@@ -550,7 +575,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
-        terminalCheckbox.set_active( script.isTerminalOpen() )
+        terminalCheckbox.set_active( script.getTerminalOpen() )
 
         grid.attach( terminalCheckbox, 0, 23, 1, 1 )
 
@@ -639,10 +664,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                                   scriptNameEntry.get_text().strip(),
                                   scriptDirectoryEntry.get_text().strip(),
                                   self.getTextViewText( commandTextView ).strip(),
-                                  terminalCheckbox.get_active() )
-
-                newScript.setPlaySound( soundCheckbox.get_active() )
-                newScript.setShowNotification( notificationCheckbox.get_active() )
+                                  terminalCheckbox.get_active(),
+                                  soundCheckbox.get_active(),
+                                  notificationCheckbox.get_active() )
 
                 scripts.append( newScript )
 
@@ -727,9 +751,27 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
                     defaultScriptFound = True
 
-                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
+#TODO Original
+                # self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
+#End Original
+                
+             
+#TODO New                 
+                if script[ 2 ] == "":
+                    self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
+                
+                else:
+                    self.scripts.append( Info( script[ 0 ], script[ 1 ], "", "cd " + script[ 2 ] + "; " + script[ 3 ], bool( script[ 4 ] ) ) )
+#End New
 
                 # Handle additions to scripts: show notification and play sound.
+#TODO What is this?  Can it be safely removed?
+# If a script was created using the original script constructor, then playSound and showNotification will be set to default of False.
+# So if reading in a script which has subsequently set playSound to True or showNotification to True (or both to True)
+# then need to ensure those scripts have these values set when create the script object.
+# So...
+#    for a script read in with length of 5, playSound = False and showNotfication = False. 
+#    for a script read in with length of 6, playSound = <value from JSON> and showNotfication = <value from JSON>. 
                 if len( script ) == 7:
                     self.scripts[ -1 ].setPlaySound( script[ 5 ] )
                     self.scripts[ -1 ].setShowNotification( script[ 6 ] )
@@ -739,20 +781,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
-            self.scripts.append( Info( "Network", "Ping Google", "", "ping -c 3 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
+            self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False ) )
+            self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True ) )
-            self.scripts[ -1 ].setPlaySound( True )
-            self.scripts[ -1 ].setShowNotification( True )
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True ) )
 
 
     def saveConfig( self ):
         scripts = [ ]
         for script in self.scripts:
-            scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.isTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
+            scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.getTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
         return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,

@@ -58,6 +58,8 @@
 #
 # When the preferences are opened and hit OK, what happens to all background scripts?
 # Should each background script be run again...or just resume the timers? 
+#
+# Maybe have a test button for all background scripts to show what the label will look like?
 
 
 INDICATOR_NAME = "indicator-script-runner"
