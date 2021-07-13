@@ -131,7 +131,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
-#TODO Check the numbers for each grid.attach!        
 
         scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
