@@ -1073,7 +1073,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         grid.attach( minorPlanetsAddNewCheckbox, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
 
