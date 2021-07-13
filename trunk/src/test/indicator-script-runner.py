@@ -19,6 +19,25 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
+#TODO (from the original file)
+# Add Background Script Functionality
+# 
+# Add property to script to specify if a script is background (does not appear in the menu) or not (does appear in the menu).
+# For a background script, need to have a timer property, measured in seconds, which is the frequency of script execution.
+# Rather than background, perhaps use active instead and passive?
+# 
+# Add Ability to Write to Indicator Label
+# 
+# Use a similar system as Indicator Lunar when adding items to the icon text.
+# 
+# Add Ability to Write to Indicator Menu Items...why?  How would this be used?
+# 
+# How to show in the menu the available scripts, yet distinguish from script results written to menu items?
+# If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
+
+
+
+
 #TODO
 # Add Background Script Functionality
 # 
