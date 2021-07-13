@@ -5,7 +5,7 @@ indicator-script-runner (1.0.14-1) bionic; urgency=low
     the corresponding command attribute.
     If a directory need be specified for a script, prepend the following to
     the command:
-        "cd /the/directory/you/want ; ".
+        "cd /the/directory/you/want ; "
   * Update release to bionic as xenial is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000
