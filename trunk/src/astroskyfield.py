@@ -1069,7 +1069,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         # For example, the lunar eclipse code starts searching prior to the search date.
         # https://github.com/skyfielders/python-skyfield/issues/531
         startDate = today - relativedelta( months = 1 ) 
-
         endDate = today.replace( year = today.year + 5 ) # Five years should be enough data.
         dateFormat = "%Y/%m/%d"
         command = "python3 -m jplephem excerpt " + \
