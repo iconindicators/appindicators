@@ -737,6 +737,38 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return scriptsGroupedByName
 
 
+    #TODO Remove this in a later version.
+    # In version 14 the 'directory' attribute was removed and existing values for 'directory' are prepended to the script command.
+    def __convertFromVersion13ToVersion14( self, scripts ):
+        # Map the old format scripts from JSON:
+        #
+        #    group, name, directory, command, terminalOpen, playSound, showNotification
+        #
+        # to the new format of script object:
+        #
+        #    group, name, directory + command, terminalOpen, playSound, showNotification
+#TODO Only do this if the script length is 7?  Otherwise just return the original?
+#TODO What happens for empty list of scripts?
+        convertedScripts = [ ]
+        for script in scripts:
+            convertedScript = [ ]
+            convertedScript.append( script[ 0 ] )
+            convertedScript.append( script[ 1 ] )
+
+            if script[ 2 ] == "": # No directory specified.
+                convertedScript.append( script[ 3 ] )
+
+            else:
+                convertedScript.append( "cd " + script[ 2 ] + "; " + script[ 3 ] )
+
+            convertedScript.append( script[ 4 ] )
+            convertedScript.append( script[ 5 ] )
+            convertedScript.append( script[ 6 ] )
+            convertedScripts.append( convertedScript )
+
+        return convertedScripts
+
+
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
@@ -746,53 +778,42 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.scripts = [ ]
         if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
+            scripts = self.__convertFromVersion13ToVersion14( scripts )
             defaultScriptFound = False
             for script in scripts:
                 if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
                     defaultScriptFound = True
 
-#TODO Original
-                # self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
-#End Original
+                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 3 ], bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ) ) )
                 
              
 #TODO New                 
-                if script[ 2 ] == "":
-                    self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
-                
-                else:
-                    self.scripts.append( Info( script[ 0 ], script[ 1 ], "", "cd " + script[ 2 ] + "; " + script[ 3 ], bool( script[ 4 ] ) ) )
+                # if script[ 2 ] == "":
+                #     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
+                #
+                # else:
+                #     self.scripts.append( Info( script[ 0 ], script[ 1 ], "", "cd " + script[ 2 ] + "; " + script[ 3 ], bool( script[ 4 ] ) ) )
 #End New
-
-                # Handle additions to scripts: show notification and play sound.
-#TODO What is this?  Can it be safely removed?
-# If a script was created using the original script constructor, then playSound and showNotification will be set to default of False.
-# So if reading in a script which has subsequently set playSound to True or showNotification to True (or both to True)
-# then need to ensure those scripts have these values set when create the script object.
-# So...
-#    for a script read in with length of 5, playSound = False and showNotfication = False. 
-#    for a script read in with length of 6, playSound = <value from JSON> and showNotfication = <value from JSON>. 
-                if len( script ) == 7:
-                    self.scripts[ -1 ].setPlaySound( script[ 5 ] )
-                    self.scripts[ -1 ].setShowNotification( script[ 6 ] )
 
             if not defaultScriptFound:
                 self.scriptGroupDefault = ""
                 self.scriptNameDefault = ""
 
         else:
-            self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False ) )
-            self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False ) )
+            self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False ) )
+            self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False ) )
+            self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True ) )
+
+#TODO Request a config save somewhere...not sure at what point.
 
 
     def saveConfig( self ):
         scripts = [ ]
         for script in self.scripts:
-            scripts.append( [ script.getGroup(), script.getName(), script.getDirectory(), script.getCommand(), script.getTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
+            scripts.append( [ script.getGroup(), script.getName(), script.getCommand(), script.getTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
 
         return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,
