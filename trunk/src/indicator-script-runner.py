@@ -111,6 +111,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
 
 #TODO No longer needed.
+#TODO Do lotsa testing!
         # if script.getDirectory() != "":
         #     command += "cd " + script.getDirectory() + "; "
 
@@ -154,6 +155,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     #     Thread( target = self.processCall, args = ( command, ) ).start()
 
 
+#TODO Remove all references to directory.
+#TODO Will need to rebuild/edit POT/PO files.
     def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
@@ -755,10 +758,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             convertedScript.append( script[ 0 ] )
             convertedScript.append( script[ 1 ] )
 
-            if script[ 2 ] == "": # No directory specified.
+            if script[ 2 ] == "": # No directory specified, so only take the command.
                 convertedScript.append( script[ 3 ] )
 
-            else:
+            else: # Combine the directory and command.
                 convertedScript.append( "cd " + script[ 2 ] + "; " + script[ 3 ] )
 
             convertedScript.append( script[ 4 ] )
@@ -784,22 +787,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
                     defaultScriptFound = True
 
-                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 3 ], bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ) ) )
-                
-             
-#TODO New                 
-                # if script[ 2 ] == "":
-                #     self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], script[ 3 ], bool( script[ 4 ] ) ) )
-                #
-                # else:
-                #     self.scripts.append( Info( script[ 0 ], script[ 1 ], "", "cd " + script[ 2 ] + "; " + script[ 3 ], bool( script[ 4 ] ) ) )
-#End New
+                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ) ) )
 
             if not defaultScriptFound:
                 self.scriptGroupDefault = ""
                 self.scriptNameDefault = ""
 
         else:
+#TODO If we keep the default arguments for Info, then drop each set of three Falses.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False ) )
