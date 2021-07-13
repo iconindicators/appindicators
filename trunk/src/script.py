@@ -28,6 +28,8 @@ class Info( object ):
     # Play a sound on completion of script/command execution.
     # Show a notification on completion of script/command execution.
     def __init__( self, group, name, command, terminalOpen = False, playSound = False, showNotification = False ):
+#TODO Should have the defaults in the argument list?
+# Good for now but what about when background scripts are implemented and additional arguments are needed?
         self.group = group
         self.name = name
         self.command = command
@@ -45,9 +47,6 @@ class Info( object ):
     def getCommand( self ): return self.command
 
 
-#TODO Check for isTerminalOpen
-#TODO Check for setShowNotification
-#TODO Check for setPlaySound
     def getTerminalOpen( self ): return self.terminalOpen
 
 
