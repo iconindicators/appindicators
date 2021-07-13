@@ -1,14 +1,14 @@
 # Russian translation for indicator-script-runner.
-# Copyright (C) 2016-2020 Bernard Giannetti
+# Copyright (C) 2016-2021 Bernard Giannetti
 # This file is distributed under the same license as the indicator-script-runner package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2016-2020.
+# Oleg Moiseichuk <berroll@mail.ru>, 2016-2021.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-script-runner 1.0.13\n"
+"Project-Id-Version: indicator-script-runner 1.0.14\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-17 09:48+1100\n"
-"PO-Revision-Date: 2019-10-17 09:48+1100\n"
+"POT-Creation-Date: 2021-07-13 09:48+1100\n"
+"PO-Revision-Date: 2021-07-13 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -77,14 +77,6 @@ msgstr "Уведомление"
 #: indicator-script-runner.py:168
 msgid "Default"
 msgstr "По умолчанию"
-
-#: indicator-script-runner.py:182 indicator-script-runner.py:511
-msgid "Directory"
-msgstr "Папка"
-
-#: indicator-script-runner.py:185 indicator-script-runner.py:515
-msgid "The directory from which the script/command is executed."
-msgstr "Папка, из которой запускается команда/сценарий."
 
 #: indicator-script-runner.py:195 indicator-script-runner.py:524
 msgid "Command"

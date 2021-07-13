@@ -19,23 +19,6 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
-#TODO
-# Add Background Script Functionality
-# 
-# Add property to script to specify if a script is background (does not appear in the menu) or not (does appear in the menu).
-# For a background script, need to have a timer property, measured in seconds, which is the frequency of script execution.
-# Rather than background, perhaps use active instead and passive?
-# 
-# Add Ability to Write to Indicator Label
-# 
-# Use a similar system as Indicator Lunar when adding items to the icon text.
-# 
-# Add Ability to Write to Indicator Menu Items...why?  How would this be used?
-# 
-# How to show in the menu the available scripts, yet distinguish from script results written to menu items?
-# If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -66,7 +49,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.13",
+            version = "1.0.14",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script from an indicator." ) )
 
@@ -181,6 +164,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
+#TODO Check the numbers for each attach!        
 
         scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
@@ -222,19 +206,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( scrolledWindow, 0, 1, 1, 15 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Directory" ) ), False, False, 0 )
-
-        directoryEntry = Gtk.Entry()
-        directoryEntry.set_tooltip_text( _( "The directory from which the script/command is executed." ) )
-        directoryEntry.set_editable( False )
-
-        box.pack_start( directoryEntry, True, True, 0 )
-
-        grid.attach( box, 0, 16, 1, 1 )
-
         box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
         box.set_margin_top( 10 )
 
@@ -253,7 +224,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_vexpand( True )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 17, 1, 15 )
+        grid.attach( box, 0, 16, 1, 15 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -276,7 +247,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptGroupComboBox, scriptNameTreeView, directoryEntry, commandTextView )
+        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptGroupComboBox, scriptNameTreeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
 
         box.set_halign( Gtk.Align.CENTER )
@@ -319,7 +290,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         scriptGroupComboBox.connect( "changed", self.onScriptGroup, copyOfScripts, scriptNameListStore, scriptNameTreeView )
-        scriptNameTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, directoryEntry, commandTextView, copyOfScripts )
+        scriptNameTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, commandTextView, copyOfScripts )
         self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptNameTreeView, None, None )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -379,14 +350,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
 
 
-    def onScriptName( self, scriptNameTreeSelection, scriptGroupComboBox, directoryEntry, commandTextView, scripts ):
+    def onScriptName( self, scriptNameTreeSelection, scriptGroupComboBox, commandTextView, scripts ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeSelection.get_selected()
         if treeiter:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
             if theScript:
-                directoryEntry.set_text( theScript.getDirectory() )
                 commandTextView.get_buffer().set_text( theScript.getCommand() )
 
 
@@ -451,7 +421,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     newScript = Info( scriptGroupCombo.get_active_text().strip(),
                                       scriptNameEntry.get_text().strip(),
-                                      script.getDirectory(),
                                       script.getCommand(),
                                       script.getTerminalOpen(),
                                       script.getPlaySound(),
@@ -465,7 +434,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
-    def onScriptRemove( self, button, scripts, scriptGroupComboBox, scriptNameTreeView, directoryEntry, commandTextView ):
+    def onScriptRemove( self, button, scripts, scriptGroupComboBox, scriptNameTreeView, commandTextView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         model, treeiter = scriptNameTreeView.get_selection().get_selected()
         if scriptGroup and treeiter:
@@ -480,7 +449,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                         self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, None )
                         if len( scripts ) == 0:
-                            directoryEntry.set_text( "" )
                             commandTextView.get_buffer().set_text( "" )
 
                         break
@@ -543,19 +511,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Directory" ) ), False, False, 0 )
-
-        scriptDirectoryEntry = Gtk.Entry()
-        scriptDirectoryEntry.set_text( script.getDirectory() )
-        scriptDirectoryEntry.set_tooltip_text( _( "The directory from which the script/command is executed." ) )
-
-        box.pack_start( scriptDirectoryEntry, True, True, 0 )
-
-        grid.attach( box, 0, 2, 1, 1 )
-
         box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
         box.set_margin_top( 10 )
 
@@ -574,25 +529,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_vexpand( True )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 3, 1, 20 )
+        grid.attach( box, 0, 2, 1, 20 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
 
-        grid.attach( terminalCheckbox, 0, 23, 1, 1 )
+        grid.attach( terminalCheckbox, 0, 22, 1, 1 )
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
         soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
         soundCheckbox.set_active( script.getPlaySound() )
 
-        grid.attach( soundCheckbox, 0, 24, 1, 1 )
+        grid.attach( soundCheckbox, 0, 23, 1, 1 )
 
         notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
         notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) )
         notificationCheckbox.set_active( script.getShowNotification() )
 
-        grid.attach( notificationCheckbox, 0, 25, 1, 1 )
+        grid.attach( notificationCheckbox, 0, 24, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
@@ -601,7 +556,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "middle mouse click of the indicator icon.\n\n" + \
             "Only one script can be the default." ) )
 
-        grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
+        grid.attach( defaultScriptCheckbox, 0, 25, 1, 1 )
 
         title = _( "Edit Script" )
         if script.getGroup() == "":
@@ -633,7 +588,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         continue
 
                 else: # Editing an existing script.
-                    if script.isIdentical( Info( scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip(), scriptDirectoryEntry.get_text().strip(), self.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
+                    if script.isIdentical( Info( scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip(), self.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
                         pass # No change to the script, so should exit, but continue to handle the default script checkbox.
 
                     elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
@@ -665,7 +620,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 # The new script or the edit.
                 newScript = Info( scriptGroupCombo.get_active_text().strip(),
                                   scriptNameEntry.get_text().strip(),
-                                  scriptDirectoryEntry.get_text().strip(),
                                   self.getTextViewText( commandTextView ).strip(),
                                   terminalCheckbox.get_active(),
                                   soundCheckbox.get_active(),

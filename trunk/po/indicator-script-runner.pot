@@ -1,14 +1,14 @@
 # Portable Object Template for indicator-script-runner.
-# Copyright (C) 2016-2020 Bernard Giannetti
+# Copyright (C) 2016-2021 Bernard Giannetti
 # This file is distributed under the same license as the indicator-script-runner package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-script-runner 1.0.13\n"
+"Project-Id-Version: indicator-script-runner 1.0.14\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"POT-Creation-Date: 2021-07-13 09:48+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,14 +66,6 @@ msgstr ""
 
 #: indicator-script-runner.py:168
 msgid "Default"
-msgstr ""
-
-#: indicator-script-runner.py:182 indicator-script-runner.py:510
-msgid "Directory"
-msgstr ""
-
-#: indicator-script-runner.py:185 indicator-script-runner.py:514
-msgid "The directory from which the script/command is executed."
 msgstr ""
 
 #: indicator-script-runner.py:195 indicator-script-runner.py:523
