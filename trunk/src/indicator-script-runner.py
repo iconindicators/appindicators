@@ -90,13 +90,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScript( self, menuItem, script ):
         terminal = self.getTerminal()
         terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
-
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-
-#TODO No longer needed.
-#TODO Do lotsa testing!
-        # if script.getDirectory() != "":
-        #     command += "cd " + script.getDirectory() + "; "
 
         command += script.getCommand()
 
@@ -113,33 +107,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         Thread( target = self.processCall, args = ( command, ) ).start()
 
 
-#TODO Original
-    # def onScript( self, menuItem, script ):
-    #     terminal = self.getTerminal()
-    #     terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
-    #
-    #     command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-    #
-    #     if script.getDirectory() != "":
-    #         command += "cd " + script.getDirectory() + "; "
-    #
-    #     command += script.getCommand()
-    #
-    #     if script.getShowNotification():
-    #         command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
-    #
-    #     if script.getPlaySound():
-    #         command += "; " + IndicatorScriptRunner.COMMAND_SOUND
-    #
-    #     if script.isTerminalOpen():
-    #         command += "; ${SHELL}"
-    #
-    #     command += "'"
-    #     Thread( target = self.processCall, args = ( command, ) ).start()
-
-
-#TODO Remove all references to directory.
-#TODO Will need to rebuild/edit POT/PO files.
     def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
@@ -164,7 +131,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
-#TODO Check the numbers for each attach!        
+#TODO Check the numbers for each grid.attach!        
 
         scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
