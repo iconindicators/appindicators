@@ -27,9 +27,7 @@ class Info( object ):
     # Leave the terminal (used to execute the script/command) open on completion.
     # Play a sound on completion of script/command execution.
     # Show a notification on completion of script/command execution.
-    def __init__( self, group, name, command, terminalOpen = False, playSound = False, showNotification = False ):
-#TODO Should have the defaults in the argument list?
-# Good for now but what about when background scripts are implemented and additional arguments are needed?
+    def __init__( self, group, name, command, terminalOpen, playSound, showNotification ):
         self.group = group
         self.name = name
         self.command = command
