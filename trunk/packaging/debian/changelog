@@ -3,8 +3,8 @@ indicator-script-runner (1.0.14-1) bionic; urgency=low
   * Removed the directory attribute from scripts.
     Any script which had a directory specified now has that value prepended to
     the corresponding command attribute.
-    If a directory need be specified for a script, prepend the following to
-    the command:
+    If a directory need be specified for a (new) script, prepend the following
+    to the command:
         "cd /the/directory/you/want ; "
   * Update release to bionic as xenial is end of life.
 
