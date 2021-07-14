@@ -661,8 +661,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     #TODO Remove this in a later version.
-    # In version 14 the 'directory' attribute was removed and existing values for 'directory' are prepended to the script command.
     def __convertFromVersion13ToVersion14( self, scripts ):
+        # In version 14 the 'directory' attribute was removed.
+        # If a value for 'directory' is present, prepend to the 'command'.
+        #
         # Map the old format scripts from JSON:
         #
         #    group, name, directory, command, terminalOpen, playSound, showNotification
@@ -670,8 +672,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # to the new format of script object:
         #
         #    group, name, directory + command, terminalOpen, playSound, showNotification
-#TODO Only do this if the script length is 7?  Otherwise just return the original?
-#TODO What happens for empty list of scripts?
         convertedScripts = [ ]
         for script in scripts:
             convertedScript = [ ]
@@ -701,7 +701,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.scripts = [ ]
         if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
-            scripts = self.__convertFromVersion13ToVersion14( scripts )
+
+            #TODO Remove this in a later version.
+            if scripts and len( scripts[ 0 ] ) == 7:
+                scripts = self.__convertFromVersion13ToVersion14( scripts )
+                self.requestSaveConfig()
+
             defaultScriptFound = False
             for script in scripts:
                 if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
@@ -714,15 +719,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
-#TODO If we keep the default arguments for Info, then drop each set of three Falses.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True ) )
-
-#TODO Request a config save somewhere...not sure at what point.
 
 
     def saveConfig( self ):
