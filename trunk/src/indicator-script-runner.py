@@ -137,6 +137,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
+#TODO Testing Background script stuff.
+        self.updateLabel()
+
 
     def addScriptsToMenu( self, scripts, group, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
@@ -157,8 +160,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #         self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
 
 
-#TODO Need to implement!
     def updateLabel( self ):
+        label = ""
+        for script in self.scripts:
+            if script.getGroup() == "Background":
+                label += self.processGet( script.getCommand() ).strip()
+
+        print( "X" + label + "X" )
+        if label:
+            self.indicator.set_label( label, "" )
+            self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
+
+
+#TODO Need to implement!
+    def updateLabelFromIndicatorLunar( self ):
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
@@ -860,6 +875,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True ) )
+
+
+#TODO Testing for background scripts...
+        self.scripts.append( Info( "Background", "Background - StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False ) )
+        self.scripts.append( Info( "Background", "Background - Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", True, False, False ) )
+        self.scripts.append( Info( "Background", "Background - Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", True, False, False ) )
 
 
     def saveConfig( self ):
