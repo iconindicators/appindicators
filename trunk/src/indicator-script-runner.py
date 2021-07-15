@@ -166,7 +166,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         label = ""
         for script in self.scripts:
             if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
-                label += self.processGet( script.getCommand() ).strip()
+                result = self.processGet( script.getCommand() ).strip()
+                if result:
+                    label += result
 
         print( "X" + label + "X" )
         if label:
