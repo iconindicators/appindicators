@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 
@@ -27,40 +27,13 @@ class Info( object ):
     # Leave the terminal (used to execute the script/command) open on completion.
     # Play a sound on completion of script/command execution.
     # Show a notification on completion of script/command execution.
-#TODO Figure out which parameters apply to both passive/background and active scripts and put those first.
-# Then after the runInBackgroudFlag list the attributes for active scripts first followed by the background attributes.
-# Or, use two factory methods (classmethods) and just don't use the constructor.
-# https://www.geeksforgeeks.org/what-is-a-clean-pythonic-way-to-have-multiple-constructors-in-python/
-# https://stackoverflow.com/questions/44726196/how-to-implement-multiple-constructors-in-python
-# https://stackoverflow.com/questions/44765482/multiple-constructors-the-pythonic-way
-# If the attributes of terminalOpen, playSound and showNotification ultimately also apply to background scripts,
-# move the runInBackgroud parameter to just before intervalInMinutes.
     def __init__( self, group, name, command, terminalOpen, playSound, showNotification ):
         self.group = group
         self.name = name
         self.command = command
-
-        # self.runInBackground = runInBackground #TODO Need a better name?
-
-        # Apply only to foreground scripts.
-        self.terminalOpen = terminalOpen #TODO Apply also somehow to background scripts?
-        self.playSound = playSound #TODO Ditto
-        self.showNotification = showNotification #TODO Ditto
-
-        # Apply only to background scripts.
-        # self.intervalInMinutes = intervalInMinutes
-
-
-    @classmethod
-    def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ):
-#TODO Remove directory eventually.        
-        return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification )
-
-
-    @classmethod
-    def backgroundScript( cls, group, name, command, intervalInMinutes = 60 ):
-#TODO Remove directory eventually.        
-        return cls( group, name, command, None, True, False, False, False, intervalInMinutes )
+        self.terminalOpen = terminalOpen
+        self.playSound = playSound
+        self.showNotification = showNotification
 
 
     def getGroup( self ): return self.group
@@ -81,8 +54,6 @@ class Info( object ):
     def getShowNotification( self ): return self.showNotification
 
 
-#TODO Add stuff for background scripts.
-# Will need to check first if a script is background or not?  Or just compare all attributes?
     def isIdentical( self, script ):
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
@@ -92,8 +63,6 @@ class Info( object ):
                self.showNotification == script.getShowNotification()
 
 
-#TODO Add stuff for background scripts.
-# Will need to check first if a script is background or not?  Or just print/return all attributes?
     def __str__( self ):
         return self.getGroup() + " | " + \
                self.getName() + " | " + \

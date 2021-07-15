@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 
 
@@ -17,69 +17,6 @@
 
 
 # Application indicator allowing a user to run a terminal command or script.
-
-#TODO (from the original file)
-# Add Background Script Functionality
-# 
-# Add property to script to specify if a script is background (does not appear in the menu) or not (does appear in the menu).
-# For a background script, need to have a timer property, measured in seconds, which is the frequency of script execution.
-# Rather than background, perhaps use active instead and passive?
-# 
-# Add Ability to Write to Indicator Label
-# 
-# Use a similar system as Indicator Lunar when adding items to the icon text.
-# 
-# Add Ability to Write to Indicator Menu Items...why?  How would this be used?
-# 
-# How to show in the menu the available scripts, yet distinguish from script results written to menu items?
-# If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-
-
-
-
-#TODO
-# Add Background Script Functionality
-# 
-# Add property to script to specify if a script is background (does not appear in the menu) or not (does appear in the menu).
-# For a background script, need to have a timer property, measured in seconds, which is the frequency of script execution.
-# Rather than background, perhaps use active instead and passive?
-# 
-# Add Ability to Write to Indicator Label
-#
-# Add Ability to Write to Indicator Menu Items...why?  How would this be used?
-# 
-# How to show in the menu the available scripts, yet distinguish from script results written to menu items?
-# If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-# What does the above really mean?
-# Why have a list in the menu of the background scripts?
-# If the user wants to kick off a script, that should be an active/foreground script, not a background script.
-# Background scripts run at intervals (every x minutes) and either write the output to the label or don't write any output.
-# So no need for listing background scripts in the menu...correct?
-# 
-# Uses for background scripts...
-#    Show current BTC price/details in label.
-#    Show current TPG usage in label.
-#    Run some process hourly without writing to the label (maybe show a notification).
-#    Run some process on indicator startup (with or without label).
-#
-# Need a separate timer for each background script.
-# Run each script on startup, or just start the timer at startup (or run at startup and also run the timer)? 
-# Need to keep the timer interval (in minutes) in the script object (so need to add an attribute for that).
-#
-# Want an option to limit the output of background scripts to say 100 chars?
-# If exceeding that amount, then don't write output to label but instead to the log file.
-#
-# What about a background script which in not intended to write to the label but errors when running?
-# How to log that?
-# Maybe have another option somehow?
-# Or if a background script is NOT added to the label, then always write the output to the log?
-#
-# When the preferences are opened and hit OK, what happens to all background scripts?
-# Should each background script be run again...or just resume the timers? 
-#
-# Maybe have a test button for all background scripts to show what the label will look like?
-#
-# Where to put the background script output character limit?
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -112,7 +49,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.14",
+            version = "1.0.15",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script from an indicator." ) )
 
@@ -139,9 +76,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
-#TODO Testing Background script stuff.
-        self.updateLabel()
-
 
     def addScriptsToMenu( self, scripts, group, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
@@ -153,95 +87,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.secondaryActivateTarget = menuItem
 
 
-#TODO Implement
-#     def updateLabel( self ):
-#         for script self.scripts:
-#             if script.getRunInBackground()
-# 
-#         self.indicator.set_label( "Hello", "" )
-#         self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
-
-
-    def updateLabel( self ):
-        label = ""
-        for script in self.scripts:
-            if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
-                label += self.processGet( script.getCommand() ).strip()
-
-        print( "X" + label + "X" )
-        if label:
-            self.indicator.set_label( label, "" )
-            self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
-
-#TODO We have to do the play sound and notification here per script...but when?
-# Only when a script produces a result?  Or when a script does not produce a result?
-# What if the script text output exceeds the expected hard limit?
-
-
-#TODO Need to implement!
-    def updateLabelFromIndicatorLunar( self ):
-        label = self.indicatorText
-
-        # Capture any whitespace at the start which the user intends for padding.
-        whitespaceAtStart = ""
-        match = re.search( "^\s*", label )
-        if match:
-            whitespaceAtStart = match.group( 0 )
-
-        # Capture any whitespace at the end which the user intends for padding.
-        whitespaceAtEnd = ""
-        match = re.search( "\s*$", label )
-        if match:
-            whitespaceAtEnd = match.group( 0 )
-
-        # Substitute data tags '[' and ']' for values.
-        for key in self.data.keys():
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
-                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
-
-        # Handle any free text '{' and '}'.
-        i = 0
-        start = i
-        result = ""
-        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
-        tagRegularExpression = "\[[^\[^\]]*\]"
-        while( i < len( label ) ):
-            if label[ i ] == '{':
-                j = i + 1
-                while( j < len( label ) ):
-                    if label[ j ] == '}':
-                        freeText = label[ i + 1 : j ]
-                        freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
-                        if freeText == freeTextMinusUnknownTags: # No unused tags were found.
-                            result += label[ start : i ] + freeText + self.indicatorTextSeparator
-                            lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
-
-                        else:
-                            result += label[ start : i ]
-
-                        i = j
-                        start = i + 1
-                        break
-
-                    j += 1
-
-            i += 1
-
-        if lastSeparatorIndex > -1:
-            result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
-
-        result += label[ start : i ]
-
-        # Remove remaining tags and any whitespace resulting from removed tags.
-        result = re.sub( tagRegularExpression, "", result ).strip()
-
-        # Replace start and end whitespace.
-        result = whitespaceAtStart + result + whitespaceAtEnd
-
-        self.indicator.set_label( result, "" )
-        self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
-
-    
     def onScript( self, menuItem, script ):
         terminal = self.getTerminal()
         terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
@@ -578,7 +423,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptAdd( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        self.addEditScript( Info( "", "", "", "", False ), scripts, scriptGroupComboBox, scriptNameTreeView )
+        self.addEditScript( Info( "", "", "", False, False, False ), scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
     def onScriptNameDoubleClick( self, scriptNameTreeView, scriptNameTreePath, scriptNameTreeViewColumn, scriptGroupComboBox, scripts ):
@@ -709,7 +554,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         continue
 
                 else: # Editing an existing script.
-                    if script.isIdentical( Info( scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip(), self.getTextViewText( commandTextView ).strip(), terminalCheckbox.get_active() ) ):
+                    if script.isIdentical(
+                        Info( scriptGroupCombo.get_active_text().strip(),
+                              scriptNameEntry.get_text().strip(),
+                              self.getTextViewText( commandTextView ).strip(),
+                              terminalCheckbox.get_active(),
+                              soundCheckbox.get_active(),
+                              notificationCheckbox.get_active() ) ):
                         pass # No change to the script, so should exit, but continue to handle the default script checkbox.
 
                     elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
@@ -815,7 +666,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return scriptsGroupedByName
 
 
-    #TODO Remove this in a later version.
     def __convertFromVersion13ToVersion14( self, scripts ):
         # In version 14 the 'directory' attribute was removed.
         # If a value for 'directory' is present, prepend to the 'command'.
@@ -857,7 +707,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
 
-            #TODO Remove this in a later version.
             if scripts and len( scripts[ 0 ] ) == 7:
                 scripts = self.__convertFromVersion13ToVersion14( scripts )
                 self.requestSaveConfig()
@@ -874,19 +723,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
-#TODO Will need example of background scripts.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True ) )
-
-
-#TODO Testing for background scripts...
-        self.scripts.append( Info( "Background", "Background - StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False ) )
-        self.scripts.append( Info( "Background", "Background - Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", True, False, False ) )
-        self.scripts.append( Info( "Background", "Background - Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", True, False, False ) )
 
 
     def saveConfig( self ):
