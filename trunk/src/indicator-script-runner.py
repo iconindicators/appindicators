@@ -78,6 +78,8 @@
 # Should each background script be run again...or just resume the timers? 
 #
 # Maybe have a test button for all background scripts to show what the label will look like?
+#
+# Where to put the background script output character limit?
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -163,13 +165,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def updateLabel( self ):
         label = ""
         for script in self.scripts:
-            if script.getGroup() == "Background":
+            if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
                 label += self.processGet( script.getCommand() ).strip()
 
         print( "X" + label + "X" )
         if label:
             self.indicator.set_label( label, "" )
             self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
+
+#TODO We have to do the play sound and notification here per script...but when?
+# Only when a script produces a result?  Or when a script does not produce a result?
+# What if the script text output exceeds the expected hard limit?
 
 
 #TODO Need to implement!
