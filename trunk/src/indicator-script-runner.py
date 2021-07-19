@@ -118,26 +118,31 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
+#TODO Will need to hide the background scripts...
+#It is possible that a mix of foreground and background scripts will be in the same group, so handle this.
         if self.showScriptsInSubmenus:
             scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
             indent = self.indent( 0, 1 )
             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                menuItem = Gtk.MenuItem( group )
-                menu.append( menuItem )
-                subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
-                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
+                if self.groupContainsNoBackgroundScripts( group ):
+                    menuItem = Gtk.MenuItem( group )
+                    menu.append( menuItem )
+                    subMenu = Gtk.Menu()
+                    menuItem.set_submenu( subMenu )
+                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
-                    self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
+                    if not script.getBackground():
+                        self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
 
             else:
                 scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
                 indent = self.indent( 1, 1 )
                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                    menu.append( Gtk.MenuItem( group + "..." ) )
-                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
+                    if self.groupContainsNoBackgroundScripts( group ):
+                        menu.append( Gtk.MenuItem( group + "..." ) )
+                        self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
 #TODO Testing Background script stuff.
         self.updateLabel()
@@ -153,6 +158,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.secondaryActivateTarget = menuItem
 
 
+    def groupContainsNoBackgroundScripts( self, group ):
+        groupContainsNoBackgroundScripts = True
+        for script in self.scripts:
+            if script.getGroup() == group and script.getBackground():
+                groupContainsNoBackgroundScripts = True
+                break
+
+        return groupContainsNoBackgroundScripts
+
+
 #TODO Implement
 #     def updateLabel( self ):
 #         for script self.scripts:
@@ -162,7 +177,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #         self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
 
 
-    def updateLabel( self ):
+#TODO Needed?
+    def updateLabelOLD( self ):
         label = ""
         for script in self.scripts:
             if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
@@ -180,8 +196,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # What if the script text output exceeds the expected hard limit?
 
 
-#TODO Need to implement!
-    def updateLabelFromIndicatorLunar( self ):
+#TODO If a background script is modified (group name or script name changes or script is removed)
+# need to update the tags of scripts in the label to match the change.
+
+
+#TODO In progress
+    def updateLabel( self ):
+        import re
+
+        #TODO Need to acquire this from the Preferences
+        self.indicatorText = " [Background::StackExchange][Background::Bitcoin][Background::Log]"
+
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
@@ -196,10 +221,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if match:
             whitespaceAtEnd = match.group( 0 )
 
-        # Substitute data tags '[' and ']' for values.
-        for key in self.data.keys():
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
-                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
+#TODO Will need some way to ensure that no background scripts have the same group/name combination.
+# Maybe in the preferences when they hit okay and we check the label?
+# Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
+        # Run each background script present in the label...
+        for script in self.scripts:
+            if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
+                if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
+                    label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", self.processGet( script.getCommand() ).strip() )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -892,9 +921,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 #TODO Testing for background scripts...
-        self.scripts.append( Info( "Background", "Background - StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False ) )
-        self.scripts.append( Info( "Background", "Background - Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", True, False, False ) )
-        self.scripts.append( Info( "Background", "Background - Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", True, False, False ) )
+        self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False ) )
+        self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", True, False, False ) )
+        self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", True, False, False ) )
 
 
     def saveConfig( self ):
