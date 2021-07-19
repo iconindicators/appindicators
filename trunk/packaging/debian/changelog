@@ -1,3 +1,10 @@
+indicator-script-runner (1.0.16-1) bionic; urgency=low
+
+  * TODO....Background scripts.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Jul 2021 18:02:42 +1000
+
+
 indicator-script-runner (1.0.15-1) bionic; urgency=low
 
   * Bug fix: Script Info class constructor had changed and some calls were not
