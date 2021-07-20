@@ -112,24 +112,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.14",
+            version = "1.0.16",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script from an indicator." ) )
 
 
     def update( self, menu ):
-#TODO Will need to hide the background scripts...
-#It is possible that a mix of foreground and background scripts will be in the same group, so handle this.
         if self.showScriptsInSubmenus:
-            scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+            scriptsGroupedByName = self.getScriptsByGroup( self.scripts, True )
             indent = self.indent( 0, 1 )
             for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                if self.groupContainsNoBackgroundScripts( group ):
-                    menuItem = Gtk.MenuItem( group )
-                    menu.append( menuItem )
-                    subMenu = Gtk.Menu()
-                    menuItem.set_submenu( subMenu )
-                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
+                menuItem = Gtk.MenuItem( group )
+                menu.append( menuItem )
+                subMenu = Gtk.Menu()
+                menuItem.set_submenu( subMenu )
+                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
@@ -137,14 +134,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
 
             else:
-                scriptsGroupedByName = self.getScriptsByGroup( self.scripts )
+                scriptsGroupedByName = self.getScriptsByGroup( self.scripts, True )
                 indent = self.indent( 1, 1 )
                 for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
-                    if self.groupContainsNoBackgroundScripts( group ):
-                        menu.append( Gtk.MenuItem( group + "..." ) )
-                        self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
+                    menu.append( Gtk.MenuItem( group + "..." ) )
+                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
-#TODO Testing Background script stuff.
         self.updateLabel()
 
 
@@ -158,14 +153,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.secondaryActivateTarget = menuItem
 
 
-    def groupContainsNoBackgroundScripts( self, group ):
-        groupContainsNoBackgroundScripts = True
-        for script in self.scripts:
-            if script.getGroup() == group and script.getBackground():
-                groupContainsNoBackgroundScripts = True
-                break
-
-        return groupContainsNoBackgroundScripts
+#TODO Probably not needed.
+    # def groupContainsAtLeastOneForegroundScript( self, group ):
+    #     groupContainsAtLeastOneForegroundScript = False
+    #     for script in self.scripts:
+    #         if script.getGroup() == group and not script.getBackground():
+    #             groupContainsAtLeastOneForegroundScript = True
+    #             break
+    #
+    #     return groupContainsAtLeastOneForegroundScript
 
 
 #TODO Implement
@@ -448,6 +444,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
+#TODO Ensure the default script, if any, is NOT a background script.
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
@@ -841,9 +838,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.get_selection().select_path( scriptIndex )
 
 
-    def getScriptsByGroup( self, scripts ):
+    def getScriptsByGroup( self, scripts, foregroundOnly = False ):
         scriptsGroupedByName = { }
         for script in scripts:
+            if foregroundOnly and script.getBackground():
+                continue
+
             if script.getGroup() not in scriptsGroupedByName:
                 scriptsGroupedByName[ script.getGroup() ] = [ ]
 
@@ -884,6 +884,27 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
+    #TODO Remove this in a later version.
+    def __convertFromVersion15ToVersion16( self, scripts ):
+        # In version 16 background script functionality was added.
+        # All scripts prior to this change are deemed to be foreground scripts.
+        # For each script, set a flag and a dummy value for interval.
+        convertedScripts = [ ]
+        for script in scripts:
+            convertedScript = [ ]
+            convertedScript.append( script[ 0 ] )
+            convertedScript.append( script[ 1 ] )
+            convertedScript.append( script[ 2 ] )
+            convertedScript.append( script[ 3 ] )
+            convertedScript.append( script[ 4 ] )
+            convertedScript.append( script[ 5 ] )
+            convertedScript.append( False ) # Indicates this is a foreground script.
+            convertedScript.append( -1 ) # For a foreground script, the interval is ignored.
+            convertedScripts.append( convertedScript )
+
+        return convertedScripts
+
+
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
@@ -899,12 +920,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 scripts = self.__convertFromVersion13ToVersion14( scripts )
                 self.requestSaveConfig()
 
+            #TODO Remove this in a later version.
+            if scripts and len( scripts[ 0 ] ) == 6:
+                scripts = self.__convertFromVersion15ToVersion16( scripts )
+                self.requestSaveConfig()
+
             defaultScriptFound = False
             for script in scripts:
-                if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault:
+                if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault and not script[ 6 ]:
                     defaultScriptFound = True
 
-                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ) ) )
+                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ), script[ 7 ] ) )
 
             if not defaultScriptFound:
                 self.scriptGroupDefault = ""
@@ -912,24 +938,31 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         else:
 #TODO Will need example of background scripts.
-            self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False ) )
-            self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False ) )
-            self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False ) )
+            self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
+            self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
+            self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, False, -1 ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True ) )
-
+            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
 
 #TODO Testing for background scripts...
-        self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False ) )
-        self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", True, False, False ) )
-        self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", True, False, False ) )
+        # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
+        # self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", False, False, False, True, 5 ) )
+        # self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", False, False, False, True, 60 ) )
 
 
     def saveConfig( self ):
         scripts = [ ]
         for script in self.scripts:
-            scripts.append( [ script.getGroup(), script.getName(), script.getCommand(), script.getTerminalOpen(), script.getPlaySound(), script.getShowNotification() ] )
+            scripts.append( [ 
+                script.getGroup(), 
+                script.getName(), 
+                script.getCommand(), 
+                script.getTerminalOpen(), 
+                script.getPlaySound(), 
+                script.getShowNotification(),
+                script.getBackground(),
+                script.getIntervalInMinutes() ] )
 
         return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,

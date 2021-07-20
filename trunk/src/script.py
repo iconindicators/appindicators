@@ -27,6 +27,8 @@ class Info( object ):
     # Leave the terminal (used to execute the script/command) open on completion.
     # Play a sound on completion of script/command execution.
     # Show a notification on completion of script/command execution.
+    # Is a script background (displays result in a label) versus a foreground script (activated by user).
+    # Update interval for a background script (ignored for foreground scripts).
 #TODO Figure out which parameters apply to both passive/background and active scripts and put those first.
 # Then after the runInBackgroudFlag list the attributes for active scripts first followed by the background attributes.
 # Or, use two factory methods (classmethods) and just don't use the constructor.
@@ -35,32 +37,31 @@ class Info( object ):
 # https://stackoverflow.com/questions/44765482/multiple-constructors-the-pythonic-way
 # If the attributes of terminalOpen, playSound and showNotification ultimately also apply to background scripts,
 # move the runInBackgroud parameter to just before intervalInMinutes.
-    def __init__( self, group, name, command, terminalOpen, playSound, showNotification ):
+    def __init__( self, group, name, command, terminalOpen, playSound, showNotification, background, intervalInMinutes ):
         self.group = group
         self.name = name
         self.command = command
 
-        # self.runInBackground = runInBackground #TODO Need a better name?
-
-        # Apply only to foreground scripts.
+        # Apply only to foreground scripts.  TODO Is this still correct?
         self.terminalOpen = terminalOpen #TODO Apply also somehow to background scripts?
         self.playSound = playSound #TODO Ditto
         self.showNotification = showNotification #TODO Ditto
 
+        self.background = background
+
         # Apply only to background scripts.
-        # self.intervalInMinutes = intervalInMinutes
+        self.intervalInMinutes = intervalInMinutes
 
 
-    @classmethod
-    def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ):
-#TODO Remove directory eventually.        
-        return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification )
+#TODO Probably not needed.
+    # @classmethod
+    # def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ):
+        # return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification )
 
 
-    @classmethod
-    def backgroundScript( cls, group, name, command, intervalInMinutes = 60 ):
-#TODO Remove directory eventually.        
-        return cls( group, name, command, None, True, False, False, False, intervalInMinutes )
+    # @classmethod
+    # def backgroundScript( cls, group, name, command, intervalInMinutes = 60 ):
+        # return cls( group, name, command, None, True, False, False, False, intervalInMinutes )
 
 
     def getGroup( self ): return self.group
@@ -79,6 +80,12 @@ class Info( object ):
 
 
     def getShowNotification( self ): return self.showNotification
+
+
+    def getBackground( self ): return self.background
+
+
+    def getIntervalInMinutes( self ): return self.intervalInMinutes
 
 
 #TODO Add stuff for background scripts.
