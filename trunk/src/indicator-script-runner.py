@@ -93,7 +93,7 @@ from gi.repository import Gtk
 from script import Info
 from threading import Thread
 
-import copy, indicatorbase
+import copy, indicatorbase, re
 
 
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
@@ -118,6 +118,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
+        self.updateMenu( menu )
+        self.updateLabel()
+
+
+    def updateMenu( self, menu ):
         if self.showScriptsInSubmenus:
             scriptsGroupedByName = self.getScriptsByGroup( self.scripts, True )
             indent = self.indent( 0, 1 )
@@ -140,52 +145,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
-        self.updateLabel()
-
-
-    def addScriptsToMenu( self, scripts, group, menu, indent ):
-        scripts.sort( key = lambda script: script.getName().lower() )
-        for script in scripts:
-            menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
-            menuItem.connect( "activate", self.onScript, script )
-            menu.append( menuItem )
-            if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
-                self.secondaryActivateTarget = menuItem
-
-
-#TODO Probably not needed.
-    # def groupContainsAtLeastOneForegroundScript( self, group ):
-    #     groupContainsAtLeastOneForegroundScript = False
-    #     for script in self.scripts:
-    #         if script.getGroup() == group and not script.getBackground():
-    #             groupContainsAtLeastOneForegroundScript = True
-    #             break
-    #
-    #     return groupContainsAtLeastOneForegroundScript
-
-
-#TODO Implement
-#     def updateLabel( self ):
-#         for script self.scripts:
-#             if script.getRunInBackground()
-# 
-#         self.indicator.set_label( "Hello", "" )
-#         self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
-
-
-#TODO Needed?
-    def updateLabelOLD( self ):
-        label = ""
-        for script in self.scripts:
-            if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
-                result = self.processGet( script.getCommand() ).strip()
-                if result:
-                    label += result
-
-        print( "X" + label + "X" )
-        if label:
-            self.indicator.set_label( label, "" )
-            self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
 
 #TODO We have to do the play sound and notification here per script...but when?
 # Only when a script produces a result?  Or when a script does not produce a result?
@@ -198,8 +157,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO In progress
     def updateLabel( self ):
-        import re
-
         #TODO Need to acquire this from the Preferences
         self.indicatorText = " [Background::StackExchange][Background::Bitcoin][Background::Log]"
 
@@ -267,6 +224,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         self.indicator.set_label( result, "" )
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
+
+
+    def addScriptsToMenu( self, scripts, group, menu, indent ):
+        scripts.sort( key = lambda script: script.getName().lower() )
+        for script in scripts:
+            menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
+            menuItem.connect( "activate", self.onScript, script )
+            menu.append( menuItem )
+            if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
+                self.secondaryActivateTarget = menuItem
 
     
     def onScript( self, menuItem, script ):
