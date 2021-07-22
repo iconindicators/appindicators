@@ -179,9 +179,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
         # Run each background script present in the label...
         for script in self.scripts:
-            if script.getGroup() == "Background": #TODO Should really be script.getBackground() or similar.
+            if script.getBackground():
                 if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
-                    label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", self.processGet( script.getCommand() ).strip() )
+#TODO I don't think it is possible to leave the terminal open...check!
+                    # TODO Use this line if we don't allow sound/notification...
+                    # label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", self.processGet( script.getCommand() ).strip() )
+
+#TODO If we keep sound/notification, need to add to preferences.
+                    commandResult = self.processGet( script.getCommand() ).strip()
+                    if script.getPlaySound() and commandResult:
+                        self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+
+                    if script.getShowNotification() and commandResult: #TODO If we keep notifications, either need a better generic main text for the notification, or a preference per script. 
+                        self.processCall( IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() ) )
+
+                    label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
+
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -281,7 +294,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
+        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for background, tick icon for default script.
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptNameTreeView = Gtk.TreeView.new_with_model( scriptNameListStore )
@@ -310,7 +323,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = 4 ) #TODO New text
+        treeViewColumn.set_expand( False )
+        scriptNameTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 5 )
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
@@ -456,11 +473,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             if self.getScript( scripts, scriptGroup, scriptName ).getShowNotification():
                 showNotification = Gtk.STOCK_APPLY
 
+            background = Gtk.STOCK_NO #TODO Consider using this if we have to show background and non-background scripts together.
+            if self.getScript( scripts, scriptGroup, scriptName ).getBackground():
+                background = Gtk.STOCK_APPLY
+
             defaultScript = None
             if scriptGroup == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
                 defaultScript = Gtk.STOCK_APPLY
 
-            scriptNameListStore.append( [ scriptName, terminalOpen, playSound, showNotification, defaultScript ] )
+            scriptNameListStore.append( [ scriptName, terminalOpen, playSound, showNotification, background, defaultScript ] )
 
         scriptNameTreeView.get_selection().select_path( 0 )
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
@@ -540,7 +561,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                                       script.getCommand(),
                                       script.getTerminalOpen(),
                                       script.getPlaySound(),
-                                      script.getShowNotification() )
+                                      script.getShowNotification(),
+                                      script.getBackground(),
+                                      script.getIntervalInMinutes() )
 
                     scripts.append( newScript )
                     self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, newScript.getGroup(), newScript.getName() )
@@ -664,6 +687,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         notificationCheckbox.set_active( script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 24, 1, 1 )
+
+#TODO Need Background checkbox.
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
