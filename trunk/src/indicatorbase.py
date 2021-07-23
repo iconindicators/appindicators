@@ -54,6 +54,7 @@ class IndicatorBase( ABC ):
     __TERMINAL_XFCE = "xfce4-terminal"
 
     # Public
+    CONFIG_VERSION = "version"
     INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
     URL_TIMEOUT_IN_SECONDS = 5
@@ -528,6 +529,10 @@ class IndicatorBase( ABC ):
                 config = { }
                 logging.exception( e )
                 logging.error( "Error reading configuration: " + configFile )
+
+#TODO NOt sure about this yet.
+        if IndicatorBase.CONFIG_VERSION not in config:
+            config[ IndicatorBase.CONFIG_VERSION ] = self.version
 
         self.loadConfig( config ) # Call to implementation in indicator.
 
