@@ -18,68 +18,7 @@
 
 # Application indicator allowing a user to run a terminal command or script.
 
-#TODO (from the original file)
-# Add Background Script Functionality
-# 
-# Add property to script to specify if a script is background (does not appear in the menu) or not (does appear in the menu).
-# For a background script, need to have a timer property, measured in seconds, which is the frequency of script execution.
-# Rather than background, perhaps use active instead and passive?
-# 
-# Add Ability to Write to Indicator Label
-# 
-# Use a similar system as Indicator Lunar when adding items to the icon text.
-# 
-# Add Ability to Write to Indicator Menu Items...why?  How would this be used?
-# 
-# How to show in the menu the available scripts, yet distinguish from script results written to menu items?
-# If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-
-
-
-
-#TODO
-# Add Background Script Functionality
-# 
-# Add property to script to specify if a script is background (does not appear in the menu) or not (does appear in the menu).
-# For a background script, need to have a timer property, measured in seconds, which is the frequency of script execution.
-# Rather than background, perhaps use active instead and passive?
-# 
-# Add Ability to Write to Indicator Label
-#
-# Add Ability to Write to Indicator Menu Items...why?  How would this be used?
-# 
-# How to show in the menu the available scripts, yet distinguish from script results written to menu items?
-# If unresolved, somewhat defeats the idea of amending Indicator Script Runner and suggests making a new indicator.
-# What does the above really mean?
-# Why have a list in the menu of the background scripts?
-# If the user wants to kick off a script, that should be an active/foreground script, not a background script.
-# Background scripts run at intervals (every x minutes) and either write the output to the label or don't write any output.
-# So no need for listing background scripts in the menu...correct?
-# 
-# Uses for background scripts...
-#    Show current BTC price/details in label.
-#    Show current TPG usage in label.
-#    Run some process hourly without writing to the label (maybe show a notification).
-#    Run some process on indicator startup (with or without label).
-#
-# Need a separate timer for each background script.
-# Run each script on startup, or just start the timer at startup (or run at startup and also run the timer)? 
-# Need to keep the timer interval (in minutes) in the script object (so need to add an attribute for that).
-#
-# Want an option to limit the output of background scripts to say 100 chars?
-# If exceeding that amount, then don't write output to label but instead to the log file.
-#
-# What about a background script which in not intended to write to the label but errors when running?
-# How to log that?
-# Maybe have another option somehow?
-# Or if a background script is NOT added to the label, then always write the output to the log?
-#
-# When the preferences are opened and hit OK, what happens to all background scripts?
-# Should each background script be run again...or just resume the timers? 
-#
-# Maybe have a test button for all background scripts to show what the label will look like?
-#
-# Where to put the background script output character limit?
+#TODO Need a timer per background script, measured in minutes, which is the frequency of script execution.
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -99,14 +38,23 @@ import copy, indicatorbase, re
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     CONFIG_HIDE_GROUPS = "hideGroups"
+    CONFIG_INDICATOR_TEXT = "indicatorText" #TODO Needed???
+    CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator" #TODO Needed???
     CONFIG_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
     CONFIG_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
     CONFIG_SCRIPTS = "scripts"
     CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
+    COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
+    COMMAND_NOTIFY_BACKGROUND = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\""
+    COMMAND_NOTIFY_FOREGROUND = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_NOTIFY = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+
+#TODO Likely needed for background scripts.  Need better names?
+    INDICATOR_TEXT_DEFAULT = "" #TODO Possible to have a sample background script and therefore a sample label?
+    INDICATOR_TEXT_SEPARATOR_DEFAULT = " | "
 
 
     def __init__( self ):
@@ -146,19 +94,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
 
 
-#TODO We have to do the play sound and notification here per script...but when?
-# Only when a script produces a result?  Or when a script does not produce a result?
-# What if the script text output exceeds the expected hard limit?
-
-
 #TODO If a background script is modified (group name or script name changes or script is removed)
 # need to update the tags of scripts in the label to match the change.
 
 
-#TODO In progress
     def updateLabel( self ):
         #TODO Need to acquire this from the Preferences
-        self.indicatorText = " [Background::StackExchange][Background::Bitcoin][Background::Log]"
+        self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
         label = self.indicatorText
 
@@ -174,27 +116,28 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if match:
             whitespaceAtEnd = match.group( 0 )
 
+#TODO If we keep sound/notification, need to add to preferences.
+
+
 #TODO Will need some way to ensure that no background scripts have the same group/name combination.
 # Maybe in the preferences when they hit okay and we check the label?
 # Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
+
         # Run each background script present in the label...
         for script in self.scripts:
             if script.getBackground():
                 if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
-#TODO I don't think it is possible to leave the terminal open...check!
-                    # TODO Use this line if we don't allow sound/notification...
-                    # label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", self.processGet( script.getCommand() ).strip() )
-
-#TODO If we keep sound/notification, need to add to preferences.
                     commandResult = self.processGet( script.getCommand() ).strip()
                     if script.getPlaySound() and commandResult:
                         self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
 
-                    if script.getShowNotification() and commandResult: #TODO If we keep notifications, either need a better generic main text for the notification, or a preference per script. 
-                        self.processCall( IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() ) )
+                    if script.getShowNotification() and commandResult:
+                        notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+                        self.processCall( notificationCommand )
 
                     label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
-
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -209,7 +152,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     if label[ j ] == '}':
                         freeText = label[ i + 1 : j ]
                         freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
-                        if freeText == freeTextMinusUnknownTags: # No unused tags were found.
+                        if freeText == freeTextMinusUnknownTags and len( freeTextMinusUnknownTags ): # No unused tags were found.  Also handle when a script returns an empty string.
                             result += label[ start : i ] + freeText + self.indicatorTextSeparator
                             lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
 
@@ -311,9 +254,24 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( True )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
+        # treeViewColumn.set_expand( False )
+        # scriptNameTreeView.append_column( treeViewColumn )
+        
+#TODO From here
+# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
+# https://gist.github.com/geoffyoungs/1231530        
+        treeViewColumn = Gtk.TreeViewColumn( _( "Interval / Terminal" ) )
+        intervalRenderer = Gtk.CellRendererText()
+        terminalRenderer = Gtk.CellRendererPixbuf()
+        treeViewColumn.pack_start( intervalRenderer, True )
+        treeViewColumn.pack_start( terminalRenderer, True )
+        treeViewColumn.add_attribute( intervalRenderer, "text", 1 )
+        treeViewColumn.add_attribute( terminalRenderer, "pixbuf", 1 )
         scriptNameTreeView.append_column( treeViewColumn )
+
+
+        
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
         treeViewColumn.set_expand( False )
@@ -461,20 +419,30 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNames = sorted( scriptNames, key = str.lower )
 
         for scriptName in scriptNames:
+            script = self.getScript( scripts, scriptGroup, scriptName )
+
             terminalOpen = None
-            if self.getScript( scripts, scriptGroup, scriptName ).getTerminalOpen():
+            if script.getTerminalOpen() and not script.getBackground():
                 terminalOpen = Gtk.STOCK_APPLY
 
+            if script.getBackground():
+                terminalOpen = "23"
+
             playSound = None
-            if self.getScript( scripts, scriptGroup, scriptName ).getPlaySound():
+            if script.getPlaySound():
                 playSound = Gtk.STOCK_APPLY
 
             showNotification = None
-            if self.getScript( scripts, scriptGroup, scriptName ).getShowNotification():
+            if script.getShowNotification():
                 showNotification = Gtk.STOCK_APPLY
 
-            background = Gtk.STOCK_NO #TODO Consider using this if we have to show background and non-background scripts together.
-            if self.getScript( scripts, scriptGroup, scriptName ).getBackground():
+            # background = Gtk.STOCK_REMOVE #TODO Not sure if this is a keeper.
+            # background = "23"
+#Maybe just put in the tooltip that some fields don't apply...            
+#TODO Check this list for something else perhaps:
+# https://thebigdoc.readthedocs.io/en/latest/PyGObject-Tutorial/stock.html
+            background = ""
+            if script.getBackground():
                 background = Gtk.STOCK_APPLY
 
             defaultScript = None
@@ -899,6 +867,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
+        self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, IndicatorScriptRunner.INDICATOR_TEXT_DEFAULT ) #TODO Better name?
+        self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, IndicatorScriptRunner.INDICATOR_TEXT_SEPARATOR_DEFAULT ) #TODO Need a better name?
         self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
         self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
         self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
@@ -908,11 +878,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
 
             #TODO Remove this in a later version.
+#TODO Need to also check there is no version?            
             if scripts and len( scripts[ 0 ] ) == 7:
                 scripts = self.__convertFromVersion13ToVersion14( scripts )
                 self.requestSaveConfig()
 
             #TODO Remove this in a later version.
+#TODO Need to also check there is no version?            
             if scripts and len( scripts[ 0 ] ) == 6:
                 scripts = self.__convertFromVersion15ToVersion16( scripts )
                 self.requestSaveConfig()
@@ -929,13 +901,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
-#TODO Will need example of background scripts.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, False, -1 ) )
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
+#TODO Will need example of background scripts.
+#Maybe a script that only produces a result if the internet is down?
+
 
 #TODO Testing for background scripts...
         # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
