@@ -275,7 +275,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.append_column( treeViewColumn )
 
 
-        
+#TODO Another approach is to BOLD the row that is the default script.
+# https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
+#
+# Also may add a dot next to the script name in the menu?        
+# From VirtualBox:
+        # menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
+        # menuItem.set_active( True )
+        # menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() )
+
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
         treeViewColumn.set_expand( False )
@@ -816,7 +824,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return scriptsGroupedByName
 
 
-    #TODO Remove this in a later version.
     def __convertFromVersion13ToVersion14( self, scripts ):
         # In version 14 the 'directory' attribute was removed.
         # If a value for 'directory' is present, prepend to the 'command'.
@@ -848,7 +855,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
-    #TODO Remove this in a later version.
     def __convertFromVersion15ToVersion16( self, scripts ):
         # In version 16 background script functionality was added.
         # All scripts prior to this change are deemed to be foreground scripts.
@@ -882,36 +888,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
 
             # Temporarily needed until the version number is saved into the config.
-            version = config.get( self.CONFIG_VERSION )
-            if version is None:
+            if config.get( self.CONFIG_VERSION ) is None:
                 if scripts and len( scripts[ 0 ] ) == 7:
                     scripts = self.__convertFromVersion13ToVersion14( scripts )
                     self.requestSaveConfig()
 
-                if scripts and len( scripts[ 0 ] ) == 7:
-                    scripts = self.__convertFromVersion13ToVersion14( scripts )
+                if scripts and len( scripts[ 0 ] ) == 6 and version is None:
+                    scripts = self.__convertFromVersion15ToVersion16( scripts )
                     self.requestSaveConfig()
-
-            # self.saveVersion = False
-
-            #TODO Remove this in a later version.
-#TODO Is the version == None safe/correct?            
-            # if scripts and len( scripts[ 0 ] ) == 7 and version is None:
-            #     scripts = self.__convertFromVersion13ToVersion14( scripts )
-            #     self.requestSaveConfig()
-
-            #TODO Remove this in a later version.
-#TODO Is the version == None safe/correct?            
-            # if scripts and len( scripts[ 0 ] ) == 6 and version is None:
-            #     scripts = self.__convertFromVersion15ToVersion16( scripts )
-            #     self.requestSaveConfig()
-
-#TODO NOt sure about this yet.
-#Does not work!  the 'config' variable is out of scope and not passed to save!
-#Need to figure out where/when/how to insert the version into the config.
-            # if version is None:
-            #     self.saveVersion = True
-            #     self.requestSaveConfig()
 
             defaultScriptFound = False
             for script in scripts:
@@ -933,8 +917,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
 
 #TODO Do a request save (always)?
-            self.requestSaveConfig()
-            
+            self.requestSaveConfig() #TODO Probably a good idea to do this for all indicators which have default values?
+
 #TODO Will need example of background scripts.
 #Maybe a script that only produces a result if the internet is down?
 
