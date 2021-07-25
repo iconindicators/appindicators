@@ -185,13 +185,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def addScriptsToMenu( self, scripts, group, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
         for script in scripts:
+
+#TODO Not sure to use this or not to display the current default script.
+            # if script.getGroup() == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
+            #     menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + script.getName() )
+            #     menuItem.set_active( True )
+            #
+            # else:
+            #     menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
+
             menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
             menuItem.connect( "activate", self.onScript, script )
             menu.append( menuItem )
             if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
                 self.secondaryActivateTarget = menuItem
 
-    
+
     def onScript( self, menuItem, script ):
         terminal = self.getTerminal()
         terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
@@ -241,7 +250,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for background, tick icon for default script.
+        scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptNameTreeView = Gtk.TreeView.new_with_model( scriptNameListStore )
@@ -258,31 +267,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( True )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
-        # treeViewColumn.set_expand( False )
-        # scriptNameTreeView.append_column( treeViewColumn )
-        
-#TODO From here
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
-# https://gist.github.com/geoffyoungs/1231530        
-        treeViewColumn = Gtk.TreeViewColumn( _( "Interval / Terminal" ) )
-        intervalRenderer = Gtk.CellRendererText()
-        terminalRenderer = Gtk.CellRendererPixbuf()
-        treeViewColumn.pack_start( intervalRenderer, True )
-        treeViewColumn.pack_start( terminalRenderer, True )
-        treeViewColumn.add_attribute( intervalRenderer, "text", 1 )
-        treeViewColumn.add_attribute( terminalRenderer, "pixbuf", 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
+        treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
 
 #TODO Another approach is to BOLD the row that is the default script.
 # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
-#
-# Also may add a dot next to the script name in the menu?        
-# From VirtualBox:
-        # menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
-        # menuItem.set_active( True )
-        # menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() )
+# https://python-gtk-3-tutorial.readthedocs.io/en/latest/cellrenderers.html
 
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
@@ -293,11 +285,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = 4 ) #TODO New text
-        treeViewColumn.set_expand( False )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 5 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
@@ -448,20 +436,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             if script.getShowNotification():
                 showNotification = Gtk.STOCK_APPLY
 
-            # background = Gtk.STOCK_REMOVE #TODO Not sure if this is a keeper.
-            # background = "23"
-#Maybe just put in the tooltip that some fields don't apply...            
-#TODO Check this list for something else perhaps:
-# https://thebigdoc.readthedocs.io/en/latest/PyGObject-Tutorial/stock.html
-            background = ""
-            if script.getBackground():
-                background = Gtk.STOCK_APPLY
-
             defaultScript = None
             if scriptGroup == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
                 defaultScript = Gtk.STOCK_APPLY
 
-            scriptNameListStore.append( [ scriptName, terminalOpen, playSound, showNotification, background, defaultScript ] )
+            scriptNameListStore.append( [ scriptName, terminalOpen, playSound, showNotification, defaultScript ] )
 
         scriptNameTreeView.get_selection().select_path( 0 )
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
@@ -610,6 +589,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         if script.getGroup() == "":
             scriptGroupCombo.set_active( scriptGroupComboBox.get_active() )
+
         else:
             scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
 
