@@ -234,6 +234,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "the group to which the script belongs\n" + \
             "will be initially selected." ) )
 
+#TODO The tooltip above and below...
+#Can't find the code which checks to see which, if any, script is the default and then select it.
+#If this is the case, remove that part of each tooltip.
+
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -877,17 +881,37 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
 
-            #TODO Remove this in a later version.
-#TODO Need to also check there is no version?            
-            if scripts and len( scripts[ 0 ] ) == 7:
-                scripts = self.__convertFromVersion13ToVersion14( scripts )
-                self.requestSaveConfig()
+            # Temporarily needed until the version number is saved into the config.
+            version = config.get( self.CONFIG_VERSION )
+            if version is None:
+                if scripts and len( scripts[ 0 ] ) == 7:
+                    scripts = self.__convertFromVersion13ToVersion14( scripts )
+                    self.requestSaveConfig()
+
+                if scripts and len( scripts[ 0 ] ) == 7:
+                    scripts = self.__convertFromVersion13ToVersion14( scripts )
+                    self.requestSaveConfig()
+
+            # self.saveVersion = False
 
             #TODO Remove this in a later version.
-#TODO Need to also check there is no version?            
-            if scripts and len( scripts[ 0 ] ) == 6:
-                scripts = self.__convertFromVersion15ToVersion16( scripts )
-                self.requestSaveConfig()
+#TODO Is the version == None safe/correct?            
+            # if scripts and len( scripts[ 0 ] ) == 7 and version is None:
+            #     scripts = self.__convertFromVersion13ToVersion14( scripts )
+            #     self.requestSaveConfig()
+
+            #TODO Remove this in a later version.
+#TODO Is the version == None safe/correct?            
+            # if scripts and len( scripts[ 0 ] ) == 6 and version is None:
+            #     scripts = self.__convertFromVersion15ToVersion16( scripts )
+            #     self.requestSaveConfig()
+
+#TODO NOt sure about this yet.
+#Does not work!  the 'config' variable is out of scope and not passed to save!
+#Need to figure out where/when/how to insert the version into the config.
+            # if version is None:
+            #     self.saveVersion = True
+            #     self.requestSaveConfig()
 
             defaultScriptFound = False
             for script in scripts:
@@ -907,6 +931,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
+
+#TODO Do a request save (always)?
+            self.requestSaveConfig()
+            
 #TODO Will need example of background scripts.
 #Maybe a script that only produces a result if the internet is down?
 
