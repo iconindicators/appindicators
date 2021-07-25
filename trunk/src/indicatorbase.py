@@ -22,7 +22,7 @@
 #     http://python-gtk-3-tutorial.readthedocs.org
 #     http://wiki.gnome.org/Projects/PyGObject/Threading
 #     http://wiki.ubuntu.com/NotifyOSD
-#     http://lazka.github.io/pgi-docs/AppIndicator3-0.1
+#     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
 #TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
