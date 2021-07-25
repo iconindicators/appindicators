@@ -530,10 +530,6 @@ class IndicatorBase( ABC ):
                 logging.exception( e )
                 logging.error( "Error reading configuration: " + configFile )
 
-#TODO NOt sure about this yet.
-        if IndicatorBase.CONFIG_VERSION not in config:
-            config[ IndicatorBase.CONFIG_VERSION ] = self.version
-
         self.loadConfig( config ) # Call to implementation in indicator.
 
 
@@ -543,6 +539,11 @@ class IndicatorBase( ABC ):
     #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
     def __saveConfig( self, returnStatus = True ):
         config = self.saveConfig() # Call to implementation in indicator.
+
+#TODO Should we save the version number to the config here...at least until we've done a release of all indicators and months have passed?
+#Maybe just leave the config save here because if it is only temporary and somebody does a new install of a future release we still need the version number in the config.
+        config[ IndicatorBase.CONFIG_VERSION ] = self.version
+
         configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
         success = True
         try:
