@@ -228,6 +228,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         copyOfScripts = copy.deepcopy( self.scripts )
         notebook = Gtk.Notebook()
 
+
+
+
         # Foreground scripts.
         grid = self.createGrid()
 
@@ -271,12 +274,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
-
-#TODO Another approach is to BOLD the row that is the default script.
-# https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/cellrenderers.html
-
-
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
@@ -284,6 +281,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = 3 )
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
+
+#TODO Can we show the default script in some other way (highlight/bold the row) rather than have an extra column just for a tick?
+# https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
+# https://python-gtk-3-tutorial.readthedocs.io/en/latest/cellrenderers.html
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
         treeViewColumn.set_expand( False )
@@ -345,6 +346,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Foreground Scripts" ) ) )
 
+
+
+
         # Menu settings.
         grid = self.createGrid()
 
@@ -379,6 +383,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
+
+
+
         # Background scripts.
         grid = self.createGrid()
 
@@ -388,11 +395,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         scriptGroupComboBox = Gtk.ComboBoxText()
         scriptGroupComboBox.set_entry_text_column( 0 )
-        scriptGroupComboBox.set_tooltip_text( _(
-            "The group to which a script belongs.\n\n" + \
-            "If a default script is specified,\n" + \
-            "the group to which the script belongs\n" + \
-            "will be initially selected." ) )
+        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs." ) )
 
 #TODO The tooltip above and below...
 #Can't find the code which checks to see which, if any, script is the default and then select it.
@@ -409,10 +412,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.set_vexpand( True )
         scriptNameTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         scriptNameTreeView.connect( "row-activated", self.onScriptNameDoubleClick, scriptGroupComboBox, copyOfScripts )
-        scriptNameTreeView.set_tooltip_text( _(
-            "List of scripts within the same group.\n\n" + \
-            "If a default script has been nominated,\n" + \
-            "that script will be initially selected." ) )
+        scriptNameTreeView.set_tooltip_text( _( "List of scripts within the same group." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 0 )
         treeViewColumn.set_expand( True )
@@ -421,12 +421,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
-
-
-#TODO Another approach is to BOLD the row that is the default script.
-# https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/cellrenderers.html
-
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
         treeViewColumn.set_expand( False )
