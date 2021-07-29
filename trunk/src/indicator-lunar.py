@@ -773,6 +773,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
 
 
+#TODO Noticed around 6:15pm when satellites where rising (under PyEphem) in the released version of 1.0.89).
+# Some satellites which had rise times shortly before 6:15 where displayed as yet to rise (only rise time showing).
+
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
         satellitesPolar = [ ]
