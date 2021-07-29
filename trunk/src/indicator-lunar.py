@@ -775,6 +775,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 #TODO Noticed around 6:15pm when satellites where rising (under PyEphem) in the released version of 1.0.89).
 # Some satellites which had rise times shortly before 6:15 where displayed as yet to rise (only rise time showing).
+#
+# More observations...
+# At 17:52, there was a satellite listed to rise at 17:55.
+# Not update until 17:57 though.
+# Why?
+# Need to check the code for determining when the next update should occur.
 
     def updateMenuSatellites( self, menu ):
         satellites = [ ]
