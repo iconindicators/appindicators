@@ -481,7 +481,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
 
         rendererPixbuf = Gtk.CellRendererPixbuf()
-        treeViewColumn.pack_start( rendererPixbuf, True )
+        treeViewColumn.pack_start( rendererPixbuf, False )
         treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 5 )
         treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
 
@@ -653,34 +653,47 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return responseType
 
 
+    # Renders the script name.
+    #
+    # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
+    # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TextTag.html
+    # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
     def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
-        # cellRenderer.set_property( "xalign", 0.0 )  #TODO Need this?
+        cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
         scriptGroup = treeModel.get_value( treeIter, 0 )
         scriptName = treeModel.get_value( treeIter, 1 )
         if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
 
+    # Renders either:
+    #    The tick symbol for a foreground script to leave the terminal open,
+    #    The interval (number as text) for a background script.
+    #
+    # Only want to render either the tick symbol OR the text, not both.
+    # If the renderer for the item that is not to be displayed is still visible,
+    # space is taken up throwing out alignments, so need to hide the unused renderer.
+    #
+    # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
+    # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
+    # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
+    # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants    
     def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_visible( True )
+        background = treeModel.get_value( treeIter, 4 )
 
         if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
-            background = treeModel.get_value( treeIter, 3 )
             if background:
                 cellRenderer.set_visible( False )
 
-            else:
-                cellRenderer.set_property( "xalign", 0.8 )
+#TODO Needed?
+            # else:
+            #     cellRenderer.set_property( "xalign", 0.5 )
 
         if isinstance( cellRenderer, Gtk.CellRendererText ):
-            background = treeModel.get_value( treeIter, 3 )
+            cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
             if background:
-                # renderer.set_property( "xalign", 0.5 )
-                cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
-                scriptGroup = treeModel.get_value( treeIter, 0 )
-                scriptName = treeModel.get_value( treeIter, 1 )
-                if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
-                    cellRenderer.set_property( "weight", Pango.Weight.BOLD )
+                cellRenderer.set_property( "xalign", 0.5 )
 
             else:
                 cellRenderer.set_visible( False )
