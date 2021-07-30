@@ -85,7 +85,7 @@ class Info( object ):
     def getBackground( self ): return self.background
 
 
-    def getIntervalInMinutes( self ): return self.intervalInMinutes
+    def getIntervalInMinutes( self ): return str( self.intervalInMinutes )
 
 
 #TODO Add stuff for background scripts.
