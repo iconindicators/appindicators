@@ -28,7 +28,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "Gtk", "3.0" )
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 from script import Info
 from threading import Thread
 
@@ -221,7 +221,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         Thread( target = self.processCall, args = ( command, ) ).start()
 
 
-    def onPreferences( self, dialog ):
+    def onPreferencesOLD( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
 
@@ -405,17 +405,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return responseType
 
 
-    def get_data_text( self, column, cell, model, iterator, prop ):
-        '''property function to get string data from a object in
-        the TreeStore based on an attributes key
-        '''
-        obj = model.get_value(iterator, 0)
-        if obj:
-            cell.set_property('text', getattr(obj, prop))
-            cell.set_property('foreground-rgba', obj.color)
-
-
-    def onPreferencesORIGINAL( self, dialog ):
+    def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
 
@@ -425,7 +415,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 
-        # Foreground scripts.
+        # Scripts.
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
@@ -447,7 +437,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( scriptGroupComboBox, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
+        # Data model to hold... 
+        #    Script group
+        #    Script name
+        #    tick icon for play sound
+        #    tick icon for show notification
+        #    tick for background script
+        #    tick icon for terminal open
+        #    interval amount (string)
+        #    boolean for default script.
+        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str, str, str )
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptNameTreeView = Gtk.TreeView.new_with_model( scriptNameListStore )
@@ -460,12 +459,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "If a default script has been nominated,\n" + \
             "that script will be initially selected." ) )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 0 )
+        rendererText = Gtk.CellRendererText()
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = 1, weight_set = True )
         treeViewColumn.set_expand( True )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
-        treeViewColumn.set_expand( False )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
         scriptNameTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
@@ -476,13 +473,32 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
+        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
+        treeViewColumn.set_expand( False )
+        scriptNameTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal / Interval" ) )
+        treeViewColumn.set_expand( False )
+
+        rendererPixbuf = Gtk.CellRendererPixbuf()
+        treeViewColumn.pack_start( rendererPixbuf, True )
+        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 5 )
+        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
+
+        rendererText = Gtk.CellRendererText()
+        treeViewColumn.pack_start( rendererText, False )
+        treeViewColumn.add_attribute( rendererText, "text", 6 )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
+
+        scriptNameTreeView.append_column( treeViewColumn )
+
 #TODO Can we show the default script in some other way (highlight/bold the row) rather than have an extra column just for a tick?
 # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
 # https://python-gtk-3-tutorial.readthedocs.io/en/latest/cellrenderers.html
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
-        treeViewColumn.set_expand( False )
-        scriptNameTreeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
+        # treeViewColumn.set_expand( False )
+        # scriptNameTreeView.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -538,7 +554,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 32, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "Foreground Scripts" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Scripts" ) ) )
 
 
 
@@ -579,111 +595,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 
-
-        # Background scripts.
-        grid = self.createGrid()
-
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
-
-        scriptGroupComboBox = Gtk.ComboBoxText()
-        scriptGroupComboBox.set_entry_text_column( 0 )
-        scriptGroupComboBox.set_tooltip_text( _( "The group to which a script belongs." ) )
-
-#TODO The tooltip above and below...
-#Can't find the code which checks to see which, if any, script is the default and then select it.
-#If this is the case, remove that part of each tooltip.
-
-        box.pack_start( scriptGroupComboBox, True, True, 0 )
-        grid.attach( box, 0, 0, 1, 1 )
-
-        scriptNameListStore = Gtk.ListStore( str, str, str, str, str ) # Script names, tick icon for terminal open, tick icon for play sound, tick icon for show notification, tick icon for default script.
-        scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-
-        scriptNameTreeView = Gtk.TreeView.new_with_model( scriptNameListStore )
-        scriptNameTreeView.set_hexpand( True )
-        scriptNameTreeView.set_vexpand( True )
-        scriptNameTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-        scriptNameTreeView.connect( "row-activated", self.onScriptNameDoubleClick, scriptGroupComboBox, copyOfScripts )
-        scriptNameTreeView.set_tooltip_text( _( "List of scripts within the same group." ) )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 0 )
-        treeViewColumn.set_expand( True )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
-        treeViewColumn.set_expand( False )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
-        treeViewColumn.set_expand( False )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = 3 )
-        treeViewColumn.set_expand( False )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Default" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
-        treeViewColumn.set_expand( False )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( scriptNameTreeView )
-        scrolledWindow.set_margin_top( 10 )
-
-        grid.attach( scrolledWindow, 0, 1, 1, 15 )
-
-        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
-        box.set_margin_top( 10 )
-
-        label = Gtk.Label.new( _( "Command" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        commandTextView = Gtk.TextView()
-        commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
-        commandTextView.set_editable( False )
-        commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( commandTextView )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 16, 1, 15 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-        box.set_homogeneous( True )
-
-        addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        addButton.set_tooltip_text( _( "Add a new script." ) )
-        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, scriptGroupComboBox, scriptNameTreeView )
-        box.pack_start( addButton, True, True, 0 )
-
-        editButton = Gtk.Button.new_with_label( _( "Edit" ) )
-        editButton.set_tooltip_text( _( "Edit the selected script." ) )
-        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, scriptGroupComboBox, scriptNameTreeView )
-        box.pack_start( editButton, True, True, 0 )
-
-        copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
-        copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
-        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, scriptGroupComboBox, scriptNameTreeView )
-        box.pack_start( copyButton, True, True, 0 )
-
-        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptGroupComboBox, scriptNameTreeView, commandTextView )
-        box.pack_start( removeButton, True, True, 0 )
-
-        box.set_halign( Gtk.Align.CENTER )
-        grid.attach( box, 0, 32, 1, 1 )
-
-        notebook.append_page( grid, Gtk.Label.new( _( "Background Scripts" ) ) )
-
         # General settings.
         grid = self.createGrid()
 
@@ -742,11 +653,84 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return responseType
 
 
+    def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
+        # cellRenderer.set_property( "xalign", 0.0 )  #TODO Need this?
+        scriptGroup = treeModel.get_value( treeIter, 0 )
+        scriptName = treeModel.get_value( treeIter, 1 )
+        if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
+            cellRenderer.set_property( "weight", Pango.Weight.BOLD )
+
+
+    def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
+        cellRenderer.set_visible( True )
+
+        if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+            background = treeModel.get_value( treeIter, 3 )
+            if background:
+                cellRenderer.set_visible( False )
+
+            else:
+                cellRenderer.set_property( "xalign", 0.8 )
+
+        if isinstance( cellRenderer, Gtk.CellRendererText ):
+            background = treeModel.get_value( treeIter, 3 )
+            if background:
+                # renderer.set_property( "xalign", 0.5 )
+                cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
+                scriptGroup = treeModel.get_value( treeIter, 0 )
+                scriptName = treeModel.get_value( treeIter, 1 )
+                if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
+                    cellRenderer.set_property( "weight", Pango.Weight.BOLD )
+
+            else:
+                cellRenderer.set_visible( False )
+
+
     def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
         hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
+        scriptGroup = scriptGroupComboBox.get_active_text()
+        scriptNameListStore.clear()
+
+        scriptNames = [ ]
+        for script in scripts:
+            if script.getGroup() == scriptGroup:
+                scriptNames.append( script.getName() )
+
+        scriptNames = sorted( scriptNames, key = str.lower )
+
+        for scriptName in scriptNames:
+            script = self.getScript( scripts, scriptGroup, scriptName )
+
+            playSound = None
+            if script.getPlaySound():
+                playSound = Gtk.STOCK_APPLY
+
+            showNotification = None
+            if script.getShowNotification():
+                showNotification = Gtk.STOCK_APPLY
+
+            background = None
+            if script.getBackground():
+                background = Gtk.STOCK_APPLY
+
+            terminalOpen = None
+            if script.getTerminalOpen() and not script.getBackground():
+                terminalOpen = Gtk.STOCK_APPLY
+
+            defaultScript = None
+            if scriptGroup == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
+                defaultScript = Gtk.STOCK_APPLY
+
+            scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, "27", defaultScript ] )
+
+        scriptNameTreeView.get_selection().select_path( 0 )
+        scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
+
+
+    def onScriptGroupORIGINAL( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
         scriptGroup = scriptGroupComboBox.get_active_text()
         scriptNameListStore.clear()
 
