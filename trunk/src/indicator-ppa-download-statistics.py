@@ -962,7 +962,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 self.filters.addFilter( theFilter[ 0 ], theFilter[ 1 ], theFilter[ 2 ], theFilter[ 3 ], theFilter[ 4 ] )
 
         else:
-#TODO Perhaps put here the _requestSaveConfig?            
             self.ppas = [ ]
             self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
 
