@@ -477,20 +477,32 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal / Interval" ) )
+
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 5 )
         treeViewColumn.set_expand( False )
-
-        rendererPixbuf = Gtk.CellRendererPixbuf()
-        treeViewColumn.pack_start( rendererPixbuf, False )
-        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 5 )
-        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
-
-        rendererText = Gtk.CellRendererText()
-        treeViewColumn.pack_start( rendererText, False )
-        treeViewColumn.add_attribute( rendererText, "text", 6 )
-        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
-
         scriptNameTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), rendererText, text = 6, weight_set = True )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
+        scriptNameTreeView.append_column( treeViewColumn )
+
+        
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Terminal / Interval" ) )
+        # treeViewColumn.set_expand( False )
+        #
+        # rendererPixbuf = Gtk.CellRendererPixbuf()
+        # treeViewColumn.pack_start( rendererPixbuf, False )
+        # treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 5 )
+        # treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
+        #
+        # rendererText = Gtk.CellRendererText()
+        # treeViewColumn.pack_start( rendererText, False )
+        # treeViewColumn.add_attribute( rendererText, "text", 6 )
+        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
+        #
+        # scriptNameTreeView.append_column( treeViewColumn )
 
 #TODO Can we show the default script in some other way (highlight/bold the row) rather than have an extra column just for a tick?
 # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
