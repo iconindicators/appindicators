@@ -446,8 +446,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         #    tick for background script
         #    tick icon for terminal open
         #    interval amount (string)
-        #    boolean for default script.    #TODO This is not used...
-        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str, str, str )
+        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str, str )
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptNameTreeView = Gtk.TreeView.new_with_model( scriptNameListStore )
@@ -466,20 +465,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        rendererPixbuf = Gtk.CellRendererPixbuf()
-        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), rendererPixbuf, stock_id = 2 )
-        treeViewColumn.set_expand( False )
-        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionPixbuf )
-        scriptNameTreeView.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), rendererPixbuf, stock_id = 3 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 2 )
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), rendererPixbuf, stock_id = 4 )
-        # treeViewColumn.set_expand( False )
-        # treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionPixbuf )
-        # scriptNameTreeView.append_column( treeViewColumn )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = 3 )
+        treeViewColumn.set_expand( False )
+        scriptNameTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
+        treeViewColumn.set_expand( False )
+        scriptNameTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal / Interval" ) )
         treeViewColumn.set_expand( False )
@@ -663,22 +659,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TextTag.html
     # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
     def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
-        self.setCellBackground( cellRenderer, treeModel, treeIter )
-
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
         scriptGroup = treeModel.get_value( treeIter, 0 )
         scriptName = treeModel.get_value( treeIter, 1 )
         if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
-
-
-    # Renders the script name.
-    #
-    # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
-    # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TextTag.html
-    # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
-    def dataFunctionPixbuf( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
-        self.setCellBackground( cellRenderer, treeModel, treeIter )
 
 
     # Renders either:
@@ -697,8 +682,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         cellRenderer.set_visible( True )
         background = treeModel.get_value( treeIter, 4 )
 
-        self.setCellBackground( cellRenderer, treeModel, treeIter )
-
         if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
             if background:
                 cellRenderer.set_visible( False )
@@ -714,15 +697,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             else:
                 cellRenderer.set_visible( False )
-
-
-    def setCellBackground( self, cellRenderer, treeModel, treeIter ):
-        background = treeModel.get_value( treeIter, 4 )
-        if background:
-            cellRenderer.set_property( "cell-background", "light gray" )
-
-        else:
-            cellRenderer.set_property( "cell-background", "dark gray" )
 
 
     def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
@@ -763,11 +737,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             if script.getBackground():
                 intervalInMinutes = script.getIntervalInMinutes()
 
-            defaultScript = None
-            if scriptGroup == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
-                defaultScript = Gtk.STOCK_APPLY
+#TODO Not needed I hope
+            # defaultScript = None
+            # if scriptGroup == self.defaultScriptGroupCurrent and scriptName == self.defaultScriptNameCurrent:
+            #     defaultScript = Gtk.STOCK_APPLY
 
-            scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, intervalInMinutes, defaultScript ] )
+            scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, intervalInMinutes ] )
 
         scriptNameTreeView.get_selection().select_path( 0 )
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
