@@ -1032,7 +1032,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
 
 #TODO Do a request save (always)?
-            self.requestSaveConfig() #TODO Probably a good idea to do this for all indicators which have default values?
+            self.requestSaveConfig()
 
 #TODO Will need example of background scripts.
 #Maybe a script that only produces a result if the internet is down?
