@@ -978,6 +978,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             self.filters = Filters()
             self.filters.addFilter( "thebernmeister", "ppa", "focal", "amd64", filterText )
+            self.requestSaveConfig()
 
 
     def saveConfig( self ):
