@@ -568,10 +568,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 background = Gtk.STOCK_APPLY
 
             terminalOpen = None
+            # if script.getBackground():
+            #     terminalOpen = Gtk.STOCK_REMOVE
+            #
+            # else:
+            #     if script.getTerminalOpen():
+            #         terminalOpen = Gtk.STOCK_APPLY
             if not script.getBackground() and script.getTerminalOpen():
                 terminalOpen = Gtk.STOCK_APPLY
 
             intervalInMinutes = None
+            # if script.getBackground():
+            #     intervalInMinutes = script.getIntervalInMinutes()
+            #
+            # else:
+            #     intervalInMinutes = Gtk.STOCK_REMOVE
             if script.getBackground():
                 intervalInMinutes = script.getIntervalInMinutes()
 
