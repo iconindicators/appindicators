@@ -261,8 +261,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         #    tick icon for play sound
         #    tick icon for show notification
         #    tick for background script
-        #    tick icon for terminal open
-        #    interval amount (string)
+        #    terminal open icon (tick icon or remove icon)
+        #    interval amount (string) or remove icon (for when interval amount is not applicable)
         scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str, str )
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
@@ -300,26 +300,26 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_expand( False )
         scriptNameTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), rendererText, text = 6, weight_set = True )
-        treeViewColumn.set_expand( False )
-        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
-        scriptNameTreeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), rendererText, text = 6, weight_set = True )
+        # treeViewColumn.set_expand( False )
+        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
+        # scriptNameTreeView.append_column( treeViewColumn )
 
         
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Terminal / Interval" ) )
-        # treeViewColumn.set_expand( False )
-        #
-        # rendererPixbuf = Gtk.CellRendererPixbuf()
-        # treeViewColumn.pack_start( rendererPixbuf, False )
-        # treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 5 )
-        # treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
-        #
-        # rendererText = Gtk.CellRendererText()
-        # treeViewColumn.pack_start( rendererText, False )
-        # treeViewColumn.add_attribute( rendererText, "text", 6 )
-        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
-        #
-        # scriptNameTreeView.append_column( treeViewColumn )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
+        treeViewColumn.set_expand( False )
+
+        rendererText = Gtk.CellRendererText()
+        treeViewColumn.pack_start( rendererText, False )
+        treeViewColumn.add_attribute( rendererText, "text", 6 )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
+
+        rendererPixbuf = Gtk.CellRendererPixbuf()
+        treeViewColumn.pack_start( rendererPixbuf, False )
+        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 6 )
+        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
+
+        scriptNameTreeView.append_column( treeViewColumn )
 
 #TODO Can we show the default script in some other way (highlight/bold the row) rather than have an extra column just for a tick?
 # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
@@ -494,8 +494,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
     def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_property( "xalign", 0.0 )
-        if treeViewColumn.get_title() == _( "Interval" ):
-            cellRenderer.set_property( "xalign", 0.5 )
+#TODO May not need this bit.        
+        # if treeViewColumn.get_title() == _( "Interval" ):
+        #     cellRenderer.set_property( "xalign", 0.5 )
 
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
         scriptGroup = treeModel.get_value( treeIter, 0 )
@@ -504,24 +505,68 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-#     # Renders either:
-#     #    The tick symbol for a foreground script to leave the terminal open,
-#     #    The interval (number as text) for a background script.
-#     #
-#     # Only want to render either the tick symbol OR the text, not both.
-#     # If the renderer for the item that is not to be displayed is still visible,
-#     # space is taken up throwing out alignments, so need to hide the unused renderer.
-#     #
-#     # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
-#     # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
-#     # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
-#     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-#     def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
-#         cellRenderer.set_visible( True )
-#         background = treeModel.get_value( treeIter, 4 )
-#
+    # Renders either:
+    #    The tick symbol for a foreground script to leave the terminal open,
+    #    The interval (number as text) for a background script.
+    #
+    # Only want to render either the tick symbol OR the text, not both.
+    # If the renderer for the item that is not to be displayed is still visible,
+    # space is taken up throwing out alignments, so need to hide the unused renderer.
+    #
+    # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
+    # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
+    # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
+    # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
+    def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
+        cellRenderer.set_visible( True )
+        # group = treeModel.get_value( treeIter, 0 )
+        # name = treeModel.get_value( treeIter, 1 )
+        # sound = treeModel.get_value( treeIter, 2 )
+        # notification = treeModel.get_value( treeIter, 3 )
+        # backgroundModel = treeModel.get_value( treeIter, 4 )
+        # terminal = treeModel.get_value( treeIter, 5 )
+        # interval = treeModel.get_value( treeIter, 6 )
+
+        # background = False if treeModel.get_value( treeIter, 4 ) is None else True
+        # if background:
+        if treeModel.get_value( treeIter, 4 ) == Gtk.STOCK_APPLY:
+            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+                cellRenderer.set_visible( False )
+
+            else:
+                cellRenderer.set_property( "xalign", 0.5 )
+                #TODO Probably want the bold/normal stuff here too?  Probably not; a background script cannot be a default script.
+
+        else:
+            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+                pass
+
+            else:
+                cellRenderer.set_visible( False )
+        
+        
+        # background = False if treeModel.get_value( treeIter, 4 ) is None else True
+        # if background:
+        #     if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+        #         cellRenderer.set_visible( False )
+        #
+        #     else:
+        #         cellRenderer.set_property( "xalign", 0.5 )
+        #         #TODO Probably want the bold/normal stuff here too?  Probably not; a background script cannot be a default script.
+        #
+        # else:
+        #     if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+        #         pass
+        #
+        #     else:
+        #         cellRenderer.set_visible( False )
+
+
+
+
+
 #         if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
-#             if background:
+#             if background == Gtk.STOCK_APPLY:
 #                 cellRenderer.set_visible( False )
 #
 # #TODO Needed?
@@ -530,7 +575,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #
 #         if isinstance( cellRenderer, Gtk.CellRendererText ):
 #             cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
-#             if background:
+#             if background == Gtk.STOCK_APPLY:
 #                 cellRenderer.set_property( "xalign", 0.5 )
 #
 #             else:
@@ -555,38 +600,52 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for scriptName in scriptNames:
             script = self.getScript( scripts, scriptGroup, scriptName )
 
-            playSound = None
+            playSound = Gtk.STOCK_CLOSE
             if script.getPlaySound():
                 playSound = Gtk.STOCK_APPLY
 
-            showNotification = None
+            showNotification = Gtk.STOCK_CLOSE
             if script.getShowNotification():
                 showNotification = Gtk.STOCK_APPLY
 
-            background = None
+            background = Gtk.STOCK_CLOSE
             if script.getBackground():
                 background = Gtk.STOCK_APPLY
 
-            terminalOpen = None
-            # if script.getBackground():
-            #     terminalOpen = Gtk.STOCK_REMOVE
-            #
-            # else:
-            #     if script.getTerminalOpen():
-            #         terminalOpen = Gtk.STOCK_APPLY
-            if not script.getBackground() and script.getTerminalOpen():
-                terminalOpen = Gtk.STOCK_APPLY
+            terminalOpen = Gtk.STOCK_CLOSE
+            if script.getBackground():
+                terminalOpen = Gtk.STOCK_REMOVE
 
-            intervalInMinutes = None
-            # if script.getBackground():
-            #     intervalInMinutes = script.getIntervalInMinutes()
-            #
-            # else:
-            #     intervalInMinutes = Gtk.STOCK_REMOVE
+            else:
+                if script.getTerminalOpen():
+                    terminalOpen = Gtk.STOCK_APPLY
+            # if not script.getBackground() and script.getTerminalOpen():
+            #     terminalOpen = Gtk.STOCK_APPLY
+
+            # intervalInMinutes = None
             if script.getBackground():
                 intervalInMinutes = script.getIntervalInMinutes()
 
+            else:
+                intervalInMinutes = Gtk.STOCK_REMOVE
+            # if script.getBackground():
+            #     intervalInMinutes = script.getIntervalInMinutes()
+
             scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, intervalInMinutes ] )
+
+
+            # iter_child = scriptNameListStore.get_iter_first()
+            # while iter_child:
+            #     print( 
+            #         scriptNameListStore.get_value( iter_child, 0 ),
+            #         scriptNameListStore.get_value( iter_child, 1 ),
+            #         scriptNameListStore.get_value( iter_child, 2 ),
+            #         scriptNameListStore.get_value( iter_child, 3 ),
+            #         scriptNameListStore.get_value( iter_child, 4 ),
+            #         scriptNameListStore.get_value( iter_child, 5 ),
+            #         scriptNameListStore.get_value( iter_child, 6 ) )
+            #
+            #     iter_child = scriptNameListStore.iter_next(iter_child)
 
         scriptNameTreeView.get_selection().select_path( 0 )
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
