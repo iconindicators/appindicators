@@ -262,8 +262,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         #    tick icon for show notification
         #    tick for background script
         #    terminal open icon (tick icon or remove icon)
-        #    interval amount (string) or remove icon (for when interval amount is not applicable)
-        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str, str )
+        #    interval amount (string)
+        #    Remove icon (for when interval amount is not applicable)
+        scriptNameListStore = Gtk.ListStore( str, str, str, str, str, str, str, str )
         scriptNameListStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptNameTreeView = Gtk.TreeView.new_with_model( scriptNameListStore )
@@ -316,7 +317,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         rendererPixbuf = Gtk.CellRendererPixbuf()
         treeViewColumn.pack_start( rendererPixbuf, False )
-        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 6 )
+        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 7 )
         treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
 
         scriptNameTreeView.append_column( treeViewColumn )
@@ -519,13 +520,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
     def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_visible( True )
-        # group = treeModel.get_value( treeIter, 0 )
-        # name = treeModel.get_value( treeIter, 1 )
-        # sound = treeModel.get_value( treeIter, 2 )
-        # notification = treeModel.get_value( treeIter, 3 )
-        # backgroundModel = treeModel.get_value( treeIter, 4 )
-        # terminal = treeModel.get_value( treeIter, 5 )
-        # interval = treeModel.get_value( treeIter, 6 )
 
         # background = False if treeModel.get_value( treeIter, 4 ) is None else True
         # if background:
@@ -622,16 +616,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             # if not script.getBackground() and script.getTerminalOpen():
             #     terminalOpen = Gtk.STOCK_APPLY
 
-            # intervalInMinutes = None
+            intervalInMinutes = None
             if script.getBackground():
                 intervalInMinutes = script.getIntervalInMinutes()
 
-            else:
-                intervalInMinutes = Gtk.STOCK_REMOVE
+            intervalInMinutesExtra = None
+            if not script.getBackground():
+                intervalInMinutesExtra = Gtk.STOCK_CLOSE
+
+            # else:
+            #     intervalInMinutes = Gtk.STOCK_REMOVE
             # if script.getBackground():
             #     intervalInMinutes = script.getIntervalInMinutes()
 
-            scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, intervalInMinutes ] )
+            scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesExtra ] )
 
 
             # iter_child = scriptNameListStore.get_iter_first()
