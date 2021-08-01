@@ -594,27 +594,30 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for scriptName in scriptNames:
             script = self.getScript( scripts, scriptGroup, scriptName )
 
-            playSound = Gtk.STOCK_CLOSE
+            playSound = None
             if script.getPlaySound():
                 playSound = Gtk.STOCK_APPLY
 
-            showNotification = Gtk.STOCK_CLOSE
+            showNotification = None
             if script.getShowNotification():
                 showNotification = Gtk.STOCK_APPLY
 
-            background = Gtk.STOCK_CLOSE
+            background = None
             if script.getBackground():
                 background = Gtk.STOCK_APPLY
 
-            terminalOpen = Gtk.STOCK_CLOSE
+            # terminalOpen = None
+            # if script.getBackground():
+            #     terminalOpen = Gtk.STOCK_REMOVE
+            #
+            # else:
+            #     if script.getTerminalOpen():
+            #         terminalOpen = Gtk.STOCK_APPLY
+            terminalOpen = None
+            if script.getTerminalOpen() and not script.getBackground():
+                terminalOpen = Gtk.STOCK_APPLY
             if script.getBackground():
                 terminalOpen = Gtk.STOCK_REMOVE
-
-            else:
-                if script.getTerminalOpen():
-                    terminalOpen = Gtk.STOCK_APPLY
-            # if not script.getBackground() and script.getTerminalOpen():
-            #     terminalOpen = Gtk.STOCK_APPLY
 
             intervalInMinutes = None
             if script.getBackground():
@@ -622,13 +625,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             intervalInMinutesExtra = None
             if not script.getBackground():
-                intervalInMinutesExtra = Gtk.STOCK_CLOSE
+                intervalInMinutesExtra = Gtk.STOCK_REMOVE
 
             # else:
             #     intervalInMinutes = Gtk.STOCK_REMOVE
             # if script.getBackground():
             #     intervalInMinutes = script.getIntervalInMinutes()
 
+
+# https://thebigdoc.readthedocs.io/en/latest/PyGObject-Tutorial/stock.html#Gtk.STOCK_REMOVE
             scriptNameListStore.append( [ scriptGroup, scriptName, playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesExtra ] )
 
 
