@@ -266,12 +266,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         #    interval amount (string)
         #    Remove icon (for when interval amount is not applicable)
         scriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
-        scriptsTreeStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        # scriptsTreeStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptsTreeView = Gtk.TreeView.new_with_model( scriptsTreeStore )
         scriptsTreeView.set_hexpand( True )
         scriptsTreeView.set_vexpand( True )
-        scriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+        scriptsTreeView.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
+        scriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         # scriptsTreeView.connect( "row-activated", self.onScriptNameDoubleClick, scriptGroupComboBox, copyOfScripts )
         scriptsTreeView.set_tooltip_text( _(
             "List of scripts within the same group.\n\n" + \
@@ -344,11 +345,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( scriptsTreeView )
-        scrolledWindow.set_margin_top( 10 )
+        # scrolledWindow.set_margin_top( 10 )
 
         self.populateTreeStore( copyOfScripts, scriptsTreeStore, scriptsTreeView )
+        scriptsTreeView.expand_all()
 
-        grid.attach( scrolledWindow, 0, 1, 1, 15 )
+        grid.attach( scrolledWindow, 0, 0, 1, 20 )
 
         box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
         box.set_margin_top( 10 )
@@ -368,7 +370,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_vexpand( True )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 16, 1, 15 )
+        grid.attach( box, 0, 21, 1, 15 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -395,7 +397,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( removeButton, True, True, 0 )
 
         box.set_halign( Gtk.Align.CENTER )
-        grid.attach( box, 0, 32, 1, 1 )
+        grid.attach( box, 0, 37, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Scripts" ) ) )
 
@@ -476,7 +478,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
         # scriptGroupComboBox.connect( "changed", self.onScriptGroup, copyOfScripts, scriptsListStore, scriptsTreeView )
-        # scriptsTreeView.get_selection().connect( "changed", self.onScriptName, scriptGroupComboBox, commandTextView, copyOfScripts )
+        # scriptsTreeView.get_selection().connect( "changed", self.onScriptName, commandTextView, copyOfScripts )
+        # scriptsTreeView.connect( "row-activated", 
+        scriptsTreeView.connect( "cursor-changed", self.onScript, commandTextView, copyOfScripts )
         # self.populateScriptGroupCombo( copyOfScripts, scriptGroupComboBox, scriptsTreeView, None, None )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -627,8 +631,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # https://thebigdoc.readthedocs.io/en/latest/PyGObject-Tutorial/stock.html#Gtk.STOCK_REMOVE
                 treeStore.append( parent, [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
-        treeView.get_selection().select_path( 0 )
-        treeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
+        treeView.get_selection().select_path( 1 )
+        treeView.scroll_to_cell( Gtk.TreePath.new_from_string( "1" ) )
 
 
     def onScriptGroup( self, scriptGroupComboBox, scripts, scriptNameListStore, scriptNameTreeView ):
@@ -705,14 +709,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNameTreeView.scroll_to_cell( Gtk.TreePath.new_from_string( "0" ) )
 
 
-    def onScriptName( self, scriptNameTreeSelection, scriptGroupComboBox, commandTextView, scripts ):
-        scriptGroup = scriptGroupComboBox.get_active_text()
-        model, treeiter = scriptNameTreeSelection.get_selected()
+    def onScript( self, scriptTreeSelection, commandTextView, scripts ):
+        model, treeiter = scriptTreeSelection.get_selection().get_selected_rows()
         if treeiter:
-            scriptName = model[ treeiter ][ 1 ]
+            scriptGroup = model[ treeiter ][ 0 ]
+            scriptName = model[ treeiter ][ 2 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
+            # if theScript:
+            #     commandTextView.get_buffer().set_text( theScript.getCommand() )
+            commandText = ""
             if theScript:
-                commandTextView.get_buffer().set_text( theScript.getCommand() )
+                commandText = theScript.getCommand()
+
+            commandTextView.get_buffer().set_text( commandText )
 
 
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
