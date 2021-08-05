@@ -73,7 +73,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def updateMenu( self, menu ):
         if self.showScriptsInSubmenus:
-            scriptsByGroup = self.getScriptsByGroup( self.scripts, foreground = True, background = False )
+            scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
             indent = self.indent( 0, 1 )
             for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                 menuItem = Gtk.MenuItem( group )
@@ -88,7 +88,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
 
             else:
-                scriptsByGroup = self.getScriptsByGroup( self.scripts, foreground = True, background = False )
+                scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
                 indent = self.indent( 1, 1 )
                 for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
@@ -330,7 +330,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-        scriptsTreeView.connect( "cursor-changed", self.onScript, commandTextView, copyOfScripts )
+        scriptsTreeView.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -439,9 +439,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-
-
-
         backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str )
         # scriptsTreeStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
@@ -473,10 +470,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsTreeView.expand_all()
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
-
-
-
-
 
         notebook.append_page( grid, Gtk.Label.new( _( "Label" ) ) )
 
@@ -589,7 +582,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
         treeStore.clear()
-        scriptsByGroup = self.getScriptsByGroup( scripts, foreground = False, background = True )
+        scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
 #TODO Can we have a group but without any scripts?  Check!
@@ -606,7 +599,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # treeView.scroll_to_cell( treePath )
 
 
-    def onScript( self, treeSelection, textView, scripts ):
+    def onScriptSelection( self, treeSelection, textView, scripts ):
         model, treeiter = treeSelection.get_selection().get_selected_rows()
         if treeiter:
             scriptGroup = model[ treeiter ][ 0 ]
@@ -620,10 +613,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ):
-        model = treeView.get_model()
-        print( model[ treePath][ : ] )
-        #TODO Need to ignore if element 1 is not None. (ignore a group)
-        # self.onScriptEdit( None, scripts, scriptGroupComboBox, treeView )
+        model, treeiter = treeView.get_selection().get_selected()
+        if treeiter:
+            scriptGroup = model[ treeiter ][ 0 ]
+            scriptName = model[ treeiter ][ 2 ]
+            theScript = self.getScript( scripts, scriptGroup, scriptName )
+            if theScript:
+                pass
+                #TODO Edit the script from here?
+                # self.onScriptEdit( None, scripts, scriptGroupComboBox, scriptNameTreeView ) Original code
 
 
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
@@ -965,20 +963,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         scriptGroupComboBox.set_active( groupIndex )
         scriptTreeView.get_selection().select_path( scriptIndex )
-
-
-    # def getScriptsByGroup( self, scripts, foregroundOnly = False ):
-    #     scriptsGroupedByName = { }
-    #     for script in scripts:
-    #         if foregroundOnly and script.getBackground():
-    #             continue
-    #
-    #         if script.getGroup() not in scriptsGroupedByName:
-    #             scriptsGroupedByName[ script.getGroup() ] = [ ]
-    #
-    #         scriptsGroupedByName[ script.getGroup() ].append( script )
-    #
-    #     return scriptsGroupedByName
 
 
     def getScriptsByGroup( self, scripts, foreground = True, background = True ):
