@@ -66,20 +66,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def update( self, menu ):
+        print()#TODO debugging
         self.updateMenu( menu )
         self.updateLabel()
 
 
     def updateMenu( self, menu ):
         if self.showScriptsInSubmenus:
-            scriptsGroupedByName = self.getScriptsByGroup( self.scripts, True )
+            scriptsByGroup = self.getScriptsByGroup( self.scripts, foreground = True, background = False )
             indent = self.indent( 0, 1 )
-            for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+            for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                 menuItem = Gtk.MenuItem( group )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
-                self.addScriptsToMenu( scriptsGroupedByName[ group ], group, subMenu, indent )
+                self.addScriptsToMenu( scriptsByGroup[ group ], group, subMenu, indent )
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
@@ -87,11 +88,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
 
             else:
-                scriptsGroupedByName = self.getScriptsByGroup( self.scripts, True )
+                scriptsByGroup = self.getScriptsByGroup( self.scripts, foreground = True, background = False )
                 indent = self.indent( 1, 1 )
-                for group in sorted( scriptsGroupedByName.keys(), key = str.lower ):
+                for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
-                    self.addScriptsToMenu( scriptsGroupedByName[ group ], group, menu, indent )
+                    self.addScriptsToMenu( scriptsByGroup[ group ], group, menu, indent )
 
 
 #TODO If a background script is modified (group name or script name changes or script is removed)
@@ -124,20 +125,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
 
         # Run each background script present in the label...
-        for script in self.scripts:
-            if script.getBackground():
-                if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
-                    commandResult = self.processGet( script.getCommand() ).strip()
-                    if script.getPlaySound() and commandResult:
-                        self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
-
-                    if script.getShowNotification() and commandResult:
-                        notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
-                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
-                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
-                        self.processCall( notificationCommand )
-
-                    label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
+#TODO Temporarily turn off background script execution whilst developing...        
+        # for script in self.scripts:
+        #     if script.getBackground():
+        #         if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
+        #             commandResult = self.processGet( script.getCommand() ).strip()
+        #             if script.getPlaySound() and commandResult:
+        #                 self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+        #
+        #             if script.getShowNotification() and commandResult:
+        #                 notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+        #                 notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+        #                 notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+        #                 self.processCall( notificationCommand )
+        #
+        #             label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -196,13 +198,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             #     menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
 
             menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
-            menuItem.connect( "activate", self.onScript, script )
+            menuItem.connect( "activate", self.onScriptMenuItem, script )
             menu.append( menuItem )
             if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
                 self.secondaryActivateTarget = menuItem
 
 
-    def onScript( self, menuItem, script ):
+    def onScriptMenuItem( self, menuItem, script ):
         terminal = self.getTerminal()
         terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
@@ -251,7 +253,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsTreeView = Gtk.TreeView.new_with_model( scriptsTreeStore )
         scriptsTreeView.set_hexpand( True )
         scriptsTreeView.set_vexpand( True )
-        scriptsTreeView.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
+        # scriptsTreeView.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
         scriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         scriptsTreeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
         scriptsTreeView.set_tooltip_text( _(
@@ -311,7 +313,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( scriptsTreeView )
 
-        self.populateTreeStore( copyOfScripts, scriptsTreeStore, scriptsTreeView )
+        self.populateScriptsTreeStore( copyOfScripts, scriptsTreeStore, scriptsTreeView )
         scriptsTreeView.expand_all()
 
         grid.attach( scrolledWindow, 0, 0, 1, 20 )
@@ -406,10 +408,82 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Icon stuff...take fron Lunar.
 
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
+
+        indicatorText = Gtk.Entry()
+        indicatorText.set_tooltip_text( _(
+            "The text shown next to the indicator icon,\n" + \
+            "or tooltip where applicable.\n\n" + \
+            "The icon text can contain text and tags\n" + \
+            "from the table below.\n\n" + \
+            "To associate text with one or more tags,\n" + \
+            "enclose the text and tag(s) within { }.\n\n" + \
+            "For example\n\n" + \
+            "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
+            "If any tag contains no data at render time,\n" + \
+            "the tag will be removed.\n\n" + \
+            "If a removed tag is within { }, the tag and\n" + \
+            "text will be removed." ) )
+        box.pack_start( indicatorText, True, True, 0 )
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
+
+        indicatorTextSeparator = Gtk.Entry()
+        indicatorTextSeparator.set_text( self.indicatorTextSeparator )
+        indicatorTextSeparator.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
+        box.pack_start( indicatorTextSeparator, False, False, 0 )
+        grid.attach( box, 0, 1, 1, 1 )
+
+
+
+
+        backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str )
+        # scriptsTreeStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+
+        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
+        backgroundScriptsTreeView.set_hexpand( True )
+        backgroundScriptsTreeView.set_vexpand( True )
+        # backgroundScriptsTreeView.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
+        backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorText, copyOfScripts )
+        backgroundScriptsTreeView.set_tooltip_text( _(
+            "List of scripts within the same group.\n\n" + \
+            "If a default script has been nominated,\n" + \
+            "that script will be initially selected." ) )
+#TODO Fix the tooltip above.
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn.set_expand( False )
+        backgroundScriptsTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 2 )
+        treeViewColumn.set_expand( False )
+        backgroundScriptsTreeView.append_column( treeViewColumn )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( backgroundScriptsTreeView )
+
+        self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeStore, backgroundScriptsTreeView )
+        backgroundScriptsTreeView.expand_all()
+
+        grid.attach( scrolledWindow, 0, 2, 1, 20 )
+
+
+
+
+
         notebook.append_page( grid, Gtk.Label.new( _( "Label" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
+
+#TODO HOw to rename a group?
 
 #TODO Ensure the default script, if any, is NOT a background script.
         responseType = dialog.run()
@@ -479,9 +553,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
-    def populateTreeStore( self, scripts, treeStore, treeView ):
+    def populateScriptsTreeStore( self, scripts, treeStore, treeView ):
         treeStore.clear()
-        scriptsByGroup = self.getScriptsByGroup( self.scripts )
+        scriptsByGroup = self.getScriptsByGroup( scripts )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
 #TODO Can we have a group but without any scripts?  Check!
@@ -508,13 +582,32 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
-        # treePath = Gtk.TreePath.new_from_string( "0:0" )
+        # treePath = Gtk.TreePath.new_from_string( "0" )
         # treeView.get_selection().select_path( treePath )
         # treeView.scroll_to_cell( treePath )
 
 
-    def onScript( self, scriptTreeSelection, commandTextView, scripts ):
-        model, treeiter = scriptTreeSelection.get_selection().get_selected_rows()
+    def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
+        treeStore.clear()
+        scriptsByGroup = self.getScriptsByGroup( scripts, foreground = False, background = True )
+        scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
+
+#TODO Can we have a group but without any scripts?  Check!
+        for scriptGroup in scriptGroups:
+            parent = treeStore.append( None, [ scriptGroup, scriptGroup, None ] )
+
+            for script in scriptsByGroup[ scriptGroup ]:
+                treeStore.append( parent, [ scriptGroup, None, script.getName() ] )
+
+# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
+#TODO Figure out how to select the first script, not the first group...or is this not an issue?
+        # treePath = Gtk.TreePath.new_from_string( "0" )
+        # treeView.get_selection().select_path( treePath )
+        # treeView.scroll_to_cell( treePath )
+
+
+    def onScript( self, treeSelection, textView, scripts ):
+        model, treeiter = treeSelection.get_selection().get_selected_rows()
         if treeiter:
             scriptGroup = model[ treeiter ][ 0 ]
             scriptName = model[ treeiter ][ 2 ]
@@ -523,7 +616,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             if theScript:
                 commandText = theScript.getCommand()
 
-            commandTextView.get_buffer().set_text( commandText )
+            textView.get_buffer().set_text( commandText )
+
+
+    def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ):
+        model = treeView.get_model()
+        print( model[ treePath][ : ] )
+        #TODO Need to ignore if element 1 is not None. (ignore a group)
+        # self.onScriptEdit( None, scripts, scriptGroupComboBox, treeView )
 
 
     def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
@@ -628,11 +728,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.addEditScript( Info( "", "", "", False, False, False ), scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
-    def onScriptDoubleClick( self, scriptTreeView, scriptTreePath, scriptTreeViewColumn, scripts ):
-        model = scriptTreeView.get_model()
-        print( model[ scriptTreePath][ : ] )
-        #TODO Need to ignore if element 1 is not None.
-        # self.onScriptEdit( None, scripts, scriptGroupComboBox, scriptTreeView )
+    def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
+    #     model = treeView.get_model()
+    #     print( model[ treePath][ : ] )
+    #     #TODO Need to ignore if element 1 is not None.
+    # def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
+        model, treeiter = treeView.get_selection().get_selected()
+        #TODO Ignore if a group.
+        textEntry.insert_text( "[" + model[ treeiter ][ 2 ] + "]", textEntry.get_position() )
+
 
 
     def onScriptEdit( self, button, scripts, scriptGroupComboBox, scriptTreeView ):
@@ -863,18 +967,30 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptTreeView.get_selection().select_path( scriptIndex )
 
 
-    def getScriptsByGroup( self, scripts, foregroundOnly = False ):
-        scriptsGroupedByName = { }
+    # def getScriptsByGroup( self, scripts, foregroundOnly = False ):
+    #     scriptsGroupedByName = { }
+    #     for script in scripts:
+    #         if foregroundOnly and script.getBackground():
+    #             continue
+    #
+    #         if script.getGroup() not in scriptsGroupedByName:
+    #             scriptsGroupedByName[ script.getGroup() ] = [ ]
+    #
+    #         scriptsGroupedByName[ script.getGroup() ].append( script )
+    #
+    #     return scriptsGroupedByName
+
+
+    def getScriptsByGroup( self, scripts, foreground = True, background = True ):
+        scriptsByGroup = { }
         for script in scripts:
-            if foregroundOnly and script.getBackground():
-                continue
+            if ( foreground and not script.getBackground() ) or ( background and script.getBackground() ):
+                if script.getGroup() not in scriptsByGroup:
+                    scriptsByGroup[ script.getGroup() ] = [ ]
 
-            if script.getGroup() not in scriptsGroupedByName:
-                scriptsGroupedByName[ script.getGroup() ] = [ ]
+                scriptsByGroup[ script.getGroup() ].append( script )
 
-            scriptsGroupedByName[ script.getGroup() ].append( script )
-
-        return scriptsGroupedByName
+        return scriptsByGroup
 
 
     def __convertFromVersion13ToVersion14( self, scripts ):
