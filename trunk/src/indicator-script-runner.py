@@ -18,6 +18,7 @@
 
 # Application indicator allowing a user to run a terminal command or script.
 
+
 #TODO Need a timer per background script, measured in minutes, which is the frequency of script execution.
 
 
@@ -38,8 +39,8 @@ import copy, indicatorbase, re
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     CONFIG_HIDE_GROUPS = "hideGroups"
-    CONFIG_INDICATOR_TEXT = "indicatorText" #TODO Needed???
-    CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator" #TODO Needed???
+    CONFIG_INDICATOR_TEXT = "indicatorText"
+    CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator"
     CONFIG_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
     CONFIG_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
     CONFIG_SCRIPTS = "scripts"
@@ -117,8 +118,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if match:
             whitespaceAtEnd = match.group( 0 )
 
-#TODO If we keep sound/notification, need to add to preferences.
-
 
 #TODO Will need some way to ensure that no background scripts have the same group/name combination.
 # Maybe in the preferences when they hit okay and we check the label?
@@ -187,16 +186,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def addScriptsToMenu( self, scripts, group, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
         for script in scripts:
-
-#TODO Not sure to use this or not to display the current default script.
-#Ask Oleg.
-            # if script.getGroup() == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
-            #     menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + script.getName() )
-            #     menuItem.set_active( True )
-            #
-            # else:
-            #     menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
-
             menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
             menuItem.connect( "activate", self.onScriptMenuItem, script )
             menu.append( menuItem )
@@ -237,6 +226,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
 
 #TODO Might be a good idea to define these as constants...so other code does not refer to numbers but rather names.
+#See indicator lunar.
+#Do the same for the treeview for background scripts for the lable/icon text.
         # Data model to hold... 
         #    Script group
         #    Script group
@@ -260,9 +251,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "List of scripts within the same group.\n\n" + \
             "If a default script has been nominated,\n" + \
             "that script will be initially selected." ) )
-#TODO The tooltip above...
-#Can't find the code which checks to see which, if any, script is the default and then select it.
-#If this is the case, remove that part of each tooltip.
+#TODO The tooltip above needs rewriting.  Doesn't appear that we now select any script by default.
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = 1 )
         treeViewColumn.set_expand( False )
@@ -304,10 +293,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
 
         scriptsTreeView.append_column( treeViewColumn )
-
-#TODO Can we show the default script in some other way (highlight/bold the row) rather than have an extra column just for a tick?
-# https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/cellrenderers.html
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -372,10 +357,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # Menu settings.
         grid = self.createGrid()
 
-        # label = Gtk.Label.new( _( "Display" ) )
-        # label.set_halign( Gtk.Align.START )
-        # grid.attach( label, 0, 0, 1, 1 )
-
         radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
         radioShowScriptsSubmenu.set_tooltip_text( _( "Scripts of the same group are shown in submenus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
@@ -406,13 +387,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # Label settings.
         grid = self.createGrid()
 
-#TODO Icon stuff...take fron Lunar.
-
         box = Gtk.Box( spacing = 6 )
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
+#TODO Check this tooltip.
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -452,7 +432,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "List of scripts within the same group.\n\n" + \
             "If a default script has been nominated,\n" + \
             "that script will be initially selected." ) )
-#TODO Fix the tooltip above.
+#TODO Fix the tooltip above.  No default script is selected.
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = 1 )
         treeViewColumn.set_expand( False )
@@ -495,7 +475,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return responseType
 
 
-    # Renders the script name and interval (for background scripts).
+    # Renders the script name bold when the (foreground) script is default.
+    # Otherwise normal style is used.
     #
     # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
     # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
@@ -513,13 +494,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-    # Renders either:
-    #    The tick symbol for a foreground script to leave the terminal open,
-    #    The interval (number as text) for a background script.
-    #
-    # Only want to render either the tick symbol OR the text, not both.
-    # If the renderer for the item that is not to be displayed is still visible,
-    # space is taken up throwing out alignments, so need to hide the unused renderer.
+    # Renderer for the Interval column.
+    #    For a background script, the value will be a number (as text) for the interval in minutes.
+    #    For a foreground script, the interval does not apply and so a dash icon is rendered.
     #
     # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
     # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
@@ -723,7 +700,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptAdd( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        self.addEditScript( Info( "", "", "", False, False, False ), scripts, scriptGroupComboBox, scriptNameTreeView )
+        self.__addEditScript( Info( "", "", "", False, False, False ), scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
@@ -743,10 +720,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if scriptGroup and treeiter:
             scriptName = model[ treeiter ][ 0 ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
-            self.addEditScript( theScript, scripts, scriptGroupComboBox, scriptTreeView )
+            self.__addEditScript( theScript, scripts, scriptGroupComboBox, scriptTreeView )
 
 
-    def addEditScript( self, script, scripts, scriptGroupComboBox, scriptTreeView ):
+    def __addEditScript( self, script, scripts, scriptGroupComboBox, scriptTreeView ):
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
@@ -823,7 +800,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( notificationCheckbox, 0, 24, 1, 1 )
 
-#TODO Need Background checkbox.
+#TODO Need Background checkbox.  Also need widget for interval.
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
