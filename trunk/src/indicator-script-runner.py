@@ -307,6 +307,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
+#TODO Need to capture the event when you CTRL click a script and that unselects the script...should then clear the command text view.
         commandTextView = Gtk.TextView()
         commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_editable( False )
@@ -343,7 +344,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        # removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptGroupComboBox, scriptsTreeView, commandTextView )
+        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptsTreeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
 
         box.set_halign( Gtk.Align.CENTER )
@@ -677,23 +678,31 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
-    def onScriptRemove( self, button, scripts, scriptGroupComboBox, scriptNameTreeView, commandTextView ):
-        scriptGroup = scriptGroupComboBox.get_active_text()
-        model, treeiter = scriptNameTreeView.get_selection().get_selected()
-        if scriptGroup and treeiter:
-            scriptName = model[ treeiter ][ 0 ]
+    def onScriptRemove( self, button, scripts, treeView, commandTextView ):
+        model, treeiter = treeView.get_selection().get_selected()
+        if treeiter:
+            scriptGroup = model[ treeiter ][ 1 ]
+            scriptName = model[ treeiter ][ 2 ]
             if self.showOKCancel( scriptNameTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
                         del scripts[ i ]
-                        if scriptGroup not in self.getScriptsByGroup( scripts ):
-                            scriptGroup = None
 
-                        self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, None )
-                        if len( scripts ) == 0:
-                            commandTextView.get_buffer().set_text( "" )
+                        #TODO Is this needed?
+#                         if scriptGroup not in self.getScriptsByGroup( scripts ):
+#                             scriptGroup = None
 
+#                         self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, None ) TODO Original
+
+                        #TODO Is this needed?
+#                         if len( scripts ) == 0:
+#                             commandTextView.get_buffer().set_text( "" )
+
+#TODO Need to either pass in the treeStores or get it from the treeViews.
+#TODO Need to figure out how to select the deleted script.  If so, probably don't need the commandTextView.
+#                         self.populateScriptsTreeStore( scripts, treeStore, treeView )
+#                         self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView ):
                         break
 
                     i += 1
