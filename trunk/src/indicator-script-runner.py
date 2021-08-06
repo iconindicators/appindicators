@@ -545,8 +545,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
-        # treePath = Gtk.TreePath.new_from_string( "0:1" )
-        # treeView.get_selection().select_path( treePath )
+        treePath = Gtk.TreePath.new_from_string( "0:1" )
+        treeView.get_selection().select_path( treePath )
         # treeView.set_cursor( treePath, None, False )
         # treeView.scroll_to_cell( treePath )
 
