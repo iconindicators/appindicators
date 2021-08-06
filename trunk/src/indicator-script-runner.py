@@ -689,16 +689,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
                         del scripts[ i ]
 
-                        #TODO Is this needed?
-#                         if scriptGroup not in self.getScriptsByGroup( scripts ):
-#                             scriptGroup = None
-
-#                         self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, scriptGroup, None ) TODO Original
-
-                        #TODO Is this needed?
-#                         if len( scripts ) == 0:
-#                             commandTextView.get_buffer().set_text( "" )
-
 #TODO Need to either pass in the treeStores or get it from the treeViews.
 #TODO Need to figure out how to select the deleted script.  If so, probably don't need the commandTextView.
 #                         self.populateScriptsTreeStore( scripts, treeStore, treeView )
