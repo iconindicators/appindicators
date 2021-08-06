@@ -699,7 +699,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptAdd( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        self.__addEditScript( Info( "", "", "", False, False, False ), scripts, scriptGroupComboBox, scriptNameTreeView )
+        self.__addEditScript( Info( "", "", "", False, False, False, False, 0 ), scripts, scriptGroupComboBox, scriptNameTreeView )
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
@@ -721,7 +721,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.__addEditScript( theScript, scripts, scriptGroupComboBox, scriptTreeView )
 
 
-    def __addEditScript( self, script, scripts, scriptGroupComboBox, scriptTreeView ):
+    def __addEditScript( self, script, scripts, scriptTreeView ):
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
@@ -737,10 +737,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for group in groups:
             scriptGroupCombo.append_text( group )
 
-        if script.getGroup() == "":
-            scriptGroupCombo.set_active( scriptGroupComboBox.get_active() )
+        if script.getGroup() == "": # This is a new script to be added.
+            pass
+#             scriptGroupCombo.set_active( scriptGroupComboBox.get_active() ) #TODO Cannot really do this now...get from treeView?
 
-        else:
+        else: # This is an existing script for edit.
             scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
 
         box.pack_start( scriptGroupCombo, True, True, 0 )
@@ -780,11 +781,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 20 )
 
+        backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
+        backgroundCheckbox.set_active( script.getBackground() )
+        backgroundCheckbox.set_tooltip_text( _(
+            "If checked, this script will run in background,\n" + \
+            "the results optionally displayed in the icon text.\n\n" + \
+            "Otherwise the script will appear in the menu." ) )
+
+        grid.attach( terminalCheckbox, 0, 22, 1, 1 )
+
+#TODO Should only be enabled if the background checkbox is unchecked.
+#Also need to watch the event for the background checkbox.
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
 
-        grid.attach( terminalCheckbox, 0, 22, 1, 1 )
+        grid.attach( terminalCheckbox, 0, 23, 1, 1 )
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
         soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
