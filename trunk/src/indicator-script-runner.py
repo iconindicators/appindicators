@@ -338,7 +338,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
         copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
-        # copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, scriptGroupComboBox, scriptsTreeView )
+        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, scriptsTreeView )
         box.pack_start( copyButton, True, True, 0 )
 
         removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
@@ -595,11 +595,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 # self.onScriptEdit( None, scripts, scriptGroupComboBox, scriptNameTreeView ) Original code
 
 
-    def onScriptCopy( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        scriptGroup = scriptGroupComboBox.get_active_text()
-        model, treeiter = scriptNameTreeView.get_selection().get_selected()
-        if scriptGroup and treeiter:
-            scriptName = model[ treeiter ][ 1 ]
+    def onScriptCopy( self, button, scripts, treeView ):
+        model, treeiter = treeView.get_selection().get_selected()
+        if treeiter:
+            scriptGroup = model[ treeiter ][ 1 ]
+            scriptName = model[ treeiter ][ 2 ]
             script = self.getScript( scripts, scriptGroup, scriptName )
 
             grid = self.createGrid()
@@ -664,7 +664,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                                       script.getIntervalInMinutes() )
 
                     scripts.append( newScript )
-                    self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, newScript.getGroup(), newScript.getName() )
+
+#TODO                     self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, newScript.getGroup(), newScript.getName() ) Original and not needed.
+
+#TODO Need to either pass in the treeStores or get it from the treeViews.
+#TODO Need to figure out how to select the copied script.
+#                     self.populateScriptsTreeStore( scripts, treeStore, treeView )
+#                     self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView ):
 
                 break
 
