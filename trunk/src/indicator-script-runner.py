@@ -96,14 +96,39 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.addScriptsToMenu( scriptsByGroup[ group ], group, menu, indent )
 
 
-#TODO If a background script is modified (group name or script name changes or script is removed)
-# need to update the tags of scripts in the label to match the change.
+    def addScriptsToMenu( self, scripts, group, menu, indent ):
+        scripts.sort( key = lambda script: script.getName().lower() )
+        for script in scripts:
+            menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
+            menuItem.connect( "activate", self.onScriptMenuItem, script )
+            menu.append( menuItem )
+            if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
+                self.secondaryActivateTarget = menuItem
 
 
+    def onScriptMenuItem( self, menuItem, script ):
+        terminal = self.getTerminal()
+        terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
+        command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
+
+        command += script.getCommand()
+
+        if script.getShowNotification():
+            command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+
+        if script.getPlaySound():
+            command += "; " + IndicatorScriptRunner.COMMAND_SOUND
+
+        if script.getTerminalOpen():
+            command += "; ${SHELL}"
+
+        command += "'"
+        Thread( target = self.processCall, args = ( command, ) ).start()
+
+
+#TODO Compare this function with that in Indicator Lunar.  
+#Is it possible to pull this into Indicate Base, passing in the smarts for running scripts as an argument?
     def updateLabel( self ):
-        #TODO Need to acquire this from the Preferences
-        self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
@@ -118,27 +143,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if match:
             whitespaceAtEnd = match.group( 0 )
 
-
-#TODO Will need some way to ensure that no background scripts have the same group/name combination.
-# Maybe in the preferences when they hit okay and we check the label?
-# Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
-
         # Run each background script present in the label...
-#TODO Temporarily turn off background script execution whilst developing...        
-        # for script in self.scripts:
-        #     if script.getBackground():
-        #         if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
-        #             commandResult = self.processGet( script.getCommand() ).strip()
-        #             if script.getPlaySound() and commandResult:
-        #                 self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
-        #
-        #             if script.getShowNotification() and commandResult:
-        #                 notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
-        #                 notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
-        #                 notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
-        #                 self.processCall( notificationCommand )
-        #
-        #             label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
+        for script in self.scripts:
+            if script.getBackground():
+#TODO Cannot simply run each background script...need to respect the timer for each script.
+#So perhaps cache each script's result.
+#When we come to this point, (somehow) determine which script we should be running (because its timer expired)
+#and pull results from the other scripts from the cache.
+                if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
+                    commandResult = self.processGet( script.getCommand() ).strip()
+                    if script.getPlaySound() and commandResult:
+                        self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+        
+                    if script.getShowNotification() and commandResult:
+                        notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+                        self.processCall( notificationCommand )
+        
+                    label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -183,41 +206,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
 
 
-    def addScriptsToMenu( self, scripts, group, menu, indent ):
-        scripts.sort( key = lambda script: script.getName().lower() )
-        for script in scripts:
-            menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
-            menuItem.connect( "activate", self.onScriptMenuItem, script )
-            menu.append( menuItem )
-            if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
-                self.secondaryActivateTarget = menuItem
-
-
-    def onScriptMenuItem( self, menuItem, script ):
-        terminal = self.getTerminal()
-        terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
-        command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-
-        command += script.getCommand()
-
-        if script.getShowNotification():
-            command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
-
-        if script.getPlaySound():
-            command += "; " + IndicatorScriptRunner.COMMAND_SOUND
-
-        if script.getTerminalOpen():
-            command += "; ${SHELL}"
-
-        command += "'"
-        Thread( target = self.processCall, args = ( command, ) ).start()
-
-
+#TODO If a background script is modified (group name or script name changes or script is removed)
+# need to update the tags of scripts in the label to match the change.
+#
+#TODO Will need some way to ensure that no background scripts have the same group/name combination.
+# Maybe in the preferences when they hit okay and we check the label?
+# Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
     def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
-
         copyOfScripts = copy.deepcopy( self.scripts )
+
         notebook = Gtk.Notebook()
 
         # Scripts.
@@ -225,9 +224,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-#TODO Might be a good idea to define these as constants...so other code does not refer to numbers but rather names.
+#TODO Define these as constants...so other code does not refer to numbers but rather names.
 #See indicator lunar.
-#Do the same for the treeview for background scripts for the lable/icon text.
+#Do the same for the treeview for background scripts in the label/icon text tab.
         # Data model to hold... 
         #    Script group
         #    Script group
@@ -239,12 +238,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         #    interval amount (string)
         #    Remove icon (for when interval amount is not applicable)
         scriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
-        # scriptsTreeStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         scriptsTreeView = Gtk.TreeView.new_with_model( scriptsTreeStore )
         scriptsTreeView.set_hexpand( True )
         scriptsTreeView.set_vexpand( True )
-        # scriptsTreeView.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
         scriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         scriptsTreeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
         scriptsTreeView.set_tooltip_text( _(
@@ -360,13 +357,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
         radioShowScriptsSubmenu.set_tooltip_text( _( "Scripts of the same group are shown in submenus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
-        # radioShowScriptsSubmenu.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
         radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts grouped" ) )
         radioShowScriptsIndented.set_tooltip_text( _( "Scripts are shown within their respective group." ) )
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
-        # radioShowScriptsIndented.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
         hideGroupsCheckbox = Gtk.CheckButton.new_with_label( _( "Hide groups" ) )
@@ -420,12 +415,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, 1, 1, 1 )
 
         backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str )
-        # scriptsTreeStore.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
-        # backgroundScriptsTreeView.set_grid_lines( Gtk.TreeViewGridLines.HORIZONTAL )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorText, copyOfScripts )
         backgroundScriptsTreeView.set_tooltip_text( _(
@@ -459,6 +452,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO HOw to rename a group?
 
 #TODO Ensure the default script, if any, is NOT a background script.
+#Should not be possible to select (via the GUI) a background script to be default. 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
@@ -528,7 +522,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
-#TODO Can we have a group but without any scripts?  Check!
+#TODO Is it possible to have a group but without any scripts?  Check!
         for scriptGroup in scriptGroups:
             parent = treeStore.append( None, [ scriptGroup, scriptGroup, None, None, None, None, None, None, None ] )
 
@@ -562,7 +556,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
-#TODO Can we have a group but without any scripts?  Check!
+#TODO Is it possible to have a group but without any scripts?  Check!
         for scriptGroup in scriptGroups:
             parent = treeStore.append( None, [ scriptGroup, scriptGroup, None ] )
 
@@ -704,14 +698,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
-    #     model = treeView.get_model()
-    #     print( model[ treePath][ : ] )
-    #     #TODO Need to ignore if element 1 is not None.
-    # def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = treeView.get_selection().get_selected()
-        #TODO Ignore if a group.
-        textEntry.insert_text( "[" + model[ treeiter ][ 2 ] + "]", textEntry.get_position() )
-
+        if treeiter:
+            scriptGroup = model[ treeiter ][ 0 ]
+            scriptName = model[ treeiter ][ 2 ]
+            theScript = self.getScript( scripts, scriptGroup, scriptName )
+            if theScript:
+                textEntry.insert_text( "[" + model[ treeiter ][ 2 ] + "]", textEntry.get_position() )
 
 
     def onScriptEdit( self, button, scripts, scriptGroupComboBox, scriptTreeView ):
@@ -800,7 +793,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( notificationCheckbox, 0, 24, 1, 1 )
 
-#TODO Need Background checkbox.  Also need widget for interval.
+#TODO Need Background checkbox.  
+# Also need widget for interval.
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
@@ -1057,6 +1051,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
         # self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", False, False, False, True, 5 ) )
         # self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", False, False, False, True, 60 ) )
+
+
+#TODO Need to read this from config...and also save it out!
+        # self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+        self.indicatorText = ""
 
 
     def saveConfig( self ):
