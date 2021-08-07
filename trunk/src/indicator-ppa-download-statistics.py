@@ -639,10 +639,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         return responseType
 
-
+#TODO Can we use self.onCheckbox?
     def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
 
-
+#TODO Can we use self.onCheckbox?
     def onClipByDownloadCheckbox( self, source, spinner, label ):
         label.set_sensitive( source.get_active() )
         spinner.set_sensitive( source.get_active() )
