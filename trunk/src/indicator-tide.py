@@ -386,7 +386,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         portsTree.get_selection().select_path( portIndex )
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
 
-
+#TODO See if we can use self.onCheckbox.
     def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ): showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
 
 
