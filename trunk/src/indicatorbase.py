@@ -381,6 +381,12 @@ class IndicatorBase( ABC ):
             widget.set_sensitive( checkbox.get_active() )
 
 
+    # Listens to checkbox events and inversely toggles the visibility of the widgets.
+    def onCheckboxInverse( self, checkbox, *widgets ):
+        for widget in widgets:
+                widget.set_sensitive( not checkbox.get_active() )
+
+
     # Listens to radio events and toggles the visibility of the widgets.
     def onRadio( self, radio, *widgets ):
         for widget in widgets:
