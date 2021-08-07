@@ -154,7 +154,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
 
         return responseType
 
-
+#TODO Can we use self.onCheckbox?
     def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
         padIntegerCheckbox.set_sensitive( source.get_active() )
         showIssueCheckbox.set_sensitive( source.get_active() )
