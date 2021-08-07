@@ -273,7 +273,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( showAsSubmenusExceptFirstDayCheckbox, 0, 1, 1, 1 )
 
-        showAsSubmenusCheckbox.connect( "toggled", self.onShowAsSubmenusCheckbox, showAsSubmenusExceptFirstDayCheckbox )
+        showAsSubmenusCheckbox.connect( "toggled", self.onCheckbox, showAsSubmenusExceptFirstDayCheckbox )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -385,9 +385,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         portsTree.get_selection().select_path( portIndex )
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
-
-#TODO See if we can use self.onCheckbox.
-    def onShowAsSubmenusCheckbox( self, source, showAsSubmenusExceptFirstDayCheckbox ): showAsSubmenusExceptFirstDayCheckbox.set_sensitive( source.get_active() )
 
 
     def getTidalData( self, portID ):
