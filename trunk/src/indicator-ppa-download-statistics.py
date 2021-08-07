@@ -564,7 +564,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
 
-        combinePPAsCheckbox.connect( "toggled", self.onCombinePPAsCheckbox, ignoreVersionArchitectureSpecificCheckbox )
+        combinePPAsCheckbox.connect( "toggled", self.onCheckbox, ignoreVersionArchitectureSpecificCheckbox )
 
         sortByDownloadCheckbox = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
         sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count within each PPA." ) )
@@ -591,7 +591,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 4, 1, 1 )
 
-        sortByDownloadCheckbox.connect( "toggled", self.onClipByDownloadCheckbox, label, spinner )
+        sortByDownloadCheckbox.connect( "toggled", self.onCheckbox, label, spinner )
 
         lowBandwitdhCheckbox = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
         lowBandwitdhCheckbox.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
@@ -638,14 +638,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 treeiter = filterStore.iter_next( treeiter )
 
         return responseType
-
-#TODO Can we use self.onCheckbox?
-    def onCombinePPAsCheckbox( self, source, checkbox ): checkbox.set_sensitive( source.get_active() )
-
-#TODO Can we use self.onCheckbox?
-    def onClipByDownloadCheckbox( self, source, spinner, label ):
-        label.set_sensitive( source.get_active() )
-        spinner.set_sensitive( source.get_active() )
 
 
     def onPPARemove( self, button, tree ):
@@ -953,7 +945,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
-
+            
             PPA.sort( self.ppas )
 
             self.filters = Filters()
