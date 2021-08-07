@@ -141,7 +141,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
         padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
-        showClassicCheckbox.connect( "toggled", self.onShowClassicCheckbox, showIssueCheckbox, padIntegerCheckbox )
+        showClassicCheckbox.connect( "toggled", self.onCheckbox, showIssueCheckbox, padIntegerCheckbox )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
@@ -153,11 +153,6 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             self.showIssue = showIssueCheckbox.get_active()
 
         return responseType
-
-#TODO Can we use self.onCheckbox?
-    def onShowClassicCheckbox( self, source, showIssueCheckbox, padIntegerCheckbox ):
-        padIntegerCheckbox.set_sensitive( source.get_active() )
-        showIssueCheckbox.set_sensitive( source.get_active() )
 
 
     def loadConfig( self, config ):
