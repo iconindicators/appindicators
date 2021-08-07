@@ -329,12 +329,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
-        # addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, scriptGroupComboBox, scriptsTreeView )
+        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, scriptsTreeView )
         box.pack_start( addButton, True, True, 0 )
 
         editButton = Gtk.Button.new_with_label( _( "Edit" ) )
         editButton.set_tooltip_text( _( "Edit the selected script." ) )
-        # editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, scriptGroupComboBox, scriptsTreeView )
+        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, scriptsTreeView )
         box.pack_start( editButton, True, True, 0 )
 
         copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
@@ -373,8 +373,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "If checked, only script names are displayed.\n\n" + \
             "Otherwise, script names are indented within each group." ) )
 
-        radioShowScriptsSubmenu.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
-        radioShowScriptsIndented.connect( "toggled", self.onDisplayCheckboxes, radioShowScriptsSubmenu, hideGroupsCheckbox )
+        radioShowScriptsIndented.connect( "toggled", self.onRadio, hideGroupsCheckbox )
 
         grid.attach( hideGroupsCheckbox, 0, 2, 1, 1 )
 
@@ -514,8 +513,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 cellRenderer.set_visible( False )
 
 
-    def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
-        hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
+    # def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
+    #     hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
     def populateScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -585,22 +584,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ):
-        model, treeiter = treeView.get_selection().get_selected()
-        if treeiter:
-            scriptGroup = model[ treeiter ][ 0 ]
-            scriptName = model[ treeiter ][ 2 ]
-            theScript = self.getScript( scripts, scriptGroup, scriptName )
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        if group and name:
+            theScript = self.getScript( scripts, group, name )
             if theScript:
-                pass
-                #TODO Edit the script from here?
-                # self.onScriptEdit( None, scripts, scriptGroupComboBox, scriptNameTreeView ) Original code
+                self.onScriptEdit( None, scripts, treeView )
 
 
     def onScriptCopy( self, button, scripts, treeView ):
-        model, treeiter = treeView.get_selection().get_selected()
-        if treeiter:
-            scriptGroup = model[ treeiter ][ 1 ]
-            scriptName = model[ treeiter ][ 2 ]
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        if group and name:
             script = self.getScript( scripts, scriptGroup, scriptName )
 
             grid = self.createGrid()
@@ -679,10 +672,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptRemove( self, button, scripts, treeView, commandTextView ):
-        model, treeiter = treeView.get_selection().get_selected()
-        if treeiter:
-            scriptGroup = model[ treeiter ][ 1 ]
-            scriptName = model[ treeiter ][ 2 ]
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        if group and name:
             if self.showOKCancel( scriptNameTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
@@ -698,30 +689,31 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     i += 1
 
 
-    def onScriptAdd( self, button, scripts, scriptGroupComboBox, scriptNameTreeView ):
-        self.__addEditScript( Info( "", "", "", False, False, False, False, 0 ), scripts, scriptGroupComboBox, scriptNameTreeView )
+    def onScriptAdd( self, button, scripts, treeView ):
+        self.__addEditScript( Info( "", "", "", False, False, False, False, 0 ), scripts, treeView )
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
-        model, treeiter = treeView.get_selection().get_selected()
-        if treeiter:
-            scriptGroup = model[ treeiter ][ 0 ]
-            scriptName = model[ treeiter ][ 2 ]
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        if group and name:
             theScript = self.getScript( scripts, scriptGroup, scriptName )
             if theScript:
                 textEntry.insert_text( "[" + model[ treeiter ][ 2 ] + "]", textEntry.get_position() )
 
 
-    def onScriptEdit( self, button, scripts, scriptGroupComboBox, scriptTreeView ):
-        scriptGroup = scriptGroupComboBox.get_active_text()
-        model, treeiter = scriptTreeView.get_selection().get_selected()
-        if scriptGroup and treeiter:
-            scriptName = model[ treeiter ][ 0 ]
+    def onScriptEdit( self, button, scripts, treeView ):
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        if group and name:
             theScript = self.getScript( scripts, scriptGroup, scriptName )
-            self.__addEditScript( theScript, scripts, scriptGroupComboBox, scriptTreeView )
+
+#TODO Can the above in part/all be made into a function?
+                        
+            self.__addEditScript( theScript, scripts, treeView )
 
 
-    def __addEditScript( self, script, scripts, scriptTreeView ):
+#TODO Add a new script, first with a group selected and then not.
+# Check the background checkbox if it and others are checked or not.
+    def __addEditScript( self, script, scripts, treeView ):
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
@@ -737,9 +729,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for group in groups:
             scriptGroupCombo.append_text( group )
 
-        if script.getGroup() == "": # This is a new script to be added.
-            pass
-#             scriptGroupCombo.set_active( scriptGroupComboBox.get_active() ) #TODO Cannot really do this now...get from treeView?
+        if script.getGroup() == "": # This is a new script to be added...if a group/script is selected, preselect the group.
+            model, treeiter = treeView.get_selection().get_selected()
+            if treeiter:
+                scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
+                scriptGroupCombo.set_active( groups.index( scriptGroup ) ) #TODO Check this works!
 
         else: # This is an existing script for edit.
             scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
@@ -781,52 +775,71 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 20 )
 
-        backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
-        backgroundCheckbox.set_active( script.getBackground() )
-        backgroundCheckbox.set_tooltip_text( _(
-            "If checked, this script will run in background,\n" + \
-            "the results optionally displayed in the icon text.\n\n" + \
-            "Otherwise the script will appear in the menu." ) )
-
-        grid.attach( terminalCheckbox, 0, 22, 1, 1 )
-
-#TODO Should only be enabled if the background checkbox is unchecked.
-#Also need to watch the event for the background checkbox.
-        terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
-        terminalCheckbox.set_active( script.getTerminalOpen() )
-
-        grid.attach( terminalCheckbox, 0, 23, 1, 1 )
-
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
         soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
         soundCheckbox.set_active( script.getPlaySound() )
 
-        grid.attach( soundCheckbox, 0, 23, 1, 1 )
+        grid.attach( soundCheckbox, 0, 22, 1, 1 )
 
         notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
         notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) )
         notificationCheckbox.set_active( script.getShowNotification() )
 
-        grid.attach( notificationCheckbox, 0, 24, 1, 1 )
+        grid.attach( notificationCheckbox, 0, 23, 1, 1 )
 
-#TODO Need Background checkbox.  
-# Also need widget for interval.
+        backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
+        backgroundCheckbox.set_tooltip_text( _(
+            "If checked, this script will run in background,\n" + \
+            "the results optionally displayed in the icon text.\n\n" + \
+            "Otherwise the script will appear in the menu." ) )
+
+        grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
+
+        terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
+        terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
+        terminalCheckbox.set_active( script.getTerminalOpen() )
+
+        grid.attach( terminalCheckbox, 0, 25, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
+        defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
         defaultScriptCheckbox.set_tooltip_text( _(
             "If checked, this script will be run on a\n" + \
             "middle mouse click of the indicator icon.\n\n" + \
             "Only one script can be the default." ) )
 
-        grid.attach( defaultScriptCheckbox, 0, 25, 1, 1 )
+        grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 )
+
+        box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
+
+        backgroundScriptIntervalSpinner = Gtk.SpinButton()
+        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( self.interval, 0, 10000, 1, 1, 0 ) )
+        backgroundScriptIntervalSpinner.set_value( self.interval )
+        backgroundScriptIntervalSpinner.set_tooltip_text( _(
+            "The number of most recent\n" + \
+            "results to show in the menu.\n\n" + \
+            "Selecting a menu item which\n" + \
+            "contains a result will copy\n" + \
+            "the result to the output." ) ) #TODO Fix
+        box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
+
+        grid.attach( box, 0, 27, 1, 1 )
+
+        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox)
+        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, defaultScriptCheckbox )
+        backgroundCheckbox.connect( "toggled", self.onCheckbox, box )
+        backgroundCheckbox.set_active( script.getBackground() )
 
         title = _( "Edit Script" )
         if script.getGroup() == "":
             title = _( "Add Script" )
 
-        dialog = self.createDialog( scriptTreeView, title, grid )
+        dialog = self.createDialog( treeView, title, grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -906,7 +919,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
-                self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
+                # self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
 
             break
 
@@ -923,36 +936,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return theScript
 
 
-    # Script group/name must be valid OR group is None (name is ignored) OR group is valid and name is None.
-    def populateScriptGroupCombo( self, scripts, scriptGroupComboBox, scriptTreeView, scriptGroup, scriptName ):
-        scriptGroupComboBox.remove_all()
-        groups = sorted( self.getScriptsByGroup( scripts ), key = str.lower )
-        for group in groups:
-            scriptGroupComboBox.append_text( group )
-
-        if scriptGroup is None:
-            groupIndex = 0
-            scriptIndex = 0
-
-        else:
-            if scriptName is None:
-                groupIndex = groups.index( scriptGroup )
-                scriptIndex = 0
-
-            else:
-                groupIndex = groups.index( scriptGroup )
-                scriptNames = [ ]
-                for script in scripts:
-                    if script.getGroup() == scriptGroup:
-                        scriptNames.append( script.getName() )
-
-                scriptNames = sorted( scriptNames, key = str.lower )
-                scriptIndex = scriptNames.index( scriptName )
-
-        scriptGroupComboBox.set_active( groupIndex )
-        scriptTreeView.get_selection().select_path( scriptIndex )
-
-
     def getScriptsByGroup( self, scripts, foreground = True, background = True ):
         scriptsByGroup = { }
         for script in scripts:
@@ -963,6 +946,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 scriptsByGroup[ script.getGroup() ].append( script )
 
         return scriptsByGroup
+
+
+    def __getGroupNameFromTreeView( self, treeView ):
+        group = None
+        name = None
+        model, treeiter = treeView.get_selection().get_selected()
+        if treeiter:
+            group = model[ treeiter ][ 0 ] #TODO Need to substitute the indexes with labels/constants.
+            name = model[ treeiter ][ 2 ]
+
+        return group, name
 
 
     def __convertFromVersion13ToVersion14( self, scripts ):
@@ -1073,6 +1067,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Need to read this from config...and also save it out!
         # self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         self.indicatorText = ""
+        self.interval = 60 #TODO 
 
 
     def saveConfig( self ):
