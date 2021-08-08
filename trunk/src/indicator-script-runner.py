@@ -57,6 +57,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     INDICATOR_TEXT_DEFAULT = "" #TODO Possible to have a sample background script and therefore a sample label?
     INDICATOR_TEXT_SEPARATOR_DEFAULT = " | "
 
+    # Columns for the table to display all scripts AND the table to display background scripts.
+    COLUMN_TAG_GROUP_PERSISTENT = 0 # Always present but never shown.  Used when the script group is needed by decision logic yet not displayed.
+    COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
+    COLUMN_TAG_NAME = 2 # Script name.
+    COLUMN_TAG_SOUND = 3 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_TAG_NOTIFICATION = 4 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_TAG_BACKGROUND = 5 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_TAG_TERMINAL = 6 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_TAG_INTERVAL = 7 # Numeric amount as a string.
+    COLUMN_TAG_REMOVE = 8 # Icon name for the REMOVE icon; None otherwise.
+
 
     def __init__( self ):
         super().__init__(
@@ -224,19 +235,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-#TODO Define these as constants...so other code does not refer to numbers but rather names.
-#See indicator lunar.
-#Do the same for the treeview for background scripts in the label/icon text tab.
-        # Data model to hold... 
-        #    Script group
-        #    Script group
-        #    Script name
-        #    tick icon for play sound
-        #    tick icon for show notification
-        #    tick for background script
-        #    terminal open icon (tick icon or remove icon)
-        #    interval amount (string)
-        #    Remove icon (for when interval amount is not applicable)
         scriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
 
         scriptsTreeView = Gtk.TreeView.new_with_model( scriptsTreeStore )
@@ -250,29 +248,29 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "that script will be initially selected." ) )
 #TODO The tooltip above needs rewriting.  Doesn't appear that we now select any script by default.
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
         treeViewColumn.set_expand( False )
         scriptsTreeView.append_column( treeViewColumn )
 
         rendererText = Gtk.CellRendererText()
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = 2, weight_set = True )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_TAG_NAME, weight_set = True )
         treeViewColumn.set_expand( True )
         treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
         scriptsTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = 3 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
         treeViewColumn.set_expand( False )
         scriptsTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = 4 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION )
         treeViewColumn.set_expand( False )
         scriptsTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = 5 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_BACKGROUND )
         treeViewColumn.set_expand( False )
         scriptsTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = 6 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_TERMINAL )
         treeViewColumn.set_expand( False )
         scriptsTreeView.append_column( treeViewColumn )
 
@@ -281,12 +279,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn.pack_start( rendererText, False )
-        treeViewColumn.add_attribute( rendererText, "text", 7 )
+        treeViewColumn.add_attribute( rendererText, "text", IndicatorScriptRunner.COLUMN_TAG_INTERVAL )
         treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
 
         rendererPixbuf = Gtk.CellRendererPixbuf()
         treeViewColumn.pack_start( rendererPixbuf, False )
-        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", 8 )
+        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", IndicatorScriptRunner.COLUMN_TAG_REMOVE )
         treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
 
         scriptsTreeView.append_column( treeViewColumn )
@@ -346,6 +344,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
         removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptsTreeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
+
+#TODO HOw to rename a group?
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 35, 1, 1 )
@@ -427,11 +427,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "that script will be initially selected." ) )
 #TODO Fix the tooltip above.  No default script is selected.
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
         treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 2 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_NAME )
         treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
@@ -449,10 +449,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-#TODO HOw to rename a group?
-
-#TODO Ensure the default script, if any, is NOT a background script.
-#Should not be possible to select (via the GUI) a background script to be default. 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
@@ -482,8 +478,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
     def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
-        scriptGroup = treeModel.get_value( treeIter, 0 )
-        scriptName = treeModel.get_value( treeIter, 2 )
+        scriptGroup = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_PERSISTENT )
+        scriptName = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_NAME )
         if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
@@ -498,7 +494,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
     def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_visible( True )
-        if treeModel.get_value( treeIter, 5 ) == Gtk.STOCK_APPLY: # This is a background script.
+        if treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
             if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
                 cellRenderer.set_visible( False )
 
@@ -511,10 +507,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             else:
                 cellRenderer.set_visible( False )
-
-
-    # def onDisplayCheckboxes( self, radiobutton, radioShowScriptsSubmenu, hideGroupsCheckbox ):
-    #     hideGroupsCheckbox.set_sensitive( not radioShowScriptsSubmenu.get_active() )
 
 
     def populateScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -545,8 +537,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
-        treePath = Gtk.TreePath.new_from_string( "0:1" )
-        treeView.get_selection().select_path( treePath )
+        # treePath = Gtk.TreePath.new_from_string( "0:1" )
+        # treeView.get_selection().select_path( treePath )
         # treeView.set_cursor( treePath, None, False )
         # treeView.scroll_to_cell( treePath )
 
@@ -573,8 +565,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptSelection( self, treeSelection, textView, scripts ):
         model, treeiter = treeSelection.get_selection().get_selected_rows()
         if treeiter:
-            scriptGroup = model[ treeiter ][ 0 ]
-            scriptName = model[ treeiter ][ 2 ]
+            scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_PERSISTENT ]
+            scriptName = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
             commandText = ""
             if theScript:
@@ -589,6 +581,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             theScript = self.getScript( scripts, group, name )
             if theScript:
                 self.onScriptEdit( None, scripts, treeView )
+
+
+    def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        if group and name:
+            theScript = self.getScript( scripts, scriptGroup, scriptName )
+            if theScript:
+                textEntry.insert_text( "[" + model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ] + "]", textEntry.get_position() )
 
 
     def onScriptCopy( self, button, scripts, treeView ):
@@ -659,10 +659,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     scripts.append( newScript )
 
-#TODO                     self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptNameTreeView, newScript.getGroup(), newScript.getName() ) Original and not needed.
-
-#TODO Need to either pass in the treeStores or get it from the treeViews.
-#TODO Need to figure out how to select the copied script.
+#TODO Need to either pass in the treeStores or get it from the treeViews and then how to select the copied script.
 #                     self.populateScriptsTreeStore( scripts, treeStore, treeView )
 #                     self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView ):
 
@@ -680,8 +677,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
                         del scripts[ i ]
 
-#TODO Need to either pass in the treeStores or get it from the treeViews.
-#TODO Need to figure out how to select the deleted script.  If so, probably don't need the commandTextView.
+#TODO Need to either pass in the treeStores or get it from the treeViews and then how to select the group of the deleted script...unless the group is also gone.
+# Maybe just select first or nothing?
 #                         self.populateScriptsTreeStore( scripts, treeStore, treeView )
 #                         self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView ):
                         break
@@ -693,27 +690,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.__addEditScript( Info( "", "", "", False, False, False, False, 0 ), scripts, treeView )
 
 
-    def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
-        if group and name:
-            theScript = self.getScript( scripts, scriptGroup, scriptName )
-            if theScript:
-                textEntry.insert_text( "[" + model[ treeiter ][ 2 ] + "]", textEntry.get_position() )
-
-
     def onScriptEdit( self, button, scripts, treeView ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
             theScript = self.getScript( scripts, scriptGroup, scriptName )
-
-#TODO Can the above in part/all be made into a function?
-                        
             self.__addEditScript( theScript, scripts, treeView )
 
 
+#TODO Ensure the default script, if any, is NOT a background script.
+#Should not be possible to select (via the GUI) a background script to be default. 
+#
 #TODO Add a new script, first with a group selected and then not.
 # Check the background checkbox if it and others are checked or not.
     def __addEditScript( self, script, scripts, treeView ):
+        add = True if script.getGroup() == "" else False
+
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
@@ -729,7 +720,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for group in groups:
             scriptGroupCombo.append_text( group )
 
-        if script.getGroup() == "": # This is a new script to be added...if a group/script is selected, preselect the group.
+        if add:
+# This is a new script to be added...if a group/script is selected, preselect the group.
             model, treeiter = treeView.get_selection().get_selected()
             if treeiter:
                 scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
@@ -953,8 +945,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         name = None
         model, treeiter = treeView.get_selection().get_selected()
         if treeiter:
-            group = model[ treeiter ][ 0 ] #TODO Need to substitute the indexes with labels/constants.
-            name = model[ treeiter ][ 2 ]
+            group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_PERSISTENT ]
+            name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ]
 
         return group, name
 
