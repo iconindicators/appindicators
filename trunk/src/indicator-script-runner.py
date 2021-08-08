@@ -732,6 +732,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         if add:
 # This is a new script to be added...if a group/script is selected, preselect the group.
+# This code assumes other scripts exist...need to check for adding very first script.
             model, treeiter = treeView.get_selection().get_selected()
             if treeiter:
                 scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
@@ -863,35 +864,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         continue
 
                 else: # Edit existing script.
-                    if script.isIdentical(
-                        Info( scriptGroupCombo.get_active_text().strip(),
-                              scriptNameEntry.get_text().strip(),
-                              self.getTextViewText( commandTextView ).strip(),
-                              terminalCheckbox.get_active(),
-                              soundCheckbox.get_active(),
-                              notificationCheckbox.get_active() ) ):
-                        pass # No change to the script; however handle the default script checkbox.
+                    if scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
+                        pass # Script group/name have not been modified so delete from scripts and insert edit.
 
-                    elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
-                        pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
-
-                    else: # At this point either the script group or name has changed or both (and possibly the other script parameters).
-                        duplicate = False
-                        for scriptInList in scripts:
-                            if not scriptInList.isIdentical( script ):
-                                if scriptGroupCombo.get_active_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
-                                    duplicate = True
-                                    break
-
-                        if duplicate:
+                    else: # Check for a duplicate.
+                        if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
                             self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
                             scriptGroupCombo.grab_focus()
                             continue
 
                     # Remove the existing script.
                     i = 0
-                    for scriptInList in scripts:
-                        if script.getGroup() == scriptInList.getGroup() and script.getName() == scriptInList.getName():
+                    for skript in scripts:
+                        if script.getGroup() == skript.getGroup() and script.getName() == skript.getName():
                             break
 
                         i += 1
@@ -904,7 +889,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                                   self.getTextViewText( commandTextView ).strip(),
                                   terminalCheckbox.get_active(),
                                   soundCheckbox.get_active(),
-                                  notificationCheckbox.get_active() )
+                                  notificationCheckbox.get_active(),
+                                  backgroundCheckbox.get_active(),
+                                  backgroundScriptIntervalSpinner.get_value() )
 
                 scripts.append( newScript )
 
@@ -917,6 +904,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
+                #TODO Select group and script name.
                 # self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
 
             break
@@ -924,6 +912,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.destroy()
 
 
+#TODO Remove if not needed.    
     def __addEditScriptORIGINAL( self, script, scripts, treeView ):
         add = True if script.getGroup() == "" else False
 
