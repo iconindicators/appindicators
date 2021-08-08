@@ -50,7 +50,7 @@ class Info( object ):
         self.background = background
 
         # Apply only to background scripts.
-        self.intervalInMinutes = intervalInMinutes
+        self.intervalInMinutes = intervalInMinutes #TODO Document/decide if this is to be an int or str.
 
 
 #TODO Probably not needed.
