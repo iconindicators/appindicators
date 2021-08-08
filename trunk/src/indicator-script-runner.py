@@ -58,7 +58,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     INDICATOR_TEXT_SEPARATOR_DEFAULT = " | "
 
     # Columns for the table to display all scripts AND the table to display background scripts.
-    COLUMN_TAG_GROUP_PERSISTENT = 0 # Always present but never shown.  Used when the script group is needed by decision logic yet not displayed.
+    COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic yet not displayed.
     COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
     COLUMN_TAG_NAME = 2 # Script name.
     COLUMN_TAG_SOUND = 3 # Icon name for the APPLY icon; None otherwise.
@@ -235,14 +235,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        scriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+        treeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
 
-        scriptsTreeView = Gtk.TreeView.new_with_model( scriptsTreeStore )
-        scriptsTreeView.set_hexpand( True )
-        scriptsTreeView.set_vexpand( True )
-        scriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        scriptsTreeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
-        scriptsTreeView.set_tooltip_text( _(
+        treeView = Gtk.TreeView.new_with_model( treeStore )
+        treeView.set_hexpand( True )
+        treeView.set_vexpand( True )
+        treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
+        treeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
+        treeView.set_tooltip_text( _(
             "List of scripts within the same group.\n\n" + \
             "If a default script has been nominated,\n" + \
             "that script will be initially selected." ) )
@@ -250,29 +250,29 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
         treeViewColumn.set_expand( False )
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_TAG_NAME, weight_set = True )
         treeViewColumn.set_expand( True )
         treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
         treeViewColumn.set_expand( False )
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION )
         treeViewColumn.set_expand( False )
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_BACKGROUND )
         treeViewColumn.set_expand( False )
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_TERMINAL )
         treeViewColumn.set_expand( False )
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
         treeViewColumn.set_expand( False )
@@ -287,14 +287,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn.add_attribute( rendererPixbuf, "icon_name", IndicatorScriptRunner.COLUMN_TAG_REMOVE )
         treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
 
-        scriptsTreeView.append_column( treeViewColumn )
+        treeView.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( scriptsTreeView )
+        scrolledWindow.add( treeView )
 
-        self.populateScriptsTreeStore( copyOfScripts, scriptsTreeStore, scriptsTreeView )
-        scriptsTreeView.expand_all()
+        self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
+        treeView.expand_all()
 
         grid.attach( scrolledWindow, 0, 0, 1, 20 )
 
@@ -306,12 +306,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
 #TODO Need to capture the event when you CTRL click a script and that unselects the script...should then clear the command text view.
+#
+# Maybe one of the signals can be used?
+# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeView.html#Gtk.TreeView.signals
         commandTextView = Gtk.TextView()
         commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-        scriptsTreeView.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )
+#TODO Need a comment as to why this is here.
+        treeView.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -327,22 +331,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
-        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, scriptsTreeView )
+        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView )
         box.pack_start( addButton, True, True, 0 )
 
         editButton = Gtk.Button.new_with_label( _( "Edit" ) )
         editButton.set_tooltip_text( _( "Edit the selected script." ) )
-        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, scriptsTreeView )
+        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView )
         box.pack_start( editButton, True, True, 0 )
 
         copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
         copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
-        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, scriptsTreeView )
+        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, treeView )
         box.pack_start( copyButton, True, True, 0 )
 
         removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, scriptsTreeView, commandTextView )
+        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
 
 #TODO HOw to rename a group?
@@ -478,7 +482,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
     def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
-        scriptGroup = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_PERSISTENT )
+        scriptGroup = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL )
         scriptName = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_NAME )
         if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
@@ -565,7 +569,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptSelection( self, treeSelection, textView, scripts ):
         model, treeiter = treeSelection.get_selection().get_selected_rows()
         if treeiter:
-            scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_PERSISTENT ]
+            scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
             scriptName = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ]
             theScript = self.getScript( scripts, scriptGroup, scriptName )
             commandText = ""
@@ -573,6 +577,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 commandText = theScript.getCommand()
 
             textView.get_buffer().set_text( commandText )
+
+#TODO Figure out how to trap when a row is unhighlighted.
+# When a row is clicked or CTRL + clicked, a selection event is fired and the row selection count is one.
+# So no idea how to discern between these two events. 
+#May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
+            # textView.get_buffer().set_text( "" )
 
 
     def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ):
@@ -693,7 +703,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptEdit( self, button, scripts, treeView ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
-            theScript = self.getScript( scripts, scriptGroup, scriptName )
+            theScript = self.getScript( scripts, group, name )
             self.__addEditScript( theScript, scripts, treeView )
 
 
@@ -727,7 +737,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
                 scriptGroupCombo.set_active( groups.index( scriptGroup ) ) #TODO Check this works!
 
-        else: # This is an existing script for edit.
+        else:
             scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
 
         box.pack_start( scriptGroupCombo, True, True, 0 )
@@ -805,7 +815,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Want to align the box with the previous checkboxes.
 
         box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
 
@@ -827,11 +837,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundCheckbox.connect( "toggled", self.onCheckbox, box )
         backgroundCheckbox.set_active( script.getBackground() )
 
-        title = _( "Edit Script" )
-        if script.getGroup() == "":
-            title = _( "Add Script" )
-
-        dialog = self.createDialog( treeView, title, grid )
+        dialog = self.createDialog( treeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -850,13 +856,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     commandTextView.grab_focus()
                     continue
 
-                if script.getGroup() == "": # Adding a new script - check for duplicate.
+                if add: # Check for duplicate.
                     if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
                         self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
                         scriptGroupCombo.grab_focus()
                         continue
 
-                else: # Editing an existing script.
+                else: # Edit existing script.
                     if script.isIdentical(
                         Info( scriptGroupCombo.get_active_text().strip(),
                               scriptNameEntry.get_text().strip(),
@@ -864,7 +870,219 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                               terminalCheckbox.get_active(),
                               soundCheckbox.get_active(),
                               notificationCheckbox.get_active() ) ):
-                        pass # No change to the script, so should exit, but continue to handle the default script checkbox.
+                        pass # No change to the script; however handle the default script checkbox.
+
+                    elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
+                        pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
+
+                    else: # At this point either the script group or name has changed or both (and possibly the other script parameters).
+                        duplicate = False
+                        for scriptInList in scripts:
+                            if not scriptInList.isIdentical( script ):
+                                if scriptGroupCombo.get_active_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
+                                    duplicate = True
+                                    break
+
+                        if duplicate:
+                            self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
+                            scriptGroupCombo.grab_focus()
+                            continue
+
+                    # Remove the existing script.
+                    i = 0
+                    for scriptInList in scripts:
+                        if script.getGroup() == scriptInList.getGroup() and script.getName() == scriptInList.getName():
+                            break
+
+                        i += 1
+
+                    del scripts[ i ]
+
+                # The new script or the edit.
+                newScript = Info( scriptGroupCombo.get_active_text().strip(),
+                                  scriptNameEntry.get_text().strip(),
+                                  self.getTextViewText( commandTextView ).strip(),
+                                  terminalCheckbox.get_active(),
+                                  soundCheckbox.get_active(),
+                                  notificationCheckbox.get_active() )
+
+                scripts.append( newScript )
+
+                if defaultScriptCheckbox.get_active():
+                    self.defaultScriptGroupCurrent = scriptGroupCombo.get_active_text().strip()
+                    self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
+
+                else:
+                    if self.defaultScriptGroupCurrent == scriptGroupCombo.get_active_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
+                        self.defaultScriptGroupCurrent = ""
+                        self.defaultScriptNameCurrent = ""
+
+                # self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
+
+            break
+
+        dialog.destroy()
+
+
+    def __addEditScriptORIGINAL( self, script, scripts, treeView ):
+        add = True if script.getGroup() == "" else False
+
+        grid = self.createGrid()
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
+
+        scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
+        scriptGroupCombo.set_tooltip_text( _(
+            "The group to which the script belongs.\n\n" + \
+            "Choose an existing group or enter a new one." ) )
+
+        groups = sorted( self.getScriptsByGroup( scripts ).keys(), key = str.lower )
+        for group in groups:
+            scriptGroupCombo.append_text( group )
+
+        if add:
+# This is a new script to be added...if a group/script is selected, preselect the group.
+            model, treeiter = treeView.get_selection().get_selected()
+            if treeiter:
+                scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
+                scriptGroupCombo.set_active( groups.index( scriptGroup ) ) #TODO Check this works!
+
+        else:
+            scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
+
+        box.pack_start( scriptGroupCombo, True, True, 0 )
+
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
+
+        scriptNameEntry = Gtk.Entry()
+        scriptNameEntry.set_tooltip_text( _( "The name of the script." ) )
+        scriptNameEntry.set_text( script.getName() )
+
+        box.pack_start( scriptNameEntry, True, True, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
+        box.set_margin_top( 10 )
+
+        label = Gtk.Label.new( _( "Command" ) )
+        label.set_halign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
+        commandTextView = Gtk.TextView()
+        commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
+        commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
+        commandTextView.get_buffer().set_text( script.getCommand() )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.add( commandTextView )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+
+        box.pack_start( scrolledWindow, True, True, 0 )
+        grid.attach( box, 0, 2, 1, 20 )
+
+        soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
+        soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
+        soundCheckbox.set_active( script.getPlaySound() )
+
+        grid.attach( soundCheckbox, 0, 22, 1, 1 )
+
+        notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
+        notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) )
+        notificationCheckbox.set_active( script.getShowNotification() )
+
+        grid.attach( notificationCheckbox, 0, 23, 1, 1 )
+
+        backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
+        backgroundCheckbox.set_tooltip_text( _(
+            "If checked, this script will run in background,\n" + \
+            "the results optionally displayed in the icon text.\n\n" + \
+            "Otherwise the script will appear in the menu." ) )
+
+        grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
+
+        terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
+        terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
+        terminalCheckbox.set_active( script.getTerminalOpen() )
+
+        grid.attach( terminalCheckbox, 0, 25, 1, 1 )
+
+        defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
+        defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
+        defaultScriptCheckbox.set_tooltip_text( _(
+            "If checked, this script will be run on a\n" + \
+            "middle mouse click of the indicator icon.\n\n" + \
+            "Only one script can be the default." ) )
+
+        grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Want to align the box with the previous checkboxes.
+
+        box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
+
+        backgroundScriptIntervalSpinner = Gtk.SpinButton()
+        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( self.interval, 0, 10000, 1, 1, 0 ) )
+        backgroundScriptIntervalSpinner.set_value( self.interval )
+        backgroundScriptIntervalSpinner.set_tooltip_text( _(
+            "The number of most recent\n" + \
+            "results to show in the menu.\n\n" + \
+            "Selecting a menu item which\n" + \
+            "contains a result will copy\n" + \
+            "the result to the output." ) ) #TODO Fix
+        box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
+
+        grid.attach( box, 0, 27, 1, 1 )
+
+        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox)
+        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, defaultScriptCheckbox )
+        backgroundCheckbox.connect( "toggled", self.onCheckbox, box )
+        backgroundCheckbox.set_active( script.getBackground() )
+
+        dialog = self.createDialog( treeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
+        while True:
+            dialog.show_all()
+            if dialog.run() == Gtk.ResponseType.OK:
+                if scriptGroupCombo.get_active_text().strip() == "":
+                    self.showMessage( dialog, _( "The group cannot be empty." ) )
+                    scriptGroupCombo.grab_focus()
+                    continue
+
+                if scriptNameEntry.get_text().strip() == "":
+                    self.showMessage( dialog, _( "The name cannot be empty." ) )
+                    scriptNameEntry.grab_focus()
+                    continue
+
+                if self.getTextViewText( commandTextView ).strip() == "":
+                    self.showMessage( dialog, _( "The command cannot be empty." ) )
+                    commandTextView.grab_focus()
+                    continue
+
+                if add: # Check for duplicate.
+                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
+                        self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
+                        scriptGroupCombo.grab_focus()
+                        continue
+
+                else: # Edit existing script.
+                    if script.isIdentical(
+                        Info( scriptGroupCombo.get_active_text().strip(),
+                              scriptNameEntry.get_text().strip(),
+                              self.getTextViewText( commandTextView ).strip(),
+                              terminalCheckbox.get_active(),
+                              soundCheckbox.get_active(),
+                              notificationCheckbox.get_active() ) ):
+                        pass # No change to the script; however handle the default script checkbox.
 
                     elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
                         pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
@@ -945,7 +1163,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         name = None
         model, treeiter = treeView.get_selection().get_selected()
         if treeiter:
-            group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_PERSISTENT ]
+            group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
             name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ]
 
         return group, name
