@@ -697,7 +697,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptAdd( self, button, scripts, treeView ):
-        self.__addEditScript( Info( "", "", "", False, False, False, False, 0 ), scripts, treeView )
+        self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, treeView )
 
 
     def onScriptEdit( self, button, scripts, treeView ):
@@ -709,9 +709,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Ensure the default script, if any, is NOT a background script.
 #Should not be possible to select (via the GUI) a background script to be default. 
-#
-#TODO Add a new script, first with a group selected and then not.
-# Check the background checkbox if it and others are checked or not.
     def __addEditScript( self, script, scripts, treeView ):
         add = True if script.getGroup() == "" else False
 
@@ -731,15 +728,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             scriptGroupCombo.append_text( group )
 
         if add:
-# This is a new script to be added...if a group/script is selected, preselect the group.
-# This code assumes other scripts exist...need to check for adding very first script.
+            index = 0
             model, treeiter = treeView.get_selection().get_selected()
             if treeiter:
-                scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
-                scriptGroupCombo.set_active( groups.index( scriptGroup ) ) #TODO Check this works!
+                scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
+                index = groups.index( scriptGroup )
 
         else:
-            scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
+            index = groups.index( script.getGroup() )
+
+        scriptGroupCombo.set_active( index )
 
         box.pack_start( scriptGroupCombo, True, True, 0 )
 
@@ -821,7 +819,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
-        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( self.interval, 0, 10000, 1, 1, 0 ) )
+        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( self.interval, 1, 10000, 1, 1, 0 ) )
         backgroundScriptIntervalSpinner.set_value( self.interval )
         backgroundScriptIntervalSpinner.set_tooltip_text( _(
             "The number of most recent\n" + \
@@ -865,7 +863,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 else: # Edit existing script.
                     if scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
-                        pass # Script group/name have not been modified so delete from scripts and insert edit.
+                        pass # Script group/name have not been modified, so this is a replace of an existing script.
 
                     else: # Check for a duplicate.
                         if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
@@ -905,219 +903,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptNameCurrent = ""
 
                 #TODO Select group and script name.
-                # self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
-
-            break
-
-        dialog.destroy()
-
-
-#TODO Remove if not needed.    
-    def __addEditScriptORIGINAL( self, script, scripts, treeView ):
-        add = True if script.getGroup() == "" else False
-
-        grid = self.createGrid()
-
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
-
-        scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-        scriptGroupCombo.set_tooltip_text( _(
-            "The group to which the script belongs.\n\n" + \
-            "Choose an existing group or enter a new one." ) )
-
-        groups = sorted( self.getScriptsByGroup( scripts ).keys(), key = str.lower )
-        for group in groups:
-            scriptGroupCombo.append_text( group )
-
-        if add:
-# This is a new script to be added...if a group/script is selected, preselect the group.
-            model, treeiter = treeView.get_selection().get_selected()
-            if treeiter:
-                scriptGroup = model[ treeiter ][ 1 ] #TODO Is this the correct index?
-                scriptGroupCombo.set_active( groups.index( scriptGroup ) ) #TODO Check this works!
-
-        else:
-            scriptGroupCombo.set_active( groups.index( script.getGroup() ) )
-
-        box.pack_start( scriptGroupCombo, True, True, 0 )
-
-        grid.attach( box, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
-
-        scriptNameEntry = Gtk.Entry()
-        scriptNameEntry.set_tooltip_text( _( "The name of the script." ) )
-        scriptNameEntry.set_text( script.getName() )
-
-        box.pack_start( scriptNameEntry, True, True, 0 )
-
-        grid.attach( box, 0, 1, 1, 1 )
-
-        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
-        box.set_margin_top( 10 )
-
-        label = Gtk.Label.new( _( "Command" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        commandTextView = Gtk.TextView()
-        commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
-        commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
-        commandTextView.get_buffer().set_text( script.getCommand() )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( commandTextView )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-
-        box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 2, 1, 20 )
-
-        soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
-        soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
-        soundCheckbox.set_active( script.getPlaySound() )
-
-        grid.attach( soundCheckbox, 0, 22, 1, 1 )
-
-        notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
-        notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) )
-        notificationCheckbox.set_active( script.getShowNotification() )
-
-        grid.attach( notificationCheckbox, 0, 23, 1, 1 )
-
-        backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
-        backgroundCheckbox.set_tooltip_text( _(
-            "If checked, this script will run in background,\n" + \
-            "the results optionally displayed in the icon text.\n\n" + \
-            "Otherwise the script will appear in the menu." ) )
-
-        grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
-
-        terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
-        terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
-        terminalCheckbox.set_active( script.getTerminalOpen() )
-
-        grid.attach( terminalCheckbox, 0, 25, 1, 1 )
-
-        defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
-        defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_tooltip_text( _(
-            "If checked, this script will be run on a\n" + \
-            "middle mouse click of the indicator icon.\n\n" + \
-            "Only one script can be the default." ) )
-
-        grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Want to align the box with the previous checkboxes.
-
-        box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
-
-        backgroundScriptIntervalSpinner = Gtk.SpinButton()
-        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( self.interval, 0, 10000, 1, 1, 0 ) )
-        backgroundScriptIntervalSpinner.set_value( self.interval )
-        backgroundScriptIntervalSpinner.set_tooltip_text( _(
-            "The number of most recent\n" + \
-            "results to show in the menu.\n\n" + \
-            "Selecting a menu item which\n" + \
-            "contains a result will copy\n" + \
-            "the result to the output." ) ) #TODO Fix
-        box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
-
-        grid.attach( box, 0, 27, 1, 1 )
-
-        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox)
-        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, defaultScriptCheckbox )
-        backgroundCheckbox.connect( "toggled", self.onCheckbox, box )
-        backgroundCheckbox.set_active( script.getBackground() )
-
-        dialog = self.createDialog( treeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
-        while True:
-            dialog.show_all()
-            if dialog.run() == Gtk.ResponseType.OK:
-                if scriptGroupCombo.get_active_text().strip() == "":
-                    self.showMessage( dialog, _( "The group cannot be empty." ) )
-                    scriptGroupCombo.grab_focus()
-                    continue
-
-                if scriptNameEntry.get_text().strip() == "":
-                    self.showMessage( dialog, _( "The name cannot be empty." ) )
-                    scriptNameEntry.grab_focus()
-                    continue
-
-                if self.getTextViewText( commandTextView ).strip() == "":
-                    self.showMessage( dialog, _( "The command cannot be empty." ) )
-                    commandTextView.grab_focus()
-                    continue
-
-                if add: # Check for duplicate.
-                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
-                        self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
-                        scriptGroupCombo.grab_focus()
-                        continue
-
-                else: # Edit existing script.
-                    if script.isIdentical(
-                        Info( scriptGroupCombo.get_active_text().strip(),
-                              scriptNameEntry.get_text().strip(),
-                              self.getTextViewText( commandTextView ).strip(),
-                              terminalCheckbox.get_active(),
-                              soundCheckbox.get_active(),
-                              notificationCheckbox.get_active() ) ):
-                        pass # No change to the script; however handle the default script checkbox.
-
-                    elif scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
-                        pass # The group/name have not changed, but other parts have - so there is no chance of a clash.
-
-                    else: # At this point either the script group or name has changed or both (and possibly the other script parameters).
-                        duplicate = False
-                        for scriptInList in scripts:
-                            if not scriptInList.isIdentical( script ):
-                                if scriptGroupCombo.get_active_text().strip() == scriptInList.getGroup() and scriptNameEntry.get_text().strip() == scriptInList.getName():
-                                    duplicate = True
-                                    break
-
-                        if duplicate:
-                            self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
-                            scriptGroupCombo.grab_focus()
-                            continue
-
-                    # Remove the existing script.
-                    i = 0
-                    for scriptInList in scripts:
-                        if script.getGroup() == scriptInList.getGroup() and script.getName() == scriptInList.getName():
-                            break
-
-                        i += 1
-
-                    del scripts[ i ]
-
-                # The new script or the edit.
-                newScript = Info( scriptGroupCombo.get_active_text().strip(),
-                                  scriptNameEntry.get_text().strip(),
-                                  self.getTextViewText( commandTextView ).strip(),
-                                  terminalCheckbox.get_active(),
-                                  soundCheckbox.get_active(),
-                                  notificationCheckbox.get_active() )
-
-                scripts.append( newScript )
-
-                if defaultScriptCheckbox.get_active():
-                    self.defaultScriptGroupCurrent = scriptGroupCombo.get_active_text().strip()
-                    self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
-
-                else:
-                    if self.defaultScriptGroupCurrent == scriptGroupCombo.get_active_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
-                        self.defaultScriptGroupCurrent = ""
-                        self.defaultScriptNameCurrent = ""
-
                 # self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
 
             break
