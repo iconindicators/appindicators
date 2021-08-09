@@ -217,12 +217,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
 
 
-#TODO If a background script is modified (group name or script name changes or script is removed)
-# need to update the tags of scripts in the label to match the change.
-#
-#TODO Will need some way to ensure that no background scripts have the same group/name combination.
-# Maybe in the preferences when they hit okay and we check the label?
-# Need a function to take the group name and script name and combine with :: to standardise?  Might be also used in the preferences?
+#TODO When an add/edit/remove/copy occurs, update each of the treeviews and rejig the indicator text tags.
     def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault
         self.defaultScriptNameCurrent = self.scriptNameDefault
@@ -309,6 +304,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #
 # Maybe one of the signals can be used?
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeView.html#Gtk.TreeView.signals
+#
+#Maybe not now that BROWSE is used (see TODO above).
         commandTextView = Gtk.TextView()
         commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_editable( False )
@@ -349,7 +346,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
 
-#TODO HOw to rename a group?
+#TODO HOw to rename a group (if at all)?
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 35, 1, 1 )
@@ -518,7 +515,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
-#TODO Is it possible to have a group but without any scripts?  Check!
         for scriptGroup in scriptGroups:
             parent = treeStore.append( None, [ scriptGroup, scriptGroup, None, None, None, None, None, None, None ] )
 
@@ -552,7 +548,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
-#TODO Is it possible to have a group but without any scripts?  Check!
         for scriptGroup in scriptGroups:
             parent = treeStore.append( None, [ scriptGroup, scriptGroup, None ] )
 
@@ -707,8 +702,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.__addEditScript( theScript, scripts, treeView )
 
 
-#TODO Ensure the default script, if any, is NOT a background script.
-#Should not be possible to select (via the GUI) a background script to be default. 
     def __addEditScript( self, script, scripts, treeView ):
         add = True if script.getGroup() == "" else False
 
@@ -893,7 +886,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 scripts.append( newScript )
 
-                if defaultScriptCheckbox.get_active():
+                if defaultScriptCheckbox.get_active() and not backgroundCheckbox.get_active(): #TODO Verify it's not possible to have a background script as default.
                     self.defaultScriptGroupCurrent = scriptGroupCombo.get_active_text().strip()
                     self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
 
