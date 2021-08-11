@@ -55,7 +55,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
-        self.notification = None
+        self.notification = None #TODO Testing
 
 
 # Testing ideas for middle mouse click of icon to get a notification for each event...
@@ -81,13 +81,18 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
             for event in events:
                 if today == event.getDate():
+#TODO Original line                    # Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
+
+
+#TODO Testing
                     print( event.getDescription())
-                    # Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
                     self.notification = Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon )
                     self.notification.connect("closed", self.actionCallback)
                     self.notification.show()
                     # import time
                     # time.sleep( 5 )
+
+                    
                     break
 
 
@@ -99,9 +104,13 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             if event.getDate() != currentDate:
                 if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and at least one event menu item.
                     menu.append( Gtk.MenuItem.new_with_label( self.removeLeadingZeroFromDate( event.getDate() ) ) )
+
+
+#TODO Testing                    
                     if currentDate == "":
                         menu.get_children()[ 0 ].connect( "activate", lambda widget: self.fingersCrossed( widget ) )
                         self.secondaryActivateTarget = menu.get_children()[ 0 ]
+
 
                     currentDate = event.getDate()
                     menuItemCount += 1
@@ -124,6 +133,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                 break
 
 
+#TODO Testing
     def fingersCrossed( self, widget ):
         today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
         for event in self.getEvents():
