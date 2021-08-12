@@ -788,22 +788,24 @@ class IndicatorBase( ABC ):
         return directory
 
 
-    # Calls the command in a new process; quietly fails.
+    # Calls the command in a new process; quietly fails but logs to file.
     def processCall( self, command ):
         try:
             subprocess.call( command, shell = True )
 
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            self.getLogging().error( e )
             pass
 
 
-    # Returns the result of calling the command.  On exception, returns None.
+    # Returns the result of calling the command.  On exception, returns None but logs to file.
     def processGet( self, command ):
         result = None
         try:
             result = subprocess.check_output( command, shell = True, universal_newlines = True )
 
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
+            self.getLogging().error( e )
             result = None
 
         return result
