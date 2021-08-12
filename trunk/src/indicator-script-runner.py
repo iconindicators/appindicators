@@ -118,14 +118,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # OR CAN THIS BE STORED WITHIN THE BASE CLASS?  Use self.nextUpdateTime
 
 
-# When it comes time to calculate the next update time
-# (or amount in seconds from now until the next update is due),
-# iterate over each background script asking the update frequency (in seconds or minutes)
-# and read from a list/dict the last update time for that script.
-# If the last update time is in the past, then 
-
-
-
     def updateMenu( self, menu ):
         if self.showScriptsInSubmenus:
             scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
@@ -1063,6 +1055,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptGroupDefault = ""
                 self.scriptNameDefault = ""
 
+#TODO Testing
+            self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
+            self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
+
         else:
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
@@ -1071,12 +1067,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
 
-#TODO Do a request save (always)?
-            self.requestSaveConfig()
+
 
 #TODO Will need example of background scripts.
-#Maybe a script that only produces a result if the internet is down?
+            self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
+            self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 
+
+#TODO Do a request save (always)?
+            self.requestSaveConfig()
 
 #TODO Testing for background scripts...
         # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
@@ -1086,7 +1085,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Need to read this from config...and also save it out!
         # self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-        self.indicatorText = ""
+        self.indicatorText = "{[Network::Up or down (background)]}{[System::Available Memory]}"
         self.interval = 60 #TODO 
 
 
