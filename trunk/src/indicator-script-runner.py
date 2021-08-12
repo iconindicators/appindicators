@@ -57,7 +57,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     INDICATOR_TEXT_DEFAULT = "" #TODO Possible to have a sample background script and therefore a sample label?
     INDICATOR_TEXT_SEPARATOR_DEFAULT = " | "
 
-    # Columns for the table to display all scripts AND the table to display background scripts.
+    # Columns for the date model used by...
+    #    the table to display all scripts;
+    #    the table to display background scripts.
     COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic yet not displayed.
     COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
     COLUMN_TAG_NAME = 2 # Script name.
@@ -81,6 +83,47 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         print()#TODO debugging
         self.updateMenu( menu )
         self.updateLabel()
+
+#TODO Need to figure out the update timing for each of the background scripts...
+        # return int( 60 * self.refreshIntervalInMinutes )
+#
+# Would make life simple if there was one update time for all background scripts, set by the user (for example every five minutes or every hour).
+# What happens if a user really wants to run one script every five minutes and another every hour (or less)?  Need a per script solution.
+#
+# During initialisation, for each background script
+#    Set a last update update time in the past
+#    Set the script output to be None
+#
+# During an update cycle...
+#    If a background script's last update time is less than (or equal to) the current time,
+#        run that script and save the output.
+#    If a background script's last update time is greater than the current time,
+#        retrieve the saved output.
+#    
+# At the end of each update cycle...
+#    If a background script's update time is less than (or equal to) the current time,
+#        get the interval and set the new update time to be the current time plus the interval.
+#    If a background script's update time is greater than the current time,
+#        do nothing.
+#    Find the smallest update time in all background scripts and
+#    set the next update to be from the the smallest update time less the current time.
+#    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
+#    MAYBE HAVE A SMALLEST HARD LIMIT OF ONE MINUTE?
+# 
+# When the Preferences are OK'd, do a normal update.
+# WHAT HAPPENS IF THE PREFERENCES ARE KEPT OPEN WHILST AN UPDATE SHOULD HAVE OCCURRED
+# BUT THE UPDATE WERE SUSPENDED?
+# MAYBE KEEP THE NEXT UPDATE TIME AROUND IN THE PREFERENCES AND DO A CHECK?
+# AT THE END OF THE UPDATE, KEEP THE NEXT UPDATE AMOUNT (AS A TIME) FOR THE PREFERENCES TO ACCESS?
+# OR CAN THIS BE STORED WITHIN THE BASE CLASS?  Use self.nextUpdateTime
+
+
+# When it comes time to calculate the next update time
+# (or amount in seconds from now until the next update is due),
+# iterate over each background script asking the update frequency (in seconds or minutes)
+# and read from a list/dict the last update time for that script.
+# If the last update time is in the past, then 
+
 
 
     def updateMenu( self, menu ):
