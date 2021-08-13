@@ -99,7 +99,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground():
+            if script.getBackground(): # TODO Should we also only take into account scripts that are in the label?
                 if self.backgroundScriptNextUpdateTime[ key ] < now:
                     self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
 
@@ -1063,7 +1063,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
-    def __createKey( self, group, name ): return script.getGroup() + "::" + script.getName()
+    def __createKey( self, group, name ): return group + "::" + name
 
 
     def loadConfig( self, config ):
