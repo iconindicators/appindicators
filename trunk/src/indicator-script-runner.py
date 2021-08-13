@@ -22,6 +22,11 @@
 #TODO Need a timer per background script, measured in minutes, which is the frequency of script execution.
 
 
+#TODO Look for 
+    # Gtk.SelectionMode.SINGLE
+# in all other indicators.  Is it a problem and should instead use BROWSE?
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -57,7 +62,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     INDICATOR_TEXT_DEFAULT = "" #TODO Possible to have a sample background script and therefore a sample label?
     INDICATOR_TEXT_SEPARATOR_DEFAULT = " | "
 
-    # Columns for the date model used by...
+    # Data model columns used by...
     #    the table to display all scripts;
     #    the table to display background scripts.
     COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic yet not displayed.
@@ -423,6 +428,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
+        indicatorText.set_text( self.indicatorText )
 #TODO Check this tooltip.
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
@@ -455,7 +461,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
-        backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorText, copyOfScripts )
         backgroundScriptsTreeView.set_tooltip_text( _(
             "List of scripts within the same group.\n\n" + \
@@ -1041,8 +1047,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
-        self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, IndicatorScriptRunner.INDICATOR_TEXT_DEFAULT ) #TODO Better name?
-        self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, IndicatorScriptRunner.INDICATOR_TEXT_SEPARATOR_DEFAULT ) #TODO Need a better name?
+        self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, IndicatorScriptRunner.INDICATOR_TEXT_DEFAULT )
+        self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, IndicatorScriptRunner.INDICATOR_TEXT_SEPARATOR_DEFAULT )
         self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
         self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
         self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
@@ -1087,9 +1093,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 #TODO Will need example of background scripts.
+#TODO Also would be nice to put these into the user's scripts first time (for this version) so the user can see what's what (and add in the indicator text).
             self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
-
 
 #TODO Do a request save (always)?
             self.requestSaveConfig()
@@ -1101,8 +1107,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 #TODO Need to read this from config...and also save it out!
-        # self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}"
+
+        
+#TODO Testing for me.        
+        self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
 
     def saveConfig( self ):
