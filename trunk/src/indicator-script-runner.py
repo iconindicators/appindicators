@@ -450,7 +450,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str )
+        backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str ) # Extra redundant columns, but allows the reuse of the column definitions.
 
         backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
         backgroundScriptsTreeView.set_hexpand( True )
@@ -468,6 +468,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_NAME )
+        treeViewColumn.set_expand( False )
+        backgroundScriptsTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
+        treeViewColumn.set_expand( False )
+        backgroundScriptsTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION )
+        treeViewColumn.set_expand( False )
+        backgroundScriptsTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_INTERVAL )
         treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
@@ -568,7 +580,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     intervalInMinutes = None
                     intervalInMinutesDash = Gtk.STOCK_REMOVE
 
-                treeStore.append( parent, [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
+                treeStore.append(
+                    parent,
+                    [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
@@ -583,11 +597,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
+        # Extra redundant columns are present, but allows the reuse of the column definitions.
         for scriptGroup in scriptGroups:
-            parent = treeStore.append( None, [ scriptGroup, scriptGroup, None ] )
+            parent = treeStore.append( None, [ scriptGroup, scriptGroup, None, None, None, None, None, None ] )
 
             for script in scriptsByGroup[ scriptGroup ]:
-                treeStore.append( parent, [ scriptGroup, None, script.getName() ] )
+                treeStore.append( 
+                    parent,
+                    [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, script.getIntervalInMinutes() ] )
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
