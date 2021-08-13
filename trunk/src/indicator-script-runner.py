@@ -22,11 +22,6 @@
 #TODO Need a timer per background script, measured in minutes, which is the frequency of script execution.
 
 
-#TODO Look for 
-    # Gtk.SelectionMode.SINGLE
-# in all other indicators.  Is it a problem and should instead use BROWSE?
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -38,7 +33,7 @@ from gi.repository import Gtk, Pango
 from script import Info
 from threading import Thread
 
-import copy, indicatorbase, re
+import copy, datetime, indicatorbase, re
 
 
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
@@ -65,7 +60,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # Data model columns used by...
     #    the table to display all scripts;
     #    the table to display background scripts.
-    COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic yet not displayed.
+    COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic.
     COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
     COLUMN_TAG_NAME = 2 # Script name.
     COLUMN_TAG_SOUND = 3 # Icon name for the APPLY icon; None otherwise.
@@ -87,13 +82,36 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         print()#TODO debugging
         self.updateMenu( menu )
-        self.updateLabel()
+        now = datetime.datetime.utcnow()
+        self.updateLabel( now )
 
-#TODO Need to figure out the update timing for each of the background scripts...
-        # return int( 60 * self.refreshIntervalInMinutes )
+
+
+# At the end of each update cycle...
+#    If a background script's update time is less than (or equal to) the current time,
+#        get the interval and set the new update time to be the current time plus the interval.
+#    If a background script's update time is greater than the current time, do nothing.
+#    Find the smallest update time in all background scripts and
+#    set the next update to be from the the smallest update time less the current time.
+#    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
+#    MAYBE HAVE A SMALLEST HARD LIMIT OF ONE MINUTE?
+
+        nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if script.getBackground():
+                if self.backgroundScriptNextUpdateTime[ key ] < now:
+                    self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+
+                if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+                    nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
+
+        return int( ( nextUpdate - now ).total_seconds() ) #TODO Make now a bit later?
 #
-# Would make life simple if there was one update time for all background scripts, set by the user (for example every five minutes or every hour).
-# What happens if a user really wants to run one script every five minutes and another every hour (or less)?  Need a per script solution.
+# Would make life simple if there was one update time for all background scripts, 
+# set by the user (for example every five minutes or every hour).
+# What happens if a user really wants to run one script every five minutes and another every hour (or less)?  
+# Need a per script solution.
 #
 # During initialisation, for each background script
 #    Set a last update update time in the past
@@ -108,8 +126,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # At the end of each update cycle...
 #    If a background script's update time is less than (or equal to) the current time,
 #        get the interval and set the new update time to be the current time plus the interval.
-#    If a background script's update time is greater than the current time,
-#        do nothing.
+#    If a background script's update time is greater than the current time, do nothing.
 #    Find the smallest update time in all background scripts and
 #    set the next update to be from the the smallest update time less the current time.
 #    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
@@ -179,7 +196,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Compare this function with that in Indicator Lunar.  
 #Is it possible to pull this into Indicate Base, passing in the smarts for running scripts as an argument?
-    def updateLabel( self ):
+#Or maybe take parts out (like the whitespace matching) and the end parts and put into a couple of functions?
+    def updateLabel( self, now ):
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
@@ -196,23 +214,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         # Run each background script present in the label...
         for script in self.scripts:
-            if script.getBackground():
-#TODO Cannot simply run each background script...need to respect the timer for each script.
-#So perhaps cache each script's result.
-#When we come to this point, (somehow) determine which script we should be running (because its timer expired)
-#and pull results from the other scripts from the cache.
-                if "[" + script.getGroup() + "::" + script.getName() + "]" in label:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if script.getBackground() and "[" + key + "]" in label:
+                if self.backgroundScriptNextUpdateTime[ key ] < now:
                     commandResult = self.processGet( script.getCommand() ).strip()
-                    if script.getPlaySound() and commandResult:
-                        self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
-        
-                    if script.getShowNotification() and commandResult:
-                        notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
-                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
-                        notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
-                        self.processCall( notificationCommand )
-        
-                    label = label.replace( "[" + script.getGroup() + "::" + script.getName() + "]", commandResult )
+                    self.backgroundScriptResult[ key ] = commandResult
+
+                commandResult = self.backgroundScriptResult[ key ]
+                if script.getPlaySound() and commandResult:
+                    self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+
+                if script.getShowNotification() and commandResult:
+                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+                    self.processCall( notificationCommand )
+
+                label = label.replace( "[" + key + "]", commandResult )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -1045,6 +1063,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
+    def __createKey( self, group, name ): return script.getGroup() + "::" + script.getName()
+
+
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, IndicatorScriptRunner.INDICATOR_TEXT_DEFAULT )
@@ -1112,6 +1133,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         
 #TODO Testing for me.        
         self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+
+
+        # Each background script needs their results cached and a record of next time to update.
+        self.backgroundScriptResult = { }
+        self.backgroundScriptNextUpdateTime = { }
+        now = datetime.datetime.utcnow() # By the time the first update occurs, this time will be in the past forcing script execution.
+        for script in self.scripts:
+            if script.getBackground():
+                self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
+                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
 
 
     def saveConfig( self ):
