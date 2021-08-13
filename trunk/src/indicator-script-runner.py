@@ -355,7 +355,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_vexpand( True )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 20, 1, 15 )
+        grid.attach( box, 0, 20, 1, 10 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -384,7 +384,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO HOw to rename a group (if at all)?
 
         box.set_halign( Gtk.Align.CENTER )
-        grid.attach( box, 0, 35, 1, 1 )
+        grid.attach( box, 0, 30, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Scripts" ) ) )
 
@@ -847,8 +847,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
-        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( self.interval, 1, 10000, 1, 1, 0 ) )
-        backgroundScriptIntervalSpinner.set_value( self.interval )
+        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
+        backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
         backgroundScriptIntervalSpinner.set_tooltip_text( _(
             "The number of most recent\n" + \
             "results to show in the menu.\n\n" + \
@@ -1085,8 +1085,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Need to read this from config...and also save it out!
         # self.indicatorText = " {[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-        self.indicatorText = "{[Network::Up or down (background)]}{[System::Available Memory]}"
-        self.interval = 60 #TODO 
+        self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}"
 
 
     def saveConfig( self ):
