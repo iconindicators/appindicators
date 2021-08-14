@@ -53,10 +53,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     COMMAND_NOTIFY = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
-#TODO Likely needed for background scripts.  Need better names?
-    INDICATOR_TEXT_DEFAULT = "" #TODO Possible to have a sample background script and therefore a sample label?
-    INDICATOR_TEXT_SEPARATOR_DEFAULT = " | "
-
     # Data model columns used by...
     #    the table to display all scripts;
     #    the table to display background scripts.
@@ -607,7 +603,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 treeStore.append(
                     parent,
-                    [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
+                    [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, str( intervalInMinutes ), intervalInMinutesDash ] )
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
@@ -629,7 +625,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             for script in scriptsByGroup[ scriptGroup ]:
                 treeStore.append( 
                     parent,
-                    [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, script.getIntervalInMinutes() ] )
+                    [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
 
 # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
 #TODO Figure out how to select the first script, not the first group...or is this not an issue?
@@ -1069,8 +1065,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
-        self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, IndicatorScriptRunner.INDICATOR_TEXT_DEFAULT )
-        self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, IndicatorScriptRunner.INDICATOR_TEXT_SEPARATOR_DEFAULT )
+        self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" )
+        self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, " | " )
         self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
         self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
         self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
@@ -1100,12 +1096,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptGroupDefault = ""
                 self.scriptNameDefault = ""
 
-#TODO Testing
-            self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
-            self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
-
-
         else:
+            # Example (not background) scripts.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, False, -1 ) )
@@ -1113,28 +1105,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
 
-
-#TODO Will need example of background scripts.
+            # Example background scripts.
 #TODO Also would be nice to put these into the user's scripts first time (for this version) so the user can see what's what (and add in the indicator text).
             self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
+            self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
-#TODO Do a request save (always)?
             self.requestSaveConfig()
 
-#TODO Testing for background scripts...
-        # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
-        # self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", False, False, False, True, 5 ) )
-        # self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", False, False, False, True, 60 ) )
-
-
-#TODO Need to read this from config...and also save it out!
-        # self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}"
-
-        
-#TODO Testing for me.        
+#TODO Testing Remove
+        self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
+        self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-
 
         # Cache the results after running a background script and record the next time to update.
         self.backgroundScriptResult = { }
