@@ -82,10 +82,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         print()#TODO debugging
         self.updateMenu( menu )
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now()
         self.updateLabel( now )
-
-
 
 # At the end of each update cycle...
 #    If a background script's update time is less than (or equal to) the current time,
@@ -96,18 +94,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
 #    MAYBE HAVE A SMALLEST HARD LIMIT OF ONE MINUTE?
 
-        # nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
-        # for script in self.scripts:
-        #     key = self.__createKey( script.getGroup(), script.getName() )
-        #     if script.getBackground(): # TODO Should we also only take into account scripts that are in the label?
-        #         if self.backgroundScriptNextUpdateTime[ key ] < now:
-        #             self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
-        #
-        #         if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
-        #             nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
-        #
-        # return int( ( nextUpdate - now ).total_seconds() ) #TODO Make now a bit later?
-#
+        nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if script.getBackground() and "[" + key + "]" in self.indicatorText:
+                if self.backgroundScriptNextUpdateTime[ key ] < now:
+                    self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+
+                if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+                    nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
+
+        nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() ) #TODO Can this be negative?  Need to use a new now or the previous now?
+        return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
+
 # Would make life simple if there was one update time for all background scripts, 
 # set by the user (for example every five minutes or every hour).
 # What happens if a user really wants to run one script every five minutes and another every hour (or less)?  
@@ -221,6 +220,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.backgroundScriptResult[ key ] = commandResult
 
                 commandResult = self.backgroundScriptResult[ key ]
+                label = label.replace( "[" + key + "]", commandResult )
+
                 if script.getPlaySound() and commandResult:
                     self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
 
@@ -229,8 +230,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
                     self.processCall( notificationCommand )
-
-                label = label.replace( "[" + key + "]", commandResult )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -533,6 +532,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             else:
                 self.scriptGroupDefault = self.defaultScriptGroupCurrent
                 self.scriptNameDefault = self.defaultScriptNameCurrent
+
+            #TODO May need to add/remove background scripts from nextupdate and results caches.
 
         return responseType
 
@@ -1103,9 +1104,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 
-#TODO For me            
-            self.scripts.append( Info( "Network", "Internet Running Monthly Quota", 'python3 /home/bernard/Programming/getInternetRunningMonthlyQuota.py', False, False, False, False, 24 * 60 ) )
-
 
         else:
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
@@ -1114,7 +1112,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
             self.scriptNameDefault = self.scripts[ -1 ].getName()
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
-
 
 
 #TODO Will need example of background scripts.
@@ -1132,18 +1129,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 #TODO Need to read this from config...and also save it out!
-        self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}"
+        # self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}"
 
         
 #TODO Testing for me.        
-        # self.indicatorText = " {[System:Internet Usage]}{[Network::Up or down (background)]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-        self.indicatorText = " {[System::Internet Running Quota]}"
+        self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
 
-        # Each background script needs their results cached and a record of next time to update.
+        # Cache the results after running a background script and record the next time to update.
         self.backgroundScriptResult = { }
         self.backgroundScriptNextUpdateTime = { }
-        now = datetime.datetime.utcnow() # By the time the first update occurs, this time will be in the past forcing script execution.
+        now = datetime.datetime.now() # By the time the first update occurs, this time will be in the past forcing script execution.
         for script in self.scripts:
             if script.getBackground():
                 self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None

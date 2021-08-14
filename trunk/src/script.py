@@ -50,7 +50,8 @@ class Info( object ):
         self.background = background
 
         # Apply only to background scripts.
-        self.intervalInMinutes = intervalInMinutes #TODO Document/decide if this is to be an int or str.
+        self.intervalInMinutes = intervalInMinutes #TODO Document/decide if this is to be an int or str.  Check to see how the data is read in from the file...if a number
+        #will it be a number or a string?
 
 
 #TODO Probably not needed.
@@ -85,7 +86,7 @@ class Info( object ):
     def getBackground( self ): return self.background
 
 
-    def getIntervalInMinutes( self ): return str( self.intervalInMinutes )
+    def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
 
 
 #TODO Add stuff for background scripts.
