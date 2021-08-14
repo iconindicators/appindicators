@@ -96,17 +96,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
 #    MAYBE HAVE A SMALLEST HARD LIMIT OF ONE MINUTE?
 
-        nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
-        for script in self.scripts:
-            key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground(): # TODO Should we also only take into account scripts that are in the label?
-                if self.backgroundScriptNextUpdateTime[ key ] < now:
-                    self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
-
-                if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
-                    nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
-
-        return int( ( nextUpdate - now ).total_seconds() ) #TODO Make now a bit later?
+        # nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
+        # for script in self.scripts:
+        #     key = self.__createKey( script.getGroup(), script.getName() )
+        #     if script.getBackground(): # TODO Should we also only take into account scripts that are in the label?
+        #         if self.backgroundScriptNextUpdateTime[ key ] < now:
+        #             self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+        #
+        #         if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+        #             nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
+        #
+        # return int( ( nextUpdate - now ).total_seconds() ) #TODO Make now a bit later?
 #
 # Would make life simple if there was one update time for all background scripts, 
 # set by the user (for example every five minutes or every hour).
@@ -1103,6 +1103,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 
+#TODO For me            
+            self.scripts.append( Info( "Network", "Internet Running Monthly Quota", 'python3 /home/bernard/Programming/getInternetRunningMonthlyQuota.py', False, False, False, False, 24 * 60 ) )
+
+
         else:
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
@@ -1132,7 +1136,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         
 #TODO Testing for me.        
-        self.indicatorText = " {[Network::Up or down (background)]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+        # self.indicatorText = " {[System:Internet Usage]}{[Network::Up or down (background)]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+        self.indicatorText = " {[System::Internet Running Quota]}"
 
 
         # Each background script needs their results cached and a record of next time to update.
