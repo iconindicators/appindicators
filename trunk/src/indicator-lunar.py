@@ -333,7 +333,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
-#         self.updateLabel() #TODO Old hopefully!
         self.processLabel( False, self.processTags, None )
         self.updateIcon()
 
@@ -449,70 +448,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuCometsMinorPlanets( menu, astrobase.AstroBase.BodyType.COMET )
         self.updateMenuCometsMinorPlanets( menu, astrobase.AstroBase.BodyType.MINOR_PLANET)
         self.updateMenuSatellites( menu )
-
-
-#TODO Maybe not needed...
-    def updateLabelORIGINAL( self ):
-        label = self.indicatorText
-
-        # Capture any whitespace at the start which the user intends for padding.
-        whitespaceAtStart = ""
-        match = re.search( "^\s*", label )
-        if match:
-            whitespaceAtStart = match.group( 0 )
-
-        # Capture any whitespace at the end which the user intends for padding.
-        whitespaceAtEnd = ""
-        match = re.search( "\s*$", label )
-        if match:
-            whitespaceAtEnd = match.group( 0 )
-
-        # Substitute data tags '[' and ']' for values.
-        for key in self.data.keys():
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
-                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
-
-        # Handle any free text '{' and '}'.
-        i = 0
-        start = i
-        result = ""
-        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
-        tagRegularExpression = "\[[^\[^\]]*\]"
-        while( i < len( label ) ):
-            if label[ i ] == '{':
-                j = i + 1
-                while( j < len( label ) ):
-                    if label[ j ] == '}':
-                        freeText = label[ i + 1 : j ]
-                        freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
-                        if freeText == freeTextMinusUnknownTags: # No unused tags were found.
-                            result += label[ start : i ] + freeText + self.indicatorTextSeparator
-                            lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
-
-                        else:
-                            result += label[ start : i ]
-
-                        i = j
-                        start = i + 1
-                        break
-
-                    j += 1
-
-            i += 1
-
-        if lastSeparatorIndex > -1:
-            result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
-
-        result += label[ start : i ]
-
-        # Remove remaining tags and any whitespace resulting from removed tags.
-        result = re.sub( tagRegularExpression, "", result ).strip()
-
-        # Replace start and end whitespace.
-        result = whitespaceAtStart + result + whitespaceAtEnd
-
-        self.indicator.set_label( result, "" )
-        self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
 
 
     def updateIcon( self ):
