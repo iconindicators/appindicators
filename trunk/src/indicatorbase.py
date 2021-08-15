@@ -38,7 +38,7 @@ gi.require_version( "Notify", "0.7" )
 from abc import ABC
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 
-import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
+import datetime, gzip, json, logging.handlers, os, pickle, re, shutil, subprocess
 
 
 class IndicatorBase( ABC ):
@@ -96,6 +96,8 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
+
+        self.indicatorText = "" #TODO NOt sure if this should be here yet...
 
         self.__loadConfig()
 
@@ -155,11 +157,8 @@ class IndicatorBase( ABC ):
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
 
-
-
-    def __updateLabel( self, indicatorText, processTagsFunction, processTagsArguments  ):
-        import re #TODO Put up top.
-        label = indicatorText
+    def updateLabel( self, processTagsFunction, processTagsFunctionArguments ):
+        label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
         whitespaceAtStart = ""
@@ -173,7 +172,7 @@ class IndicatorBase( ABC ):
         if match:
             whitespaceAtEnd = match.group( 0 )
 
-        label = processTagsFunction()
+        label = processTagsFunction( label, processTagsFunctionArguments )
 
         # Handle any free text '{' and '}'.
         i = 0
@@ -188,7 +187,7 @@ class IndicatorBase( ABC ):
                     if label[ j ] == '}':
                         freeText = label[ i + 1 : j ]
                         freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
-                        # if freeText == freeTextMinusUnknownTags: # No unused tags were found.
+                        # if freeText == freeTextMinusUnknownTags: # No unused tags were found. #TODO Need to make this line and the one below switchable.
                         if freeText == freeTextMinusUnknownTags and len( freeTextMinusUnknownTags ): # No unused tags were found.  Also handle when a script returns an empty string.
                             result += label[ start : i ] + freeText + self.indicatorTextSeparator
                             lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
@@ -217,10 +216,6 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_label( result, "" )
         self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
-
-
-
-
 
 
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
