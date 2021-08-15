@@ -333,7 +333,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
-        self.updateLabel()
+#         self.updateLabel() #TODO Old hopefully!
+        self.processLabel( False, self.processTags, None )
         self.updateIcon()
 
         if self.showWerewolfWarning:
@@ -343,6 +344,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.notificationSatellites()
 
         return self.getNextUpdateTimeInSeconds()
+
+
+    # Called by base class when updating the indicator's label.
+    def processTags( self, label, noArgs ):
+        for key in self.data.keys(): # Substitute data tags '[' and ']' for values.
+            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
+                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
+
+        return label
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -441,7 +451,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuSatellites( menu )
 
 
-    def updateLabel( self ):
+#TODO Maybe not needed...
+    def updateLabelORIGINAL( self ):
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
