@@ -97,7 +97,8 @@ class IndicatorBase( ABC ):
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
-        self.indicatorText = "" #TODO NOt sure if this should be here yet...
+        self.indicatorText = ""
+        self.indicatorTextSeparator = ""
 
         self.__loadConfig()
 
