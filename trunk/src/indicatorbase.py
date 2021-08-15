@@ -155,6 +155,74 @@ class IndicatorBase( ABC ):
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
 
+
+
+    def __updateLabel( self, indicatorText, processTagsFunction, processTagsArguments  ):
+        import re #TODO Put up top.
+        label = indicatorText
+
+        # Capture any whitespace at the start which the user intends for padding.
+        whitespaceAtStart = ""
+        match = re.search( "^\s*", label )
+        if match:
+            whitespaceAtStart = match.group( 0 )
+
+        # Capture any whitespace at the end which the user intends for padding.
+        whitespaceAtEnd = ""
+        match = re.search( "\s*$", label )
+        if match:
+            whitespaceAtEnd = match.group( 0 )
+
+        label = processTagsFunction()
+
+        # Handle any free text '{' and '}'.
+        i = 0
+        start = i
+        result = ""
+        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
+        tagRegularExpression = "\[[^\[^\]]*\]"
+        while( i < len( label ) ):
+            if label[ i ] == '{':
+                j = i + 1
+                while( j < len( label ) ):
+                    if label[ j ] == '}':
+                        freeText = label[ i + 1 : j ]
+                        freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
+                        # if freeText == freeTextMinusUnknownTags: # No unused tags were found.
+                        if freeText == freeTextMinusUnknownTags and len( freeTextMinusUnknownTags ): # No unused tags were found.  Also handle when a script returns an empty string.
+                            result += label[ start : i ] + freeText + self.indicatorTextSeparator
+                            lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
+
+                        else:
+                            result += label[ start : i ]
+
+                        i = j
+                        start = i + 1
+                        break
+
+                    j += 1
+
+            i += 1
+
+        if lastSeparatorIndex > -1:
+            result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
+
+        result += label[ start : i ]
+
+        # Remove remaining tags and any whitespace resulting from removed tags.
+        result = re.sub( tagRegularExpression, "", result ).strip()
+
+        # Replace start and end whitespace.
+        result = whitespaceAtStart + result + whitespaceAtEnd
+
+        self.indicator.set_label( result, "" )
+        self.indicator.set_title( result ) # Needed for Lubuntu/Xubuntu.
+
+
+
+
+
+
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
 
 
