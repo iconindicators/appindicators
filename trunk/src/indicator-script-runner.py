@@ -30,7 +30,7 @@ from gi.repository import Gtk, Pango
 from script import Info
 from threading import Thread
 
-import copy, datetime, indicatorbase, re
+import copy, datetime, indicatorbase
 
 
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
