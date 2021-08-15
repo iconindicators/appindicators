@@ -347,7 +347,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     # Called by base class when updating the indicator's label.
-    def processTags( self, label, noArgs ):
+    def processTags( self, label, arguments ):
         for key in self.data.keys(): # Substitute data tags '[' and ']' for values.
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
                 label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
