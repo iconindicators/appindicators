@@ -76,9 +76,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         print()#TODO debugging
         self.updateMenu( menu )
         now = datetime.datetime.now()
-        self.updateLabel( self.processTags, now )
-#         self.updateLabel( now )
+        self.processLabel( True, self.processTags, now )
 
+        # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
@@ -93,9 +93,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
 
 
+    # Called by base class when updating the indicator's label.
     def processTags( self, label, now ):
-        # Run each background script present in the label...
-        for script in self.scripts:
+        for script in self.scripts: # Run each background script present in the label...
             key = self.__createKey( script.getGroup(), script.getName() )
             if script.getBackground() and "[" + key + "]" in label:
                 if self.backgroundScriptNextUpdateTime[ key ] < now:
@@ -202,6 +202,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #Is it possible to pull this into Indicate Base, passing in the smarts for running scripts as an argument?
 #Or maybe take parts out (like the whitespace matching) and the end parts and put into a couple of functions?
 #Might need to generic parameter (or parameter list) to have the time passed in?
+# DELETE ME!
     def updateLabelORIGINAL( self, now ):
         label = self.indicatorText
 
