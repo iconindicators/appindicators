@@ -175,7 +175,7 @@ class IndicatorBase( ABC ):
 # "text will be removed." ) )
 #
 # Mention the processTagsFunction is passed the label and must return the processed label.
-    def processLabel( self, allowForEmptyString, processTagsFunction, processTagsFunctionArguments ):
+    def processLabel( self, allowForEmptyString, processTagsFunction, *processTagsFunctionArguments ):
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
