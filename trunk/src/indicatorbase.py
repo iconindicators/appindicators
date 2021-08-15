@@ -190,7 +190,7 @@ class IndicatorBase( ABC ):
         if match:
             whitespaceAtEnd = match.group( 0 )
 
-        label = processTagsFunction( label, processTagsFunctionArguments )
+        label = processTagsFunction( label, processTagsFunctionArguments ) # Call to specific handler for data tags in the label.
 
         # Handle any free text '{' and '}'.
         i = 0
