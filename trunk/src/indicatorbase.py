@@ -157,7 +157,25 @@ class IndicatorBase( ABC ):
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
 
-    def updateLabel( self, processTagsFunction, processTagsFunctionArguments ):
+    # Process text used for the indicator's label.
+    # The text may contain tags, delimited by '[' and ']' which are to be processed by the caller providing a function.
+    # Any text which is delimited by '{' and '}' will be removed if ...
+#TODO Update this comment header...
+# "The text shown next to the indicator icon,\n" + \
+# "or tooltip where applicable.\n\n" + \
+# "The icon text can contain text and tags\n" + \
+# "from the table below.\n\n" + \
+# "To associate text with one or more tags,\n" + \
+# "enclose the text and tag(s) within { }.\n\n" + \
+# "For example\n\n" + \
+# "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
+# "If any tag contains no data at render time,\n" + \
+# "the tag will be removed.\n\n" + \
+# "If a removed tag is within { }, the tag and\n" + \
+# "text will be removed." ) )
+#
+# Mention the processTagsFunction is passed the label and must return the processed label.
+    def processLabel( self, allowForEmptyString, processTagsFunction, processTagsFunctionArguments ):
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
@@ -187,8 +205,7 @@ class IndicatorBase( ABC ):
                     if label[ j ] == '}':
                         freeText = label[ i + 1 : j ]
                         freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
-                        # if freeText == freeTextMinusUnknownTags: # No unused tags were found. #TODO Need to make this line and the one below switchable.
-                        if freeText == freeTextMinusUnknownTags and len( freeTextMinusUnknownTags ): # No unused tags were found.  Also handle when a script returns an empty string.
+                        if freeText == freeTextMinusUnknownTags and ( allowForEmptyString and len( freeTextMinusUnknownTags ) or not allowForEmptyString ): # Check for unused tags and allow for an empty string.
                             result += label[ start : i ] + freeText + self.indicatorTextSeparator
                             lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
 
