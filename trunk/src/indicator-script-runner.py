@@ -76,7 +76,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         print()#TODO debugging
         self.updateMenu( menu )
         now = datetime.datetime.now()
-        self.updateLabel( now )
+        self.updateLabel( self.processTags, now )
+#         self.updateLabel( now )
 
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
         for script in self.scripts:
@@ -90,6 +91,30 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() )
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
+
+
+    def processTags( self, label, now ):
+        # Run each background script present in the label...
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if script.getBackground() and "[" + key + "]" in label:
+                if self.backgroundScriptNextUpdateTime[ key ] < now:
+                    commandResult = self.processGet( script.getCommand() ).strip()
+                    self.backgroundScriptResult[ key ] = commandResult
+
+                commandResult = self.backgroundScriptResult[ key ]
+                label = label.replace( "[" + key + "]", commandResult )
+
+                if script.getPlaySound() and commandResult:
+                    self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+
+                if script.getShowNotification() and commandResult:
+                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+                    self.processCall( notificationCommand )
+
+        return label
 
 
 # During initialisation, for each background script
@@ -177,7 +202,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #Is it possible to pull this into Indicate Base, passing in the smarts for running scripts as an argument?
 #Or maybe take parts out (like the whitespace matching) and the end parts and put into a couple of functions?
 #Might need to generic parameter (or parameter list) to have the time passed in?
-    def updateLabel( self, now ):
+    def updateLabelORIGINAL( self, now ):
         label = self.indicatorText
 
         # Capture any whitespace at the start which the user intends for padding.
@@ -1096,12 +1121,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
-            self.requestSaveConfig()
+#             self.requestSaveConfig()
 
 #TODO Testing Remove
-        self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
-        self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
-        self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+#         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
+#         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
+#         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
         # Cache the results after running a background script and record the next time to update.
         self.backgroundScriptResult = { }
