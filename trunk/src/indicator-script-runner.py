@@ -19,9 +19,6 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
-#TODO Need a timer per background script, measured in minutes, which is the frequency of script execution.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -81,15 +78,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         now = datetime.datetime.now()
         self.updateLabel( now )
 
-# At the end of each update cycle...
-#    If a background script's update time is less than (or equal to) the current time,
-#        get the interval and set the new update time to be the current time plus the interval.
-#    If a background script's update time is greater than the current time, do nothing.
-#    Find the smallest update time in all background scripts and
-#    set the next update to be from the the smallest update time less the current time.
-#    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
-#    MAYBE HAVE A SMALLEST HARD LIMIT OF ONE MINUTE?
-
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
@@ -100,14 +88,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
                     nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
-        nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() ) #TODO Can this be negative?  Need to use a new now or the previous now?
+        nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() )
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
 
-# Would make life simple if there was one update time for all background scripts, 
-# set by the user (for example every five minutes or every hour).
-# What happens if a user really wants to run one script every five minutes and another every hour (or less)?  
-# Need a per script solution.
-#
+
 # During initialisation, for each background script
 #    Set a last update update time in the past
 #    Set the script output to be None
@@ -192,6 +176,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Compare this function with that in Indicator Lunar.  
 #Is it possible to pull this into Indicate Base, passing in the smarts for running scripts as an argument?
 #Or maybe take parts out (like the whitespace matching) and the end parts and put into a couple of functions?
+#Might need to generic parameter (or parameter list) to have the time passed in?
     def updateLabel( self, now ):
         label = self.indicatorText
 
