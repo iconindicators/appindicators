@@ -94,7 +94,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     # Called by base class when updating the indicator's label.
-    def processTags( self, label, now ):
+    def processTags( self, label, arguments ):
+        now = arguments[ 0 ]
         for script in self.scripts: # Run each background script present in the label...
             key = self.__createKey( script.getGroup(), script.getName() )
             if script.getBackground() and "[" + key + "]" in label:
