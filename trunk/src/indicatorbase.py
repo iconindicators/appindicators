@@ -160,22 +160,8 @@ class IndicatorBase( ABC ):
 
     # Process text used for the indicator's label.
     # The text may contain tags, delimited by '[' and ']' which are to be processed by the caller providing a function.
-    # Any text which is delimited by '{' and '}' will be removed if ...
-#TODO Update this comment header...
-# "The text shown next to the indicator icon,\n" + \
-# "or tooltip where applicable.\n\n" + \
-# "The icon text can contain text and tags\n" + \
-# "from the table below.\n\n" + \
-# "To associate text with one or more tags,\n" + \
-# "enclose the text and tag(s) within { }.\n\n" + \
-# "For example\n\n" + \
-# "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
-# "If any tag contains no data at render time,\n" + \
-# "the tag will be removed.\n\n" + \
-# "If a removed tag is within { }, the tag and\n" + \
-# "text will be removed." ) )
-#
-# Mention the processTagsFunction is passed the label and must return the processed label.
+    # Any text which is delimited by '{' and '}' will be removed if the enclosing text contains [ ] after the processing.
+    # The processing tags function is passed the label and the processed label must be returned.
     def processLabel( self, allowForEmptyString, processTagsFunction, *processTagsFunctionArguments ):
         label = self.indicatorText
 
