@@ -75,6 +75,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         print()#TODO debugging
         self.updateMenu( menu )
+
         now = datetime.datetime.now()
         self.processLabel( True, self.processTags, now )
 
@@ -94,6 +95,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     # Called by base class when updating the indicator's label.
+    # Each background script, present in the label, is:
+    #    executed if the last update time is in the past (and the result is then cached), or
+    #    the result is extracted from the cache.
     def processTags( self, label, arguments ):
         now = arguments[ 0 ]
         for script in self.scripts: # Run each background script present in the label...
@@ -116,33 +120,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.processCall( notificationCommand )
 
         return label
-
-
-# During initialisation, for each background script
-#    Set a last update update time in the past
-#    Set the script output to be None
-#
-# During an update cycle...
-#    If a background script's last update time is less than (or equal to) the current time,
-#        run that script and save the output.
-#    If a background script's last update time is greater than the current time,
-#        retrieve the saved output.
-#    
-# At the end of each update cycle...
-#    If a background script's update time is less than (or equal to) the current time,
-#        get the interval and set the new update time to be the current time plus the interval.
-#    If a background script's update time is greater than the current time, do nothing.
-#    Find the smallest update time in all background scripts and
-#    set the next update to be from the the smallest update time less the current time.
-#    NEED TO DO SOME SORT OF CHECK ENSURING THE SMALLEST UPDATE TIME IS IN FACT GREATER THAN THE CURRENT TIME.
-#    MAYBE HAVE A SMALLEST HARD LIMIT OF ONE MINUTE?
-# 
-# When the Preferences are OK'd, do a normal update.
-# WHAT HAPPENS IF THE PREFERENCES ARE KEPT OPEN WHILST AN UPDATE SHOULD HAVE OCCURRED
-# BUT THE UPDATE WERE SUSPENDED?
-# MAYBE KEEP THE NEXT UPDATE TIME AROUND IN THE PREFERENCES AND DO A CHECK?
-# AT THE END OF THE UPDATE, KEEP THE NEXT UPDATE AMOUNT (AS A TIME) FOR THE PREFERENCES TO ACCESS?
-# OR CAN THIS BE STORED WITHIN THE BASE CLASS?  Use self.nextUpdateTime
 
 
     def updateMenu( self, menu ):
@@ -444,6 +421,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
+
+# When the Preferences are OK'd, do a normal update.
+# WHAT HAPPENS IF THE PREFERENCES ARE KEPT OPEN WHILST AN UPDATE SHOULD HAVE OCCURRED
+# BUT THE UPDATE WERE SUSPENDED?
+# MAYBE KEEP THE NEXT UPDATE TIME AROUND IN THE PREFERENCES AND DO A CHECK?
+# AT THE END OF THE UPDATE, KEEP THE NEXT UPDATE AMOUNT (AS A TIME) FOR THE PREFERENCES TO ACCESS?
+# OR CAN THIS BE STORED WITHIN THE BASE CLASS?  Use self.nextUpdateTime
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
@@ -1047,10 +1031,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
-        # Cache the results after running a background script and record the next time to update.
+        # Each time a background script is run, cache the results.
+        # One script may have an interval of five minutes whereas another is one hour.
+        # The hourly script should not be run any more frequently so need to use the cached result.
+        # Initialise the cache results and set a next update time in the past to force the scripts to update first time.
         self.backgroundScriptResult = { }
         self.backgroundScriptNextUpdateTime = { }
-        now = datetime.datetime.now() # By the time the first update occurs, this time will be in the past forcing script execution.
+        now = datetime.datetime.now()
+        print( now )
         for script in self.scripts:
             if script.getBackground():
                 self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
