@@ -753,13 +753,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, 2, 1, 20 )
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
-        soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) )
+        soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) ) #TODO Need to explain difference in operation between background and non-background scripts.
         soundCheckbox.set_active( script.getPlaySound() )
 
         grid.attach( soundCheckbox, 0, 22, 1, 1 )
 
         notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
-        notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) )
+        notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) ) #TODO Need to explain difference in operation between background and non-background scripts.
         notificationCheckbox.set_active( script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
@@ -767,14 +767,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
         backgroundCheckbox.set_tooltip_text( _(
             "If checked, this script will run in background,\n" + \
-            "the results optionally displayed in the icon text.\n\n" + \
+            "the results displayed in the icon text.\n\n" + \
             "Otherwise the script will appear in the menu." ) )
+#TODO Make it clear that only background scripts that are ALSO in the icon text are executed.
+#Or should they always be executed?  Ask Oleg.
 
         grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) )
+        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) ) #TODO Note it only applies to non-background scripts.
         terminalCheckbox.set_active( script.getTerminalOpen() )
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
@@ -785,7 +787,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         defaultScriptCheckbox.set_tooltip_text( _(
             "If checked, this script will be run on a\n" + \
             "middle mouse click of the indicator icon.\n\n" + \
-            "Only one script can be the default." ) )
+            "Only one script can be the default." ) )#TODO Note it only applies to non-background scripts.
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
@@ -802,7 +804,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "results to show in the menu.\n\n" + \
             "Selecting a menu item which\n" + \
             "contains a result will copy\n" + \
-            "the result to the output." ) ) #TODO Fix
+            "the result to the output." ) ) #TODO Fix and note it only applies to background scripts.
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 27, 1, 1 )
