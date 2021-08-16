@@ -200,8 +200,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.set_tooltip_text( _(
             "Scripts are 'background' or 'non-background'.\n\n" + \
             "A background script is periodically\n" + \
-            "executed and the result written to the\n" + \
-            "indicator label.\n\n" + \
+            "executed and the result optionally written\n" + \
+            "to the indicator label.\n\n" + \
             "Non-background scripts are listed in the\n" + \
             "indicator menu and are executed when the\n" + \
             "user selects that script.\n\n" + \
@@ -324,12 +324,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
-        radioShowScriptsSubmenu.set_tooltip_text( _( "Non-background scripts of the same group\nare shown in submenus." ) )
+        radioShowScriptsSubmenu.set_tooltip_text( _(
+            "Non-background scripts of the same group\n" + \
+            "are shown in submenus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
         radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts grouped" ) )
-        radioShowScriptsIndented.set_tooltip_text( _( "Non-background scripts are shown\nwithin their respective group." ) )
+        radioShowScriptsIndented.set_tooltip_text( _(
+            "Non-background scripts are shown\n" + \
+            "within their respective group." ) )
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
@@ -773,8 +777,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "If checked, this script will run in background,\n" + \
             "the results displayed in the icon text.\n\n" + \
             "Otherwise the script will appear in the menu." ) )
-#TODO Make it clear that only background scripts that are ALSO in the icon text are executed.
-#Or should they always be executed?  Ask Oleg.
+#TODO Make it clear ALL background scripts are executed.
 
         grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
 
