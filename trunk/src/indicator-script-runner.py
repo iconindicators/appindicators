@@ -19,6 +19,13 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
+#TODO Find all mentions of
+    # icon text
+    # indicator text 
+    # icon label
+# and standardise.
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -761,13 +768,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, 2, 1, 20 )
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
-        soundCheckbox.set_tooltip_text( _( "Play a beep on script completion." ) ) #TODO Need to explain difference in operation between background and non-background scripts.
+        soundCheckbox.set_tooltip_text( _( "Background script" ) )
+        backgroundCheckbox.set_tooltip_text( _(
+            "For non-background scripts,\n" + \
+            "play a beep on script completion.\n\n" + \
+            "For background scripts, play a beep\n" + \
+            "only if the script returns a result." ) )
         soundCheckbox.set_active( script.getPlaySound() )
 
         grid.attach( soundCheckbox, 0, 22, 1, 1 )
 
         notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
-        notificationCheckbox.set_tooltip_text( _( "Show a notification on script completion." ) ) #TODO Need to explain difference in operation between background and non-background scripts.
+        notificationCheckbox.set_tooltip_text( _(
+            "For non-background scripts,\n" + \
+            "show a notification on script completion.\n\n" + \
+            "For background scripts, show a\n" + \
+            "notification only if the script returns a result." ) )
         notificationCheckbox.set_active( script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
@@ -775,15 +791,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
         backgroundCheckbox.set_tooltip_text( _(
             "If checked, this script will run in background,\n" + \
-            "the results displayed in the icon text.\n\n" + \
+            "at the interval specified, with the results\n" + \
+            "optionally displayed in the icon label.\n\n" + \
             "Otherwise the script will appear in the menu." ) )
-#TODO Make it clear ALL background scripts are executed.
 
         grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open after the script completes." ) ) #TODO Note it only applies to non-background scripts.
+        terminalCheckbox.set_tooltip_text( _(
+            "For non-background scripts only,\n" + \
+            "leave the terminal open on completion." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
@@ -792,26 +810,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
         defaultScriptCheckbox.set_tooltip_text( _(
-            "If checked, this script will be run on a\n" + \
-            "middle mouse click of the indicator icon.\n\n" + \
-            "Only one script can be the default." ) )#TODO Note it only applies to non-background scripts.
+            "If checked for non-background scripts,\n" + \
+            "this script will run on a middle\n" + \
+            "mouse click of the indicator icon.\n\n" + \
+            "Only one script can be the default." ) )
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Want to align the box with the previous checkboxes.
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Ensure approximate alignment with the previous checkboxes.
 
         box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
         backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
         backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
-        backgroundScriptIntervalSpinner.set_tooltip_text( _(
-            "The number of most recent\n" + \
-            "results to show in the menu.\n\n" + \
-            "Selecting a menu item which\n" + \
-            "contains a result will copy\n" + \
-            "the result to the output." ) ) #TODO Fix and note it only applies to background scripts.
+        backgroundScriptIntervalSpinner.set_tooltip_text( _( "For background scripts the interval between runs." ) )
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 27, 1, 1 )
