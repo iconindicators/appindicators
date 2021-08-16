@@ -46,8 +46,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
     COMMAND_NOTIFY_BACKGROUND = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\""
-    COMMAND_NOTIFY_FOREGROUND = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
-    COMMAND_NOTIFY = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
+    COMMAND_NOTIFY_NON_BACKGROUND = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
     # Data model columns used by...
@@ -164,7 +163,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         command += script.getCommand()
 
         if script.getShowNotification():
-            command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+            command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY_NON_BACKGROUND.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
         if script.getPlaySound():
             command += "; " + IndicatorScriptRunner.COMMAND_SOUND
@@ -197,10 +196,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
         treeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
         treeView.set_tooltip_text( _(
-            "List of scripts within the same group.\n\n" + \
-            "If a default script has been nominated,\n" + \
-            "that script will be initially selected." ) )
-#TODO The tooltip above needs rewriting.  Doesn't appear that we now select any script by default.
+            "Scripts are 'background' or 'non-background'.\n\n" + \
+            "A background script is periodically\n" + \
+            "executed and the result written to the\n" + \
+            "indicator label.\n\n" + \
+            "Non-background scripts are listed in the\n" + \
+            "indicator menu and are executed when the\n" + \
+            "user selects that script.\n\n" + \
+            "If an attribute does not apply to a script,\n" + \
+            "a dash is displayed.\n\n" + \
+            "If a non-background script is checked as default,\n" + \
+            "that script will appear as bold." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
         treeViewColumn.set_expand( False )
@@ -316,12 +322,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
-        radioShowScriptsSubmenu.set_tooltip_text( _( "Scripts of the same group are shown in submenus." ) )
+        radioShowScriptsSubmenu.set_tooltip_text( _( "Non-background scripts of the same group\nare shown in submenus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
         radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts grouped" ) )
-        radioShowScriptsIndented.set_tooltip_text( _( "Scripts are shown within their respective group." ) )
+        radioShowScriptsIndented.set_tooltip_text( _( "Non-background scripts are shown\nwithin their respective group." ) )
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
@@ -330,8 +336,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         hideGroupsCheckbox.set_sensitive( not self.showScriptsInSubmenus )
         hideGroupsCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         hideGroupsCheckbox.set_tooltip_text( _(
-            "If checked, only script names are displayed.\n\n" + \
-            "Otherwise, script names are indented within each group." ) )
+            "If checked, only script names are displayed.\n" + \
+            "Otherwise, script names are indented within each group.\n\n" + \
+            "Applies only to non-background scripts." ) )
 
         radioShowScriptsIndented.connect( "toggled", self.onRadio, hideGroupsCheckbox )
 
@@ -348,20 +355,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         indicatorText = Gtk.Entry()
         indicatorText.set_text( self.indicatorText )
-#TODO Check this tooltip.
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "The icon text can contain text and tags\n" + \
+            "The icon text may contain plain text and\n" + \
+            "the result from any background script\n" + \
             "from the table below.\n\n" + \
-            "To associate text with one or more tags,\n" + \
-            "enclose the text and tag(s) within { }.\n\n" + \
-            "For example\n\n" + \
-            "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
-            "If any tag contains no data at render time,\n" + \
-            "the tag will be removed.\n\n" + \
-            "If a removed tag is within { }, the tag and\n" + \
-            "text will be removed." ) )
+            "To associate text with one or more scripts,\n" + \
+            "enclose the text and script(s) within { }.\n" + \
+            "For example, for the script 'MY SCRIPT',\n\n" + \
+            "\t{The result of my script is: [MY SCRIPT]}\n\n" + \
+            "If the script results in an empty string,\n" + \
+            "the entire text within the { } will be removed." ) )
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -383,10 +388,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorText, copyOfScripts )
         backgroundScriptsTreeView.set_tooltip_text( _(
-            "List of scripts within the same group.\n\n" + \
-            "If a default script has been nominated,\n" + \
-            "that script will be initially selected." ) )
-#TODO Fix the tooltip above.  No default script is selected.
+            "Background scripts by group.\n" + \
+            "Double click on a script to\n" + \
+            "add to the icon text." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
         treeViewColumn.set_expand( False )
@@ -422,13 +426,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-# When the Preferences are OK'd, do a normal update.
-# WHAT HAPPENS IF THE PREFERENCES ARE KEPT OPEN WHILST AN UPDATE SHOULD HAVE OCCURRED
-# BUT THE UPDATE WERE SUSPENDED?
-# MAYBE KEEP THE NEXT UPDATE TIME AROUND IN THE PREFERENCES AND DO A CHECK?
-# AT THE END OF THE UPDATE, KEEP THE NEXT UPDATE AMOUNT (AS A TIME) FOR THE PREFERENCES TO ACCESS?
-# OR CAN THIS BE STORED WITHIN THE BASE CLASS?  Use self.nextUpdateTime
-
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
@@ -442,12 +439,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptGroupDefault = self.defaultScriptGroupCurrent
                 self.scriptNameDefault = self.defaultScriptNameCurrent
 
-            #TODO May need to add/remove background scripts from nextupdate and results caches.
+            self.initialiseBackgroundScripts()
 
         return responseType
 
 
-    # Renders the script name bold when the (foreground) script is default.
+    # Renders the script name bold when the (non-background) script is default.
     # Otherwise normal style is used.
     #
     # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
@@ -468,7 +465,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     # Renderer for the Interval column.
     #    For a background script, the value will be a number (as text) for the interval in minutes.
-    #    For a foreground script, the interval does not apply and so a dash icon is rendered.
+    #    For a non-background script, the interval does not apply and so a dash icon is rendered.
     #
     # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
     # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
@@ -899,10 +896,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return theScript
 
 
-    def getScriptsByGroup( self, scripts, foreground = True, background = True ):
+    def getScriptsByGroup( self, scripts, nonBackground = True, background = True ):
         scriptsByGroup = { }
         for script in scripts:
-            if ( foreground and not script.getBackground() ) or ( background and script.getBackground() ):
+            if ( nonBackground and not script.getBackground() ) or ( background and script.getBackground() ):
                 if script.getGroup() not in scriptsByGroup:
                     scriptsByGroup[ script.getGroup() ] = [ ]
 
@@ -955,7 +952,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def __convertFromVersion15ToVersion16( self, scripts ):
         # In version 16 background script functionality was added.
-        # All scripts prior to this change are deemed to be foreground scripts.
+        # All scripts prior to this change are deemed to be non-background scripts.
         # For each script, set a flag and a dummy value for interval.
         convertedScripts = [ ]
         for script in scripts:
@@ -966,14 +963,28 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             convertedScript.append( script[ 3 ] )
             convertedScript.append( script[ 4 ] )
             convertedScript.append( script[ 5 ] )
-            convertedScript.append( False ) # Indicates this is a foreground script.
-            convertedScript.append( -1 ) # For a foreground script, the interval is ignored.
+            convertedScript.append( False ) # Indicates this is a non-background script.
+            convertedScript.append( -1 ) # For a non-background script, the interval is ignored.
             convertedScripts.append( convertedScript )
 
         return convertedScripts
 
 
     def __createKey( self, group, name ): return group + "::" + name
+
+
+    # Each time a background script is run, cache the results.
+    # One script may have an interval of five minutes whereas another is one hour.
+    # The hourly script should not be run any more frequently so need to use the cached result.
+    # Initialise the cache results and set a next update time in the past to force the scripts to update first time.
+    def initialiseBackgroundScripts( self ):
+        self.backgroundScriptResult = { }
+        self.backgroundScriptNextUpdateTime = { }
+        now = datetime.datetime.now()
+        for script in self.scripts:
+            if script.getBackground():
+                self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
+                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
 
 
     def loadConfig( self, config ):
@@ -1031,18 +1042,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
-        # Each time a background script is run, cache the results.
-        # One script may have an interval of five minutes whereas another is one hour.
-        # The hourly script should not be run any more frequently so need to use the cached result.
-        # Initialise the cache results and set a next update time in the past to force the scripts to update first time.
-        self.backgroundScriptResult = { }
-        self.backgroundScriptNextUpdateTime = { }
-        now = datetime.datetime.now()
-        print( now )
-        for script in self.scripts:
-            if script.getBackground():
-                self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
-                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
+        self.initialiseBackgroundScripts()
 
 
     def saveConfig( self ):
@@ -1060,6 +1060,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,
+            IndicatorScriptRunner.CONFIG_INDICATOR_TEXT: self.indicatorText,
+            IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR: self.indicatorTextSeparator,
             IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
             IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
             IndicatorScriptRunner.CONFIG_SCRIPTS: scripts,
