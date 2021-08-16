@@ -68,7 +68,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.16",
             copyrightStartYear = "2016",
-            comments = _( "Run a terminal command or script from an indicator." ) )
+            comments = _( "Run a terminal command or script from an indicator;\ndisplay script results in the icon label." ) )
 
 
     def update( self, menu ):
@@ -76,49 +76,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.updateMenu( menu )
 
         now = datetime.datetime.now()
+        self.runBackgroundScripts (now )
         self.processLabel( True, self.processTags, now )
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground() and "[" + key + "]" in self.indicatorText:
-                if self.backgroundScriptNextUpdateTime[ key ] < now:
-                    self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
-
-                if self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
-                    nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
+            if script.getBackground() and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+                nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
         nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() )
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
-
-
-    # Called by base class when updating the indicator's label.
-    # Each background script, present in the label, is:
-    #    executed if the last update time is in the past (and the result is then cached), or
-    #    the result is extracted from the cache.
-    def processTags( self, label, arguments ):
-        now = arguments[ 0 ]
-        for script in self.scripts: # Run each background script present in the label...
-            key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground() and "[" + key + "]" in label:
-                if self.backgroundScriptNextUpdateTime[ key ] < now:
-                    commandResult = self.processGet( script.getCommand() ).strip()
-                    self.backgroundScriptResult[ key ] = commandResult
-
-                commandResult = self.backgroundScriptResult[ key ]
-                label = label.replace( "[" + key + "]", commandResult )
-
-                if script.getPlaySound() and commandResult:
-                    self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
-
-                if script.getShowNotification() and commandResult:
-                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
-                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
-                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
-                    self.processCall( notificationCommand )
-
-        return label
 
 
     def updateMenu( self, menu ):
@@ -173,6 +142,39 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         command += "'"
         Thread( target = self.processCall, args = ( command, ) ).start()
+
+
+    def runBackgroundScripts( self, now ):
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if script.getBackground():
+                if self.backgroundScriptNextUpdateTime[ key ] < now:
+                    commandResult = self.processGet( script.getCommand() ).strip()
+                    self.backgroundScriptResult[ key ] = commandResult
+                    self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+
+                commandResult = self.backgroundScriptResult[ key ]
+
+                if script.getPlaySound() and commandResult:
+                    self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+
+                if script.getShowNotification() and commandResult:
+                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+                    self.processCall( notificationCommand )
+
+
+    # Called by the base class when updating the indicator's label which may contain tags [ ] and/or { }.
+    def processTags( self, label, arguments ):
+        now = arguments[ 0 ]
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if script.getBackground() and "[" + key + "]" in label:
+                commandResult = self.backgroundScriptResult[ key ]
+                label = label.replace( "[" + key + "]", commandResult )
+
+        return label
 
 
 #TODO When an add/edit/remove/copy occurs, update each of the treeviews and rejig the indicator text tags.
@@ -425,6 +427,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
+
+#TODO Add a tooltip on the OK button about how all background scripts are run.
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
@@ -976,8 +980,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     # Each time a background script is run, cache the results.
-    # One script may have an interval of five minutes whereas another is one hour.
-    # The hourly script should not be run any more frequently so need to use the cached result.
+    #
+    # For example, One script may have an interval of five minutes another hourly.
+    # The hourly script should not be run any more frequently so use a cached result.
+    #
     # Initialise the cache results and set a next update time in the past to force the scripts to update first time.
     def initialiseBackgroundScripts( self ):
         self.backgroundScriptResult = { }
