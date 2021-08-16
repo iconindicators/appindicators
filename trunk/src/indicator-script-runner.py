@@ -380,6 +380,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "\t{The result of my script is: [MY SCRIPT]}\n\n" + \
             "If the script results in an empty string,\n" + \
             "the entire text within the { } will be removed." ) )
+#TODO Need to reword the part about { } and removing.
+# See Indicator Lunar.  If a data tag remains in the text (because there is missing data) all text within the { } is removed.
+# This does not apply here.
+# Instead what should happen (and NEED TO TEST THIS) is that if a script returns an empty result, all text within the { } is removed.
+#
+# Do we even need the extra check in processLabel for empty strings?
+# Come up with lots of examples of scripts and outputs for the icon text.
+#    {[CHECK FOR LOG FILE]}
+#    {[CHECK FOR BOG FILE]}
+
+ 
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
