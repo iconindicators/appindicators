@@ -436,10 +436,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Label" ) ) )
 
+        dialog.get_widget_for_response( Gtk.ResponseType.OK ).set_tooltip_text(
+            "All background scripts will be run when the\n" + \
+            "dialog is closed, irrespective of interval." )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
-
-#TODO Add a tooltip on the OK button about how all background scripts are run.
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
