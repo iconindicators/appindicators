@@ -20,6 +20,11 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Should/does the backend insert all data for an object (rise AND set)?
+# Check this...maybe the backend should ALWAYS have BOTH rise AND set for each object
+# and the front end decides what to show.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
