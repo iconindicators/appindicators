@@ -20,11 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Should/does the backend insert all data for an object (rise AND set)?
-# Check this...maybe the backend should ALWAYS have BOTH rise AND set for each object
-# and the front end decides what to show.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -976,6 +971,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
+        # Table to show all attributes of selected/checked bodies.
+        # If a body's magnitude passes through the magnitude filter,
+        # all attributes (rise/set/az/alt) will be displayed in this table,
+        # irrespective of the setting to hide bodies below the horizon. 
         COLUMN_TAG = 0
         COLUMN_TRANSLATED_TAG = 1
         COLUMN_VALUE = 2
