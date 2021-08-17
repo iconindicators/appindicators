@@ -84,7 +84,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         now = datetime.datetime.now()
         self.runBackgroundScripts (now )
-        self.processLabel( True, self.processTags, now )
+        self.processLabel( True, self.processTags, now ) #TODO Test this with False and see how it works.
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
@@ -387,8 +387,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #
 # Do we even need the extra check in processLabel for empty strings?
 # Come up with lots of examples of scripts and outputs for the icon text.
-#    {[CHECK FOR LOG FILE]}
-#    {[CHECK FOR BOG FILE]}
+#    [LOG] - if no log file is present, tag should disappear; otherwise "Log file present!".
+#    [STACKEXCHANGE] - if messages on Stack Exchange are present, tag should disappear; otherwise "Messages present!".
+#    {[LOG]}{[STACKEXCHANGE]} - As above but now with separator.
+#    
 
  
         box.pack_start( indicatorText, True, True, 0 )
@@ -447,9 +449,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Label" ) ) )
 
-        dialog.get_widget_for_response( Gtk.ResponseType.OK ).set_tooltip_text(
-            "All background scripts will be run when the\n" + \
-            "dialog is closed, irrespective of interval." )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
