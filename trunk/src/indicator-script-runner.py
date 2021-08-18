@@ -75,16 +75,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.16",
             copyrightStartYear = "2016",
-            comments = _( "Run a terminal command or script from an indicator;\ndisplay script results in the icon label." ) )
+            comments = _( "Run a terminal command or script from the indicator;\ndisplay script results in the icon label." ) )
 
 
     def update( self, menu ):
-        print()#TODO debugging
         self.updateMenu( menu )
 
         now = datetime.datetime.now()
-        self.runBackgroundScripts (now )
-        self.processLabel( True, self.processTags, now ) #TODO Test this with False and see how it works.
+        self.updateBackgroundScripts( now )
+        self.processLabel( self.processTags, now )
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
@@ -151,7 +150,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         Thread( target = self.processCall, args = ( command, ) ).start()
 
 
-    def runBackgroundScripts( self, now ):
+    def updateBackgroundScripts( self, now ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if script.getBackground():
@@ -172,7 +171,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.processCall( notificationCommand )
 
 
-    # Called by the base class when updating the indicator's label which may contain tags [ ] and/or { }.
+    # Called by the base class when updating the indicator's label.
     def processTags( self, label, arguments ):
         now = arguments[ 0 ]
         for script in self.scripts:
@@ -1082,6 +1081,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         self.initialiseBackgroundScripts()
+        print()#TODO debugging
 
 
     def saveConfig( self ):
