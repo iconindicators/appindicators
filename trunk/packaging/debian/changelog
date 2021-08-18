@@ -1,3 +1,10 @@
+indicator-lunar (1.0.90-1) bionic; urgency=low
+
+  * Bug fix: Removed separator character after empty { } in icon text.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Aug 2021 25:44:26 +1000
+
+
 indicator-lunar (1.0.89-1) bionic; urgency=low
 
   * Added dh-python to debian/control Build-Depends to satisfy LaunchPad:

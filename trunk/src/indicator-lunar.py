@@ -333,7 +333,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
-        self.processLabel( False, self.processTags, None )
+        self.processLabel( self.processTags, None )
         self.updateIcon()
 
         if self.showWerewolfWarning:
