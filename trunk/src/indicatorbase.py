@@ -167,20 +167,6 @@ class IndicatorBase( ABC ):
         label = self.indicatorText
 
         print( "+" + label + "+" ) #TODO Testing
-        # Capture any whitespace at the start which the user intends for padding.
-#TODO After the {} code is fixed, may not need to do a strip of whitespace.        
-        whitespaceAtStart = ""
-        match = re.search( "^\s*", label )
-        if match:
-            whitespaceAtStart = match.group( 0 )
-
-        # Capture any whitespace at the end which the user intends for padding.
-        whitespaceAtEnd = ""
-        match = re.search( "\s*$", label )
-        if match:
-            whitespaceAtEnd = match.group( 0 )
-
-        print( "+" + label + "+" ) #TODO Testing
         label = processTagsFunction( label, processTagsFunctionArguments ) # Call to specific handler for data tags in the label.
         print( "+" + label + "+" ) #TODO Testing
 
@@ -192,8 +178,6 @@ class IndicatorBase( ABC ):
 
         # Handle free text and pairs of { }.
         i = 0
-        start = i
-        result = ""
         lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
         tagRegularExpression = "\[[^\[\]]*\]"
         while( i < len( label ) ):
@@ -203,27 +187,14 @@ class IndicatorBase( ABC ):
                     if label[ j ] == '}':
                         text = label[ i + 1 : j ]
                         textMinusUnknownTags = re.sub( tagRegularExpression, "", text )
-                        # if len( textMinusUnknownTags ) and text == textMinusUnknownTags:
-                        if len( text ):
-                            if text == textMinusUnknownTags: # No unknown tags found, so keep this text.
-                                label = label[ 0 : i ] + label[ i + 1 : j ] + self.indicatorTextSeparator + label[ j + 1 : ]
-                                # result += label[ start : i ] + text + self.indicatorTextSeparator
-                                lastSeparatorIndex = j - 1
+                        if len( text ) and text == textMinusUnknownTags: # Text is not empty and no unknown tags found, so keep this text.
+                            label = label[ 0 : i ] + label[ i + 1 : j ] + self.indicatorTextSeparator + label[ j + 1 : ]
+                            lastSeparatorIndex = j - 1
 
-                            else: # There was one or more unknown tags found, so drop the text.
-                                label = label[ 0 : i ] + label[ j + 1 : ]
-                                # result += label[ start : i ] + text + self.indicatorTextSeparator
-                                # lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
-
-                        else: # Found empty { } pair, so remove.
+                        else: # Empty text or there was one or more unknown tags found, so drop the text.
                             label = label[ 0 : i ] + label[ j + 1 : ]
-                        
-                        i -= 1
-                        # else:
-                        #     result += label[ start : i ]
 
-                        # i = j
-                        # start = i + 1
+                        i -= 1
                         break
 
                     j += 1
@@ -235,45 +206,6 @@ class IndicatorBase( ABC ):
         if lastSeparatorIndex > -1:
             label = label[ 0 : lastSeparatorIndex ] + label[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
 
-        # result += label[ start : i ]
-
-
-#         # Handle free text and pairs of { }.
-#         i = 0
-#         start = i
-#         result = ""
-#         lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
-#         tagRegularExpression = "\[[^\[\]]*\]"
-#         while( i < len( label ) ):
-#             if label[ i ] == '{':
-#                 j = i + 1
-#                 while( j < len( label ) ):
-#                     if label[ j ] == '}':
-#                         freeText = label[ i + 1 : j ]
-#                         freeTextMinusUnknownTags = re.sub( tagRegularExpression, "", freeText )
-#                         if len( freeTextMinusUnknownTags ) and freeText == freeTextMinusUnknownTags:
-# #TODO Is it possible in Indicator Lunar to hit the check for empty strings?
-# # How is this check triggered in Script Runner?                            
-#                         # if freeText == freeTextMinusUnknownTags and ( allowForEmptyString and len( freeTextMinusUnknownTags ) or not allowForEmptyString ): # Check for unused tags and allow for an empty string.
-#                             result += label[ start : i ] + freeText + self.indicatorTextSeparator
-#                             lastSeparatorIndex = len( result ) - len( self.indicatorTextSeparator )
-#
-#                         else:
-#                             result += label[ start : i ]
-#
-#                         i = j
-#                         start = i + 1
-#                         break
-#
-#                     j += 1
-#
-#             i += 1
-#
-#         if lastSeparatorIndex > -1:
-#             result = result[ 0 : lastSeparatorIndex ] # Remove the last separator.
-#
-#         result += label[ start : i ]
-
         print( "+" + label + "+" ) #TODO Testing
 
         # Remove remaining tags and any whitespace resulting from removed tags.
@@ -281,10 +213,6 @@ class IndicatorBase( ABC ):
 
         print( "+" + label + "+" ) #TODO Testing
         
-
-        # Replace start and end whitespace.
-        # result = whitespaceAtStart + result + whitespaceAtEnd
-
         self.indicator.set_label( label, "" )
         self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
 
