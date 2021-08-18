@@ -159,11 +159,17 @@ class IndicatorBase( ABC ):
 
 
     # Process text used for the indicator's label.
-    # The text may contain tags, delimited by '[' and ']' which are to be processed by the caller providing a function.
-#TODO Check the next comment!!!
-    # Any text which is delimited by '{' and '}' will be removed if the enclosing text contains [ ] after the processing.
-    # The processing tags function is passed the label and the processed label must be returned.
-    def processLabel( self, allowForEmptyString, processTagsFunction, *processTagsFunctionArguments ):
+    #
+    # The text may contain tags, delimited by '[' and ']' to be processed by the caller.
+    # The caller must provide a 'process tags' function, taking optional arguments.
+    #
+    # Free text may be associated with any number of tags, all of which are to be enclosed with '{' and '}'.
+    # If all tags within '{' and '}' are not replaced, all text (and tags) within is removed.
+    # This ensures a tag which cannot be processed does not cause the text to hang around.
+    #
+    # The 'process tags' function is passed the label (along with optional arguments);
+    # the processed label must then be returned.
+    def processLabel( self, processTagsFunction, *processTagsFunctionArguments ):
         label = self.indicatorText
 
         print( "+" + label + "+" ) #TODO Testing
