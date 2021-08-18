@@ -387,10 +387,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #
 # Do we even need the extra check in processLabel for empty strings?
 # Come up with lots of examples of scripts and outputs for the icon text.
-#    [LOG] - if no log file is present, tag should disappear; otherwise "Log file present!".
-#    [STACKEXCHANGE] - if messages on Stack Exchange are present, tag should disappear; otherwise "Messages present!".
-#    {[LOG]}{[STACKEXCHANGE]} - As above but now with separator.
-#    
+#    [LOG] - Log file present: "Log file present"            No log file: ""
+#    [STACKEXCHANGE] - Messages present: "Messages present"  No messages: ""      
+#    {[LOG]}{[STACKEXCHANGE]}
+#    {[LOG][STACKEXCHANGE]}
+#    [FREEMEMORY] - "1234 MB"
+#    [INTERNETDOWN] - Internet up: ""        Internet down: "Internet is down"
 
  
         box.pack_start( indicatorText, True, True, 0 )
@@ -1078,6 +1080,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
+        self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         self.initialiseBackgroundScripts()
 
 
