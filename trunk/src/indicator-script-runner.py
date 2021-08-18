@@ -370,15 +370,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "The icon text may contain plain text and\n" + \
-            "the result from any background script\n" + \
-            "from the table below.\n\n" + \
-            "To associate text with one or more scripts,\n" + \
-            "enclose the text and script(s) within { }.\n" + \
-            "For example, for the script 'MY SCRIPT',\n\n" + \
-            "\t{The result of my script is: [MY SCRIPT]}\n\n" + \
+            "A background script should either:\n" + \
+            "\talways return non-empty text output, or\n" + \
+            "\treturn non-empty text output only on an event\n" + \
+            "\t(and empty text otherwise).\n\n" + \
+            "For example, a background script which shows\n" + \
+            "free memory will always show a text result.\n\n" + \
+            "A background script which checks for a log file\n" + \
+            "will only show a text result when that log file\n" + \
+            "exists, yet show empty text otherwise.\n\n" + \
+            "Enclosing a script within { } will ensure\n" + \
+            "the separator is added automatically.\n\n" + \
             "If the script results in an empty string,\n" + \
-            "the entire text within the { } will be removed." ) )
+            # "the entire text within the { } will be removed." ) ) #TODO Fix this line...anything else?
 #TODO Need to reword the part about { } and removing.
 # See Indicator Lunar.  If a data tag remains in the text (because there is missing data) all text within the { } is removed.
 # This does not apply here.
@@ -1079,7 +1083,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
 
-        self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+        self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
         self.initialiseBackgroundScripts()
         print()#TODO debugging
 
