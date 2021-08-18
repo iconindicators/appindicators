@@ -171,16 +171,7 @@ class IndicatorBase( ABC ):
     # the processed label must then be returned.
     def processLabel( self, processTagsFunction, *processTagsFunctionArguments ):
         label = self.indicatorText
-
-        print( "+" + label + "+" ) #TODO Testing
         label = processTagsFunction( label, processTagsFunctionArguments ) # Call to specific handler for data tags in the label.
-        print( "+" + label + "+" ) #TODO Testing
-
-# ZZZ{}{A A A}{B B B [MOON NEW]}C{[MOON FULL]}D[MOON NEW] -  {E E E [MOON PHASED]}{[MOON PHASEED]}[MOON PHASEEED]
-# ZZZ{}{A A A}{B B B [MOON NEW]}C{[MOON FULL]}D[MOON NEW] -  {E E E [MOON PHASED]}{[MOON PHASEED]}[MOON PHASEEED]
-# ZZZ{}{A A A}{B B B 2021-09-07  10:51}C{2021-08-22  22:01}D2021-09-07  10:51 -  {E E E [MOON PHASED]}{[MOON PHASEED]}[MOON PHASEEED]
-#+ ZZZA A A, B B B 2021-09-07  10:51, C2021-08-22  22:01[MOON PHASEEED]+
-#+ZZZA A A, B B B 2021-09-07  10:51, C2021-08-22  22:01+
 
         # Handle free text and pairs of { }.
         i = 0
@@ -207,18 +198,12 @@ class IndicatorBase( ABC ):
 
             i += 1
 
-        print( "+" + label + "+" ) #TODO Testing
-
         if lastSeparatorIndex > -1:
             label = label[ 0 : lastSeparatorIndex ] + label[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
 
-        print( "+" + label + "+" ) #TODO Testing
-
-        # Remove remaining tags and any whitespace resulting from removed tags.
+        # Remove remaining tags (not removed because they were not contained within { }).
         label = re.sub( tagRegularExpression, "", label )
 
-        print( "+" + label + "+" ) #TODO Testing
-        
         self.indicator.set_label( label, "" )
         self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
 
