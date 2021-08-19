@@ -19,13 +19,6 @@
 # Application indicator allowing a user to run a terminal command or script.
 
 
-#TODO Find all mentions of
-    # icon text
-    # indicator text 
-    # icon label
-# and standardise.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -75,7 +68,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.16",
             copyrightStartYear = "2016",
-            comments = _( "Run a terminal command or script from the indicator;\ndisplay script results in the icon label." ) )
+            comments = _( "Run a terminal command or script;\ndisplay script results in the icon label." ) )
 
 
     def update( self, menu ):
@@ -436,7 +429,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "Label" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
