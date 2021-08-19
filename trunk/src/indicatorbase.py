@@ -97,9 +97,6 @@ class IndicatorBase( ABC ):
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
-        self.indicatorText = ""
-        self.indicatorTextSeparator = ""
-
         self.__loadConfig()
 
 
@@ -158,7 +155,7 @@ class IndicatorBase( ABC ):
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
 
-    # Process text used for the indicator's label.
+    # Process text containing pairs of [ ] and { }, typically displayed in the indicator's label.
     #
     # The text may contain tags, delimited by '[' and ']' to be processed by the caller.
     # The caller must provide a 'process tags' function, taking optional arguments.
@@ -167,29 +164,28 @@ class IndicatorBase( ABC ):
     # If all tags within '{' and '}' are not replaced, all text (and tags) within is removed.
     # This ensures a tag which cannot be processed does not cause the text to hang around.
     #
-    # The 'process tags' function is passed the label (along with optional arguments);
-    # the processed label must then be returned.
-    def processLabel( self, processTagsFunction, *processTagsFunctionArguments ):
-        label = self.indicatorText
-        label = processTagsFunction( label, processTagsFunctionArguments ) # Call to specific handler for data tags in the label.
+    # The 'process tags' function is passed the text along with optional arguments and
+    # must then return the processed text.
+    def processTags( self, text, separator, processTagsFunction, *processTagsFunctionArguments ):
+        processedText = processTagsFunction( text, processTagsFunctionArguments ) # Call to specific handler for data tags in the text.
 
-        # Handle free text and pairs of { }.
+        # Handle pairs of { }.
         i = 0
-        lastSeparatorIndex = -1 # Need to track the last insertion point of the separator so it can be removed.
+        lastSeparatorIndex = -1 # Track the last insertion point of the separator so it can be removed.
         tagRegularExpression = "\[[^\[\]]*\]"
-        while( i < len( label ) ):
-            if label[ i ] == '{':
+        while( i < len( processedText ) ):
+            if processedText[ i ] == '{':
                 j = i + 1
-                while( j < len( label ) ):
-                    if label[ j ] == '}':
-                        text = label[ i + 1 : j ]
-                        textMinusUnknownTags = re.sub( tagRegularExpression, "", text )
+                while( j < len( processedText ) ):
+                    if processedText[ j ] == '}':
+                        text = processedText[ i + 1 : j ] # Text between braces.
+                        textMinusUnknownTags = re.sub( tagRegularExpression, "", text ) # Text between braces with outstanding/unknown tags removed.
                         if len( text ) and text == textMinusUnknownTags: # Text is not empty and no unknown tags found, so keep this text.
-                            label = label[ 0 : i ] + label[ i + 1 : j ] + self.indicatorTextSeparator + label[ j + 1 : ]
+                            processedText = processedText[ 0 : i ] + processedText[ i + 1 : j ] + separator + processedText[ j + 1 : ]
                             lastSeparatorIndex = j - 1
 
                         else: # Empty text or there was one or more unknown tags found, so drop the text.
-                            label = label[ 0 : i ] + label[ j + 1 : ]
+                            processedText = processedText[ 0 : i ] + processedText[ j + 1 : ]
 
                         i -= 1
                         break
@@ -199,13 +195,16 @@ class IndicatorBase( ABC ):
             i += 1
 
         if lastSeparatorIndex > -1:
-            label = label[ 0 : lastSeparatorIndex ] + label[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
+            processedText = processedText[ 0 : lastSeparatorIndex ] + processedText[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
 
         # Remove remaining tags (not removed because they were not contained within { }).
-        label = re.sub( tagRegularExpression, "", label )
+        processedText = re.sub( tagRegularExpression, "", processedText )
+        return processedText
 
-        self.indicator.set_label( label, "" )
-        self.indicator.set_title( label ) # Needed for Lubuntu/Xubuntu.
+
+    def setLabel( self, text ):
+        self.indicator.set_label( text, text )  # Second parameter is a hint for the typical length.
+        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.
 
 
     def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
