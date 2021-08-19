@@ -26,24 +26,28 @@ changeLogs = [
     "IndicatorVirtualBox" ]
 
 for changeLog in changeLogs:
-    errors = [ ]
-    dates = [ ]
-    releaseNumbers = [ ]
-    lineNumbers = [ ]
-    with open( basePath + changeLog + changeLogPath ) as f:
-        content = f.readlines()
-        for line in content:
-            if line.startswith( " -- " ):
-                dateTime = line[ line.find( ">" ) + 1 : ].strip()
-                dateTimeObject = datetime.strptime( dateTime, "%a, %d %b %Y %H:%M:%S %z" )
-                dates.append( dateTimeObject )
+    try:
+        errors = [ ]
+        dates = [ ]
+        releaseNumbers = [ ]
+        lineNumbers = [ ]
+        with open( basePath + changeLog + changeLogPath ) as f:
+            content = f.readlines()
+            for line in content:
+                if line.startswith( " -- " ):
+                    dateTime = line[ line.find( ">" ) + 1 : ].strip()
+                    dateTimeObject = datetime.strptime( dateTime, "%a, %d %b %Y %H:%M:%S %z" )
+                    dates.append( dateTimeObject )
 
-            if line.startswith( "indicator-" ):
-                releaseNumbers.append( line.split( '(' )[ 1 ].split( ')' )[ 0 ] )
+                if line.startswith( "indicator-" ):
+                    releaseNumbers.append( line.split( '(' )[ 1 ].split( ')' )[ 0 ] )
 
-            if not line.startswith( " -- " ) and len( line ) > 80:
-                lineNumbers.append( line )
-
+                if not line.startswith( " -- " ) and len( line ) > 80:
+                    lineNumbers.append( line )
+    except Exception as e:
+        print( changeLog )
+        print( e )
+        
     releaseNumbersUnsorted = releaseNumbers.copy()
     releaseNumbers.sort( key = lambda x: int( ''.join( filter( str.isdigit, x ) ) ), reverse = True )
     if releaseNumbersUnsorted != releaseNumbers:
