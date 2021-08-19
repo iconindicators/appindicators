@@ -63,8 +63,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             stardateInteger, stardateFraction = stardate.getStardate2009Revised( now )
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
-        self.indicator.set_label( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ), "" )
-        self.indicator.set_title( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) ) # Needed for Lubuntu/Xubuntu.
+        self.setLabel( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) )
         return numberOfSecondsToNextUpdate
 
 
