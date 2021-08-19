@@ -333,7 +333,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
-        self.processLabel( self.processTags, None )
+        self.setLabel( self.processTags( self.indicatorText, self.indicatorTextSeparator, self.__processTags, None ) )
         self.updateIcon()
 
         if self.showWerewolfWarning:
@@ -345,13 +345,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds()
 
 
-    # Called by base class when updating the indicator's label.
-    def processTags( self, label, arguments ):
+    # Called by base class to process data tags.
+    def __processTags( self, textToProcess, arguments ):
+        text = textToProcess
         for key in self.data.keys(): # Substitute data tags '[' and ']' for values.
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in label:
-                label = label.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
+            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in text:
+                text = text.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
 
-        return label
+        return text
 
 
     # Get the data from the cache, or if stale, download from the source.
