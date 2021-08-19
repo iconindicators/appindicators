@@ -76,7 +76,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         now = datetime.datetime.now()
         self.updateBackgroundScripts( now )
-        self.processLabel( self.processTags, now )
+        self.setLabel( self.processTags( self.indicatorText, self.indicatorTextSeparator, self.__processTags, now ) )
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
@@ -164,16 +164,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.processCall( notificationCommand )
 
 
-    # Called by the base class when updating the indicator's label.
-    def processTags( self, label, arguments ):
+    # Called by base class to process data tags.
+    def __processTags( self, textToProcess, arguments ):
+        text = textToProcess
         now = arguments[ 0 ]
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground() and "[" + key + "]" in label:
+            if script.getBackground() and "[" + key + "]" in text:
                 commandResult = self.backgroundScriptResult[ key ]
-                label = label.replace( "[" + key + "]", commandResult )
+                text = text.replace( "[" + key + "]", commandResult )
 
-        return label
+        return text
 
 
 #TODO When an add/edit/remove/copy occurs, update each of the treeviews and rejig the indicator text tags.
@@ -359,7 +360,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorText = Gtk.Entry()
-        indicatorText.set_text( self.indicatorText )
+        indicatorText.set_text( self.indicatorText ) #TODO Need to capture during OK press.
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -383,7 +384,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
 
         indicatorTextSeparator = Gtk.Entry()
-        indicatorTextSeparator.set_text( self.indicatorTextSeparator )
+        indicatorTextSeparator.set_text( self.indicatorTextSeparator ) #TODO Need to capture during OK press.
         indicatorTextSeparator.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
