@@ -371,33 +371,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
             "A background script should either:\n" + \
-            "\talways return non-empty text output, or\n" + \
-            "\treturn non-empty text output only on an event\n" + \
+            "\talways return non-empty text, or\n" + \
+            "\treturn non-empty text on success\n" + \
             "\t(and empty text otherwise).\n\n" + \
-            "For example, a background script which shows\n" + \
-            "free memory will always show a text result.\n\n" + \
+            "A background script which shows free\n" + \
+            "memory will always show a text result.\n\n" + \
             "A background script which checks for a log file\n" + \
-            "will only show a text result when that log file\n" + \
+            "will only show a text result when the log file\n" + \
             "exists, yet show empty text otherwise.\n\n" + \
-            "Enclosing a script within { } will ensure\n" + \
-            "the separator is added automatically.\n\n" + \
-            "If the script results in an empty string,\n" + \
-            # "the entire text within the { } will be removed." ) ) #TODO Fix this line...anything else?
-#TODO Need to reword the part about { } and removing.
-# See Indicator Lunar.  If a data tag remains in the text (because there is missing data) all text within the { } is removed.
-# This does not apply here.
-# Instead what should happen (and NEED TO TEST THIS) is that if a script returns an empty result, all text within the { } is removed.
-#
-# Do we even need the extra check in processLabel for empty strings?
-# Come up with lots of examples of scripts and outputs for the icon text.
-#    [LOG] - Log file present: "Log file present"            No log file: ""
-#    [STACKEXCHANGE] - Messages present: "Messages present"  No messages: ""      
-#    {[LOG]}{[STACKEXCHANGE]}
-#    {[LOG][STACKEXCHANGE]}
-#    [FREEMEMORY] - "1234 MB"
-#    [INTERNETDOWN] - Internet up: ""        Internet down: "Internet is down"
+            "Enclose a script tag(s) within { } to\n" + \
+            "automatically add the separator." ) )
 
- 
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -1076,16 +1060,27 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
-#             self.requestSaveConfig()
+            self.requestSaveConfig()
 
 #TODO Testing Remove
 #         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
 #         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-
         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
+
         self.initialiseBackgroundScripts()
+
+        
         print()#TODO debugging
+
+#TODO Come up with lots of examples of scripts and outputs for the icon text.
+#    [LOG] - Log file present: "Log file present"            No log file: ""
+#    [STACKEXCHANGE] - Messages present: "Messages present"  No messages: ""      
+#    {[LOG]}{[STACKEXCHANGE]}
+#    {[LOG][STACKEXCHANGE]}
+#    [FREEMEMORY] - "1234 MB"
+#    [INTERNETDOWN] - Internet up: ""        Internet down: "Internet is down"
+
 
 
     def saveConfig( self ):
