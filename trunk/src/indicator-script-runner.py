@@ -830,7 +830,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 27, 1, 1 )
 
-        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox)
+        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox )
         backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, defaultScriptCheckbox )
         backgroundCheckbox.connect( "toggled", self.onCheckbox, box )
         backgroundCheckbox.set_active( script.getBackground() )
@@ -993,9 +993,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
-    def __createKey( self, group, name ): return group + "::" + name
-
-
     # Each time a background script is run, cache the results.
     #
     # For example, One script may have an interval of five minutes another hourly.
@@ -1012,6 +1009,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
 
 
+    def __createKey( self, group, name ): return group + "::" + name
+
+
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" )
@@ -1024,7 +1024,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
 
-            # Temporarily needed until the version number is saved into the config.
             if config.get( self.CONFIG_VERSION ) is None:
                 if scripts and len( scripts[ 0 ] ) == 7:
                     scripts = self.__convertFromVersion13ToVersion14( scripts )
