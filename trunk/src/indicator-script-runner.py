@@ -254,7 +254,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.add( treeView )
 
         self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
-        treeView.expand_all()
 
         grid.attach( scrolledWindow, 0, 0, 1, 20 )
 
@@ -424,7 +423,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.add( backgroundScriptsTreeView )
 
         self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeStore, backgroundScriptsTreeView )
-        backgroundScriptsTreeView.expand_all()
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
 
@@ -522,12 +520,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, str( intervalInMinutes ), intervalInMinutesDash ] )
 
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
-#TODO Figure out how to select the first script, not the first group...or is this not an issue?
-        # treePath = Gtk.TreePath.new_from_string( "0:1" )
-        # treeView.get_selection().select_path( treePath )
-        # treeView.set_cursor( treePath, None, False )
-        # treeView.scroll_to_cell( treePath )
+        treeView.expand_all()
+        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
+        treeView.get_selection().select_path( treePath )
+        # treeView.set_cursor( treePath, None, False )#TODO Needed?
+        treeView.scroll_to_cell( treePath )
 
 
     def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -544,11 +541,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
 
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html#Gtk.TreePath.new_from_string
-#TODO Figure out how to select the first script, not the first group...or is this not an issue?
-        # treePath = Gtk.TreePath.new_from_string( "0" )
-        # treeView.get_selection().select_path( treePath )
-        # treeView.scroll_to_cell( treePath )
+        treeView.expand_all()
+        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
+        treeView.get_selection().select_path( treePath )
+        # treeView.set_cursor( treePath, None, False )#TODO Needed?
+        treeView.scroll_to_cell( treePath )
 
 
     def onScriptSelection( self, treeSelection, textView, scripts ):
@@ -760,8 +757,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, 2, 1, 20 )
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
-        soundCheckbox.set_tooltip_text( _( "Background script" ) )
-        backgroundCheckbox.set_tooltip_text( _(
+        soundCheckbox.set_tooltip_text( _(
             "For non-background scripts,\n" + \
             "play a beep on script completion.\n\n" + \
             "For background scripts, play a beep\n" + \
@@ -774,8 +770,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         notificationCheckbox.set_tooltip_text( _(
             "For non-background scripts,\n" + \
             "show a notification on script completion.\n\n" + \
-            "For background scripts, show a\n" + \
-            "notification only if the script returns a result." ) )
+            "For background scripts, show a notification\n" + \
+            "only if the script returns a result." ) )
         notificationCheckbox.set_active( script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
@@ -792,7 +788,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         terminalCheckbox.set_tooltip_text( _(
-            "For non-background scripts only,\n" + \
+            "Only for non-background scripts,\n" + \
             "leave the terminal open on completion." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
 
@@ -802,10 +798,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
         defaultScriptCheckbox.set_tooltip_text( _(
-            "If checked for non-background scripts,\n" + \
-            "this script will run on a middle\n" + \
-            "mouse click of the indicator icon.\n\n" + \
-            "Only one script can be the default." ) )
+            "One non-background script can be set as\n" + \
+            "the default script which is run on a\n" + \
+            "middle mouse click of the indicator icon." ) )
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
