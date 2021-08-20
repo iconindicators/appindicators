@@ -290,6 +290,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.set_margin_top( 10 )
         box.set_homogeneous( True )
 
+#TODO Test all of these when no scripts are present.
+# Also is it possible to have no script selected (for edit/copy/remove)?
         addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
         addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView )
@@ -309,8 +311,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
         removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
-
-#TODO HOw to rename a group (if at all)?
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 30, 1, 1 )
@@ -578,7 +578,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
-            theScript = self.getScript( scripts, scriptGroup, scriptName )
+            theScript = self.getScript( scripts, group, name )
             if theScript:
                 textEntry.insert_text( "[" + model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ] + "]", textEntry.get_position() )
 
@@ -586,7 +586,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptCopy( self, button, scripts, treeView ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
-            script = self.getScript( scripts, scriptGroup, scriptName )
+            script = self.getScript( scripts, group, name )
 
             grid = self.createGrid()
 
