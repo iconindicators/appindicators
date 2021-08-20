@@ -199,12 +199,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
         treeView.set_tooltip_text( _(
             "Scripts are 'background' or 'non-background'.\n\n" + \
-            "A background script is periodically\n" + \
-            "executed and the result optionally written\n" + \
-            "to the indicator label.\n\n" + \
-            "Non-background scripts are listed in the\n" + \
-            "indicator menu and are executed when the\n" + \
-            "user selects that script.\n\n" + \
+            "Background scripts are executed at intervals,\n" + \
+            "the result optionally written to the label.\n\n" + \
+            "Non-background scripts, listed in the menu,\n" + \
+            "are executed when the user selects that script.\n\n" + \
             "If an attribute does not apply to a script,\n" + \
             "a dash is displayed.\n\n" + \
             "If a non-background script is checked as default,\n" + \
@@ -987,12 +985,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
-    # Each time a background script is run, cache the results.
+    # Each time a background script is run, cache the result.
     #
-    # For example, One script may have an interval of five minutes another hourly.
-    # The hourly script should not be run any more frequently so use a cached result.
+    # If for example, one script has an interval of five minutes and another script hourly,
+    # the hourly script should not be run any more frequently so use a cached result when the quicker script is run.
     #
-    # Initialise the cache results and set a next update time in the past to force the scripts to update first time.
+    # Initialise the cache results and set a next update time in the past to force all (background) scripts to update first time.
     def initialiseBackgroundScripts( self ):
         self.backgroundScriptResult = { }
         self.backgroundScriptNextUpdateTime = { }
