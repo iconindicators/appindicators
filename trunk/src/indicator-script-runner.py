@@ -1050,30 +1050,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             # Example background scripts.
 #TODO Also would be nice to put these into the user's scripts first time (for this version) so the user can see what's what (and add in the indicator text).
             self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
-            self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
+            self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
             self.requestSaveConfig()
 
 #TODO Testing Remove
 #         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
-#         self.scripts.append( Info( "System", "Available Memory", "echo \"Free memory: $(expr \( `cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9` / 1024 \))\" MB", False, False, False, True, 5 ) )
+        # self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-        self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
+        # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
+
 
         self.initialiseBackgroundScripts()
 
         
         print()#TODO debugging
-
-#TODO Come up with lots of examples of scripts and outputs for the icon text.
-#    [LOG] - Log file present: "Log file present"            No log file: ""
-#    [STACKEXCHANGE] - Messages present: "Messages present"  No messages: ""      
-#    {[LOG]}{[STACKEXCHANGE]}
-#    {[LOG][STACKEXCHANGE]}
-#    [FREEMEMORY] - "1234 MB"
-#    [INTERNETDOWN] - Internet up: ""        Internet down: "Internet is down"
-
 
 
     def saveConfig( self ):
