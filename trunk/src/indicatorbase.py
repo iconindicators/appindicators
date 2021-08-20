@@ -197,8 +197,7 @@ class IndicatorBase( ABC ):
         if lastSeparatorIndex > -1:
             processedText = processedText[ 0 : lastSeparatorIndex ] + processedText[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
 
-        # Remove remaining tags (not removed because they were not contained within { }).
-        processedText = re.sub( tagRegularExpression, "", processedText )
+        processedText = re.sub( tagRegularExpression, "", processedText ) # Remove remaining tags (not removed because they were not contained within { }).
         return processedText
 
 
