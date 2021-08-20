@@ -651,9 +651,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     scripts.append( newScript )
 
-#TODO Need to either pass in the treeStores or get it from the treeViews and then how to select the copied script.
-#                     self.populateScriptsTreeStore( scripts, treeStore, treeView )
-#                     self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView ):
+                    #TODO Need treeStore and treeView from each of the tabs...how?
+                    # self.populateScriptsTreeStore( scripts, treeStore, treeView )
+                    # self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView )
 
                 break
 
@@ -669,10 +669,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
                         del scripts[ i ]
 
-#TODO Need to either pass in the treeStores or get it from the treeViews and then how to select the group of the deleted script...unless the group is also gone.
-# Maybe just select first or nothing?
-#                         self.populateScriptsTreeStore( scripts, treeStore, treeView )
-#                         self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView ):
+                        #TODO Need treeStore and treeView from each of the tabs...how?
+                        # self.populateScriptsTreeStore( scripts, treeStore, treeView )
+                        # self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView )
                         break
 
                     i += 1
@@ -888,8 +887,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
-                #TODO Select group and script name.
-                # self.populateScriptGroupCombo( scripts, scriptGroupComboBox, scriptTreeView, newScript.getGroup(), newScript.getName() )
+                #TODO Need treeStore and treeView from each of the tabs...how?
+                # self.populateScriptsTreeStore( scripts, treeStore, treeView )
+                # self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView )
 
             break
 
