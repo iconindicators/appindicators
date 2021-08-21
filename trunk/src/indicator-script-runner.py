@@ -196,7 +196,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
-        treeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts )
+        treeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts ) #TODO Test double click of script group and script name.
         treeView.set_tooltip_text( _(
             "Scripts are 'background' or 'non-background'.\n\n" + \
             "Background scripts are executed at intervals,\n" + \
@@ -253,7 +253,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( treeView )
 
-        self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
+        # self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
 
         grid.attach( scrolledWindow, 0, 0, 1, 20 )
 
@@ -275,8 +275,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-#TODO Need a comment as to why this is here.
         treeView.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )
+        self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -521,10 +521,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, str( intervalInMinutes ), intervalInMinutesDash ] )
 
         treeView.expand_all()
-        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
+        treePath = Gtk.TreePath.new_from_string( "0:1" ) #TODO Not sure if we need to check to ensure there is at least one script present.
         treeView.get_selection().select_path( treePath )
         # treeView.set_cursor( treePath, None, False )#TODO Needed?
-        treeView.scroll_to_cell( treePath )
+        treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
 
 
     def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -545,10 +545,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
         treeView.get_selection().select_path( treePath )
         # treeView.set_cursor( treePath, None, False )#TODO Needed?
-        treeView.scroll_to_cell( treePath )
+        # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
 
 
     def onScriptSelection( self, treeSelection, textView, scripts ):
+        print( "onScriptSelection")
         model, treeiter = treeSelection.get_selection().get_selected_rows()
         if treeiter:
             scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
@@ -767,8 +768,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
         notificationCheckbox.set_tooltip_text( _(
-            "For non-background scripts,\n" + \
-            "show a notification on script completion.\n\n" + \
+            "For non-background scripts, show a\n" + \
+            "notification on script completion.\n\n" + \
             "For background scripts, show a notification\n" + \
             "only if the script returns a result." ) )
         notificationCheckbox.set_active( script.getShowNotification() )
@@ -787,8 +788,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         terminalCheckbox.set_tooltip_text( _(
-            "Only for non-background scripts,\n" + \
-            "leave the terminal open on completion." ) )
+            "Leave the terminal open on completion\n" + \
+            "of non-background scripts." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
@@ -811,7 +812,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
         backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
         backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
-        backgroundScriptIntervalSpinner.set_tooltip_text( _( "For background scripts the interval between runs." ) )
+        backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of backgrond scripts." ) )
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 27, 1, 1 )
@@ -1053,6 +1054,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
 #         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
+
+        # self.scripts = []
+        # self.scriptGroupDefault = ""
+        # self.scriptNameDefault = ""
+
+
 
 
         self.initialiseBackgroundScripts()
