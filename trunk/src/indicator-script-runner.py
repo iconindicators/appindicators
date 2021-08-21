@@ -773,6 +773,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
 
         backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
+        backgroundCheckbox.set_active( script.getBackground() )
         backgroundCheckbox.set_tooltip_text( _(
             "If checked, this script will run in background,\n" + \
             "at the interval specified, with the results\n" + \
@@ -787,14 +788,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "Leave the terminal open on completion\n" + \
             "of non-background scripts." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
-        terminalCheckbox.set_sensitive( not script.getBackground() ) #TODO Not working!  Edit a non-background script and this checkbox is enabled.
+        terminalCheckbox.set_sensitive( not script.getBackground() )
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_sensitive( not script.getBackground() ) #TODO Not working!  Edit a non-background script and this checkbox is enabled.
+        defaultScriptCheckbox.set_sensitive( not script.getBackground() )
         defaultScriptCheckbox.set_tooltip_text( _(
             "One non-background script can be set as\n" + \
             "the default script which is run on a\n" + \
@@ -802,24 +803,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
+        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox, defaultScriptCheckbox )
+
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
 
-        box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 ) #TODO Add this to the sensitive event handling.
+        label = Gtk.Label.new( _( "Interval (minutes)" ) )
+        label.set_sensitive( script.getBackground() )
+        box.pack_start( label, False, False, 0 )
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
         backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
         backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
-        backgroundScriptIntervalSpinner.set_sensitive( script.getBackground() ) #TODO Not working!  Edit a non-background script and this checkbox is enabled.
-        backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of backgrond scripts." ) )
+        backgroundScriptIntervalSpinner.set_sensitive( script.getBackground() )
+        backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 27, 1, 1 )
 
-        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox )
-        backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, defaultScriptCheckbox )
-        backgroundCheckbox.connect( "toggled", self.onCheckbox, box )
-        backgroundCheckbox.set_active( script.getBackground() )
+        backgroundCheckbox.connect( "toggled", self.onCheckbox, label, backgroundScriptIntervalSpinner )
 
         dialog = self.createDialog( treeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
         while True:
