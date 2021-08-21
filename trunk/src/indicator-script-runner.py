@@ -488,45 +488,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 cellRenderer.set_visible( False )
 
 
-
-
-
-    def dataFunctionCombinedORIGIANL( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
-#TODO The non-background rows are fat...why?
-
-        # print( treeModel.get( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL,
-        #       IndicatorScriptRunner.COLUMN_TAG_GROUP,
-        #       IndicatorScriptRunner.COLUMN_TAG_NAME,
-        #       IndicatorScriptRunner.COLUMN_TAG_SOUND,
-        #       IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION,
-        #       IndicatorScriptRunner.COLUMN_TAG_BACKGROUND,
-        #       IndicatorScriptRunner.COLUMN_TAG_TERMINAL,
-        #       IndicatorScriptRunner.COLUMN_TAG_INTERVAL,
-        #       IndicatorScriptRunner.COLUMN_TAG_REMOVE ) )
-
-        print( treeViewColumn.get_title()   )
-
-        if treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
-            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
-                cellRenderer.set_visible( False )
-            
-            else:
-                cellRenderer.set_visible( True )
-                cellRenderer.set_property( "xalign", 0.5 )
-
-            pass
-        else:
-            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
-                cellRenderer.set_visible( True )
-            
-            else:
-                cellRenderer.set_visible( False )
-
-            pass
-
-
-
-
     def populateScriptsTreeStore( self, scripts, treeStore, treeView ):
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts )
@@ -554,11 +515,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
+#TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
         treeView.expand_all()
-        # treePath = Gtk.TreePath.new_from_string( "0:1" ) #TODO Not sure if we need to check to ensure there is at least one script present.
-        # treeView.get_selection().select_path( treePath )
-        # # treeView.set_cursor( treePath, None, False )#TODO Needed?
-        # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
+        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
+        treeView.get_selection().select_path( treePath )
+        treeView.set_cursor( treePath, None, False )
+        treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
     def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -575,15 +537,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
 
-        # treeView.expand_all()
-        # treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
-        # treeView.get_selection().select_path( treePath )
-        # # treeView.set_cursor( treePath, None, False )#TODO Needed?
-        # # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
+#TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
+        treeView.expand_all()
+        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
+        treeView.get_selection().select_path( treePath )
+        treeView.set_cursor( treePath, None, False )
+        treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
     def onScriptSelection( self, treeSelection, textView, scripts ):
-        print( "onScriptSelection")
         model, treeiter = treeSelection.get_selection().get_selected_rows()
         if treeiter:
             scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]

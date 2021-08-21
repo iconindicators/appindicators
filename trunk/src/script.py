@@ -38,6 +38,9 @@ class Info( object ):
 # If the attributes of terminalOpen, playSound and showNotification ultimately also apply to background scripts,
 # move the runInBackgroud parameter to just before intervalInMinutes.
     def __init__( self, group, name, command, terminalOpen, playSound, showNotification, background, intervalInMinutes ):
+#TODO The order of the arguments are different to the treeview/model...sort out which is the "RIGHT" way/order and fix.
+        
+        
         self.group = group
         self.name = name
         self.command = command
