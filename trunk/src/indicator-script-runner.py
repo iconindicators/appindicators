@@ -787,12 +787,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "Leave the terminal open on completion\n" + \
             "of non-background scripts." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
+        terminalCheckbox.set_sensitive( not script.getBackground() ) #TODO Not working!  Edit a non-background script and this checkbox is enabled.
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
+        defaultScriptCheckbox.set_sensitive( not script.getBackground() ) #TODO Not working!  Edit a non-background script and this checkbox is enabled.
         defaultScriptCheckbox.set_tooltip_text( _(
             "One non-background script can be set as\n" + \
             "the default script which is run on a\n" + \
@@ -801,13 +803,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Ensure approximate alignment with the previous checkboxes.
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
 
-        box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Interval (minutes)" ) ), False, False, 0 ) #TODO Add this to the sensitive event handling.
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
         backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
         backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
+        backgroundScriptIntervalSpinner.set_sensitive( script.getBackground() ) #TODO Not working!  Edit a non-background script and this checkbox is enabled.
         backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of backgrond scripts." ) )
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
