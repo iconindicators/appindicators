@@ -209,7 +209,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "that script will appear as bold." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         rendererText = Gtk.CellRendererText()
@@ -219,23 +219,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_BACKGROUND )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_TERMINAL )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
-        treeViewColumn.set_expand( False )
+        # treeViewColumn.set_expand( False )
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn.pack_start( rendererText, False )
@@ -252,8 +252,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( treeView )
-
-        # self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
 
         grid.attach( scrolledWindow, 0, 0, 1, 20 )
 
@@ -486,11 +484,47 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 cellRenderer.set_property( "xalign", 0.5 )
 
         else:
-            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
-                pass
+            if isinstance( cellRenderer, Gtk.CellRendererText ):
+                cellRenderer.set_visible( False )
 
+
+
+
+
+    def dataFunctionCombinedORIGIANL( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
+#TODO The non-background rows are fat...why?
+
+        # print( treeModel.get( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL,
+        #       IndicatorScriptRunner.COLUMN_TAG_GROUP,
+        #       IndicatorScriptRunner.COLUMN_TAG_NAME,
+        #       IndicatorScriptRunner.COLUMN_TAG_SOUND,
+        #       IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION,
+        #       IndicatorScriptRunner.COLUMN_TAG_BACKGROUND,
+        #       IndicatorScriptRunner.COLUMN_TAG_TERMINAL,
+        #       IndicatorScriptRunner.COLUMN_TAG_INTERVAL,
+        #       IndicatorScriptRunner.COLUMN_TAG_REMOVE ) )
+
+        print( treeViewColumn.get_title()   )
+
+        if treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
+            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+                cellRenderer.set_visible( False )
+            
+            else:
+                cellRenderer.set_visible( True )
+                cellRenderer.set_property( "xalign", 0.5 )
+
+            pass
+        else:
+            if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
+                cellRenderer.set_visible( True )
+            
             else:
                 cellRenderer.set_visible( False )
+
+            pass
+
+
 
 
     def populateScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -508,19 +542,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 if script.getBackground():
                     terminalOpen = Gtk.STOCK_REMOVE
-                    intervalInMinutes = script.getIntervalInMinutes()
+                    intervalInMinutes = str( script.getIntervalInMinutes() )
                     intervalInMinutesDash = None
 
                 else:
                     terminalOpen = Gtk.STOCK_APPLY if script.getTerminalOpen() else None
-                    intervalInMinutes = None
+                    intervalInMinutes = ""
                     intervalInMinutesDash = Gtk.STOCK_REMOVE
 
                 treeStore.append(
                     parent,
-                    [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, str( intervalInMinutes ), intervalInMinutesDash ] )
+                    [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
-        # treeView.expand_all()
+        treeView.expand_all()
         # treePath = Gtk.TreePath.new_from_string( "0:1" ) #TODO Not sure if we need to check to ensure there is at least one script present.
         # treeView.get_selection().select_path( treePath )
         # # treeView.set_cursor( treePath, None, False )#TODO Needed?
@@ -532,7 +566,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
 
-        # Extra redundant columns are present, but allows the reuse of the column definitions.
+        # Unused columns are present, but allows the reuse of the column definitions.
         for scriptGroup in scriptGroups:
             parent = treeStore.append( None, [ scriptGroup, scriptGroup, None, None, None, None, None, None ] )
 
