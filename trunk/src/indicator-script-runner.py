@@ -520,11 +520,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, str( intervalInMinutes ), intervalInMinutesDash ] )
 
-        treeView.expand_all()
-        treePath = Gtk.TreePath.new_from_string( "0:1" ) #TODO Not sure if we need to check to ensure there is at least one script present.
-        treeView.get_selection().select_path( treePath )
-        # treeView.set_cursor( treePath, None, False )#TODO Needed?
-        treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
+        # treeView.expand_all()
+        # treePath = Gtk.TreePath.new_from_string( "0:1" ) #TODO Not sure if we need to check to ensure there is at least one script present.
+        # treeView.get_selection().select_path( treePath )
+        # # treeView.set_cursor( treePath, None, False )#TODO Needed?
+        # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
 
 
     def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
@@ -541,11 +541,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
 
-        treeView.expand_all()
-        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
-        treeView.get_selection().select_path( treePath )
-        # treeView.set_cursor( treePath, None, False )#TODO Needed?
-        # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
+        # treeView.expand_all()
+        # treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Not sure if we need to check to ensure there is at least one script present.
+        # treeView.get_selection().select_path( treePath )
+        # # treeView.set_cursor( treePath, None, False )#TODO Needed?
+        # # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  Is this needed when we do have scripts?  Test with large list of scripts and select end.
 
 
     def onScriptSelection( self, treeSelection, textView, scripts ):
