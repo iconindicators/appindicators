@@ -609,7 +609,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             grid.attach( box, 0, 1, 1, 1 )
 
-            dialog = self.createDialog( scriptNameTreeView, _( "Copy Script" ), grid )
+            dialog = self.createDialog( treeView, _( "Copy Script" ), grid )
             while True:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
@@ -651,7 +651,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def onScriptRemove( self, button, scripts, treeView, commandTextView ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
-            if self.showOKCancel( scriptNameTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( treeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
                     if script.getGroup() == scriptGroup and script.getName() == scriptName:
