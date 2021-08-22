@@ -543,7 +543,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
-        group, name = self.__getGroupFromTreeView( treeView )
+        group, name = self.__getGroupNameFromTreeView( treeView )
         commandText = ""
         if group and name:
             commandText = self.getScript( scripts, group, name ).getCommand()
@@ -560,13 +560,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
-        group, name = self.__getGroupFromTreeView( treeView )
+        group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
             textEntry.insert_text( "[" + self.__createKey( group, name ) + "]", textEntry.get_position() )
 
 
     def onScriptCopy( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
-        group, name = self.__getGroupFromTreeView( scriptsTreeView )
+        group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
             script = self.getScript( scripts, group, name )
 
@@ -642,7 +642,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView ):
-        group, name = self.__getGroupFromTreeView( scriptsTreeView )
+        group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
             if self.showOKCancel( scriptsTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
@@ -661,7 +661,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptEdit( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
-        group, name = self.__getGroupFromTreeView( scriptsTreeView )
+        group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
             theScript = self.getScript( scripts, group, name )
             self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
@@ -901,7 +901,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return scriptsByGroup
 
 
-    def __getGroupFromTreeView( self, treeView ):
+    def __getGroupNameFromTreeView( self, treeView ):
         group = None
         name = None
         model, treeiter = treeView.get_selection().get_selected()
@@ -965,7 +965,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     # Each time a background script is run, cache the result.
     #
-    # If for example, one script has an interval of five minutes and another script hourly,
+    # If for example, one script has an interval of five minutes and another script is hourly,
     # the hourly script should not be run any more frequently so use a cached result when the quicker script is run.
     #
     # Initialise the cache results and set a next update time in the past to force all (background) scripts to update first time.
