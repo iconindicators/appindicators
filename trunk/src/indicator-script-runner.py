@@ -273,7 +273,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-        treeView.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )
+        treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
         self.populateScriptsTreeStore( copyOfScripts, treeView )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -549,23 +549,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
-    def onScriptSelection( self, treeSelection, textView, scripts ):
-        model, treeiter = treeSelection.get_selection().get_selected_rows()
-        if treeiter:
-            scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
-            scriptName = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ]
-            theScript = self.getScript( scripts, scriptGroup, scriptName )
-            commandText = ""
-            if theScript:
-                commandText = theScript.getCommand()
+    def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
+        group, name = self.__getGroupNameFromTreeView( treeView )
+        commandText = ""
+        if group and name:
+            commandText = self.getScript( scripts, group, name ).getCommand()
 
-            textView.get_buffer().set_text( commandText )
-
-#TODO Figure out how to trap when a row is unhighlighted.
+        textView.get_buffer().set_text( commandText )
+#TODO Need to figure out how to trap when a row is unhighlighted?
 # When a row is clicked or CTRL + clicked, a selection event is fired and the row selection count is one.
 # So no idea how to discern between these two events. 
 #May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
-            # textView.get_buffer().set_text( "" )
 
 
     def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ): self.onScriptEdit( None, scripts, treeView ) # Check to see if a group was double clicked downstream.
