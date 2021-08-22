@@ -274,7 +274,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
         treeView.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )
-        self.populateScriptsTreeStore( copyOfScripts, treeStore, treeView )
+        self.populateScriptsTreeStore( copyOfScripts, treeView )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -420,7 +420,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( backgroundScriptsTreeView )
 
-        self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeStore, backgroundScriptsTreeView )
+        self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeView )
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
 
@@ -488,7 +488,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 cellRenderer.set_visible( False )
 
 
-    def populateScriptsTreeStore( self, scripts, treeStore, treeView ):
+    def populateScriptsTreeStore( self, scripts, treeView ):
+        treeStore = treeView.get_model()
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
@@ -524,7 +525,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
-    def populateBackgroundScriptsTreeStore( self, scripts, treeStore, treeView ):
+    def populateBackgroundScriptsTreeStore( self, scripts, treeView ):
+        treeStore = treeView.get_model()
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
@@ -566,20 +568,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             # textView.get_buffer().set_text( "" )
 
 
-    def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
-        if group and name:
-            theScript = self.getScript( scripts, group, name )
-            if theScript:
-                self.onScriptEdit( None, scripts, treeView )
+    def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ): self.onScriptEdit( None, scripts, treeView ) # Check to see if a group was double clicked downstream.
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         if group and name:
-            theScript = self.getScript( scripts, group, name )
-            if theScript:
-                textEntry.insert_text( "[" + model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_NAME ] + "]", textEntry.get_position() )
+            textEntry.insert_text( "[" + self.__createKey( group, name ) + "]", textEntry.get_position() )
 
 
     def onScriptCopy( self, button, scripts, treeView ):
