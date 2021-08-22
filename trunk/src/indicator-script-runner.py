@@ -87,6 +87,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() )
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
+#TODO Need to test that the timing works...
+# On each run dump the interval for each background script,
+# the number of minutes until the next update
+# and the time of each update.
 
 
     def updateMenu( self, menu ):
@@ -212,7 +216,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "that script will appear as bold." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
-        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         rendererText = Gtk.CellRendererText()
@@ -222,23 +225,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
-        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION )
-        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_BACKGROUND )
-        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_TERMINAL )
-        # treeViewColumn.set_expand( False )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
-        # treeViewColumn.set_expand( False )
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn.pack_start( rendererText, False )
@@ -397,23 +395,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "add to the icon text." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_GROUP )
-        treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_NAME )
-        treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
-        treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_NOTIFICATION )
-        treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_TAG_INTERVAL )
-        treeViewColumn.set_expand( False )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -1041,7 +1034,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Testing Remove
 #         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
         # self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
-#         self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
+        # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
 
         # self.scripts = []
