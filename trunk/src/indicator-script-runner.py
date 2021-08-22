@@ -190,13 +190,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        treeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+        # Define these here so that buttons/widgets can connect to the background scripts treeview to handle events.        
+        backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str ) # Extra redundant columns, but allows the reuse of the column definitions.
+        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
 
+        treeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
         treeView = Gtk.TreeView.new_with_model( treeStore )
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
-        treeView.connect( "row-activated", self.onScriptDoubleClick, copyOfScripts ) #TODO Test double click of script group and script name.
+        treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, copyOfScripts )
         treeView.set_tooltip_text( _(
             "Scripts are 'background' or 'non-background'.\n\n" + \
             "Background scripts are executed at intervals,\n" + \
@@ -292,22 +295,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # Also is it possible to have no script selected (for edit/copy/remove)?
         addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
-        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView )
+        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView, backgroundScriptsTreeView )
         box.pack_start( addButton, True, True, 0 )
 
         editButton = Gtk.Button.new_with_label( _( "Edit" ) )
         editButton.set_tooltip_text( _( "Edit the selected script." ) )
-        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView )
+        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView, backgroundScriptsTreeView )
         box.pack_start( editButton, True, True, 0 )
 
         copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
         copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
-        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, treeView )
+        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, treeView, backgroundScriptsTreeView )
         box.pack_start( copyButton, True, True, 0 )
 
         removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, commandTextView )
+        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView )
         box.pack_start( removeButton, True, True, 0 )
 
         box.set_halign( Gtk.Align.CENTER )
@@ -384,9 +387,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str ) # Extra redundant columns, but allows the reuse of the column definitions.
-
-        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -460,9 +460,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
     def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
-        scriptGroup = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL )
-        scriptName = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_NAME )
-        if scriptGroup == self.scriptGroupDefault and scriptName == self.scriptNameDefault:
+        group = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL )
+        name = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_NAME )
+        if group == self.scriptGroupDefault and name == self.scriptNameDefault:
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
 
@@ -492,12 +492,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeStore = treeView.get_model()
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts )
-        scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
+        groups = sorted( scriptsByGroup.keys(), key = str.lower )
 
-        for scriptGroup in scriptGroups:
-            parent = treeStore.append( None, [ scriptGroup, scriptGroup, None, None, None, None, None, None, None ] )
+        for group in groups:
+            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
 
-            for script in scriptsByGroup[ scriptGroup ]:
+            for script in scriptsByGroup[ group ]:
                 playSound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 showNotification = Gtk.STOCK_APPLY if script.getShowNotification() else None
                 background = Gtk.STOCK_APPLY if script.getBackground() else None
@@ -514,10 +514,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 treeStore.append(
                     parent,
-                    [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
+                    [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
 #TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
-#TODO Is it possible to create our own event that the treemodels listen for and then call this function?
+#TODO When the copy script calls this, might be nice to pass in the name of the group/script to select it?
         treeView.expand_all()
         treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
         treeView.get_selection().select_path( treePath )
@@ -529,16 +529,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeStore = treeView.get_model()
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
-        scriptGroups = sorted( scriptsByGroup.keys(), key = str.lower )
+        groups = sorted( scriptsByGroup.keys(), key = str.lower )
 
         # Unused columns are present, but allows the reuse of the column definitions.
-        for scriptGroup in scriptGroups:
-            parent = treeStore.append( None, [ scriptGroup, scriptGroup, None, None, None, None, None, None ] )
+        for group in groups:
+            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None ] )
 
-            for script in scriptsByGroup[ scriptGroup ]:
+            for script in scriptsByGroup[ group ]:
                 treeStore.append( 
                     parent,
-                    [ scriptGroup, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
+                    [ group, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
 
 #TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
         treeView.expand_all()
@@ -550,7 +550,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
+        group, name = self.__getGroupFromTreeView( treeView )
         commandText = ""
         if group and name:
             commandText = self.getScript( scripts, group, name ).getCommand()
@@ -562,17 +562,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
 
 
-    def onScriptDoubleClick( self, treeView, treePath, treeViewColumn, scripts ): self.onScriptEdit( None, scripts, treeView ) # Check to see if a group was double clicked downstream.
+    def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, scripts ):
+        self.onScriptEdit( None, scripts, scriptsTreeView, backgroundScriptsTreeView ) # Check to see if a group was double clicked downstream.
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
+        group, name = self.__getGroupFromTreeView( treeView )
         if group and name:
             textEntry.insert_text( "[" + self.__createKey( group, name ) + "]", textEntry.get_position() )
 
 
-    def onScriptCopy( self, button, scripts, treeView ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
+    def onScriptCopy( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
+        group, name = self.__getGroupFromTreeView( scriptsTreeView )
         if group and name:
             script = self.getScript( scripts, group, name )
 
@@ -609,7 +610,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             grid.attach( box, 0, 1, 1, 1 )
 
-            dialog = self.createDialog( treeView, _( "Copy Script" ), grid )
+            dialog = self.createDialog( scriptsTreeView, _( "Copy Script" ), grid )
             while True:
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
@@ -639,44 +640,41 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     scripts.append( newScript )
 
-                    #TODO Need treeStore and treeView from each of the tabs...how?
-                    # self.populateScriptsTreeStore( scripts, treeStore, treeView )
-                    # self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView )
+                    self.populateScriptsTreeStore( scripts, scriptsTreeView )
+                    self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
 
                 break
 
             dialog.destroy()
 
 
-    def onScriptRemove( self, button, scripts, treeView, commandTextView ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
+    def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView ):
+        group, name = self.__getGroupFromTreeView( scriptsTreeView )
         if group and name:
-            if self.showOKCancel( treeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
+            if self.showOKCancel( scriptsTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
                 for script in scripts:
-                    if script.getGroup() == scriptGroup and script.getName() == scriptName:
+                    if script.getGroup() == group and script.getName() == name:
                         del scripts[ i ]
-
-                        #TODO Need treeStore and treeView from each of the tabs...how?
-                        # self.populateScriptsTreeStore( scripts, treeStore, treeView )
-                        # self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView )
+                        self.populateScriptsTreeStore( scripts, scriptsTreeView )
+                        self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
                         break
 
                     i += 1
 
 
-    def onScriptAdd( self, button, scripts, treeView ):
-        self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, treeView )
+    def onScriptAdd( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
+        self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, scriptsTreeView, backgroundScriptsTreeView )
 
 
-    def onScriptEdit( self, button, scripts, treeView ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
+    def onScriptEdit( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
+        group, name = self.__getGroupFromTreeView( scriptsTreeView )
         if group and name:
             theScript = self.getScript( scripts, group, name )
-            self.__addEditScript( theScript, scripts, treeView )
+            self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
 
 
-    def __addEditScript( self, script, scripts, treeView ):
+    def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
         add = True if script.getGroup() == "" else False
 
         grid = self.createGrid()
@@ -696,10 +694,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         if add:
             index = 0
-            model, treeiter = treeView.get_selection().get_selected()
+            model, treeiter = scriptsTreeView.get_selection().get_selected()
             if treeiter:
-                scriptGroup = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
-                index = groups.index( scriptGroup )
+                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL ]
+                index = groups.index( group )
 
         else:
             index = groups.index( script.getGroup() )
@@ -814,7 +812,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         backgroundCheckbox.connect( "toggled", self.onCheckbox, label, backgroundScriptIntervalSpinner )
 
-        dialog = self.createDialog( treeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
+        dialog = self.createDialog( scriptsTreeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -880,19 +878,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
-                #TODO Need treeStore and treeView from each of the tabs...how?
-                # self.populateScriptsTreeStore( scripts, treeStore, treeView )
-                # self.populateBackgroundScriptsTreeStore( scripts, treeStore, treeView )
+                self.populateScriptsTreeStore( scripts, scriptsTreeView )
+                self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
 
             break
 
         dialog.destroy()
 
 
-    def getScript( self, scripts, scriptGroup, scriptName ):
+    def getScript( self, scripts, group, name ):
         theScript = None
         for script in scripts:
-            if script.getGroup() == scriptGroup and script.getName() == scriptName:
+            if script.getGroup() == group and script.getName() == name:
                 theScript = script
                 break
 
@@ -911,7 +908,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return scriptsByGroup
 
 
-    def __getGroupNameFromTreeView( self, treeView ):
+    def __getGroupFromTreeView( self, treeView ):
         group = None
         name = None
         model, treeiter = treeView.get_selection().get_selected()
