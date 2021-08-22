@@ -516,6 +516,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     [ scriptGroup, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
 #TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
+#TODO Is it possible to create our own event that the treemodels listen for and then call this function?
         treeView.expand_all()
         treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
         treeView.get_selection().select_path( treePath )
@@ -539,10 +540,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
         treeView.expand_all()
-        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
-        treeView.get_selection().select_path( treePath )
-        treeView.set_cursor( treePath, None, False )
-        treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
+#TODO The stuff below is likely not needed since this is only for display (and click) purposes.
+        # treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
+        # treeView.get_selection().select_path( treePath )
+        # treeView.set_cursor( treePath, None, False )
+        # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
     def onScriptSelection( self, treeSelection, textView, scripts ):
