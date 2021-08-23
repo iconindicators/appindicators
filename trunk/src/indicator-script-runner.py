@@ -944,9 +944,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __convertFromVersion15ToVersion16( self, scripts ):
-        # In version 16 background script functionality was added.
+        # In version 16 background script were added.
         # All scripts prior to this change are deemed to be non-background scripts.
-        # For each script, set a flag and a dummy value for interval.
+        # For each (non-background) script, set a flag and a dummy value for interval.
         convertedScripts = [ ]
         for script in scripts:
             convertedScript = [ ]
