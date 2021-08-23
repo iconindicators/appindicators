@@ -960,11 +960,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             convertedScript.append( -1 ) # For a non-background script, the interval is ignored.
             convertedScripts.append( convertedScript )
 
-#TODO Add in sample background scripts ensuring there is no clash with existing groups/scripts.
         # Add in sample background scripts and indicator text...
-        # convertedScripts.append( [ "Background Example", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ] )
-        # convertedScripts.append( [ "Background Example", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ] )
-        # self.indicatorText = " {[Background Example::Internet Down]}{[Background Example::Available Memory]}"
+        group = "Background Script Examples" #TODO Check this does not exist and if so then what?
+        convertedScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ] )
+        convertedScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ] )
+        self.indicatorText = " {[" + group + "::Internet Down]}{[" + group + "::Available Memory]}"
 
         return convertedScripts
 
@@ -1005,7 +1005,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     scripts = self.__convertFromVersion13ToVersion14( scripts )
                     self.requestSaveConfig()
 
-                if scripts and len( scripts[ 0 ] ) == 6 and version is None:
+                if scripts and len( scripts[ 0 ] ) == 6:
                     scripts = self.__convertFromVersion15ToVersion16( scripts )
                     self.requestSaveConfig()
 
