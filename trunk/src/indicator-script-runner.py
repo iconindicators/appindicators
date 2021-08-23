@@ -960,6 +960,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             convertedScript.append( -1 ) # For a non-background script, the interval is ignored.
             convertedScripts.append( convertedScript )
 
+#TODO Add in sample background scripts ensuring there is no clash with existing groups/scripts.
+        # Add in sample background scripts and indicator text...
+        # convertedScripts.append( [ "Background Example", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ] )
+        # convertedScripts.append( [ "Background Example", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ] )
+        # self.indicatorText = " {[Background Example::Internet Down]}{[Background Example::Available Memory]}"
+
         return convertedScripts
 
 
@@ -1015,7 +1021,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 self.scriptNameDefault = ""
 
         else:
-            # Example (not background) scripts.
+            # Example non-background scripts.
             self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
             self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, False, -1 ) )
@@ -1024,7 +1030,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
 
             # Example background scripts.
-#TODO Also would be nice to put these into the user's scripts first time (for this version) so the user can see what's what (and add in the indicator text).
             self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
             self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
@@ -1036,18 +1041,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
         # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
-
         # self.scripts = []
         # self.scriptGroupDefault = ""
         # self.scriptNameDefault = ""
-
-
-
+        print()#TODO debugging
 
         self.initialiseBackgroundScripts()
-
-        
-        print()#TODO debugging
 
 
     def saveConfig( self ):
