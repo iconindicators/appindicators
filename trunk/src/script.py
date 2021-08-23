@@ -24,48 +24,20 @@ class Info( object ):
     # Group to which a script belongs.
     # Name of script.
     # The command or script with any arguments as needed.
-    # Leave the terminal (used to execute the script/command) open on completion.
-    # Play a sound on completion of script/command execution.
-    # Show a notification on completion of script/command execution.
-    # Is a script background (displays result in a label) versus a foreground script (activated by user).
-    # Update interval for a background script (ignored for foreground scripts).
-#TODO Figure out which parameters apply to both passive/background and active scripts and put those first.
-# Then after the runInBackgroudFlag list the attributes for active scripts first followed by the background attributes.
-# Or, use two factory methods (classmethods) and just don't use the constructor.
-# https://www.geeksforgeeks.org/what-is-a-clean-pythonic-way-to-have-multiple-constructors-in-python/
-# https://stackoverflow.com/questions/44726196/how-to-implement-multiple-constructors-in-python
-# https://stackoverflow.com/questions/44765482/multiple-constructors-the-pythonic-way
-# If the attributes of terminalOpen, playSound and showNotification ultimately also apply to background scripts,
-# move the runInBackgroud parameter to just before intervalInMinutes.
+    # True to leave the terminal open on completion of script/command execution (applies only to non-background scripts).
+    # True to play a sound on completion of script/command execution.
+    # True to show a notification on completion of script/command execution.
+    # True if the script is background (runs at intervals and optionally displays result in a label) versus a non-background script (activated by user).
+    # Update interval for background scripts (in minutes); ignored for non-background scripts.
     def __init__( self, group, name, command, terminalOpen, playSound, showNotification, background, intervalInMinutes ):
-#TODO The order of the arguments are different to the treeview/model...sort out which is the "RIGHT" way/order and fix.
-        
-        
         self.group = group
         self.name = name
         self.command = command
-
-        # Apply only to foreground scripts.  TODO Is this still correct?
-        self.terminalOpen = terminalOpen #TODO Apply also somehow to background scripts?
-        self.playSound = playSound #TODO Ditto
-        self.showNotification = showNotification #TODO Ditto
-
+        self.terminalOpen = terminalOpen
+        self.playSound = playSound
+        self.showNotification = showNotification
         self.background = background
-
-        # Apply only to background scripts.
-        self.intervalInMinutes = intervalInMinutes #TODO Document/decide if this is to be an int or str.  Check to see how the data is read in from the file...if a number
-        #will it be a number or a string?
-
-
-#TODO Probably not needed.
-    # @classmethod
-    # def foregroundScript( cls, group, name, command, directory, terminalOpen = False, playSound = False, showNotification = False ):
-        # return cls( group, name, command, directory, False, terminalOpen, playSound, showNotification )
-
-
-    # @classmethod
-    # def backgroundScript( cls, group, name, command, intervalInMinutes = 60 ):
-        # return cls( group, name, command, None, True, False, False, False, intervalInMinutes )
+        self.intervalInMinutes = intervalInMinutes #TODO Is this an int or str?
 
 
     def getGroup( self ): return self.group
@@ -89,29 +61,31 @@ class Info( object ):
     def getBackground( self ): return self.background
 
 
-    def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
+    def getIntervalInMinutes( self ): return int( self.intervalInMinutes ) #TODO As per the TODO above check if this is an int or string...
 
 
-#TODO Add stuff for background scripts.
-# Will need to check first if a script is background or not?  Or just compare all attributes?
+#TODO Test
     def isIdentical( self, script ):
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
                self.command == script.getCommand() and \
                self.terminalOpen == script.getTerminalOpen() and \
                self.playSound == script.getPlaySound() and \
-               self.showNotification == script.getShowNotification()
+               self.showNotification == script.getShowNotification() and \
+               self.background == script.getBackground() and \
+               self.intervalInMinutes == script.getIntervalInMinutes()
 
 
-#TODO Add stuff for background scripts.
-# Will need to check first if a script is background or not?  Or just print/return all attributes?
+#TODO Test
     def __str__( self ):
         return self.getGroup() + " | " + \
                self.getName() + " | " + \
                self.getCommand() + " | " + \
                str( self.getTerminalOpen() ) + " | " + \
                str( self.getPlaySound() ) + " | " + \
-               str( self.getShowNotification() )
+               str( self.getShowNotification() ) + " | " + \
+               str( self.getBackground() ) + " | " + \
+               str( self.getIntervalInMinutes() )
 
 
     def __repr__( self ): return self.__str__()

@@ -1014,7 +1014,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault and not script[ 6 ]:
                     defaultScriptFound = True
 
-                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ), script[ 7 ] ) )
+                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ), script[ 7 ] ) ) #TODO Is this last item an int?
 
             if not defaultScriptFound:
                 self.scriptGroupDefault = ""
