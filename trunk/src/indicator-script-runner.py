@@ -181,9 +181,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return text
 
 
-#TODO When an add/edit/remove/copy occurs, update each of the treeviews and rejig the indicator text tags.
     def onPreferences( self, dialog ):
-        self.defaultScriptGroupCurrent = self.scriptGroupDefault
+        self.defaultScriptGroupCurrent = self.scriptGroupDefault #TODO Check if all this makes sense...can't we get the default from the current list of scripts (the copy)?
         self.defaultScriptNameCurrent = self.scriptNameDefault
         copyOfScripts = copy.deepcopy( self.scripts )
 
@@ -194,12 +193,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        # Define these here so that buttons/widgets can connect to the background scripts treeview to handle events.        
-        backgroundScriptsTreeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str ) # Extra redundant columns, but allows the reuse of the column definitions.
-        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( backgroundScriptsTreeStore )
+        # Define these here so that widgets can connect to handle events.        
+        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str ) ) # Extra redundant columns, but allows the reuse of the column definitions.
+        indicatorTextEntry = Gtk.Entry()
 
-        treeStore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
-        treeView = Gtk.TreeView.new_with_model( treeStore )
+        treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) )
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
@@ -298,7 +296,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         editButton = Gtk.Button.new_with_label( _( "Edit" ) )
         editButton.set_tooltip_text( _( "Edit the selected script." ) )
-        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView, backgroundScriptsTreeView )
+        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView, backgroundScriptsTreeView, indicatorTextEntry )
         box.pack_start( editButton, True, True, 0 )
 
         copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
@@ -308,7 +306,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView )
+        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView, indicatorTextEntry )
         box.pack_start( removeButton, True, True, 0 )
 
         box.set_halign( Gtk.Align.CENTER )
@@ -348,16 +346,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
-        # Label settings.
+        # Icon text settings.
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
-        indicatorText = Gtk.Entry()
-        indicatorText.set_text( self.indicatorText ) #TODO Need to capture during OK press.
-        indicatorText.set_tooltip_text( _(
+        indicatorTextEntry.set_text( self.indicatorText ) #TODO Need to capture during OK press.
+        indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
             "A background script should either:\n" + \
@@ -372,23 +369,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "Enclose a script tag(s) within { } to\n" + \
             "automatically add the separator." ) )
 
-        box.pack_start( indicatorText, True, True, 0 )
+        box.pack_start( indicatorTextEntry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
 
         box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
 
-        indicatorTextSeparator = Gtk.Entry()
-        indicatorTextSeparator.set_text( self.indicatorTextSeparator ) #TODO Need to capture during OK press.
-        indicatorTextSeparator.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
-        box.pack_start( indicatorTextSeparator, False, False, 0 )
+        indicatorTextSeparatorEntry = Gtk.Entry()
+        indicatorTextSeparatorEntry.set_text( self.indicatorTextSeparator ) #TODO Need to capture during OK press.
+        indicatorTextSeparatorEntry.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
+        box.pack_start( indicatorTextSeparatorEntry, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-        backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorText, copyOfScripts )
+        backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorTextEntry, copyOfScripts )
         backgroundScriptsTreeView.set_tooltip_text( _(
             "Background scripts by group.\n" + \
             "Double click on a script to\n" + \
@@ -424,16 +421,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
-            self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
-            self.hideGroups = hideGroupsCheckbox.get_active()
             self.scripts = copyOfScripts
-            if len( self.scripts ) == 0:
-                self.scriptGroupDefault = ""
-                self.scriptNameDefault = ""
 
-            else:
+            
+#TODO Don't see how this works...surely need to iterate through list of scripts and find the script that is default?
+            self.scriptGroupDefault = ""
+            self.scriptNameDefault = ""
+            if self.scripts: #TODO Check logic.
                 self.scriptGroupDefault = self.defaultScriptGroupCurrent
                 self.scriptNameDefault = self.defaultScriptNameCurrent
+
+            self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
+            self.hideGroups = hideGroupsCheckbox.get_active()
+
+            self.indicatorText = indicatorTextEntry.get_text().strip()#TODO Check
+            self.indicatorTextSeparator = indicatorTextSeparatorEntry.get_text().strip()#TODO Check
 
             self.initialiseBackgroundScripts()
 
@@ -651,6 +653,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         del scripts[ i ]
                         self.populateScriptsTreeStore( scripts, scriptsTreeView )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
+                        #TODO Need to remove the script from the indicator text (from the text entry) if present.                        
                         break
 
                     i += 1
@@ -665,6 +668,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if group and name:
             theScript = self.getScript( scripts, group, name )
             self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
+            #TODO Need to update the script from the indicator text (from the text entry) if present.                        
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
