@@ -201,7 +201,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
-        treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, copyOfScripts )
+        treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts )
         treeView.set_tooltip_text( _(
             "Scripts are 'background' or 'non-background'.\n\n" + \
             "Background scripts are executed at intervals,\n" + \
@@ -353,7 +353,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
-        indicatorTextEntry.set_text( self.indicatorText ) #TODO Need to capture during OK press.
+        indicatorTextEntry.set_text( self.indicatorText )
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -544,6 +544,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
+    # Update the indicator text...
+    # When a script is removed, the new group/name must be set to "".
+    def updateIndicatorTextEntry( self, textEntry, oldGroup, oldName, newGroup, newName ):
+#TODO Need to handle [] and {[]}!
+        oldKey = self.__createKey( oldGroup, oldName )
+        newKey = ""
+        if newGroup and newName:
+            newKey = self.__createKey( newGroup, newName )
+
+        textEntry.set_text( textEntry.get_text().replace( oldKey, newKey ) )
+
+
     def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         commandText = ""
@@ -557,8 +569,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
 
 
-    def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, scripts ):
-        self.onScriptEdit( None, scripts, scriptsTreeView, backgroundScriptsTreeView ) # Check to see if a group was double clicked downstream.
+    def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, textEntry, scripts ):
+        self.onScriptEdit( None, scripts, scriptsTreeView, backgroundScriptsTreeView, textEntry ) # Check to see if a group was double clicked downstream.  <---TODO What is this?  A TODO missing the TODO...?????
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
@@ -643,7 +655,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
-    def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView ):
+    def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView, textEntry ):
         group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
             if self.showOKCancel( scriptsTreeView, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
@@ -653,7 +665,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         del scripts[ i ]
                         self.populateScriptsTreeStore( scripts, scriptsTreeView )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
-                        #TODO Need to remove the script from the indicator text (from the text entry) if present.                        
+                        self.updateIndicatorTextEntry( textEntry, group, name, "", "" )                        
                         break
 
                     i += 1
@@ -663,12 +675,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, scriptsTreeView, backgroundScriptsTreeView )
 
 
-    def onScriptEdit( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
+    def onScriptEdit( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, textEntry ):
         group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
             theScript = self.getScript( scripts, group, name )
-            self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
-            #TODO Need to update the script from the indicator text (from the text entry) if present.                        
+            editedScript = self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
+            if editedScript:
+                self.updateIndicatorTextEntry( textEntry, group, name, editedScript.getGroup(), editedScript.getName() )
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
@@ -810,6 +823,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundCheckbox.connect( "toggled", self.onCheckbox, label, backgroundScriptIntervalSpinner )
 
         dialog = self.createDialog( scriptsTreeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
+        newScript = None
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -881,6 +895,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             break
 
         dialog.destroy()
+        return newScript
 
 
     def getScript( self, scripts, group, name ):
