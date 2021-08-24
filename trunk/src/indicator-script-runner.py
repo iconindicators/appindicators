@@ -964,8 +964,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             convertedScript.append( -1 ) # For a non-background script, the interval is ignored.
             convertedScripts.append( convertedScript )
 
-        # Add in sample background scripts and indicator text...
-        group = "Background Script Examples" #TODO Check this does not exist and if so then what?
+        # Add in sample background scripts and indicator text...ensuring there is no clash with existing groups! 
+        group = "Background Script Examples"
+        while True:
+            clash = False
+            for script in convertedScripts:
+                if script[ 0 ] == group:
+                    group += "..."
+                    clash = True
+                    break
+
+            if not clash:
+                break
+
         convertedScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ] )
         convertedScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ] )
         self.indicatorText = " {[" + group + "::Internet Down]}{[" + group + "::Available Memory]}"
