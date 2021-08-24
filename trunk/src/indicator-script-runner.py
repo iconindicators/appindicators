@@ -544,16 +544,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
 
 
-    # Update the indicator text...
-    # When a script is removed, the new group/name must be set to "".
+    # Update the indicator text after script edit/removal; on removal, the new group/name must be set to "".
     def updateIndicatorTextEntry( self, textEntry, oldGroup, oldName, newGroup, newName ):
-#TODO Need to handle [] and {[]}!
         oldKey = self.__createKey( oldGroup, oldName )
-        newKey = ""
-        if newGroup and newName:
+        if newGroup and newName: # Script was edited, so do tag substitution...
             newKey = self.__createKey( newGroup, newName )
+            textEntry.set_text( textEntry.get_text().replace( "{[" + oldKey + "]}", "{[" + newKey + "]}" ) )
+            textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
 
-        textEntry.set_text( textEntry.get_text().replace( oldKey, newKey ) )
+        else: # Script was removed, so do tag removal...
+            textEntry.set_text( textEntry.get_text().replace( "{[" + oldKey + "]}", "" ) )
+            textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "" ) )
 
 
     def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
