@@ -273,7 +273,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
         treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
-        self.populateScriptsTreeStore( copyOfScripts, treeView )
+        self.populateScriptsTreeStore( copyOfScripts, treeView, "", "" )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -410,7 +410,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( backgroundScriptsTreeView )
 
-        self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeView )
+        self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeView, "", "" )
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
 
@@ -483,15 +483,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 cellRenderer.set_visible( False )
 
 
-    def populateScriptsTreeStore( self, scripts, treeView ):
+    def populateScriptsTreeStore( self, scripts, treeView, selectGroup, selectScript ):
         treeStore = treeView.get_model()
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
         for group in groups:
             parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
-            # for script in scriptsByGroup[ group ]: #TODO Remove if not needed
-            for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ): #TODO Test this sorts! If so, put into background function below.
+            for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 playSound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 showNotification = Gtk.STOCK_APPLY if script.getShowNotification() else None
                 background = Gtk.STOCK_APPLY if script.getBackground() else None
@@ -510,56 +509,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
-        selectGroup = "Network" #TODO Remove eventually
-        selectScript = "Up or down"#TODO Remove eventually
-
-        # selectGroup = ""
-        # selectScript = ""
-
-        # if scripts:
-        #     groupIndex = 0
-        #     scriptIndex = 0
-        #     if selectGroup:
-        #         groupIndex = groups.index( selectGroup )
-        #         i = 0
-        #         for script in sorted( scriptsByGroup[ selectGroup ], key = lambda script: script.getName().lower() ): #TODO Test this sorts! If so, put into background function below.
-        #             if selectScript == script.getName():
-        #                 scriptIndex = i
-        #                 break
-        #
-        #             i += 1
-        #
-        #     self.expandTreeAndSelectPath( treeView, str( groupIndex ) + ":" + str( scriptIndex ) )
-            # treeView.expand_all()
-            # treePath = Gtk.TreePath.new_from_string( str( groupIndex ) + ":" + str( scriptIndex ) )
-            # treeView.get_selection().select_path( treePath )
-            # treeView.set_cursor( treePath, None, False )
-            # treeView.scroll_to_cell( treePath )
-        self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
+        if scripts:
+            self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
 
 
-    def populateBackgroundScriptsTreeStore( self, scripts, treeView ):
+    def populateBackgroundScriptsTreeStore( self, scripts, treeView, selectGroup, selectScript ):
         treeStore = treeView.get_model()
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
-
-        # Unused columns are present, but allows the reuse of the column definitions.
         for group in groups:
-            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None ] )
+            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None ] ) # Unused columns are present, but allows the reuse of the column definitions.
 
-            for script in scriptsByGroup[ group ]:
+            for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 treeStore.append( 
                     parent,
                     [ group, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
 
-#TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
-        treeView.expand_all()
-#TODO The stuff below is likely not needed since this is only for display (and click) purposes.
-        # treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
-        # treeView.get_selection().select_path( treePath )
-        # treeView.set_cursor( treePath, None, False )
-        # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
+        if scripts:
+            self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
 
 
     def expandTreeAndSelect( self, treeView, selectGroup, selectScript, scriptsByGroup, groups ):
@@ -605,6 +573,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # When a row is clicked or CTRL + clicked, a selection event is fired and the row selection count is one.
 # So no idea how to discern between these two events. 
 #May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
+#
+#TODO Not sure where the issue is, but open preferences, copy a script (give new name) and click ok.
+# The indicator text on the icon tab is highlighted...why?
 
 
     def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, textEntry, scripts ):
@@ -685,8 +656,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     scripts.append( newScript )
 
-                    self.populateScriptsTreeStore( scripts, scriptsTreeView )
-                    self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
+                    self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
+                    self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, newScript.getGroup() if newScript.getBackground() else "", newScript.getName() if newScript.getBackground() else "" )
 
                 break
 
@@ -701,8 +672,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 for script in scripts:
                     if script.getGroup() == group and script.getName() == name:
                         del scripts[ i ]
-                        self.populateScriptsTreeStore( scripts, scriptsTreeView )
-                        self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
+                        self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
+                        self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
                         self.updateIndicatorTextEntry( textEntry, group, name, "", "" )                        
                         break
 
@@ -927,8 +898,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptGroupCurrent = ""
                         self.defaultScriptNameCurrent = ""
 
-                self.populateScriptsTreeStore( scripts, scriptsTreeView )
-                self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView )
+                self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
+                self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, newScript.getGroup() if newScript.getBackground() else "", newScript.getName() if newScript.getBackground() else "" )
 
             break
 
