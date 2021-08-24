@@ -489,10 +489,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
 
+        selectGroup = "Network" #TODO Remove eventually
+        selectScript = "Up or down"#TODO Remove eventually
+        groupIndex = -1
+        nameIndex = -1
         for group in groups:
             parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
+            if group == selectGroup:
+                groupIndex += 1
 
             for script in scriptsByGroup[ group ]:
+                if script.getName() == selectScript:
+                    nameIndex += 1
+
                 playSound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 showNotification = Gtk.STOCK_APPLY if script.getShowNotification() else None
                 background = Gtk.STOCK_APPLY if script.getBackground() else None
@@ -513,8 +522,26 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
 #TODO When the copy script calls this, might be nice to pass in the name of the group/script to select it?
+#
+# Perhaps we take a group/name to select which is either set to None or valid values.
+#        
+        # if groups                                              tree has content
+            # if group is None (and name is None)                when first populating or removing, so set to first script
+                # create path to 0:0
+
+            # else                                               add/edit script
+                # create path to FIND SCRIPT SOMEHOW
+
+            # expand_all
+            # select path
+            # set cursor
+            # scroll
+
+        print( groupIndex )
+        print( nameIndex )
         treeView.expand_all()
-        treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
+        # treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
+        treePath = Gtk.TreePath.new_from_string( str( groupIndex ) + ":" + str( nameIndex ) ) #TODO Is this safe if no scripts are present?
         treeView.get_selection().select_path( treePath )
         treeView.set_cursor( treePath, None, False )
         treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
@@ -547,12 +574,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # Update the indicator text after script edit/removal; on removal, the new group/name must be set to "".
     def updateIndicatorTextEntry( self, textEntry, oldGroup, oldName, newGroup, newName ):
         oldKey = self.__createKey( oldGroup, oldName )
-        if newGroup and newName: # Script was edited, so do tag substitution...
+        if newGroup and newName: # Script was edited; do tag substitution...
             newKey = self.__createKey( newGroup, newName )
             textEntry.set_text( textEntry.get_text().replace( "{[" + oldKey + "]}", "{[" + newKey + "]}" ) )
             textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
 
-        else: # Script was removed, so do tag removal...
+        else: # Script was removed; do tag removal...
             textEntry.set_text( textEntry.get_text().replace( "{[" + oldKey + "]}", "" ) )
             textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "" ) )
 
