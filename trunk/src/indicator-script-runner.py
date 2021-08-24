@@ -1043,6 +1043,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Testing Remove
 #         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
         # self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
+
+        # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
+        # self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", False, False, False, True, 15 ) )
+        # self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", False, False, True, True, 60 ) )
+        # self.scripts.append( Info( "Network", "Internet Running Monthly Quota", "python3 /home/bernard/Programming/getInternetRunningMonthlyQuota.py", False, False, False, False, -1 ) )
+
         # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
         # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
         # self.scripts = []
