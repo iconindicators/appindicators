@@ -488,20 +488,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeStore.clear()
         scriptsByGroup = self.getScriptsByGroup( scripts )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
-
-        selectGroup = "Network" #TODO Remove eventually
-        selectScript = "Up or down"#TODO Remove eventually
-        groupIndex = -1
-        nameIndex = -1
         for group in groups:
             parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
-            if group == selectGroup:
-                groupIndex += 1
-
-            for script in scriptsByGroup[ group ]:
-                if script.getName() == selectScript:
-                    nameIndex += 1
-
+            # for script in scriptsByGroup[ group ]: #TODO Remove if not needed
+            for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ): #TODO Test this sorts! If so, put into background function below.
                 playSound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 showNotification = Gtk.STOCK_APPLY if script.getShowNotification() else None
                 background = Gtk.STOCK_APPLY if script.getBackground() else None
@@ -520,31 +510,32 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     parent,
                     [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
 
-#TODO Might need to make the code below into a function to allow selecting a script that was just added or copied or edited.
-#TODO When the copy script calls this, might be nice to pass in the name of the group/script to select it?
-#
-# Perhaps we take a group/name to select which is either set to None or valid values.
-#        
-        # if groups                                              tree has content
-            # if group is None (and name is None)                when first populating or removing, so set to first script
-                # create path to 0:0
+        selectGroup = "Network" #TODO Remove eventually
+        selectScript = "Up or down"#TODO Remove eventually
 
-            # else                                               add/edit script
-                # create path to FIND SCRIPT SOMEHOW
+        # selectGroup = ""
+        # selectScript = ""
 
-            # expand_all
-            # select path
-            # set cursor
-            # scroll
-
-        print( groupIndex )
-        print( nameIndex )
-        treeView.expand_all()
-        # treePath = Gtk.TreePath.new_from_string( "0:0" ) #TODO Is this safe if no scripts are present?
-        treePath = Gtk.TreePath.new_from_string( str( groupIndex ) + ":" + str( nameIndex ) ) #TODO Is this safe if no scripts are present?
-        treeView.get_selection().select_path( treePath )
-        treeView.set_cursor( treePath, None, False )
-        treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
+        # if scripts:
+        #     groupIndex = 0
+        #     scriptIndex = 0
+        #     if selectGroup:
+        #         groupIndex = groups.index( selectGroup )
+        #         i = 0
+        #         for script in sorted( scriptsByGroup[ selectGroup ], key = lambda script: script.getName().lower() ): #TODO Test this sorts! If so, put into background function below.
+        #             if selectScript == script.getName():
+        #                 scriptIndex = i
+        #                 break
+        #
+        #             i += 1
+        #
+        #     self.expandTreeAndSelectPath( treeView, str( groupIndex ) + ":" + str( scriptIndex ) )
+            # treeView.expand_all()
+            # treePath = Gtk.TreePath.new_from_string( str( groupIndex ) + ":" + str( scriptIndex ) )
+            # treeView.get_selection().select_path( treePath )
+            # treeView.set_cursor( treePath, None, False )
+            # treeView.scroll_to_cell( treePath )
+        self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
 
 
     def populateBackgroundScriptsTreeStore( self, scripts, treeView ):
@@ -569,6 +560,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # treeView.get_selection().select_path( treePath )
         # treeView.set_cursor( treePath, None, False )
         # treeView.scroll_to_cell( treePath ) #TODO Cannot have this when no scripts present.  
+
+
+    def expandTreeAndSelect( self, treeView, selectGroup, selectScript, scriptsByGroup, groups ):
+        pathAsString = "0:0"
+        if selectGroup:
+            groupIndex = groups.index( selectGroup )
+            i = 0
+            for script in sorted( scriptsByGroup[ selectGroup ], key = lambda script: script.getName().lower() ):
+                if selectScript == script.getName():
+                    pathAsString = str( groupIndex ) + ":" + str( i )
+                    break
+
+                i += 1
+
+        treeView.expand_all()
+        treePath = Gtk.TreePath.new_from_string( pathAsString )
+        treeView.get_selection().select_path( treePath )
+        treeView.set_cursor( treePath, None, False )
+        treeView.scroll_to_cell( treePath )
 
 
     # Update the indicator text after script edit/removal; on removal, the new group/name must be set to "".
