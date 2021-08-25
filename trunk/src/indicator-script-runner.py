@@ -386,6 +386,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, 1, 1, 1 )
 
         # backgroundScriptsTreeView.set_receives_default( True ) #TODO Testing
+        # backgroundScriptsTreeView.set_property( "can-focus", True )#TODO Testing
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -426,6 +427,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
+        grid.set_focus_child( backgroundScriptsTreeView )#TODO Testing
+        backgroundScriptsTreeView.grab_focus()#TODO Testing
+
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.scripts = copyOfScripts
@@ -457,12 +461,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         #     print( "focus")
         
         # print( textEntry.has_focus())
-        textEntry.grab_focus_without_selecting()
+        # textEntry.grab_focus_without_selecting()
         
         # if pageNumber == notebook.get_n_pages() - 1:
         #     print( "Last ")
         #
-        # print( pageNumber )
+        print( pageNumber )
+
+        # print( textEntry.get_text())
+        # textEntry.select_region( 5, 10  )
+        # textEntry.set_position( -1 )
+        # print( textEntry.get_overwrite_mode())
+        # textEntry.grab_focus_without_selecting()
+        # treeView.grab_focus()
 
 
     # Renders the script name bold when the (non-background) script is default.
