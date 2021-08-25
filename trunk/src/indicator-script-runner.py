@@ -421,7 +421,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         tabName = _( "Icon" ) #TODO Not sure if this stays
         notebook.append_page( grid, Gtk.Label.new( tabName ) )
 
-        # notebook.connect( "switch-page", self.onSwitchPage, tabName, backgroundScriptsTreeView )
+        notebook.connect( "switch-page", self.onSwitchPage, tabName, backgroundScriptsTreeView, indicatorTextEntry )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
@@ -450,10 +450,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
 #TODO NOt sure if this stays.
-    def onSwitchPage( self, notebook, page, pageNumber, tabName, treeView ):
-        if notebook.get_tab_label_text( page ) == tabName:
-            treeView.grab_focus()
-            print( "focus")
+    def onSwitchPage( self, notebook, page, pageNumber, tabName, treeView, textEntry ):
+        # if notebook.get_tab_label_text( page ) == tabName:
+        #     # treeView.grab_focus()
+        #     textEntry.grab_focus_without_selecting()
+        #     print( "focus")
+        
+        # print( textEntry.has_focus())
+        textEntry.grab_focus_without_selecting()
         
         # if pageNumber == notebook.get_n_pages() - 1:
         #     print( "Last ")
