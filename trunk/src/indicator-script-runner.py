@@ -181,6 +181,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return text
 
 
+#TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
+# The indicator text on the icon tab is highlighted...why?
     def onPreferences( self, dialog ):
         self.defaultScriptGroupCurrent = self.scriptGroupDefault #TODO Check if all this makes sense...can't we get the default from the current list of scripts (the copy)?
         self.defaultScriptNameCurrent = self.scriptNameDefault
@@ -354,6 +356,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorTextEntry.set_text( self.indicatorText )
+        # indicatorTextEntry.set_receives_default( False )#TODO Testing
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -377,11 +380,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
 
         indicatorTextSeparatorEntry = Gtk.Entry()
-        indicatorTextSeparatorEntry.set_text( self.indicatorTextSeparator ) #TODO Need to capture during OK press.
+        indicatorTextSeparatorEntry.set_text( self.indicatorTextSeparator )
         indicatorTextSeparatorEntry.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
         box.pack_start( indicatorTextSeparatorEntry, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
+        # backgroundScriptsTreeView.set_receives_default( True ) #TODO Testing
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -414,7 +418,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
+        tabName = _( "Icon" ) #TODO Not sure if this stays
+        notebook.append_page( grid, Gtk.Label.new( tabName ) )
+
+        # notebook.connect( "switch-page", self.onSwitchPage, tabName, backgroundScriptsTreeView )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
@@ -440,6 +447,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.initialiseBackgroundScripts()
 
         return responseType
+
+
+#TODO NOt sure if this stays.
+    def onSwitchPage( self, notebook, page, pageNumber, tabName, treeView ):
+        if notebook.get_tab_label_text( page ) == tabName:
+            treeView.grab_focus()
+            print( "focus")
+        
+        # if pageNumber == notebook.get_n_pages() - 1:
+        #     print( "Last ")
+        #
+        # print( pageNumber )
 
 
     # Renders the script name bold when the (non-background) script is default.
@@ -573,9 +592,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # When a row is clicked or CTRL + clicked, a selection event is fired and the row selection count is one.
 # So no idea how to discern between these two events. 
 #May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
-#
-#TODO Not sure where the issue is, but open preferences, copy a script (give new name) and click ok.
-# The indicator text on the icon tab is highlighted...why?
 
 
     def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, textEntry, scripts ):
