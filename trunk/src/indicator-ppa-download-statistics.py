@@ -122,7 +122,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getDescriptor() )
-                print( ppa.getDescriptor() )#TODO Testing
                 menuItem.connect( "activate", self.onPPA )
                 if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries( True )
@@ -147,7 +146,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         menuItem = Gtk.MenuItem.new_with_label( label )
         menuItem.set_name( ppa.getDescriptor() )
-        print( ppa.getDescriptor() )#TODO Testing
         menuItem.connect( "activate", self.onPPA )
         menu.append( menuItem )
 
@@ -233,111 +231,30 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         PPA.sort( self.ppas )
         return ppas
 
-# Uncombined, no submenus
-# 
-# thebernmeister | ppa | bionic | i386
-# ...
-# thebernmeister | ppa | groovy | i386
-#
-#
-        # thebernmeister | ppa | bionic | i386
-        # thebernmeister | ppa | bionic | i386
-        #
-        # thebernmeister | ppa | bionic | i386
-        #       indicator-fortune 1.0.35-1:  11
-# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=bionic
-
-# Uncombined, submenus
-#
-# thebernmeister | ppa | bionic | i386
-# ...
-# thebernmeister | ppa | focal | amd64
-#
-#
-        # thebernmeister | ppa | bionic | i386
-        #       indicator-fortune 1.0.35-1:  11
-# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=bionic
-
-# Combined, submenus
-#
-# thebernmeister | ppa
-# ...
-# thebernmeister | ppa
-#
-#
-        # thebernmeister | ppa
-        #       indicator-fortune 1.0.35-1:  11
-# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=
-
-# Combined, no submenus
-#
-# thebernmeister | ppa
-# ...
-# thebernmeister | ppa
-#
-#
-        # thebernmeister | ppa
-        # thebernmeister | ppa
-        #
-        # thebernmeister | ppa
-        #       indicator-fortune 1.0.35-1:  11
-# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=
-
 
     def onPPA( self, widget ):
-        print( widget.props.name ) # thebernmeister | ppa
-        print( widget.get_label() ) #       indicator-fortune 1.0.35-1:  11
-        print()
         url = "https://launchpad.net/~"
         firstPipe = str.find( widget.props.name, "|" )
         ppaUser = widget.props.name[ 0 : firstPipe ].strip()
         secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
         if secondPipe == -1:
-            print( 1 )
             # This is a combined PPA...
             ppaName = widget.props.name[ firstPipe + 1 : ].strip()
             url += ppaUser + "/+archive/ubuntu/" + ppaName
-            if widget.props.name != widget.get_label(): #TODO Add comment
-                print( 2 )
+            if widget.props.name != widget.get_label(): # Use the menu item label to specify the package name.
                 url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter="
 
         else:
-            print( 3)
             ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
             thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
             series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
             url += ppaUser + "/+archive/ubuntu/" + ppaName
-            if widget.props.name == widget.get_label(): #TODO Add comment
+            if widget.props.name == widget.get_label():
                 url += "?field.series_filter=" + series
 
-            else: #TODO COmment
+            else: # Use the menu item label to specify the package name.
                 url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter=" + series
-                print( 4)
-        print( url )
-        webbrowser.open( url )
 
-
-#TODO Remove
-    def onPPAORIGINAL( self, widget ):
-        print( widget.props.name ) # thebernmeister | ppa
-        print( widget.get_label() ) #       indicator-fortune 1.0.35-1:  11
-        print()
-        url = "https://launchpad.net/~"
-        firstPipe = str.find( widget.props.name, "|" )
-        ppaUser = widget.props.name[ 0 : firstPipe ].strip()
-        secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
-        if secondPipe == -1:
-            # This is a combined PPA...
-            ppaName = widget.props.name[ firstPipe + 1 : ].strip()
-            url += ppaUser + "/+archive/ubuntu/" + ppaName
-
-        else:
-            ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
-            thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
-            series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
-            url += ppaUser + "/+archive/ubuntu/" + ppaName + "?field.series_filter=" + series
-
-        print( url )
         webbrowser.open( url )
 
 
