@@ -122,6 +122,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )
                 menu.append( menuItem )
                 menuItem.set_name( ppa.getDescriptor() )
+                print( ppa.getDescriptor() )#TODO Testing
                 menuItem.connect( "activate", self.onPPA )
                 if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries( True )
@@ -146,6 +147,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         menuItem = Gtk.MenuItem.new_with_label( label )
         menuItem.set_name( ppa.getDescriptor() )
+        print( ppa.getDescriptor() )#TODO Testing
         menuItem.connect( "activate", self.onPPA )
         menu.append( menuItem )
 
@@ -231,8 +233,95 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         PPA.sort( self.ppas )
         return ppas
 
+# Uncombined, no submenus
+# 
+# thebernmeister | ppa | bionic | i386
+# ...
+# thebernmeister | ppa | groovy | i386
+#
+#
+        # thebernmeister | ppa | bionic | i386
+        # thebernmeister | ppa | bionic | i386
+        #
+        # thebernmeister | ppa | bionic | i386
+        #       indicator-fortune 1.0.35-1:  11
+# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=bionic
+
+# Uncombined, submenus
+#
+# thebernmeister | ppa | bionic | i386
+# ...
+# thebernmeister | ppa | focal | amd64
+#
+#
+        # thebernmeister | ppa | bionic | i386
+        #       indicator-fortune 1.0.35-1:  11
+# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=bionic
+
+# Combined, submenus
+#
+# thebernmeister | ppa
+# ...
+# thebernmeister | ppa
+#
+#
+        # thebernmeister | ppa
+        #       indicator-fortune 1.0.35-1:  11
+# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=
+
+# Combined, no submenus
+#
+# thebernmeister | ppa
+# ...
+# thebernmeister | ppa
+#
+#
+        # thebernmeister | ppa
+        # thebernmeister | ppa
+        #
+        # thebernmeister | ppa
+        #       indicator-fortune 1.0.35-1:  11
+# https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+packages?field.name_filter=indicator-fortune&field.status_filter=published&field.series_filter=
+
 
     def onPPA( self, widget ):
+        print( widget.props.name ) # thebernmeister | ppa
+        print( widget.get_label() ) #       indicator-fortune 1.0.35-1:  11
+        print()
+        url = "https://launchpad.net/~"
+        firstPipe = str.find( widget.props.name, "|" )
+        ppaUser = widget.props.name[ 0 : firstPipe ].strip()
+        secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
+        if secondPipe == -1:
+            print( 1 )
+            # This is a combined PPA...
+            ppaName = widget.props.name[ firstPipe + 1 : ].strip()
+            url += ppaUser + "/+archive/ubuntu/" + ppaName
+            if widget.props.name != widget.get_label(): #TODO Add comment
+                print( 2 )
+                url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter="
+
+        else:
+            print( 3)
+            ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
+            thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
+            series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
+            url += ppaUser + "/+archive/ubuntu/" + ppaName
+            if widget.props.name == widget.get_label(): #TODO Add comment
+                url += "?field.series_filter=" + series
+
+            else: #TODO COmment
+                url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter=" + series
+                print( 4)
+        print( url )
+        webbrowser.open( url )
+
+
+#TODO Remove
+    def onPPAORIGINAL( self, widget ):
+        print( widget.props.name ) # thebernmeister | ppa
+        print( widget.get_label() ) #       indicator-fortune 1.0.35-1:  11
+        print()
         url = "https://launchpad.net/~"
         firstPipe = str.find( widget.props.name, "|" )
         ppaUser = widget.props.name[ 0 : firstPipe ].strip()
@@ -240,14 +329,15 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if secondPipe == -1:
             # This is a combined PPA...
             ppaName = widget.props.name[ firstPipe + 1 : ].strip()
-            url += ppaUser + "/+archive/" + ppaName
+            url += ppaUser + "/+archive/ubuntu/" + ppaName
 
         else:
             ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
             thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
             series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
-            url += ppaUser + "/+archive/" + ppaName + "?field.series_filter=" + series
+            url += ppaUser + "/+archive/ubuntu/" + ppaName + "?field.series_filter=" + series
 
+        print( url )
         webbrowser.open( url )
 
 
@@ -326,7 +416,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
     def hasPublishedBinaries( self, ppa ):
         url = "https://api.launchpad.net/1.0/~" + \
-              ppa.getUser() + "/+archive/" + \
+              ppa.getUser() + "/+archive/ubuntu/" + \
               ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
               ppa.getArchitecture() + "&status=Published" + \
@@ -351,7 +441,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def getPublishedBinaries( self, ppa, filterText ):
         url = "https://api.launchpad.net/1.0/~" + \
-              ppa.getUser() + "/+archive/" + \
+              ppa.getUser() + "/+archive/ubuntu/" + \
               ppa.getName() + "?ws.op=getPublishedBinaries" + \
               "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
               ppa.getArchitecture() + "&status=Published" + \
@@ -398,7 +488,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
                 url = "https://api.launchpad.net/1.0/~" + \
-                      ppa.getUser() + "/+archive/" + \
+                      ppa.getUser() + "/+archive/ubuntu/" + \
                       ppa.getName() + "/+binarypub/" + \
                       packageId + "?ws.op=getDownloadCount"
 
