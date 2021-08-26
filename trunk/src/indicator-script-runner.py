@@ -427,8 +427,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        grid.set_focus_child( backgroundScriptsTreeView )#TODO Testing
-        backgroundScriptsTreeView.grab_focus()#TODO Testing
+        # grid.set_focus_child( backgroundScriptsTreeView )#TODO Testing
+        # backgroundScriptsTreeView.grab_focus()#TODO Testing
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
@@ -456,16 +456,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO NOt sure if this stays.
     def onSwitchPage( self, notebook, page, pageNumber, tabName, treeView, textEntry ):
         # if notebook.get_tab_label_text( page ) == tabName:
-        #     # treeView.grab_focus()
+        treeView.get_parent().grab_focus()
+        # treeView.get_parent().get_parent().set_focus_child( treeView.get_parent() )
+
         #     textEntry.grab_focus_without_selecting()
         #     print( "focus")
-        
         # print( textEntry.has_focus())
         # textEntry.grab_focus_without_selecting()
         
         # if pageNumber == notebook.get_n_pages() - 1:
         #     print( "Last ")
         #
+        print(  treeView.get_parent().get_parent() )
         print( pageNumber )
 
         # print( textEntry.get_text())
