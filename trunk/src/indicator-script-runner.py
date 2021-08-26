@@ -612,7 +612,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, textEntry, scripts ):
-        self.onScriptEdit( None, scripts, scriptsTreeView, backgroundScriptsTreeView, textEntry ) # Check to see if a group was double clicked downstream.  <---TODO What is this?  A TODO missing the TODO...?????
+        self.onScriptEdit( None, scripts, scriptsTreeView, backgroundScriptsTreeView, textEntry )
 
 
     def onBackgroundScriptDoubleClick( self, treeView, treePath, treeViewColumn, textEntry, scripts ):
