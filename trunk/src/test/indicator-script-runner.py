@@ -835,9 +835,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
 
-#TODO Fix all 'script' references below...
         backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
-        backgroundCheckbox.set_active( script.getBackground() ) #TODO Change
+        backgroundCheckbox.set_active( False if add else type( script ) == Background )
         backgroundCheckbox.set_tooltip_text( _(
             "If checked, this script will run in background,\n" + \
             "at the interval specified, with the results\n" + \
@@ -851,15 +850,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         terminalCheckbox.set_tooltip_text( _(
             "Leave the terminal open on completion\n" + \
             "of non-background scripts." ) )
-        terminalCheckbox.set_active( script.getTerminalOpen() )
-        terminalCheckbox.set_sensitive( not script.getBackground() )#TODO Change
+        terminalCheckbox.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
+        terminalCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_sensitive( not script.getBackground() )#TODO Change
+        defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
+        defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
         defaultScriptCheckbox.set_tooltip_text( _(
             "One non-background script can be set as\n" + \
             "the default script which is run on a\n" + \
@@ -873,13 +872,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
 
         label = Gtk.Label.new( _( "Interval (minutes)" ) )
-        label.set_sensitive( script.getBackground() )# TODO Change
+        label.set_sensitive( False if add else type( script ) == Background )
         box.pack_start( label, False, False, 0 )
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
-        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
-        backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
-        backgroundScriptIntervalSpinner.set_sensitive( script.getBackground() )#TODO Change
+        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes() if type( script ) == Background else 60, 1, 10000, 1, 1, 0 ) )
+        backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() if type( script ) == Background else 60 )
+        backgroundScriptIntervalSpinner.set_sensitive( False if add else type( script ) == Background )
         backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
@@ -933,7 +932,26 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     del scripts[ i ]
 
+#TODO Fix below...
                 # The new script or the edit.
+                # if type( script ) == Background:
+                #     newScript = Background(
+                #         scriptGroupCombo.get_active_text().strip(),
+                #         scriptNameEntry.get_text().strip(),
+                #         script.getCommand(),
+                #         script.getPlaySound(),
+                #         script.getShowNotification(),
+                #         script.getIntervalInMinutes() )
+                #
+                # else:
+                #     newScript = NonBackground(
+                #         scriptGroupCombo.get_active_text().strip(),
+                #         scriptNameEntry.get_text().strip(),
+                #         script.getCommand(),
+                #         script.getPlaySound(),
+                #         script.getShowNotification(),
+                #         script.getTerminalOpen(),
+                #         False )
                 newScript = Info( scriptGroupCombo.get_active_text().strip(),
                                   scriptNameEntry.get_text().strip(),
                                   self.getTextViewText( commandTextView ).strip(),
@@ -1125,7 +1143,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
-            self.requestSaveConfig()
+#TODO COmmented out for testing
+            # self.requestSaveConfig()
 
 #TODO Testing Remove
 #         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
