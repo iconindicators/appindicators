@@ -22,6 +22,8 @@
 # Implementation classes hold attributes for background script and non-background scripts.
 
 
+from abc import ABC
+
 
 #TODO Do we store in JSON scripts in one list?  
 # If so, need a flag per script now to discrimatate background from non-background...!
@@ -32,10 +34,9 @@
 # Can/should the reverse be done?  Take a string list from JSON and easily create a script?
 
 
-class Info( object ):
+class Info( ABC ):
 
     # Create a script (neither background nor non-background).
-    # Should NOT be called directly!
     #
     # Group to which a script belongs.
     # Name of script.
