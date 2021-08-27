@@ -184,9 +184,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
 # The indicator text on the icon tab is highlighted...why?
     def onPreferences( self, dialog ):
-        self.defaultScriptGroupCurrent = self.scriptGroupDefault #TODO Check if all this makes sense...can't we get the default from the current list of scripts (the copy)?
-        self.defaultScriptNameCurrent = self.scriptNameDefault
         copyOfScripts = copy.deepcopy( self.scripts )
+
+        #TODO Check if all this makes sense...can't we get the default from the current list of scripts (the copy)?
+        # Given we use 'copy' above, maybe also use this term rather than 'current'?
+        self.defaultScriptGroupCurrent = self.scriptGroupDefault 
+        self.defaultScriptNameCurrent = self.scriptNameDefault
 
         notebook = Gtk.Notebook()
 
@@ -493,7 +496,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
         group = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL )
         name = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_NAME )
-        if group == self.scriptGroupDefault and name == self.scriptNameDefault:
+        if group == self.defaultScriptGroupCurrent and name == self.defaultScriptNameCurrent:
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
 
@@ -707,7 +710,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         del scripts[ i ]
                         self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
-                        self.updateIndicatorTextEntry( textEntry, group, name, "", "" )                        
+                        self.updateIndicatorTextEntry( textEntry, group, name, "", "" )
+#TODO Check if the removed scrpit is the default and if so, set defatuls to "".                        
                         break
 
                     i += 1
