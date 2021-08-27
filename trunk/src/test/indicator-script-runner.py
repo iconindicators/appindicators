@@ -557,9 +557,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             parent = treeStore.append( None, [ group, group, None, None, None, None, None, None ] ) # Unused columns are present, but allows the reuse of the column definitions.
 
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
-                treeStore.append( 
-                    parent,
-                    [ group, None, script.getName(), Gtk.STOCK_APPLY if script.getPlaySound() else None, Gtk.STOCK_APPLY if script.getShowNotification() else None, None, None, str( script.getIntervalInMinutes() ) ] )
+                row = [
+                        group,
+                        None, 
+                        script.getName(), 
+                        Gtk.STOCK_APPLY if script.getPlaySound() else None, 
+                        Gtk.STOCK_APPLY if script.getShowNotification() else None, 
+                        None, 
+                        None, 
+                        str( script.getIntervalInMinutes() ) ]
+
+                treeStore.append( parent, row )
 
         if scripts:
             self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
@@ -677,19 +685,33 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         scriptGroupCombo.grab_focus()
                         continue
 
-                    newScript = Info( scriptGroupCombo.get_active_text().strip(),
-                                      scriptNameEntry.get_text().strip(),
-                                      script.getCommand(),
-                                      script.getTerminalOpen(),
-                                      script.getPlaySound(),
-                                      script.getShowNotification(),
-                                      script.getBackground(),
-                                      script.getIntervalInMinutes() )
+                    if type( script ) == Background:
+                        newScript = Background(
+                            scriptGroupCombo.get_active_text().strip(),
+                            scriptNameEntry.get_text().strip(),
+                            script.getCommand(),
+                            script.getPlaySound(),
+                            script.getShowNotification(),
+                            script.getIntervalInMinutes() )
+
+                    else:
+                        newScript = NonBackground(
+                            scriptGroupCombo.get_active_text().strip(),
+                            scriptNameEntry.get_text().strip(),
+                            script.getCommand(),
+                            script.getPlaySound(),
+                            script.getShowNotification(),
+                            script.getTerminalOpen(),
+                            False )
 
                     scripts.append( newScript )
 
                     self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
-                    self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, newScript.getGroup() if newScript.getBackground() else "", newScript.getName() if newScript.getBackground() else "" )
+                    self.populateBackgroundScriptsTreeStore(
+                        scripts, 
+                        backgroundScriptsTreeView, 
+                        newScript.getGroup() if type( newScript ) == Background else "", 
+                        newScript.getName() if type( newScript ) == Background else "" )
 
                 break
 
@@ -707,14 +729,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
                         self.updateIndicatorTextEntry( textEntry, group, name, "", "" )
-#TODO Check if the removed scrpit is the default and if so, set defatuls to "".                        
                         break
 
                     i += 1
 
 
     def onScriptAdd( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
-        self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, scriptsTreeView, backgroundScriptsTreeView )
+        # self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, scriptsTreeView, backgroundScriptsTreeView ) #TODO Delete hopefully
+        self.__addEditScript( None, scripts, scriptsTreeView, backgroundScriptsTreeView )
 
 
     def onScriptEdit( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, textEntry ):
@@ -727,7 +749,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
-        add = True if script.getGroup() == "" else False
+        add = True if script is None else False
 
         grid = self.createGrid()
 
@@ -767,7 +789,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         scriptNameEntry = Gtk.Entry()
         scriptNameEntry.set_tooltip_text( _( "The name of the script." ) )
-        scriptNameEntry.set_text( script.getName() )
+        scriptNameEntry.set_text( "" if add else script.getName() )
 
         box.pack_start( scriptNameEntry, True, True, 0 )
 
@@ -783,7 +805,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView = Gtk.TextView()
         commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
-        commandTextView.get_buffer().set_text( script.getCommand() )
+        commandTextView.get_buffer().set_text( "" if add else script.getCommand() )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -799,7 +821,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "play a beep on script completion.\n\n" + \
             "For background scripts, play a beep\n" + \
             "only if the script returns a result." ) )
-        soundCheckbox.set_active( script.getPlaySound() )
+        soundCheckbox.set_active( False if add else script.getPlaySound() )
 
         grid.attach( soundCheckbox, 0, 22, 1, 1 )
 
@@ -809,12 +831,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "notification on script completion.\n\n" + \
             "For background scripts, show a notification\n" + \
             "only if the script returns a result." ) )
-        notificationCheckbox.set_active( script.getShowNotification() )
+        notificationCheckbox.set_active( False if add else script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
 
+#TODO Fix all 'script' references below...
         backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
-        backgroundCheckbox.set_active( script.getBackground() )
+        backgroundCheckbox.set_active( script.getBackground() ) #TODO Change
         backgroundCheckbox.set_tooltip_text( _(
             "If checked, this script will run in background,\n" + \
             "at the interval specified, with the results\n" + \
@@ -829,14 +852,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "Leave the terminal open on completion\n" + \
             "of non-background scripts." ) )
         terminalCheckbox.set_active( script.getTerminalOpen() )
-        terminalCheckbox.set_sensitive( not script.getBackground() )
+        terminalCheckbox.set_sensitive( not script.getBackground() )#TODO Change
 
         grid.attach( terminalCheckbox, 0, 25, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         defaultScriptCheckbox.set_active( script.getGroup() == self.defaultScriptGroupCurrent and script.getName() == self.defaultScriptNameCurrent )
-        defaultScriptCheckbox.set_sensitive( not script.getBackground() )
+        defaultScriptCheckbox.set_sensitive( not script.getBackground() )#TODO Change
         defaultScriptCheckbox.set_tooltip_text( _(
             "One non-background script can be set as\n" + \
             "the default script which is run on a\n" + \
@@ -850,13 +873,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
 
         label = Gtk.Label.new( _( "Interval (minutes)" ) )
-        label.set_sensitive( script.getBackground() )
+        label.set_sensitive( script.getBackground() )# TODO Change
         box.pack_start( label, False, False, 0 )
 
         backgroundScriptIntervalSpinner = Gtk.SpinButton()
         backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes(), 1, 10000, 1, 1, 0 ) )
         backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() )
-        backgroundScriptIntervalSpinner.set_sensitive( script.getBackground() )
+        backgroundScriptIntervalSpinner.set_sensitive( script.getBackground() )#TODO Change
         backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
         box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
 
@@ -932,7 +955,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.defaultScriptNameCurrent = ""
 
                 self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
-                self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, newScript.getGroup() if newScript.getBackground() else "", newScript.getName() if newScript.getBackground() else "" )
+                self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, newScript.getGroup() if newScript.getBackground() else "", newScript.getName() if newScript.getBackground() else "" )#TODO Change
 
             break
 
@@ -953,7 +976,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def getScriptsByGroup( self, scripts, nonBackground = True, background = True ):
         scriptsByGroup = { }
         for script in scripts:
-            if ( nonBackground and type( script ) != Background ) or ( background and type( script ) == Background ):
+            if ( nonBackground and type( script ) != Background ) or ( background and type( script ) == Background ): #TODO Check logic and can we use NonBackground in the test?
                 if script.getGroup() not in scriptsByGroup:
                     scriptsByGroup[ script.getGroup() ] = [ ]
 
@@ -1136,7 +1159,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 script.getTerminalOpen(), 
                 script.getPlaySound(), 
                 script.getShowNotification(),
-                script.getBackground(),
+                script.getBackground(), #TODO Change
                 script.getIntervalInMinutes() ] )
 
         return {
