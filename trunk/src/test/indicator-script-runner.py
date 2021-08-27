@@ -27,7 +27,7 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 
 from gi.repository import Gtk, Pango
-from script import Info
+from script import Background, NonBackground
 from threading import Thread
 
 import copy, datetime, indicatorbase
@@ -38,8 +38,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator"
-    CONFIG_SCRIPT_GROUP_DEFAULT = "scriptGroupDefault"
-    CONFIG_SCRIPT_NAME_DEFAULT = "scriptNameDefault"
     CONFIG_SCRIPTS = "scripts"
     CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
@@ -52,6 +50,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # Data model columns used by...
     #    the table to display all scripts;
     #    the table to display background scripts.
+#TODO Might need to reorder the columns...are all the columns still required?
     COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic.
     COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
     COLUMN_TAG_NAME = 2 # Script name.
@@ -73,7 +72,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         self.updateMenu( menu )
-
         now = datetime.datetime.now()
         self.updateBackgroundScripts( now )
         self.setLabel( self.processTags( self.indicatorText, self.indicatorTextSeparator, self.__processTags, now ) )
@@ -82,7 +80,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground() and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
                 nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
         nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() )
@@ -106,7 +104,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
-                    if not script.getBackground():
+                    if type( script ) != Background:
                         self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
 
             else:
@@ -123,7 +121,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
             menuItem.connect( "activate", self.onScriptMenuItem, script )
             menu.append( menuItem )
-            if group == self.scriptGroupDefault and script.getName() == self.scriptNameDefault:
+            if script.getDefault():
                 self.secondaryActivateTarget = menuItem
 
 
@@ -150,7 +148,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def updateBackgroundScripts( self, now ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground():
+            if type( script ) == Background:
                 if self.backgroundScriptNextUpdateTime[ key ] < now:
                     commandResult = self.processGet( script.getCommand() ).strip()
                     self.backgroundScriptResult[ key ] = commandResult
@@ -174,7 +172,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         now = arguments[ 0 ]
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if script.getBackground() and "[" + key + "]" in text:
+            if type( script ) == Background and "[" + key + "]" in text:
                 commandResult = self.backgroundScriptResult[ key ]
                 text = text.replace( "[" + key + "]", commandResult )
 
@@ -185,11 +183,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 # The indicator text on the icon tab is highlighted...why?
     def onPreferences( self, dialog ):
         copyOfScripts = copy.deepcopy( self.scripts )
-
-        #TODO Check if all this makes sense...can't we get the default from the current list of scripts (the copy)?
-        # Given we use 'copy' above, maybe also use this term rather than 'current'?
-        self.defaultScriptGroupCurrent = self.scriptGroupDefault 
-        self.defaultScriptNameCurrent = self.scriptNameDefault
 
         notebook = Gtk.Notebook()
 
@@ -224,7 +217,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         rendererText = Gtk.CellRendererText()
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_TAG_NAME, weight_set = True )
         treeViewColumn.set_expand( True )
-        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText, copyOfScripts )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_SOUND )
@@ -236,6 +229,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_BACKGROUND )
         treeView.append_column( treeViewColumn )
 
+#TODO Check how this column renders...should there also be a REMOVE/DASH icon availble (background scripts don't have this attribute so should have a dash).
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_TERMINAL )
         treeView.append_column( treeViewColumn )
 
@@ -439,11 +433,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             
 #TODO Don't see how this works...surely need to iterate through list of scripts and find the script that is default?
-            self.scriptGroupDefault = ""
-            self.scriptNameDefault = ""
-            if self.scripts: #TODO Check logic.
-                self.scriptGroupDefault = self.defaultScriptGroupCurrent
-                self.scriptNameDefault = self.defaultScriptNameCurrent
+# May not be needed soon....
+            # self.scriptGroupDefault = ""
+            # self.scriptNameDefault = ""
+            # if self.scripts: #TODO Check logic.
+            #     self.scriptGroupDefault = self.defaultScriptGroupCurrent
+            #     self.scriptNameDefault = self.defaultScriptNameCurrent
 
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
             self.hideGroups = hideGroupsCheckbox.get_active()
@@ -492,11 +487,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
     # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-    def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
+    def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, scripts ):
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
         group = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_GROUP_INTERNAL )
         name = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_TAG_NAME )
-        if group == self.defaultScriptGroupCurrent and name == self.defaultScriptNameCurrent:
+        script = self.getScript( scripts, group, name )
+        if type( script ) == NonBackground and script.getDefault():
             cellRenderer.set_property( "weight", Pango.Weight.BOLD )
 
 
@@ -532,9 +528,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 playSound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 showNotification = Gtk.STOCK_APPLY if script.getShowNotification() else None
-                background = Gtk.STOCK_APPLY if script.getBackground() else None
+                background = Gtk.STOCK_APPLY if type( script ) == Background else None
 
-                if script.getBackground():
+                if type( script ) == Background:
                     terminalOpen = Gtk.STOCK_REMOVE
                     intervalInMinutes = str( script.getIntervalInMinutes() )
                     intervalInMinutesDash = None
@@ -957,7 +953,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def getScriptsByGroup( self, scripts, nonBackground = True, background = True ):
         scriptsByGroup = { }
         for script in scripts:
-            if ( nonBackground and not script.getBackground() ) or ( background and script.getBackground() ):
+            if ( nonBackground and type( script ) != Background ) or ( background and type( script ) == Background ):
                 if script.getGroup() not in scriptsByGroup:
                     scriptsByGroup[ script.getGroup() ] = [ ]
 
@@ -1056,7 +1052,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.backgroundScriptNextUpdateTime = { }
         now = datetime.datetime.now()
         for script in self.scripts:
-            if script.getBackground():
+            if type( script ) == Background:
                 self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
                 self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
 
@@ -1068,8 +1064,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" )
         self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, " | " )
-        self.scriptGroupDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT, "" )
-        self.scriptNameDefault = config.get( IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT, "" )
         self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
 
         self.scripts = [ ]
@@ -1098,16 +1092,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         else:
             # Example non-background scripts.
-            self.scripts.append( Info( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False, -1 ) )
-            self.scripts.append( Info( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False, -1 ) )
-            self.scripts.append( Info( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, False, -1 ) )
-            self.scriptGroupDefault = self.scripts[ -1 ].getGroup()
-            self.scriptNameDefault = self.scripts[ -1 ].getName()
-            self.scripts.append( Info( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False, -1 ) )
+            self.scripts.append( NonBackground( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False ) )
+            self.scripts.append( NonBackground( "Network", "Public IP address", "notify-send -i " + self.icon + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False ) )
+            self.scripts.append( NonBackground( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.icon + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, True ) )
+            self.scripts.append( NonBackground( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False ) )
 
             # Example background scripts.
-            self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
-            self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
+            self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 60 ) )
+            self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
             self.requestSaveConfig()
@@ -1132,6 +1124,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def saveConfig( self ):
+
+        if True: return {}#TODO Fix below
+        
         scripts = [ ]
         for script in self.scripts:
             scripts.append( [ 
@@ -1148,8 +1143,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,
             IndicatorScriptRunner.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR: self.indicatorTextSeparator,
-            IndicatorScriptRunner.CONFIG_SCRIPT_GROUP_DEFAULT: self.scriptGroupDefault,
-            IndicatorScriptRunner.CONFIG_SCRIPT_NAME_DEFAULT: self.scriptNameDefault,
             IndicatorScriptRunner.CONFIG_SCRIPTS: scripts,
             IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
         }
