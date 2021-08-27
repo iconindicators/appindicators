@@ -88,7 +88,7 @@ class Info( ABC ):
     def __repr__( self ): return self.__str__()
 
 
-class BackgroundInfo( Info ):
+class Background( Info ):
 
     # Create a background script.
     #
@@ -122,7 +122,7 @@ class BackgroundInfo( Info ):
     def __repr__( self ): return self.__str__()
 
 
-class NonBackgroundInfo( Info ):
+class NonBackground( Info ):
 
     # Create a non-background script.
     #
