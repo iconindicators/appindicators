@@ -1005,6 +1005,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return group, name
 
 
+    # Each time a background script is run, cache the result.
+    #
+    # If for example, one script has an interval of five minutes and another script is hourly,
+    # the hourly script should not be run any more frequently so use a cached result when the quicker script is run.
+    #
+    # Initialise the cache results and set a next update time in the past to force all (background) scripts to update first time.
+    def initialiseBackgroundScripts( self ):
+        self.backgroundScriptResult = { }
+        self.backgroundScriptNextUpdateTime = { }
+        now = datetime.datetime.now()
+        for script in self.scripts:
+            if type( script ) == Background:
+                self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
+                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
+
+
+    def __createKey( self, group, name ): return group + "::" + name
+
+
     def __convertFromVersion13ToVersion14( self, scripts ):
         # In version 14 the 'directory' attribute was removed.
         # If a value for 'directory' is present, prepend to the 'command'.
@@ -1071,25 +1090,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.indicatorText = " {[" + group + "::Internet Down]}{[" + group + "::Available Memory]}"
 
         return convertedScripts
-
-
-    # Each time a background script is run, cache the result.
-    #
-    # If for example, one script has an interval of five minutes and another script is hourly,
-    # the hourly script should not be run any more frequently so use a cached result when the quicker script is run.
-    #
-    # Initialise the cache results and set a next update time in the past to force all (background) scripts to update first time.
-    def initialiseBackgroundScripts( self ):
-        self.backgroundScriptResult = { }
-        self.backgroundScriptNextUpdateTime = { }
-        now = datetime.datetime.now()
-        for script in self.scripts:
-            if type( script ) == Background:
-                self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
-                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
-
-
-    def __createKey( self, group, name ): return group + "::" + name
 
 
     def loadConfig( self, config ):
