@@ -18,24 +18,12 @@
 
 # Script information.
 #
-# A base class encapsulates basic script information.
-# Implementation classes hold attributes for background script and non-background scripts.
+# A base class which encapsulates basic script information.
+# Implementation classes for attributes specific to background script and non-background scripts.
 
 
 from abc import ABC
 
-
-#TODO Do we store in JSON scripts in one list?  
-# If so, need a flag per script now to discrimatate background from non-background...!
-#
-# Otherwise, have a separate list for each type.
-#
-# Also, maybe have a method which produces the text output of a script suitable for passing to JSON?
-# Can/should the reverse be done?  Take a string list from JSON and easily create a script?
-#
-# So each of Background and NonBackground could have 
-#    A function toList() which dumps to a list for saving out to JSON
-#    A static function fromList() which takes a list (from JSON) and creates the script object. 
 
 class Info( ABC ):
 
@@ -153,6 +141,7 @@ class NonBackground( Info ):
         return super().isIdentical( script ) and \
                self.terminalOpen == script.getTerminalOpen() and \
                self.default == script.getDefault()
+
 
 #TODO Test
     def __str__( self ):
