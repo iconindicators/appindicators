@@ -38,7 +38,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_INDICATOR_TEXT = "indicatorText"
     CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator"
-    CONFIG_SCRIPTS = "scripts"
+    CONFIG_SCRIPTS_BACKGROUND = "scriptsBackground"
+    CONFIG_SCRIPTS_NON_BACKGROUND = "scriptsNonBackground"
     CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
@@ -442,10 +443,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO NOt sure if this stays.
     def onSwitchPage( self, notebook, page, pageNumber, tabName, treeView, textEntry ):
         # if notebook.get_tab_label_text( page ) == tabName:
-        treeView.get_parent().grab_focus()
+        # treeView.get_parent().grab_focus()
+        # treeView.grab_focus()
         # treeView.get_parent().get_parent().set_focus_child( treeView.get_parent() )
 
-        #     textEntry.grab_focus_without_selecting()
+        # textEntry.grab_focus_without_selecting()
         #     print( "focus")
         # print( textEntry.has_focus())
         # textEntry.grab_focus_without_selecting()
@@ -453,8 +455,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # if pageNumber == notebook.get_n_pages() - 1:
         #     print( "Last ")
         #
-        print(  treeView.get_parent().get_parent() )
-        print( pageNumber )
+        # print(  treeView.get_parent().get_parent() )
+        # print( pageNumber )
 
         # print( textEntry.get_text())
         # textEntry.select_region( 5, 10  )
@@ -462,6 +464,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # print( textEntry.get_overwrite_mode())
         # textEntry.grab_focus_without_selecting()
         # treeView.grab_focus()
+        pass
 
 
     # Renders the script name bold when the (non-background) script is default.
@@ -1055,6 +1058,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
+#TODO I think this function has to take existing scripts and make them NonBackground...and also add in Background scripts and return two lists.
+#Reorder the final lists so that the indices match
+    # def __init__( self, group, name, command, playSound, showNotification, terminalOpen, default ):
+    # def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes ):
     def __convertFromVersion15ToVersion16( self, scripts ):
         # In version 16 background script were added.
         # All scripts prior to this change are deemed to be non-background scripts.
@@ -1100,21 +1107,26 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         self.scripts = [ ]
         if config:
-            scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
+            if config.get( self.CONFIG_VERSION ) is None: # Need to do upgrade(s)...
+                scripts = config.get( "scripts", [ ] )
 
-#TODO Check upgrade stuff
-            if config.get( self.CONFIG_VERSION ) is None:
                 if scripts and len( scripts[ 0 ] ) == 7:
                     scripts = self.__convertFromVersion13ToVersion14( scripts )
                     self.requestSaveConfig()
 
                 if scripts and len( scripts[ 0 ] ) == 6:
-                    scripts = self.__convertFromVersion15ToVersion16( scripts )
+                    scriptsNonBackground, scriptsBackground = self.__convertFromVersion15ToVersion16( scripts )
                     self.requestSaveConfig()
 
-#TODO Fix...presumably need to now store scripts in two lists, one for background and the other for non-background.
-            for script in scripts:
-                self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ), script[ 7 ] ) ) #TODO Is this last item an int?
+            else:
+                scriptsNonBackground = config.get( self.CONFIG_SCRIPTS_NON_BACKGROUND, [ ] )
+                scriptsBackground = config.get( self.CONFIG_SCRIPTS_BACKGROUND, [ ] )
+
+            for script in scriptsNonBackground:
+                self.scripts.append( NonBackground( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ) ) )
+
+            for script in scriptsNonBackground:
+                self.scripts.append( NonBackground( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), script[ 5 ] ) )
 
         else:
             # Example non-background scripts.
@@ -1169,25 +1181,36 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def saveConfig( self ):
 
-        if True: return {}#TODO Fix below
-        
-        scripts = [ ]
-        for script in self.scripts: #TODO Make this into two lists/loops if need be...
-            scripts.append( [ 
-                script.getGroup(), 
-                script.getName(), 
-                script.getCommand(), 
-                script.getTerminalOpen(), 
-                script.getPlaySound(), 
-                script.getShowNotification(),
-                script.getBackground(), #TODO Change
-                script.getIntervalInMinutes() ] )
+        if True: return {}#TODO Keep until load is kosher.
+
+        scriptsBackground = [ ]
+        scriptsNonBackground = [ ]
+        for script in self.scripts:
+            if type( script ) == Background:
+                scriptsBackground.append( [ 
+                    script.getGroup(), 
+                    script.getName(), 
+                    script.getCommand(), 
+                    script.getPlaySound(), 
+                    script.getShowNotification(),
+                    script.getIntervalInMinutes() ] )
+
+            else:
+                scriptsNonBackground.append( [ 
+                    script.getGroup(), 
+                    script.getName(), 
+                    script.getCommand(), 
+                    script.getPlaySound(), 
+                    script.getShowNotification(),
+                    script.getTerminalOpen(), 
+                    script.getDefault() ] )
 
         return {
             IndicatorScriptRunner.CONFIG_HIDE_GROUPS: self.hideGroups,
             IndicatorScriptRunner.CONFIG_INDICATOR_TEXT: self.indicatorText,
             IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR: self.indicatorTextSeparator,
-            IndicatorScriptRunner.CONFIG_SCRIPTS: scripts,
+            IndicatorScriptRunner.CONFIG_SCRIPTS_BACKGROUND: scriptsBackground,
+            IndicatorScriptRunner.CONFIG_SCRIPTS_NON_BACKGROUND: scriptsNonBackground,
             IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
         }
 
