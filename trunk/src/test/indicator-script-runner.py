@@ -906,23 +906,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     commandTextView.grab_focus()
                     continue
 
-                if add: # Check for duplicate.
-                    if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
-                        self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
-                        scriptGroupCombo.grab_focus()
-                        continue
+                # Check for duplicates...
+                #    For an add, find an existing script with the same group/name.
+                #    For an edit, the group and/or name must change (and then match with an existing script other than the original).
+                scriptOfSameNameAndGroupExists = self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None
+                editedScriptGroupOrNameDifferent = \
+                    not add and \
+                    ( scriptGroupCombo.get_active_text().strip() != script.getGroup() or scriptNameEntry.get_text().strip() != script.getName() )
+                if ( add or editedScriptGroupOrNameDifferent ) and scriptOfSameNameAndGroupExists:
+                    self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
+                    scriptGroupCombo.grab_focus()
+                    continue
 
-                else: # Edit existing script.
-                    if scriptGroupCombo.get_active_text().strip() == script.getGroup() and scriptNameEntry.get_text().strip() == script.getName():
-                        pass # Script group/name have not been modified, so this is a replace of an existing script.
-
-                    else: # Check for a duplicate.
-                        if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
-                            self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
-                            scriptGroupCombo.grab_focus()
-                            continue
-
-                    # Remove the existing script.
+                # For an edit, remove the original script...
+                if not add:
                     i = 0
                     for skript in scripts:
                         if script.getGroup() == skript.getGroup() and script.getName() == skript.getName():
@@ -932,48 +929,54 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     del scripts[ i ]
 
-#TODO Fix below...
-                # The new script or the edit.
-                # if type( script ) == Background:
-                #     newScript = Background(
-                #         scriptGroupCombo.get_active_text().strip(),
-                #         scriptNameEntry.get_text().strip(),
-                #         script.getCommand(),
-                #         script.getPlaySound(),
-                #         script.getShowNotification(),
-                #         script.getIntervalInMinutes() )
-                #
-                # else:
-                #     newScript = NonBackground(
-                #         scriptGroupCombo.get_active_text().strip(),
-                #         scriptNameEntry.get_text().strip(),
-                #         script.getCommand(),
-                #         script.getPlaySound(),
-                #         script.getShowNotification(),
-                #         script.getTerminalOpen(),
-                #         False )
-                newScript = Info( scriptGroupCombo.get_active_text().strip(),
-                                  scriptNameEntry.get_text().strip(),
-                                  self.getTextViewText( commandTextView ).strip(),
-                                  terminalCheckbox.get_active(),
-                                  soundCheckbox.get_active(),
-                                  notificationCheckbox.get_active(),
-                                  backgroundCheckbox.get_active(),
-                                  backgroundScriptIntervalSpinner.get_value() )
+                # If this script is marked as default (and is non-background), check for an existing default script and if found, undefault it...
+                if defaultScriptCheckbox.get_active() and not backgroundCheckbox.get_active():
+                    i = 0
+                    for skript in scripts:
+                        if type( skript ) == NonBackground and skript.getDefault():
+                            undefaultScript = NonBackground(
+                                skript.getGroup(),
+                                skript.getName(),
+                                skript.getCommand(),
+                                skript.getPlaySound(),
+                                skript.getShowNotification(),
+                                skript.getTerminalOpen(),
+                                False )
+
+                            del scripts[ i ]
+                            scripts.append( undefaultScript )
+                            break
+
+                        i += 1
+
+                # Create new script (add or edit) and add to scripts...
+                if type( script ) == Background:
+                    newScript = Background(
+                        scriptGroupCombo.get_active_text().strip(),
+                        scriptNameEntry.get_text().strip(),
+                        self.getTextViewText( commandTextView ).strip(),
+                        soundCheckbox.get_active(),
+                        notificationCheckbox.get_active(),
+                        backgroundScriptIntervalSpinner.get_value_as_int() )
+
+                else:
+                    newScript = NonBackground(
+                        scriptGroupCombo.get_active_text().strip(),
+                        scriptNameEntry.get_text().strip(),
+                        self.getTextViewText( commandTextView ).strip(),
+                        soundCheckbox.get_active(),
+                        notificationCheckbox.get_active(),
+                        terminalCheckbox.get_active(),
+                        backgroundCheckbox.get_active() )
 
                 scripts.append( newScript )
 
-                if defaultScriptCheckbox.get_active() and not backgroundCheckbox.get_active(): #TODO Verify it's not possible to have a background script as default.
-                    self.defaultScriptGroupCurrent = scriptGroupCombo.get_active_text().strip()
-                    self.defaultScriptNameCurrent = scriptNameEntry.get_text().strip()
-
-                else:
-                    if self.defaultScriptGroupCurrent == scriptGroupCombo.get_active_text().strip() and self.defaultScriptNameCurrent == scriptNameEntry.get_text().strip():
-                        self.defaultScriptGroupCurrent = ""
-                        self.defaultScriptNameCurrent = ""
-
                 self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
-                self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, newScript.getGroup() if newScript.getBackground() else "", newScript.getName() if newScript.getBackground() else "" )#TODO Change
+                self.populateBackgroundScriptsTreeStore(
+                    scripts,
+                    backgroundScriptsTreeView,
+                    newScript.getGroup() if type( newScript ) == Background else "",
+                    newScript.getName() if type( newScript ) == Background else "" )
 
             break
 
@@ -1160,6 +1163,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # self.scripts = []
         # self.scriptGroupDefault = ""
         # self.scriptNameDefault = ""
+        
+        
+# Example script to maybe detect if I am shaped.
+# Background script, if shaped then flash up a notification/sound/label.
+# https://www.geeksforgeeks.org/test-internet-speed-using-python/
+# https://www.codegrepper.com/code-examples/python/check+internet+speed+using+python
+# https://python.plainenglish.io/test-internet-connection-speed-using-python-3a1b5a84028
+# https://github.com/sivel/speedtest-cli
+        
         print()#TODO debugging
 
         self.initialiseBackgroundScripts()
