@@ -581,7 +581,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treePath = Gtk.TreePath.new_from_string( pathAsString )
         treeView.get_selection().select_path( treePath )
         treeView.set_cursor( treePath, None, False )
-        treeView.scroll_to_cell( treePath )
+        if len( treeView.get_model() ):
+            treeView.scroll_to_cell( treePath ) # Doesn't like to be called when empty.
 
 
     # Update the indicator text after script edit/removal; on removal, the new group/name must be set to "".
@@ -1062,18 +1063,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # In version 16 background scripts were added.
     # All scripts prior to this change are deemed to be non-background scripts.
     def __convertFromVersion15ToVersion16( self, scripts, groupDefault, nameDefault ):
-    # def __init__( self, group, name, command, playSound, showNotification, terminalOpen, default ):
-    # def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes ):
-
-# "scriptGroupDefault": "Network", 
-# "scriptNameDefault": "Up or down", 
-
-# ["Network", "Ping Google", "ping -c 3 www.google.com", false, false, false], 
-# ["Network", "Public IP address", "notify-send -i indicator-script-runner \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", false, false, false], 
-# ["Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i indicator-script-runner \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", false, false, false], 
-# ["Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", true, true, true]
-    # def __init__( self, group, name, command, terminalOpen, playSound, showNotification ):
-
         nonBackgroundScripts = [ ]
         for script in scripts:
             nonBackgroundScript = [ ]
