@@ -969,7 +969,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         soundCheckbox.get_active(),
                         notificationCheckbox.get_active(),
                         terminalCheckbox.get_active(),
-                        backgroundCheckbox.get_active() )
+                        defaultScriptCheckbox.get_active() )
 
                 scripts.append( newScript )
 
