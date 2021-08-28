@@ -69,7 +69,7 @@ class Info( ABC ):
     def getShowNotification( self ): return self.showNotification
 
 
-#TODO Test
+#TODO Test  See the PPA class...I use __eq__ there ...should I use this instead?
     def isIdentical( self, script ):
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
