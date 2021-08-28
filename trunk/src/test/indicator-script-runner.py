@@ -1076,22 +1076,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         nonBackgroundScripts = [ ]
         for script in scripts:
-            convertedScript = [ ]
-            convertedScript.append( script[ 0 ] )
-            convertedScript.append( script[ 1 ] )
-            convertedScript.append( script[ 2 ] )
-            convertedScript.append( script[ 4 ] )
-            convertedScript.append( script[ 5 ] )
-            convertedScript.append( script[ 3 ] )
-            convertedScript.append( script[ 0 ] == groupDefault and script[ 1 ] == nameDefault )
+            nonBackgroundScript = [ ]
+            nonBackgroundScript.append( script[ 0 ] )
+            nonBackgroundScript.append( script[ 1 ] )
+            nonBackgroundScript.append( script[ 2 ] )
+            nonBackgroundScript.append( script[ 4 ] )
+            nonBackgroundScript.append( script[ 5 ] )
+            nonBackgroundScript.append( script[ 3 ] )
+            nonBackgroundScript.append( script[ 0 ] == groupDefault and script[ 1 ] == nameDefault )
 
-            nonBackgroundScripts.append( convertedScript )
+            nonBackgroundScripts.append( nonBackgroundScript )
 
         # Add in sample background scripts and indicator text...ensuring there is no clash with existing groups! 
         group = "Background Script Examples"
         while True:
             clash = False
-            for script in convertedScripts:
+            for script in nonBackgroundScripts:
                 if script[ 0 ] == group:
                     group += "..."
                     clash = True
@@ -1193,7 +1193,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def saveConfig( self ):
 
-        if True: return {}#TODO Keep until load is kosher.
+        # if True: return {}#TODO Keep until load is kosher.
 
         scriptsBackground = [ ]
         scriptsNonBackground = [ ]
