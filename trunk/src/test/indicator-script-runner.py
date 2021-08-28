@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from zope.interface.declarations import named
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +17,19 @@ from zope.interface.declarations import named
 
 
 # Application indicator allowing a user to run a terminal command or script.
+
+
+#TODO
+# A script to maybe detect if I am shaped.
+# Background script, if shaped then flash up a notification/sound/label.
+# https://www.geeksforgeeks.org/test-internet-speed-using-python/
+# https://www.codegrepper.com/code-examples/python/check+internet+speed+using+python
+# https://python.plainenglish.io/test-internet-connection-speed-using-python-3a1b5a84028
+# https://github.com/sivel/speedtest-cli
+# speedtest-cli --csv
+#     29570,GCOMM,Sydney,2021-08-28T01:43:13.256074Z,1.0114354937553816,10.919,11003889.775948126,1454235.1486335099,,193.82.226.151
+# speedtest-cli --csv-header
+#     Server ID,Sponsor,Server Name,Timestamp,Distance,Ping,Download,Upload,Share,IP Address
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -52,7 +64,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # Data model columns used by...
     #    the table to display all scripts;
     #    the table to display background scripts.
-#TODO Might need to reorder the columns...are all the columns still required?
     COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic.
     COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
     COLUMN_TAG_NAME = 2 # Script name.
@@ -231,7 +242,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_BACKGROUND )
         treeView.append_column( treeViewColumn )
 
-#TODO Check how this column renders...should there also be a REMOVE/DASH icon availble (background scripts don't have this attribute so should have a dash).
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TAG_TERMINAL )
         treeView.append_column( treeViewColumn )
 
@@ -434,8 +444,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts = copyOfScripts
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
             self.hideGroups = hideGroupsCheckbox.get_active()
-            self.indicatorText = indicatorTextEntry.get_text().strip()#TODO Check
-            self.indicatorTextSeparator = indicatorTextSeparatorEntry.get_text().strip()#TODO Check
+            self.indicatorText = indicatorTextEntry.get_text()
+            self.indicatorTextSeparator = indicatorTextSeparatorEntry.get_text()
             self.initialiseBackgroundScripts()
 
         return responseType
@@ -728,7 +738,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def onScriptAdd( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView ):
-        # self.__addEditScript( Info( "", "", "", False, False, False, False, 1 ), scripts, scriptsTreeView, backgroundScriptsTreeView ) #TODO Delete hopefully
         self.__addEditScript( None, scripts, scriptsTreeView, backgroundScriptsTreeView )
 
 
@@ -923,7 +932,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     del scripts[ i ]
 
                 # If this script is marked as default (and is non-background), check for an existing default script and if found, undefault it...
-                if defaultScriptCheckbox.get_active() and not backgroundCheckbox.get_active():
+                if not backgroundCheckbox.get_active() and defaultScriptCheckbox.get_active():
                     i = 0
                     for skript in scripts:
                         if type( skript ) == NonBackground and skript.getDefault():
@@ -943,7 +952,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         i += 1
 
                 # Create new script (add or edit) and add to scripts...
-                if type( script ) == Background:
+                if backgroundCheckbox.get_active():
                     newScript = Background(
                         scriptGroupCombo.get_active_text().strip(),
                         scriptNameEntry.get_text().strip(),
@@ -1141,49 +1150,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ) )
             self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
 
-#TODO COmmented out for testing
-            # self.requestSaveConfig()
-
-#TODO Testing Remove
-#         self.scripts.append( Info( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ) )
-        # self.scripts.append( Info( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ) )
-
-        # self.scripts.append( Info( "Background", "StackExchange", "python3 /home/bernard/Programming/getStackExchange.py", False, False, False, True, 60 ) )
-        # self.scripts.append( Info( "Background", "Bitcoin", "python3 /home/bernard/Programming/getBitcoin.py", False, False, False, True, 15 ) )
-        # self.scripts.append( Info( "Background", "Log", "python3 /home/bernard/Programming/checkIndicatorLog.py", False, False, True, True, 60 ) )
-        # self.scripts.append( Info( "Network", "Internet Running Monthly Quota", "python3 /home/bernard/Programming/getInternetRunningMonthlyQuota.py", False, False, False, False, -1 ) )
-
-        # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}"
-        # self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}[System::Available Memory]{[Background::StackExchange]}{[Background::Bitcoin]}{[Background::Log]}{My log output: [Background::Log]}[Background::Log]"
-        # self.scripts = []
-        # self.scriptGroupDefault = ""
-        # self.scriptNameDefault = ""
-
-
-# A script to maybe detect if I am shaped.
-# Background script, if shaped then flash up a notification/sound/label.
-# https://www.geeksforgeeks.org/test-internet-speed-using-python/
-# https://www.codegrepper.com/code-examples/python/check+internet+speed+using+python
-# https://python.plainenglish.io/test-internet-connection-speed-using-python-3a1b5a84028
-# https://github.com/sivel/speedtest-cli
-# speedtest-cli --csv
-#     29570,GCOMM,Sydney,2021-08-28T01:43:13.256074Z,1.0114354937553816,10.919,11003889.775948126,1454235.1486335099,,193.82.226.151
-# speedtest-cli --csv-header
-#     Server ID,Sponsor,Server Name,Timestamp,Distance,Ping,Download,Upload,Share,IP Address
-
-        
-# A script to update PIP stuff.
-# echo password | sudo -S pip3 install --upgrade jplephem numpy pandas pip pytz skyfield speedtest-cli youtube-dl     
-        
-        print()#TODO debugging
+            self.requestSaveConfig()
 
         self.initialiseBackgroundScripts()
 
 
     def saveConfig( self ):
-
-        # if True: return {}#TODO Keep until load is kosher.
-
         scriptsBackground = [ ]
         scriptsNonBackground = [ ]
         for script in self.scripts:
