@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from zope.interface.declarations import named
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -1027,17 +1028,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __createKey( self, group, name ): return group + "::" + name
 
 
+    # In version 14 the 'directory' attribute was removed.
+    # If a value for 'directory' is present, prepend to the 'command'.
+    #
+    # Map the old format scripts from JSON:
+    #
+    #    group, name, directory, command, terminalOpen, playSound, showNotification
+    #
+    # to the new format of script object:
+    #
+    #    group, name, directory + command, terminalOpen, playSound, showNotification
     def __convertFromVersion13ToVersion14( self, scripts ):
-        # In version 14 the 'directory' attribute was removed.
-        # If a value for 'directory' is present, prepend to the 'command'.
-        #
-        # Map the old format scripts from JSON:
-        #
-        #    group, name, directory, command, terminalOpen, playSound, showNotification
-        #
-        # to the new format of script object:
-        #
-        #    group, name, directory + command, terminalOpen, playSound, showNotification
         convertedScripts = [ ]
         for script in scripts:
             convertedScript = [ ]
@@ -1058,26 +1059,33 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return convertedScripts
 
 
-#TODO I think this function has to take existing scripts and make them NonBackground...and also add in Background scripts and return two lists.
-#Reorder the final lists so that the indices match
+    # In version 16 background scripts were added.
+    # All scripts prior to this change are deemed to be non-background scripts.
+    def __convertFromVersion15ToVersion16( self, scripts, groupDefault, nameDefault ):
     # def __init__( self, group, name, command, playSound, showNotification, terminalOpen, default ):
     # def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes ):
-    def __convertFromVersion15ToVersion16( self, scripts ):
-        # In version 16 background script were added.
-        # All scripts prior to this change are deemed to be non-background scripts.
-        # For each (non-background) script, set a flag and a dummy value for interval.
-        convertedScripts = [ ]
+
+# "scriptGroupDefault": "Network", 
+# "scriptNameDefault": "Up or down", 
+
+# ["Network", "Ping Google", "ping -c 3 www.google.com", false, false, false], 
+# ["Network", "Public IP address", "notify-send -i indicator-script-runner \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", false, false, false], 
+# ["Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i indicator-script-runner \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", false, false, false], 
+# ["Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", true, true, true]
+    # def __init__( self, group, name, command, terminalOpen, playSound, showNotification ):
+
+        nonBackgroundScripts = [ ]
         for script in scripts:
             convertedScript = [ ]
             convertedScript.append( script[ 0 ] )
             convertedScript.append( script[ 1 ] )
             convertedScript.append( script[ 2 ] )
-            convertedScript.append( script[ 3 ] )
             convertedScript.append( script[ 4 ] )
             convertedScript.append( script[ 5 ] )
-            convertedScript.append( False ) # Indicates this is a non-background script.
-            convertedScript.append( -1 ) # For a non-background script, the interval is ignored.
-            convertedScripts.append( convertedScript )
+            convertedScript.append( script[ 3 ] )
+            convertedScript.append( script[ 0 ] == groupDefault and script[ 1 ] == nameDefault )
+
+            nonBackgroundScripts.append( convertedScript )
 
         # Add in sample background scripts and indicator text...ensuring there is no clash with existing groups! 
         group = "Background Script Examples"
@@ -1092,11 +1100,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             if not clash:
                 break
 
-        convertedScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, True, True, 60 ] )
-        convertedScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, False, True, 5 ] )
+        backgroundScripts = [ ]
+        backgroundScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", True, True, 60 ] )
+        backgroundScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ] )
+
         self.indicatorText = " {[" + group + "::Internet Down]}{[" + group + "::Available Memory]}"
 
-        return convertedScripts
+        return nonBackgroundScripts, backgroundScripts
 
 
     def loadConfig( self, config ):
@@ -1115,7 +1125,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     self.requestSaveConfig()
 
                 if scripts and len( scripts[ 0 ] ) == 6:
-                    scriptsNonBackground, scriptsBackground = self.__convertFromVersion15ToVersion16( scripts )
+                    groupDefault = config.get( "scriptGroupDefault", "" )
+                    nameDefault = config.get( "scriptNameDefault", "" )
+                    scriptsNonBackground, scriptsBackground = self.__convertFromVersion15ToVersion16( scripts, groupDefault, nameDefault )
                     self.requestSaveConfig()
 
             else:
@@ -1125,8 +1137,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             for script in scriptsNonBackground:
                 self.scripts.append( NonBackground( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ) ) )
 
-            for script in scriptsNonBackground:
-                self.scripts.append( NonBackground( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), script[ 5 ] ) )
+            for script in scriptsBackground:
+                self.scripts.append( Background( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), script[ 5 ] ) )
 
         else:
             # Example non-background scripts.
