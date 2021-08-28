@@ -1172,7 +1172,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if True: return {}#TODO Fix below
         
         scripts = [ ]
-        for script in self.scripts:
+        for script in self.scripts: #TODO Make this into two lists/loops if need be...
             scripts.append( [ 
                 script.getGroup(), 
                 script.getName(), 

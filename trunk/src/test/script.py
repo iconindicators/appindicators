@@ -32,7 +32,10 @@ from abc import ABC
 #
 # Also, maybe have a method which produces the text output of a script suitable for passing to JSON?
 # Can/should the reverse be done?  Take a string list from JSON and easily create a script?
-
+#
+# So each of Background and NonBackground could have 
+#    A function toList() which dumps to a list for saving out to JSON
+#    A static function fromList() which takes a list (from JSON) and creates the script object. 
 
 class Info( ABC ):
 
