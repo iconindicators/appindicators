@@ -57,8 +57,7 @@ class Info( ABC ):
     def getShowNotification( self ): return self.showNotification
 
 
-#TODO Test  See the PPA class...I use __eq__ there ...should I use this instead?
-    def isIdentical( self, script ):
+    def __eq__( self, script ): 
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
                self.command == script.getCommand() and \
@@ -99,7 +98,7 @@ class Background( Info ):
 
 #TODO Test
     def __eq__( self, script ): 
-        return super().isIdentical( script ) and \
+        return super().__eq__( script ) and \
                self.intervalInMinutes == script.getIntervalInMinutes()
 
 
@@ -138,7 +137,7 @@ class NonBackground( Info ):
 
 #TODO Test
     def __eq__( self, script ): 
-        return super().isIdentical( script ) and \
+        return super().__eq__( script ) and \
                self.terminalOpen == script.getTerminalOpen() and \
                self.default == script.getDefault()
 
