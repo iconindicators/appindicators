@@ -110,7 +110,7 @@ class Background( Info ):
 
 
 #TODO Test
-    def isIdentical( self, script ):
+    def __eq__( self, script ): 
         return super().isIdentical( script ) and \
                self.intervalInMinutes == script.getIntervalInMinutes()
 
@@ -149,11 +149,10 @@ class NonBackground( Info ):
 
 
 #TODO Test
-    def isIdentical( self, script ):
+    def __eq__( self, script ): 
         return super().isIdentical( script ) and \
                self.terminalOpen == script.getTerminalOpen() and \
                self.default == script.getDefault()
-
 
 #TODO Test
     def __str__( self ):
