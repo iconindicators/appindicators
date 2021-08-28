@@ -430,22 +430,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.scripts = copyOfScripts
-
-            
-#TODO Don't see how this works...surely need to iterate through list of scripts and find the script that is default?
-# May not be needed soon....
-            # self.scriptGroupDefault = ""
-            # self.scriptNameDefault = ""
-            # if self.scripts: #TODO Check logic.
-            #     self.scriptGroupDefault = self.defaultScriptGroupCurrent
-            #     self.scriptNameDefault = self.defaultScriptNameCurrent
-
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
             self.hideGroups = hideGroupsCheckbox.get_active()
-
             self.indicatorText = indicatorTextEntry.get_text().strip()#TODO Check
             self.indicatorTextSeparator = indicatorTextSeparatorEntry.get_text().strip()#TODO Check
-
             self.initialiseBackgroundScripts()
 
         return responseType
@@ -1114,6 +1102,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if config:
             scripts = config.get( IndicatorScriptRunner.CONFIG_SCRIPTS, [ ] )
 
+#TODO Check upgrade stuff
             if config.get( self.CONFIG_VERSION ) is None:
                 if scripts and len( scripts[ 0 ] ) == 7:
                     scripts = self.__convertFromVersion13ToVersion14( scripts )
@@ -1123,16 +1112,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     scripts = self.__convertFromVersion15ToVersion16( scripts )
                     self.requestSaveConfig()
 
-            defaultScriptFound = False
+#TODO Fix...presumably need to now store scripts in two lists, one for background and the other for non-background.
             for script in scripts:
-                if script[ 0 ] == self.scriptGroupDefault and script[ 1 ] == self.scriptNameDefault and not script[ 6 ]:
-                    defaultScriptFound = True
-
                 self.scripts.append( Info( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ), script[ 7 ] ) ) #TODO Is this last item an int?
-
-            if not defaultScriptFound:
-                self.scriptGroupDefault = ""
-                self.scriptNameDefault = ""
 
         else:
             # Example non-background scripts.
@@ -1163,14 +1145,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # self.scripts = []
         # self.scriptGroupDefault = ""
         # self.scriptNameDefault = ""
-        
-        
-# Example script to maybe detect if I am shaped.
+
+
+# A script to maybe detect if I am shaped.
 # Background script, if shaped then flash up a notification/sound/label.
 # https://www.geeksforgeeks.org/test-internet-speed-using-python/
 # https://www.codegrepper.com/code-examples/python/check+internet+speed+using+python
 # https://python.plainenglish.io/test-internet-connection-speed-using-python-3a1b5a84028
 # https://github.com/sivel/speedtest-cli
+# speedtest-cli --csv
+#     29570,GCOMM,Sydney,2021-08-28T01:43:13.256074Z,1.0114354937553816,10.919,11003889.775948126,1454235.1486335099,,193.82.226.151
+# speedtest-cli --csv-header
+#     Server ID,Sponsor,Server Name,Timestamp,Distance,Ping,Download,Upload,Share,IP Address
+
+        
+# A script to update PIP stuff.
+# echo password | sudo -S pip3 install --upgrade jplephem numpy pandas pip pytz skyfield speedtest-cli youtube-dl     
         
         print()#TODO debugging
 
