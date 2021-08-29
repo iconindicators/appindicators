@@ -65,7 +65,6 @@ class Info( ABC ):
                self.showNotification == script.getShowNotification()
 
 
-#TODO Test
     def __str__( self ):
         return self.group + " | " + \
                self.name + " | " + \
@@ -74,7 +73,6 @@ class Info( ABC ):
                str( self.showNotification )
 
 
-#TODO Test
     def __repr__( self ): return self.__str__()
 
 
@@ -96,19 +94,16 @@ class Background( Info ):
     def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
 
 
-#TODO Test
     def __eq__( self, script ): 
         return super().__eq__( script ) and \
                self.intervalInMinutes == script.getIntervalInMinutes()
 
 
-#TODO Test
     def __str__( self ):
         return super().__str__() + " | " + \
                str( self.intervalInMinutes )
 
 
-#TODO Test...can we remove this and rely on the parent class?
     def __repr__( self ): return self.__str__()
 
 
@@ -135,19 +130,16 @@ class NonBackground( Info ):
     def getDefault( self ): return self.default
 
 
-#TODO Test
     def __eq__( self, script ): 
         return super().__eq__( script ) and \
                self.terminalOpen == script.getTerminalOpen() and \
                self.default == script.getDefault()
 
 
-#TODO Test
     def __str__( self ):
         return super().__str__() + " | " + \
                str( self.terminalOpen ) + " | " + \
                str( self.default )
 
 
-#TODO Test...can we remove this and rely on the parent class?
     def __repr__( self ): return self.__str__()
