@@ -363,21 +363,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         indicatorTextEntry.set_text( self.indicatorText )
         # indicatorTextEntry.set_receives_default( False )#TODO Testing
-#TODO Word better...
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "A background script should either:\n" + \
-            "\talways return non-empty text, or\n" + \
-            "\treturn non-empty text on success\n" + \
-            "\t(and empty text otherwise).\n\n" + \
-            "A background script which shows free\n" + \
-            "memory will always show a text result.\n\n" + \
-            "A background script which checks for a log file\n" + \
-            "will only show a text result when the log file\n" + \
-            "exists, yet show empty text otherwise.\n\n" + \
-            "Enclose a script tag(s) within { } to\n" + \
-            "automatically add the separator." ) )
+            "A background script must return either:\n" + \
+            "\tNon-empty text; or\n" + \
+            "\tNon-empty text on success and\n" + \
+            "\tempty text otherwise.\n\n" + \
+            "A background script which computes free\n" + \
+            "memory will always show non-empty text.\n\n" + \
+            "A background script which checks for a file\n" + \
+            "will show non-empty text if the file exists,\n" + \
+            "and show empty text otherwise.\n\n" + \
+            "Enclose a script within { } to automatically\n" + \
+            "add the separator." ) )
 
         box.pack_start( indicatorTextEntry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
