@@ -19,6 +19,9 @@
 # Application indicator for VirtualBox™ virtual machines.
 
 
+#TODO Given I now understand treestore/treeview, should I change the treeview in this indicator?
+
+
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
