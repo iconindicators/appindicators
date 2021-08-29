@@ -67,11 +67,11 @@ class Info( ABC ):
 
 #TODO Test
     def __str__( self ):
-        return self.getGroup() + " | " + \
-               self.getName() + " | " + \
-               self.getCommand() + " | " + \
-               str( self.getPlaySound() ) + " | " + \
-               str( self.getShowNotification() )
+        return self.group + " | " + \
+               self.name + " | " + \
+               self.command + " | " + \
+               str( self.playSound ) + " | " + \
+               str( self.showNotification )
 
 
 #TODO Test
@@ -105,7 +105,7 @@ class Background( Info ):
 #TODO Test
     def __str__( self ):
         return super().__str__() + " | " + \
-               str( self.getIntervalInMinutes() )
+               str( self.intervalInMinutes )
 
 
 #TODO Test...can we remove this and rely on the parent class?
@@ -145,8 +145,8 @@ class NonBackground( Info ):
 #TODO Test
     def __str__( self ):
         return super().__str__() + " | " + \
-               str( self.getTerminalOpen() ) + " | " + \
-               str( self.getDefault() )
+               str( self.terminalOpen ) + " | " + \
+               str( self.default )
 
 
 #TODO Test...can we remove this and rely on the parent class?
