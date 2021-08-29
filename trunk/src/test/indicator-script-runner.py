@@ -759,14 +759,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
 
-        scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-        scriptGroupCombo.set_tooltip_text( _(
+        groupCombo = Gtk.ComboBoxText.new_with_entry()
+        groupCombo.set_tooltip_text( _(
             "The group to which the script belongs.\n\n" + \
             "Choose an existing group or enter a new one." ) )
 
         groups = sorted( self.getScriptsByGroup( scripts ).keys(), key = str.lower )
         for group in groups:
-            scriptGroupCombo.append_text( group )
+            groupCombo.append_text( group )
 
         if add:
             index = 0
@@ -778,9 +778,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         else:
             index = groups.index( script.getGroup() )
 
-        scriptGroupCombo.set_active( index )
+        groupCombo.set_active( index )
 
-        box.pack_start( scriptGroupCombo, True, True, 0 )
+        box.pack_start( groupCombo, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -789,11 +789,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
 
-        scriptNameEntry = Gtk.Entry()
-        scriptNameEntry.set_tooltip_text( _( "The name of the script." ) )
-        scriptNameEntry.set_text( "" if add else script.getName() )
+        nameEntry = Gtk.Entry()
+        nameEntry.set_tooltip_text( _( "The name of the script." ) )
+        nameEntry.set_text( "" if add else script.getName() )
 
-        box.pack_start( scriptNameEntry, True, True, 0 )
+        box.pack_start( nameEntry, True, True, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -877,30 +877,30 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         label.set_sensitive( False if add else type( script ) == Background )
         box.pack_start( label, False, False, 0 )
 
-        backgroundScriptIntervalSpinner = Gtk.SpinButton()
-        backgroundScriptIntervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes() if type( script ) == Background else 60, 1, 10000, 1, 1, 0 ) )
-        backgroundScriptIntervalSpinner.set_value( script.getIntervalInMinutes() if type( script ) == Background else 60 )
-        backgroundScriptIntervalSpinner.set_sensitive( False if add else type( script ) == Background )
-        backgroundScriptIntervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
-        box.pack_start( backgroundScriptIntervalSpinner, False, False, 0 )
+        intervalSpinner = Gtk.SpinButton()
+        intervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes() if type( script ) == Background else 60, 1, 10000, 1, 1, 0 ) )
+        intervalSpinner.set_value( script.getIntervalInMinutes() if type( script ) == Background else 60 )
+        intervalSpinner.set_sensitive( False if add else type( script ) == Background )
+        intervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
+        box.pack_start( intervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 27, 1, 1 )
 
-        backgroundCheckbox.connect( "toggled", self.onCheckbox, label, backgroundScriptIntervalSpinner )
+        backgroundCheckbox.connect( "toggled", self.onCheckbox, label, intervalSpinner )
 
         dialog = self.createDialog( scriptsTreeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
         newScript = None
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if scriptGroupCombo.get_active_text().strip() == "":
+                if groupCombo.get_active_text().strip() == "":
                     self.showMessage( dialog, _( "The group cannot be empty." ) )
-                    scriptGroupCombo.grab_focus()
+                    groupCombo.grab_focus()
                     continue
 
-                if scriptNameEntry.get_text().strip() == "":
+                if nameEntry.get_text().strip() == "":
                     self.showMessage( dialog, _( "The name cannot be empty." ) )
-                    scriptNameEntry.grab_focus()
+                    nameEntry.grab_focus()
                     continue
 
                 if self.getTextViewText( commandTextView ).strip() == "":
@@ -911,13 +911,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 # Check for duplicates...
                 #    For an add, find an existing script with the same group/name.
                 #    For an edit, the group and/or name must change (and then match with an existing script other than the original).
-                scriptOfSameNameAndGroupExists = self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ) is not None
-                editedScriptGroupOrNameDifferent = \
-                    not add and \
-                    ( scriptGroupCombo.get_active_text().strip() != script.getGroup() or scriptNameEntry.get_text().strip() != script.getName() )
+                scriptOfSameNameAndGroupExists = self.getScript( scripts, groupCombo.get_active_text().strip(), nameEntry.get_text().strip() ) is not None
+                editedScriptGroupOrNameDifferent = not add and ( groupCombo.get_active_text().strip() != script.getGroup() or nameEntry.get_text().strip() != script.getName() )
                 if ( add or editedScriptGroupOrNameDifferent ) and scriptOfSameNameAndGroupExists:
                     self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
-                    scriptGroupCombo.grab_focus()
+                    groupCombo.grab_focus()
                     continue
 
                 # For an edit, remove the original script...
@@ -954,17 +952,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 # Create new script (add or edit) and add to scripts...
                 if backgroundCheckbox.get_active():
                     newScript = Background(
-                        scriptGroupCombo.get_active_text().strip(),
-                        scriptNameEntry.get_text().strip(),
+                        groupCombo.get_active_text().strip(),
+                        nameEntry.get_text().strip(),
                         self.getTextViewText( commandTextView ).strip(),
                         soundCheckbox.get_active(),
                         notificationCheckbox.get_active(),
-                        backgroundScriptIntervalSpinner.get_value_as_int() )
+                        intervalSpinner.get_value_as_int() )
 
                 else:
                     newScript = NonBackground(
-                        scriptGroupCombo.get_active_text().strip(),
-                        scriptNameEntry.get_text().strip(),
+                        groupCombo.get_active_text().strip(),
+                        nameEntry.get_text().strip(),
                         self.getTextViewText( commandTextView ).strip(),
                         soundCheckbox.get_active(),
                         notificationCheckbox.get_active(),
@@ -1085,7 +1083,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             nonBackgroundScripts.append( nonBackgroundScript )
 
-        # Add in sample background scripts and indicator text...ensuring there is no clash with existing groups! 
+        # Add in sample background scripts and indicator text,
+        # ensuring there is no clash with existing groups! 
         group = "Background Script Examples"
         while True:
             clash = False
