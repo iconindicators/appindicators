@@ -151,7 +151,7 @@ indicator-script-runner (1.0.4-1) trusty; urgency=low
 
 indicator-script-runner (1.0.3-1) trusty; urgency=low
 
-  * Bug fix: Updates we're being called twice!
+  * Bug fix: Updates were being called twice!
   * Corrected warnings in .desktop file.
   * Added option to only show script names when scripts are shown grouped.
   * About/Preferences dialogs now block each other - only show one at a time.
