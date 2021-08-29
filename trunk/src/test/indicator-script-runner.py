@@ -16,7 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator allowing a user to run a terminal command or script.
+# Application indicator to run a terminal command or script;
+# optionally display results in the icon label.
 
 
 #TODO
@@ -61,9 +62,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     COMMAND_NOTIFY_NON_BACKGROUND = "notify-send -i " + INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
-    # Data model columns used by...
-    #    the table to display all scripts;
-    #    the table to display background scripts.
+    # Data model columns used in the Preferences dialog...
+    #    in the table to display all scripts;
+    #    in the table to display background scripts.
     COLUMN_TAG_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic.
     COLUMN_TAG_GROUP = 1 # Valid when displaying a row containing just the group; otherwise empty when displaying a script name and attributes.
     COLUMN_TAG_NAME = 2 # Script name.
@@ -80,7 +81,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.16",
             copyrightStartYear = "2016",
-            comments = _( "Run a terminal command or script;\ndisplay script results in the icon label." ) )
+            comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
 
 
     def update( self, menu ):
@@ -194,6 +195,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
 # The indicator text on the icon tab is highlighted...why?
+# https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
     def onPreferences( self, dialog ):
         copyOfScripts = copy.deepcopy( self.scripts )
 
@@ -211,12 +213,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) )
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
-        treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Using BROWSE instead of SINGLE seems to disallow unselecting...which is good...but test!!!
+        treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts )
         treeView.set_tooltip_text( _(
             "Scripts are 'background' or 'non-background'.\n\n" + \
             "Background scripts are executed at intervals,\n" + \
-            "the result optionally written to the label.\n\n" + \
+            "the result optionally written to the icon text.\n\n" + \
             "Non-background scripts, listed in the menu,\n" + \
             "are executed when the user selects that script.\n\n" + \
             "If an attribute does not apply to a script,\n" + \
@@ -272,17 +274,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-#TODO Need to capture the event when you CTRL click a script and that unselects the script...should then clear the command text view.
-#
-# Maybe one of the signals can be used?
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeView.html#Gtk.TreeView.signals
-#
-#Maybe not now that BROWSE is used (see TODO above).
         commandTextView = Gtk.TextView()
         commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
+#TODO Check when removing last script; is the command text view cleared?
         treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
         self.populateScriptsTreeStore( copyOfScripts, treeView, "", "" )
 
@@ -328,10 +325,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # Menu settings.
         grid = self.createGrid()
 
-        radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in submenus" ) )
+        radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in sub-menus" ) )
         radioShowScriptsSubmenu.set_tooltip_text( _(
-            "Non-background scripts of the same group\n" + \
-            "are shown in submenus." ) )
+            "Non-background scripts of the same\n" + \
+            "group are shown in sub-menus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
@@ -366,6 +363,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         indicatorTextEntry.set_text( self.indicatorText )
         # indicatorTextEntry.set_receives_default( False )#TODO Testing
+#TODO Word better...
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -615,10 +613,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             commandText = self.getScript( scripts, group, name ).getCommand()
 
         textView.get_buffer().set_text( commandText )
-#TODO Need to figure out how to trap when a row is unhighlighted?
-# When a row is clicked or CTRL + clicked, a selection event is fired and the row selection count is one.
-# So no idea how to discern between these two events. 
-#May NOT need to do this if setting BROWSE works out (stops a user from unselecting).
 
 
     def onScriptDoubleClick( self, scriptsTreeView, treePath, treeViewColumn, backgroundScriptsTreeView, textEntry, scripts ):
@@ -721,6 +715,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
+#TODO When removing a script, if that script is background and is present in the indicator text,
+# and the indicator text is wrapped in { } but also has freetext present, ensure the whole { } is removed.
     def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView, textEntry ):
         group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
@@ -820,9 +816,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
         soundCheckbox.set_tooltip_text( _(
             "For non-background scripts,\n" + \
-            "play a beep on script completion.\n\n" + \
-            "For background scripts, play a beep\n" + \
-            "only if the script returns a result." ) )
+            "play a sound on script completion.\n\n" + \
+            "For background scripts, play a sound\n" + \
+            "if the script returns non-empty text." ) )
         soundCheckbox.set_active( False if add else script.getPlaySound() )
 
         grid.attach( soundCheckbox, 0, 22, 1, 1 )
@@ -832,7 +828,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "For non-background scripts, show a\n" + \
             "notification on script completion.\n\n" + \
             "For background scripts, show a notification\n" + \
-            "only if the script returns a result." ) )
+            "if the script returns non-empty text." ) )
         notificationCheckbox.set_active( False if add else script.getShowNotification() )
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
