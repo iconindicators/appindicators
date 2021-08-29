@@ -999,7 +999,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def getScriptsByGroup( self, scripts, nonBackground = True, background = True ):
         scriptsByGroup = { }
         for script in scripts:
-            if ( nonBackground and type( script ) != Background ) or ( background and type( script ) == Background ): #TODO Check logic and can we use NonBackground in the test?
+            if ( nonBackground and type( script ) == NonBackground ) or ( background and type( script ) == Background ):
                 if script.getGroup() not in scriptsByGroup:
                     scriptsByGroup[ script.getGroup() ] = [ ]
 
