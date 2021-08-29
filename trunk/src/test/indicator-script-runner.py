@@ -714,8 +714,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
-#TODO When removing a script, if that script is background and is present in the indicator text,
-# and the indicator text is wrapped in { } but also has freetext present, ensure the whole { } is removed.
     def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView, textEntry ):
         group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
