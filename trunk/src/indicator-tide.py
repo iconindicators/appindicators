@@ -19,6 +19,16 @@
 # Application indicator which displays tidal information.
 
 
+#TODO Looks like the UKHO is dropping all ports other than those of the UK.
+# If so, need another source, possible ones (local and/or global) are...
+    # https://tidesnear.me/tide_stations/6671
+    # https://www.tidetime.org/australia-pacific/australia/palm-beach.htm
+    # http://www.bom.gov.au/australia/tides/#!/nsw-sand-point-pittwater
+    # http://www.bom.gov.au/australia/tides/print.php?aac=NSW_TP032&type=tide&date=29-8-2021&region=NSW&tz=Australia/Sydney&tz_js=AEDT&days=7
+    # https://www.aquatera.co.uk/tools/tidal-database
+    # https://www.worldtides.info/copyright
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
