@@ -27,7 +27,7 @@ from abc import ABC
 
 class Info( ABC ):
 
-    # Create a script (neither background nor non-background).
+    # Create a script.
     #
     # Group to which a script belongs.
     # Name of script.
