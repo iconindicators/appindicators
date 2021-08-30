@@ -156,6 +156,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                         _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
 
+#TODO Testing...
+# Need to test install first of pyephem using apt-get and an install via LaunchPad.
+# Then do another install via LaunchPad but using PIP...
+# Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
+        import ephem
+        print( ephem.__version__ )
+
         utcNow = datetime.datetime.utcnow()
 
         self.data = None
