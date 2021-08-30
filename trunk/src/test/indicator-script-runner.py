@@ -279,7 +279,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-#TODO Check when removing last script; is the command text view cleared?
         treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
         self.populateScriptsTreeStore( copyOfScripts, treeView, "", "" )
 
