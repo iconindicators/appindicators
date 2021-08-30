@@ -294,8 +294,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.set_margin_top( 10 )
         box.set_homogeneous( True )
 
-#TODO Test all of these when no scripts are present.
-# Also is it possible to have no script selected (for edit/copy/remove)?
         addButton = Gtk.Button.new_with_label( _( "Add" ) )
         addButton.set_tooltip_text( _( "Add a new script." ) )
         addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView, backgroundScriptsTreeView )
