@@ -19,6 +19,20 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO Here is a list of attributes which used to be calculated before the big cull!
+# Which of them could be reinstated assuming they are available in BOTH PyEphem and Skyfield...
+    # DATA_BRIGHT_LIMB = "BRIGHT LIMB"
+    # DATA_CONSTELLATION = "CONSTELLATION"
+    # DATA_DAWN = "DAWN"
+    # DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
+    # DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
+    # DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
+    # DATA_DUSK = "DUSK"
+    # DATA_ILLUMINATION = "ILLUMINATION"
+    # DATA_MAGNITUDE = "MAGNITUDE"
+    # DATA_PHASE = "PHASE"
+
+
 #TODO Do timing between each set of object types
 # (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
