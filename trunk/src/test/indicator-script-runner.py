@@ -31,7 +31,7 @@ from gi.repository import Gtk, Pango
 from script import Background, NonBackground
 from threading import Thread
 
-import copy, datetime, indicatorbase
+import copy, datetime, indicatorbase, math
 
 
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
@@ -79,14 +79,33 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # To use the base class process tags functionality, enclose each tag within { }.
         self.setLabel( self.processTags( self.indicatorText, self.indicatorText.replace( '[', "{{" ).replace( ']', "]}" ), self.__processTags, now ) )
 
+        print( "\n\nUpdating:", now )#TODO Testing
+
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
+        print( "\nFuture update:", nextUpdate )#TODO Testing
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
-                nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
-        nextUpdateInSeconds = int( ( nextUpdate - now ).total_seconds() )
+#TODO Testing
+            if type( script ) == Background:
+                print( "\tScript", script.getName(), self.backgroundScriptNextUpdateTime[ key ] )
+
+            
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+                print( "\tNext update now", self.backgroundScriptNextUpdateTime[ key ] )#TODO Testing
+                nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
+            
+            if type( script ) == Background: print()#TODO Testing
+            
+
+        nextUpdateInSeconds = int( math.ceil( ( nextUpdate - now ).total_seconds() ) )
+        print( "Next update in seconds:", nextUpdateInSeconds )#TODO Test
+        print( 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds )#TODO Test
+        x = 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds #TODO Test
+        print( "Next update time", now + datetime.timedelta( seconds = x ) ) #TODO Test
+        print()#TODO Test
+        print()#TODO Test
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
 #TODO Need to test that the timing works...
 # On each run dump the interval for each background script,
@@ -1122,7 +1141,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( NonBackground( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False ) )
 
             # Example background scripts.
-            self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 60 ) )
+            self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 7 ) )#TODO Change from 7 to 60 when finished testing.
             self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ) )
             self.indicatorText = " [Network::Internet Down][System::Available Memory]"
 
