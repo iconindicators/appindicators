@@ -441,7 +441,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
 
-        nextUpdateInSeconds = int( ( nextUpdateTime - utcNow ).total_seconds() )
+        nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
         if nextUpdateInSeconds <= 60:
             nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources.
 
