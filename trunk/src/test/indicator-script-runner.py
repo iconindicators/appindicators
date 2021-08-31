@@ -1078,7 +1078,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", True, True, 60 ] )
         backgroundScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ] )
 
-        self.indicatorText = " {[" + group + "::Internet Down]}{[" + group + "::Available Memory]}"
+        self.indicatorText = " [" + group + "::Internet Down][" + group + "::Available Memory]"
 
         return nonBackgroundScripts, backgroundScripts
 
@@ -1124,7 +1124,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             # Example background scripts.
             self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 60 ) )
             self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ) )
-            self.indicatorText = " {[Network::Internet Down]}{[System::Available Memory]}"
+            self.indicatorText = " [Network::Internet Down][System::Available Memory]"
 
             self.requestSaveConfig()
 
