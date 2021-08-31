@@ -77,7 +77,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.updateBackgroundScripts( now )
 
         # To use the base class process tags functionality, enclose each tag within { }.
-        self.setLabel( self.processTags( self.indicatorText, self.indicatorText.replace( '[', "{{" ).replace( ']', "]}" ), self.__processTags, now ) )
+        self.setLabel( self.processTags( self.indicatorText.replace( '[', "{[" ).replace( ']', "]}" ), self.indicatorTextSeparator, self.__processTags, now ) )
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
