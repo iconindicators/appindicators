@@ -76,13 +76,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         now = datetime.datetime.now()
         self.updateBackgroundScripts( now )
 
-#TODO When I double click a background script to add,
-# I find that I need to also add in the { }.
-# Should these be added in also by default?
-# If we remove (from the user's perspective) the { },
-# and before passing the indicatorText to processTags we replace each [ with {[ and each ] with ]},
-# then processTags will magically work.
-        self.setLabel( self.processTags( self.indicatorText, self.indicatorTextSeparator, self.__processTags, now ) )
+        # To use the base class process tags functionality, enclose each tag within { }.
+        self.setLabel( self.processTags( self.indicatorText, self.indicatorText.replace( '[', "{{" ).replace( ']', "]}" ), self.__processTags, now ) )
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
@@ -365,9 +360,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "memory will always show non-empty text.\n\n" + \
             "A background script which checks for a file\n" + \
             "will show non-empty text if the file exists,\n" + \
-            "and show empty text otherwise.\n\n" + \
-            "Enclose a script within { } to automatically\n" + \
-            "add the separator." ) ) #TODO Reword if the { } are hidden from the user.
+            "and show empty text otherwise." ) )
 
         box.pack_start( indicatorTextEntry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -378,7 +371,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         indicatorTextSeparatorEntry = Gtk.Entry()
         indicatorTextSeparatorEntry.set_text( self.indicatorTextSeparator )
-        indicatorTextSeparatorEntry.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
+        indicatorTextSeparatorEntry.set_tooltip_text( _( "The separator will be added between tags." ) )
         box.pack_start( indicatorTextSeparatorEntry, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
