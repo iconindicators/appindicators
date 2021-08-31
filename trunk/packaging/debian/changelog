@@ -3,21 +3,22 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
   * New background script functionality added.
 
     Existing scripts are now referred to as non-background scripts and remain
-    functionally the same as they did.
+    functionally the same prior to this release.
 
     A background script has a command/script to run but now at a specified
-    interval (in minutes).  Optionally the text output of the background
-    script can be written to the icon text.
+    interval (in minutes) rather than directly by the user.
+    Optionally, the text output of the background script can be written to the
+    icon text.
 
     If a background script computes the amount of free memory, the text output
     will always be present.  In this case, enabling the sound and notification
-    options for the script are of no value.
+    options for the script are of _no_ value.
 
-    If a background script determines the presence or absence of a log file,
+    If a background script determines the presence/absence of a log file,
     the script will produce no text output if the log file is present, yet
     produce some warning/error text if the log file is present.
-    If the log file is present enabling the sound and notification options for
-    the script are of value.
+    If the log file is present, enabling the sound and notification options for
+    the script _are_ of value.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Jul 2021 18:02:42 +1000
 
