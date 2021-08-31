@@ -21,16 +21,14 @@
 
 #TODO Here is a list of attributes which used to be calculated before the big cull!
 # Which of them could be reinstated assuming they are available in BOTH PyEphem and Skyfield...
-    # DATA_BRIGHT_LIMB = "BRIGHT LIMB"
-    # DATA_CONSTELLATION = "CONSTELLATION"
-    # DATA_DAWN = "DAWN"
-    # DATA_DISTANCE_TO_EARTH = "DISTANCE TO EARTH"
-    # DATA_DISTANCE_TO_EARTH_KM = "DISTANCE TO EARTH KM"
-    # DATA_DISTANCE_TO_SUN = "DISTANCE TO SUN"
-    # DATA_DUSK = "DUSK"
-    # DATA_ILLUMINATION = "ILLUMINATION"
-    # DATA_MAGNITUDE = "MAGNITUDE"
-    # DATA_PHASE = "PHASE"
+    # DATA_CONSTELLATION:            Skyfield implements; incurs one menu item per object.
+    # DATA_DAWN:                     Skyfield currently does not implement but there is a ticket suggesting how.
+    # DATA_DISTANCE_TO_EARTH:        Skyfield calculates this distance
+    # DATA_DISTANCE_TO_EARTH_KM:     Skyfield calculates this distance       
+    # DATA_DISTANCE_TO_SUN:          Skyfield calculates this distance
+    # DATA_DUSK:                     Skyfield currently does not implement but there is a ticket suggesting how.
+    # DATA_MAGNITUDE:                Skyfield calculates/looksup planetary magnitudes.  Star and OE/comet come from the ephemeris/data files.            
+    # DATA_PHASE:            
 
 
 #TODO Do timing between each set of object types
