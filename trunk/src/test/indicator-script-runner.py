@@ -20,11 +20,6 @@
 # optionally display results in the icon label.
 
 
-#TODO When I double click a background script to add,
-# I find that I need to also add in the { }.
-# Should these be added in also by default?
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -80,6 +75,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.updateMenu( menu )
         now = datetime.datetime.now()
         self.updateBackgroundScripts( now )
+
+#TODO When I double click a background script to add,
+# I find that I need to also add in the { }.
+# Should these be added in also by default?
+# If we remove (from the user's perspective) the { },
+# and before passing the indicatorText to processTags we replace each [ with {[ and each ] with ]},
+# then processTags will magically work.
         self.setLabel( self.processTags( self.indicatorText, self.indicatorTextSeparator, self.__processTags, now ) )
 
         # Calculate next update...
@@ -365,7 +367,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "will show non-empty text if the file exists,\n" + \
             "and show empty text otherwise.\n\n" + \
             "Enclose a script within { } to automatically\n" + \
-            "add the separator." ) )
+            "add the separator." ) ) #TODO Reword if the { } are hidden from the user.
 
         box.pack_start( indicatorTextEntry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
