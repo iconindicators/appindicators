@@ -199,13 +199,13 @@ def getNextUpdateInSeconds( gregorianDateTime, isClassic ):
                 stardateIssueNext += 1
 
         dateTimeOfNextStardate = getGregorianFromStardateClassic( stardateIssueNext, stardateIntegerNext, stardateFractionNext )
-        numberOfSecondsToNextUpdate = int( ( dateTimeOfNextStardate - gregorianDateTime ).total_seconds() )
+        numberOfSecondsToNextUpdate = int( math.ceil( ( dateTimeOfNextStardate - gregorianDateTime ).total_seconds() ) )
 
     else:
         oneSecondAfterMidnight = ( gregorianDateTime + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
-        numberOfSecondsToNextUpdate = int( ( oneSecondAfterMidnight - gregorianDateTime ).total_seconds() )
+        numberOfSecondsToNextUpdate = int( math.ceil( ( oneSecondAfterMidnight - gregorianDateTime ).total_seconds() ) )
 
-    return numberOfSecondsToNextUpdate + 1 # Add in a bit of safety.
+    return numberOfSecondsToNextUpdate
 
 
 # Convert a 'classic' stardate to a Gregorian datetime.datetime.
