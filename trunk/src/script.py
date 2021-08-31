@@ -17,27 +17,29 @@
 
 
 # Script information.
+#
+# A base class which encapsulates basic script information.
+# Implementation classes for attributes specific to background script and non-background scripts.
 
 
-class Info( object ):
+from abc import ABC
 
+
+class Info( ABC ):
+
+    # Create a script.
+    #
     # Group to which a script belongs.
     # Name of script.
     # The command or script with any arguments as needed.
-    # True to leave the terminal open on completion of script/command execution (applies only to non-background scripts).
     # True to play a sound on completion of script/command execution.
     # True to show a notification on completion of script/command execution.
-    # True if the script is background (runs at intervals and optionally displays result in a label) versus a non-background script (activated by user).
-    # Update interval for background scripts (in minutes); ignored for non-background scripts.
-    def __init__( self, group, name, command, terminalOpen, playSound, showNotification, background, intervalInMinutes ):
+    def __init__( self, group, name, command, playSound, showNotification ):
         self.group = group
         self.name = name
         self.command = command
-        self.terminalOpen = terminalOpen
         self.playSound = playSound
         self.showNotification = showNotification
-        self.background = background
-        self.intervalInMinutes = intervalInMinutes #TODO Is this an int or str?
 
 
     def getGroup( self ): return self.group
@@ -49,43 +51,95 @@ class Info( object ):
     def getCommand( self ): return self.command
 
 
-    def getTerminalOpen( self ): return self.terminalOpen
-
-
     def getPlaySound( self ): return self.playSound
 
 
     def getShowNotification( self ): return self.showNotification
 
 
-    def getBackground( self ): return self.background
-
-
-    def getIntervalInMinutes( self ): return int( self.intervalInMinutes ) #TODO As per the TODO above check if this is an int or string...
-
-
-#TODO Test
-    def isIdentical( self, script ):
+    def __eq__( self, script ): 
         return self.group == script.getGroup() and \
                self.name == script.getName() and \
                self.command == script.getCommand() and \
-               self.terminalOpen == script.getTerminalOpen() and \
                self.playSound == script.getPlaySound() and \
-               self.showNotification == script.getShowNotification() and \
-               self.background == script.getBackground() and \
+               self.showNotification == script.getShowNotification()
+
+
+    def __str__( self ):
+        return self.group + " | " + \
+               self.name + " | " + \
+               self.command + " | " + \
+               str( self.playSound ) + " | " + \
+               str( self.showNotification )
+
+
+    def __repr__( self ): return self.__str__()
+
+
+class Background( Info ):
+
+    # Create a background script.
+    #
+    # Group to which a script belongs.
+    # Name of script.
+    # The command or script with any arguments as needed.
+    # True to play a sound on completion of script/command execution.
+    # True to show a notification on completion of script/command execution.
+    # Update interval (in minutes).
+    def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes ):
+        super().__init__( group, name, command, playSound, showNotification )
+        self.intervalInMinutes = intervalInMinutes
+
+
+    def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
+
+
+    def __eq__( self, script ): 
+        return super().__eq__( script ) and \
                self.intervalInMinutes == script.getIntervalInMinutes()
 
 
-#TODO Test
     def __str__( self ):
-        return self.getGroup() + " | " + \
-               self.getName() + " | " + \
-               self.getCommand() + " | " + \
-               str( self.getTerminalOpen() ) + " | " + \
-               str( self.getPlaySound() ) + " | " + \
-               str( self.getShowNotification() ) + " | " + \
-               str( self.getBackground() ) + " | " + \
-               str( self.getIntervalInMinutes() )
+        return super().__str__() + " | " + \
+               str( self.intervalInMinutes )
+
+
+    def __repr__( self ): return self.__str__()
+
+
+class NonBackground( Info ):
+
+    # Create a non-background script.
+    #
+    # Group to which a script belongs.
+    # Name of script.
+    # The command or script with any arguments as needed.
+    # True to play a sound on completion of script/command execution.
+    # True to show a notification on completion of script/command execution.
+    # True to leave the terminal open on completion of script/command execution.
+    # True if the script is default (only one non-background script can be default).
+    def __init__( self, group, name, command, playSound, showNotification, terminalOpen, default ):
+        super().__init__( group, name, command, playSound, showNotification )
+        self.terminalOpen = terminalOpen
+        self.default = default
+
+
+    def getTerminalOpen( self ): return self.terminalOpen
+
+
+    def getDefault( self ): return self.default
+
+
+    def __eq__( self, script ): 
+        return super().__eq__( script ) and \
+               self.terminalOpen == script.getTerminalOpen() and \
+               self.default == script.getDefault()
+
+
+    def __str__( self ):
+        return super().__str__() + " | " + \
+               str( self.terminalOpen ) + " | " + \
+               str( self.default )
 
 
     def __repr__( self ): return self.__str__()
