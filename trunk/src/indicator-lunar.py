@@ -160,6 +160,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Need to test install first of pyephem using apt-get and an install via LaunchPad.
 # Then do another install via LaunchPad but using PIP...
 # Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
+#
+# Need to create the test indicator to install python3-pyephem and verify the version number.
+# Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
+
         import ephem
         print( ephem.__version__ )
 
