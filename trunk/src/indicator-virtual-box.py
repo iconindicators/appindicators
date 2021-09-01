@@ -22,6 +22,15 @@
 #TODO Given I now understand treestore/treeview, should I change the treeview in this indicator?
 
 
+#TODO Consider rewriting the code to read in the XML file...can we use a hashtable with keys either a VM name or a group?
+# If a group, the value is another hashtable.  Otherwise...need to think about this.
+# Also this will affect the menu building...and the Preferences!
+
+
+#TODO Test how the menu looks without showing groups, but two VMs with the same name.
+# Can we append the group to the VM in the menu item?
+
+
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -247,7 +256,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return names, uuids
 
 
-    # Returns a list of virtualmachine.Info objects reflecting VMs and groups as found via VBoxManage and configuration files.
+    # Returns a list of virtualmachine.Info objects reflecting VMs and groups
+    # as found via VBoxManage and configuration files.
     def getVirtualMachines( self ):
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
@@ -277,7 +287,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return virtualMachines
 
 
-    # The returned list of virtualmachine.Info objects does not include any groups (if present) nor any order set by the user in the GUI.
+    # The returned list of virtualmachine.Info objects does not include any groups (if present),
+    #  nor any order set by the user in the GUI.
     # Safe to call without checking if VBoxManage is installed.
     def __getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = [ ]
@@ -311,7 +322,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def __getVirtualMachinesFromConfig4dot3OrGreater( self ):
-        # The config file may exist in one of two places, particularly if the user has done an upgrade or uses an older version of Ubuntu.
+        # The config file may exist in one of two places,
+        # particularly if the user has done an upgrade or uses an older version of Ubuntu.
         # https://www.virtualbox.org/manual/ch10.html
         configFile = None
         if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
