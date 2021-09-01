@@ -573,15 +573,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     # Update the indicator text after script edit/removal; on removal, the new group/name must be set to "".
+#TODO Test this; edit a scrpt and remove a script.
     def updateIndicatorTextEntry( self, textEntry, oldGroup, oldName, newGroup, newName ):
         oldKey = self.__createKey( oldGroup, oldName )
         if newGroup and newName: # Script was edited; do tag substitution...
             newKey = self.__createKey( newGroup, newName )
-            textEntry.set_text( textEntry.get_text().replace( "{[" + oldKey + "]}", "{[" + newKey + "]}" ) )
             textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
 
         else: # Script was removed; do tag removal...
-            textEntry.set_text( textEntry.get_text().replace( "{[" + oldKey + "]}", "" ) )
             textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "" ) )
 
 
