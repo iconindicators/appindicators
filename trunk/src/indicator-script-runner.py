@@ -100,6 +100,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
                 self.addScriptsToMenu( scriptsByGroup[ group ], group, subMenu, indent )
+
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
