@@ -117,6 +117,9 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         # Scroll to the end...strange way of doing so!
         # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
+#TODO Below 'self' is used...but it is not called/referred.
+# Indicator Lunar uses inner functions without a self.
+# See if self is not needed here or needed in Lunar.
         def textViewChanged( self, widget ):
             adjustment = scrolledWindow.get_vadjustment()
             adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
