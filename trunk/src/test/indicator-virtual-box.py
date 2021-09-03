@@ -139,7 +139,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     self.addMenuItemForGroupAndChildren( menu, item, 0 )
 
                 else:
-                    self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
+                    self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs ) #TODO Maybe pass in runningVMUUIDs into here and the group function so that it can be passed all the way along.
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
