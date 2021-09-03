@@ -20,7 +20,9 @@
 
 
 #TODO Add to changelog that prior to 4.3 support is now gone.
-# Should I put back the method for pre-4.3 support of config files?
+# Not sure when exactly the changeover occurred.
+# Figure out when the change happened...maybe.
+# At least put something in the changelog about not supporting old format files and locations.
 
 
 INDICATOR_NAME = "indicator-virtual-box"
@@ -45,11 +47,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
     CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME = "virtualboxManagerWindowName"
 
-    # Configuration file location and format changed at version 4.3:
-    #    https://www.virtualbox.org/manual/ch10.html#idp99351072
-    VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
-
+    VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
 
@@ -254,16 +252,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         if self.isVBoxManageInstalled():
             virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage()
 
-            configFile = None
-            if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
-                configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
-
-            elif os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 ):
-                configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
-
-            if configFile: #TODO Test with configFile set to None.
+            if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
                 try:
-                    with open( configFile, 'r' ) as f:
+                    with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, 'r' ) as f:
                         lines = f.readlines()
 
                     for line in lines:
