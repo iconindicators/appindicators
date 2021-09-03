@@ -127,50 +127,37 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def buildMenu( self, menu ):
         virtualMachines = self.getVirtualMachines()
-        if len( virtualMachines ) == 0:
-            menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
-
-        else:
+        if virtualMachines: #TODO Check this works for empty VMs.
 # <ExtraDataItem name="GUI/GroupDefinitions/" value="go=A and B,go=C and D,m=7a96fc66-7142-459e-9efb-b7f610e8660e,m=58aa424b-2ae7-4f60-aca9-feb5642924aa,m=256f0096-c3e5-45e1-85e0-44e85b4cbc1d,m=54ba0488-739c-4e4a-8aca-eaeb786681d1,m=e1a5e766-27cc-4b13-8c81-b69a5aa5dac7,m=628a6317-792a-45ff-8f0a-de3227f14724,m=bc161180-2cde-47b1-a3ee-b8c44d335417"/>
 # <ExtraDataItem name="GUI/GroupDefinitions/A and B" value="m=48edac78-b24a-48ad-8383-c953c8994848,m=a9744af5-a301-4cd9-82f1-a6322382f246"/>
 # <ExtraDataItem name="GUI/GroupDefinitions/C and D" value="go=E,m=99ffe5d2-76e1-47b8-ac64-c14eaf16c3dc,m=032e257d-c814-4046-8809-946e6f3982cd"/>
 # <ExtraDataItem name="GUI/GroupDefinitions/C and D/E" value="go=F and G,m=b10f4467-9cc8-4359-97d7-7139777ece1f"/>
 # <ExtraDataItem name="GUI/GroupDefinitions/C and D/E/F and G" value="m=08ed6d07-8744-4fc7-8740-02e1019dc71a,m=34afeba3-5a63-4a9b-a7fd-eadeacb5b190"/>
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
-            if not self.showSubmenu:
-                for item in virtualMachines:
-                    if type( item ) == virtualmachine.Group:
-                        self.addMenuItemForGroupAndChildrenSubmenu( menu, item, 0 )
+            for item in virtualMachines:
+                if type( item ) == virtualmachine.Group:
+                    self.addMenuItemForGroupAndChildren( menu, item, 0 )
 
-                    else:
-                        self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
+                else:
+                    self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
+            # if not self.showSubmenu:
+            #     for item in virtualMachines:
+            #         if type( item ) == virtualmachine.Group:
+            #             self.addMenuItemForGroupAndChildrenSubmenu( menu, item, 0 )
+            #
+            #         else:
+            #             self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
+            #
+            # else:
+            #     for item in virtualMachines:
+            #         if type( item ) == virtualmachine.Group:
+            #             self.addMenuItemForGroupAndChildren( menu, item, 0 )
+            #
+            #         else:
+            #             self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
 
-                #
-                # stack = [ ]
-                # currentMenu = menu
-                # for virtualMachine in virtualMachines:
-                #     while virtualMachine.getIndent() < len( stack ):
-                #         currentMenu = stack.pop()
-                #
-                #     if virtualMachine.isGroup():
-                #         menuItem = Gtk.MenuItem.new_with_label( self.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
-                #         currentMenu.append( menuItem )
-                #         subMenu = Gtk.Menu()
-                #         menuItem.set_submenu( subMenu )
-                #         stack.append( currentMenu )
-                #         currentMenu = subMenu
-                #
-                #     else:
-                #         currentMenu.append( self.addMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
-
-            else:
-                level = 0
-                for item in virtualMachines:
-                    if type( item ) == virtualmachine.Group:
-                        self.addMenuItemForGroupAndChildren( menu, item, level )
-
-                    else:
-                        self.addMenuItemForVirtualMachine( menu, item, level, item.getUUID() in runningVMUUIDs )
+        else:
+            menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -180,21 +167,24 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.secondaryActivateTarget = menuItem
 
 
-    def addMenuItemForGroupAndChildrenSubmenu( self, menu, group, level ):
+    def addMenuItemForGroupAndChildren( self, menu, group, level ):
         indent = level * self.indent( 0, 1 )
         menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
         menu.append( menuItem )
-        subMenu = Gtk.Menu()
-        menuItem.set_submenu( subMenu )
+
+        if self.showSubmenu:
+            menu = Gtk.Menu()
+            menuItem.set_submenu( menu )
+
         for item in group.getItems():
             if type( item ) == virtualmachine.Group:
-                self.addMenuItemForGroupAndChildrenSubmenu( subMenu, item, level + 1 )
+                self.addMenuItemForGroupAndChildrenSubmenu( menu, item, level + 1 )
 
             else:
-                self.addMenuItemForVirtualMachine( subMenu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
+                self.addMenuItemForVirtualMachine( menu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
 
 
-    def addMenuItemForGroupAndChildren( self, menu, group, level ):
+    def addMenuItemForGroupAndChildrenNOTNEEDED( self, menu, group, level ):
         indent = level * self.indent( 0, 1 )
         menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
         menu.append( menuItem )
