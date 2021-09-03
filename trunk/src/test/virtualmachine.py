@@ -19,47 +19,6 @@
 # Virtual Machine information.
 
 
-#TODO Remove
-# class Info( object ):
-#
-#     # Name of VM or Group.
-#     # True if a group; False is a VM.
-#     # UUID of VM.
-#     # Numeric amount to indent when groups are used.
-#     def __init__( self, name, isGroup, uuid, indent ):
-#         self.name = name
-#         self.group = isGroup
-#         self.uuid = uuid
-#         self.indent = indent
-#
-#
-#     def getName( self ): return self.name
-#
-#
-#     def setName( self, name ): self.name = name
-#
-#
-#     def isGroup( self ): return self.group
-#
-#
-#     def getUUID( self ): return self.uuid
-#
-#
-#     def getIndent( self ): return self.indent
-#
-#
-#     def getGroupName( self ): return self.name[ self.name.rfind( "/" ) + 1 : ] # Works for non-groups too, in case it's called!
-#
-#
-#     def __str__( self ): return self.getName() + " | " + str( self.isGroup() ) + " | " + self.getUUID() + " | " + str( self.getIndent() )
-#
-#
-#     def __repr__( self ): return self.__str__()
-    
-    
-    
-
-
 class VirtualMachine( object ):
 
     def __init__( self, name, uuid ):
@@ -96,7 +55,7 @@ class Group( object ):
     def getItems( self ): return self.items
 
 
-    def __str__( self ): return self.getName() + " | " + self.getItems() #TODO Test this!
+    def __str__( self ): return self.getName() + ": " + ' | '.join( [ str( x.getName() ) for x in self.getItems() ] )
 
 
     def __repr__( self ): return self.__str__()    
