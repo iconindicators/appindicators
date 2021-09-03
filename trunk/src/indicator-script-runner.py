@@ -20,6 +20,14 @@
 # optionally display results in the icon label.
 
 
+
+#TODO Turn ON the sound for check log script.
+#Place a log file in the home directory.
+# Wait for a sound/notification.
+# Remove the log file...sound and notification keeps happening!
+
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
