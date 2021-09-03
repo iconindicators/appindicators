@@ -19,52 +19,7 @@
 # Application indicator for VirtualBox™ virtual machines.
 
 
-#TODO Given I now understand treestore/treeview, should I change the treeview in this indicator?
-
-
-#TODO Consider rewriting the code to read in the XML file...can we use a hashtable with keys either a VM name or a group?
-# If a group, the value is another hashtable.  Otherwise...need to think about this.
-# Also this will affect the menu building...and the Preferences!
-
-
 #TODO Add to changelog that prior to 4.3 support is now gone.
-
-
-#TODO Test how the menu looks without showing groups, but two VMs with the same name.
-# Can we append the group to the VM in the menu item?
-
-
-    # <ExtraData>
-    #   <ExtraDataItem name="GUI/DetailsPageBoxes" value="general,system,preview,display,storage,audio,network,usb,sharedFolders,description"/>
-    #   <ExtraDataItem name="GUI/GroupDefinitions/" value="go=A and B,go=C and D,m=7a96fc66-7142-459e-9efb-b7f610e8660e,m=58aa424b-2ae7-4f60-aca9-feb5642924aa,m=256f0096-c3e5-45e1-85e0-44e85b4cbc1d,m=54ba0488-739c-4e4a-8aca-eaeb786681d1,m=e1a5e766-27cc-4b13-8c81-b69a5aa5dac7,m=628a6317-792a-45ff-8f0a-de3227f14724,m=bc161180-2cde-47b1-a3ee-b8c44d335417"/>
-    #   <ExtraDataItem name="GUI/GroupDefinitions/A and B" value="m=48edac78-b24a-48ad-8383-c953c8994848,m=a9744af5-a301-4cd9-82f1-a6322382f246"/>
-    #   <ExtraDataItem name="GUI/GroupDefinitions/C and D" value="go=E,m=99ffe5d2-76e1-47b8-ac64-c14eaf16c3dc,m=032e257d-c814-4046-8809-946e6f3982cd"/>
-    #   <ExtraDataItem name="GUI/GroupDefinitions/C and D/E" value="m=b10f4467-9cc8-4359-97d7-7139777ece1f"/>
-    #   <ExtraDataItem name="GUI/LastItemSelected" value="g=E"/>
-    #   <ExtraDataItem name="GUI/LastWindowPosition" value="473,153,800,832"/>
-    #   <ExtraDataItem name="GUI/RecentFolderCD" value="/usr/share/virtualbox"/>
-    #   <ExtraDataItem name="GUI/RecentListCD" value="/usr/share/virtualbox/VBoxGuestAdditions.iso,/home/bernard/Downloads/debian-10.10.0-amd64-netinst.iso,/home/bernard/Downloads/ubuntu-20.04-desktop-amd64.iso,/home/bernard/Downloads/xubuntu-19.10-desktop-amd64.iso,/home/bernard/Downloads/lubuntu-19.10-desktop-amd64.iso"/>
-    #   <ExtraDataItem name="GUI/SplitterSizes" value="265,531"/>
-    #   <ExtraDataItem name="GUI/Statusbar" value="false"/>
-    #   <ExtraDataItem name="GUI/SuppressMessages" value="remindAboutAutoCapture,remindAboutMouseIntegration"/>
-    #   <ExtraDataItem name="GUI/Toolbar/MachineTools/Order" value="Details"/>
-    # </ExtraData>
-    # <MachineRegistry>
-    #   <MachineEntry uuid="{bc161180-2cde-47b1-a3ee-b8c44d335417}" src="/home/bernard/VirtualBox VMs/Windows XP/Windows XP.vbox"/>
-    #   <MachineEntry uuid="{628a6317-792a-45ff-8f0a-de3227f14724}" src="/home/bernard/VirtualBox VMs/Windows 10/Windows 10.vbox"/>
-    #   <MachineEntry uuid="{54ba0488-739c-4e4a-8aca-eaeb786681d1}" src="/home/bernard/VirtualBox VMs/Ubuntu 18.04/Ubuntu 18.04.vbox"/>
-    #   <MachineEntry uuid="{e1a5e766-27cc-4b13-8c81-b69a5aa5dac7}" src="/home/bernard/VirtualBox VMs/Ubuntu 20.04/Ubuntu 20.04.vbox"/>
-    #   <MachineEntry uuid="{58aa424b-2ae7-4f60-aca9-feb5642924aa}" src="/home/bernard/VirtualBox VMs/MythTV Test/MythTV Test.vbox"/>
-    #   <MachineEntry uuid="{256f0096-c3e5-45e1-85e0-44e85b4cbc1d}" src="/home/bernard/VirtualBox VMs/MythTV Test 2/MythTV Test 2.vbox"/>
-    #   <MachineEntry uuid="{7a96fc66-7142-459e-9efb-b7f610e8660e}" src="/home/bernard/VirtualBox VMs/Debian 10/Debian 10.vbox"/>
-    #   <MachineEntry uuid="{48edac78-b24a-48ad-8383-c953c8994848}" src="/home/bernard/VirtualBox VMs/A and B/A Machine/A Machine.vbox"/>
-    #   <MachineEntry uuid="{a9744af5-a301-4cd9-82f1-a6322382f246}" src="/home/bernard/VirtualBox VMs/A and B/B Machine/B Machine.vbox"/>
-    #   <MachineEntry uuid="{99ffe5d2-76e1-47b8-ac64-c14eaf16c3dc}" src="/home/bernard/VirtualBox VMs/C and D/C Machine/C Machine.vbox"/>
-    #   <MachineEntry uuid="{032e257d-c814-4046-8809-946e6f3982cd}" src="/home/bernard/VirtualBox VMs/C and D/D Machine/D Machine.vbox"/>
-    #   <MachineEntry uuid="{b10f4467-9cc8-4359-97d7-7139777ece1f}" src="/home/bernard/VirtualBox VMs/C and D/E/E Machine/E Machine.vbox"/>
-    # </MachineRegistry>
-
-
 
 
 INDICATOR_NAME = "indicator-virtual-box"
@@ -78,7 +33,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
 
-import indicatorbase, datetime, os, time, virtualmachine #TODO Check if time is still needed.
+import indicatorbase, datetime, os, time, virtualmachine
 
 
 class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
@@ -129,11 +84,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def buildMenu( self, menu ):
         virtualMachines = self.getVirtualMachines()
         if virtualMachines: #TODO Check this works for empty VMs.
-# <ExtraDataItem name="GUI/GroupDefinitions/" value="go=A and B,go=C and D,m=7a96fc66-7142-459e-9efb-b7f610e8660e,m=58aa424b-2ae7-4f60-aca9-feb5642924aa,m=256f0096-c3e5-45e1-85e0-44e85b4cbc1d,m=54ba0488-739c-4e4a-8aca-eaeb786681d1,m=e1a5e766-27cc-4b13-8c81-b69a5aa5dac7,m=628a6317-792a-45ff-8f0a-de3227f14724,m=bc161180-2cde-47b1-a3ee-b8c44d335417"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/A and B" value="m=48edac78-b24a-48ad-8383-c953c8994848,m=a9744af5-a301-4cd9-82f1-a6322382f246"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/C and D" value="go=E,m=99ffe5d2-76e1-47b8-ac64-c14eaf16c3dc,m=032e257d-c814-4046-8809-946e6f3982cd"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/C and D/E" value="go=F and G,m=b10f4467-9cc8-4359-97d7-7139777ece1f"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/C and D/E/F and G" value="m=08ed6d07-8744-4fc7-8740-02e1019dc71a,m=34afeba3-5a63-4a9b-a7fd-eadeacb5b190"/>
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
             for item in virtualMachines:
                 if type( item ) == virtualmachine.Group:
@@ -376,23 +326,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         return virtualMachines
-
-
-    # Returns the version number as a string or None if no version could be determined.
-    # Safe to call without checking if VBoxManage is installed.
-#TODO No longer used...consider deleting.
-    def getVirtualBoxVersion( self ):
-        result = self.processGet( "VBoxManage --version" )
-        if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
-            version = None
-
-        else:
-            for line in result.splitlines():
-                if len( line ) > 0 and line[ 0 ].isdigit(): # The result may include compile warnings in addition to the actual version number or even empty lines.
-                    version = line
-                    break
-
-        return version
 
 
     def isVBoxManageInstalled( self ):
