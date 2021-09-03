@@ -78,7 +78,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
 
-import indicatorbase, datetime, os, time, virtualmachine
+import indicatorbase, datetime, os, time, virtualmachine #TODO Check if time is still needed.
 
 
 class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
@@ -89,9 +89,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
     CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME = "virtualboxManagerWindowName"
 
+    # Configuration file location and format changed at version 4.3:
+    #    https://www.virtualbox.org/manual/ch10.html#idp99351072
     VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 = os.getenv( "HOME" ) + "/.VirtualBox/VirtualBox.xml"
-    VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION = "4.3" # Configuration file location and format changed at this version (https://www.virtualbox.org/manual/ch10.html#idp99351072).
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
@@ -296,18 +297,13 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return names, uuids
 
 
-#TODO Update comment.
-    # Returns a list of virtualmachine.Info objects reflecting VMs and groups
-    # as found via VBoxManage and configuration files.
+    # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and configuration files.
     def getVirtualMachines( self ):
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
-            virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
+            virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage()
 
-            # If the user has an old version of Ubuntu or has done and upgrade,
-            # the config file may exist in one of two places.
-            # https://www.virtualbox.org/manual/ch10.html
-            configFile = None #TODO Rename the constants below to be location rather than config.
+            configFile = None
             if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
                 configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
 
@@ -315,11 +311,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
 
             if configFile: #TODO Test with configFile set to None.
-# <ExtraDataItem name="GUI/GroupDefinitions/" value="go=A and B,go=C and D,m=7a96fc66-7142-459e-9efb-b7f610e8660e,m=58aa424b-2ae7-4f60-aca9-feb5642924aa,m=256f0096-c3e5-45e1-85e0-44e85b4cbc1d,m=54ba0488-739c-4e4a-8aca-eaeb786681d1,m=e1a5e766-27cc-4b13-8c81-b69a5aa5dac7,m=628a6317-792a-45ff-8f0a-de3227f14724,m=bc161180-2cde-47b1-a3ee-b8c44d335417"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/A and B" value="m=48edac78-b24a-48ad-8383-c953c8994848,m=a9744af5-a301-4cd9-82f1-a6322382f246"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/C and D" value="go=E,m=99ffe5d2-76e1-47b8-ac64-c14eaf16c3dc,m=032e257d-c814-4046-8809-946e6f3982cd"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/C and D/E" value="go=F and G,m=b10f4467-9cc8-4359-97d7-7139777ece1f"/>
-# <ExtraDataItem name="GUI/GroupDefinitions/C and D/E/F and G" value="m=08ed6d07-8744-4fc7-8740-02e1019dc71a,m=34afeba3-5a63-4a9b-a7fd-eadeacb5b190"/>
                 try:
                     with open( configFile, 'r' ) as f:
                         lines = f.readlines()
@@ -367,39 +358,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return virtualMachines
 
 
-#TODO Delete hopefully
-    def getVirtualMachinesORIGINAL( self ):
-        virtualMachines = [ ]
-        if self.isVBoxManageInstalled():
-            version = self.getVirtualBoxVersion()
-            if version:
-                if version < IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_CHANGEOVER_VERSION:
-                    virtualMachinesFromConfig = self.__getVirtualMachinesFromConfigPriorTo4dot3()
-
-                else:
-                    virtualMachinesFromConfig = self.__getVirtualMachinesFromConfig4dot3OrGreater()
-
-                virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
-                if len( virtualMachinesFromConfig ) == 0: # If the user did not modify VM sort order, there will be no list of VMs in the config file, so use the result from VBoxManage.
-                    virtualMachinesFromConfig = virtualMachinesFromVBoxManage
-
-                # Going forward, the virtual machine infos from the config is the definitive list of VMs (and groups, if any).
-                virtualMachines = virtualMachinesFromConfig
-
-                # The virtual machine infos from the config do not contain the names of virtual machines.
-                # Obtain the names from the virtual machine infos from VBoxManage.
-                for virtualmachineFromVBoxManage in virtualMachinesFromVBoxManage:
-                    for virtualMachine in virtualMachines:
-                        if virtualmachineFromVBoxManage.getUUID() == virtualMachine.getUUID():
-                            virtualMachine.setName( virtualmachineFromVBoxManage.getName() )
-                            break
-
-        return virtualMachines
-
-    # The returned list of virtualmachine.Info objects contains no group information,
-    # nor sort order set by the user in the GUI.
+    # Returns a list of virtualmachine objects from calling VBoxManage.
+    # Contains no group information, nor sort order which is set by the user in the GUI.
     # Safe to call without checking if VBoxManage is installed.
-    def __getVirtualMachinesFromVBoxManage( self ):
+    def getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = [ ]
         result = self.processGet( "VBoxManage list vms" )
         if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
@@ -416,74 +378,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return virtualMachines
 
 
-    def __getVirtualMachinesFromConfig4dot3OrGreater( self ):
-        # The config file may exist in one of two places,
-        # particularly if the user has done an upgrade or uses an older version of Ubuntu.
-        # https://www.virtualbox.org/manual/ch10.html
-        configFile = None #TODO Rename the constants below to be location rather than config.
-        if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER ):
-            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_4_DOT_3_OR_GREATER
-
-        elif os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3 ):
-            configFile = IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION_PRIOR_4_DOT_3
-
-        virtualMachines = [ ]
-        virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage() # Contains no group information, nor sort order.
-        if configFile:
-            try:
-                with open( configFile, "r" ) as f:
-                    content = f.readlines()
-
-                # Parse all group definition tags extracting each group name and contents (which may be group names and/or VMs).
-                groupDefinitions = { }
-                for line in content:
-                    if "\"GUI/GroupDefinitions/" in line:
-                        parts = line.split( "\"" )
-                        groupDefinitions[ parts[ 1 ] ] = parts[ 3 ]
-
-                # Process the top level tag first...
-                i = 0
-                key = "GUI/GroupDefinitions/"
-                if len( groupDefinitions ) > 0 and key in groupDefinitions:
-                    values = groupDefinitions[ key ].split( "," )
-                    for value in values:
-                        if value.startswith( "go=" ):
-                            virtualMachines.insert( i, virtualmachine.Info( key + value.replace( "go=", "" ), True, "", 0 ) )
-
-                        else:
-                            virtualMachines.insert( i, virtualmachine.Info( "", False, value.replace( "m=", "" ), 0 ) )
-
-                        i += 1
-
-                # Now have a list of virtual machine infos containing top level groups and/or VMs.
-                # Process the list and where a group is found, add in its children (groups and/or VMs).
-                i = 0
-                while i < len( virtualMachines ):
-                    if virtualMachines[ i ].isGroup():
-                        indent = virtualMachines[ i ].getIndent() + 1
-                        key = virtualMachines[ i ].getName()
-                        values = groupDefinitions[ key ].split( "," )
-                        j = i + 1
-                        for value in values:
-                            if value.startswith( "go=" ):
-                                virtualMachines.insert( j, virtualmachine.Info( key + "/" + value.replace( "go=", "" ), True, "", indent ) )
-
-                            else:
-                                virtualMachines.insert( j, virtualmachine.Info( "", False, value.replace( "m=", "" ), indent ) )
-
-                            j += 1
-
-                    i += 1
-
-            except Exception as e:
-                self.getLogging().exception( e )
-                virtualMachines = [ ]
-
-        return virtualMachines
-
-
     # Returns the version number as a string or None if no version could be determined.
     # Safe to call without checking if VBoxManage is installed.
+#TODO No longer used...consider deleting.
     def getVirtualBoxVersion( self ):
         result = self.processGet( "VBoxManage --version" )
         if result is None: # If a VM is corrupt/missing, VBoxManage may return a spurious (None) result.
