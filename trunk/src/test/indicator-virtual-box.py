@@ -140,21 +140,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
                 else:
                     self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
-            # if not self.showSubmenu:
-            #     for item in virtualMachines:
-            #         if type( item ) == virtualmachine.Group:
-            #             self.addMenuItemForGroupAndChildrenSubmenu( menu, item, 0 )
-            #
-            #         else:
-            #             self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
-            #
-            # else:
-            #     for item in virtualMachines:
-            #         if type( item ) == virtualmachine.Group:
-            #             self.addMenuItemForGroupAndChildren( menu, item, 0 )
-            #
-            #         else:
-            #             self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
@@ -184,18 +169,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 self.addMenuItemForVirtualMachine( menu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
 
 
-    def addMenuItemForGroupAndChildrenNOTNEEDED( self, menu, group, level ):
-        indent = level * self.indent( 0, 1 )
-        menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
-        menu.append( menuItem )
-        for item in group.getItems():
-            if type( item ) == virtualmachine.Group:
-                self.addMenuItemForGroupAndChildren( menu, item, level + 1 )
-
-            else:
-                self.addMenuItemForVirtualMachine( menu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
-
-
     def addMenuItemForVirtualMachine( self, menu, virtualMachine, level, isRunning ):
         indent = level * self.indent( 0, 1 )
         if isRunning:
@@ -210,7 +183,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def autoStartVirtualMachines( self ):
-        pass #TODO Fix below
+        pass #TODO Fix below...will need to be recursive!
         # for virtualMachine in self.getVirtualMachines():
         #     if self.isAutostart( virtualMachine.getUUID() ):
         #         time.sleep( self.delayBetweenAutoStartInSeconds )
@@ -553,7 +526,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         parent = None
         virtualMachines = self.getVirtualMachines()
         groupsExist = False
-        for virtualMachine in virtualMachines:
+        for virtualMachine in virtualMachines: #TODO Need to change to be recursive...
             while virtualMachine.getIndent() < len( stack ):
                 parent = stack.pop()
 
