@@ -19,12 +19,6 @@
 # Application indicator for VirtualBox™ virtual machines.
 
 
-#TODO Add to changelog that prior to 4.3 support is now gone.
-# Not sure when exactly the changeover occurred.
-# Figure out when the change happened...maybe.
-# At least put something in the changelog about not supporting old format files and locations.
-
-
 #TODO Need to get translation done.
 
 
@@ -57,7 +51,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.66",
+            version = "1.0.67",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -553,7 +547,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 10 )
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
-        self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs (not groups). Key is VM UUID; value is [ autostart (bool), start command (str) ]
+        self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs.  Key is VM UUID; value is [ autostart (bool), start command (str) ]
         self.virtualboxManagerWindowName = config.get( IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME, "Oracle VM VirtualBox Manager" )
 
 
