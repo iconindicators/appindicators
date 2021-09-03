@@ -24,7 +24,6 @@ class VirtualMachine( object ):
     def __init__( self, name, uuid ):
         self.name = name
         self.uuid = uuid
-        # self.indent = indent#TODO Hopefully not needed.
 
 
     def getName( self ): return self.name
@@ -43,7 +42,7 @@ class Group( object ):
 
     def __init__( self, name ):
         self.name = name
-        self.items = [ ]
+        self.items = [ ] # List of virtual machines and/or groups pertaining to this group.
 
 
     def getName( self ): return self.name
