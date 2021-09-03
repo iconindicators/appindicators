@@ -137,23 +137,31 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 # <ExtraDataItem name="GUI/GroupDefinitions/C and D/E" value="go=F and G,m=b10f4467-9cc8-4359-97d7-7139777ece1f"/>
 # <ExtraDataItem name="GUI/GroupDefinitions/C and D/E/F and G" value="m=08ed6d07-8744-4fc7-8740-02e1019dc71a,m=34afeba3-5a63-4a9b-a7fd-eadeacb5b190"/>
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
-            if self.showSubmenu:
-                stack = [ ]
-                currentMenu = menu
-                for virtualMachine in virtualMachines:
-                    while virtualMachine.getIndent() < len( stack ):
-                        currentMenu = stack.pop()
-
-                    if virtualMachine.isGroup():
-                        menuItem = Gtk.MenuItem.new_with_label( self.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
-                        currentMenu.append( menuItem )
-                        subMenu = Gtk.Menu()
-                        menuItem.set_submenu( subMenu )
-                        stack.append( currentMenu )
-                        currentMenu = subMenu
+            if not self.showSubmenu:
+                for item in virtualMachines:
+                    if type( item ) == virtualmachine.Group:
+                        self.addMenuItemForGroupAndChildrenSubmenu( menu, item, 0 )
 
                     else:
-                        currentMenu.append( self.addMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
+                        self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs )
+
+                #
+                # stack = [ ]
+                # currentMenu = menu
+                # for virtualMachine in virtualMachines:
+                #     while virtualMachine.getIndent() < len( stack ):
+                #         currentMenu = stack.pop()
+                #
+                #     if virtualMachine.isGroup():
+                #         menuItem = Gtk.MenuItem.new_with_label( self.indent( 0, virtualMachine.getIndent() ) + virtualMachine.getGroupName() )
+                #         currentMenu.append( menuItem )
+                #         subMenu = Gtk.Menu()
+                #         menuItem.set_submenu( subMenu )
+                #         stack.append( currentMenu )
+                #         currentMenu = subMenu
+                #
+                #     else:
+                #         currentMenu.append( self.addMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
 
             else:
                 level = 0
@@ -172,12 +180,24 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.secondaryActivateTarget = menuItem
 
 
-#TODO Should this be add group to menu
-# If so, the create menu item function should be similar (pass in the menu)?
-# If not, ...not sure!
+    def addMenuItemForGroupAndChildrenSubmenu( self, menu, group, level ):
+        indent = level * self.indent( 0, 1 )
+        menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
+        menu.append( menuItem )
+        subMenu = Gtk.Menu()
+        menuItem.set_submenu( subMenu )
+        for item in group.getItems():
+            if type( item ) == virtualmachine.Group:
+                self.addMenuItemForGroupAndChildrenSubmenu( subMenu, item, level + 1 )
+
+            else:
+                self.addMenuItemForVirtualMachine( subMenu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
+
+
     def addMenuItemForGroupAndChildren( self, menu, group, level ):
         indent = level * self.indent( 0, 1 )
-        menu.append( Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
+        menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
+        menu.append( menuItem )
         for item in group.getItems():
             if type( item ) == virtualmachine.Group:
                 self.addMenuItemForGroupAndChildren( menu, item, level + 1 )
