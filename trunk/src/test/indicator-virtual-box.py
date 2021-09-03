@@ -153,7 +153,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                         currentMenu = subMenu
 
                     else:
-                        currentMenu.append( self.createMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
+                        currentMenu.append( self.addMenuItemForVirtualMachine( virtualMachine, self.indent( 0, virtualMachine.getIndent() ), virtualMachine.getUUID() in runningVMUUIDs ) )
 
             else:
                 level = 0
@@ -162,7 +162,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                         self.addMenuItemForGroupAndChildren( menu, item, level )
 
                     else:
-                        menu.append( self.createMenuItemForVirtualMachine( item, level, item.getUUID() in runningVMUUIDs ) )
+                        self.addMenuItemForVirtualMachine( menu, item, level, item.getUUID() in runningVMUUIDs )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -183,10 +183,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 self.addMenuItemForGroupAndChildren( menu, item, level + 1 )
 
             else:
-                menu.append( self.createMenuItemForVirtualMachine( item, level + 1, False ) )#TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
+                self.addMenuItemForVirtualMachine( menu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
 
 
-    def createMenuItemForVirtualMachine( self, virtualMachine, level, isRunning ):
+    def addMenuItemForVirtualMachine( self, menu, virtualMachine, level, isRunning ):
         indent = level * self.indent( 0, 1 )
         if isRunning:
             menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
@@ -196,7 +196,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )
 
         menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() )
-        return menuItem
+        menu.append( menuItem )
 
 
     def autoStartVirtualMachines( self ):
