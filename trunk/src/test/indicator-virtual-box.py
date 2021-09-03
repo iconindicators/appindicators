@@ -20,6 +20,7 @@
 
 
 #TODO Add to changelog that prior to 4.3 support is now gone.
+# Should I put back the method for pre-4.3 support of config files?
 
 
 INDICATOR_NAME = "indicator-virtual-box"
@@ -82,7 +83,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def buildMenu( self, menu ):
-        virtualMachines = self.getVirtualMachines()
+        virtualMachines = self.getVirtualMachines()  #TODO Maybe pass this in...so it can be passed in to the autostart function too; otherwise it's called twice.
         if virtualMachines: #TODO Check this works for empty VMs.
             runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
             for item in virtualMachines:
@@ -317,10 +318,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
             for line in result.splitlines():
                 try:
-                    info = line[ 1 : -1 ].split( "\" {" )
-                    name = info[ 0 ]
-                    uuid = info[ 1 ]
-                    virtualMachines.append( virtualmachine.VirtualMachine( name, uuid ) )
+                    nameAndUUID = line[ 1 : -1 ].split( "\" {" )
+                    virtualMachines.append( virtualmachine.VirtualMachine( nameAndUUID[ 0 ], nameAndUUID[ 1 ] ) )
 
                 except Exception:
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
