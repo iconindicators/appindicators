@@ -269,9 +269,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     for line in lines:
                         if "GUI/GroupDefinitions/" in line:
                             parts = line.split( "\"" )
-
-#TODO Can the if clause be made to resemble the else clause and so combine into one chunk of code?                            
-                            if parts[ 1 ] == "GUI/GroupDefinitions/": # Top level...
+                            if parts[ 1 ] == "GUI/GroupDefinitions/": # Top level groups/VMs...add to list.
+#TODO COnsider creating a group to start with and add all top level items to it.
+# At the end of this function, return the top level group's items.
+# Then can these two sections be combined?
                                 groupNamesAndUUIDs = parts[ 3 ].split( ',' )
                                 for item in groupNamesAndUUIDs:
                                     if item.startswith( "go=" ):
@@ -282,7 +283,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                                         name = next( x for x in virtualMachinesFromVBoxManage if x.getUUID() == uuid ).getName()
                                         virtualMachines.append( virtualmachine.VirtualMachine( name, uuid ) )
 
-                            else: # Groups...
+                            else: # Subsequent groups and groups/VMs within...
                                 path = parts[ 1 ].split( '/' )[ 2 : ]
                                 groupItems = virtualMachines
                                 for groupName in path:
