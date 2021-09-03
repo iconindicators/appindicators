@@ -371,7 +371,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         tree.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
         tree.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
         tree.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        tree.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         tree.connect( "row-activated", self.onVirtualMachineDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -463,7 +463,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter:
-            isVirtualMachine = store[ treeiter ][ 3 ] != "" # UUID is not empty, so this is a VM and not a group.
+            isVirtualMachine = store[ treeiter ][ 3 ] # UUID is not None, so this is a VM and not a group.
             isAutostart = store[ treeiter ][ 1 ] == "gtk-apply"
             isDefaultStartCommand = store[ treeiter ][ 2 ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( isVirtualMachine and isAutostart ) or ( isVirtualMachine and not isDefaultStartCommand ): # Only record VMs with different settings to default.
@@ -478,7 +478,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def onVirtualMachineDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
-        if treeiter and model[ treeiter ][ 3 ] != "":
+        if treeiter and model[ treeiter ][ 3 ]:
             self.editVirtualMachine( tree, model, treeiter )
 
 
