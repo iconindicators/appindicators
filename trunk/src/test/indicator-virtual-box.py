@@ -347,142 +347,21 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         notebook = Gtk.Notebook()
 
         # List of VMs.
-        stack = [ ]
-        store = Gtk.TreeStore( str, str, str, str ) # Group, virtual machine name, autostart, start command.
-        groupsExist = False
-
         def addItemsToStore( parent, items ):
+            groupsExist = False
             for item in items:
                 if type( item ) == virtualmachine.Group:
-                    groupsExist = True # TODO This is not being set...scope problem?
-                    addItemsToStore( store.append( parent, [ item.getName(), "", None, None ] ), item.getItems() )
+                    groupsExist = True
+                    addItemsToStore( store.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
     
                 else:
                     uuid = item.getUUID()        
-                    store.append( parent, [ "", item.getName(), Gtk.STOCK_APPLY if self.isAutostart( uuid ) else None, self.getStartCommand( uuid ) ] ) #TODO Not sure if should be "" or None.
+                    store.append( parent, [ item.getName(), Gtk.STOCK_APPLY if self.isAutostart( uuid ) else None, self.getStartCommand( uuid ), uuid ] )
 
-        addItemsToStore( None, self.getVirtualMachines() )
+            return groupsExist
 
-        tree = Gtk.TreeView.new_with_model( store )
-        tree.expand_all()
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = 1 ) )
-        tree.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 2 ) )
-        tree.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 3 ) )
-        tree.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onVirtualMachineDoubleClick )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( tree )
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-
-        notebook.append_page( scrolledWindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
-
-        # General settings.
-        grid = self.createGrid()
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )
-
-        label = Gtk.Label.new( _( "VirtualBox™ Manager" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
-        windowName = Gtk.Entry()
-        windowName.set_tooltip_text( _( \
-            "The name (window title) of VirtualBox™ Manager.\n" + \
-            "You may have to adjust for your local language." ) )
-        windowName.set_text( self.virtualboxManagerWindowName )
-        box.pack_start( windowName, True, True, 0 )
-
-        grid.attach( box, 0, 0, 1, 1 )
-
-        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show groups as submenus" ) )
-        showAsSubmenusCheckbox.set_tooltip_text( _(
-            "If checked, groups are shown using submenus.\n\n" + \
-            "Otherwise groups are shown as an indented list." ) )
-        showAsSubmenusCheckbox.set_active( self.showSubmenu )
-
-        row = 1
-        if groupsExist:
-            print( groupsExist)
-            grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
-            row += 1
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
-
-        spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
-        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to explicitly set.
-        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of virtual machines\nand running status are updated." ) )
-
-        box.pack_start( spinnerRefreshInterval, False, False, 0 )
-
-        grid.attach( box, 0, row, 1, 1 )
-        row += 1
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False, False, 0 )
-
-        spinnerDelay = Gtk.SpinButton()
-        spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
-        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to explicitly set.
-        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically\nstarting one virtual machine to the next." ) )
-
-        box.pack_start( spinnerDelay, False, False, 0 )
-
-        grid.attach( box, 0, row, 1, 1 )
-        row += 1
-
-        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
-
-        dialog.vbox.pack_start( notebook, True, True, 0 )
-        dialog.show_all()
-
-        responseType = dialog.run()
-        if responseType == Gtk.ResponseType.OK:
-            self.virtualboxManagerWindowName = windowName.get_text().strip()
-            self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
-            self.showSubmenu = showAsSubmenusCheckbox.get_active()
-            self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
-            self.virtualMachinePreferences.clear()
-            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
-
-        return responseType
-
-
-    def onPreferencesORIGINAL( self, dialog ):
-        notebook = Gtk.Notebook()
-
-        # List of VMs.
-        stack = [ ]
-        store = Gtk.TreeStore( str, str, str, str ) # Name of VM/Group, tick icon (Gtk.STOCK_APPLY) or None for autostart of VM, VM start command, UUID.
-        parent = None
-        virtualMachines = self.getVirtualMachines()
-        groupsExist = False
-        for virtualMachine in virtualMachines: #TODO Need to change to be recursive...
-            while virtualMachine.getIndent() < len( stack ):
-                parent = stack.pop()
-
-            if virtualMachine.isGroup():
-                groupsExist = True
-                stack.append( parent )
-                parent = store.append( parent, [ virtualMachine.getGroupName(), None, "", virtualMachine.getUUID() ] )
-
-            else:
-                autoStart = None
-                if self.isAutostart( virtualMachine.getUUID() ):
-                    autoStart = Gtk.STOCK_APPLY
-
-                store.append( parent, [ virtualMachine.getName(), autoStart, self.getStartCommand( virtualMachine.getUUID() ), virtualMachine.getUUID() ] )
+        store = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
+        groupsExist = addItemsToStore( None, self.getVirtualMachines() )
 
         tree = Gtk.TreeView.new_with_model( store )
         tree.expand_all()
@@ -539,7 +418,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         spinnerRefreshInterval = Gtk.SpinButton()
         spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to explicitly set.
-        spinnerRefreshInterval.set_tooltip_text( _( "How often the list of virtual machines\nand running status are updated." ) )
+        spinnerRefreshInterval.set_tooltip_text( _(
+            "How often the list of virtual machines\n" + \
+            "and running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
@@ -554,7 +435,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         spinnerDelay = Gtk.SpinButton()
         spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
         spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to explicitly set.
-        spinnerDelay.set_tooltip_text( _( "Amount of time to wait from automatically\nstarting one virtual machine to the next." ) )
+        spinnerDelay.set_tooltip_text( _(
+            "Amount of time to wait from automatically\n" + \
+            "starting one virtual machine to the next." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
 
