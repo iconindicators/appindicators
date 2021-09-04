@@ -845,6 +845,10 @@ class IndicatorBase( ABC ):
             subprocess.call( command, shell = True )
 
         except subprocess.CalledProcessError as e:
+#TODO Check who calls this function...
+# The CalledProcessError is triggered when a non-zero exit code arises.
+# So what to do...?  Maybe have an argument to ignore the exit code?
+# This works for when grepping for VBoxManage and no result comes back (but get an exit code of 1).
             self.getLogging().error( e )
             pass
 
@@ -856,6 +860,10 @@ class IndicatorBase( ABC ):
             result = subprocess.check_output( command, shell = True, universal_newlines = True )
 
         except subprocess.CalledProcessError as e:
+#TODO Check who calls this function...
+# The CalledProcessError is triggered when a non-zero exit code arises.
+# So what to do...?  Maybe have an argument to ignore the exit code?
+# This works for when grepping for VBoxManage and no result comes back (but get an exit code of 1).
             self.getLogging().error( e )
             result = None
 
