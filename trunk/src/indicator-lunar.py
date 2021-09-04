@@ -20,6 +20,9 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -245,6 +248,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.nextDownloadTimeMinorPlanetUnusual = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
+#TODO Use a definition for the indices below.
         self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME, utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
         self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
         self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 1 ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
@@ -360,6 +364,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __processTags( self, textToProcess, arguments ):
         text = textToProcess
         for key in self.data.keys(): # Substitute data tags '[' and ']' for values.
+#TODO Use a definition for the indices.
             if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in text:
                 text = text.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
 
@@ -1174,6 +1179,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
+#TODO Define column definitions rather than using integers.
         treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore )
@@ -1501,7 +1507,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", toggleCheckbox, listStore )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) #TODO Use column definition.
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, listStore )
         tree.append_column( treeViewColumn )
