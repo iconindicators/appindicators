@@ -31,6 +31,9 @@
     # https://www.tide-forecast.com/
 
 
+#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
