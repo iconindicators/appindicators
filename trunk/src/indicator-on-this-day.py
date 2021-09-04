@@ -19,6 +19,9 @@
 # Application indicator which displays calendar events.
 
 
+#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
+
+
 INDICATOR_NAME = "indicator-on-this-day"
 import gettext
 gettext.install( INDICATOR_NAME )
