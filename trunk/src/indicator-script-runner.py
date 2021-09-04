@@ -25,7 +25,10 @@
 #Place a log file in the home directory.
 # Wait for a sound/notification.
 # Remove the log file...sound and notification keeps happening!
-
+#
+# The cached result of the log file script is simply resused when the next update cycle happens
+# (and it is not yet time to re-run the script to get a new value).
+# So what to do...?
 
 
 INDICATOR_NAME = "indicator-script-runner"
