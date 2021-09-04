@@ -31,6 +31,10 @@
 # So what to do...?
 
 
+#TODO Document and/or use definition for the indices.
+
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
