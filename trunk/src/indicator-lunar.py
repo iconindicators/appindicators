@@ -284,6 +284,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             dataType = orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
             magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
+#TODO Document and/or use definition for the indices.
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ 0 ],

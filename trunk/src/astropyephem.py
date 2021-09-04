@@ -959,6 +959,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
 
 
+#TODO Document and/or use definition for the indices.
     @staticmethod
     def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
                                                       float( _city_data.get( city )[ 1 ] ), \
@@ -1136,6 +1137,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                     earthSatellite.compute( city )
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
+#TODO Document and/or use definition for the indices.
                         nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
                         if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
@@ -1164,6 +1166,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
     def __calculateNextSatellitePass( city, satellite ):
+#TODO Document and/or use definition for the indices.
         version = int( ephem.__version__.split( '.' )[ 2 ] )
         if version <= 6:
             nextPass = city.next_pass( satellite )
@@ -1184,6 +1187,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    Transit time exceeds set time.
     @staticmethod
     def __isSatellitePassValid( satellitePass ):
+#TODO Document and/or use definition for the indices.
         return satellitePass and \
                len( satellitePass ) == 6 and \
                satellitePass[ 0 ] and \

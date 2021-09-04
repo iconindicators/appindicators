@@ -50,6 +50,7 @@ def getEclipse( dateTimeUTC, isLunar ):
 
     eclipseInfo = None
     for eclipse in eclipseData:
+#TODO Document and/or use definition for the indices.
         dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
         dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) ) # Need to subtract delta T (https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
         if dateTimeUTC.timestamp() <= dateTime.timestamp():

@@ -717,6 +717,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     def getCredit(): return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
 
 
+#TODO Document and/or use definition for the indices.
     @staticmethod
     def getLatitudeLongitudeElevation( city ): return AstroSkyfield._city_data.get( city )[ 0 ], \
                                                       AstroSkyfield._city_data.get( city )[ 1 ], \
@@ -812,6 +813,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( utcNow, utcNowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
+#TODO Document and/or use definition for the indices.
         nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ] # New moon.
         nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ] # Full moon.
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
@@ -852,6 +854,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             t, y = almanac.find_discrete( utcNow, utcNowPlusSevenMonths, almanac.seasons( ephemerisPlanets ) )
             t = t.utc_datetime()
+#TODO Document and/or use definition for the indices.
             if almanac.SEASON_EVENTS[ 0 ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ 2 ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
@@ -966,6 +969,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( utcNow, utcNowPlusOneDay, almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
+#TODO Document and/or use definition for the indices.
             if y[ 0 ]:
                 riseDateTime = t[ 0 ]
                 setDateTime = t[ 1 ]
