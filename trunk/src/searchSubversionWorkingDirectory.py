@@ -20,6 +20,7 @@ def runCommand( cmd ): return subprocess.check_output( cmd.split(), universal_ne
 print( "May first need to run from a terminal\n" )
 print( "\tsvn info " + fullPathToFile + "\n" )
 
+#TODO Document and/or use definition for the indices.
 
 latestRevision = runCommand( "svn info " + fullPathToFile ).partition( "Revision: ")[ 2 ].partition( "\n" )[ 0 ]
 print( "File to check: " + fullPathToFile )

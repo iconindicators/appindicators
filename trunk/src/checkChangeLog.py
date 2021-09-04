@@ -38,6 +38,7 @@ for changeLog in changeLogs:
                     dateTime = line[ line.find( ">" ) + 1 : ].strip()
                     dateTimeObject = datetime.strptime( dateTime, "%a, %d %b %Y %H:%M:%S %z" )
                     dates.append( dateTimeObject )
+#TODO Document and/or use definition for the indices.
 
                 if line.startswith( "indicator-" ):
                     releaseNumbers.append( line.split( '(' )[ 1 ].split( ')' )[ 0 ] )
