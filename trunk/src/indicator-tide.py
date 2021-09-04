@@ -107,6 +107,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
             return self.getNextUpdateTimeInSeconds( tidalReadings )
 
+#TODO Document and/or use definition for the indices.
 
     def buildMenu( self, menu, tidalReadings ):
         menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
@@ -360,6 +361,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         if responseType == Gtk.ResponseType.OK:
             country = countriesComboBox.get_active_text()
             model, treeiter = portsTree.get_selection().get_selected()
+#TODO Document and/or use definition for the indices.
             port = model[ treeiter ][ 0 ]
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
@@ -466,6 +468,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                         utcOffset = line[ line.index( "are" ) + 4 : line.index( "hour" ) - 1 ]
                         if len( utcOffset ) == 3: # Example: "Port predictions (Standard Local Time) are +10 hours from UTC"
                             utcOffset += "00"
+#TODO Document and/or use definition for the indices.
 
                         else:
                             utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # Example: "Port predictions (Standard Local Time) are -3 hours from UTC"
