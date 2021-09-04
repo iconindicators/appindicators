@@ -81,7 +81,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def buildMenu( self, menu, virtualMachines ):
-        if virtualMachines: #TODO Check this works for empty VMs.
+        if virtualMachines:
             runningNames, runningUUIDs = self.getRunningVirtualMachines()
             for item in virtualMachines:
                 if type( item ) == virtualmachine.Group:
