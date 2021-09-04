@@ -47,6 +47,12 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     VIRTUAL_BOX_CONFIGURATION = os.getenv( "HOME" ) + "/.config/VirtualBox/VirtualBox.xml"
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
+    # Data model columns used in the Preferences dialog.
+    COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME = 0 # Either the group or name of the virtual machine.
+    COLUMN_AUTOSTART = 1 # Icon name for the APPLY icon when the virtual machine is to autostart; None otherwise.
+    COLUMN_START_COMMAND = 2 # Start command for the virtual machine.
+    COLUMN_UUID = 3 # The UUID for the virtual machine (used to identify; not displayed).
+
 
     def __init__( self ):
         super().__init__(
@@ -103,8 +109,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def addMenuItemForGroupAndChildren( self, menu, group, level, runningUUIDs ):
         indent = level * self.indent( 0, 1 )
-        # menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
-        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
+        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
         menu.append( menuItem )
 
         if self.showSubmenu:
@@ -368,9 +373,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         treeView.expand_all()
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
-        treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = 0 ) )
-        treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ) )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorVirtualBox.COLUMN_AUTOSTART ) )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_START_COMMAND ) )
         treeView.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeView.connect( "row-activated", self.onVirtualMachineDoubleClick )
@@ -465,11 +470,11 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 #TODO Check this for correctness.
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter:
-            isVirtualMachine = store[ treeiter ][ 3 ] # UUID is not None, so this is a VM and not a group.
-            isAutostart = store[ treeiter ][ 1 ] == "gtk-apply"
-            isDefaultStartCommand = store[ treeiter ][ 2 ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+            isVirtualMachine = store[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ] # UUID is not None, so this is a VM and not a group.
+            isAutostart = store[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == "gtk-apply"
+            isDefaultStartCommand = store[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( isVirtualMachine and isAutostart ) or ( isVirtualMachine and not isDefaultStartCommand ): # Only record VMs with different settings to default.
-                self.virtualMachinePreferences[ store[ treeiter ][ 3 ] ] = [ store[ treeiter ][ 1 ] == "gtk-apply", store[ treeiter ][ 2 ] ]
+                self.virtualMachinePreferences[ store[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ] ] = [ store[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == "gtk-apply", store[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
 
             if store.iter_has_child( treeiter ):
                 childiter = store.iter_children( treeiter )
@@ -480,7 +485,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def onVirtualMachineDoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
-        if treeiter and model[ treeiter ][ 3 ]:
+        if treeiter and model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]:
             self.editVirtualMachine( tree, model, treeiter )
 
 
@@ -494,8 +499,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         startCommand = Gtk.Entry()
         startCommand.set_width_chars( 20 )
         if model[ treeiter ][ 2 ]:
-            startCommand.set_text( model[ treeiter ][ 2 ] )
-            startCommand.set_width_chars( len( model[ treeiter ][ 2 ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
+            startCommand.set_text( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] )
+            startCommand.set_width_chars( len( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
 
         startCommand.set_tooltip_text( _(
             "The terminal command to start the virtual machine such as\n\n" + \
@@ -507,7 +512,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-        autostartCheckbox.set_active( model[ treeiter ][ 1 ] is not None and model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+        autostartCheckbox.set_active( model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         dialog = self.createDialog( tree, _( "Virtual Machine Properties" ), grid )
@@ -540,11 +545,11 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
             # So this is the workaround...
             if autostartCheckbox.get_active():
-                model.set_value( treeiter, 1, Gtk.STOCK_APPLY )
-                model[ treeiter ][ 2 ] = startCommand.get_text().strip()
+                model.set_value( treeiter, 1, Gtk.STOCK_APPLY ) #TODO Not sure if the 1 should be IndicatorVirtualBox.COLUMN_AUTOSTART
+                model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = startCommand.get_text().strip()
 
             else:
-                model.insert_after( None, treeiter, [ model[ treeiter ][ 0 ], None, startCommand.get_text().strip(), model[ treeiter ][ 3 ] ] )
+                model.insert_after( None, treeiter, [ model[ treeiter ][ IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ], None, startCommand.get_text().strip(), model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ] ] )
                 model.remove( treeiter )
 
             break
