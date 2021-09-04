@@ -29,9 +29,6 @@
 # https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
 
 
-#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
-
-
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
@@ -73,7 +70,8 @@ class IndicatorBase( ABC ):
         self.log = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
         self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
-        self.authors = [ "Bernard Giannetti" + " " + self.website ]
+        self.copyrightName = "Bernard Giannetti"
+        self.authors = [ self.copyrightName + " " + self.website ]
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
         self.debug = debug
@@ -123,7 +121,7 @@ class IndicatorBase( ABC ):
 
         if self.debug:
             nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
-            menu.prepend( Gtk.MenuItem.new_with_label( "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] ) )
+            menu.prepend( Gtk.MenuItem.new_with_label( "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] ) ) # Remove fractional seconds.
 
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
@@ -237,7 +235,7 @@ class IndicatorBase( ABC ):
 
         copyrightText = "Copyright \xa9 " + \
                         self.copyrightStartYear + "-" + str( datetime.datetime.now().year ) + " " + \
-                        self.authors[ 0 ].rsplit( ' ', 1 )[ 0 ]
+                        self.copyrightName
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -562,6 +560,7 @@ class IndicatorBase( ABC ):
 
     def listOfListsToListStore( self, listofLists ):
         types = [ ]
+#TODO See Indicator Lunar...figure out what the loop is doing and document the function and the two '0' indices.
         for item in listofLists[ 0 ]:
             types.append( type( item[ 0 ] ) )
 
