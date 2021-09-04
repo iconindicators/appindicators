@@ -172,6 +172,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             else:
                 line = line.split( "\t" ) # This is a regular line with the month/day separated by TAB from the event.
+#TODO Document and/or use definition for the indices.
                 date = line[ 0 ].replace( "*", "" ).strip()
                 description = line[ -1 ].strip() # Take the last element as there may be more than one TAB character throwing out the index of the event in the line.
                 events.append( Event( date, description ) )
@@ -346,6 +347,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             self.calendars = [ ]
             treeiter = store.get_iter_first()
+#TODO Document and/or use definition for the indices.
             while treeiter != None:
                 if store[ treeiter ][ 1 ]:
                     self.calendars.append( store[ treeiter ][ 0 ] )
@@ -392,6 +394,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         if treeiter is None:
             self.showMessage( treeView, _( "No calendar has been selected." ) )
 
+#TODO Document and/or use definition for the indices.
         elif model[ treeiter ][ 0 ] in self.getCalendars():
             self.showMessage( treeView, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.WARNING )
 
@@ -408,6 +411,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         if rowNumber is None: # This is an add.
             isSystemCalendar = False
 
+#TODO Document and/or use definition for the indices.
         else: # This is an edit.
             isSystemCalendar = model[ treeiter ][ 0 ] in self.getCalendars()
 
@@ -420,6 +424,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         fileEntry = Gtk.Entry()
         fileEntry.set_editable( False )
 
+#TODO Document and/or use definition for the indices.
         if rowNumber: # This is an edit.
             fileEntry.set_text( model[ treeiter ][ 0 ] )
             fileEntry.set_width_chars( len( fileEntry.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
@@ -449,6 +454,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             enabledCheckbox.set_active( True )
 
         else:
+#TODO Document and/or use definition for the indices.
             enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 1, 1, 1 )
