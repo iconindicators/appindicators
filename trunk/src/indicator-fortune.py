@@ -50,6 +50,10 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
 
+    # Data model columns used in the Preferences dialog.
+    COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
+    COLUMN_ENABLED = 1 # Icon name for the APPLY icon when the fortune is enabled; None otherwise.
+
 
     def __init__( self ):
         super().__init__(
@@ -215,11 +219,11 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = 0 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = IndicatorFortune.COLUMN_FILE_OR_DIRECTORY )
         treeViewColumn.set_sort_column_id( 0 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorFortune.COLUMN_ENABLED )
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
@@ -353,11 +357,11 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
             while treeiter != None:
-                if store[ treeiter ][ 1 ] == Gtk.STOCK_APPLY:
-                    self.fortunes.append( [ store[ treeiter ][ 0 ], True ] )
+                if store[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY:
+                    self.fortunes.append( [ store[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ], True ] )
 
                 else:
-                    self.fortunes.append( [ store[ treeiter ][ 0 ], False ] )
+                    self.fortunes.append( [ store[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ], False ] )
 
                 treeiter = store.iter_next( treeiter )
 
@@ -376,7 +380,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         if treeiter is None:
             self.showMessage( treeView, _( "No fortune has been selected for removal." ) )
 
-        elif model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE:
+        elif model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE:
             self.showMessage( treeView, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.WARNING )
 
         elif self.showOKCancel( treeView, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
@@ -400,7 +404,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         fortuneFileDirectory.set_hexpand( True )
 
         if rowNumber: # This is an edit.
-            fortuneFileDirectory.set_text( model[ treeiter ][ 0 ] )
+            fortuneFileDirectory.set_text( model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
             fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
         fortuneFileDirectory.set_tooltip_text( _(
@@ -419,7 +423,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         isSystemFortune = False # This is an add.
         if rowNumber: # This is an edit.
-            isSystemFortune = model[ treeiter ][ 0 ] == IndicatorFortune.DEFAULT_FORTUNE
+            isSystemFortune = model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE
 
         browseFileButton = Gtk.Button.new_with_label( _( "File" ) )
         browseFileButton.set_sensitive( not isSystemFortune )
@@ -464,7 +468,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         enabledCheckbox.set_active( True ) # This is an add.
         if rowNumber: # This is an edit.
-            enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+            enabledCheckbox.set_active( model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
@@ -509,7 +513,7 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ 0 ] ):
+                if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] ):
                     self.showMessage( dialog, _( "The fortune is part of your system and is already included." ), Gtk.MessageType.INFO )
 
                 else:
