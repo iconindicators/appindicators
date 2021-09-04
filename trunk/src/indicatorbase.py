@@ -29,6 +29,9 @@
 # https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
 
 
+#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
+
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
