@@ -246,6 +246,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             url += ppaUser + "/+archive/ubuntu/" + ppaName
             if widget.props.name != widget.get_label(): # Use the menu item label to specify the package name.
                 url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter="
+#TODO Document and/or use definition for the indices.
 
         else:
             ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
@@ -257,6 +258,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
             else: # Use the menu item label to specify the package name.
                 url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter=" + series
+#TODO Document and/or use definition for the indices.
 
         webbrowser.open( url )
 
@@ -626,6 +628,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas = [ ]
             treeiter = ppaStore.get_iter_first()
             while treeiter != None:
+#TODO Document and/or use definition for the indices.
                 self.ppas.append(
                     PPA(
                         ppaStore[ treeiter ][ 0 ],
@@ -639,6 +642,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.filters = Filters()
             treeiter = filterStore.get_iter_first()
             while treeiter != None:
+#TODO Document and/or use definition for the indices.
                 self.filters.addFilter(
                     filterStore[ treeiter ][ 0 ],
                     filterStore[ treeiter ][ 1 ],
@@ -675,6 +679,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         if len( model ) > 0:
             ppaUsers = [ ]
+#TODO Document and/or use definition for the indices.
             for row in range( len( model ) ):
                 if model[ row ][ 0 ] not in ppaUsers:
                     ppaUsers.append( model[ row ][ 0 ] )
@@ -685,6 +690,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for item in ppaUsers:
                 ppaUser.append_text( item )
 
+#TODO Document and/or use definition for the indices.
             if rowNumber:
                 ppaUser.set_active( ppaUsers.index( model[ treeiter ][ 0 ] ) ) # This is an edit.
 
@@ -701,6 +707,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         if len( model ) > 0:
             ppaNames = [ ]
+#TODO Document and/or use definition for the indices.
             for row in range( len( model ) ):
                 if model[ row ][ 1 ] not in ppaNames:
                     ppaNames.append( model[ row ][ 1 ] )
@@ -711,6 +718,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             for item in ppaNames:
                 ppaName.append_text( item )
 
+#TODO Document and/or use definition for the indices.
             if rowNumber:
                 ppaName.set_active( ppaNames.index( model[ treeiter ][ 1 ] ) ) # This is an edit.
 
@@ -727,6 +735,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for item in IndicatorPPADownloadStatistics.SERIES:
             series.append_text( item )
 
+#TODO Document and/or use definition for the indices.
         if rowNumber:
             series.set_active( IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ 2 ] ) )
 
@@ -743,6 +752,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
             architectures.append_text( item )
 
+#TODO Document and/or use definition for the indices.
         if rowNumber:
             architectures.set_active( IndicatorPPADownloadStatistics.ARCHITECTURES.index( model[ treeiter ][ 3 ] ) )
 
@@ -784,6 +794,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                         dataHasBeenChanged = True
 
                     else: # Doing an edit, so check to see if there the data has actually been changed...
+#TODO Document and/or use definition for the indices.
                         dataHasBeenChanged = not ( \
                             ppaUserValue == model[ treeiter ][ 0 ] and \
                             ppaNameValue == model[ treeiter ][ 1 ] and \
@@ -792,6 +803,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                     if dataHasBeenChanged:
                         duplicate = False
+#TODO Document and/or use definition for the indices.
                         for row in range( len( model ) ):
                             if ppaUserValue == model[ row ][ 0 ] and \
                                ppaNameValue == model[ row ][ 1 ] and \
@@ -835,6 +847,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
             ppaUsersNames = [ ]
             for ppa in range( len( ppaTree.get_model() ) ):
+#TODO Document and/or use definition for the indices.
                 ppaUserName = ppaTree.get_model()[ ppa ][ 0 ] + " | " + ppaTree.get_model()[ ppa ][ 1 ]
                 if not ppaUserName in ppaUsersNames:
                     ppaUsersNames.append( ppaUserName )
@@ -860,6 +873,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         if rowNumber is None: # Adding
             temp = [ ] # Used to ensure duplicates are not added.
             for ppa in range( len( ppaTreeModel ) ): # List of PPA User/Names from the list of PPAs in the preferences.
+#TODO Document and/or use definition for the indices.
                 ppaUserName = ppaTreeModel[ ppa ][ 0 ] + " | " + ppaTreeModel[ ppa ][ 1 ]
                 if ppaUserName in temp:
                     continue
@@ -867,6 +881,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                 # Ensure the PPA User/Name is not present in the list of filters in the preferences.
                 inFilterList = False
                 for theFilter in range( len( filterTreeModel ) ):
+#TODO Document and/or use definition for the indices.
                     if ppaUserName in filterTreeModel[ theFilter ][ 0 ]:
                         inFilterList = True
                         break
@@ -876,6 +891,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                     temp.append( ppaUserName )
 
         else:
+#TODO Document and/or use definition for the indices.
             ppaUsersNames.append_text( filterTreeModel[ filterTreeIter ][ 0 ] )
 
         ppaUsersNames.set_hexpand( True )
@@ -906,6 +922,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "cards are not accepted!" ) )
 
         if rowNumber:
+#TODO Document and/or use definition for the indices.
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ 1 ] ) # This is an edit.
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -954,6 +971,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.ppas = [ ]
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
+#TODO Document and/or use definition for the indices.
                 self.ppas.append( PPA( ppa[ 0 ], ppa[ 1 ], ppa[ 2 ], ppa[ 3 ] ) )
             
             PPA.sort( self.ppas )
@@ -961,6 +979,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
             for theFilter in filters:
+#TODO Document and/or use definition for the indices.
                 self.filters.addFilter( theFilter[ 0 ], theFilter[ 1 ], theFilter[ 2 ], theFilter[ 3 ], theFilter[ 4 ] )
 
         else:

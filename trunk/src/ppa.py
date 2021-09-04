@@ -174,6 +174,7 @@ class Filters( object ):
         for key in sorted( self.filters.keys() ):
             keyComponents = key.split( " | " )
             yield keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
+#TODO Document and/or use definition for the indices.
 
 
     def __getKey( self, user, name, series, architecture ):
