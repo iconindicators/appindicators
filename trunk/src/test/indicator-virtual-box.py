@@ -202,9 +202,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     # It is assumed that VirtualBox is installed!
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         runningNames, runningUUIDs = self.getRunningVirtualMachines()
-        if len( runningUUIDs ) > 0: #TODO Test if we can instead use "if runningUUIDs:"
+        if runningUUIDs:
             if self.scrollUUID is None or self.scrollUUID not in runningUUIDs:
-                self.scrollUUID = runningUUIDs[ 0 ] #TODO What is this index?  DOcument.
+                self.scrollUUID = runningUUIDs[ 0 ]
 
             if scrollDirection == Gdk.ScrollDirection.UP:
                 index = ( runningUUIDs.index( self.scrollUUID ) + 1 ) % len( runningUUIDs )
