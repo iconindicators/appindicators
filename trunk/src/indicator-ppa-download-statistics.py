@@ -19,6 +19,9 @@
 # Application indicator which displays PPA download statistics.
 
 
+#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
+
+
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
