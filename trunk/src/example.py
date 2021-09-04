@@ -27,16 +27,18 @@ print( "UTC now:", utcNow, "\n" )
 
 #TODO Document and/or use definition for the indices.
 
-stardateClassic = stardate.getStardateClassic( utcNow )
-print( "'classic' Stardate (issue, integer, fraction, fractionalPeriod):", stardateClassic )
-print( "'classic' Stardate (as string):", stardate.toStardateString( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ], True, False ) )
+stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( utcNow )
+print( "'classic' Stardate (issue, integer, fraction, fractionalPeriod):", stardateIssue, stardateInteger, stardateFraction )
+print( "'classic' Stardate (as string):", stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, True, False ) )
 
 # Use the calculated 'classic' Stardate to get the date/time (should be the same but rounding plays a part).
-print( "UTC now from 'classic' Stardate:", stardate.getGregorianFromStardateClassic( stardateClassic[ 0 ], stardateClassic[ 1 ], stardateClassic[ 2 ] ), "\n" )
+print( "UTC now from 'classic' Stardate:", stardate.getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFraction ) )
 
-stardate2009Revised = stardate.getStardate2009Revised( utcNow )
-print( "'2009Revised' Stardate (integer, fraction, fractionalPeriod):", stardate2009Revised )
-print( "'2009Revised' Stardate (as string):", stardate.toStardateString( None, stardate2009Revised[ 0 ], stardate2009Revised[ 1 ], None, False ) )
+print()
+
+stardateInteger, stardateFraction = stardate.getStardate2009Revised( utcNow )
+print( "'2009Revised' Stardate (integer, fraction, fractionalPeriod):", stardateInteger, stardateFraction )
+print( "'2009Revised' Stardate (as string):", stardate.toStardateString( None, stardateInteger, stardateFraction, None, False ) )
 
 # Use the calculated '2009Revised' Stardate to get the date/time (should be the same but rounding plays a part).
-print( "UTC now from '2009Revised' Stardate:", stardate.getGregorianFromStardate2009Revised( stardate2009Revised[ 0 ], stardate2009Revised[ 1 ] ) )
+print( "UTC now from '2009Revised' Stardate:", stardate.getGregorianFromStardate2009Revised( stardateInteger, stardateFraction ) )
