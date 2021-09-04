@@ -103,7 +103,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def addMenuItemForGroupAndChildren( self, menu, group, level, runningUUIDs ):
         indent = level * self.indent( 0, 1 )
-        menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
+        # menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
+        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
         menu.append( menuItem )
 
         if self.showSubmenu:
@@ -132,11 +133,14 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def autoStartVirtualMachines( self, virtualMachines ):
-        if True: return #TODO Fix below...will need to be recursive!
-        for virtualMachine in virtualMachines:
-            if self.isAutostart( virtualMachine.getUUID() ):
-                time.sleep( self.delayBetweenAutoStartInSeconds )
-                self.startVirtualMachine( None, virtualMachine.getUUID(), False )
+        for item in virtualMachines:
+            if type( item ) == virtualmachine.Group:
+                self.autoStartVirtualMachines( item.getItems() )
+
+            else:
+                if self.isAutostart( item.getUUID() ):
+                    time.sleep( self.delayBetweenAutoStartInSeconds )
+                    self.startVirtualMachine( None, item.getUUID(), False )
 
 
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
