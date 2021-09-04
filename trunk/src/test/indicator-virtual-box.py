@@ -61,6 +61,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.scrollUUID = None
 
         self.requestMouseWheelScrollEvents()
+        print()#TODOTesting
 
 
     def update( self, menu ):
@@ -81,13 +82,13 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def buildMenu( self, menu, virtualMachines ):
         if virtualMachines: #TODO Check this works for empty VMs.
-            runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
+            runningNames, runningUUIDs = self.getRunningVirtualMachines()
             for item in virtualMachines:
                 if type( item ) == virtualmachine.Group:
-                    self.addMenuItemForGroupAndChildren( menu, item, 0 )
+                    self.addMenuItemForGroupAndChildren( menu, item, 0, runningUUIDs )
 
                 else:
-                    self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningVMUUIDs ) #TODO Maybe pass in runningVMUUIDs into here and the group function so that it can be passed all the way along.
+                    self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningUUIDs )
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
@@ -100,7 +101,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.secondaryActivateTarget = menuItem
 
 
-    def addMenuItemForGroupAndChildren( self, menu, group, level ):
+    def addMenuItemForGroupAndChildren( self, menu, group, level, runningUUIDs ):
         indent = level * self.indent( 0, 1 )
         menuItem = Gtk.MenuItem.new_with_label( indent + "--- " + group.getName() + " ---" ) #TODO Not sure about the --- used to distinguish for groups...ask Oleg.
         menu.append( menuItem )
@@ -111,10 +112,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         for item in group.getItems():
             if type( item ) == virtualmachine.Group:
-                self.addMenuItemForGroupAndChildren( menu, item, level + 1 )
+                self.addMenuItemForGroupAndChildren( menu, item, level + 1, runningUUIDs )
 
             else:
-                self.addMenuItemForVirtualMachine( menu, item, level + 1, False ) #TODO Fix: False should be something like item.getUUID() in runningVMUUIDs ) )
+                self.addMenuItemForVirtualMachine( menu, item, level + 1, item.getUUID() in runningUUIDs )
 
 
     def addMenuItemForVirtualMachine( self, menu, virtualMachine, level, isRunning ):
@@ -337,7 +338,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def onPreferences( self, dialog ):
-        print()#TODOTesting
         notebook = Gtk.Notebook()
 
         # List of VMs.
@@ -357,19 +357,22 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         store = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
         groupsExist = addItemsToStore( None, self.getVirtualMachines() )
 
-        tree = Gtk.TreeView.new_with_model( store )
-        tree.expand_all()
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
-        tree.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = 0 ) )
-        tree.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
-        tree.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
-        tree.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
-        tree.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-        tree.connect( "row-activated", self.onVirtualMachineDoubleClick )
+#TODO In the start command column is the repeating command too much?
+# Maybe only show when the start command is different? Ask Oleg.    
+
+        treeView = Gtk.TreeView.new_with_model( store )
+        treeView.expand_all()
+        treeView.set_hexpand( True )
+        treeView.set_vexpand( True )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = 0 ) )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = 1 ) )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = 2 ) )
+        treeView.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
+        treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+        treeView.connect( "row-activated", self.onVirtualMachineDoubleClick )
 
         scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( tree )
+        scrolledWindow.add( treeView )
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
 
         notebook.append_page( scrolledWindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
@@ -450,7 +453,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
-            self.updateVirtualMachinePreferences( store, tree.get_model().get_iter_first() )
+            self.updateVirtualMachinePreferences( store, treeView.get_model().get_iter_first() )
 
         return responseType
 
