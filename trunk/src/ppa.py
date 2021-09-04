@@ -154,6 +154,12 @@ class PublishedBinary( object ):
 
 class Filters( object ):
 
+    INDEX_USER = 0
+    INDEX_NAME = 1
+    INDEX_SERIES = 2
+    INDEX_ARCHITECTURE = 3
+
+
     def __init__( self ):
         self.filters = { }
 
@@ -173,8 +179,7 @@ class Filters( object ):
     def getUserNameSeriesArchitecture( self ):
         for key in sorted( self.filters.keys() ):
             keyComponents = key.split( " | " )
-            yield keyComponents[ 0 ], keyComponents[ 1 ], keyComponents[ 2 ], keyComponents[ 3 ]
-#TODO Document and/or use definition for the indices.
+            yield keyComponents[ Filters.INDEX_USER ], keyComponents[ Filters.INDEX_NAME ], keyComponents[ Filters.INDEX_SERIES ], keyComponents[ Filters.INDEX_ARCHITECTURE ]
 
 
     def __getKey( self, user, name, series, architecture ):
