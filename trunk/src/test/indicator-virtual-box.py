@@ -53,6 +53,10 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     COLUMN_START_COMMAND = 2 # Start command for the virtual machine.
     COLUMN_UUID = 3 # The UUID for the virtual machine (used to identify; not displayed).
 
+    # Indices for preferences list (within a dictionary).
+    PREFERENCES_AUTOSTART = 0
+    PREFERENCES_START_COMMAND = 1
+
 
     def __init__( self ):
         super().__init__(
@@ -197,22 +201,22 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     # It is assumed that VirtualBox is installed!
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
-        if len( runningVMUUIDs ) > 0:
-            if self.scrollUUID is None or self.scrollUUID not in runningVMUUIDs:
-                self.scrollUUID = runningVMUUIDs[ 0 ]
+        runningNames, runningUUIDs = self.getRunningVirtualMachines()
+        if len( runningUUIDs ) > 0: #TODO Test if we can instead use "if runningUUIDs:"
+            if self.scrollUUID is None or self.scrollUUID not in runningUUIDs:
+                self.scrollUUID = runningUUIDs[ 0 ] #TODO What is this index?  DOcument.
 
             if scrollDirection == Gdk.ScrollDirection.UP:
-                index = ( runningVMUUIDs.index( self.scrollUUID ) + 1 ) % len( runningVMUUIDs )
-                self.scrollUUID = runningVMUUIDs[ index ]
+                index = ( runningUUIDs.index( self.scrollUUID ) + 1 ) % len( runningUUIDs )
+                self.scrollUUID = runningUUIDs[ index ]
                 self.scrollDirectionIsUp = True
 
             else:
-                index = ( runningVMUUIDs.index( self.scrollUUID ) - 1 ) % len( runningVMUUIDs )
-                self.scrollUUID = runningVMUUIDs[ index ]
+                index = ( runningUUIDs.index( self.scrollUUID ) - 1 ) % len( runningUUIDs )
+                self.scrollUUID = runningUUIDs[ index ]
                 self.scrollDirectionIsUp = False
 
-            self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( self.scrollUUID ) ] )
+            self.bringWindowToFront( runningNames[ runningUUIDs.index( self.scrollUUID ) ] )
 
 
     def onLaunchVirtualBoxManager( self, menuItem ):
@@ -337,13 +341,17 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def getStartCommand( self, uuid ):
+        startCommand = IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
         if uuid in self.virtualMachinePreferences:
-            return self.virtualMachinePreferences[ uuid ][ 1 ]
+            startCommand = self.virtualMachinePreferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
 
-        return IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+        return startCommand
 
 
-    def isAutostart( self, uuid ): return uuid in self.virtualMachinePreferences and self.virtualMachinePreferences[ uuid ][ 0 ]
+    def isAutostart( self, uuid ):
+        return \
+            uuid in self.virtualMachinePreferences and \
+            self.virtualMachinePreferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_AUTOSTART ]
 
 
     def onPreferences( self, dialog ):
@@ -355,21 +363,21 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             for item in items:
                 if type( item ) == virtualmachine.Group:
                     groupsExist = True
-                    addItemsToStore( store.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
+                    addItemsToStore( treeStore.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
     
                 else:
                     uuid = item.getUUID()        
-                    store.append( parent, [ item.getName(), Gtk.STOCK_APPLY if self.isAutostart( uuid ) else None, self.getStartCommand( uuid ), uuid ] )
+                    treeStore.append( parent, [ item.getName(), Gtk.STOCK_APPLY if self.isAutostart( uuid ) else None, self.getStartCommand( uuid ), uuid ] )
 
             return groupsExist
 
-        store = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
+        treeStore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
         groupsExist = addItemsToStore( None, self.getVirtualMachines() )
 
 #TODO In the start command column is the repeating command too much?
 # Maybe only show when the start command is different? Ask Oleg.    
 
-        treeView = Gtk.TreeView.new_with_model( store )
+        treeView = Gtk.TreeView.new_with_model( treeStore )
         treeView.expand_all()
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
@@ -398,7 +406,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         windowName = Gtk.Entry()
         windowName.set_tooltip_text( _( \
-            "The name (window title) of VirtualBox™ Manager.\n" + \
+            "The window title of VirtualBox™ Manager.\n" + \
             "You may have to adjust for your local language." ) )
         windowName.set_text( self.virtualboxManagerWindowName )
         box.pack_start( windowName, True, True, 0 )
@@ -462,25 +470,26 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
-            self.updateVirtualMachinePreferences( store, treeView.get_model().get_iter_first() )
+            self.__updateVirtualMachinePreferences( treeStore, treeView.get_model().get_iter_first() )
 
         return responseType
 
 
-#TODO Check this for correctness.
-    def updateVirtualMachinePreferences( self, store, treeiter ):
+    def __updateVirtualMachinePreferences( self, treeStore, treeiter ):
         while treeiter:
-            isVirtualMachine = store[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ] # UUID is not None, so this is a VM and not a group.
-            isAutostart = store[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == "gtk-apply"
-            isDefaultStartCommand = store[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+            isVirtualMachine = treeStore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
+            isAutostart = treeStore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY
+            isDefaultStartCommand = treeStore[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( isVirtualMachine and isAutostart ) or ( isVirtualMachine and not isDefaultStartCommand ): # Only record VMs with different settings to default.
-                self.virtualMachinePreferences[ store[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ] ] = [ store[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == "gtk-apply", store[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
+                key = treeStore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
+                value = [ isAutostart, treeStore[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
+                self.virtualMachinePreferences[ key ] = value
 
-            if store.iter_has_child( treeiter ):
-                childiter = store.iter_children( treeiter )
-                self.updateVirtualMachinePreferences( store, childiter )
+            if treeStore.iter_has_child( treeiter ):
+                childiter = treeStore.iter_children( treeiter )
+                self.__updateVirtualMachinePreferences( treeStore, childiter )
 
-            treeiter = store.iter_next( treeiter )
+            treeiter = treeStore.iter_next( treeiter )
 
 
     def onVirtualMachineDoubleClick( self, tree, rowNumber, treeViewColumn ):
@@ -498,7 +507,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         startCommand = Gtk.Entry()
         startCommand.set_width_chars( 20 )
-        if model[ treeiter ][ 2 ]:
+        if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ]:
             startCommand.set_text( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] )
             startCommand.set_width_chars( len( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
 
@@ -545,7 +554,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
             # So this is the workaround...
             if autostartCheckbox.get_active():
-                model.set_value( treeiter, 1, Gtk.STOCK_APPLY ) #TODO Not sure if the 1 should be IndicatorVirtualBox.COLUMN_AUTOSTART
+                model.set_value( treeiter, IndicatorVirtualBox.COLUMN_AUTOSTART, Gtk.STOCK_APPLY )
                 model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = startCommand.get_text().strip()
 
             else:
