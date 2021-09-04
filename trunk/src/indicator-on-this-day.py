@@ -46,6 +46,10 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
+    # Data model columns used in the Preferences dialog.
+    COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
+    COLUMN_CALENDAR_ENABLED = 1 # tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
+
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
@@ -172,7 +176,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             else:
                 line = line.split( "\t" ) # This is a regular line with the month/day separated by TAB from the event.
-#TODO Document and/or use definition for the indices.
                 date = line[ 0 ].replace( "*", "" ).strip()
                 description = line[ -1 ].strip() # Take the last element as there may be more than one TAB character throwing out the index of the event in the line.
                 events.append( Event( date, description ) )
@@ -228,11 +231,11 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         tree.set_hexpand( True )
         tree.set_vexpand( True )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Calendar" ), Gtk.CellRendererText(), text = 0 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Calendar" ), Gtk.CellRendererText(), text = IndicatorOnThisDay.COLUMN_CALENDAR_FILE )
         treeViewColumn.set_sort_column_id( 0 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
@@ -347,10 +350,9 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             self.calendars = [ ]
             treeiter = store.get_iter_first()
-#TODO Document and/or use definition for the indices.
             while treeiter != None:
-                if store[ treeiter ][ 1 ]:
-                    self.calendars.append( store[ treeiter ][ 0 ] )
+                if store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ]:
+                    self.calendars.append( store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
 
                 treeiter = store.iter_next( treeiter )
 
@@ -394,8 +396,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         if treeiter is None:
             self.showMessage( treeView, _( "No calendar has been selected." ) )
 
-#TODO Document and/or use definition for the indices.
-        elif model[ treeiter ][ 0 ] in self.getCalendars():
+        elif model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.getCalendars():
             self.showMessage( treeView, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.WARNING )
 
         elif self.showOKCancel( treeView, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
@@ -411,9 +412,8 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         if rowNumber is None: # This is an add.
             isSystemCalendar = False
 
-#TODO Document and/or use definition for the indices.
         else: # This is an edit.
-            isSystemCalendar = model[ treeiter ][ 0 ] in self.getCalendars()
+            isSystemCalendar = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.getCalendars()
 
         grid = self.createGrid()
 
@@ -424,9 +424,8 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         fileEntry = Gtk.Entry()
         fileEntry.set_editable( False )
 
-#TODO Document and/or use definition for the indices.
         if rowNumber: # This is an edit.
-            fileEntry.set_text( model[ treeiter ][ 0 ] )
+            fileEntry.set_text( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
             fileEntry.set_width_chars( len( fileEntry.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
         fileEntry.set_tooltip_text( _( "The path to a calendar file." ) )
@@ -454,8 +453,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             enabledCheckbox.set_active( True )
 
         else:
-#TODO Document and/or use definition for the indices.
-            enabledCheckbox.set_active( model[ treeiter ][ 1 ] == Gtk.STOCK_APPLY )
+            enabledCheckbox.set_active( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 1, 1, 1 )
 
