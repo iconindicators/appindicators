@@ -462,6 +462,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return responseType
 
 
+#TODO Check this for correctness.
     def updateVirtualMachinePreferences( self, store, treeiter ):
         while treeiter:
             isVirtualMachine = store[ treeiter ][ 3 ] # UUID is not None, so this is a VM and not a group.
@@ -526,6 +527,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 startCommand.grab_focus()
                 continue
 
+#TODO Revise this...does this still apply?
             # Ideally I'd like to do this...
             #
             #    if autostartCheckbox.get_active():
