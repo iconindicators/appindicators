@@ -42,6 +42,10 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
     CONFIG_OUTPUT_BOTH = "outputBoth"
     CONFIG_RESULT_HISTORY_LENGTH = "resultHistoryLength"
 
+    # Results are stored in two element sublists.
+    RESULTS_UNICODE = 0
+    RESULTS_ASCII = 1
+
 
     def __init__( self ):
         super().__init__(
@@ -64,13 +68,12 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-#TODO Document and/or use definition for the indices.
-            menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ 0 ] )
-            menuItem.connect( "activate", self.pasteToClipboard, result[ 0 ] )
+            menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
+            menuItem.connect( "activate", self.pasteToClipboard, result[ IndicatorPunycode.RESULTS_UNICODE ] )
             menu.append( menuItem )
 
-            menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ 1 ] )
-            menuItem.connect( "activate", self.pasteToClipboard, result[ 1 ] )
+            menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
+            menuItem.connect( "activate", self.pasteToClipboard, result[ IndicatorPunycode.RESULTS_ASCII ] )
             menu.append( menuItem )
 
 
@@ -93,7 +96,6 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         else:
             protocol = ""
             result = re.split( r"(^.*//)", text )
-#TODO Document and/or use definition for the indices.
             if len( result ) == 3:
                 protocol = result[ 1 ]
                 text = result[ 2 ]
