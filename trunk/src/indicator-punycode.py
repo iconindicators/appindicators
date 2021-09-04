@@ -64,6 +64,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
+#TODO Document and/or use definition for the indices.
             menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ 0 ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ 0 ] )
             menu.append( menuItem )
@@ -92,6 +93,7 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         else:
             protocol = ""
             result = re.split( r"(^.*//)", text )
+#TODO Document and/or use definition for the indices.
             if len( result ) == 3:
                 protocol = result[ 1 ]
                 text = result[ 2 ]
