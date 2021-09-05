@@ -374,9 +374,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         treeStore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
         groupsExist = addItemsToStore( None, self.getVirtualMachines() )
 
-#TODO In the start command column is the repeating command too much?
-# Maybe only show when the start command is different? Ask Oleg.    
-
         treeView = Gtk.TreeView.new_with_model( treeStore )
         treeView.expand_all()
         treeView.set_hexpand( True )
