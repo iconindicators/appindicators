@@ -96,7 +96,6 @@ def getCountries():
     return countries
 
 
-#TODO Document and/or use definition for the indices.
 def getFirstPortID(): return _ports[ 0 ][ _INDEX_PORT_ID ]
 
 
