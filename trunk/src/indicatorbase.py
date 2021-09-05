@@ -567,11 +567,14 @@ class IndicatorBase( ABC ):
     #    ...
     #      [ dataX, dataY, dataZ, ...] ]
     #
-    # each inner list is of the same length and corresponding indices of elements of each inner list are of the same data type.
+    # Each inner list must be of the same length.
+    #
+    # Corresponding indices of elements of each inner list must be of the same data type.
     # That is:
+    #
     #    type( dataA ) == type( dataX ) and type( dataB ) == type( dataY ) and type( dataC ) == type( dataZ ).
     #
-    # Each row of the ListStore will contain one inner list.
+    # Each row of the returned ListStore contain one inner list.
     def listOfListsToListStore( self, listofLists ):
         types = [ ]
         for item in listofLists[ 0 ]:
