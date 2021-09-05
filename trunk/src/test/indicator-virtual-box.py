@@ -38,7 +38,7 @@ import indicatorbase, datetime, os, time, virtualmachine
 
 class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
-    CONFIG_DELAY_BETWEEN_AUTO_START = "delayBetweenAutoStartInSeconds"
+    CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
@@ -430,8 +430,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
-        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to explicitly set.
+        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
+        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes )
         spinnerRefreshInterval.set_tooltip_text( _(
             "How often the list of virtual machines\n" + \
             "and running status are updated." ) )
@@ -447,8 +447,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
         spinnerDelay = Gtk.SpinButton()
-        spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) ) # Initial value is not applied...
-        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds ) # ...so need to explicitly set.
+        spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) )
+        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds )
         spinnerDelay.set_tooltip_text( _(
             "Amount of time to wait from automatically\n" + \
             "starting one virtual machine to the next." ) )
@@ -521,7 +521,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
         autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-        autostartCheckbox.set_active( model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
+        autostartCheckbox.set_active(
+            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
+            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbox, 0, 1, 2, 1 )
 
         dialog = self.createDialog( tree, _( "Virtual Machine Properties" ), grid )
@@ -567,7 +569,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def loadConfig( self, config ):
-        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START, 10 )
+        self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS, 10 )
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
         self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs.  Key is VM UUID; value is [ autostart (bool), start command (str) ]
@@ -576,7 +578,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
     def saveConfig( self ):
         return {
-            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START: self.delayBetweenAutoStartInSeconds,
+            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS: self.delayBetweenAutoStartInSeconds,
             IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
             IndicatorVirtualBox.CONFIG_SHOW_SUBMENU: self.showSubmenu,
             IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences,
