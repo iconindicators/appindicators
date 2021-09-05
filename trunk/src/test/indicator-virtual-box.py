@@ -95,7 +95,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
             runningNames, runningUUIDs = self.getRunningVirtualMachines()
             for item in virtualMachines:
                 if type( item ) == virtualmachine.Group:
-                    self.addMenuItemForGroupAndChildren( menu, item, 0, runningUUIDs )
+                    self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
 
                 else:
                     self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningUUIDs )
@@ -111,7 +111,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.secondaryActivateTarget = menuItem
 
 
-    def addMenuItemForGroupAndChildren( self, menu, group, level, runningUUIDs ):
+    def addMenuItemForGroup( self, menu, group, level, runningUUIDs ):
         indent = level * self.indent( 0, 1 )
         menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
         menu.append( menuItem )
@@ -123,7 +123,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         for item in group.getItems():
             if type( item ) == virtualmachine.Group:
-                self.addMenuItemForGroupAndChildren( menu, item, level + 1, runningUUIDs )
+                self.addMenuItemForGroup( menu, item, level + 1, runningUUIDs )
 
             else:
                 self.addMenuItemForVirtualMachine( menu, item, level + 1, item.getUUID() in runningUUIDs )
