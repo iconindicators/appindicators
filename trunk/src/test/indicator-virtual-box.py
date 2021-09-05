@@ -117,6 +117,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         menu.append( menuItem )
 
         if self.showSubmenu:
+#TODO Test what happens if this preference is True but there aren't actually any groups!            
             menu = Gtk.Menu()
             menuItem.set_submenu( menu )
 
