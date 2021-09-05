@@ -543,25 +543,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 startCommand.grab_focus()
                 continue
 
-#TODO Revise this...does this still apply?
-            # Ideally I'd like to do this...
-            #
-            #    if autostartCheckbox.get_active():
-            #        model[ treeiter ][ 1 ] = Gtk.STOCK_APPLY
-            #    else:
-            #        model[ treeiter ][ 1 ] = None
-            #
-            #    model[ treeiter ][ 2 ] = startCommand.get_text().strip()
-            #
-            # But due to this bug https://bugzilla.gnome.org/show_bug.cgi?id=684094 cannot set the model value to None.
-            # So this is the workaround...
-            if autostartCheckbox.get_active():
-                model.set_value( treeiter, IndicatorVirtualBox.COLUMN_AUTOSTART, Gtk.STOCK_APPLY )
-                model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = startCommand.get_text().strip()
-
-            else:
-                model.insert_after( None, treeiter, [ model[ treeiter ][ IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ], None, startCommand.get_text().strip(), model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ] ] )
-                model.remove( treeiter )
+            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] = Gtk.STOCK_APPLY if autostartCheckbox.get_active() else None
+            model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = startCommand.get_text().strip()
 
             break
 
