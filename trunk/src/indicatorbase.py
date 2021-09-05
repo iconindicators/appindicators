@@ -558,9 +558,22 @@ class IndicatorBase( ABC ):
         return executionFlag
 
 
+    # Converts a list of inner lists to a GTK ListStore.
+    #
+    # If the list of inner lists is of the form:
+    #
+    #    [ [ dataA, dataB, dataC, ...],
+    #    ...
+    #    ...
+    #      [ dataX, dataY, dataZ, ...] ]
+    #
+    # each inner list is of the same length and corresponding indices of elements of each inner list are of the same data type.
+    # That is:
+    #    type( dataA ) == type( dataX ) and type( dataB ) == type( dataY ) and type( dataC ) == type( dataZ ).
+    #
+    # Each row of the ListStore will contain one inner list.
     def listOfListsToListStore( self, listofLists ):
         types = [ ]
-#TODO See Indicator Lunar...figure out what the loop is doing and document the function and the two '0' indices.
         for item in listofLists[ 0 ]:
             types.append( type( item[ 0 ] ) )
 
