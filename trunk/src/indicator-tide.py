@@ -251,6 +251,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 0, 1, 1 )
 
+        COLUMN_PORT = 0
+
         portsList = Gtk.ListStore( str ) # Port.
         portsList.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
@@ -258,7 +260,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         portsTree.set_tooltip_text( _( "Choose your port." ) )
         portsTree.set_hexpand( True )
         portsTree.set_vexpand( True )
-        portsTree.append_column( Gtk.TreeViewColumn( _( "Port" ), Gtk.CellRendererText(), text = 0 ) )
+        portsTree.append_column( Gtk.TreeViewColumn( _( "Port" ), Gtk.CellRendererText(), text = COLUMN_PORT ) )
         portsTree.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -361,8 +363,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         if responseType == Gtk.ResponseType.OK:
             country = countriesComboBox.get_active_text()
             model, treeiter = portsTree.get_selection().get_selected()
-#TODO Document and/or use definition for the indices.
-            port = model[ treeiter ][ 0 ]
+            port = model[ treeiter ][ COLUMN_PORT ]
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
             self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
             self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
@@ -468,7 +469,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
                         utcOffset = line[ line.index( "are" ) + 4 : line.index( "hour" ) - 1 ]
                         if len( utcOffset ) == 3: # Example: "Port predictions (Standard Local Time) are +10 hours from UTC"
                             utcOffset += "00"
-#TODO Document and/or use definition for the indices.
 
                         else:
                             utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # Example: "Port predictions (Standard Local Time) are -3 hours from UTC"
