@@ -269,6 +269,63 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                     with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, 'r' ) as f:
                         lines = f.readlines()
 
+# <ExtraDataItem name="GUI/GroupDefinitions/" value="go=A and B,go=C and D,m=7a96fc66-7142-459e-9efb-b7f610e8660e,m=58aa424b-2ae7-4f60-aca9-feb5642924aa,m=256f0096-c3e5-45e1-85e0-44e85b4cbc1d,m=54ba0488-739c-4e4a-8aca-eaeb786681d1,m=e1a5e766-27cc-4b13-8c81-b69a5aa5dac7,m=628a6317-792a-45ff-8f0a-de3227f14724,m=bc161180-2cde-47b1-a3ee-b8c44d335417,m=1d866b9e-1396-4ab3-84c3-0230fd3d76f6"/>
+# <ExtraDataItem name="GUI/GroupDefinitions/A and B" value="m=48edac78-b24a-48ad-8383-c953c8994848,m=a9744af5-a301-4cd9-82f1-a6322382f246"/>
+# <ExtraDataItem name="GUI/GroupDefinitions/C and D" value="go=E,m=99ffe5d2-76e1-47b8-ac64-c14eaf16c3dc,m=032e257d-c814-4046-8809-946e6f3982cd"/>
+# <ExtraDataItem name="GUI/GroupDefinitions/C and D/E" value="go=F and G,m=b10f4467-9cc8-4359-97d7-7139777ece1f"/>
+# <ExtraDataItem name="GUI/GroupDefinitions/C and D/E/F and G" value="m=08ed6d07-8744-4fc7-8740-02e1019dc71a,m=34afeba3-5a63-4a9b-a7fd-eadeacb5b190"/>
+                    topGroup = virtualmachine.Group( "" ) #TODO Document how this is a nice cheat!
+                    for line in lines:
+                        if "GUI/GroupDefinitions/" in line:
+                            parts = line.split( "\"" )
+                            groupPath = parts[ 1 ].split( '/' )[ 2 : ]
+                            groupItems = topGroup.getItems()
+                            for groupName in groupPath:
+                                group = next( ( x for x in groupItems if type( x ) == virtualmachine.Group and x.getName() == groupName ), topGroup )
+                                groupItems = group.getItems()
+
+                            # groupNamesAndUUIDs = parts[ 3 ].split( ',' )
+                            # for item in groupNamesAndUUIDs:
+                            #     if item.startswith( "go=" ):
+                            #         virtualMachines.append( virtualmachine.Group( item.replace( "go=", "" ) ) )
+                            #
+                            #     else:
+                            #         uuid = item.replace( "m=", "" )
+                            #         name = next( x for x in virtualMachinesFromVBoxManage if x.getUUID() == uuid ).getName()
+                            #         virtualMachines.append( virtualmachine.VirtualMachine( name, uuid ) )
+
+                            groupNamesAndUUIDs = parts[ 3 ].split( ',' )
+                            for item in groupNamesAndUUIDs:
+                                if item.startswith( "go=" ):
+                                    group.addItem( virtualmachine.Group( item.replace( "go=", "" ) ) )
+
+                                else:
+                                    uuid = item.replace( "m=", "" )
+                                    name = next( x for x in virtualMachinesFromVBoxManage if x.getUUID() == uuid ).getName()
+                                    group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
+
+                    virtualMachines = topGroup.getItems()
+
+                except Exception as e:
+                    self.getLogging().exception( e )
+                    virtualMachines = [ ]
+
+            else:
+                virtualMachines = virtualMachinesFromVBoxManage
+
+        return virtualMachines
+
+
+    def getVirtualMachinesORIGINAL( self ):
+        virtualMachines = [ ]
+        if self.isVBoxManageInstalled():
+            virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage()
+
+            if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
+                try:
+                    with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, 'r' ) as f:
+                        lines = f.readlines()
+
                     for line in lines:
                         if "GUI/GroupDefinitions/" in line:
                             parts = line.split( "\"" )
