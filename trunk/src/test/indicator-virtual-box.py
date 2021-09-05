@@ -258,7 +258,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         return names, uuids
 
 
-    # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and configuration files.
+    # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and the configuration file.
     def getVirtualMachines( self ):
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
