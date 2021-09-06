@@ -1664,12 +1664,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     break
 
             if theCity is None or not theCity:
-                theCity = cities[ 0 ]
+                theCity = cities[ 0 ] # No city found, so choose first city by default.
 
         except Exception as e:
             self.getLogging().exception( e )
             self.getLogging().error( "Error getting default city." )
-            theCity = cities[ 0 ]
+            theCity = cities[ 0 ] # Some error occurred, so choose first city by default.
 
         return theCity
 
