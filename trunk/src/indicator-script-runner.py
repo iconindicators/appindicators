@@ -814,7 +814,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scrolledWindow.set_vexpand( True )
 
         box.pack_start( scrolledWindow, True, True, 0 )
-        grid.attach( box, 0, 2, 1, 20 )
+        grid.attach( box, 0, 2, 1, 10 )
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
         soundCheckbox.set_tooltip_text( _(
@@ -824,7 +824,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "if the script returns non-empty text." ) )
         soundCheckbox.set_active( False if add else script.getPlaySound() )
 
-        grid.attach( soundCheckbox, 0, 22, 1, 1 )
+        grid.attach( soundCheckbox, 0, 12, 1, 1 )
 
         notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
         notificationCheckbox.set_tooltip_text( _(
@@ -834,7 +834,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "if the script returns non-empty text." ) )
         notificationCheckbox.set_active( False if add else script.getShowNotification() )
 
-        grid.attach( notificationCheckbox, 0, 23, 1, 1 )
+        grid.attach( notificationCheckbox, 0, 13, 1, 1 )
 
 #TODO Consider making this a radio button...
 # Logically separates background from non-background attributes,
@@ -847,7 +847,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "optionally displayed in the icon label.\n\n" + \
             "Otherwise the script will appear in the menu." ) )
 
-        grid.attach( backgroundCheckbox, 0, 24, 1, 1 )
+        grid.attach( backgroundCheckbox, 0, 14, 1, 1 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
@@ -857,7 +857,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         terminalCheckbox.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
         terminalCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
 
-        grid.attach( terminalCheckbox, 0, 25, 1, 1 )
+        grid.attach( terminalCheckbox, 0, 15, 1, 1 )
 
         defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
         defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
@@ -868,7 +868,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "the default script which is run on a\n" + \
             "middle mouse click of the indicator icon." ) )
 
-        grid.attach( defaultScriptCheckbox, 0, 26, 1, 1 )
+        grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
 
         backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox, defaultScriptCheckbox )
 
@@ -886,7 +886,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         intervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
         box.pack_start( intervalSpinner, False, False, 0 )
 
-        grid.attach( box, 0, 27, 1, 1 )
+        grid.attach( box, 0, 17, 1, 1 )
 
         backgroundCheckbox.connect( "toggled", self.onCheckbox, label, intervalSpinner )
 
