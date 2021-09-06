@@ -31,6 +31,17 @@ ECLIPSE_TYPE_PENUMBRAL = "N"
 ECLIPSE_TYPE_TOTAL = "T"
 
 
+# Eclipse data format.
+__ECLIPSE_YEAR = 0
+__ECLIPSE_MONTH = 1
+__ECLIPSE_DAY = 2
+__ECLIPSE_HOUR_MINUTE_SECOND = 3
+__ECLIPSE_DELTA_T = 4
+__ECLIPSE_TYPE = 5
+__ECLIPSE_LATITUDE = 6
+__ECLIPSE_LONGITUDE = 7
+
+
 # Gets the upcoming eclipse, lunar or solar.
 #
 # dateTimeUTC - Current date/time in UTC as a python datetime.datetime object.
@@ -50,19 +61,22 @@ def getEclipse( dateTimeUTC, isLunar ):
 
     eclipseInfo = None
     for eclipse in eclipseData:
-#TODO Document and/or use definition for the indices.
-        dateTime = datetime.datetime.strptime( eclipse[ 0 ] + ", " + eclipse[ 1 ] + ", " + eclipse[ 2 ] + ", " + eclipse[ 3 ], "%Y, %m, %d, %H:%M:%S" )
-        dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ 4 ] ) ) # Need to subtract delta T (https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
+        dateTime = datetime.datetime.strptime(
+            eclipse[ __ECLIPSE_YEAR ] + ", " + 
+            eclipse[ __ECLIPSE_MONTH ] + ", " + 
+            eclipse[ __ECLIPSE_DAY ] + ", " + 
+            eclipse[ __ECLIPSE_HOUR_MINUTE_SECOND ], "%Y, %m, %d, %H:%M:%S" )
+        dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ __ECLIPSE_DELTA_T ] ) ) # Need to subtract delta T (https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
         if dateTimeUTC.timestamp() <= dateTime.timestamp():
-            latitude = eclipse[ 6 ][ 0 : len( eclipse[ 6 ] ) - 1 ]
-            if eclipse[ 6 ][ -1 ] == "S":
+            latitude = eclipse[ __ECLIPSE_LATITUDE ][ 0 : len( eclipse[ __ECLIPSE_LATITUDE ] ) - 1 ]
+            if eclipse[ __ECLIPSE_LATITUDE ][ -1 ] == "S":
                 latitude = "-" + latitude
 
-            longitude = eclipse[ 7 ][ 0 : len( eclipse[ 7 ] ) - 1 ]
-            if eclipse[ 7 ][ -1 ] == "E":
+            longitude = eclipse[ __ECLIPSE_LONGITUDE ][ 0 : len( eclipse[ __ECLIPSE_LONGITUDE ] ) - 1 ]
+            if eclipse[ __ECLIPSE_LONGITUDE ][ -1 ] == "E":
                 longitude = "-" + longitude
 
-            eclipseInfo = str( dateTime ), eclipse[ 5 ], latitude, longitude
+            eclipseInfo = str( dateTime ), eclipse[ __ECLIPSE_TYPE ], latitude, longitude
             break
 
     return eclipseInfo
