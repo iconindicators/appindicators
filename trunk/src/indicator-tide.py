@@ -31,9 +31,6 @@
     # https://www.tide-forecast.com/
 
 
-#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
-
-
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -107,7 +104,6 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
             return self.getNextUpdateTimeInSeconds( tidalReadings )
 
-#TODO Document and/or use definition for the indices.
 
     def buildMenu( self, menu, tidalReadings ):
         menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
