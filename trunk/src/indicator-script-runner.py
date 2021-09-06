@@ -836,6 +836,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( notificationCheckbox, 0, 23, 1, 1 )
 
+#TODO Consider making this a radio button...
+# Logically separates background from non-background attributes,
+#which will help if the "exception" checkbox is also added (for background scripts).
         backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
         backgroundCheckbox.set_active( False if add else type( script ) == Background )
         backgroundCheckbox.set_tooltip_text( _(
