@@ -231,6 +231,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "ZAURAK",
         "3C 273" ] )
 
+
     astrobase.AstroBase.STARS_TO_HIP.update( {
         "ACAMAR"            :   13847,
         "ACHERNAR"          :   7588,
@@ -328,6 +329,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "VINDEMIATRIX"      :   63608,
         "ZAURAK"            :   18543,
         "3C 273"            :   60936 } )
+
 
     astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.update( {
         astrobase.AstroBase.STARS[ 0 ]  :   _( "Acamar" ),
@@ -427,6 +429,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 94 ] :   _( "Zaurak" ),
         astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
+
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
         astrobase.AstroBase.STARS[ 0 ]  :   _( "ACAMAR" ),
@@ -525,6 +528,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 93 ] :   _( "VINDEMIATRIX" ),
         astrobase.AstroBase.STARS[ 94 ] :   _( "ZAURAK" ),
         astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
+
 
     # Taken from ephem/cities.py as Skyfield does not provide a list of cities.
     #    https://github.com/skyfielders/python-skyfield/issues/316
@@ -653,6 +657,26 @@ class AstroSkyfield( astrobase.AstroBase ):
         "Zurich"            :   ( 47.3833333, 8.5333333, 405.500916 ) }
 
 
+    # Used to reference city components of latitude, longitude and elevation.
+    __CITY_LATITUDE = 0
+    __CITY_LONGITUDE = 1
+    __CITY_ELEVATION = 2
+
+
+    # Used to reference Skyfield almanac for moon phases.
+    __MOON_PHASE_NEW = 0
+    __MOON_PHASE_FIRST_QUARTER = 1
+    __MOON_PHASE_FULL = 2
+    __MOON_PHASE_LAST_QUARTER = 3
+
+
+    # Used to reference Skyfield almanac for seasons.
+    __SEASON_VERNAL_EQUINOX = 0
+    __SEASON_SUMMER_SOLSTICE = 1
+    __SEASON_AUTUMNAL_EQUINOX = 2
+    __SEASON_WINTER_SOLSTICE = 3
+
+
     @staticmethod
     def calculate( utcNow,
                    latitude, longitude, elevation,
@@ -717,11 +741,10 @@ class AstroSkyfield( astrobase.AstroBase ):
     def getCredit(): return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
 
 
-#TODO Document and/or use definition for the indices.
     @staticmethod
-    def getLatitudeLongitudeElevation( city ): return AstroSkyfield._city_data.get( city )[ 0 ], \
-                                                      AstroSkyfield._city_data.get( city )[ 1 ], \
-                                                      AstroSkyfield._city_data.get( city )[ 2 ]
+    def getLatitudeLongitudeElevation( city ): return AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LATITUDE ], \
+                                                      AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LONGITUDE ], \
+                                                      AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
 
 
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
@@ -813,11 +836,10 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( utcNow, utcNowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
-#TODO Document and/or use definition for the indices.
-        nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ] # New moon.
-        nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ] # Full moon.
+        nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ]
+        nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ]
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Need for notification.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusOneDay,
                                                    data, ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ),
@@ -826,12 +848,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                    ephemerisPlanets[ AstroSkyfield.__MOON ] )
 
         if not neverUp:
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 1 ] ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 2 ] ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 3 ] ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ 0 ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_LAST_QUARTER ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
 
-            t, y, details = eclipselib.lunar_eclipses( utcNow, utcNowPlusOneYear, ephemerisPlanets )
+            t, y, details = eclipselib.lunar_eclipses( utcNow, utcNowPlusOneYear, ephemerisPlanets ) # Zeroth result in t and y is the first result, so use that.
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
@@ -854,8 +876,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             t, y = almanac.find_discrete( utcNow, utcNowPlusSevenMonths, almanac.seasons( ephemerisPlanets ) )
             t = t.utc_datetime()
-#TODO Document and/or use definition for the indices.
-            if almanac.SEASON_EVENTS[ 0 ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ 2 ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
+            if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
@@ -969,7 +990,6 @@ class AstroSkyfield( astrobase.AstroBase ):
         t, y = almanac.find_discrete( utcNow, utcNowPlusOneDay, almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
-#TODO Document and/or use definition for the indices.
             if y[ 0 ]:
                 riseDateTime = t[ 0 ]
                 setDateTime = t[ 1 ]
