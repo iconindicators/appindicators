@@ -175,6 +175,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background:
                 if self.backgroundScriptNextUpdateTime[ key ] < now:
+#TODO Is it feasible to run the background scripts in threads?
+# Where have I used threads before?  PPA indicator?
                     commandResult = self.processGet( script.getCommand() ).strip()
                     self.backgroundScriptResult[ key ] = commandResult
                     self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
