@@ -901,10 +901,19 @@ class AstroPyEphem( astrobase.AstroBase ):
     __DATA_TAG_ELEVATION = "ELEVATION"
     __DATA_TAG_LATITUDE = "LATITUDE"
     __DATA_TAG_LONGITUDE = "LONGITUDE"
-
-
-    # Internally used for city.
     __NAME_TAG_CITY = "CITY"
+
+
+    # Internally used to reference PyEphem objects.
+    __PYEPHEM_CITY_LATITUDE = 0
+    __PYEPHEM_CITY_LONGITUDE = 1
+    __PYEPHEM_CITY_ELEVATION = 2
+    __PYEPHEM_SATELLITE_PASS_RISING_DATE = 0
+    __PYEPHEM_SATELLITE_PASS_RISING_ANGLE = 1
+    __PYEPHEM_SATELLITE_PASS_CULMINATION_DATE = 2
+    __PYEPHEM_SATELLITE_PASS_CULMINATION_ANGLE = 3
+    __PYEPHEM_SATELLITE_PASS_SETTING_DATE = 4
+    __PYEPHEM_SATELLITE_PASS_SETTING_ANGLE = 5
 
 
     @staticmethod
@@ -959,11 +968,10 @@ class AstroPyEphem( astrobase.AstroBase ):
     def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
 
 
-#TODO Document and/or use definition for the indices.
     @staticmethod
-    def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ 0 ] ), \
-                                                      float( _city_data.get( city )[ 1 ] ), \
-                                                      _city_data.get( city )[ 2 ]
+    def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
+                                                      float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
+                                                      _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
 
 
     @staticmethod
@@ -1137,18 +1145,17 @@ class AstroPyEphem( astrobase.AstroBase ):
                     earthSatellite.compute( city )
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
-#TODO Document and/or use definition for the indices.
                         nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
-                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ 2 ], earthSatellite ):
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 0 ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ 1 ] )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ 4 ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ 5 ] )
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
                             break
 
                         # Look for the next pass after the current pass...
-                        if nextPass[ 4 ]: # ...but occasionally pass data is bad.
-                            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
+                        if nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ]: # ...but occasionally pass data is bad.
+                            currentDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
 
                         else:
                             currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after current time.
@@ -1167,7 +1174,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     @staticmethod
     def __calculateNextSatellitePass( city, satellite ):
 #TODO Document and/or use definition for the indices.
-        version = int( ephem.__version__.split( '.' )[ 2 ] )
+        version = int( ephem.__version__.split( '.' )[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] )
         if version <= 6:
             nextPass = city.next_pass( satellite )
 
@@ -1190,14 +1197,14 @@ class AstroPyEphem( astrobase.AstroBase ):
 #TODO Document and/or use definition for the indices.
         return satellitePass and \
                len( satellitePass ) == 6 and \
-               satellitePass[ 0 ] and \
-               satellitePass[ 1 ] and \
-               satellitePass[ 2 ] and \
-               satellitePass[ 3 ] and \
-               satellitePass[ 4 ] and \
-               satellitePass[ 5 ] and \
-               satellitePass[ 2 ] > satellitePass[ 0 ] and \
-               satellitePass[ 4 ] > satellitePass[ 2 ]
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_ANGLE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
+               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ]
 
 
     # Determine if a satellite pass is visible.
