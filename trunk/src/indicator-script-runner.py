@@ -32,6 +32,7 @@
 
 
 #TODO Document and/or use definition for the indices.
+# Search for \[ \d+ \]
 
 
 
