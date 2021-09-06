@@ -31,11 +31,6 @@
 # So what to do...?
 
 
-#TODO Document and/or use definition for the indices.
-# Search for \[ \d+ \]
-
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -77,6 +72,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     COLUMN_TERMINAL = 6 # Icon name for the APPLY icon; None otherwise.
     COLUMN_INTERVAL = 7 # Numeric amount as a string.
     COLUMN_REMOVE = 8 # Icon name for the REMOVE icon; None otherwise.
+
+    # Define common indices for the scripts saved in JSON.
+    JSON_GROUP = 0
+    JSON_NAME = 1
+    JSON_COMMAND = 2
+    JSON_PLAY_SOUND = 3
+    JSON_SHOW_NOTIFICATION = 4
+
+    # Define indices for background scripts saved in JSON.
+    JSON_INTERVAL_IN_MINUTES = 5
+
+    # Define indices for non-background scripts saved in JSON.
+    JSON_TERMINAL_OPEN = 5
+    JSON_DEFAULT = 6
 
 
     def __init__( self ):
@@ -185,7 +194,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # Called by base class to process data tags.
     def __processTags( self, textToProcess, arguments ):
         text = textToProcess
-        now = arguments[ 0 ]
+        now = arguments[ 0 ] # First and only parameter passed to processTags in base class.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background and "[" + key + "]" in text:
@@ -1122,10 +1131,27 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 scriptsBackground = config.get( self.CONFIG_SCRIPTS_BACKGROUND, [ ] )
 
             for script in scriptsNonBackground:
-                self.scripts.append( NonBackground( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), bool( script[ 5 ] ), bool( script[ 6 ] ) ) )
+                skript = NonBackground(
+                    script[ IndicatorScriptRunner.JSON_GROUP ],
+                    script[ IndicatorScriptRunner.JSON_NAME ],
+                    script[ IndicatorScriptRunner.JSON_COMMAND ],
+                    bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_TERMINAL_OPEN ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_DEFAULT ] ) )
+
+                self.scripts.append( skript )
 
             for script in scriptsBackground:
-                self.scripts.append( Background( script[ 0 ], script[ 1 ], script[ 2 ], bool( script[ 3 ] ), bool( script[ 4 ] ), script[ 5 ] ) )
+                skript = Background(
+                    script[ IndicatorScriptRunner.JSON_GROUP ],
+                    script[ IndicatorScriptRunner.JSON_NAME ],
+                    script[ IndicatorScriptRunner.JSON_COMMAND ],
+                    bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
+                    script[ IndicatorScriptRunner.JSON_INTERVAL_IN_MINUTES ] )
+
+                self.scripts.append( skript )
 
         else:
             # Example non-background scripts.
