@@ -42,7 +42,7 @@ from gi.repository import Gtk, Pango
 from script import Background, NonBackground
 from threading import Thread
 
-import copy, datetime, indicatorbase, math
+import concurrent.futures, copy, datetime, indicatorbase, math
 
 
 class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
@@ -171,53 +171,19 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def updateBackgroundScripts( self, now ):
-        print( datetime.datetime.now())
         backgroundScriptsToExecute = [ ]
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:
                 backgroundScriptsToExecute.append( script )
-#TODO Is it feasible to run the background scripts in threads?
-# Where have I used threads before?  PPA indicator?
 
-        import concurrent.futures
-        with concurrent.futures.ThreadPoolExecutor( max_workers = 3 ) as executor:
-            results = { executor.submit( self.updateBackgroundScript, script, now ): script for script in backgroundScriptsToExecute }
-            for future in concurrent.futures.as_completed( results ):
-                script = results[ future ]
-                print( "\t", script.getName() )
-                commandResult = self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ]
-
-                if script.getPlaySound() and commandResult:
-                    self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
-
-                if script.getShowNotification() and commandResult:
-                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
-                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
-                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
-                    self.processCall( notificationCommand )
-        print( datetime.datetime.now())
-
-
-    def updateBackgroundScript( self, script, now ):
-        print( script.getName() )
-        key = self.__createKey( script.getGroup(), script.getName() )
-        commandResult = self.processGet( script.getCommand() ).strip()
-        self.backgroundScriptResults[ key ] = commandResult
-        self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
-        return script
-
-
-    def updateBackgroundScriptsORIGINAL( self, now ):
-        # print( datetime.datetime.now())
-        for script in self.scripts:
-            key = self.__createKey( script.getGroup(), script.getName() )
-            if type( script ) == Background:
-                if self.backgroundScriptNextUpdateTime[ key ] < now:
-                    commandResult = self.processGet( script.getCommand() ).strip()
-                    self.backgroundScriptResults[ key ] = commandResult
-                    self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
-
+        # Based on example from
+        #    https://docs.python.org/3.6/library/concurrent.futures.html#threadpoolexecutor-example
+        with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
+            futureToScript = { executor.submit( self.__updateBackgroundScript, script, now ): script for script in backgroundScriptsToExecute }
+            for future in concurrent.futures.as_completed( futureToScript ):
+                script = futureToScript[ future ]
+                key = future.result()
                 commandResult = self.backgroundScriptResults[ key ]
 
                 if script.getPlaySound() and commandResult:
@@ -229,7 +195,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
                     self.processCall( notificationCommand )
 
-        # print( datetime.datetime.now())
+
+    def __updateBackgroundScript( self, script, now ):
+        commandResult = self.processGet( script.getCommand() ).strip()
+        key = self.__createKey( script.getGroup(), script.getName() )
+        self.backgroundScriptResults[ key ] = commandResult
+        self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+        return key
 
 
     # Called by base class to process data tags.
