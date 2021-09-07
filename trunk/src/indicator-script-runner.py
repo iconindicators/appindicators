@@ -171,6 +171,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def updateBackgroundScripts( self, now ):
+        print( datetime.datetime.now())
         backgroundScriptsToExecute = [ ]
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
@@ -181,24 +182,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         import concurrent.futures
         with concurrent.futures.ThreadPoolExecutor( max_workers = 3 ) as executor:
-            # results = { executor.submit( self.processGet, script.getCommand() ): script for script in backgroundScriptsToExecute }
             results = { executor.submit( self.updateBackgroundScript, script, now ): script for script in backgroundScriptsToExecute }
             for future in concurrent.futures.as_completed( results ):
                 script = results[ future ]
-                # try:
-                #     backgroundScriptExecutionResult = future.result()
-                #
-                # except Exception as exc:
-                #     print( '%r generated an exception: %s' % ( result, exc ) )
-                #     # print( '%r generated an exception: %s' % ( result, exc ) )
-                #
-                # else:
-                #     print( script.getName(), backgroundScriptExecutionResult )
-                #     # print( '%r page is %d bytes' % ( result, len( backgroundScriptExecutionResult ) ) )                    
-                #
-                #     self.backgroundScriptResults[ key ] = backgroundScriptExecutionResult
-                #     self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
-
+                print( "\t", script.getName() )
                 commandResult = self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ]
 
                 if script.getPlaySound() and commandResult:
@@ -209,9 +196,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
                     self.processCall( notificationCommand )
+        print( datetime.datetime.now())
 
 
     def updateBackgroundScript( self, script, now ):
+        print( script.getName() )
         key = self.__createKey( script.getGroup(), script.getName() )
         commandResult = self.processGet( script.getCommand() ).strip()
         self.backgroundScriptResults[ key ] = commandResult
@@ -220,6 +209,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def updateBackgroundScriptsORIGINAL( self, now ):
+        # print( datetime.datetime.now())
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background:
@@ -238,6 +228,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
                     self.processCall( notificationCommand )
+
+        # print( datetime.datetime.now())
 
 
     # Called by base class to process data tags.
