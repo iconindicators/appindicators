@@ -171,17 +171,64 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def updateBackgroundScripts( self, now ):
+        backgroundScriptsToExecute = [ ]
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:
+                backgroundScriptsToExecute.append( script )
+#TODO Is it feasible to run the background scripts in threads?
+# Where have I used threads before?  PPA indicator?
+
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor( max_workers = 3 ) as executor:
+            # results = { executor.submit( self.processGet, script.getCommand() ): script for script in backgroundScriptsToExecute }
+            results = { executor.submit( self.updateBackgroundScript, script, now ): script for script in backgroundScriptsToExecute }
+            for future in concurrent.futures.as_completed( results ):
+                script = results[ future ]
+                # try:
+                #     backgroundScriptExecutionResult = future.result()
+                #
+                # except Exception as exc:
+                #     print( '%r generated an exception: %s' % ( result, exc ) )
+                #     # print( '%r generated an exception: %s' % ( result, exc ) )
+                #
+                # else:
+                #     print( script.getName(), backgroundScriptExecutionResult )
+                #     # print( '%r page is %d bytes' % ( result, len( backgroundScriptExecutionResult ) ) )                    
+                #
+                #     self.backgroundScriptResults[ key ] = backgroundScriptExecutionResult
+                #     self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+
+                commandResult = self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ]
+
+                if script.getPlaySound() and commandResult:
+                    self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
+
+                if script.getShowNotification() and commandResult:
+                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
+                    notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
+                    self.processCall( notificationCommand )
+
+
+    def updateBackgroundScript( self, script, now ):
+        key = self.__createKey( script.getGroup(), script.getName() )
+        commandResult = self.processGet( script.getCommand() ).strip()
+        self.backgroundScriptResults[ key ] = commandResult
+        self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
+        return script
+
+
+    def updateBackgroundScriptsORIGINAL( self, now ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background:
                 if self.backgroundScriptNextUpdateTime[ key ] < now:
-#TODO Is it feasible to run the background scripts in threads?
-# Where have I used threads before?  PPA indicator?
                     commandResult = self.processGet( script.getCommand() ).strip()
-                    self.backgroundScriptResult[ key ] = commandResult
+                    self.backgroundScriptResults[ key ] = commandResult
                     self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
 
-                commandResult = self.backgroundScriptResult[ key ]
+                commandResult = self.backgroundScriptResults[ key ]
 
                 if script.getPlaySound() and commandResult:
                     self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
@@ -200,7 +247,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background and "[" + key + "]" in text:
-                commandResult = self.backgroundScriptResult[ key ]
+                commandResult = self.backgroundScriptResults[ key ]
                 text = text.replace( "[" + key + "]", commandResult )
 
         return text
@@ -1028,12 +1075,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     #
     # Initialise the cache results and set a next update time in the past to force all (background) scripts to update first time.
     def initialiseBackgroundScripts( self ):
-        self.backgroundScriptResult = { }
+        self.backgroundScriptResults = { }
         self.backgroundScriptNextUpdateTime = { }
         now = datetime.datetime.now()
         for script in self.scripts:
             if type( script ) == Background:
-                self.backgroundScriptResult[ self.__createKey( script.getGroup(), script.getName() ) ] = None
+                self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ] = None
                 self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
 
 
