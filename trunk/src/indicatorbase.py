@@ -249,12 +249,15 @@ class IndicatorBase( ABC ):
         if self.creditz:
             aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
 
+        # Ordinarily when installed via a package manager, the changelog will be in the correct place.
+        # However if running from a terminal without installing, say for testing purposes, the changelong will not be present.
         changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
         changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
-        with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
-            shutil.copyfileobj( fileIn, fileOut )
+        if os.path.exists( changeLogGzipped ):
+            with gzip.open( changeLogGzipped, 'r' ) as fileIn, open( changeLog, 'wb' ) as fileOut:
+                shutil.copyfileobj( fileIn, fileOut )
 
-        self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
+            self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
 
         errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
         if os.path.exists( errorLog ):
