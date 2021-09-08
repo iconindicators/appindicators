@@ -1,6 +1,6 @@
 indicator-virtual-box (1.0.67-1) bionic; urgency=low
 
-  * Removed support for old VirtualBox configuration files.
+  * Removed support VirtualBox configuration files prior to version 5.
   * Update release to bionic as xenial is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000
