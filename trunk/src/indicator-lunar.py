@@ -154,6 +154,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
+    DATA_INDEX_BODY_TYPE = 0
+    DATA_INDEX_BODY_NAME = 1
+    DATA_INDEX_DATA_NAME = 2
+
 
     def __init__( self ):
         super().__init__(
@@ -179,6 +183,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         utcNow = datetime.datetime.utcnow()
 
+        # Dictionary to hold currently calculated (and previously calculated) astronomical data.
+        # Key is a combination of three tags: body type, body name and data name.
+        # Value is a string, regardless being numerical or not. 
         self.data = None
         self.dataPrevious = None
 
@@ -370,9 +377,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __processTags( self, textToProcess, arguments ):
         text = textToProcess
         for key in self.data.keys(): # Substitute data tags '[' and ']' for values.
-#TODO Use a definition for the indices.
-            if "[" + key[ 1 ] + " " + key[ 2 ] + "]" in text:
-                text = text.replace( "[" + key[ 1 ] + " " + key[ 2 ] + "]", self.formatData( key[ 2 ], self.data[ key ] ) )
+            if "[" + key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] + " " + key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] + "]" in text:
+                text = text.replace( "[" + key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] + " " + key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] + "]", self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ) )
 
         return text
 
@@ -439,17 +445,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         for key in self.data:
             dateTimeAttributeExceptRiseDateTime = \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_FULL or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_NEW or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_FULL or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_NEW or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER
 
             riseDateTimeAtributeAndShowBodiesBelowHorizon = \
-                key[ 2 ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and not self.hideBodiesBelowHorizon
+                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and not self.hideBodiesBelowHorizon
 
             if dateTimeAttributeExceptRiseDateTime or riseDateTimeAtributeAndShowBodiesBelowHorizon:
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
@@ -580,7 +586,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             indent = self.indent( 1, 2 )
             for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ 0 ] ):
-                self.createMenuItem( subMenu, indent + displayText + self.formatData( key[ 2 ], self.data[ key ] ), IndicatorLunar.SEARCH_URL_MOON )
+                self.createMenuItem( subMenu, indent + displayText + self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ), IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
@@ -1409,9 +1415,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   [ astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, astrobase.AstroBase.DATA_TAGS_SUN ] ]
 
         for item in items:
-            bodyType = item[ 0 ]
-            bodyTag = item[ 1 ]
-            dataTags = item[ 2 ]
+            bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
+            bodyTag = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
+            dataTags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                 for dataTag in dataTags:
                     translatedTag = IndicatorLunar.BODY_TAGS_TRANSLATIONS[ bodyTag ] + " " + astrobase.AstroBase.DATA_TAGS_TRANSLATIONS[ dataTag ]
@@ -1425,9 +1431,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   [ astrobase.AstroBase.BodyType.STAR, astrobase.AstroBase.STARS, astrobase.AstroBase.DATA_TAGS_STAR ] ]
 
         for item in items:
-            bodyType = item[ 0 ]
-            bodyTags = item[ 1 ]
-            dataTags = item[ 2 ]
+            bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
+            bodyTags = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
+            dataTags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             for bodyTag in bodyTags:
                 if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                     for dataTag in dataTags:
@@ -1442,9 +1448,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                   [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.minorPlanetData, astrobase.AstroBase.DATA_TAGS_MINOR_PLANET ] ]
 
         for item in items:
-            bodyType = item[ 0 ]
-            bodyTags = item[ 1 ]
-            dataTags = item[ 2 ]
+            bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
+            bodyTags = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
+            dataTags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             for bodyTag in bodyTags:
                 if ( bodyType, bodyTag, astrobase.AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                     for dataTag in dataTags:
