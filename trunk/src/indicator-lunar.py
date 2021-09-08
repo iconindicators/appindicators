@@ -255,7 +255,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.nextDownloadTimeMinorPlanetUnusual = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
-#TODO Use a definition for the indices below.
         self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME, utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
         self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_BRIGHT ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
         self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_CRITICAL ], utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
@@ -291,7 +290,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             dataType = orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
             magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
-#TODO Document and/or use definition for the indices.
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
                              self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_BRIGHT ],
