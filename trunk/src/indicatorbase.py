@@ -448,6 +448,12 @@ class IndicatorBase( ABC ):
             widget.set_sensitive( radio.get_active() )
 
 
+    # Listens to radio events and inversely toggles the visibility of the widgets.
+    def onRadioInverse( self, radio, *widgets ):
+        for widget in widgets:
+            widget.set_sensitive( not radio.get_active() )
+
+
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
 
 
