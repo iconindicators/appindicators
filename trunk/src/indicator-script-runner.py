@@ -849,13 +849,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         notificationCheckbox.set_active( False if add else script.getShowNotification() )
         grid.attach( notificationCheckbox, 0, 13, 1, 1 )
 
-        radioNonBackground = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
-        radioNonBackground.set_active( True if add else type( script ) == NonBackground )
-        radioNonBackground.set_tooltip_text(
+        scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
+        scriptNonBackgroundRadio.set_active( True if add else type( script ) == NonBackground )
+        scriptNonBackgroundRadio.set_tooltip_text(
             "This script is displayed in the menu\n" + \
             "and runs when the user clicks on the\n" + \
             "corresponding menu item." )
-        grid.attach( radioNonBackground, 0, 14, 1, 1 )
+        grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
@@ -876,13 +876,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "middle mouse click of the indicator icon." ) )
         grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
 
-        radioBackground = Gtk.RadioButton.new_with_label_from_widget( radioNonBackground, _( "Background" ) )
-        radioBackground.set_active( False if add else type( script ) == Background ) #TODO This and the same line above might need to go below the connect lines.
-        radioBackground.set_tooltip_text(
+        scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
+        scriptBackgroundRadio.set_active( False if add else type( script ) == Background ) #TODO This and the same line above might need to go below the connect lines.
+        scriptBackgroundRadio.set_tooltip_text(
             "The script will run in the background,\n" + \
             "at the interval specified, with the results\n" + \
             "optionally displayed in the icon label." )
-        grid.attach( radioBackground, 0, 17, 1, 1 )
+        grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
@@ -900,10 +900,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 18, 1, 1 )
 
-        radioNonBackground.connect( "toggled", self.onRadio, terminalCheckbox, defaultScriptCheckbox )
-        radioNonBackground.connect( "toggled", self.onRadioInverse, label, intervalSpinner )
-        radioBackground.connect( "toggled", self.onRadio, label, intervalSpinner )
-        radioBackground.connect( "toggled", self.onRadioInverse, terminalCheckbox, defaultScriptCheckbox )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadio, terminalCheckbox, defaultScriptCheckbox )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadioInverse, label, intervalSpinner )
+        scriptBackgroundRadio.connect( "toggled", self.onRadio, label, intervalSpinner )
+        scriptBackgroundRadio.connect( "toggled", self.onRadioInverse, terminalCheckbox, defaultScriptCheckbox )
 
 
 #TODO Consider making this a radio button...
@@ -1002,7 +1002,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     del scripts[ i ]
 
                 # If this script is marked as default (and is non-background), check for an existing default script and if found, undefault it...
-                if not backgroundCheckbox.get_active() and defaultScriptCheckbox.get_active():
+                if scriptNonBackgroundRadio.get_active() and defaultScriptCheckbox.get_active():
                     i = 0
                     for skript in scripts:
                         if type( skript ) == NonBackground and skript.getDefault():
@@ -1022,7 +1022,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         i += 1
 
                 # Create new script (add or edit) and add to scripts...
-                if backgroundCheckbox.get_active():
+                if scriptBackgroundRadio.get_active():
                     newScript = Background(
                         groupCombo.get_active_text().strip(),
                         nameEntry.get_text().strip(),
