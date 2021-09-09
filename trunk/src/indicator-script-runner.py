@@ -852,7 +852,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
         scriptNonBackgroundRadio.set_active( True if add else type( script ) == NonBackground )
         scriptNonBackgroundRadio.set_tooltip_text(
-            "This script is displayed in the menu\n" + \
+            "The script is displayed in the menu\n" + \
             "and runs when the user clicks on the\n" + \
             "corresponding menu item." )
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
@@ -880,7 +880,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptBackgroundRadio.set_active( False if add else type( script ) == Background ) #TODO This and the same line above might need to go below the connect lines.
         scriptBackgroundRadio.set_tooltip_text(
             "The script will run in the background,\n" + \
-            "at the interval specified, with the results\n" + \
+            "at the interval specified, the results\n" + \
             "optionally displayed in the icon label." )
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
