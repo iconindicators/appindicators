@@ -1587,7 +1587,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.set_sensitive( checkbox.get_active() )
         grid.attach( box, 0, gridStartIndex + 1, 1, 1 )
 
-        checkbox.connect( "toggled", self.onCheckbox, box )
+        checkbox.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
@@ -1608,7 +1608,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         box.set_sensitive( checkbox.get_active() )
         grid.attach( box, 0, gridStartIndex + 2, 1, 1 )
 
-        checkbox.connect( "toggled", self.onCheckbox, box )
+        checkbox.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
         test = Gtk.Button.new_with_label( testButtonText )
         test.set_halign( Gtk.Align.END )
@@ -1617,7 +1617,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         test.set_tooltip_text( testButtonTooltip )
         grid.attach( test, 0, gridStartIndex + 3, 1, 1 )
 
-        checkbox.connect( "toggled", self.onCheckbox, test )
+        checkbox.connect( "toggled", self.onRadioOrCheckbox, True, test )
 
         return checkbox, summaryTextEntry, messageTextView
 
