@@ -372,7 +372,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "Otherwise, script names are indented within each group.\n\n" + \
             "Applies only to non-background scripts." ) )
 
-        radioShowScriptsIndented.connect( "toggled", self.onRadio, hideGroupsCheckbox )
+        radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbox )
 
         grid.attach( hideGroupsCheckbox, 0, 2, 1, 1 )
 
@@ -900,10 +900,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 18, 1, 1 )
 
-        scriptNonBackgroundRadio.connect( "toggled", self.onRadio, terminalCheckbox, defaultScriptCheckbox )
-        scriptNonBackgroundRadio.connect( "toggled", self.onRadioInverse, label, intervalSpinner )
-        scriptBackgroundRadio.connect( "toggled", self.onRadio, label, intervalSpinner )
-        scriptBackgroundRadio.connect( "toggled", self.onRadioInverse, terminalCheckbox, defaultScriptCheckbox )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, label, intervalSpinner )
+        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, label, intervalSpinner )
+        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, terminalCheckbox, defaultScriptCheckbox )
 
 
 #TODO Consider making this a radio button...
