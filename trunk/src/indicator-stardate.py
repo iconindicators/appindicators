@@ -140,7 +140,7 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
         padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
 
-        showClassicCheckbox.connect( "toggled", self.onCheckbox, showIssueCheckbox, padIntegerCheckbox )
+        showClassicCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, showIssueCheckbox, padIntegerCheckbox )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
