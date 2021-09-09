@@ -121,8 +121,8 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         # Scroll to the end...strange way of doing so!
         # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
-        def textViewChanged( self, widget ):
-            adjustment = scrolledWindow.get_vadjustment()
+        def textViewChanged( textView, rectangle ):
+            adjustment = textView.get_parent().get_vadjustment()
             adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
 
         textView.connect( "size-allocate", textViewChanged )
