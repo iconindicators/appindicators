@@ -430,28 +430,7 @@ class IndicatorBase( ABC ):
         return textViewBuffer.get_text( textViewBuffer.get_start_iter(), textViewBuffer.get_end_iter(), True )
 
 
-    # Listens to checkbox events and toggles the visibility of the widgets.
-    def onCheckbox( self, checkbox, *widgets ): self.__onWidget( checkbox, True, *widgets )
-
-
-    # Listens to checkbox events and inversely toggles the visibility of the widgets.
-    def onCheckboxInverse( self, checkbox, *widgets ): self.__onWidget( checkbox, False, *widgets )
-
-
-    # Listens to radio events and toggles the visibility of the widgets.
-    def onRadio( self, radio, *widgets ): self.__onWidget( radio, True, *widgets )
-
-
-    # Listens to radio events and inversely toggles the visibility of the widgets.
-    def onRadioInverse( self, radio, *widgets ): self.__onWidget( radio, False, *widgets )
-
-
-    def __onWidget( self, theWidget, sense, *widgets ):
-        for widget in widgets:
-            widget.set_sensitive( sense and theWidget.get_active() )
-
-
-#TODO Replace all calls to onCheckbox* and onRadio* with a call to the function below...
+    # Listens to radio/checkbox "toggled" events and toggles the visibility of the widgets according to the boolean value of 'sense'.
     def onRadioOrCheckbox( self, radioOrCheckbox, sense, *widgets ):
         for widget in widgets:
             widget.set_sensitive( sense and radioOrCheckbox.get_active() )
