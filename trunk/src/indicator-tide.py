@@ -287,7 +287,7 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
 
         grid.attach( showAsSubmenusExceptFirstDayCheckbox, 0, 1, 1, 1 )
 
-        showAsSubmenusCheckbox.connect( "toggled", self.onCheckbox, showAsSubmenusExceptFirstDayCheckbox )
+        showAsSubmenusCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbox )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
