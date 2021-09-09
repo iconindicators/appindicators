@@ -581,7 +581,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
 
-        combinePPAsCheckbox.connect( "toggled", self.onCheckbox, ignoreVersionArchitectureSpecificCheckbox )
+        combinePPAsCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, ignoreVersionArchitectureSpecificCheckbox )
 
         sortByDownloadCheckbox = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
         sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count within each PPA." ) )
@@ -608,7 +608,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 4, 1, 1 )
 
-        sortByDownloadCheckbox.connect( "toggled", self.onCheckbox, label, spinner )
+        sortByDownloadCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, label, spinner )
 
         lowBandwitdhCheckbox = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
         lowBandwitdhCheckbox.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
