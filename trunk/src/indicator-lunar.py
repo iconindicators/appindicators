@@ -20,9 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Do a search for      \[ \d \]    and for those indices, use a definition.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -142,6 +139,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = astrobase.AstroBase.SATELLITE_TAG_NAME + " : " + \
                                              astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
                                              astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + _( " now rising..." )
+
+    SATELLITE_MENU_NUMBER = 0
+    SATELLITE_MENU_NAME = 1
+    SATELLITE_MENU_DATA = 2
 
     SEARCH_URL_DWARF_PLANET = "https://solarsystem.nasa.gov/planets/dwarf-planets/"
     SEARCH_URL_COMET_AND_MINOR_PLANET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
@@ -520,7 +521,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def notificationSatellites( self ):
         utcNow = datetime.datetime.utcnow()
+
+        INDEX_NUMBER = 0
+        INDEX_RISE_TIME = 1
         satelliteCurrentNotifications = [ ]
+
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
@@ -538,7 +543,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
                     self.satellitePreviousNotifications.remove( number )
 
-        for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ 1 ], x[ 0 ] ) ):
+        for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ INDEX_RISE_TIME ], x[ INDEX_NUMBER ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             riseTime = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
             riseAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
@@ -579,13 +584,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             # Determine which phases occur by date rather than using the phase calculated.
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
+            INDEX_KEY = 0
             nextPhases = [ ]
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ], _( "First Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ], _( "Full: " ), key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ], _( "New: " ), key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] )
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             indent = self.indent( 1, 2 )
-            for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ 0 ] ):
+            for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ INDEX_KEY ] ):
                 self.createMenuItem( subMenu, indent + displayText + self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ), IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
@@ -785,15 +791,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
 
         if self.satellitesSortByDateTime:
-            satellites = sorted( satellites, key = lambda x: ( x[ 2 ], x[ 1 ], x[ 0 ] ) )
+            satellites = sorted( satellites, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_DATA ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
         else: # Sort by name/number.
-            satellites = sorted( satellites, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
+            satellites = sorted( satellites, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
 
         if satellites:
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
-        satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ 1 ], x[ 0 ] ) ) # Sort by name then number.
+        satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
 
         if satellitesPolar:
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
@@ -804,8 +810,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
         for info in satellites:
-            number = info [ 0 ]
-            name = info [ 1 ]
+            number = info [ IndicatorLunar.SATELLITE_MENU_NUMBER ]
+            name = info [ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
@@ -1113,6 +1119,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             stars.append( [ starName in self.stars, starName, astrobase.AstroBase.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
         starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
+#TODO Can we use defined indices here?
         for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ):
             starStore.append( star )
 
@@ -1361,6 +1368,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
 
+#TODO Can we use defined indices here?
             self.planets = [ ]
             for row in planetStore:
                 if row[ 0 ]:
@@ -1512,6 +1520,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
 
 #TODO Below 'self' is not in the function definition...is it needed?  Not so for Fortune.
+#TODO Can we use defined indices here?
         def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ 0 ] = not listStore[ row ][ 0 ]
 
         tree = Gtk.TreeView.new_with_model( listStore )
@@ -1534,11 +1543,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return scrolledWindow
 
 
+#TODO Can we use defined indices here?
     def onSatelliteCheckbox( self, cellRendererToggle, row, dataStore, sortStore ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
 
 
+#TODO Can we use defined indices here?
     def onColumnHeaderClick( self, treeviewColumn, dataStore ):
         atLeastOneItemChecked = False
         atLeastOneItemUnchecked = False
