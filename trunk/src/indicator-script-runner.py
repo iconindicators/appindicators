@@ -94,6 +94,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             version = "1.0.16",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
+        print()#TODO Testing
 
 
     def update( self, menu ):
@@ -197,7 +198,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
-        commandResult = self.processGet( script.getCommand() ).strip()
+        # commandResult = self.processGet( script.getCommand() ).strip()
+        commandResult = "" #TODO Testing
         key = self.__createKey( script.getGroup(), script.getName() )
         self.backgroundScriptResults[ key ] = commandResult
         self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
@@ -763,6 +765,298 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
+        add = True if script is None else False
+
+        grid = self.createGrid()
+
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
+
+        groupCombo = Gtk.ComboBoxText.new_with_entry()
+        groupCombo.set_tooltip_text( _(
+            "The group to which the script belongs.\n\n" + \
+            "Choose an existing group or enter a new one." ) )
+
+        groups = sorted( self.getScriptsByGroup( scripts ).keys(), key = str.lower )
+        for group in groups:
+            groupCombo.append_text( group )
+
+        if add:
+            index = 0
+            model, treeiter = scriptsTreeView.get_selection().get_selected()
+            if treeiter:
+                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_GROUP_INTERNAL ]
+                index = groups.index( group )
+
+        else:
+            index = groups.index( script.getGroup() )
+
+        groupCombo.set_active( index )
+
+        box.pack_start( groupCombo, True, True, 0 )
+
+        grid.attach( box, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+
+        box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
+
+        nameEntry = Gtk.Entry()
+        nameEntry.set_tooltip_text( _( "The name of the script." ) )
+        nameEntry.set_text( "" if add else script.getName() )
+
+        box.pack_start( nameEntry, True, True, 0 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
+        box.set_margin_top( 10 )
+
+        label = Gtk.Label.new( _( "Command" ) )
+        label.set_halign( Gtk.Align.START )
+        box.pack_start( label, False, False, 0 )
+
+        commandTextView = Gtk.TextView()
+        commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
+        commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
+        commandTextView.get_buffer().set_text( "" if add else script.getCommand() )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.add( commandTextView )
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+
+        box.pack_start( scrolledWindow, True, True, 0 )
+        grid.attach( box, 0, 2, 1, 10 )
+
+        soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
+        soundCheckbox.set_tooltip_text( _(
+            "For non-background scripts,\n" + \
+            "play a sound on script completion.\n\n" + \
+            "For background scripts, play a sound\n" + \
+            "if the script returns non-empty text." ) )
+        soundCheckbox.set_active( False if add else script.getPlaySound() )
+        grid.attach( soundCheckbox, 0, 12, 1, 1 )
+
+        notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
+        notificationCheckbox.set_tooltip_text( _(
+            "For non-background scripts, show a\n" + \
+            "notification on script completion.\n\n" + \
+            "For background scripts, show a notification\n" + \
+            "if the script returns non-empty text." ) )
+        notificationCheckbox.set_active( False if add else script.getShowNotification() )
+        grid.attach( notificationCheckbox, 0, 13, 1, 1 )
+
+        radioNonBackground = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
+        radioNonBackground.set_active( True if add else type( script ) == NonBackground )
+        radioNonBackground.set_tooltip_text(
+            "This script is displayed in the menu\n" + \
+            "and runs when the user clicks on the\n" + \
+            "corresponding menu item." )
+        grid.attach( radioNonBackground, 0, 14, 1, 1 )
+
+        terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
+        terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        terminalCheckbox.set_tooltip_text( _(
+            "Leave the terminal open on completion\n" + \
+            "of non-background scripts." ) )
+        terminalCheckbox.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
+        terminalCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
+        grid.attach( terminalCheckbox, 0, 15, 1, 1 )
+
+        defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
+        defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
+        defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
+        defaultScriptCheckbox.set_tooltip_text( _(
+            "One non-background script can be set as\n" + \
+            "the default script which is run on a\n" + \
+            "middle mouse click of the indicator icon." ) )
+        grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
+
+        radioBackground = Gtk.RadioButton.new_with_label_from_widget( radioNonBackground, _( "Background" ) )
+        radioBackground.set_active( False if add else type( script ) == Background ) #TODO This and the same line above might need to go below the connect lines.
+        radioBackground.set_tooltip_text(
+            "The script will run in the background,\n" + \
+            "at the interval specified, with the results\n" + \
+            "optionally displayed in the icon label." )
+        grid.attach( radioBackground, 0, 17, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
+
+        label = Gtk.Label.new( _( "Interval" ) )
+        label.set_sensitive( False if add else type( script ) == Background )
+        box.pack_start( label, False, False, 0 )
+
+        intervalSpinner = Gtk.SpinButton()
+        intervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes() if type( script ) == Background else 60, 1, 10000, 1, 1, 0 ) )
+        intervalSpinner.set_value( script.getIntervalInMinutes() if type( script ) == Background else 60 )
+        intervalSpinner.set_sensitive( False if add else type( script ) == Background )
+        intervalSpinner.set_tooltip_text( _( "Interval, in minutes, between runs." ) )
+        box.pack_start( intervalSpinner, False, False, 0 )
+
+        grid.attach( box, 0, 18, 1, 1 )
+
+        radioNonBackground.connect( "toggled", self.onRadio, terminalCheckbox, defaultScriptCheckbox )
+        radioNonBackground.connect( "toggled", self.onRadioInverse, label, intervalSpinner )
+        radioBackground.connect( "toggled", self.onRadio, label, intervalSpinner )
+        radioBackground.connect( "toggled", self.onRadioInverse, terminalCheckbox, defaultScriptCheckbox )
+
+
+#TODO Consider making this a radio button...
+# Logically separates background from non-background attributes,
+#which will help if the "exception" checkbox is also added (for background scripts).
+        # backgroundCheckbox = Gtk.CheckButton.new_with_label( _( "Background script" ) )
+        # backgroundCheckbox.set_active( False if add else type( script ) == Background )
+        # backgroundCheckbox.set_tooltip_text( _(
+        #     "If checked, this script will run in background,\n" + \
+        #     "at the interval specified, with the results\n" + \
+        #     "optionally displayed in the icon label.\n\n" + \
+        #     "Otherwise the script will appear in the menu." ) )
+        #
+        # grid.attach( backgroundCheckbox, 0, 14, 1, 1 )
+        #
+        # terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
+        # terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        # terminalCheckbox.set_tooltip_text( _(
+        #     "Leave the terminal open on completion\n" + \
+        #     "of non-background scripts." ) )
+        # terminalCheckbox.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
+        # terminalCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
+        #
+        # grid.attach( terminalCheckbox, 0, 15, 1, 1 )
+        #
+        # defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
+        # defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        # defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
+        # defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
+        # defaultScriptCheckbox.set_tooltip_text( _(
+        #     "One non-background script can be set as\n" + \
+        #     "the default script which is run on a\n" + \
+        #     "middle mouse click of the indicator icon." ) )
+        #
+        # grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
+        #
+        # backgroundCheckbox.connect( "toggled", self.onCheckboxInverse, terminalCheckbox, defaultScriptCheckbox )
+        #
+        # box = Gtk.Box( spacing = 6 )
+        # box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
+        #
+        # label = Gtk.Label.new( _( "Interval (minutes)" ) )
+        # label.set_sensitive( False if add else type( script ) == Background )
+        # box.pack_start( label, False, False, 0 )
+        #
+        # intervalSpinner = Gtk.SpinButton()
+        # intervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes() if type( script ) == Background else 60, 1, 10000, 1, 1, 0 ) )
+        # intervalSpinner.set_value( script.getIntervalInMinutes() if type( script ) == Background else 60 )
+        # intervalSpinner.set_sensitive( False if add else type( script ) == Background )
+        # intervalSpinner.set_tooltip_text( _( "Interval between runs of background scripts." ) )
+        # box.pack_start( intervalSpinner, False, False, 0 )
+        #
+        # grid.attach( box, 0, 17, 1, 1 )
+        #
+        # backgroundCheckbox.connect( "toggled", self.onCheckbox, label, intervalSpinner )
+
+        dialog = self.createDialog( scriptsTreeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
+        newScript = None
+        while True:
+            dialog.show_all()
+            if dialog.run() == Gtk.ResponseType.OK:
+                if groupCombo.get_active_text().strip() == "":
+                    self.showMessage( dialog, _( "The group cannot be empty." ) )
+                    groupCombo.grab_focus()
+                    continue
+
+                if nameEntry.get_text().strip() == "":
+                    self.showMessage( dialog, _( "The name cannot be empty." ) )
+                    nameEntry.grab_focus()
+                    continue
+
+                if self.getTextViewText( commandTextView ).strip() == "":
+                    self.showMessage( dialog, _( "The command cannot be empty." ) )
+                    commandTextView.grab_focus()
+                    continue
+
+                # Check for duplicates...
+                #    For an add, find an existing script with the same group/name.
+                #    For an edit, the group and/or name must change (and then match with an existing script other than the original).
+                scriptOfSameNameAndGroupExists = self.getScript( scripts, groupCombo.get_active_text().strip(), nameEntry.get_text().strip() ) is not None
+                editedScriptGroupOrNameDifferent = not add and ( groupCombo.get_active_text().strip() != script.getGroup() or nameEntry.get_text().strip() != script.getName() )
+                if ( add or editedScriptGroupOrNameDifferent ) and scriptOfSameNameAndGroupExists:
+                    self.showMessage( dialog, _( "A script of the same group and name already exists." ) )
+                    groupCombo.grab_focus()
+                    continue
+
+                # For an edit, remove the original script...
+                if not add:
+                    i = 0
+                    for skript in scripts:
+                        if script.getGroup() == skript.getGroup() and script.getName() == skript.getName():
+                            break
+
+                        i += 1
+
+                    del scripts[ i ]
+
+                # If this script is marked as default (and is non-background), check for an existing default script and if found, undefault it...
+                if not backgroundCheckbox.get_active() and defaultScriptCheckbox.get_active():
+                    i = 0
+                    for skript in scripts:
+                        if type( skript ) == NonBackground and skript.getDefault():
+                            undefaultScript = NonBackground(
+                                skript.getGroup(),
+                                skript.getName(),
+                                skript.getCommand(),
+                                skript.getPlaySound(),
+                                skript.getShowNotification(),
+                                skript.getTerminalOpen(),
+                                False )
+
+                            del scripts[ i ]
+                            scripts.append( undefaultScript )
+                            break
+
+                        i += 1
+
+                # Create new script (add or edit) and add to scripts...
+                if backgroundCheckbox.get_active():
+                    newScript = Background(
+                        groupCombo.get_active_text().strip(),
+                        nameEntry.get_text().strip(),
+                        self.getTextViewText( commandTextView ).strip(),
+                        soundCheckbox.get_active(),
+                        notificationCheckbox.get_active(),
+                        intervalSpinner.get_value_as_int() )
+
+                else:
+                    newScript = NonBackground(
+                        groupCombo.get_active_text().strip(),
+                        nameEntry.get_text().strip(),
+                        self.getTextViewText( commandTextView ).strip(),
+                        soundCheckbox.get_active(),
+                        notificationCheckbox.get_active(),
+                        terminalCheckbox.get_active(),
+                        defaultScriptCheckbox.get_active() )
+
+                scripts.append( newScript )
+
+                self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
+                self.populateBackgroundScriptsTreeStore(
+                    scripts,
+                    backgroundScriptsTreeView,
+                    newScript.getGroup() if type( newScript ) == Background else "",
+                    newScript.getName() if type( newScript ) == Background else "" )
+
+            break
+
+        dialog.destroy()
+        return newScript
+
+
+    def __addEditScriptORIGINAL( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
         add = True if script is None else False
 
         grid = self.createGrid()
