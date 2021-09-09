@@ -346,8 +346,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        # List of VMs.
-#TODO Below 'self' is not in the function definition...is it needed?  Not so for Fortune.
         def addItemsToStore( parent, items ):
             groupsExist = False
             for item in items:
@@ -361,6 +359,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
             return groupsExist
 
+        # List of groups and virtual machines.
         treeStore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
         groupsExist = addItemsToStore( None, self.getVirtualMachines() )
 
