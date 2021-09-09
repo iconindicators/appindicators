@@ -431,27 +431,30 @@ class IndicatorBase( ABC ):
 
 
     # Listens to checkbox events and toggles the visibility of the widgets.
-    def onCheckbox( self, checkbox, *widgets ):
-        for widget in widgets:
-            widget.set_sensitive( checkbox.get_active() )
+    def onCheckbox( self, checkbox, *widgets ): self.__onWidget( checkbox, True, *widgets )
 
 
     # Listens to checkbox events and inversely toggles the visibility of the widgets.
-    def onCheckboxInverse( self, checkbox, *widgets ):
-        for widget in widgets:
-                widget.set_sensitive( not checkbox.get_active() )
+    def onCheckboxInverse( self, checkbox, *widgets ): self.__onWidget( checkbox, False, *widgets )
 
 
     # Listens to radio events and toggles the visibility of the widgets.
-    def onRadio( self, radio, *widgets ):
-        for widget in widgets:
-            widget.set_sensitive( radio.get_active() )
+    def onRadio( self, radio, *widgets ): self.__onWidget( radio, True, *widgets )
 
 
     # Listens to radio events and inversely toggles the visibility of the widgets.
-    def onRadioInverse( self, radio, *widgets ):
+    def onRadioInverse( self, radio, *widgets ): self.__onWidget( radio, False, *widgets )
+
+
+    def __onWidget( self, theWidget, sense, *widgets ):
         for widget in widgets:
-            widget.set_sensitive( not radio.get_active() )
+            widget.set_sensitive( sense and theWidget.get_active() )
+
+
+#TODO Replace all calls to onCheckbox* and onRadio* with a call to the function below...
+    def onRadioOrCheckbox( self, radioOrCheckbox, sense, *widgets ):
+        for widget in widgets:
+            widget.set_sensitive( sense and radioOrCheckbox.get_active() )
 
 
     def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
@@ -464,13 +467,11 @@ class IndicatorBase( ABC ):
     #
     # For GNOME Shell, the equivalent divisor is 36.
     def getMenuItemsGuess( self ):
+        divisor = 36
         if self.isUbuntu1604():
-            guess = Gtk.Window().get_screen().get_height() / 25
+            divisor = 25
 
-        else:
-            guess = Gtk.Window().get_screen().get_height() / 36
-
-        return guess
+        return Gtk.Window().get_screen().get_height() / divisor
 
 
     def createGrid( self ):
