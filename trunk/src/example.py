@@ -25,8 +25,6 @@ print( "Stardate API version: " + stardate.getVersion(), "\n" )
 utcNow = datetime.datetime.utcnow()
 print( "UTC now:", utcNow, "\n" )
 
-#TODO Document and/or use definition for the indices.
-
 stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( utcNow )
 print( "'classic' Stardate (issue, integer, fraction, fractionalPeriod):", stardateIssue, stardateInteger, stardateFraction )
 print( "'classic' Stardate (as string):", stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, True, False ) )
