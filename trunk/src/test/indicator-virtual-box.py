@@ -71,7 +71,6 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         self.scrollUUID = None
 
         self.requestMouseWheelScrollEvents()
-        print()#TODOTesting
 
 
     def update( self, menu ):
