@@ -347,6 +347,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         notebook = Gtk.Notebook()
 
         # List of VMs.
+#TODO Below 'self' is not in the function definition...is it needed?  Not so for Fortune.
         def addItemsToStore( parent, items ):
             groupsExist = False
             for item in items:
