@@ -1511,6 +1511,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
 
+#TODO Below 'self' is not in the function definition...is it needed?  Not so for Fortune.
         def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ 0 ] = not listStore[ row ][ 0 ]
 
         tree = Gtk.TreeView.new_with_model( listStore )
@@ -1639,6 +1640,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if utcNowPlusTenMinutes.index( '.' ) > -1:
                 utcNowPlusTenMinutes = utcNowPlusTenMinutes.split( '.' )[ 0 ] # Remove fractional seconds.
 
+#TODO Below 'self' is not in the function definition...is it needed?  Not so for Fortune.
             def replaceTags( text ): return text. \
                 replace( astrobase.AstroBase.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
                 replace( astrobase.AstroBase.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
