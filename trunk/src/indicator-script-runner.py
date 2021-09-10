@@ -73,7 +73,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     COLUMN_BACKGROUND = 5 # Icon name for the APPLY icon; None otherwise.
     COLUMN_TERMINAL = 6 # Icon name for the APPLY icon; None otherwise.
     COLUMN_INTERVAL = 7 # Numeric amount as a string.
-    COLUMN_REMOVE = 8 # Icon name for the REMOVE icon; None otherwise.
+    COLUMN_FORCE_UPDATE = 8 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_REMOVE = 9 # Icon name for the REMOVE icon; None otherwise.
 
     # Define common indices for the scripts saved in JSON.
     JSON_GROUP = 0
@@ -208,7 +209,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     def __updateBackgroundScript( self, script, now ):
         commandResult = self.processGet( script.getCommand() ).strip()
-        # commandResult = "" #TODO Testing
         key = self.__createKey( script.getGroup(), script.getName() )
         self.backgroundScriptResults[ key ] = commandResult
         self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
@@ -242,11 +242,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        # Define these here so that widgets can connect to handle events.        
-        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str ) ) # Extra redundant columns, but allows the reuse of the column definitions.
+        # Define these here so that widgets can connect to handle events.
+        # Contains extra/redundant columns, but allows the reuse of the column definitions.
+        backgroundScriptsTreeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) )
         indicatorTextEntry = Gtk.Entry()
 
-        treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) )
+        treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ) )
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -263,38 +264,56 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "that script will appear as bold." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME, weight_set = True )
         treeViewColumn.set_expand( True )
-        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionText, copyOfScripts )
+        treeViewColumn.set_alignment( 0.5 )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionNameColumn, copyOfScripts )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_SOUND )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_NOTIFICATION )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_BACKGROUND )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TERMINAL )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn.pack_start( rendererText, False )
         treeViewColumn.add_attribute( rendererText, "text", IndicatorScriptRunner.COLUMN_INTERVAL )
-        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionCombined )
+        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionIntervalColumn )
 
         rendererPixbuf = Gtk.CellRendererPixbuf()
         treeViewColumn.pack_start( rendererPixbuf, False )
         treeViewColumn.add_attribute( rendererPixbuf, "icon_name", IndicatorScriptRunner.COLUMN_REMOVE )
-        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionCombined )
+        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionIntervalColumn )
 
+        treeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Force Update" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_FORCE_UPDATE )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -434,18 +453,35 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "add to the icon text." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_NAME )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_SOUND )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_NOTIFICATION )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_INTERVAL )
+        renderer = Gtk.CellRendererText()
+        renderer.set_property( "xalign", 0.5 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ), renderer, text = IndicatorScriptRunner.COLUMN_INTERVAL )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
+        backgroundScriptsTreeView.append_column( treeViewColumn )
+
+        treeViewColumn = Gtk.TreeViewColumn( _( "Force Update" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_FORCE_UPDATE )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
@@ -517,7 +553,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
     # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-    def dataFunctionText( self, treeViewColumn, cellRenderer, treeModel, treeIter, scripts ):
+    def dataFunctionNameColumn( self, treeViewColumn, cellRenderer, treeModel, treeIter, scripts ):
         cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
         group = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_GROUP_INTERNAL )
         name = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_NAME )
@@ -534,7 +570,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
     # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-    def dataFunctionCombined( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
+    def dataFunctionIntervalColumn( self, treeViewColumn, cellRenderer, treeModel, treeIter, data ):
         cellRenderer.set_visible( True )
         if treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
             if isinstance( cellRenderer, Gtk.CellRendererPixbuf ):
@@ -554,7 +590,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
         for group in groups:
-            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
+            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None, None ] )
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 playSound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 showNotification = Gtk.STOCK_APPLY if script.getShowNotification() else None
@@ -564,15 +600,17 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     terminalOpen = Gtk.STOCK_REMOVE
                     intervalInMinutes = str( script.getIntervalInMinutes() )
                     intervalInMinutesDash = None
+                    forceUpdate = Gtk.STOCK_APPLY if script.getForceUpdate() else None
 
                 else:
                     terminalOpen = Gtk.STOCK_APPLY if script.getTerminalOpen() else None
                     intervalInMinutes = ""
                     intervalInMinutesDash = Gtk.STOCK_REMOVE
+                    forceUpdate = Gtk.STOCK_REMOVE
 
                 treeStore.append(
                     parent,
-                    [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash ] )
+                    [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash, forceUpdate ] )
 
         if scripts:
             self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
@@ -584,7 +622,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
         for group in groups:
-            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None ] ) # Unused columns are present, but allows the reuse of the column definitions.
+            # Unused columns are present, but allows the reuse of the column definitions.
+            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
 
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 row = [
@@ -595,7 +634,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         Gtk.STOCK_APPLY if script.getShowNotification() else None, 
                         None, 
                         None, 
-                        str( script.getIntervalInMinutes() ) ]
+                        str( script.getIntervalInMinutes() ),
+                        Gtk.STOCK_APPLY if script.getForceUpdate() else None ]
 
                 treeStore.append( parent, row )
 
@@ -718,7 +758,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                             script.getCommand(),
                             script.getPlaySound(),
                             script.getShowNotification(),
-                            script.getIntervalInMinutes() )
+                            script.getIntervalInMinutes(),
+                            script.getForceUpdate() )
 
                     else:
                         newScript = NonBackground(
