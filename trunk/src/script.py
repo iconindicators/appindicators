@@ -107,7 +107,7 @@ class Background( Info ):
 
     def __str__( self ):
         return super().__str__() + " | " + \
-               str( self.intervalInMinutes ) + \
+               str( self.intervalInMinutes ) + " | " + \
                str( self.forceUpdate )
 
 

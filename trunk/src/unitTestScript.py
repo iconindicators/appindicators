@@ -13,7 +13,7 @@ command = "myCommand"
 playSound = True
 showNotification = False
 
-string = group + " | " + name + " | " + command + " | " + str( playSound ) + " | " + str( showNotification )
+infoString = group + " | " + name + " | " + command + " | " + str( playSound ) + " | " + str( showNotification )
 
 
 class TestScript( unittest.TestCase ):
@@ -35,15 +35,16 @@ class TestScript( unittest.TestCase ):
         self.assertAlmostEqual( myScript.__eq__( Info( group, name, command, not playSound, showNotification ) ), False )
         self.assertAlmostEqual( myScript.__eq__( Info( group, name, command, playSound, not showNotification ) ), False )
 
-        self.assertAlmostEqual( myScript.__str__(), string )
+        self.assertAlmostEqual( myScript.__str__(), infoString )
 
-        self.assertAlmostEqual( myScript.__repr__(), string )
+        self.assertAlmostEqual( myScript.__repr__(), infoString )
 
 
     def testBackground( self ):
         intervalInMinutes = 60
+        forceUpdate = True
 
-        myScript = Background( group, name, command, playSound, showNotification, intervalInMinutes )
+        myScript = Background( group, name, command, playSound, showNotification, intervalInMinutes, forceUpdate )
 
         self.assertAlmostEqual( myScript.getGroup(), group )
         self.assertAlmostEqual( myScript.getName(), name )
@@ -51,18 +52,20 @@ class TestScript( unittest.TestCase ):
         self.assertAlmostEqual( myScript.getPlaySound(), playSound )
         self.assertAlmostEqual( myScript.getShowNotification(), showNotification )
         self.assertAlmostEqual( myScript.getIntervalInMinutes(), intervalInMinutes )
+        self.assertAlmostEqual( myScript.getForceUpdate(), forceUpdate )
 
-        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, showNotification, intervalInMinutes ) ), True )
-        self.assertAlmostEqual( myScript.__eq__( Background( group + " ", name, command, playSound, showNotification, intervalInMinutes ) ), False )
-        self.assertAlmostEqual( myScript.__eq__( Background( group, name + " ", command, playSound, showNotification, intervalInMinutes ) ), False )
-        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command + " ", playSound, showNotification, intervalInMinutes ) ), False )
-        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, not playSound, showNotification, intervalInMinutes ) ), False )
-        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, not showNotification, intervalInMinutes ) ), False )
-        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, showNotification, 120 ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, showNotification, intervalInMinutes, forceUpdate ) ), True )
+        self.assertAlmostEqual( myScript.__eq__( Background( group + " ", name, command, playSound, showNotification, intervalInMinutes, forceUpdate ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name + " ", command, playSound, showNotification, intervalInMinutes, forceUpdate ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command + " ", playSound, showNotification, intervalInMinutes, forceUpdate ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, not playSound, showNotification, intervalInMinutes, forceUpdate ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, not showNotification, intervalInMinutes, forceUpdate ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, showNotification, 120, forceUpdate ) ), False )
+        self.assertAlmostEqual( myScript.__eq__( Background( group, name, command, playSound, showNotification, intervalInMinutes, False ) ), False )
 
-        self.assertAlmostEqual( myScript.__str__(), string + " | " + str( intervalInMinutes ) )
-
-        self.assertAlmostEqual( myScript.__repr__(), string + " | " + str( intervalInMinutes ) )
+        self.assertAlmostEqual( myScript.__str__(), infoString + " | " + str( intervalInMinutes ) + " | " + str( forceUpdate ) )
+        
+        self.assertAlmostEqual( myScript.__repr__(), infoString + " | " + str( intervalInMinutes ) + " | " + str( forceUpdate ) )
 
 
     def testNonBackground( self ):
@@ -88,9 +91,9 @@ class TestScript( unittest.TestCase ):
         self.assertAlmostEqual( myScript.__eq__( NonBackground( group, name, command, playSound, showNotification, not terminalOpen, default ) ), False )
         self.assertAlmostEqual( myScript.__eq__( NonBackground( group, name, command, playSound, showNotification, terminalOpen, not default ) ), False )
 
-        self.assertAlmostEqual( myScript.__str__(), string + " | " + str( terminalOpen ) + " | " + str( default ) )
+        self.assertAlmostEqual( myScript.__str__(), infoString + " | " + str( terminalOpen ) + " | " + str( default ) )
 
-        self.assertAlmostEqual( myScript.__repr__(), string + " | " + str( terminalOpen ) + " | " + str( default ) )
+        self.assertAlmostEqual( myScript.__repr__(), infoString + " | " + str( terminalOpen ) + " | " + str( default ) )
 
 
 if __name__ == '__main__':
