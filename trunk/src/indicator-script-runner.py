@@ -23,14 +23,7 @@
 #TODO Update changlog.
 
 
-#TODO Turn ON the sound for check log script.
-#Place a log file in the home directory.
-# Wait for a sound/notification.
-# Remove the log file...sound and notification keeps happening!
-#
-# The cached result of the log file script is simply resused when the next update cycle happens
-# (and it is not yet time to re-run the script to get a new value).
-# So what to do...?
+#TODO Re-run the upgrade script JSON now that 'forceUpdate' has been added.
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -178,11 +171,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsToExecute = [ ]
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now: # Update background script because interval is due.
+
+            # Update background script because interval is due.
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:
                 backgroundScriptsToExecute.append( script )
 
-#TODO Test.
-            if type( script ) == Background and self.getForceUpdate() and self.backgroundScriptResults[ key ]: # Update background script because of 'force update' and non-empty cache result.
+            # Update background script because of 'force update' and non-empty cache result.
+            if type( script ) == Background and script.getForceUpdate() and self.backgroundScriptResults[ key ]:
                 backgroundScriptsToExecute.append( script )
 
         # Based on example from
@@ -205,8 +200,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
-        # commandResult = self.processGet( script.getCommand() ).strip()
-        commandResult = "" #TODO Testing
+        commandResult = self.processGet( script.getCommand() ).strip()
+        # commandResult = "" #TODO Testing
         key = self.__createKey( script.getGroup(), script.getName() )
         self.backgroundScriptResults[ key ] = commandResult
         self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
