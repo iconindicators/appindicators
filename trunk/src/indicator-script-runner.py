@@ -30,6 +30,9 @@
 # Edited the script to be non-background, but the script still appeared in the icon text (in the Preferences).
 
 
+#TODO Need to put forceUpdate into the Preferences tables and anywhere a script is accessed.
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -916,6 +919,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "The update will occur whenever the next\n" + \
             "script will update, rather than when the\n" + \
             "script is due for an update." ) )
+#TODO Should this only apply to scripts that are in the icon label?        
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
@@ -964,7 +968,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                     del scripts[ i ]
 
-                # If this script is marked as default (and is non-background), check for an existing default script and if found, undefault it...
+                # If this script is marked as default (and is non-background),
+                # check for an existing default script and if found, undefault it...
                 if scriptNonBackgroundRadio.get_active() and defaultScriptCheckbox.get_active():
                     i = 0
                     for skript in scripts:
