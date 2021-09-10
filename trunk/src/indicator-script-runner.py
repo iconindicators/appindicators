@@ -23,14 +23,8 @@
 #TODO Update changlog.
 
 
-#TODO Re-run the upgrade script JSON now that 'forceUpdate' has been added.
-
-
 #TODO Had the background script "Internet SHaped' which was present in the icon text.
 # Edited the script to be non-background, but the script still appeared in the icon text (in the Preferences).
-
-
-#TODO Need to put forceUpdate into the Preferences tables and anywhere a script is accessed.
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -76,18 +70,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     COLUMN_FORCE_UPDATE = 8 # Icon name for the APPLY icon; None otherwise.
     COLUMN_REMOVE = 9 # Icon name for the REMOVE icon; None otherwise.
 
-    # Define common indices for the scripts saved in JSON.
+    # Indices for the scripts saved in JSON.
     JSON_GROUP = 0
     JSON_NAME = 1
     JSON_COMMAND = 2
     JSON_PLAY_SOUND = 3
     JSON_SHOW_NOTIFICATION = 4
 
-    # Define indices for background scripts saved in JSON.
+    # Background scripts
     JSON_INTERVAL_IN_MINUTES = 5
     JSON_FORCE_UPDATE = 6
 
-    # Define indices for non-background scripts saved in JSON.
+    # Non-background scripts
     JSON_TERMINAL_OPEN = 5
     JSON_DEFAULT = 6
 
@@ -106,7 +100,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.updateMenu( menu )
         self.updateBackgroundScripts( now )
 
-        # To use the base class process tags functionality, enclose each tag within { }.
+        # Process tags using the base class functionality (first enclose each tag within { }).
         self.setLabel( self.processTags( self.indicatorText.replace( '[', "{[" ).replace( ']', "]}" ), self.indicatorTextSeparator, self.__processTags, now ) )
 
         # Calculate next update...
@@ -610,7 +604,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 treeStore.append(
                     parent,
-                    [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, intervalInMinutesDash, forceUpdate ] )
+                    [ group, None, script.getName(), playSound, showNotification, background, terminalOpen, intervalInMinutes, forceUpdate, intervalInMinutesDash ] )
 
         if scripts:
             self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
