@@ -26,6 +26,10 @@
 #TODO Re-run the upgrade script JSON now that 'forceUpdate' has been added.
 
 
+#TODO Had the background script "Internet SHaped' which was present in the icon text.
+# Edited the script to be non-background, but the script still appeared in the icon text (in the Preferences).
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
