@@ -96,7 +96,7 @@ class Background( Info ):
     def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
 
 
-    def getForceUpdate( self ): return int( self.forceUpdate )
+    def getForceUpdate( self ): return self.forceUpdate
 
 
     def __eq__( self, script ): 
