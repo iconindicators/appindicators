@@ -921,7 +921,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
 
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
-        scriptBackgroundRadio.set_active( False if add else type( script ) == Background ) #TODO This and the same line above might need to go below the connect lines.
+        scriptBackgroundRadio.set_active( False if add else type( script ) == Background )
         scriptBackgroundRadio.set_tooltip_text(
             "The script will run in the background,\n" + \
             "at the interval specified, the results\n" + \
@@ -955,6 +955,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "script will update, rather than when the\n" + \
             "script is due for an update." ) )
 #TODO Should this only apply to scripts that are in the icon label?        
+# That is, only run a background script if it appears in the icon text?
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
