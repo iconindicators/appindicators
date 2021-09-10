@@ -20,6 +20,8 @@
 # optionally display results in the icon label.
 
 
+#TODO Update changlog.
+
 
 #TODO Turn ON the sound for check log script.
 #Place a log file in the home directory.
@@ -901,41 +903,21 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid.attach( box, 0, 18, 1, 1 )
 
 #TODO Not sure if this stays...if so, need a better name!
-        exceptionCheckbox = Gtk.CheckButton.new_with_label( _( "Exception" ) )
-        exceptionCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        # exceptionCheckbox.set_active( False if add else type( script ) == NonBackground and script.getException() ) #TODO NOt sure what the getter will/should be.
-        exceptionCheckbox.set_sensitive( True if add else type( script ) == Background )
-        exceptionCheckbox.set_tooltip_text( _(
-            "Consider a background script that returns\n" + \
-            "non-empty text (displayed in the icon text)\n" + \
-            "to report a warning/error; otherwise no text.\n\n" + \
-            "If the user resolves the underlying event,\n" + \
-            "the icon text (and notification/sound) will indicator will report the warning/error\n" + \
-            "until the script runs again.\n\n" + \
-            "If a background script returns non-empty text\n" + \
-            "to report a warning/error (empty text otherwise),\n" + \
-            "and if the user externally resolves the event,\n" + \
-            "the indicator will report the warning/error\n" + \
-            "until the script runs again.\n\n" + \
-            "If a background script returns non-empty text\n" + \
-            "to report a warning/error (empty text otherwise),\n" + \
-            "and if the user externally resolves the event,\n" + \
-            "the indicator will report the warning/error\n" + \
-            "until the script runs again.\n\n" + \
-            "If another script runs in the meantime,\n" + \
-            "the warning/error will continue to be reported\n" + \
-            "because a cached result is used.\n\n" + \
-            "To resolve this, a background script will be run\n" + \
-            "before its interval is due, if there is a non-empty\n" + \
-            "result AND this checkbox is checked." ) )
-# Well, doesn't look too friendly for newcomer.
-# What if simply explain it as "force update on non-empty result of
-# background script" or something similar?        
-        grid.attach( exceptionCheckbox, 0, 19, 1, 1 )
+        forceUpdateCheckbox = Gtk.CheckButton.new_with_label( _( "Force update" ) )
+        forceUpdateCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
+        # forceUpdateCheckbox.set_active( False if add else type( script ) == NonBackground and script.getException() ) #TODO NOt sure what the getter will/should be.
+        forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
+        forceUpdateCheckbox.set_tooltip_text( _(
+            "Force an update when the script returns\n" + \
+            "non-empty text.\n\n" + \
+            "The update will occur whenever the next\n" + \
+            "script will update, rather than when the\n" + \
+            "script is due for an update." ) )
+        grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
-        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, label, intervalSpinner, exceptionCheckbox )
-        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, label, intervalSpinner, exceptionCheckbox )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, label, intervalSpinner, forceUpdateCheckbox )
+        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, label, intervalSpinner, forceUpdateCheckbox )
         scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, terminalCheckbox, defaultScriptCheckbox )
 
         dialog = self.createDialog( scriptsTreeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
