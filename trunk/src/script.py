@@ -86,22 +86,29 @@ class Background( Info ):
     # True to play a sound on completion of script/command execution.
     # True to show a notification on completion of script/command execution.
     # Update interval (in minutes).
-    def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes ):
+    # Force update; script will update when the next update occurs for ANY background script.
+    def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes, forceUpdate ):
         super().__init__( group, name, command, playSound, showNotification )
         self.intervalInMinutes = intervalInMinutes
+        self.forceUpdate = forceUpdate
 
 
     def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
 
 
+    def getForceUpdate( self ): return int( self.forceUpdate )
+
+
     def __eq__( self, script ): 
         return super().__eq__( script ) and \
-               self.intervalInMinutes == script.getIntervalInMinutes()
+               self.intervalInMinutes == script.getIntervalInMinutes() and \
+               self.forceUpdate == script.getForceUpdate()
 
 
     def __str__( self ):
         return super().__str__() + " | " + \
-               str( self.intervalInMinutes )
+               str( self.intervalInMinutes ) + \
+               str( self.forceUpdate )
 
 
     def __repr__( self ): return self.__str__()

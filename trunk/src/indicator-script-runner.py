@@ -84,6 +84,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
     # Define indices for background scripts saved in JSON.
     JSON_INTERVAL_IN_MINUTES = 5
+    JSON_FORCE_UPDATE = 6
 
     # Define indices for non-background scripts saved in JSON.
     JSON_TERMINAL_OPEN = 5
@@ -177,7 +178,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsToExecute = [ ]
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now: # Update background script because interval is due.
+                backgroundScriptsToExecute.append( script )
+
+#TODO Test.
+            if type( script ) == Background and self.getForceUpdate() and self.backgroundScriptResults[ key ]: # Update background script because of 'force update' and non-empty cache result.
                 backgroundScriptsToExecute.append( script )
 
         # Based on example from
@@ -902,10 +907,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 18, 1, 1 )
 
-#TODO Not sure if this stays...if so, need a better name!
         forceUpdateCheckbox = Gtk.CheckButton.new_with_label( _( "Force update" ) )
         forceUpdateCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        # forceUpdateCheckbox.set_active( False if add else type( script ) == NonBackground and script.getException() ) #TODO NOt sure what the getter will/should be.
+        forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
         forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
         forceUpdateCheckbox.set_tooltip_text( _(
             "Force an update when the script returns\n" + \
@@ -989,7 +993,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         self.getTextViewText( commandTextView ).strip(),
                         soundCheckbox.get_active(),
                         notificationCheckbox.get_active(),
-                        intervalSpinner.get_value_as_int() )
+                        intervalSpinner.get_value_as_int(),
+                        forceUpdateCheckbox.get_active() )
 
                 else:
                     newScript = NonBackground(
@@ -1130,8 +1135,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 break
 
         backgroundScripts = [ ]
-        backgroundScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", True, True, 60 ] )
-        backgroundScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ] )
+        backgroundScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", True, True, 60, True ] )
+        backgroundScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5, False ] )
 
         self.indicatorText = " [" + group + "::Internet Down][" + group + "::Available Memory]"
 
@@ -1182,7 +1187,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     script[ IndicatorScriptRunner.JSON_COMMAND ],
                     bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
                     bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
-                    script[ IndicatorScriptRunner.JSON_INTERVAL_IN_MINUTES ] )
+                    script[ IndicatorScriptRunner.JSON_INTERVAL_IN_MINUTES ],
+                    bool( script[ IndicatorScriptRunner.JSON_FORCE_UPDATE ] ) )
 
                 self.scripts.append( skript )
 
@@ -1194,8 +1200,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.scripts.append( NonBackground( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False ) )
 
             # Example background scripts.
-            self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 60 ) )
-            self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5 ) )
+            self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 60, True ) )
+            self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5, False ) )
             self.indicatorText = " [Network::Internet Down][System::Available Memory]"
 
             self.requestSaveConfig()
@@ -1214,7 +1220,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                     script.getCommand(), 
                     script.getPlaySound(), 
                     script.getShowNotification(),
-                    script.getIntervalInMinutes() ] )
+                    script.getIntervalInMinutes(),
+                    script.getForceUpdate() ] )
 
             else:
                 scriptsNonBackground.append( [ 
