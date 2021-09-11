@@ -846,32 +846,32 @@ class IndicatorBase( ABC ):
         return directory
 
 
-    # Calls the command in a new process; quietly fails but logs to file.
-    def processCall( self, command ):
+    # Calls the command in a new process.
+    # On exception, logs to file if exit code is not ignored.
+    #
+    # Ignoring the exit code is useful for commands containing 'grep' which are noisy exit codes emitters.
+    def processCall( self, command, ignoreExitCode = False ):
         try:
             subprocess.call( command, shell = True )
 
         except subprocess.CalledProcessError as e:
-#TODO Check who calls this function...
-# The CalledProcessError is triggered when a non-zero exit code arises.
-# So what to do...?  Maybe have an argument to ignore the exit code?
-# This works for when grepping for VBoxManage and no result comes back (but get an exit code of 1).
-            self.getLogging().error( e )
-            pass
+            if not ignoreExitCode:
+                self.getLogging().error( e )
 
 
-    # Returns the result of calling the command.  On exception, returns None but logs to file.
-    def processGet( self, command ):
+    # Returns the result of calling the command.
+    # On exception, returns None (logs to file if exit code is not ignored).
+    #
+    # Ignoring the exit code is useful for commands containing 'grep' which are noisy exit codes emitters.
+    def processGet( self, command, ignoreExitCode = False ):
         result = None
         try:
             result = subprocess.check_output( command, shell = True, universal_newlines = True )
 
         except subprocess.CalledProcessError as e:
-#TODO Check who calls this function...
-# The CalledProcessError is triggered when a non-zero exit code arises.
-# So what to do...?  Maybe have an argument to ignore the exit code?
-# This works for when grepping for VBoxManage and no result comes back (but get an exit code of 1).
-            self.getLogging().error( e )
+            if not ignoreExitCode:
+                self.getLogging().error( e )
+
             result = None
 
         return result
