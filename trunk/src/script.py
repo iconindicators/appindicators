@@ -18,8 +18,8 @@
 
 # Script information.
 #
-# A base class which encapsulates basic script information.
-# Implementation classes for attributes specific to background script and non-background scripts.
+# Base class encapsulating basic script information.
+# Implementation classes for background and non-background scripts.
 
 
 from abc import ABC
@@ -27,8 +27,6 @@ from abc import ABC
 
 class Info( ABC ):
 
-    # Create a script.
-    #
     # Group to which a script belongs.
     # Name of script.
     # The command or script with any arguments as needed.
@@ -78,8 +76,6 @@ class Info( ABC ):
 
 class Background( Info ):
 
-    # Create a background script.
-    #
     # Group to which a script belongs.
     # Name of script.
     # The command or script with any arguments as needed.
@@ -116,8 +112,6 @@ class Background( Info ):
 
 class NonBackground( Info ):
 
-    # Create a non-background script.
-    #
     # Group to which a script belongs.
     # Name of script.
     # The command or script with any arguments as needed.
