@@ -767,6 +767,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
+    def __updateIndicatorTextEntry( self, textEntry, oldTag, newTag ): 
+        textEntry.set_text( textEntry.get_text().replace( "[" + oldTag + "]", "[" + newTag + "]" ) )
+
+
     def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView, textEntry ):
         group, name = self.__getGroupNameFromTreeView( scriptsTreeView )
         if group and name:
@@ -777,10 +781,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         del scripts[ i ]
                         self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
+                        self.__updateIndicatorTextEntry( textEntry, self.__createKey( group, name ), "" )
 
                         # Remove script from indicator text; benign operation if the script was not present (or is non-background).
-                        key = self.__createKey( group, name )
-                        textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
+                        # key = self.__createKey( group, name )
+                        # textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
 
                         break
 
@@ -799,23 +804,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             if editedScript:
                 # Update indicator text...
                 if type( theScript ) == Background and type( editedScript ) == NonBackground:
-                    key = self.__createKey( group, name )
-                    textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
+                    # key = self.__createKey( group, name )
+                    # textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
+                    self.__updateIndicatorTextEntry( textEntry, self.__createKey( group, name ), "" )                        
 
                 elif not( group == editedScript.getGroup() and name == editedScript.getName() ):
                     oldKey = self.__createKey( group, name )
                     newKey = self.__createKey( editedScript.getGroup(), editedScript.getName() )
-                    textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
-
-                
-                # Remove script from indicator text; benign operation if the script was not present.
-                
-                scriptChangedFromBackgroundToNonBackground = type( theScript ) == Background and type( editedScript ) == NonBackground
-                scriptRenamed = not( group == editedScript.getGroup() and name == editedScript.getName() )
-                if scriptChangedFromBackgroundToNonBackground or scriptRenamed:
-                    oldKey = self.__createKey( group, name )
-                    newKey = self.__createKey( editedScript.getGroup(), editedScript.getName() )
-                    textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
+                    # textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
+                    self.__updateIndicatorTextEntry( textEntry, oldKey, newKey )
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
