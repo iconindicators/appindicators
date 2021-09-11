@@ -59,18 +59,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
-        self.notification = None #TODO Testing
-
-
-# Testing ideas for middle mouse click of icon to get a notification for each event...
-# ...unlikely to work.
-#
-# Need to run code in a thread to do the notifications, one at a time, waiting for a notification to end before showing the next one.  
-#
-# Problem is, what if the user clicks the middle mouse button in the middle of the notification process or opens the Preferences, etc?
-    def actionCallback( self, widget ):
-        print("closed")
-
 
     def update( self, menu ):
         events = self.getEvents()
@@ -81,42 +69,22 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
         self.requestUpdate( delay = fiveSecondsAfterMidnight )
 
-        if not self.notify:
+        if self.notify:
             today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
             for event in events:
                 if today == event.getDate():
-#TODO Original line                    # Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
-
-
-#TODO Testing
-                    print( event.getDescription())
-                    self.notification = Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon )
-                    self.notification.connect("closed", self.actionCallback)
-                    self.notification.show()
-                    # import time
-                    # time.sleep( 5 )
-
-                    
-                    break
+                    Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
 
 
     def buildMenu( self, menu, events ):
         menuItemMaximum = self.lines - 3 # Less three to account for About, Preferences and Quit.
         menuItemCount = 0
-        currentDate = ""
+        lastDate = ""
         for event in events:
-            if event.getDate() != currentDate:
-                if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and at least one event menu item.
+            if event.getDate() != lastDate:
+                if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and an event menu item.
                     menu.append( Gtk.MenuItem.new_with_label( self.removeLeadingZeroFromDate( event.getDate() ) ) )
-
-
-#TODO Testing                    
-                    if currentDate == "":
-                        menu.get_children()[ 0 ].connect( "activate", lambda widget: self.fingersCrossed( widget ) )
-                        self.secondaryActivateTarget = menu.get_children()[ 0 ]
-
-
-                    currentDate = event.getDate()
+                    lastDate = event.getDate()
                     menuItemCount += 1
 
                 else:
@@ -135,15 +103,6 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             if menuItemCount == menuItemMaximum:
                 break
-
-
-#TODO Testing
-    def fingersCrossed( self, widget ):
-        today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
-        for event in self.getEvents():
-            if today == event.getDate():
-                # print( event )
-                Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
 
 
     def removeLeadingZeroFromDate( self, date ): return date[ 0 : -3 ] + ' ' + date[ -1 ] if date[ -2 ] == '0' else date[ 0 : -3 ] + ' ' + date[ -2 : ]
