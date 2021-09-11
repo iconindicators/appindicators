@@ -767,8 +767,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             dialog.destroy()
 
 
-    def __updateIndicatorTextEntry( self, textEntry, oldTag, newTag ): 
-        textEntry.set_text( textEntry.get_text().replace( "[" + oldTag + "]", "[" + newTag + "]" ) )
+    def updateIndicatorTextEntry( self, textEntry, oldTag, newTag ):
+        if newTag:
+            textEntry.set_text( textEntry.get_text().replace( "[" + oldTag + "]", "[" + newTag + "]" ) )
+
+        else:
+            textEntry.set_text( textEntry.get_text().replace( "[" + oldTag + "]", "" ) )
 
 
     def onScriptRemove( self, button, scripts, scriptsTreeView, backgroundScriptsTreeView, commandTextView, textEntry ):
@@ -781,12 +785,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         del scripts[ i ]
                         self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
-                        self.__updateIndicatorTextEntry( textEntry, self.__createKey( group, name ), "" )
-
-                        # Remove script from indicator text; benign operation if the script was not present (or is non-background).
-                        # key = self.__createKey( group, name )
-                        # textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
-
+                        self.updateIndicatorTextEntry( textEntry, self.__createKey( group, name ), "" )
                         break
 
                     i += 1
@@ -802,17 +801,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             theScript = self.getScript( scripts, group, name )
             editedScript = self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
             if editedScript:
-                # Update indicator text...
                 if type( theScript ) == Background and type( editedScript ) == NonBackground:
-                    # key = self.__createKey( group, name )
-                    # textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
-                    self.__updateIndicatorTextEntry( textEntry, self.__createKey( group, name ), "" )                        
+                    oldTag = self.__createKey( group, name )
+                    self.updateIndicatorTextEntry( textEntry, oldTag, "" )
 
-                elif not( group == editedScript.getGroup() and name == editedScript.getName() ):
-                    oldKey = self.__createKey( group, name )
-                    newKey = self.__createKey( editedScript.getGroup(), editedScript.getName() )
-                    # textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
-                    self.__updateIndicatorTextEntry( textEntry, oldKey, newKey )
+                if not( group == editedScript.getGroup() and name == editedScript.getName() ):
+                    oldTag = self.__createKey( group, name )
+                    newTag = self.__createKey( editedScript.getGroup(), editedScript.getName() )
+                    self.updateIndicatorTextEntry( textEntry, oldTag, newTag )
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
