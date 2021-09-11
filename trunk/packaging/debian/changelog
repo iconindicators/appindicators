@@ -1,6 +1,6 @@
 indicator-virtual-box (1.0.67-1) bionic; urgency=low
 
-  * Removed support VirtualBox configuration files prior to version 5.
+  * Removed support for VirtualBox™ 4 configuration files and earlier.
   * Update release to bionic as xenial is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000
@@ -82,9 +82,9 @@ indicator-virtual-box (1.0.62-1) xenial; urgency=low
 
 indicator-virtual-box (1.0.61-1) xenial; urgency=low
 
-  * Bug fix: The executable for VirtualBox may have a different path
+  * Bug fix: The executable for VirtualBox™ may have a different path
     to that which is ultimately displayed in a process list, rendering the fix
-    in the previous version to show the VirtualBox Manager window useless.
+    in the previous version to show the VirtualBox™ Manager window useless.
     Instead, add a text field and the user manually specifies the window name.
   * Corrected the indents for menu items for GNOME Shell.
   * Tidy up load config of user preferences.
@@ -100,7 +100,7 @@ indicator-virtual-box (1.0.61-1) xenial; urgency=low
 
 indicator-virtual-box (1.0.60-1) trusty; urgency=low
 
-  * Bug fix: Handle different locations of the VirtualBox executable as it can
+  * Bug fix: Handle different locations of the VirtualBox™ executable as it can
     vary depending on version and method of installation.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 25 Mar 2019 13:07:50 +1000
@@ -124,7 +124,7 @@ indicator-virtual-box (1.0.58-1) trusty; urgency=low
 
 indicator-virtual-box (1.0.57-1) trusty; urgency=low
 
-  * Bug fix: An exception occurred when no VirtualBox config file was present.
+  * Bug fix: An exception occurred when no VirtualBox™ config file was present.
   * Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
     ubuntu-mono-light would not load due to directories not present in the
     underlying index.theme file.
@@ -134,7 +134,7 @@ indicator-virtual-box (1.0.57-1) trusty; urgency=low
 
 indicator-virtual-box (1.0.56-1) trusty; urgency=low
 
-  * Support for VirtualBox 4.3/5.x or greater.
+  * Support for VirtualBox™ 4.3/5.x or greater.
   * Removed the option to alphabetically sort.
   * Removed outdated Czech translation.
   * About/Preferences dialogs now block each other - only show one at a time.
@@ -148,7 +148,7 @@ indicator-virtual-box (1.0.56-1) trusty; urgency=low
 
 indicator-virtual-box (1.0.55-1) precise; urgency=low
 
-  * Bug fix: Bringing VirtualBox Manager to front only worked in English
+  * Bug fix: Bringing VirtualBox™ Manager to front only worked in English
     locales.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 18 Apr 2017 14:15:06 +1000
@@ -223,7 +223,7 @@ indicator-virtual-box (1.0.49-1) precise; urgency=low
 
 indicator-virtual-box (1.0.48-1) precise; urgency=low
 
-  * Bug fix: Handle previously installed (older) versions of VirtualBox which
+  * Bug fix: Handle previously installed (older) versions of VirtualBox™ which
     have their config file in a different location.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 6 Feb 2016 12:12:13 +1000
@@ -296,7 +296,7 @@ indicator-virtual-box (1.0.41-1) precise; urgency=low
 indicator-virtual-box (1.0.40-1) precise; urgency=low
 
   * Bug fix: Incorrectly calling processes to list/run VMs.
-  * Bug fix: Incorrectly referring to the VirtualBox manage GUI.
+  * Bug fix: Incorrectly referring to the VirtualBox™ manage GUI.
   * Bug fix: The update interval was reset when starting a VM.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 6 May 2015 23:22:51 +1000
@@ -304,7 +304,7 @@ indicator-virtual-box (1.0.40-1) precise; urgency=low
 
 indicator-virtual-box (1.0.39-1) precise; urgency=low
 
-  * Bug fix: Handle the case when the VirtualBox configuration file does not
+  * Bug fix: Handle the case when the VirtualBox™ configuration file does not
     contain any VMs (typically when the user has made no sort order changes
     via VBoxManage).
 
@@ -316,7 +316,7 @@ indicator-virtual-box (1.0.38-1) precise; urgency=low
   * Bug fix: Submenus were not correctly rendering the tree of VMs.
   * Bug fix: Tree of VMs in the Preferences was not correctly rendered.
   * Bug fix: When editing a VM's properties, was testing incorrectly for None.
-  * Bug fix: When bringing the VirtualBox Manager window to front, the name of
+  * Bug fix: When bringing the VirtualBox™ Manager window to front, the name of
     the window would only work for English.
   * Greatly simplified the reading of virtual machine config files.
   * Tidy up of tooltips and code clean up.
@@ -367,9 +367,9 @@ indicator-virtual-box (1.0.34-1) precise; urgency=low
 
 indicator-virtual-box (1.0.33-1) precise; urgency=low
 
-  * It has become apparent the VirtualBox configuration file can exist in
+  * It has become apparent the VirtualBox™ configuration file can exist in
     different places, sometimes simultaneously, depending on the version of
-    VirtualBox.  Now handles the different cases...hopefully!
+    VirtualBox™.  Now handles the different cases...hopefully!
   * Handle a warning message from VBoxManage when obtaining a list of VMs.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jun 2014 16:16:10 +1000
@@ -377,7 +377,7 @@ indicator-virtual-box (1.0.33-1) precise; urgency=low
 
 indicator-virtual-box (1.0.32-1) precise; urgency=low
 
-  * The VirtualBox configuration file is now located in .config directory.
+  * The VirtualBox™ configuration file is now located in .config directory.
     Updated internals to handle the change.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jun 2014 21:23:20 +1000
@@ -492,7 +492,7 @@ indicator-virtual-box (1.0.19-1) precise; urgency=low
 
 indicator-virtual-box (1.0.18-1) precise; urgency=low
 
-  * Only brings up one VirtualBox manager at a time.
+  * Only brings up one VirtualBox™ manager at a time.
   * User can customise the launch command for a VM, allowing VBoxHeadless to
     be used instead of VBoxManage.
   * User can set a VM to automatically start when the indicator starts.
@@ -526,9 +526,9 @@ indicator-virtual-box (1.0.16-1) precise; urgency=low
 indicator-virtual-box (1.0.15-1) precise; urgency=low
 
   * Changes for Python3 and PyGObject.
-  * Now supports VirtualBox 4.2 and specifically groups.
-  * Handle the case when VirtualBox is not installed.
-  * Handle the case when VirtualBox is installed but has not yet been run
+  * Now supports VirtualBox™ 4.2 and specifically groups.
+  * Handle the case when VirtualBox™ is not installed.
+  * Handle the case when VirtualBox™ is installed but has not yet been run
     (and so $HOME/.VirtualBox/VirtualBox.xml does not exist).
   * Moved the preferences into a tabbed view.
   * Now uses a radio button to indicate a running VM as standard.
@@ -536,7 +536,7 @@ indicator-virtual-box (1.0.15-1) precise; urgency=low
   * Added option to show text before/after a group name.
   * Known issue: If a VM exists in a group (and there is another VM of the
     same name but not in a group) and you ungroup, the VM in the group is
-    not removed from the group.  This appears to be a bug in the VirtualBox
+    not removed from the group.  This appears to be a bug in the VirtualBox™
     UI and as such the indicator displays the VM (from the group) alongside
     the other VMs.
 
@@ -583,7 +583,7 @@ indicator-virtual-box (1.0.10-1) precise; urgency=low
 
   * Fixed the PPA URL in the About dialog.
   * Consolidated all options into a preferences dialog.
-  * Default sort now matches that given by the VirtualBox UI (rather than
+  * Default sort now matches that given by the VirtualBox™ UI (rather than
     VBoxManage).
   * The update of the running status of the VMs in the menu is now
     configurable between 1 and 60 minutes.  Note that an update also occurs
@@ -624,7 +624,7 @@ indicator-virtual-box (1.0.7-1) precise; urgency=low
 indicator-virtual-box (1.0.6-1) precise; urgency=low
 
   * Hide the menu during refresh (using popdown). 
-  * Renamed menu item 'Frontend' to be 'VirtualBox'...makes more sense.
+  * Renamed menu item 'Frontend' to be 'VirtualBox™'...makes more sense.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 13 Jul 2012 23:18:16 +1000
 
@@ -640,7 +640,7 @@ indicator-virtual-box (1.0.5-1) precise; urgency=low
 indicator-virtual-box (1.0.4-1) precise; urgency=low
 
   * Added menu option to sort virtual machine names alphabetically or by
-    default (as given by VirtualBox).
+    default (as given by VirtualBox™).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 10 Jul 2012 13:44:47 +1000
 
@@ -679,7 +679,7 @@ indicator-virtual-box (1.0.0-1) precise; urgency=low
       sudo gtk-update-icon-cache -f /usr/share/icons/elementary
   * If 'Unable to locate theme engine in module_path: "pixmap"' appears on
     execution, install "sudo apt-get install gtk2-engines-pixbuf".
-  * The indicator will run without 'virtualbox' installed...but it'll do
+  * The indicator will run without VirtualBox™ installed...but it'll do
     nothing useful!
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 7 Jul 2012 11:26:52 +1000
