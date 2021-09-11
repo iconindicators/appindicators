@@ -657,18 +657,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             treeView.scroll_to_cell( treePath ) # Doesn't like to be called when empty.
 
 
-    # Update the indicator text after script edit/removal; on removal, the new group/name must be set to "".
-#TODO Test this; edit a scrpt and remove a script.
-    def updateIndicatorTextEntry( self, textEntry, oldGroup, oldName, newGroup, newName ):
-        oldKey = self.__createKey( oldGroup, oldName )
-        if newGroup and newName: # Script was edited; do tag substitution...
-            newKey = self.__createKey( newGroup, newName )
-            textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
-
-        else: # Script was removed; do tag removal...
-            textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "" ) )
-
-
     def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
         group, name = self.__getGroupNameFromTreeView( treeView )
         commandText = ""
@@ -789,7 +777,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         del scripts[ i ]
                         self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
                         self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
-                        self.updateIndicatorTextEntry( textEntry, group, name, "", "" )
+
+                        # Remove script from indicator text; benign operation if the script was not present (or is non-background).
+                        key = self.__createKey( group, name )
+                        textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
+
                         break
 
                     i += 1
@@ -805,7 +797,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             theScript = self.getScript( scripts, group, name )
             editedScript = self.__addEditScript( theScript, scripts, scriptsTreeView, backgroundScriptsTreeView )
             if editedScript:
-                self.updateIndicatorTextEntry( textEntry, group, name, editedScript.getGroup(), editedScript.getName() )
+                # Update indicator text...
+                if type( theScript ) == Background and type( editedScript ) == NonBackground:
+                    key = self.__createKey( group, name )
+                    textEntry.set_text( textEntry.get_text().replace( "[" + key + "]", "" ) )
+
+                elif not( group == editedScript.getGroup() and name == editedScript.getName() ):
+                    oldKey = self.__createKey( group, name )
+                    newKey = self.__createKey( editedScript.getGroup(), editedScript.getName() )
+                    textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
+
+                
+                # Remove script from indicator text; benign operation if the script was not present.
+                
+                scriptChangedFromBackgroundToNonBackground = type( theScript ) == Background and type( editedScript ) == NonBackground
+                scriptRenamed = not( group == editedScript.getGroup() and name == editedScript.getName() )
+                if scriptChangedFromBackgroundToNonBackground or scriptRenamed:
+                    oldKey = self.__createKey( group, name )
+                    newKey = self.__createKey( editedScript.getGroup(), editedScript.getName() )
+                    textEntry.set_text( textEntry.get_text().replace( "[" + oldKey + "]", "[" + newKey + "]" ) )
 
 
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
