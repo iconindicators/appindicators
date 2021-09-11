@@ -1,6 +1,6 @@
 indicator-script-runner (1.0.16-1) bionic; urgency=low
 
-  * New background script functionality added.
+  * Background script functionality added.
 
     Existing scripts are now referred to as non-background scripts and remain
     functionally the same.
@@ -21,8 +21,12 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
     log file is present.  Enabling the sound and notification options for
     the script are of value.
 
-TODO Mention about the exception/force feature with an example....
-
+    Background scripts are updated according to their individual intervals.
+    If one background script is updated every five minutes whereas another is
+    updated hourly, the results for the hourly script are cached and used when
+    the more frequent script is updated.  Consequently, using cached results
+    in the icon text can become out of date and so an option is available to
+    force an update for a script quicker than its specified interval.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Jul 2021 18:02:42 +1000
 
