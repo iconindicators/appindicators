@@ -400,7 +400,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorTextEntry.set_text( self.indicatorText )
-        # indicatorTextEntry.set_receives_default( False )#TODO Testing
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -427,8 +426,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( indicatorTextSeparatorEntry, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        # backgroundScriptsTreeView.set_receives_default( True ) #TODO Testing
-        # backgroundScriptsTreeView.set_property( "can-focus", True )#TODO Testing
         backgroundScriptsTreeView.set_hexpand( True )
         backgroundScriptsTreeView.set_vexpand( True )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -478,16 +475,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( scrolledWindow, 0, 2, 1, 20 )
 
-        tabName = _( "Icon" ) #TODO Not sure if this stays
-        notebook.append_page( grid, Gtk.Label.new( tabName ) )
-
-        notebook.connect( "switch-page", self.onSwitchPage, tabName, backgroundScriptsTreeView, indicatorTextEntry )
+        notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
-
-        # grid.set_focus_child( backgroundScriptsTreeView )#TODO Testing
-        # backgroundScriptsTreeView.grab_focus()#TODO Testing
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
@@ -499,33 +490,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             self.initialiseBackgroundScripts()
 
         return responseType
-
-
-#TODO NOt sure if this stays.
-    def onSwitchPage( self, notebook, page, pageNumber, tabName, treeView, textEntry ):
-        # if notebook.get_tab_label_text( page ) == tabName:
-        # treeView.get_parent().grab_focus()
-        # treeView.grab_focus()
-        # treeView.get_parent().get_parent().set_focus_child( treeView.get_parent() )
-
-        # textEntry.grab_focus_without_selecting()
-        #     print( "focus")
-        # print( textEntry.has_focus())
-        # textEntry.grab_focus_without_selecting()
-        
-        # if pageNumber == notebook.get_n_pages() - 1:
-        #     print( "Last ")
-        #
-        # print(  treeView.get_parent().get_parent() )
-        # print( pageNumber )
-
-        # print( textEntry.get_text())
-        # textEntry.select_region( 5, 10  )
-        # textEntry.set_position( -1 )
-        # print( textEntry.get_overwrite_mode())
-        # textEntry.grab_focus_without_selecting()
-        # treeView.grab_focus()
-        pass
 
 
     # Renders the script name bold when the (non-background) script is default.
