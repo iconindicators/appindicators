@@ -19,13 +19,13 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
     the log file is present.  Enabling the sound and notification options for
     the script are of value.
 
-    Each background script is updated according to its respective interval.
-    Each time a background script is updated, the results are cached.
-    When the icon text is updated, after any background script update, any
-    background script which did not update at that time has its cached results
-    used instead.  Consequently, the icon text can become out of date and
-    so an option is available to force an update for a script quicker than its
-    specified interval.
+    Each background script is updated according to its respective interval and
+    the results are cached.  At the same time, the icon text is also updated
+    with these results.  However, any background script which did not update
+    at that time has its cached results used instead.  Consequently, the icon
+    text can become out of date and so an option is available to force an
+    update for a script quicker than its specified interval.  This option would
+    typically used for a script which reports exception conditions.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Jul 2021 18:02:42 +1000
 
