@@ -88,7 +88,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             version = "1.0.16",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
-        print()#TODO Testing
 
 
     def update( self, menu ):
@@ -221,7 +220,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
 # The indicator text on the icon tab is highlighted...why?
 # https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
-# https://gitlab.gnome.org/GNOME/gtk/-/issues/1430  Can log a bug to this site if need be.
+# https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
     def onPreferences( self, dialog ):
         copyOfScripts = copy.deepcopy( self.scripts )
 
