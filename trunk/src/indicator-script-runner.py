@@ -20,9 +20,6 @@
 # optionally display results in the icon label.
 
 
-#TODO Update changlog.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -954,6 +951,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "script is due for an update." ) )
 #TODO Should this only apply to scripts that are in the icon label?        
 # That is, only run a background script if it appears in the icon text?
+# Whatever the result, update also the changelog.
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
