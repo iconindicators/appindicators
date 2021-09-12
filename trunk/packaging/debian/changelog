@@ -2,7 +2,7 @@ indicator-lunar (1.0.90-1) bionic; urgency=low
 
   * Bug fix: Removed separator character after empty { } in icon text.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Aug 2021 15:44:26 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Aug 2021 15:44:26 +1000    <-----TODO Set to date of release, whenever that happens!
 
 
 indicator-lunar (1.0.89-1) bionic; urgency=low
