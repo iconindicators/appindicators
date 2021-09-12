@@ -115,6 +115,10 @@ class PPA( object ):
     def __repr__( self ): return self.__str__()
 
 
+#TODO Need and __eq__
+        # return self.__class__ == event.__class__ and \
+
+
 class PublishedBinary( object ):
 
     def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
@@ -150,6 +154,11 @@ class PublishedBinary( object ):
 
 
     def __repr__( self ): return self.__str__()
+
+
+#TODO Need and __eq__
+        # return self.__class__ == event.__class__ and \
+
 
 
 class Filters( object ):
@@ -192,4 +201,4 @@ class Filters( object ):
     def __repr__( self ): return self.__str__()
 
 
-    def __eq__( self, other ): return self.__dict__ == other.__dict__
+    def __eq__( self, filters ): return self.__dict__ == filters.__dict__#TODO Is this correct?
