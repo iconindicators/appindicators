@@ -21,6 +21,8 @@
 
 class Event( object ):
 
+    # Date - String format 'MMM DD'.  For example, 'Jul 05'.
+    # Description - String description of the event.
     def __init__( self, date, description ):
         self.date = date
         self.description = description
