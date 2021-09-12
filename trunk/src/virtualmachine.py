@@ -38,6 +38,12 @@ class VirtualMachine( object ):
     def __repr__( self ): return self.__str__()
 
 
+    def __eq__( self, other ):
+        return self.__class__ == other.__class__ and \
+               self.getName() == other.getName() and \
+               self.getUUID() == other.getUUID()
+
+
 class Group( object ):
 
     def __init__( self, name ):
@@ -57,4 +63,16 @@ class Group( object ):
     def __str__( self ): return self.getName() + ": " + ' | '.join( [ str( x.getName() ) for x in self.getItems() ] )
 
 
-    def __repr__( self ): return self.__str__()    
+    def __repr__( self ): return self.__str__()
+
+
+    def __eq__( self, other ):
+        equal = self.__class__ == other.__class__ and \
+                self.getName() == other.getName() and \
+                len( self.getItems() ) == len( other.getItems( ) )
+
+        if equal:
+            for itemFromSelf, itemFromOther in zip( self.getItems(), other.getItems() ):
+                equal &= itemFromSelf.__eq__( itemFromOther )
+
+        return equal
