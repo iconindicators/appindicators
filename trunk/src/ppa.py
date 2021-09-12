@@ -114,9 +114,23 @@ class PPA( object ):
 
     def __repr__( self ): return self.__str__()
 
-
-#TODO Need and __eq__
-        # return self.__class__ == event.__class__ and \
+# TODO Compare above with this from Script:
+#
+#     def __eq__( self, other ): 
+#         return super().__eq__( other ) and \
+#                self.__class__ == other.__class__ and \
+#                self.getTerminalOpen() == other.getTerminalOpen() and \
+#                self.getDefault() == other.getDefault()
+#
+#
+#     def __str__( self ):
+#         return super().__str__() + " | " + \
+#                str( self.terminalOpen ) + " | " + \
+#                str( self.default )
+#
+#
+#     def __repr__( self ): return self.__str__()
+#
 
 
 class PublishedBinary( object ):
@@ -156,9 +170,23 @@ class PublishedBinary( object ):
     def __repr__( self ): return self.__str__()
 
 
-#TODO Need and __eq__
-        # return self.__class__ == event.__class__ and \
-
+# TODO Compare above with this from Script:
+#
+#     def __eq__( self, other ): 
+#         return super().__eq__( other ) and \
+#                self.__class__ == other.__class__ and \
+#                self.getTerminalOpen() == other.getTerminalOpen() and \
+#                self.getDefault() == other.getDefault()
+#
+#
+#     def __str__( self ):
+#         return super().__str__() + " | " + \
+#                str( self.terminalOpen ) + " | " + \
+#                str( self.default )
+#
+#
+#     def __repr__( self ): return self.__str__()
+#
 
 
 class Filters( object ):
@@ -201,4 +229,23 @@ class Filters( object ):
     def __repr__( self ): return self.__str__()
 
 
-    def __eq__( self, filters ): return self.__dict__ == filters.__dict__#TODO Is this correct?
+    def __eq__( self, filters ): return self.__dict__ == filters.__dict__
+    
+# TODO Compare above with this from Script:
+#
+#     def __eq__( self, other ): 
+#         return super().__eq__( other ) and \
+#                self.__class__ == other.__class__ and \
+#                self.getTerminalOpen() == other.getTerminalOpen() and \
+#                self.getDefault() == other.getDefault()
+#
+#
+#     def __str__( self ):
+#         return super().__str__() + " | " + \
+#                str( self.terminalOpen ) + " | " + \
+#                str( self.default )
+#
+#
+#     def __repr__( self ): return self.__str__()
+#
+    
