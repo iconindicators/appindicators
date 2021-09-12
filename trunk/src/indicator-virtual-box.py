@@ -19,9 +19,6 @@
 # Application indicator for VirtualBox™ virtual machines.
 
 
-#TODO Need to get translation done.
-
-
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -420,7 +417,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes )
         spinnerRefreshInterval.set_tooltip_text( _(
             "How often the list of virtual machines\n" + \
-            "and running status are updated." ) )
+            "and their running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
