@@ -55,12 +55,13 @@ class Info( ABC ):
     def getShowNotification( self ): return self.showNotification
 
 
-    def __eq__( self, script ): 
-        return self.group == script.getGroup() and \
-               self.name == script.getName() and \
-               self.command == script.getCommand() and \
-               self.playSound == script.getPlaySound() and \
-               self.showNotification == script.getShowNotification()
+    def __eq__( self, other ): 
+        return self.__class__ == other.__class__ and \
+               self.getGroup() == other.getGroup() and \
+               self.getName() == other.getName() and \
+               self.getCommand() == other.getCommand() and \
+               self.getPlaySound() == other.getPlaySound() and \
+               self.getShowNotification() == other.getShowNotification()
 
 
     def __str__( self ):
@@ -95,10 +96,11 @@ class Background( Info ):
     def getForceUpdate( self ): return self.forceUpdate
 
 
-    def __eq__( self, script ): 
-        return super().__eq__( script ) and \
-               self.intervalInMinutes == script.getIntervalInMinutes() and \
-               self.forceUpdate == script.getForceUpdate()
+    def __eq__( self, other ): 
+        return super().__eq__( other ) and \
+               self.__class__ == other.__class__ and \
+               self.getIntervalInMinutes() == other.getIntervalInMinutes() and \
+               self.getForceUpdate() == other.getForceUpdate()
 
 
     def __str__( self ):
@@ -131,10 +133,11 @@ class NonBackground( Info ):
     def getDefault( self ): return self.default
 
 
-    def __eq__( self, script ): 
-        return super().__eq__( script ) and \
-               self.terminalOpen == script.getTerminalOpen() and \
-               self.default == script.getDefault()
+    def __eq__( self, other ): 
+        return super().__eq__( other ) and \
+               self.__class__ == other.__class__ and \
+               self.getTerminalOpen() == other.getTerminalOpen() and \
+               self.getDefault() == other.getDefault()
 
 
     def __str__( self ):
