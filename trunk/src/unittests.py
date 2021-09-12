@@ -32,5 +32,32 @@ class Test( unittest.TestCase ):
         self.assertAlmostEqual( myOrbitalElement.__repr__(), data )
 
 
+    def testTLE( self ):
+
+        title = "title"
+        line1 = "1 2 3 4"
+        line2 = "5 6 7 8"
+
+        myTwoLineElement = TLE( title, line1, line2 )
+
+        self.assertAlmostEqual( myTwoLineElement.getTitle(), title )
+        self.assertAlmostEqual( myTwoLineElement.getLine1(), line1 )
+        self.assertAlmostEqual( myTwoLineElement.getLine2(), line2 )
+
+        self.assertAlmostEqual( myTwoLineElement.__eq__( TLE( title, line1, line2 ) ), True )
+        self.assertAlmostEqual( myTwoLineElement.__eq__( TLE( title + " ", line1, line2 ) ), False )
+        self.assertAlmostEqual( myTwoLineElement.__eq__( TLE( title, line1 + " ", line2 ) ), False )
+        self.assertAlmostEqual( myTwoLineElement.__eq__( TLE( title, line1, line2 + " " ) ), False )
+
+        twoLineElementString = \
+            title + " | " + \
+            line1 + " | " + \
+            line2
+
+        self.assertAlmostEqual( myTwoLineElement.__str__(), twoLineElementString )
+        
+        self.assertAlmostEqual( myTwoLineElement.__repr__(), twoLineElementString )
+
+
 if __name__ == '__main__':
     unittest.main()
