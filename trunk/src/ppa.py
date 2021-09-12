@@ -16,12 +16,103 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Store a PPA's details and published binaries.
+# Store a PPA's details, published binaries and filters.
 
 
 from enum import Enum
 
 import operator
+
+
+class Filters( object ):
+
+    INDEX_USER = 0
+    INDEX_NAME = 1
+    INDEX_SERIES = 2
+    INDEX_ARCHITECTURE = 3
+
+
+    def __init__( self ):
+        self.filters = { }
+
+
+    def addFilter( self, user, name, series, architecture, text = [ ] ):
+        self.filters[ self.__getKey( user, name, series, architecture ) ] = text
+
+
+    def hasFilter( self, user, name, series, architecture ):
+        return self.__getKey( user, name, series, architecture ) in self.filters
+
+
+    def getFilterText( self, user, name, series, architecture ):
+        return self.filters[ self.__getKey( user, name, series, architecture ) ]
+
+
+    def getUserNameSeriesArchitecture( self ):
+        for key in sorted( self.filters.keys() ):
+            keyComponents = key.split( " | " )
+            yield keyComponents[ Filters.INDEX_USER ], keyComponents[ Filters.INDEX_NAME ], keyComponents[ Filters.INDEX_SERIES ], keyComponents[ Filters.INDEX_ARCHITECTURE ]
+
+
+    def __getKey( self, user, name, series, architecture ):
+        return user + " | " + name + " | " + series + " | " + architecture
+
+
+    def __str__( self ): return str( self.__dict__ )
+
+
+    def __repr__( self ): return self.__str__()
+
+
+    def __eq__( self, filters ): return self.__dict__ == filters.__dict__
+
+
+class PublishedBinary( object ):
+
+    def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
+        self.packageName = packageName
+        self.packageVersion = packageVersion
+        self.downloadCount = downloadCount
+        self.architectureSpecific = architectureSpecific
+
+
+    def getPackageName( self ): return self.packageName
+
+
+    def getPackageVersion( self ): return self.packageVersion
+
+
+#TODO Why have a setter?
+    def setPackageVersion( self, packageVersion ): self.packageVersion = packageVersion
+
+
+    def getDownloadCount( self ): return self.downloadCount
+
+
+#TODO Why have a setter?
+    def setDownloadCount( self, downloadCount ): self.downloadCount = downloadCount
+
+
+    def isArchitectureSpecific( self ): return self.architectureSpecific
+
+
+#TODO Might need str() around version/download count/arch spec.
+    def __str__( self ):
+        return self.getPackageName() + " | " + \
+               self.getPackageVersion() + " | " + \
+               self.getDownloadCount() + " | " + \
+               self.isArchitectureSpecific()
+
+
+    def __repr__( self ): return self.__str__()
+
+
+    def __eq__( self, other ): 
+        return self.__class__ == other.__class__ and \
+               self.getPackageName() == other.getPackageName() and \
+               self.getPackageVersion() == other.getPackageVersion() and \
+               self.getDownloadCount() == other.getDownloadCount() and \
+               self.isArchitectureSpecific() == other.isArchitectureSpecific()
 
 
 class PPA( object ):
@@ -114,138 +205,14 @@ class PPA( object ):
 
     def __repr__( self ): return self.__str__()
 
-# TODO Compare above with this from Script:
-#
-#     def __eq__( self, other ): 
-#         return super().__eq__( other ) and \
-#                self.__class__ == other.__class__ and \
-#                self.getTerminalOpen() == other.getTerminalOpen() and \
-#                self.getDefault() == other.getDefault()
-#
-#
-#     def __str__( self ):
-#         return super().__str__() + " | " + \
-#                str( self.terminalOpen ) + " | " + \
-#                str( self.default )
-#
-#
-#     def __repr__( self ): return self.__str__()
-#
 
+    def __eq__( self, other ): 
+        equal = self.__class__ == other.__class__ and \
+                self.getUser() == other.getUser() and \
+                self.getName() == other.getName() and \
+                self.getSeries() == other.getSeries() and \
+                self.getArchitecture() == other.getArchitecture() and \
+                self.getStatus() == other.getStatus()
 
-class PublishedBinary( object ):
-
-    def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
-        self.packageName = packageName
-        self.packageVersion = packageVersion
-        self.downloadCount = downloadCount
-        self.architectureSpecific = architectureSpecific
-
-
-    def getPackageName( self ): return self.packageName
-
-
-    def getPackageVersion( self ): return self.packageVersion
-
-
-    def setPackageVersion( self, packageVersion ): self.packageVersion = packageVersion
-
-
-    def getDownloadCount( self ): return self.downloadCount
-
-
-    def setDownloadCount( self, downloadCount ): self.downloadCount = downloadCount
-
-
-    def isArchitectureSpecific( self ): return self.architectureSpecific
-
-
-    def __str__( self ):
-        return self.packageName + " | " + \
-               str( self.packageVersion ) + " | " + \
-               str( self.downloadCount ) + " | " + \
-               str( self.architectureSpecific )
-
-
-    def __repr__( self ): return self.__str__()
-
-
-# TODO Compare above with this from Script:
-#
-#     def __eq__( self, other ): 
-#         return super().__eq__( other ) and \
-#                self.__class__ == other.__class__ and \
-#                self.getTerminalOpen() == other.getTerminalOpen() and \
-#                self.getDefault() == other.getDefault()
-#
-#
-#     def __str__( self ):
-#         return super().__str__() + " | " + \
-#                str( self.terminalOpen ) + " | " + \
-#                str( self.default )
-#
-#
-#     def __repr__( self ): return self.__str__()
-#
-
-
-class Filters( object ):
-
-    INDEX_USER = 0
-    INDEX_NAME = 1
-    INDEX_SERIES = 2
-    INDEX_ARCHITECTURE = 3
-
-
-    def __init__( self ):
-        self.filters = { }
-
-
-    def addFilter( self, user, name, series, architecture, text = [ ] ):
-        self.filters[ self.__getKey( user, name, series, architecture ) ] = text
-
-
-    def hasFilter( self, user, name, series, architecture ):
-        return self.__getKey( user, name, series, architecture ) in self.filters
-
-
-    def getFilterText( self, user, name, series, architecture ):
-        return self.filters[ self.__getKey( user, name, series, architecture ) ]
-
-
-    def getUserNameSeriesArchitecture( self ):
-        for key in sorted( self.filters.keys() ):
-            keyComponents = key.split( " | " )
-            yield keyComponents[ Filters.INDEX_USER ], keyComponents[ Filters.INDEX_NAME ], keyComponents[ Filters.INDEX_SERIES ], keyComponents[ Filters.INDEX_ARCHITECTURE ]
-
-
-    def __getKey( self, user, name, series, architecture ):
-        return user + " | " + name + " | " + series + " | " + architecture
-
-
-    def __str__( self ): return str( self.__dict__ )
-
-
-    def __repr__( self ): return self.__str__()
-
-
-    def __eq__( self, filters ): return self.__dict__ == filters.__dict__
-    
-# TODO Compare above with this from Script:
-#
-#     def __eq__( self, other ): 
-#         return super().__eq__( other ) and \
-#                self.__class__ == other.__class__ and \
-#                self.getTerminalOpen() == other.getTerminalOpen() and \
-#                self.getDefault() == other.getDefault()
-#
-#
-#     def __str__( self ):
-#         return super().__str__() + " | " + \
-#                str( self.terminalOpen ) + " | " + \
-#                str( self.default )
-#
-#
-#     def __repr__( self ): return self.__str__()
-#
-    
+#TODO Add published binaries.        
+        return equal
