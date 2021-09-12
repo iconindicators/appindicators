@@ -20,6 +20,10 @@
 # optionally display results in the icon label.
 
 
+#TODO Update tooltips and changlog..where else?
+# Need to say that a background script is only updated if present in the icon text.
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -913,13 +917,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "The update will occur whenever the next\n" + \
             "script will update, rather than when the\n" + \
             "script is due for an update." ) )
-#TODO Should this only apply to scripts that are in the icon label?        
-# That is, only run a background script if it appears in the icon text?
-# Whatever the result, update also the changelog.
-#
-# Only update a background script if it is present in the icon text.
-#    Downside is that cannot have scripts that just run in the background; use cron instead.
-#    
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
