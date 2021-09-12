@@ -27,7 +27,7 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
     update for a script quicker than its specified interval.  This option would
     typically used for a script which reports exception conditions.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Jul 2021 18:02:42 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 19 Jul 2021 18:02:42 +1000    <-----TODO Set to date of release, whenever that happens!
 
 
 indicator-script-runner (1.0.15-1) bionic; urgency=low
