@@ -219,11 +219,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                         # Add up the download count from each published binary of the same key (package name OR package name and package version).
                         if key in temp:
+#TODO Can we instead create a new object and replace into same key rather than have a setter?                            
                             temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
 
                         else:
                             temp[ key ] = publishedBinary
                             if self.ignoreVersionArchitectureSpecific:
+#TODO Can we instead create a new object and replace into same key rather than have a setter?                            
                                 temp[ key ].setPackageVersion( None )
 
                     else:
