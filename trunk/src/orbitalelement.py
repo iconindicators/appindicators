@@ -55,25 +55,11 @@ class OE( object ):
     def __repr__( self ): return self.__str__()
 
 
-# TODO Compare above with this from Script:
-#
-#     def __eq__( self, other ): 
-#         return super().__eq__( other ) and \
-#                self.__class__ == other.__class__ and \
-#                self.getTerminalOpen() == other.getTerminalOpen() and \
-#                self.getDefault() == other.getDefault()
-#
-#
-#     def __str__( self ):
-#         return super().__str__() + " | " + \
-#                str( self.terminalOpen ) + " | " + \
-#                str( self.default )
-#
-#
-#     def __repr__( self ): return self.__str__()
-#
-
-
+    def __eq__( self, other ): 
+        return self.__class__ == other.__class__ and \
+               self.getName() == other.getName() and \
+               self.getData() == other.getData() and \
+               self.getDataType() == other.getDataType()
 
 
 # Download OE data; drop bad/missing data.
