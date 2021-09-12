@@ -79,8 +79,8 @@ class TLE( object ):
 
     def __str__( self ):
         return str( self.title ) + " | " + \
-            str( self.line1 ) + " | " + \
-            str( self.line2 )
+               str( self.line1 ) + " | " + \
+               str( self.line2 )
 
 
     def __repr__( self ): return self.__str__()
