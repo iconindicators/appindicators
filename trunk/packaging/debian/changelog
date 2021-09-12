@@ -5,7 +5,7 @@ indicator-ppa-download-statistics (1.0.74-1) bionic; urgency=low
   * Update release to bionic as xenial is end of life.
   * Added impish to the list of series.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000    <-----TODO Set to date of release, whenever that happens!
 
 
 indicator-ppa-download-statistics (1.0.73-1) xenial; urgency=low
