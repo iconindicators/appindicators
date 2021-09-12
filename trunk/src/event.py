@@ -40,7 +40,7 @@ class Event( object ):
     def __repr__( self ): return self.__str__()
 
 
-    def __eq__( self, other ):
-        return self.__class__ == other.__class__ and \
-               self.date == other.date and \
-               self.description == other.description
+    def __eq__( self, event ):
+        return self.__class__ == event.__class__ and \
+               self.date == event.getDate() and \
+               self.description == event.getDescription()
