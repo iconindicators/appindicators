@@ -77,8 +77,10 @@ class Reading( object ):
 
     # Returns the date/time or date if time is unavailable in the port local timezone.
     def getDateTime( self ):
+        dateTime = None
         if self.hour is None and self.minute is None and self.timezone is None:
-            return datetime.date( self.year, self.month, self.day )
+            dateTime = datetime.date( self.year, self.month, self.day )
+
         else:
             dateString = str( self.year ) + " " + \
                          str( self.month ) +  " " + \
@@ -87,33 +89,35 @@ class Reading( object ):
                          str( self.minute ) + " " + \
                          str( self.timezone )
 
-            return datetime.datetime.strptime( dateString, "%Y %m %d %H %M %z" )
+            dateTime = datetime.datetime.strptime( dateString, "%Y %m %d %H %M %z" )
+
+        return dateTime
 
 
     def __str__( self ):
         return self.portID + " | " + \
-               str( self.year ) + "-" + str( self.month ) + "-" + str( self.day ) + "-" + str( self.hour ) + "-" + str( self.minute ) + "-" + str( self.timezone ) + " | " + \
+               str( self.year ) + "-" + \
+               str( self.month ) + "-" + \
+               str( self.day ) + "-" + \
+               str( self.hour ) + "-" + \
+               str( self.minute ) + "-" + \
+               str( self.timezone ) + " | " + \
                str( self.levelInMetres ) + " | " + \
                ( "H" if self.tideType == Type.H else "L" )
 
 
     def __repr__( self ): return self.__str__()
-    
-# TODO Compare above with this from Script:
-#
-#     def __eq__( self, other ): 
-#         return super().__eq__( other ) and \
-#                self.__class__ == other.__class__ and \
-#                self.getTerminalOpen() == other.getTerminalOpen() and \
-#                self.getDefault() == other.getDefault()
-#
-#
-#     def __str__( self ):
-#         return super().__str__() + " | " + \
-#                str( self.terminalOpen ) + " | " + \
-#                str( self.default )
-#
-#
-#     def __repr__( self ): return self.__str__()
-#
-    
+
+
+    def __eq__( self, other ): 
+        return self.__class__ == other.__class__ and \
+               self.getPortID() == other.getPortID() and \
+               self.getYear() == other.getYear() and \
+               self.getMonth() == other.getMonth() and \
+               self.getDay() == other.getDay() and \
+               self.getHour() == other.getHour() and \
+               self.getMinute() == other.getMinute() and \
+               self.getTimezone() == other.getTimezone() and \
+               self.getType() == other.getType() and \
+               self.getLevelInMetres() == other.getLevelInMetres() and \
+               self.getURL() == other.getURL()
