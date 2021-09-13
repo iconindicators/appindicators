@@ -100,7 +100,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def buildMenu( self, menu ):
         ppas = deepcopy( self.ppas ) # Take a copy as the combine mechanism can alter the PPA series/architecture.
 
-        if self.combinePPAs:
+        if not self.combinePPAs:#TODO Remove the 'not'.
             ppas = self.combine( ppas )
 
         if self.sortByDownload:
@@ -206,8 +206,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                ppa.getStatus() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
                ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
 
-                ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
-                ppas[ -1 ].setStatus( ppa.getStatus() )
+               ppas.append( PPA( ppa.getUser(), ppa.getName(), None, None ) )
+               ppas[ -1 ].setStatus( ppa.getStatus() )
 
             else:
                 temp = { }
@@ -219,14 +219,40 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                         # Add up the download count from each published binary of the same key (package name OR package name and package version).
                         if key in temp:
-#TODO Can we instead create a new object and replace into same key rather than have a setter?                            
+
+#TODO Original single line below:
                             temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
+
+#TODO To be replaced with:
+                            newPublishedBinary = \
+                                PublishedBinary(
+                                    temp[ key ].getPackageName(),
+                                    temp[ key ].getPackageVersion(),
+                                    temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount(),
+                                    temp[ key ].isArchtectureSpecific )
+
+                            temp[ key ] = newPublishedBinary
+#TODO End replacement.  This implies that PublishedBinary::setDownloadCount() can be deleted.
+
 
                         else:
                             temp[ key ] = publishedBinary
                             if self.ignoreVersionArchitectureSpecific:
-#TODO Can we instead create a new object and replace into same key rather than have a setter?                            
+
+#TODO Original single line below:
                                 temp[ key ].setPackageVersion( None )
+
+#TODO To be replaced with:
+                                newPublishedBinary = \
+                                    PublishedBinary(
+                                        temp[ key ].getPackageName(),
+                                        None,
+                                        temp[ key ].getDownloadCount(),
+                                        temp[ key ].isArchtectureSpecific )
+
+                                temp[ key ] = newPublishedBinary
+#TODO End replacement.  This implies that PublishedBinary::setPackageVersion() can be deleted.
+
 
                     else:
                         if key not in temp:
