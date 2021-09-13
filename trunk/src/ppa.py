@@ -104,8 +104,8 @@ class PublishedBinary( object ):
     def __str__( self ):
         return self.getPackageName() + " | " + \
                self.getPackageVersion() + " | " + \
-               self.getDownloadCount() + " | " + \
-               self.isArchitectureSpecific()
+               str( self.getDownloadCount() ) + " | " + \
+               str( self.isArchitectureSpecific() )
 
 
     def __repr__( self ): return self.__str__()
