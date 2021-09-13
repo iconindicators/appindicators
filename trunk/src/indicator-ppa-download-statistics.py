@@ -100,7 +100,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     def buildMenu( self, menu ):
         ppas = deepcopy( self.ppas ) # Take a copy as the combine mechanism can alter the PPA series/architecture.
 
-        if not self.combinePPAs:#TODO Remove the 'not'.
+        if self.combinePPAs:
             ppas = self.combine( ppas )
 
         if self.sortByDownload:
@@ -219,11 +219,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
                         # Add up the download count from each published binary of the same key (package name OR package name and package version).
                         if key in temp:
-
-#TODO Original single line below:
-                            # temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
-
-#TODO To be replaced with:
                             newPublishedBinary = \
                                 PublishedBinary(
                                     temp[ key ].getPackageName(),
@@ -232,17 +227,10 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                     temp[ key ].isArchitectureSpecific )
                             
                             temp[ key ] = newPublishedBinary
-#TODO End replacement.  This implies that PublishedBinary::setDownloadCount() can be deleted.
-
 
                         else:
                             temp[ key ] = publishedBinary
                             if self.ignoreVersionArchitectureSpecific:
-
-#TODO Original single line below:
-                                # temp[ key ].setPackageVersion( None )
-
-#TODO To be replaced with:
                                 newPublishedBinary = \
                                     PublishedBinary(
                                         temp[ key ].getPackageName(),
@@ -251,8 +239,6 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                         temp[ key ].isArchitectureSpecific )
                                 
                                 temp[ key ] = newPublishedBinary
-#TODO End replacement.  This implies that PublishedBinary::setPackageVersion() can be deleted.
-
 
                     else:
                         if key not in temp:
