@@ -170,6 +170,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
 
+#TODO Need to ensure that a background script is only run if its time is up AND is present in the icon text.
+#TODO Update tooltip and changelog to describe above.
             # Update background script because interval is due.
             if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:
                 backgroundScriptsToExecute.append( script )
