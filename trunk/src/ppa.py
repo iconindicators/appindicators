@@ -217,5 +217,9 @@ class PPA( object ):
                 self.getArchitecture() == other.getArchitecture() and \
                 self.getStatus() == other.getStatus()
 
-#TODO Add published binaries.        
+        equal &= len( self.getPublishedBinaries() ) == len( other.getPublishedBinaries() )
+        if equal:
+            for publishedBinarySelf, publishedBinaryOther in zip( self.getPublishedBinaries(), other.getPublishedBinaries() ):
+                equal &= publishedBinarySelf.__eq__( publishedBinaryOther )
+
         return equal
