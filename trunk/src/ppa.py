@@ -69,6 +69,9 @@ class Filters( object ):
 
 class PublishedBinary( object ):
 
+    # Package name, package version (string)
+    # Download count (integer)
+    # Architecture specific (boolean)
     def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
         self.packageName = packageName
         self.packageVersion = packageVersion
@@ -140,8 +143,6 @@ class PPA( object ):
     def getStatus( self ): return self.status
 
 
-#TODO Why have a setter?
-# Can this be done by creating a new object instead?
     def setStatus( self, status ):
         self.status = status
         if not ( status == PPA.Status.OK ): # Any other status implies the underlying published binaries are reset.
