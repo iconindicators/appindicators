@@ -90,5 +90,10 @@ class Test( unittest.TestCase ):
         self.assertAlmostEqual( myPublishedBinary.__repr__(), publishedBinaryString )
 
 
+#TODO Implement!
+    def testPPA( self ):
+        pass
+
+
 if __name__ == '__main__':
     unittest.main()
