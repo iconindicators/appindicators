@@ -95,7 +95,7 @@ class PublishedBinary( object ):
         return self.getPackageName() + " | " + \
                str( self.getPackageVersion() ) + " | " + \
                str( self.getDownloadCount() ) + " | " + \
-               str( self.isArchitectureSpecific() ) # Must wrap str() around getPackageVersion() as it could return None.
+               str( self.isArchitectureSpecific() ) # Must wrap str() around getPackageVersion() as it will return None when published binaries are combined.
 
 
     def __repr__( self ): return self.__str__()
