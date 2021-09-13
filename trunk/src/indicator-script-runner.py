@@ -100,10 +100,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.setLabel( self.processTags( self.indicatorText.replace( '[', "{[" ).replace( ']', "]}" ), self.indicatorTextSeparator, self.__processTags, now ) )
 
         # Calculate next update...
-        nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the (immediate) future.
+        nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate:
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate: #TODO Need to also check if the background script is present in the icon text.
                 nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
         nextUpdateInSeconds = int( math.ceil( ( nextUpdate - now ).total_seconds() ) )
@@ -124,7 +124,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         else:
             if self.hideGroups:
                 for script in sorted( self.scripts, key = lambda script: script.getName().lower() ):
-                    if type( script ) != Background:
+                    if type( script ) == NonBackground:
                         self.addScriptsToMenu( [ script ], script.getGroup(), menu, "" )
 
             else:
@@ -170,14 +170,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
 
-#TODO Need to ensure that a background script is only run if its time is up AND is present in the icon text.
-#TODO Update tooltip and changelog to describe above.
             # Update background script because interval is due.
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:
+            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:  #TODO And background script is present in icon text.
                 backgroundScriptsToExecute.append( script )
 
             # Update background script because of 'force update' and non-empty cache result.
-            if type( script ) == Background and script.getForceUpdate() and self.backgroundScriptResults[ key ]:
+            if type( script ) == Background and script.getForceUpdate() and self.backgroundScriptResults[ key ]:  #TODO Ensure the script is also in the icon text?
                 backgroundScriptsToExecute.append( script )
 
         # Based on example from
@@ -244,16 +242,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts )
+        # treeView.set_tooltip_text( _(
+        #     "Scripts are 'background' or 'non-background'.\n\n" + \
+        #     "Background scripts are executed at intervals,\n" + \
+        #     "the result optionally written to the icon text.\n\n" + \
+        #     "Non-background scripts, listed in the menu,\n" + \
+        #     "are executed when the user selects that script.\n\n" + \
+        #     "If an attribute does not apply to a script,\n" + \
+        #     "a dash is displayed.\n\n" + \
+        #     "If a non-background script is checked as default,\n" + \
+        #     "that script will appear as bold." ) )
+#TODO Not sure if above should be kept.
         treeView.set_tooltip_text( _(
-            "Scripts are 'background' or 'non-background'.\n\n" + \
-            "Background scripts are executed at intervals,\n" + \
-            "the result optionally written to the icon text.\n\n" + \
-            "Non-background scripts, listed in the menu,\n" + \
-            "are executed when the user selects that script.\n\n" + \
+            "Double-click to edit a script.\n\n" + \
             "If an attribute does not apply to a script,\n" + \
             "a dash is displayed.\n\n" + \
-            "If a non-background script is checked as default,\n" + \
-            "that script will appear as bold." ) )
+            "If a non-background script is checked as\n" + \
+            "default, that script will appear as bold." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
         treeViewColumn.set_expand( True )
@@ -389,7 +394,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         hideGroupsCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         hideGroupsCheckbox.set_tooltip_text( _(
             "If checked, only script names are displayed.\n" + \
-            "Otherwise, script names are indented within each group.\n\n" + \
+            "Otherwise, script names are indented.\n" + \
+            "within their respective group.\n\n" + \
             "Applies only to non-background scripts." ) )
 
         radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbox )
@@ -406,18 +412,29 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorTextEntry.set_text( self.indicatorText )
+        # indicatorTextEntry.set_tooltip_text( _(
+        #     "The text shown next to the indicator icon,\n" + \
+        #     "or tooltip where applicable.\n\n" + \
+        #     "A background script must:\n" + \
+        #     "\tAlways return non-empty text; or\n" + \
+        #     "\tReturn non-empty text on success and\n" + \
+        #     "\tempty text otherwise.\n\n" + \
+        #     "A background script which computes free\n" + \
+        #     "memory will always show non-empty text.\n\n" + \
+        #     "A background script which checks for a file\n" + \
+        #     "will show non-empty text if the file exists,\n" + \
+        #     "and show empty text otherwise." ) )
+
+#TODO Not sure if the above should be kept.
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "A background script must return either:\n" + \
-            "\tNon-empty text; or\n" + \
-            "\tNon-empty text on success and\n" + \
+            "A background script must:\n" + \
+            "\tAlways return non-empty text; or\n" + \
+            "\tReturn non-empty text on success and\n" + \
             "\tempty text otherwise.\n\n" + \
-            "A background script which computes free\n" + \
-            "memory will always show non-empty text.\n\n" + \
-            "A background script which checks for a file\n" + \
-            "will show non-empty text if the file exists,\n" + \
-            "and show empty text otherwise." ) )
+            "Only background scripts added to the\n" + \
+            "icon text will be run." ) )
 
         box.pack_start( indicatorTextEntry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -428,7 +445,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         indicatorTextSeparatorEntry = Gtk.Entry()
         indicatorTextSeparatorEntry.set_text( self.indicatorTextSeparator )
-        indicatorTextSeparatorEntry.set_tooltip_text( _( "The separator will be added between tags." ) )
+        indicatorTextSeparatorEntry.set_tooltip_text( _( "The separator will be added between script tags." ) )
         box.pack_start( indicatorTextSeparatorEntry, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -845,7 +862,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "For non-background scripts,\n" + \
             "play a sound on script completion.\n\n" + \
             "For background scripts, play a sound\n" + \
-            "if the script returns non-empty text." ) )
+            "only if the script returns non-empty text." ) )
         soundCheckbox.set_active( False if add else script.getPlaySound() )
         grid.attach( soundCheckbox, 0, 12, 1, 1 )
 
@@ -854,7 +871,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "For non-background scripts, show a\n" + \
             "notification on script completion.\n\n" + \
             "For background scripts, show a notification\n" + \
-            "if the script returns non-empty text." ) )
+            "only if the script returns non-empty text." ) )
         notificationCheckbox.set_active( False if add else script.getShowNotification() )
         grid.attach( notificationCheckbox, 0, 13, 1, 1 )
 
@@ -868,9 +885,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
         terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        terminalCheckbox.set_tooltip_text( _(
-            "Leave the terminal open on completion\n" + \
-            "of non-background scripts." ) )
+        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open on script completion." ) )
         terminalCheckbox.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
         terminalCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
         grid.attach( terminalCheckbox, 0, 15, 1, 1 )
@@ -880,7 +895,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
         defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
         defaultScriptCheckbox.set_tooltip_text( _(
-            "One non-background script can be set as\n" + \
+            "One non-background script may be set as\n" + \
             "the default script which is run on a\n" + \
             "middle mouse click of the indicator icon." ) )
         grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
@@ -888,9 +903,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
         scriptBackgroundRadio.set_active( False if add else type( script ) == Background )
         scriptBackgroundRadio.set_tooltip_text(
-            "The script will run in the background,\n" + \
-            "at the interval specified, the results\n" + \
-            "optionally displayed in the icon label." )
+            "The script will run in the background\n" + \
+            "at the interval specified, only if\n" + \
+            "added to the icon text." )
+#TODO WOrk this in somehow?
+        #     "A background script which computes free\n" + \
+        #     "memory will always show non-empty text.\n\n" + \
+        #     "A background script which checks for a file\n" + \
+        #     "will show non-empty text if the file exists,\n" + \
+        #     "and show empty text otherwise." ) )
+        
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -914,11 +936,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
         forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
         forceUpdateCheckbox.set_tooltip_text( _(
-            "Force an update when the script returns\n" + \
-            "non-empty text.\n\n" + \
-            "The update will occur whenever the next\n" + \
-            "script will update, rather than when the\n" + \
-            "script is due for an update." ) )
+            "If the script returns non-empty text,\n" + \
+            "force the script to run whenever the next\n" + \
+            "script will update, rather than wait for\n" + \
+            "the next scheduled update." ) )
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
