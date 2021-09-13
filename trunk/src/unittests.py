@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from ppa import Filters, PublishedBinary
+from ppa import Filters, PPA, PublishedBinary
 
 import unittest
 
@@ -90,9 +90,42 @@ class Test( unittest.TestCase ):
         self.assertAlmostEqual( myPublishedBinary.__repr__(), publishedBinaryString )
 
 
-#TODO Implement!
     def testPPA( self ):
-        pass
+        user = "user"
+        name = "name"
+        series = "series"
+        architecture = "architecture"
+
+        myPPA = PPA( user, name, series, architecture )
+
+        self.assertAlmostEqual( myPPA.getUser(), user )
+        self.assertAlmostEqual( myPPA.getName(), name )
+        self.assertAlmostEqual( myPPA.getSeries(), series )
+        self.assertAlmostEqual( myPPA.getArchitecture(), architecture )
+        self.assertAlmostEqual( myPPA.getStatus(), PPA.Status.NEEDS_DOWNLOAD )
+
+        myPPA.setStatus( PPA.Status.ERROR_RETRIEVING_PPA )
+        self.assertAlmostEqual( myPPA.getStatus(), PPA.Status.ERROR_RETRIEVING_PPA )
+
+        descriptor = user + " | " + name + " | " + series + " | " + architecture
+        self.assertAlmostEqual( myPPA.getDescriptor(), descriptor)
+
+        packageName = "package name"
+        packageVersion = "1.2.3.4"
+        downloadCount = "666"
+        architectureSpecific = "false"
+
+        myPublishedBinary = PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific )
+        myPPA = PPA( user, name, series, architecture )
+        myPPA.addPublishedBinary( myPublishedBinary )
+
+        self.assertAlmostEqual( myPPA.getPublishedBinaries(), [ myPublishedBinary ] )
+
+        myOtherPPA = PPA( user, name, series, architecture )
+        myOtherPPA.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, architectureSpecific ) ) 
+        self.assertAlmostEqual( myPPA.__eq__( myOtherPPA ), True )
+        myOtherPPA.addPublishedBinary( PublishedBinary( packageName, packageVersion, downloadCount, "true" ) ) 
+        self.assertAlmostEqual( myPPA.__eq__( myOtherPPA ), False )
 
 
 if __name__ == '__main__':
