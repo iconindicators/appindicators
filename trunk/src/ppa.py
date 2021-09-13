@@ -83,6 +83,7 @@ class PublishedBinary( object ):
 
 
 #TODO Why have a setter?
+# See TODO in indicator...maybe the set can be replaced with a remove object and create new object with updated value.
     def setPackageVersion( self, packageVersion ): self.packageVersion = packageVersion
 
 
@@ -90,13 +91,13 @@ class PublishedBinary( object ):
 
 
 #TODO Why have a setter?
+# See TODO in indicator...maybe the set can be replaced with a remove object and create new object with updated value.
     def setDownloadCount( self, downloadCount ): self.downloadCount = downloadCount
 
 
     def isArchitectureSpecific( self ): return self.architectureSpecific
 
 
-#TODO Might need str() around version/download count/arch spec.
     def __str__( self ):
         return self.getPackageName() + " | " + \
                self.getPackageVersion() + " | " + \
