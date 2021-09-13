@@ -221,7 +221,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                         if key in temp:
 
 #TODO Original single line below:
-                            temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
+                            # temp[ key ].setDownloadCount( temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount() )
 
 #TODO To be replaced with:
                             newPublishedBinary = \
@@ -229,8 +229,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                     temp[ key ].getPackageName(),
                                     temp[ key ].getPackageVersion(),
                                     temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount(),
-                                    temp[ key ].isArchtectureSpecific )
-
+                                    temp[ key ].isArchitectureSpecific )
+                            
                             temp[ key ] = newPublishedBinary
 #TODO End replacement.  This implies that PublishedBinary::setDownloadCount() can be deleted.
 
@@ -240,7 +240,7 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                             if self.ignoreVersionArchitectureSpecific:
 
 #TODO Original single line below:
-                                temp[ key ].setPackageVersion( None )
+                                # temp[ key ].setPackageVersion( None )
 
 #TODO To be replaced with:
                                 newPublishedBinary = \
@@ -248,8 +248,8 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                                         temp[ key ].getPackageName(),
                                         None,
                                         temp[ key ].getDownloadCount(),
-                                        temp[ key ].isArchtectureSpecific )
-
+                                        temp[ key ].isArchitectureSpecific )
+                                
                                 temp[ key ] = newPublishedBinary
 #TODO End replacement.  This implies that PublishedBinary::setPackageVersion() can be deleted.
 
