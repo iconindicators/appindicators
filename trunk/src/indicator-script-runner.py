@@ -103,7 +103,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < nextUpdate: #TODO Need to also check if the background script is present in the icon text.
+
+            if type( script ) == Background and \
+               self.backgroundScriptNextUpdateTime[ key ] < nextUpdate and \
+               self.__isBackgroundScriptInIndicatorText( script ):
                 nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
         nextUpdateInSeconds = int( math.ceil( ( nextUpdate - now ).total_seconds() ) )
@@ -170,12 +173,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
 
-            # Update background script because interval is due.
-            if type( script ) == Background and self.backgroundScriptNextUpdateTime[ key ] < now:  #TODO And background script is present in icon text.
-                backgroundScriptsToExecute.append( script )
+            backgroundScriptAndIntervalDueAndInIndicatorText = \
+                type( script ) == Background and \
+                self.backgroundScriptNextUpdateTime[ key ] < now and \
+                self.__isBackgroundScriptInIndicatorText( script )
 
-            # Update background script because of 'force update' and non-empty cache result.
-            if type( script ) == Background and script.getForceUpdate() and self.backgroundScriptResults[ key ]:  #TODO Ensure the script is also in the icon text?
+            backgroundScriptAndForceUpdateAndNonEmptyCacheResultAndInIndicatorText = \
+                type( script ) == Background and \
+                script.getForceUpdate() and \
+                self.backgroundScriptResults[ key ] and \
+                self.__isBackgroundScriptInIndicatorText( script )
+
+            if backgroundScriptAndIntervalDueAndInIndicatorText or backgroundScriptAndForceUpdateAndNonEmptyCacheResultAndInIndicatorText:
                 backgroundScriptsToExecute.append( script )
 
         # Based on example from
@@ -1095,6 +1104,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __createKey( self, group, name ): return group + "::" + name
+
+
+    def __isBackgroundScriptInIndicatorText( self, script ): return '[' + self.__createKey( script.getGroup(), script.getName() ) + ']' in self.indicatorText
 
 
     # In version 14 the 'directory' attribute was removed.
