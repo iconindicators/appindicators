@@ -23,6 +23,14 @@
 #TODO Update tooltips and changlog..where else?
 # Need to say that a background script is only updated if present in the icon text.
 
+#TODO Can this be used?
+        #     "A background script which computes free\n" + \
+        #     "memory will always show non-empty text.\n\n" + \
+        #     "A background script which checks for a file\n" + \
+        #     "will show non-empty text if the file exists,\n" + \
+        #     "and show empty text otherwise." ) )
+
+
 
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
@@ -267,7 +275,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "If an attribute does not apply to a script,\n" + \
             "a dash is displayed.\n\n" + \
             "If a non-background script is checked as\n" + \
-            "default, that script will appear as bold." ) )
+            "default, the name will appear in bold." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
         treeViewColumn.set_expand( True )
@@ -384,16 +392,10 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         grid = self.createGrid()
 
         radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in sub-menus" ) )
-        radioShowScriptsSubmenu.set_tooltip_text( _(
-            "Non-background scripts of the same\n" + \
-            "group are shown in sub-menus." ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
-        radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts grouped" ) )
-        radioShowScriptsIndented.set_tooltip_text( _(
-            "Non-background scripts are shown\n" + \
-            "within their respective group." ) )
+        radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts indented by group" ) )
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
@@ -421,20 +423,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
         indicatorTextEntry.set_text( self.indicatorText )
-        # indicatorTextEntry.set_tooltip_text( _(
-        #     "The text shown next to the indicator icon,\n" + \
-        #     "or tooltip where applicable.\n\n" + \
-        #     "A background script must:\n" + \
-        #     "\tAlways return non-empty text; or\n" + \
-        #     "\tReturn non-empty text on success and\n" + \
-        #     "\tempty text otherwise.\n\n" + \
-        #     "A background script which computes free\n" + \
-        #     "memory will always show non-empty text.\n\n" + \
-        #     "A background script which checks for a file\n" + \
-        #     "will show non-empty text if the file exists,\n" + \
-        #     "and show empty text otherwise." ) )
-
-#TODO Not sure if the above should be kept.
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
@@ -462,10 +450,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         backgroundScriptsTreeView.set_vexpand( True )
         backgroundScriptsTreeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         backgroundScriptsTreeView.connect( "row-activated", self.onBackgroundScriptDoubleClick, indicatorTextEntry, copyOfScripts )
-        backgroundScriptsTreeView.set_tooltip_text( _(
-            "Background scripts by group.\n" + \
-            "Double click on a script to\n" + \
-            "add to the icon text." ) )
+        backgroundScriptsTreeView.set_tooltip_text( _( "Double click on a script to add to the icon text." ) )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
         treeViewColumn.set_expand( True )
@@ -887,9 +872,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
         scriptNonBackgroundRadio.set_active( True if add else type( script ) == NonBackground )
         scriptNonBackgroundRadio.set_tooltip_text(
-            "The script is displayed in the menu\n" + \
-            "and runs when the user clicks on the\n" + \
-            "corresponding menu item." )
+            "Script is displayed in the menu\n" + \
+            "and runs when the user clicks on\n" + \
+            "the corresponding menu item." )
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
@@ -904,18 +889,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
         defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
         defaultScriptCheckbox.set_tooltip_text( _(
-            "One non-background script may be set as\n" + \
-            "the default script which is run on a\n" + \
-            "middle mouse click of the indicator icon." ) )
+            "One script may be set as the default\n" + \
+            "script which is run on a middle mouse\n" + \
+            "click of the indicator icon." ) )
         grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
 
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
         scriptBackgroundRadio.set_active( False if add else type( script ) == Background )
         scriptBackgroundRadio.set_tooltip_text(
-            "The script will run in the background\n" + \
+            "Script will run in the background\n" + \
             "at the interval specified, only if\n" + \
             "added to the icon text." )
-#TODO WOrk this in somehow?
+#TODO WOrk this in somehow?  Reword above...
         #     "A background script which computes free\n" + \
         #     "memory will always show non-empty text.\n\n" + \
         #     "A background script which checks for a file\n" + \
@@ -945,10 +930,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
         forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
         forceUpdateCheckbox.set_tooltip_text( _(
-            "If the script returns non-empty text,\n" + \
-            "force the script to run whenever the next\n" + \
-            "script will update, rather than wait for\n" + \
-            "the next scheduled update." ) )
+            "The script will be run on the next update\n" + \
+            "of ANY script if this script last returned\n" + \
+            "non-empty text." ) )
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
