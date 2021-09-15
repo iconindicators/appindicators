@@ -19,9 +19,9 @@
 # Base class for application indicators.
 #
 # References:
-#     http://python-gtk-3-tutorial.readthedocs.org
-#     http://wiki.gnome.org/Projects/PyGObject/Threading
-#     http://wiki.ubuntu.com/NotifyOSD
+#     https://python-gtk-3-tutorial.readthedocs.org
+#     https://wiki.gnome.org/Projects/PyGObject/Threading
+#     https://wiki.ubuntu.com/NotifyOSD
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
