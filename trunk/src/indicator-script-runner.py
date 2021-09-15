@@ -116,7 +116,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             if type( script ) == Background and \
                self.backgroundScriptNextUpdateTime[ key ] < nextUpdate and \
-               self.__isBackgroundScriptInIndicatorText( script ):
+               self.isBackgroundScriptInIndicatorText( script ):
                 nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
         nextUpdateInSeconds = int( math.ceil( ( nextUpdate - now ).total_seconds() ) )
@@ -181,20 +181,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def updateBackgroundScripts( self, now ):
         backgroundScriptsToExecute = [ ]
         for script in self.scripts:
+            if not( type( script ) == Background and self.isBackgroundScriptInIndicatorText( script ) ):
+                continue
+
+            # Script is background AND present in the indicator text, so is a potential candidate to be updated...
             key = self.__createKey( script.getGroup(), script.getName() )
-
-            backgroundScriptAndIntervalDueAndInIndicatorText = \
-                type( script ) == Background and \
-                self.backgroundScriptNextUpdateTime[ key ] < now and \
-                self.__isBackgroundScriptInIndicatorText( script )
-
-            backgroundScriptAndForceUpdateAndNonEmptyCacheResultAndInIndicatorText = \
-                type( script ) == Background and \
-                script.getForceUpdate() and \
-                self.backgroundScriptResults[ key ] and \
-                self.__isBackgroundScriptInIndicatorText( script )
-
-            if backgroundScriptAndIntervalDueAndInIndicatorText or backgroundScriptAndForceUpdateAndNonEmptyCacheResultAndInIndicatorText:
+            if ( self.backgroundScriptNextUpdateTime[ key ] < now ) or \
+               ( script.getForceUpdate() and self.backgroundScriptResults[ key ] ):
                 backgroundScriptsToExecute.append( script )
 
         # Based on example from
@@ -1092,7 +1085,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     def __createKey( self, group, name ): return group + "::" + name
 
 
-    def __isBackgroundScriptInIndicatorText( self, script ): return '[' + self.__createKey( script.getGroup(), script.getName() ) + ']' in self.indicatorText
+    def isBackgroundScriptInIndicatorText( self, script ): return '[' + self.__createKey( script.getGroup(), script.getName() ) + ']' in self.indicatorText
 
 
     # In version 14 the 'directory' attribute was removed.
