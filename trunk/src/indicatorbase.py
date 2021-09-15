@@ -250,7 +250,7 @@ class IndicatorBase( ABC ):
             aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
 
         # Ordinarily when installed via a package manager, the changelog will be in the correct place.
-        # However if running from a terminal without installing, say for testing purposes, the changelong will not be present.
+        # However if running from a terminal without installing, say for testing purposes, the changelog will not be present.
         changeLog = self.__getCacheDirectory() + self.indicatorName + ".changelog"
         changeLogGzipped = "/usr/share/doc/" + self.indicatorName + "/changelog.Debian.gz"
         if os.path.exists( changeLogGzipped ):
@@ -363,14 +363,6 @@ class IndicatorBase( ABC ):
         dialog.run()
         dialog.destroy()
         self.__setMenuSensitivity( True, True )
-
-
-    def createAutostartCheckbox( self ):
-        autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( self.isAutoStart() )
-        autostartCheckbox.set_margin_top( 10 )
-        return autostartCheckbox
 
 
     # Show a message dialog.
