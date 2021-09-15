@@ -67,7 +67,7 @@ class IndicatorBase( ABC ):
         self.comments = comments
 
         self.icon = self.indicatorName # Located in /usr/share/icons
-        self.log = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
+        self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
         self.copyrightName = "Bernard Giannetti"
@@ -234,7 +234,7 @@ class IndicatorBase( ABC ):
         aboutDialog.set_comments( self.comments )
 
         copyrightText = "Copyright \xa9 " + \
-                        self.copyrightStartYear + "-" + str( datetime.datetime.now().year ) + " " + \
+                        self.copyrightStartYear + '-' + str( datetime.datetime.now().year ) + " " + \
                         self.copyrightName
 
         aboutDialog.set_copyright( copyrightText )
@@ -259,7 +259,7 @@ class IndicatorBase( ABC ):
 
             self.__addHyperlinkLabel( aboutDialog, changeLog, _( "View the" ), _( "changelog" ), _( "text file." ) )
 
-        errorLog = os.getenv( "HOME" ) + "/" + self.indicatorName + ".log"
+        errorLog = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         if os.path.exists( errorLog ):
             self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
 
@@ -483,11 +483,9 @@ class IndicatorBase( ABC ):
                        "Yaru"                   : "dbdbdb" }
 
         themeName = self.getThemeName()
+        themeColour = defaultColour
         if themeName in themeNames:
             themeColour = themeNames[ themeName ]
-
-        else:
-            themeColour = defaultColour
 
         return themeColour
 
@@ -578,7 +576,7 @@ class IndicatorBase( ABC ):
         config = { }
         if os.path.isfile( configFile ):
             try:
-                with open( configFile ) as f:
+                with open( configFile, 'r' ) as f:
                     config = json.load( f )
 
             except Exception as e:
@@ -601,7 +599,7 @@ class IndicatorBase( ABC ):
         configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
         success = True
         try:
-            with open( configFile, "w" ) as f:
+            with open( configFile, 'w' ) as f:
                 f.write( json.dumps( config ) )
 
         except Exception as e:
@@ -711,7 +709,7 @@ class IndicatorBase( ABC ):
         if theFile: # A value of "" evaluates to False.
             filename = cacheDirectory + theFile
             try:
-                with open( filename, "rb" ) as f:
+                with open( filename, 'rb' ) as f:
                     data = pickle.load( f )
 
             except Exception as e:
@@ -741,7 +739,7 @@ class IndicatorBase( ABC ):
             datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
         try:
-            with open( cacheFile, "wb" ) as f:
+            with open( cacheFile, 'wb' ) as f:
                 pickle.dump( binaryData, f )
 
         except Exception as e:
@@ -762,7 +760,7 @@ class IndicatorBase( ABC ):
         text = None
         if os.path.isfile( cacheFile ):
             try:
-                with open( cacheFile, "r" ) as f:
+                with open( cacheFile, 'r' ) as f:
                     text = f.read()
 
             except Exception as e:
@@ -795,10 +793,10 @@ class IndicatorBase( ABC ):
                 datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
         if extension is not None:
-            cacheFile += "." + extension
+            cacheFile += '.' + extension
 
         try:
-            with open( cacheFile, "w" ) as f:
+            with open( cacheFile, 'w' ) as f:
                 f.write( text )
 
         except Exception as e:
@@ -827,10 +825,10 @@ class IndicatorBase( ABC ):
     #    ~/.userBaseDirectory/applicationBaseDirectory
     def __getUserDirectory( self, XDGKey, userBaseDirectory, applicationBaseDirectory ):
         if XDGKey in os.environ:
-            directory = os.environ[ XDGKey ] + "/" + applicationBaseDirectory + "/"
+            directory = os.environ[ XDGKey ] + '/' + applicationBaseDirectory + '/'
 
         else:
-            directory = os.path.expanduser( "~" ) + "/" + userBaseDirectory + "/" + applicationBaseDirectory + "/"
+            directory = os.path.expanduser( '~' ) + '/' + userBaseDirectory + '/' + applicationBaseDirectory + '/'
 
         if not os.path.isdir( directory ):
             os.mkdir( directory )
@@ -876,7 +874,7 @@ class IndicatorBase( ABC ):
 #     http://svn.python.org/view/python/trunk/Lib/logging/handlers.py?view=markup
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
     def __init__( self, filename, maxBytes = 10000 ):
-        super().__init__( filename, "a", maxBytes, 0, None, True )
+        super().__init__( filename, 'a', maxBytes, 0, None, True )
 
 
     def doRollover( self ):
@@ -886,5 +884,5 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
         if os.path.exists( self.baseFilename ):
             os.remove( self.baseFilename )
 
-        self.mode = "a"
+        self.mode = 'a'
         self.stream = self._open()
