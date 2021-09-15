@@ -30,6 +30,16 @@
         #     "will show non-empty text if the file exists,\n" + \
         #     "and show empty text otherwise." ) )
 
+        #     "Scripts are 'background' or 'non-background'.\n\n" + \
+        #     "Background scripts are executed at intervals,\n" + \
+        #     "the result optionally written to the icon text.\n\n" + \
+        #     "Non-background scripts, listed in the menu,\n" + \
+        #     "are executed when the user selects that script.\n\n" + \
+        #     "If an attribute does not apply to a script,\n" + \
+        #     "a dash is displayed.\n\n" + \
+        #     "If a non-background script is checked as default,\n" + \
+        #     "that script will appear as bold." ) )
+
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -254,17 +264,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         treeView.set_vexpand( True )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts )
-        # treeView.set_tooltip_text( _(
-        #     "Scripts are 'background' or 'non-background'.\n\n" + \
-        #     "Background scripts are executed at intervals,\n" + \
-        #     "the result optionally written to the icon text.\n\n" + \
-        #     "Non-background scripts, listed in the menu,\n" + \
-        #     "are executed when the user selects that script.\n\n" + \
-        #     "If an attribute does not apply to a script,\n" + \
-        #     "a dash is displayed.\n\n" + \
-        #     "If a non-background script is checked as default,\n" + \
-        #     "that script will appear as bold." ) )
-#TODO Not sure if above should be kept.
         treeView.set_tooltip_text( _(
             "Double-click to edit a script.\n\n" + \
             "If an attribute does not apply to a script,\n" + \
@@ -386,11 +385,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         # Menu settings.
         grid = self.createGrid()
 
-        radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show scripts in sub-menus" ) )
+        radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show non-background scripts in sub-menus" ) )
         radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
-        radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show scripts indented by group" ) )
+        radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show non-background scripts indented by group" ) )
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
@@ -401,8 +400,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         hideGroupsCheckbox.set_tooltip_text( _(
             "If checked, only script names are displayed.\n" + \
             "Otherwise, script names are indented.\n" + \
-            "within their respective group.\n\n" + \
-            "Applies only to non-background scripts." ) )
+            "within their respective group." ) )
 
         radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbox )
 
@@ -584,8 +582,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptsByGroup = self.getScriptsByGroup( scripts, False, True )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
         for group in groups:
-            # Unused columns are present, but allows the reuse of the column definitions.
-            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] )
+            parent = treeStore.append( None, [ group, group, None, None, None, None, None, None, None ] ) # Not all columns are used, but allows use of column definitions.
 
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 row = [
@@ -884,8 +881,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
         defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
         defaultScriptCheckbox.set_tooltip_text( _(
-            "One script may be set as the default\n" + \
-            "script which is run on a middle mouse\n" + \
+            "One script may be set as default\n" + \
+            "which is run on a middle mouse\n" + \
             "click of the indicator icon." ) )
         grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
 
