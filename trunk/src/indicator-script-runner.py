@@ -20,28 +20,6 @@
 # optionally display results in the icon label.
 
 
-#TODO Update tooltips and changlog..where else?
-# Need to say that a background script is only updated if present in the icon text.
-
-#TODO Can this be used?
-        #     "A background script which computes free\n" + \
-        #     "memory will always show non-empty text.\n\n" + \
-        #     "A background script which checks for a file\n" + \
-        #     "will show non-empty text if the file exists,\n" + \
-        #     "and show empty text otherwise." ) )
-
-        #     "Scripts are 'background' or 'non-background'.\n\n" + \
-        #     "Background scripts are executed at intervals,\n" + \
-        #     "the result optionally written to the icon text.\n\n" + \
-        #     "Non-background scripts, listed in the menu,\n" + \
-        #     "are executed when the user selects that script.\n\n" + \
-        #     "If an attribute does not apply to a script,\n" + \
-        #     "a dash is displayed.\n\n" + \
-        #     "If a non-background script is checked as default,\n" + \
-        #     "that script will appear as bold." ) )
-
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
