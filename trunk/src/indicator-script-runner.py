@@ -892,12 +892,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "Script will run in the background\n" + \
             "at the interval specified, only if\n" + \
             "added to the icon text." )
-#TODO WOrk this in somehow?  Reword above...
-        #     "A background script which computes free\n" + \
-        #     "memory will always show non-empty text.\n\n" + \
-        #     "A background script which checks for a file\n" + \
-        #     "will show non-empty text if the file exists,\n" + \
-        #     "and show empty text otherwise." ) )
         
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
@@ -922,9 +916,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
         forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
         forceUpdateCheckbox.set_tooltip_text( _(
-            "The script will be run on the next update\n" + \
-            "of ANY script if this script last returned\n" + \
-            "non-empty text." ) )
+            "If this script returned non-empty text\n" + \
+            "on its last update, this script will\n" + \
+            "run on the next update of ANY script." ) )
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
