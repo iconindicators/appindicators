@@ -377,7 +377,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         hideGroupsCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
         hideGroupsCheckbox.set_tooltip_text( _(
             "If checked, only script names are displayed.\n" + \
-            "Otherwise, script names are indented.\n" + \
+            "Otherwise, script names are indented\n" + \
             "within their respective group." ) )
 
         radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbox )
