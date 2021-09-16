@@ -206,9 +206,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 #However, what to add into the script results cache and the next update time?
 #What to tell the user?  Leave the original tag in the icon text?         
         commandResult = self.processGet( script.getCommand() )
-        commandResult = self.processGet( script.getCommand() ).strip()
+        if not commandResult:
+            commandResult = '[' + self.__createKey( script.getGroup(), script.getName() ) + ']'
 
-        commandResult = self.processGet( script.getCommand() ).strip()
+        commandResult = commandResult.strip()
+        # commandResult = self.processGet( script.getCommand() ).strip()
         key = self.__createKey( script.getGroup(), script.getName() )
         self.backgroundScriptResults[ key ] = commandResult
         self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
