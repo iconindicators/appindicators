@@ -840,32 +840,30 @@ class IndicatorBase( ABC ):
         return directory
 
 
-    # Calls the command in a new process.
-    # On exception, logs to file if exit code is not ignored.
-    #
-    # Ignoring the exit code is useful for commands containing 'grep' which are noisy exit codes emitters.
-    def processCall( self, command, ignoreExitCode = False ):
+    # Executes the command in a new process.
+    # On exception, logs to file.
+    def processCall( self, command ):
         try:
+#TODO Caputre stderr and then log?  See next function.
             subprocess.call( command, shell = True )
 
         except subprocess.CalledProcessError as e:
-            if not ignoreExitCode:
-                self.getLogging().error( e )
+            self.getLogging().error( e )
 
 
-    # Returns the result of calling the command.
-    # On exception, returns None (logs to file if exit code is not ignored).
-    #
-    # Ignoring the exit code is useful for commands containing 'grep' which are noisy exit codes emitters.
-    def processGet( self, command, ignoreExitCode = False ):
+    # Executes the command and returns the result.
+    # On exception, logs to file.
+    def processGet( self, command ):
         result = None
         try:
-            result = subprocess.check_output( command, shell = True, universal_newlines = True )
+#TODO Use stderr???
+            result = subprocess.check_output( command, shell = True, stderr = subprocess.STDOUT, universal_newlines = True )
 
         except subprocess.CalledProcessError as e:
-            if not ignoreExitCode:
-                self.getLogging().error( e )
-
+#TODO Maybe include error code or output?
+# See what grep does (when it does and does not find a result) compared to a broken script from script runner.
+            self.getLogging().error( e.output + str( e ) )
+            # self.getLogging().error( e )
             result = None
 
         return result
