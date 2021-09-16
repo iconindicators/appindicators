@@ -844,11 +844,12 @@ class IndicatorBase( ABC ):
     # On exception, logs to file.
     def processCall( self, command ):
         try:
-#TODO Caputre stderr and then log?  See next function.
             subprocess.call( command, shell = True )
 
         except subprocess.CalledProcessError as e:
             self.getLogging().error( e )
+            if e.stderr:
+                self.getLogging().error( e.stderr )
 
 
     # Executes the command and returns the result.
@@ -862,33 +863,7 @@ class IndicatorBase( ABC ):
             self.getLogging().error( e )
             if e.stderr:
                 self.getLogging().error( e.stderr )
-            #
-            # x = str( e )
-            # if e.returncode:
-            #     print( e.returncode )
-            #
-            #
-            #
-            #
-            #
-            # print()
-#TODO Maybe include error code or output?
-# See what grep does (when it does and does not find a result) compared to a broken script from script runner.
-            # self.getLogging().error( e.output + str( e ) )
-            
-            # x = str( e )
-            # if e.returncode:
-            #     print( e.returncode )
-            #
-            # if e.stderr:
-            #     print( e.stderr )
-            
-            # CalledProcessError: Command 'ls | grep testy' returned non-zero exit status 1.
-            # CalledProcessError: Command 'lssss' returned non-zero exit status 127.
-            # e.returncode
-            # e.stderr
-            
-            # self.getLogging().error( e )
+
             result = None
 
         return result
