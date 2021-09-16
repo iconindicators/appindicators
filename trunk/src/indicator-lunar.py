@@ -374,6 +374,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds()
 
 
+#TODO This function may be reintegrated with the baseclass superfunction.
+# Also consider is it worthwhile to change below to find each [] in the 'text' and do a tag replacement, rather than iterate over all keys?
+#Maybe do a timing test first?
     # Called by base class to process data tags.
     def __processTags( self, textToProcess, arguments ):
         text = textToProcess
