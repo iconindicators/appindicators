@@ -156,11 +156,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 self.requestUpdate()
 
         else:
-#TODO 
-# VBoxManage list vms | awk '/Windows XP/ {print}'
-                                     # VBoxManage list vms | awk '/Windows XP/ {print}'
-            result = self.processGet( "VBoxManage list vms | awk \'/" + uuid + "/ {print}\'" )
-            # result = self.processGet( "VBoxManage list vms | grep " + uuid, True )
+            result = self.processGet( "VBoxManage list vms | awk \'/" + uuid + "/ {print}\'" ) # Using grep returns non zero error codes which results in unwanted log file.
             if result is None or uuid not in result:
                 message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
                 Notify.Notification.new( _( "Error" ), message, self.icon ).show()
@@ -172,12 +168,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def bringWindowToFront( self, virtualMachineName ):
-#TODO
-# wmctrl -l | awk '/Eclips/ {print}' | wc -l        
- # Using grep returns non zero error codes which results in unwanted log file.
-                                                         # wmctrl -l | awk '/Eclips/ {print}' | wc -l
-        numberOfWindowsWithTheSameName = self.processGet( "wmctrl -l | awk \'/" + virtualMachineName + "/ {print}\' | wc -l" ).strip()
-        # numberOfWindowsWithTheSameName = self.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l', True ).strip()
+        numberOfWindowsWithTheSameName = self.processGet( "wmctrl -l | awk \'/" + virtualMachineName + "/ {print}\' | wc -l" ).strip() # Using grep returns non zero error codes which results in unwanted log file.
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
             summary = _( "Warning" )
