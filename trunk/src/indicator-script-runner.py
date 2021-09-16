@@ -96,9 +96,12 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         self.updateBackgroundScripts( now )
 
         # Process tags using the base class functionality (first enclose each tag within { }).
-        indicatorTextEnclosedWithinBraces = self.indicatorText.replace( '[', "{[" ).replace( ']', "]}" )
-        indicatorTextTagsProcessed = self.processTags( indicatorTextEnclosedWithinBraces, self.indicatorTextSeparator, self.__processTags, now )
-        self.setLabel( indicatorTextTagsProcessed )
+        # indicatorTextEnclosedWithinBraces = self.indicatorText.replace( '[', "{[" ).replace( ']', "]}" )
+        # indicatorTextTagsProcessed = self.processTags( indicatorTextEnclosedWithinBraces, self.indicatorTextSeparator, self.__processTags )
+        # self.setLabel( indicatorTextTagsProcessed )
+        
+        x = self.processTagsNEW()
+        self.setLabel( x )
 
         # Calculate next update...
         nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the future.
@@ -220,7 +223,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
     # Called by base class to process data tags.
     def __processTags( self, textToProcess, arguments ):
         text = textToProcess
-        now = arguments[ 0 ] # First and only parameter passed to processTags in base class.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background and "[" + key + "]" in text:
@@ -228,6 +230,25 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                 text = text.replace( "[" + key + "]", commandResult )
 
         return text
+
+
+
+    
+    def processTagsNEW( self ):
+        indicatorTextProcessed = self.indicatorText
+        for script in self.scripts:
+            key = self.__createKey( script.getGroup(), script.getName() )
+            if type( script ) == Background and "[" + key + "]" in indicatorTextProcessed:
+                commandResult = self.backgroundScriptResults[ key ]
+                indicatorTextProcessed = indicatorTextProcessed.replace( "[" + key + "]", commandResult + self.indicatorTextSeparator )
+        #
+        #
+        # indicatorTextProcessed = indicatorTextProcessed[ 0 : len( indicatorTextProcessed ) ]
+        # if lastSeparatorIndex > -1:
+        #     processedText = processedText[ 0 : lastSeparatorIndex ] + processedText[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
+    
+#TODO Check the last separator is removed correctly.
+        return indicatorTextProcessed[ 0 : - len( self.indicatorTextSeparator ) ]
 
 
 #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
