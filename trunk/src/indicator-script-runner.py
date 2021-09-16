@@ -20,7 +20,8 @@
 # optionally display results in the icon label.
 
 
-#TODO COnsider a function to take create the tag (either taking the key or group/name).
+#TODO Update tooltip somewhere telling user when a background script barfs there should be a log file and the tag will be left in the indicator text.
+#Need a similar tooltip for non-background scripts (log file)?         
 
 
 INDICATOR_NAME = "indicator-script-runner"
@@ -195,16 +196,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
-#TODO If the command breaks or is garbage or similar, the process result will be a logged message and None returned.
-#Can easily capture the None result to avoid called .strip().
-#However, what to add into the script results cache and the next update time?
-#What to tell the user?  Leave the original tag in the icon text?         
         commandResult = self.processGet( script.getCommand() )
-        if not commandResult:
-            commandResult = '[' + self.__createKey( script.getGroup(), script.getName() ) + ']'
+        if commandResult:
+            commandResult = commandResult.strip()
 
-        commandResult = commandResult.strip()
-        # commandResult = self.processGet( script.getCommand() ).strip()
+        else:
+            commandResult = None # Indicate downstream an error occurred when running the script.
+
         key = self.__createKey( script.getGroup(), script.getName() )
         self.backgroundScriptResults[ key ] = commandResult
         self.backgroundScriptNextUpdateTime[ key ] = now + datetime.timedelta( minutes = script.getIntervalInMinutes() )
@@ -217,9 +215,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             key = self.__createKey( script.getGroup(), script.getName() )
             if type( script ) == Background and "[" + key + "]" in indicatorTextProcessed:
                 commandResult = self.backgroundScriptResults[ key ]
-                indicatorTextProcessed = indicatorTextProcessed.replace( "[" + key + "]", commandResult + self.indicatorTextSeparator )
+                if commandResult is None: # Background script failed so leave the tag in place for the user to see.
+                    indicatorTextProcessed = indicatorTextProcessed.replace( "[" + key + "]", "[" + key + "]" + self.indicatorTextSeparator )
 
-        return indicatorTextProcessed[ 0 : - len( self.indicatorTextSeparator ) ]
+                elif commandResult: # Non-empty result so replace tag and tack on a separator.
+                    indicatorTextProcessed = indicatorTextProcessed.replace( "[" + key + "]", commandResult + self.indicatorTextSeparator )
+
+                else: # No result, so remove tag but no need for separator.
+                    indicatorTextProcessed = indicatorTextProcessed.replace( "[" + key + "]", commandResult )
+
+        return indicatorTextProcessed[ 0 : - len( self.indicatorTextSeparator ) ] # Trim last separator.
 
 
 #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
