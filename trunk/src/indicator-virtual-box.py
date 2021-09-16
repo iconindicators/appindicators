@@ -156,6 +156,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 self.requestUpdate()
 
         else:
+#TODO 
+# VBoxManage list vms | awk '/Windows XP/ {print}'
             result = self.processGet( "VBoxManage list vms | grep " + uuid, True )
             if result is None or uuid not in result:
                 message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
@@ -168,6 +170,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
 
     def bringWindowToFront( self, virtualMachineName ):
+#TODO
+# wmctrl -l | awk '/Eclips/ {print}' | wc -l        
         numberOfWindowsWithTheSameName = self.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l', True ).strip()
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
@@ -224,6 +228,8 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         # because the executable might be a script which calls another executable.
         # So using processes to find the window kept failing.
         # Instead, now have the user type in the title of the window into the preferences and find the window by that.
+#TODO
+# wmctrl -l | awk '/Eclips/ {print}'
         result = self.processGet( "wmctrl -l | grep \"" + self.virtualboxManagerWindowName + "\"", True )
         windowID = None
         if result:
