@@ -156,7 +156,7 @@ class IndicatorBase( ABC ):
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
 
 
-    # Process text containing pairs of [ ] and { }, typically displayed in the indicator's label.
+    # Process text containing pairs of [ ], optionally surrounded by { }, typically used for display in the indicator's label.
     #
     # The text may contain tags, delimited by '[' and ']' to be processed by the caller.
     # The caller must provide a 'process tags' function, taking optional arguments.
