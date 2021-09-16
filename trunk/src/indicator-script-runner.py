@@ -842,9 +842,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
         scriptNonBackgroundRadio.set_active( True if add else type( script ) == NonBackground )
         scriptNonBackgroundRadio.set_tooltip_text(
-            "Script is displayed in the menu\n" + \
-            "and runs when the user clicks on\n" + \
-            "the corresponding menu item." )
+            "Non-background scripts are displayed\n" + \
+            "in the menu and run when the user\n" + \
+            "clicks on the corresponding menu item." )
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
 
         terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
@@ -867,8 +867,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
         scriptBackgroundRadio.set_active( False if add else type( script ) == Background )
         scriptBackgroundRadio.set_tooltip_text(
-            "Script will run in the background\n" + \
-            "at the interval specified, only if\n" + \
+            "Background scripts run in the background\n" + \
+            "at the interval specified, but only if\n" + \
             "added to the icon text." )
         
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
@@ -894,9 +894,9 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
         forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
         forceUpdateCheckbox.set_tooltip_text( _(
-            "If this script returned non-empty text\n" + \
-            "on its last update, this script will\n" + \
-            "run on the next update of ANY script." ) )
+            "If the background script returns non-empty\n" + \
+            "text on its update, this script will run\n" + \
+            "on the next update of ANY script." ) )
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
