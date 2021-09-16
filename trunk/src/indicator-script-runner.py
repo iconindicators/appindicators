@@ -20,6 +20,9 @@
 # optionally display results in the icon label.
 
 
+#TODO COnsider a function to take create the tag (either taking the key or group/name).
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -198,6 +201,13 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
+#TODO If the command breaks or is garbage or similar, the process result will be a logged message and None returned.
+#Can easily capture the None result to avoid called .strip().
+#However, what to add into the script results cache and the next update time?
+#What to tell the user?  Leave the original tag in the icon text?         
+        commandResult = self.processGet( script.getCommand() )
+        commandResult = self.processGet( script.getCommand() ).strip()
+
         commandResult = self.processGet( script.getCommand() ).strip()
         key = self.__createKey( script.getGroup(), script.getName() )
         self.backgroundScriptResults[ key ] = commandResult
