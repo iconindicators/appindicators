@@ -168,6 +168,10 @@ class IndicatorBase( ABC ):
     # The 'process tags' function is passed the text along with optional arguments and
     # must then return the processed text.
     def processTags( self, text, separator, processTagsFunction, *processTagsFunctionArguments ):
+#TODO If this function is ONLY called by LUnar, then consider rewriting...
+# The process tags specific function iterates over ALL key, which is wasteful.
+# Perhaps instead, down in the section below where the { } are identified, do a tag replacement by identifying []...not sure if this is feasible/possible.
+
         processedText = processTagsFunction( text, processTagsFunctionArguments ) # Call to specific handler for data tags in the text.
 
         # Handle pairs of { }.
