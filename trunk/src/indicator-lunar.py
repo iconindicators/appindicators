@@ -362,7 +362,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
         self.updateMenu( menu )
-        self.setLabel( self.processTags( self.indicatorText, self.indicatorTextSeparator, self.__processTags, None ) )
+        self.setLabel( self.processTags() )
         self.updateIcon()
 
         if self.showWerewolfWarning:
@@ -374,17 +374,59 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds()
 
 
-#TODO This function may be reintegrated with the baseclass superfunction.
-# Also consider is it worthwhile to change below to find each [] in the 'text' and do a tag replacement, rather than iterate over all keys?
-#Maybe do a timing test first?
-    # Called by base class to process data tags.
-    def __processTags( self, textToProcess, arguments ):
-        text = textToProcess
-        for key in self.data.keys(): # Substitute data tags '[' and ']' for values.
-            if "[" + key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] + " " + key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] + "]" in text:
-                text = text.replace( "[" + key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] + " " + key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] + "]", self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ) )
+    # Process text containing pairs of [ ], optionally surrounded by { }, typically used for display in the indicator's label.
+    #
+    # The text may contain tags, delimited by '[' and ']' to be processed by the caller.
+    # The caller must provide a 'process tags' function, taking optional arguments.
+    #
+    # Free text may be associated with any number of tags, all of which are to be enclosed with '{' and '}'.
+    # If all tags within '{' and '}' are not replaced, all text (and tags) within is removed.
+    # This ensures a tag which cannot be processed does not cause the text to hang around.
+    #
+    # The 'process tags' function is passed the text along with optional arguments and
+    # must then return the processed text.
+    def processTags( self ):
 
-        return text
+        # Handle [ ].
+        # There may still be tags left in as a result of say a satellite or comet dropping out.
+        # Remaining tags are moped up at the end.
+        processedText = self.indicatorText
+        for key in self.data.keys():
+            tag = "[" + key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] + " " + key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] + "]"
+            if tag in processedText:
+                data = self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
+                processedText = processedText.replace( tag, data )
+
+        # Handle text enclosed by { }.
+        i = 0
+        lastSeparatorIndex = -1 # Track the last insertion point of the separator so it can be removed.
+        tagRegularExpression = "\[[^\[\]]*\]"
+        while( i < len( processedText ) ):
+            if processedText[ i ] == '{':
+                j = i + 1
+                while( j < len( processedText ) ):
+                    if processedText[ j ] == '}':
+                        text = processedText[ i + 1 : j ] # Text between braces.
+                        textMinusUnknownTags = re.sub( tagRegularExpression, "", text ) # Text between braces with outstanding/unknown tags removed.
+                        if len( text ) and text == textMinusUnknownTags: # Text is not empty and no unknown tags found, so keep this text.
+                            processedText = processedText[ 0 : i ] + processedText[ i + 1 : j ] + self.indicatorTextSeparator + processedText[ j + 1 : ]
+                            lastSeparatorIndex = j - 1
+
+                        else: # Empty text or there was one or more unknown tags found, so drop the text.
+                            processedText = processedText[ 0 : i ] + processedText[ j + 1 : ]
+
+                        i -= 1
+                        break
+
+                    j += 1
+
+            i += 1
+
+        if lastSeparatorIndex > -1:
+            processedText = processedText[ 0 : lastSeparatorIndex ] + processedText[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
+
+        processedText = re.sub( tagRegularExpression, "", processedText ) # Remove remaining tags (not removed because they were not contained within { }).
+        return processedText
 
 
     # Get the data from the cache, or if stale, download from the source.
