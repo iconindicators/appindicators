@@ -1219,6 +1219,7 @@ class AstroPyEphem( astrobase.AstroBase ):
         sun = ephem.Sun()
         sun.compute( city )
 
+#TODO Can the sun.alt checks here be done in the main function, outside of the loop, to specify when to look for visible passes?
         return satellite.eclipsed is False and \
                sun.alt > ephem.degrees( "-18" ) and \
                sun.alt < ephem.degrees( "-6" )
