@@ -1173,8 +1173,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
     def __calculateNextSatellitePass( city, satellite ):
-        version = int( ephem.__version__.split( '.' )[ 2 ] )
-        if version <= 6: #TODO Need to handle the 3.7 because it's is possible to have 4.x.6
+        if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
             nextPass = city.next_pass( satellite )
 
         else:
