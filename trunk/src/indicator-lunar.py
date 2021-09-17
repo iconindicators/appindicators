@@ -356,12 +356,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.magnitude,
             self.getLogging() )
 
-        if self.dataPrevious is None:
+        if self.dataPrevious is None: # Happens only on first run.
             self.dataPrevious = self.data
 
         # Update frontend.
         menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
-        self.updateMenu( menu )
+        self.updateMenu( menu, utcNow )
         self.setLabel( self.processTags() )
         self.updateIcon()
 
@@ -522,7 +522,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.updateMenuStars( menu )
         self.updateMenuCometsMinorPlanets( menu, astrobase.AstroBase.BodyType.COMET )
         self.updateMenuCometsMinorPlanets( menu, astrobase.AstroBase.BodyType.MINOR_PLANET)
-        self.updateMenuSatellites( menu )
+        self.updateMenuSatellites( menu, utcNow )
 
 
     def updateIcon( self ):
@@ -808,32 +808,69 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Why?
 # Need to check the code for determining when the next update should occur.
 
-    def updateMenuSatellites( self, menu ):
+    #   RP         SP                                                      RN        SN            Yet to rise
+    #                      RP              SP                              RN        SN            Transit
+    #                                                RP             SP             RN        SN    Transit
+    #   RP    SP                    RN          SN
+    #   RP         SP                                                  RN        SN
+    #                            ^                                ^
+    #                          utcNow                        utcNow + 5
+
+    
+    
+    #                                        RiseN
+    #                                                                       RiseN
+    #
+    #
+    #   RiseP    SetP                                                                                            SetP < now: ignore
+    #   RiseP                               SetP                                                                 now < SetP < now + 5 : transit 
+    #   RiseP                                                                SetP                                now < SetP < now + 5 : transit
+    #                                    RiseP             SetP
+    #                                                                 RiseP             SetP
+    #                                                                 RiseP             SetP
+    #                            ^                                ^
+    #                          utcNow                        utcNow + 5
+    def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
-        utcNow = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() )
-        utcNowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 ) )
+        now = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() )
+        nowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 ) )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
                 if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
-                    if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes and \
-                       self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > utcNow:
+                    if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
+                       self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now:
                         # Satellite is in transit...
-                        satellites.append( [ number, self.satelliteData[ number ].getName(), self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
+                        satellites.append( [
+                            number,
+                            self.satelliteData[ number ].getName(), 
+                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
+                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
+                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
+                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
     
                     else:
                         # Satellite is yet to rise...
-                        satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+                        satellites.append( [
+                            number, 
+                            self.satelliteData[ number ].getName(), 
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                 else:
                     # Not present in previous data (the user went from no satellites checked to all satellites checked in the preferences). 
                     # Assume the satellite is yet to rise...
-                    satellites.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+                    satellites.append( [
+                        number,
+                        self.satelliteData[ number ].getName(),
+                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-            elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data:
-                # Satellite is circumpolar (always up)...
-                satellitesPolar.append( [ number, self.satelliteData[ number ].getName(), self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ], self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
+            elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is circumpolar (always up)...
+                satellitesPolar.append( [
+                    number,
+                    self.satelliteData[ number ].getName(),
+                    self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ],
+                    self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
 
         if self.satellitesSortByDateTime:
             satellites = sorted( satellites, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_DATA ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
@@ -844,9 +881,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         if satellites:
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
-        satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
-
         if satellitesPolar:
+            satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
@@ -862,19 +898,43 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
 
             if len( info ) == 3: # Satellite yet to rise.
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ) )
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ) ) #TODO Missing URL?
 
             elif len( info ) == 4: # Circumpolar (always up).
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), url )
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), url )
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 1, 2 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ),
+                    url )
 
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 1, 2 ) + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ),
+                    url )
+                
             else: # Satellite is in transit.
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
-                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ), url )
-                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] ), url )
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                    url )
+
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] ),
+                    url )
+
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
-                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ), url )
-                self.createMenuItem( subMenu, self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ), url )
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ),
+                    url )
+
+                self.createMenuItem(
+                    subMenu,
+                    self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ),
+                    url )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
