@@ -1174,7 +1174,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     @staticmethod
     def __calculateNextSatellitePass( city, satellite ):
         version = int( ephem.__version__.split( '.' )[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] )
-        if version <= 6:
+        if version <= 6: #TODO Need to handle the 3.7 because it's is possible to have 4.x.6
             nextPass = city.next_pass( satellite )
 
         else:
