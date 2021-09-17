@@ -38,7 +38,7 @@ gi.require_version( "Notify", "0.7" )
 from abc import ABC
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 
-import datetime, gzip, json, logging.handlers, os, pickle, re, shutil, subprocess
+import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 
 class IndicatorBase( ABC ):
@@ -154,56 +154,6 @@ class IndicatorBase( ABC ):
 
 
     def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
-
-
-    # Process text containing pairs of [ ], optionally surrounded by { }, typically used for display in the indicator's label.
-    #
-    # The text may contain tags, delimited by '[' and ']' to be processed by the caller.
-    # The caller must provide a 'process tags' function, taking optional arguments.
-    #
-    # Free text may be associated with any number of tags, all of which are to be enclosed with '{' and '}'.
-    # If all tags within '{' and '}' are not replaced, all text (and tags) within is removed.
-    # This ensures a tag which cannot be processed does not cause the text to hang around.
-    #
-    # The 'process tags' function is passed the text along with optional arguments and
-    # must then return the processed text.
-    def processTags( self, text, separator, processTagsFunction, *processTagsFunctionArguments ):
-#TODO If this function is ONLY called by LUnar, then consider rewriting...
-# The process tags specific function iterates over ALL key, which is wasteful.
-# Perhaps instead, down in the section below where the { } are identified, do a tag replacement by identifying []...not sure if this is feasible/possible.
-
-        processedText = processTagsFunction( text, processTagsFunctionArguments ) # Call to specific handler for data tags in the text.
-
-        # Handle pairs of { }.
-        i = 0
-        lastSeparatorIndex = -1 # Track the last insertion point of the separator so it can be removed.
-        tagRegularExpression = "\[[^\[\]]*\]"
-        while( i < len( processedText ) ):
-            if processedText[ i ] == '{':
-                j = i + 1
-                while( j < len( processedText ) ):
-                    if processedText[ j ] == '}':
-                        text = processedText[ i + 1 : j ] # Text between braces.
-                        textMinusUnknownTags = re.sub( tagRegularExpression, "", text ) # Text between braces with outstanding/unknown tags removed.
-                        if len( text ) and text == textMinusUnknownTags: # Text is not empty and no unknown tags found, so keep this text.
-                            processedText = processedText[ 0 : i ] + processedText[ i + 1 : j ] + separator + processedText[ j + 1 : ]
-                            lastSeparatorIndex = j - 1
-
-                        else: # Empty text or there was one or more unknown tags found, so drop the text.
-                            processedText = processedText[ 0 : i ] + processedText[ j + 1 : ]
-
-                        i -= 1
-                        break
-
-                    j += 1
-
-            i += 1
-
-        if lastSeparatorIndex > -1:
-            processedText = processedText[ 0 : lastSeparatorIndex ] + processedText[ lastSeparatorIndex + len( self.indicatorTextSeparator ) : ] # Remove the last separator.
-
-        processedText = re.sub( tagRegularExpression, "", processedText ) # Remove remaining tags (not removed because they were not contained within { }).
-        return processedText
 
 
     def setLabel( self, text ):
