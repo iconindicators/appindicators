@@ -1018,7 +1018,7 @@ class AstroPyEphem( astrobase.AstroBase ):
         moon = ephem.Moon()
         moon.compute( AstroPyEphem.__getCity( data, ephemNow ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] =
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = \
             astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
 
         city = AstroPyEphem.__getCity( data, ephemNow )
