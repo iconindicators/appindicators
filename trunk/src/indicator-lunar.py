@@ -805,7 +805,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Need to check the code for determining when the next update should occur.
 #
 # Hopefully the code changes have fixed this...run the indicator showing all satellite passes and keep an eye on it.
-
+#
+# Fix up the header comment below so that it reflects the code.
 
     # Display the rise/set information for each satellite.
     #
