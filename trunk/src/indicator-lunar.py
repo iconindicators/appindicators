@@ -490,6 +490,27 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
 
         for key in self.data:
+            bodyType = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
+            dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
+            if dataName == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+               dataName == astrobase.AstroBase.DATA_TAG_EQUINOX or \
+               dataName == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
+               dataName == astrobase.AstroBase.DATA_TAG_FULL or \
+               dataName == astrobase.AstroBase.DATA_TAG_NEW or \
+               dataName == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
+               dataName == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
+               dataName == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER or \
+               ( dataName == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and \
+                 bodyType != astrobase.AstroBase.BodyType.SATELLITE and \
+                 not self.hideBodiesBelowHorizon ) or \
+               ( dataName == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and \
+                 bodyType == astrobase.AstroBase.BodyType.SATELLITE ):
+                pass
+                
+
+
+            
+            
             dateTimeAttributeExceptRiseDateTime = \
                 key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                 key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
