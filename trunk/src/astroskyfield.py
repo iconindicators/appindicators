@@ -852,13 +852,22 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                    ephemerisPlanets[ AstroSkyfield.__MOON ] )
 
         if not neverUp:
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ] ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_LAST_QUARTER ] ) ) ] )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
+                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ] ) ) ] )
+
+            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = \
+                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ) ] )
+
+            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
+                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_LAST_QUARTER ] ) ) ] )
+
+            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = \
+                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
 
             t, y, details = eclipselib.lunar_eclipses( utcNow, utcNowPlusOneYear, ephemerisPlanets ) # Zeroth result in t and y is the first result, so use that.
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
+                t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
@@ -880,7 +889,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
             t, y = almanac.find_discrete( utcNow, utcNowPlusSevenMonths, almanac.seasons( ephemerisPlanets ) )
             t = t.utc_datetime()
-            if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
+            if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or \
+               almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
 
@@ -905,7 +915,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                planet == astrobase.AstroBase.PLANET_VENUS or \
                planet == astrobase.AstroBase.PLANET_JUPITER or \
                planet == astrobase.AstroBase.PLANET_URANUS:
-                apparentMagnitude = planetary_magnitude( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( utcNow ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
+                position = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( utcNow ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) 
+                apparentMagnitude = planetary_magnitude( position )
 
             else:
                 #TODO Skyfield does not calculate apparent magnitude for all bodies as yet, so hard code for now...
@@ -943,7 +954,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements( utcNow, utcNowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum, logging ):
+    def __calculateOrbitalElements(
+            utcNow, utcNowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum, logging ):
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for key in orbitalElements:
@@ -1044,7 +1056,8 @@ class AstroSkyfield( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
-                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
+                earthSatellite = \
+                    EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
                 t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
                 riseTime = None
                 culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
