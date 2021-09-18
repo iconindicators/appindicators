@@ -357,7 +357,9 @@ class AstroBase( ABC ):
         # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero.
         # Taking the subsequent logarithm is undefined!
         # Not really sure what can be done, or should be done; leave things as they are and catch the error/exception.
-        numerator = bodySunDistanceAU * bodySunDistanceAU + bodyEarthDistanceAU * bodyEarthDistanceAU - earthSunDistanceAU * earthSunDistanceAU
+        numerator = bodySunDistanceAU * bodySunDistanceAU + \
+                    bodyEarthDistanceAU * bodyEarthDistanceAU - \
+                    earthSunDistanceAU * earthSunDistanceAU
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
         beta = math.acos( numerator / denominator )
 
