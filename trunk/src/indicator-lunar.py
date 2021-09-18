@@ -808,6 +808,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Why?
 # Need to check the code for determining when the next update should occur.
 
+    # Display the rise/set information for each satellite.
+    #
+    # If a satellite is in transit OR will rise within the next five minutes, show the rise and set information.
+    # Otherwise, just show the next rise. 
     #
     # Previous rise/set relative to UTC now:
     #
@@ -820,6 +824,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #                   ^                    ^
     #                utcNow             utcNow + 5
     #
+    # When ( r < utcNow + 5 ) AND ( s > utcNow ) display rise/set information.
+    # Otherwise, when ( r < utcNow + 5 ) look to next transit.
+    # Otherwise, when ( s > utcNow ) display rise information.
+    #
     #
     # Next rise/set relative to UTC now:
     #
@@ -828,6 +836,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #                                            R       S           Satellite will rise after five minute window; display rise information.
     #                   ^                    ^
     #                utcNow             utcNow + 5
+    #
+    # When ( r < utcNow + 5 ) display rise/set information.
+    # Otherwise, display rise information.
     def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
@@ -838,8 +849,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
                 if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
                     if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
-                       self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now:
-                        # Satellite is in transit...
+                       self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
                         satellites.append( [
                             number,
                             self.satelliteData[ number ].getName(), 
@@ -848,16 +858,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                             self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
                             self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
     
-                    else:
-                        # Satellite is yet to rise...
+                    else: # Satellite is yet to rise...
                         satellites.append( [
                             number, 
                             self.satelliteData[ number ].getName(), 
                             self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                 else:
-                    # Not present in previous data (the user went from no satellites checked to all satellites checked in the preferences). 
+                    # Not present in previous data (the user went from no satellites checked to one or more satellites checked in the preferences). 
                     # Assume the satellite is yet to rise...
+#TODO Not quite correct assuming satellite is yet to rise...could be in transit...so can we figure out a better resolution?
+# Satellite could ALSO be circumpolar (or not)?
                     satellites.append( [
                         number,
                         self.satelliteData[ number ].getName(),
