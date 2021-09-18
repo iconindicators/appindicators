@@ -178,7 +178,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 #
 # Need to create the test indicator to install python3-pyephem and verify the version number.
 # Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
-
+        self.debug = True
         import ephem
         print( ephem.__version__ )
 
@@ -490,7 +490,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
 
         for key in self.data:
-            bodyType = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
             dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             if dataName == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                dataName == astrobase.AstroBase.DATA_TAG_EQUINOX or \
@@ -500,31 +499,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                dataName == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
                dataName == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
                dataName == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER or \
-               ( dataName == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and \
-                 bodyType != astrobase.AstroBase.BodyType.SATELLITE and \
-                 not self.hideBodiesBelowHorizon ) or \
-               ( dataName == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and \
-                 bodyType == astrobase.AstroBase.BodyType.SATELLITE ):
-                pass
-                
-
-
-            
-            
-            dateTimeAttributeExceptRiseDateTime = \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_EQUINOX or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_FIRST_QUARTER or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_FULL or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_NEW or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_SET_DATE_TIME or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER
-
-            riseDateTimeAtributeAndShowBodiesBelowHorizon = \
-                key[ IndicatorLunar.DATA_INDEX_DATA_NAME ] == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME and not self.hideBodiesBelowHorizon
-
-            if dateTimeAttributeExceptRiseDateTime or riseDateTimeAtributeAndShowBodiesBelowHorizon:
+               dataName == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME:
                 dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
