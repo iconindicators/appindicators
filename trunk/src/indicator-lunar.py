@@ -484,7 +484,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         utcNow = datetime.datetime.utcnow()
 
         # Do an update at least every twenty minutes to ensure:
-        #    The moon icon reflects reality
+        #    The moon icon reflects reality.
         #    Objects don't move too much between updates.
         #    Download of comet/minor planet/satellite data occurs no more than twenty minutes from when they are supposed to happen.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
@@ -515,7 +515,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return nextUpdateInSeconds
 
 
-    def updateMenu( self, menu ):
+    def updateMenu( self, menu, utcNow ):
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
@@ -844,6 +844,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesPolar = [ ]
         now = astrobase.AstroBase.toDateTimeString( utcNow )
         nowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
+        print( utcNow )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
@@ -858,7 +859,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
                 else: # Satellite will rise five minutes from now or much later, so look at previous rise to see if the satellite is in transit...
                     if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
-                        if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
+                        if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
+                           self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(), 
@@ -879,34 +881,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                             self.satelliteData[ number ].getName(),
                             self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-
-                if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
-                    if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
-                       self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
-                        satellites.append( [
-                            number,
-                            self.satelliteData[ number ].getName(), 
-                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
-                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
-                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
-                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
-    
-                    else: # Satellite is yet to rise...
-                        satellites.append( [
-                            number, 
-                            self.satelliteData[ number ].getName(), 
-                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
-
-                else:
-                    # Not present in previous data (the user went from no satellites checked to one or more satellites checked in the preferences). 
-                    # Assume the satellite is yet to rise...
-#TODO Not quite correct assuming satellite is yet to rise...could be in transit...so can we figure out a better resolution?
-# Satellite could ALSO be circumpolar (or not)?
-                    satellites.append( [
-                        number,
-                        self.satelliteData[ number ].getName(),
-                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
-
             elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is circumpolar (always up)...
                 satellitesPolar.append( [
                     number,
@@ -915,16 +889,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
 
         if self.satellitesSortByDateTime:
-            satellites = sorted( satellites, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_DATA ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
+            satellites = sorted(
+                satellites,
+                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_DATA ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
         else: # Sort by name/number.
-            satellites = sorted( satellites, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+            satellites = sorted(
+                satellites,
+                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
 
         if satellites:
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
         if satellitesPolar:
-            satellitesPolar = sorted( satellitesPolar, key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+            satellitesPolar = sorted(
+                satellitesPolar,
+                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
