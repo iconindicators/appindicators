@@ -1018,7 +1018,8 @@ class AstroPyEphem( astrobase.AstroBase ):
         moon = ephem.Moon()
         moon.compute( AstroPyEphem.__getCity( data, ephemNow ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] =
+            astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
 
         city = AstroPyEphem.__getCity( data, ephemNow )
         sun = ephem.Sun( city )
@@ -1150,20 +1151,22 @@ class AstroPyEphem( astrobase.AstroBase ):
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
                         nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
-                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
+                           AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
+                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
+                                repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
+                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
+
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
                             break
 
-#TODO Double check the logic of both the if and else.  Are the times set for looking for the next pass sensible?
-                        # Look for the next pass after the current pass...
-                        if nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ]: # ...but occasionally pass data is bad.
-                            currentDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
-
-                        else:
-                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after current time.
+                        currentDateTime = ephem.Date( currentDateTime + ephem.minute * 30 )
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
@@ -1216,8 +1219,6 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
-        if True: return True# TODO Testing
-        
         city = AstroPyEphem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
