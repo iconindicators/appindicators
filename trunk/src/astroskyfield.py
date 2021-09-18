@@ -784,12 +784,12 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             try:
                 if bodyType == astrobase.AstroBase.BodyType.COMET:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ], 
+                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ],
                                                                                      earthBodyDistance.au, sunBodyDistance.au )
 
                 else:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
-                                                                                     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+                    apparentMagnitude =  astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
+                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
                 if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                     results[ name.upper() ] = orbitalElementData[ name.upper() ]
@@ -1056,8 +1056,10 @@ class AstroSkyfield( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
-                earthSatellite = \
-                    EarthSatellite( satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2(), satelliteData[ satellite ].getName(), timeScale )
+                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), 
+                                                 satelliteData[ satellite ].getLine2(), 
+                                                 satelliteData[ satellite ].getName(), 
+                                                 timeScale )
                 t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
                 riseTime = None
                 culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
