@@ -803,6 +803,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Not update until 17:57 though.
 # Why?
 # Need to check the code for determining when the next update should occur.
+#
+# Hopefully the code changes have fixed this...run the indicator showing all satellite passes and keep an eye on it.
+
 
     # Display the rise/set information for each satellite.
     #
@@ -840,7 +843,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesPolar = [ ]
         now = astrobase.AstroBase.toDateTimeString( utcNow )
         nowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
-        print( utcNow )
+        print( utcNow ) #TODO Debug
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
@@ -909,6 +912,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
+        print( "Number satellites:", str( len( satellites ) ) )
         for info in satellites:
             number = info [ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info [ IndicatorLunar.SATELLITE_MENU_NAME ]
