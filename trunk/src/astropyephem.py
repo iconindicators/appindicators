@@ -1153,6 +1153,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
                             break
 
+#TODO Double check the logic of both the if and else.  Are the times set for looking for the next pass sensible?
                         # Look for the next pass after the current pass...
                         if nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ]: # ...but occasionally pass data is bad.
                             currentDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
@@ -1219,7 +1220,6 @@ class AstroPyEphem( astrobase.AstroBase ):
         sun = ephem.Sun()
         sun.compute( city )
 
-#TODO Can the sun.alt checks here be done in the main function, outside of the loop, to specify when to look for visible passes?
         return satellite.eclipsed is False and \
                sun.alt > ephem.degrees( "-18" ) and \
                sun.alt < ephem.degrees( "-6" )
