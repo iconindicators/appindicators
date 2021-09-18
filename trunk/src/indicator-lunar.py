@@ -808,28 +808,26 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Why?
 # Need to check the code for determining when the next update should occur.
 
-    #   RP         SP                                                      RN        SN            Yet to rise
-    #                      RP              SP                              RN        SN            Transit
-    #                                                RP             SP             RN        SN    Transit
-    #   RP    SP                    RN          SN
-    #   RP         SP                                                  RN        SN
-    #                            ^                                ^
-    #                          utcNow                        utcNow + 5
-
-    
-    
-    #                                        RiseN
-    #                                                                       RiseN
+    #
+    # Previous rise/set relative to UTC now:
+    #
+    #    R       S                                                   Satellite has set; look to next transit.
+    #    R                       S                                   Satellite in transit; display rise/set information.
+    #    R                                           S               Satellite in transit; display rise/set information.
+    #                            R       S                           Satellite will rise within the five minute window; display rise/set information.
+    #                            R                   S               Satellite will rise within the five minute window; display rise/set information.
+    #                                                R       S       Satellite will rise after five minute window; display rise information.
+    #                   ^                    ^
+    #                utcNow             utcNow + 5
     #
     #
-    #   RiseP    SetP                                                                                            SetP < now: ignore
-    #   RiseP                               SetP                                                                 now < SetP < now + 5 : transit 
-    #   RiseP                                                                SetP                                now < SetP < now + 5 : transit
-    #                                    RiseP             SetP
-    #                                                                 RiseP             SetP
-    #                                                                 RiseP             SetP
-    #                            ^                                ^
-    #                          utcNow                        utcNow + 5
+    # Next rise/set relative to UTC now:
+    #
+    #                            R       S                           Satellite will rise within the five minute window; display rise/set information.
+    #                            R               S                   Satellite will rise within the five minute window; display rise/set information.
+    #                                            R       S           Satellite will rise after five minute window; display rise information.
+    #                   ^                    ^
+    #                utcNow             utcNow + 5
     def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
