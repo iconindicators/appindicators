@@ -20,6 +20,20 @@
 # comet, minor planet and satellite information.
 
 
+#TODO Given that many more satellites are coming online,
+# it will be infeasible to display them all for the 36 hour window.
+# So need to limit the number of hours, so that many more satellites can be shown.
+# But what if I only want to keep an eye on a handful of satellites and extend the hours out to say a week?
+#
+# Perhaps have an option to change the number of hours?
+#
+#
+#
+# When only visible passes are shown, there are 59 out of 160 odd satellites.
+# Of which, 38 are for the next window.
+
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -795,23 +809,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
 
 
-#TODO Noticed around 6:15pm when satellites where rising (under PyEphem) in the released version of 1.0.89).
-# Some satellites which had rise times shortly before 6:15 where displayed as yet to rise (only rise time showing).
-#
-# More observations...
-# At 17:52, there was a satellite listed to rise at 17:55.
-# Not update until 17:57 though.
-# Why?
-# Need to check the code for determining when the next update should occur.
-#
-# Hopefully the code changes have fixed this...run the indicator showing all satellite passes and keep an eye on it.
-#
-# Fix up the header comment below so that it reflects the code.
-
     # Display the rise/set information for each satellite.
     #
     # If a satellite is in transit OR will rise within the next five minutes, show the rise and set information.
     # Otherwise, just show the next rise. 
+    #
+    # Next rise/set relative to UTC now:
+    #
+    #                            R       S                           Satellite will rise within the five minute window; display rise/set information.
+    #                            R               S                   Satellite will rise within the five minute window; display rise/set information.
+    #                                            R       S           Satellite will rise after five minute window; display rise information.  Check for a previous transit.
+    #                   ^                    ^
+    #                utcNow             utcNow + 5
+    #
+    # When ( R < utcNow + 5 ) display rise/set information.
+    # Otherwise, display rise information.
     #
     # Previous rise/set relative to UTC now:
     #
@@ -824,21 +836,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     #                   ^                    ^
     #                utcNow             utcNow + 5
     #
-    # When ( r < utcNow + 5 ) AND ( s > utcNow ) display rise/set information.
-    # Otherwise, when ( r < utcNow + 5 ) look to next transit.
-    # Otherwise, when ( s > utcNow ) display rise information.
-    #
-    #
-    # Next rise/set relative to UTC now:
-    #
-    #                            R       S                           Satellite will rise within the five minute window; display rise/set information.
-    #                            R               S                   Satellite will rise within the five minute window; display rise/set information.
-    #                                            R       S           Satellite will rise after five minute window; display rise information.
-    #                   ^                    ^
-    #                utcNow             utcNow + 5
-    #
-    # When ( r < utcNow + 5 ) display rise/set information.
-    # Otherwise, display rise information.
+    # When ( R < utcNow + 5 ) AND ( S > utcNow ) display rise/set information.
     def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
@@ -912,6 +910,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
+        print( len( satellites ) )#TODO Testing
         for info in satellites:
             number = info [ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info [ IndicatorLunar.SATELLITE_MENU_NAME ]
