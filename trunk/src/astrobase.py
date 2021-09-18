@@ -315,6 +315,12 @@ class AstroBase( ABC ):
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ): return { }
 
 
+    # Returns the version of the underlying astronomical library.
+    @staticmethod
+    @abstractmethod
+    def getVersion(): return None
+
+
     # Returns None if the minimum version of the third party library is met; an error message otherwise.
     @staticmethod
     @abstractmethod

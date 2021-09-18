@@ -802,6 +802,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
+    def getVersion(): return skyfield.__version__
+
+
+    @staticmethod
     def getVersionMessage():
         message = None
         if LooseVersion( skyfield.__version__ ) < LooseVersion( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ):

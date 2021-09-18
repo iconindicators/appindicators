@@ -990,6 +990,10 @@ class AstroPyEphem( astrobase.AstroBase ):
 
 
     @staticmethod
+    def getVersion(): return ephem.__version__
+
+
+    @staticmethod
     def getVersionMessage():
         message = None
         if LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
@@ -1212,6 +1216,8 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
+        if True: return True# TODO Testing
+        
         city = AstroPyEphem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"
