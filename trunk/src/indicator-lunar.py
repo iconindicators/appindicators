@@ -179,8 +179,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # Need to create the test indicator to install python3-pyephem and verify the version number.
 # Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
         self.debug = True
-        import ephem
-        print( ephem.__version__ )
 
         utcNow = datetime.datetime.utcnow()
 
@@ -360,7 +358,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.dataPrevious = self.data
 
         # Update frontend.
-        menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName ) )#TODO Debug
+        if self.debug:
+            menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
+
         self.updateMenu( menu, utcNow )
         self.setLabel( self.processTags() )
         self.updateIcon()
@@ -786,9 +786,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( menu, indent + _( "Rise: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ), onClickURL )
 
             else:
-                self.createMenuItem( menu, indent + _( "Set: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ), onClickURL )
                 self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
                 self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
+                self.createMenuItem( menu, indent + _( "Set: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ), onClickURL )
 
         else: # Body is always up.
             self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
@@ -843,7 +843,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesPolar = [ ]
         now = astrobase.AstroBase.toDateTimeString( utcNow )
         nowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
-        print( utcNow ) #TODO Debug
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
@@ -912,52 +911,60 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        print( "Number satellites:", str( len( satellites ) ) )
         for info in satellites:
             number = info [ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info [ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
-
             if len( info ) == 3: # Satellite yet to rise.
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 1, 2 ) + _( "Rise Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ) ) #TODO Missing URL?
+                label = self.indent( 1, 2 ) + \
+                        _( "Rise Date/Time: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
 
             elif len( info ) == 4: # Circumpolar (always up).
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 1, 2 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ),
-                    url )
+                label = self.indent( 1, 2 ) + \
+                        _( "Azimuth: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 1, 2 ) + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ),
-                    url )
+                self.createMenuItem( subMenu, label, url )
+
+                label = self.indent( 1, 2 ) + \
+                        _( "Altitude: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
                 
             else: # Satellite is in transit.
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ),
-                    url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] ),
-                    url )
+                label = self.indent( 2, 3 ) + \
+                        _( "Date/Time: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
+
+                label = self.indent( 2, 3 ) + \
+                        _( "Azimuth: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
 
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 2, 3 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ),
-                    url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.indent( 2, 3 ) + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ),
-                    url )
+                label = self.indent( 2, 3 ) + \
+                        _( "Date/Time: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
+
+                label = self.indent( 2, 3 ) + \
+                        _( "Azimuth: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
