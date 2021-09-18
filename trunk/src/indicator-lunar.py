@@ -910,7 +910,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        print( len( satellites ) )#TODO Testing
         for info in satellites:
             number = info [ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info [ IndicatorLunar.SATELLITE_MENU_NAME ]
