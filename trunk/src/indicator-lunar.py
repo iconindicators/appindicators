@@ -842,11 +842,44 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
-        now = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() )
-        nowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( datetime.datetime.utcnow() + datetime.timedelta( minutes = 5 ) )
+        now = astrobase.AstroBase.toDateTimeString( utcNow )
+        nowPlusFiveMinutes = astrobase.AstroBase.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
+                if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes or is in transit...
+                    satellites.append( [
+                        number,
+                        self.satelliteData[ number ].getName(), 
+                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
+                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
+                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
+                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
+
+                else: # Satellite will rise five minutes from now or much later, so look at previous rise to see if the satellite is in transit...
+                    if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
+                        if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
+                            satellites.append( [
+                                number,
+                                self.satelliteData[ number ].getName(), 
+                                self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
+                                self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
+                                self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
+                                self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
+
+                        else: # Previous transit is complete, so show next pass...
+                            satellites.append( [
+                                number,
+                                self.satelliteData[ number ].getName(),
+                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+
+                    else: # There was no previous transit (for whatever reason); shouldn't happen, so just show next pass...
+                        satellites.append( [
+                            number,
+                            self.satelliteData[ number ].getName(),
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+
+
                 if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
                     if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
                        self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
