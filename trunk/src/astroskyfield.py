@@ -1037,6 +1037,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     # Refer to
     #    https://github.com/skyfielders/python-skyfield/issues/327
+    #    https://github.com/skyfielders/python-skyfield/issues/558
     #
     # Use TLE data collated by Dr T S Kelso
     # http://celestrak.com/NORAD/elements
@@ -1050,15 +1051,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://uphere.space/satellites
     #    https://www.amsat.org/track
     #    https://tracksat.space
-    #    https://g7vrd.co.uk/public-satellite-pass-rest-api    
+    #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
-#TODO Seems to calculate some passes very late after sunset (or very early before sunrise) when the satellite surely cannot be sunlit.
-# https://github.com/skyfielders/python-skyfield/issues/558    
-# I have checked with
-# www.n2yo.com
-# and looked at a satellite which is said to be visible around midnight. 
-#The satellite DOES pass overhead, but surely cannot be visible.
-# So is the issue with my code or a fault in Skyfield?
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
         for satellite in satellites:
             if satellite in satelliteData:
@@ -1081,7 +1075,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                         if riseTime is not None and len( culminateTimes ) > 0:
                             for culmination in culminateTimes:
                                 if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and \
-                                   almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) < 4:
+                                   almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) == 1:
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
                                     alt, az, earthBodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
