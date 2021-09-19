@@ -145,6 +145,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt"
         MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
 
+#TODO These and below are no longer used.
         MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
