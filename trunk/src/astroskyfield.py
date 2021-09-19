@@ -1061,6 +1061,8 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                  satelliteData[ satellite ].getLine2(), 
                                                  satelliteData[ satellite ].getName(), 
                                                  timeScale )
+
+#TODO Keep as 30 or use 10 or maybe 20?  With 10 I get more passes which also match PyEPhem.
                 t, events = earthSatellite.find_events( location, utcNow, utcNowPlusThirtySixHours, altitude_degrees = 30.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
                 riseTime = None
                 culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
