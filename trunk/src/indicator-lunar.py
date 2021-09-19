@@ -131,11 +131,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     MINOR_PLANET_INDEX_DISTANT = 2
     MINOR_PLANET_INDEX_UNUSUAL = 3
 
-    MINOR_PLANET_CACHE_BASENAMES = [ "minorplanet-oe-" + "bright-",
-                                     "minorplanet-oe-" + "critical-",
-                                     "minorplanet-oe-" + "distant-",
-                                     "minorplanet-oe-" + "unusual-" ]
-
     MINOR_PLANET_CACHE_BASENAME_BRIGHT = "minorplanet-oe-" + "bright-"
     MINOR_PLANET_CACHE_BASENAME_CRITICAL = "minorplanet-oe-" + "critical-"
     MINOR_PLANET_CACHE_BASENAME_DISTANT = "minorplanet-oe-" + "distant-"
