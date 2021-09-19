@@ -136,15 +136,31 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                      "minorplanet-oe-" + "distant-",
                                      "minorplanet-oe-" + "unusual-" ]
 
+    MINOR_PLANET_CACHE_BASENAME_BRIGHT = "minorplanet-oe-" + "bright-"
+    MINOR_PLANET_CACHE_BASENAME_CRITICAL = "minorplanet-oe-" + "critical-"
+    MINOR_PLANET_CACHE_BASENAME_DISTANT = "minorplanet-oe-" + "distant-"
+    MINOR_PLANET_CACHE_BASENAME_UNUSUAL = "minorplanet-oe-" + "unusual-"
+
+
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
 
     if astroBackendName == astroBackendPyEphem:
+        MINOR_PLANET_DATA_URL_BRIGHT = "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt"
+        MINOR_PLANET_DATA_URL_CRITICAL = "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt"
+        MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt"
+        MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
+
         MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
 
     else:
+        MINOR_PLANET_DATA_URL_BRIGHT = "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt"
+        MINOR_PLANET_DATA_URL_CRITICAL = "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt"
+        MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt"
+        MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt"
+
         MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt",
                                    "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt",
@@ -262,9 +278,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
-        for cacheBaseName in IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES:
-            self.removeOldFilesFromCache( cacheBaseName, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
 
 
     def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
@@ -285,16 +303,16 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.cacheDateTimeComet = self.getCacheDateTime( IndicatorLunar.COMET_CACHE_BASENAME, 
                                                          utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
-        self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_BRIGHT ], 
+        self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT, 
                                                                      utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
-        self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_CRITICAL ], 
+        self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL, 
                                                                        utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
-        self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_DISTANT ], 
+        self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT, 
                                                                       utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
-        self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_UNUSUAL ], 
+        self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL, 
                                                                       utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
         self.cacheDateTimeSatellite = self.getCacheDateTime( IndicatorLunar.SATELLITE_CACHE_BASENAME, 
@@ -303,6 +321,43 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
+
+        # Update comet minor planet and satellite cached data.
+        self.updateCachedData( utcNow )
+
+        # Update backend.
+        self.dataPrevious = self.data
+        self.data = IndicatorLunar.astroBackend.calculate( utcNow,
+                                                           self.latitude, self.longitude, self.elevation,
+                                                           self.planets,
+                                                           self.stars,
+                                                           self.satellites, self.satelliteData,
+                                                           self.comets, self.cometData,
+                                                           self.minorPlanets, self.minorPlanetData,
+                                                           self.magnitude,
+                                                           self.getLogging() )
+
+        if self.dataPrevious is None: # Happens only on first run.
+            self.dataPrevious = self.data
+
+        # Update frontend.
+        if self.debug:
+            menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
+
+        self.updateMenu( menu, utcNow )
+        self.setLabel( self.processTags() )
+        self.updateIcon()
+
+        if self.showWerewolfWarning:
+            self.notificationFullMoon()
+
+        if self.showSatelliteNotification:
+            self.notificationSatellites()
+
+        return self.getNextUpdateTimeInSeconds()
+
+
+    def updateCachedData( self, utcNow ):
 
         # Update comet data.
         magnitudeFilterAdditionalArguments = [ ]
@@ -330,32 +385,32 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_BRIGHT ],
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ IndicatorLunar.MINOR_PLANET_INDEX_BRIGHT ], dataType, self.getLogging() ], self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
+                             self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT,
+                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_BRIGHT, dataType, self.getLogging() ], self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
                              IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetCritical, self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_CRITICAL ],
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ IndicatorLunar.MINOR_PLANET_INDEX_CRITICAL ], dataType, self.getLogging( )], self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
+                             self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL,
+                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_CRITICAL, dataType, self.getLogging( )], self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
                              IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetDistant, self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_DISTANT ],
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ IndicatorLunar.MINOR_PLANET_INDEX_DISTANT ], dataType, self.getLogging( ) ], self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
+                             self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT,
+                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_DISTANT, dataType, self.getLogging( ) ], self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
                              IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetUnusual, self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual = \
             self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAMES[ IndicatorLunar.MINOR_PLANET_INDEX_UNUSUAL ],
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URLS[ IndicatorLunar.MINOR_PLANET_INDEX_UNUSUAL ], dataType, self.getLogging( ) ], self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
+                             self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL,
+                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_UNUSUAL, dataType, self.getLogging( ) ], self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
                              IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
@@ -372,38 +427,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
-
-        # Update backend.
-        self.dataPrevious = self.data
-        self.data = IndicatorLunar.astroBackend.calculate(
-            utcNow,
-            self.latitude, self.longitude, self.elevation,
-            self.planets,
-            self.stars,
-            self.satellites, self.satelliteData,
-            self.comets, self.cometData,
-            self.minorPlanets, self.minorPlanetData,
-            self.magnitude,
-            self.getLogging() )
-
-        if self.dataPrevious is None: # Happens only on first run.
-            self.dataPrevious = self.data
-
-        # Update frontend.
-        if self.debug:
-            menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
-
-        self.updateMenu( menu, utcNow )
-        self.setLabel( self.processTags() )
-        self.updateIcon()
-
-        if self.showWerewolfWarning:
-            self.notificationFullMoon()
-
-        if self.showSatelliteNotification:
-            self.notificationSatellites()
-
-        return self.getNextUpdateTimeInSeconds()
 
 
     # Process text containing pairs of [ ], optionally surrounded by { }, typically used for display in the indicator's label.
@@ -618,10 +641,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ INDEX_RISE_TIME ], x[ INDEX_NUMBER ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
-            riseTime = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            riseAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            setTime = self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-            setAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ], IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            riseTime = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, 
+                                        self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], 
+                                        IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            riseAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, 
+                                           self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], 
+                                           IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            setTime = self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, 
+                                       self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], 
+                                       IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+            setAzimuth = self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, 
+                                          self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ], 
+                                          IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
             summary = self.satelliteNotificationSummary. \
                       replace( astrobase.AstroBase.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
@@ -652,7 +683,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, 0, 1, IndicatorLunar.SEARCH_URL_MOON )
-            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Phase: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_PHASE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ], IndicatorLunar.SEARCH_URL_MOON ) )
+
+            label = self.indent( 0, 1 ) + \
+                    _( "Phase: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_PHASE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] )
+            self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_MOON )
+
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Next Phases" ), IndicatorLunar.SEARCH_URL_MOON )
 
             # Determine which phases occur by date rather than using the phase calculated.
@@ -665,7 +701,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             nextPhases.append( [ self.data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ], _( "Third Quarter: " ), key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] )
             indent = self.indent( 1, 2 )
             for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ INDEX_KEY ] ):
-                self.createMenuItem( subMenu, indent + displayText + self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ), IndicatorLunar.SEARCH_URL_MOON )
+                label = indent + \
+                        displayText + \
+                        self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
+                self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
@@ -677,16 +716,34 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, 0, 1, IndicatorLunar.SEARCH_URL_SUN )
-            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Equinox: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_EQUINOX, self.data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] ), IndicatorLunar.SEARCH_URL_SUN )
-            self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Solstice: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SOLSTICE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] ), IndicatorLunar.SEARCH_URL_SUN )
+
+            label = self.indent( 0, 1 ) + \
+                    _( "Equinox: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_EQUINOX, self.data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] )
+            self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_SUN )
+
+            label = self.indent( 0, 1 ) + \
+                    _( "Solstice: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_SOLSTICE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] )
+            self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_SUN )
+
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
 
     def updateMenuEclipse( self, menu, bodyType, nameTag, url ):
         key = ( bodyType, nameTag )
         self.createMenuItem( menu, self.indent( 0, 1 ) + _( "Eclipse" ), url )
-        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Date/Time: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ), url )
-        self.createMenuItem( menu, self.indent( 1, 2 ) + _( "Type: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] ), url )
+
+        label = self.indent( 1, 2 ) + \
+                _( "Date/Time: " ) + \
+                self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] )
+        self.createMenuItem( menu, label, url )
+
+        label = self.indent( 1, 2 ) + \
+                _( "Type: " ) + \
+                self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] )
+        self.createMenuItem( menu, label, url )
+
         if key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
             latitude = self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
             longitude = self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
@@ -815,16 +872,37 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         indent = self.indent( indentUnity, indentGnomeShell )
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
             if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-                self.createMenuItem( menu, indent + _( "Rise: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ), onClickURL )
+                label = indent + \
+                        _( "Rise: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
+                self.createMenuItem( menu, label, onClickURL )
 
             else:
-                self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
-                self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
-                self.createMenuItem( menu, indent + _( "Set: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ), onClickURL )
+                label = indent + \
+                        _( "Azimuth: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
+                self.createMenuItem( menu, label, onClickURL )
+
+                label = indent + \
+                        _( "Altitude: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+                self.createMenuItem( menu, label, onClickURL )
+
+                label = indent + \
+                        _( "Set: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+                self.createMenuItem( menu, label, onClickURL )
 
         else: # Body is always up.
-            self.createMenuItem( menu, indent + _( "Azimuth: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ), onClickURL )
-            self.createMenuItem( menu, indent + _( "Altitude: " ) + self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ), onClickURL )
+            label = indent + \
+                    _( "Azimuth: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
+            self.createMenuItem( menu, label, onClickURL )
+
+            label = indent + \
+                    _( "Altitude: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+            self.createMenuItem( menu, label, onClickURL )
 
 
     # Display the rise/set information for each satellite.
