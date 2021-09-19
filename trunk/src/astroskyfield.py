@@ -1054,6 +1054,11 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
 #TODO Seems to calculate some passes very late after sunset (or very early before sunrise) when the satellite surely cannot be sunlit.
 # https://github.com/skyfielders/python-skyfield/issues/558    
+# I have checked with
+# www.n2yo.com
+# and looked at a satellite which is said to be visible around midnight. 
+#The satellite DOES pass overhead, but surely cannot be visible.
+# So is the issue with my code or a fault in Skyfield?
     def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
         for satellite in satellites:
             if satellite in satelliteData:
