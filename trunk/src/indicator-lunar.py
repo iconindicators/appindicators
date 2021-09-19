@@ -323,7 +323,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         utcNow = datetime.datetime.utcnow()
 
         # Update comet minor planet and satellite cached data.
-        self.updateCachedData( utcNow )
+        self.updateData( utcNow )
 
         # Update backend.
         self.dataPrevious = self.data
@@ -357,20 +357,23 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return self.getNextUpdateTimeInSeconds()
 
 
-    def updateCachedData( self, utcNow ):
+    def updateData( self, utcNow ):
 
         # Update comet data.
-        magnitudeFilterAdditionalArguments = [ ]
-        dataType = orbitalelement.OE.DataType.XEPHEM_COMET
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
             dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
             magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
+        else:
+            magnitudeFilterAdditionalArguments = [ ]
+            dataType = orbitalelement.OE.DataType.XEPHEM_COMET
+
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
-            self.updateData( utcNow,
-                             self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
-                             orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ], self.downloadCountComet, self.nextDownloadTimeComet,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+            self.__updateData( utcNow,
+                               self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
+                               orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ],
+                               self.downloadCountComet, self.nextDownloadTimeComet,
+                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
@@ -383,35 +386,43 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             dataType = orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
             magnitudeFilterAdditionalArguments = [ astrobase.AstroBase.BodyType.MINOR_PLANET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
+        else:
+            magnitudeFilterAdditionalArguments = [ ]
+            dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET
+
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
-            self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT,
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_BRIGHT, dataType, self.getLogging() ], self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+            self.__updateData( utcNow,
+                               self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT,
+                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_BRIGHT, dataType, self.getLogging() ],
+                               self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
+                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetCritical, self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical = \
-            self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL,
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_CRITICAL, dataType, self.getLogging( )], self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+            self.__updateData( utcNow,
+                               self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL,
+                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_CRITICAL, dataType, self.getLogging( )],
+                               self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
+                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetDistant, self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant = \
-            self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT,
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_DISTANT, dataType, self.getLogging( ) ], self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+            self.__updateData( utcNow,
+                               self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT,
+                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_DISTANT, dataType, self.getLogging( ) ],
+                               self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
+                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetUnusual, self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual = \
-            self.updateData( utcNow,
-                             self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL,
-                             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_UNUSUAL, dataType, self.getLogging( ) ], self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
-                             IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+            self.__updateData( utcNow,
+                               self.cacheDateTimeMinorPlanetUnusual, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL,
+                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_UNUSUAL, dataType, self.getLogging( ) ],
+                               self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual,
+                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         self.minorPlanetData.update( minorPlanetData )
 
@@ -420,10 +431,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         # Update satellite data.
         self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = \
-            self.updateData( utcNow,
-                             self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                             twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ], self.downloadCountSatellite, self.nextDownloadTimeSatellite,
-                             None, [ ] )
+            self.__updateData( utcNow,
+                               self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME,
+                               twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
+                               self.downloadCountSatellite,self.nextDownloadTimeSatellite,
+                               None, [ ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -487,7 +499,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Get the data from the cache, or if stale, download from the source.
     #
     # Returns a dictionary (may be empty).
-    def updateData( self, utcNow,
+    def __updateData( self, utcNow,
                     cacheDateTime, cacheMaximumAge, cacheBaseName,
                     downloadDataFunction, downloadDataArguments,
                     downloadCount, nextDownloadTime,
