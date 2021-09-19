@@ -41,6 +41,10 @@
 # To revert back to all visible passes, set to 3am to 10pm.
 
 
+#TODO In PyEphem the star Alcor had a set time but in Skyfield just az/alt (implying it was always up).
+# The az/alt were identical for each backend!
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -59,7 +63,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -101,7 +105,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
     ICON_CACHE_BASENAME = "icon-"
-    ICON_CACHE_MAXIMUM_AGE_HOURS = 0
+    ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
     ICON_EXTENSION = "svg"
     ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
@@ -118,7 +122,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         list( astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astrobase.AstroBase.NAME_TAG_SUN_TRANSLATION.items() ) )
 
-    COMET_CACHE_BASENAME = "comet-oe-"
+    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     if astroBackendName == astroBackendPyEphem:
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
@@ -126,16 +130,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     else:
         COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
 
-    MINOR_PLANET_INDEX_BRIGHT = 0
-    MINOR_PLANET_INDEX_CRITICAL = 1
-    MINOR_PLANET_INDEX_DISTANT = 2
-    MINOR_PLANET_INDEX_UNUSUAL = 3
-
-    MINOR_PLANET_CACHE_BASENAME_BRIGHT = "minorplanet-oe-" + "bright-"
-    MINOR_PLANET_CACHE_BASENAME_CRITICAL = "minorplanet-oe-" + "critical-"
-    MINOR_PLANET_CACHE_BASENAME_DISTANT = "minorplanet-oe-" + "distant-"
-    MINOR_PLANET_CACHE_BASENAME_UNUSUAL = "minorplanet-oe-" + "unusual-"
-
+    MINOR_PLANET_CACHE_BASENAME_BRIGHT = "minorplanet-oe-" + "bright-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME_CRITICAL = "minorplanet-oe-" + "critical-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME_DISTANT = "minorplanet-oe-" + "distant-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME_UNUSUAL = "minorplanet-oe-" + "unusual-" + astroBackendName.lower() + "-"
 
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
 
@@ -145,22 +143,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt"
         MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
 
-#TODO These and below are no longer used.
-        MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt" ]
-
     else:
         MINOR_PLANET_DATA_URL_BRIGHT = "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt"
         MINOR_PLANET_DATA_URL_CRITICAL = "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt"
         MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt"
         MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt"
-
-        MINOR_PLANET_DATA_URLS = [ "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt",
-                                   "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt" ]
+        MINOR_PLANET_DATA_URL_UNUSUAL = "file:///home/bernard/Downloads/Soft00Unusual.txt"
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
@@ -228,46 +216,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
 
-        self.__swapCacheFiles() #TODO Only for me!
+        self.__removeCacheFilesVersion89() # Cache data filenames changed in version 90, so remove old versions.
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
 
 
-    #TODO Used to swap between PyEphem data files and Skyfield data files from the Minor Planet Center.
-    def __swapCacheFiles( self ):
-        data = self.readCacheBinary( IndicatorLunar.COMET_CACHE_BASENAME )
-        if data is not None:
-            import glob, os, shutil
-            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield and \
-               next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.XEPHEM_COMET:
-                print( "Swapping Skyfield for XEphem" )
-                shutil.rmtree( self.getCachePath( "" ) + "xephem", ignore_errors = True )
-                os.mkdir( self.getCachePath( "" ) + "xephem" )
-
-                for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "xephem" )
-
-                for data in glob.glob( self.getCachePath( "" ) + "minorplanet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "xephem" )
-
-                if os.path.isdir( self.getCachePath( "" ) + "skyfield" ):
-                    for data in glob.glob( self.getCachePath( "" ) + "skyfield/*" ):
-                        shutil.move( data, self.getCachePath( "" ) )
-
-            elif IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem and \
-               next( iter( data.values() ) ).dataType == orbitalelement.OE.DataType.SKYFIELD_COMET:
-                print( "Swapping XEphem for Skyfield" )
-                shutil.rmtree( self.getCachePath( "" ) + "skyfield", ignore_errors = True )
-                os.mkdir( self.getCachePath( "" ) + "skyfield" )
-                for data in glob.glob( self.getCachePath( "" ) + "comet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "skyfield" )
-
-                for data in glob.glob( self.getCachePath( "" ) + "minorplanet*" ):
-                    shutil.move( data, self.getCachePath( "" ) + "skyfield" )
-
-                if os.path.isdir( self.getCachePath( "" ) + "xephem" ):
-                    for data in glob.glob( self.getCachePath( "" ) + "xephem/*" ):
-                        shutil.move( data, self.getCachePath( "" ) )
+    def __removeCacheFilesVersion89( self ):
+        self.removeOldFilesFromCache( "comet-oe-", 0 )
+        self.removeOldFilesFromCache( "minorplanet-oe-" + "bright-", 0 )
+        self.removeOldFilesFromCache( "minorplanet-oe-" + "critical-", 0 )
+        self.removeOldFilesFromCache( "minorplanet-oe-" + "distant-", 0 )
+        self.removeOldFilesFromCache( "minorplanet-oe-" + "unusual-", 0 )
 
 
     def flushCache( self ):
@@ -364,12 +323,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             magnitudeFilterAdditionalArguments = [ ]
             dataType = orbitalelement.OE.DataType.XEPHEM_COMET
 
-        self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
-            self.__updateData( utcNow,
-                               self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
-                               orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ],
-                               self.downloadCountComet, self.nextDownloadTimeComet,
-                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+        # self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = \
+        #     self.__updateData( utcNow,
+        #                        self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
+        #                        orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ],
+        #                        self.downloadCountComet, self.nextDownloadTimeComet,
+        #                        IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
@@ -386,32 +345,32 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             magnitudeFilterAdditionalArguments = [ ]
             dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET
 
-        minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
-            self.__updateData( utcNow,
-                               self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT,
-                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_BRIGHT, dataType, self.getLogging() ],
-                               self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
-                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
-
-        self.minorPlanetData.update( minorPlanetData )
-
-        minorPlanetData, self.cacheDateTimeMinorPlanetCritical, self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical = \
-            self.__updateData( utcNow,
-                               self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL,
-                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_CRITICAL, dataType, self.getLogging( )],
-                               self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
-                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
-
-        self.minorPlanetData.update( minorPlanetData )
-
-        minorPlanetData, self.cacheDateTimeMinorPlanetDistant, self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant = \
-            self.__updateData( utcNow,
-                               self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT,
-                               orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_DISTANT, dataType, self.getLogging( ) ],
-                               self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
-                               IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
-
-        self.minorPlanetData.update( minorPlanetData )
+        # minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = \
+        #     self.__updateData( utcNow,
+        #                        self.cacheDateTimeMinorPlanetBright, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT,
+        #                        orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_BRIGHT, dataType, self.getLogging() ],
+        #                        self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright,
+        #                        IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+        #
+        # self.minorPlanetData.update( minorPlanetData )
+        #
+        # minorPlanetData, self.cacheDateTimeMinorPlanetCritical, self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical = \
+        #     self.__updateData( utcNow,
+        #                        self.cacheDateTimeMinorPlanetCritical, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL,
+        #                        orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_CRITICAL, dataType, self.getLogging( )],
+        #                        self.downloadCountMinorPlanetCritical, self.nextDownloadTimeMinorPlanetCritical,
+        #                        IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+        #
+        # self.minorPlanetData.update( minorPlanetData )
+        #
+        # minorPlanetData, self.cacheDateTimeMinorPlanetDistant, self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant = \
+        #     self.__updateData( utcNow,
+        #                        self.cacheDateTimeMinorPlanetDistant, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT,
+        #                        orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_URL_DISTANT, dataType, self.getLogging( ) ],
+        #                        self.downloadCountMinorPlanetDistant, self.nextDownloadTimeMinorPlanetDistant,
+        #                        IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
+        #
+        # self.minorPlanetData.update( minorPlanetData )
 
         minorPlanetData, self.cacheDateTimeMinorPlanetUnusual, self.downloadCountMinorPlanetUnusual, self.nextDownloadTimeMinorPlanetUnusual = \
             self.__updateData( utcNow,
@@ -501,7 +460,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     downloadCount, nextDownloadTime,
                     magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
-#         if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
+        # if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
