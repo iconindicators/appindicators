@@ -954,8 +954,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements(
-            utcNow, utcNowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum, logging ):
+    def __calculateOrbitalElements( utcNow, utcNowPlusOneDay, 
+                                    data, timeScale, locationAtNow, ephemerisPlanets,
+                                    bodyType, orbitalElements, orbitalElementData, magnitudeMaximum,
+                                    logging ):
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for key in orbitalElements:
