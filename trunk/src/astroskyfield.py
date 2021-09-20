@@ -1076,10 +1076,21 @@ class AstroSkyfield( astrobase.AstroBase ):
                         culminateTimes.append( ti )
 
                     else: # Set
-                        if riseTime is not None and len( culminateTimes ) > 0:
+                        if riseTime is not None and culminateTimes:
                             for culmination in culminateTimes:
-                                if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and \
-                                   almanac.dark_twilight_day( ephemerisPlanets, location )( culmination ) == 1:
+                                isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
+
+#TODO Big difference between the number of satellites classed as visible depending on the twilight value(s).
+# Maybe look at a satellite that is visible under all three twilights and see what PyEphem says...and also n2y0.com.
+                                isTwilight = \
+                                    isTwilightFunction( culmination ) == 1
+
+                                # isTwilight = \
+                                #     isTwilightFunction( culmination ) == 1 or \
+                                #     isTwilightFunction( culmination ) == 2 or \
+                                #     isTwilightFunction( culmination ) == 3
+
+                                if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and isTwilight:
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
                                     alt, az, earthBodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
