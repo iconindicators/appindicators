@@ -200,7 +200,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key is a combination of three tags: body type, body name and data name.
-        # Value is a string, regardless being numerical or not. 
+        # Value is a string, regardless being numerical or not.
+        # Previous data is used for satellite transits.
         self.data = None
         self.dataPrevious = None
 
@@ -903,7 +904,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
-                if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes or is in transit...
+                if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes...
                     satellites.append( [
                         number,
                         self.satelliteData[ number ].getName(), 
