@@ -1308,7 +1308,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       _( "Clicking the header of the first column\n" + \
                          "will toggle all checkboxes." )
 
-        box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planet" ), 2 ), True, True, 0 )
+        box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planet" ), PLANET_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.keys():
@@ -1325,7 +1325,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                       _( "Clicking the header of the first column\n" + \
                          "will toggle all checkboxes." )
 
-        box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), 2 ), True, True, 0 )
+        box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
         notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
 
@@ -1350,7 +1350,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), 1 ), True, True, 0 )
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_NAME ), True, True, 0 )
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
@@ -1370,7 +1370,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), 1 ), True, True, 0 )
+        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
 
         notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
 
@@ -1404,21 +1404,20 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
-#TODO Define column definitions rather than using integers.
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 )
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = SATELLITE_STORE_INDEX_HIDE_SHOW )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = 1 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_NAME )
         treeViewColumn.set_sort_column_id( 1 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = 2 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_NUMBER )
         treeViewColumn.set_sort_column_id( 2 )
         tree.append_column( treeViewColumn )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = 3 )
+        treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR )
         treeViewColumn.set_sort_column_id( 3 )
         tree.append_column( treeViewColumn )
 
@@ -1724,8 +1723,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
 
-#TODO Can we use defined indices here?
-        def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ 0 ] = not listStore[ row ][ 0 ]
+        COLUMN_INDEX_TOGGLE = 0
+
+        def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
 
         tree = Gtk.TreeView.new_with_model( listStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
@@ -1733,7 +1733,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", toggleCheckbox, listStore )
-        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = 0 ) #TODO Use column definition.
+        treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = COLUMN_INDEX_TOGGLE )
         treeViewColumn.set_clickable( True )
         treeViewColumn.connect( "clicked", self.onColumnHeaderClick, listStore )
         tree.append_column( treeViewColumn )
@@ -1747,21 +1747,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         return scrolledWindow
 
 
-#TODO Can we use defined indices here?
     def onSatelliteCheckbox( self, cellRendererToggle, row, dataStore, sortStore ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        dataStore[ actualRow ][ 0 ] = not dataStore[ actualRow ][ 0 ]
+        COLUMN_INDEX_TOGGLE = 0
+        dataStore[ actualRow ][ COLUMN_INDEX_TOGGLE ] = not dataStore[ actualRow ][ COLUMN_INDEX_TOGGLE ]
 
 
-#TODO Can we use defined indices here?
     def onColumnHeaderClick( self, treeviewColumn, dataStore ):
+        COLUMN_INDEX_TOGGLE = 0
         atLeastOneItemChecked = False
         atLeastOneItemUnchecked = False
         for row in range( len( dataStore ) ):
-            if dataStore[ row ][ 0 ]:
+            if dataStore[ row ][ COLUMN_INDEX_TOGGLE ]:
                 atLeastOneItemChecked = True
 
-            if not dataStore[ row ][ 0 ]:
+            if not dataStore[ row ][ COLUMN_INDEX_TOGGLE ]:
                 atLeastOneItemUnchecked = True
 
         if atLeastOneItemChecked and atLeastOneItemUnchecked: # Mix of values checked and unchecked, so check all.
