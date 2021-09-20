@@ -1064,8 +1064,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                  satelliteData[ satellite ].getName(), 
                                                  timeScale )
 
-#TODO Keep as 30 or use 10 or maybe 20?  With 10 I get more passes which also match PyEPhem.
-                t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 ) # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-675123392
+                t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 )
                 riseTime = None
                 culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
                 for ti, event in zip( t, events ):
@@ -1079,18 +1078,12 @@ class AstroSkyfield( astrobase.AstroBase ):
                         if riseTime is not None and culminateTimes:
                             for culmination in culminateTimes:
                                 isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
-
-#TODO Big difference between the number of satellites classed as visible depending on the twilight value(s).
-# Maybe look at a satellite that is visible under all three twilights and see what PyEphem says...and also n2y0.com.
                                 isTwilight = \
-                                    isTwilightFunction( culmination ) == 1
+                                    isTwilightFunction( culmination ) == 1 or \
+                                    isTwilightFunction( culmination ) == 2 or \
+                                    isTwilightFunction( culmination ) == 3 # 1 = Astronomical, 2 = Nautical, 3 = Civil
 
-                                # isTwilight = \
-                                #     isTwilightFunction( culmination ) == 1 or \
-                                #     isTwilightFunction( culmination ) == 2 or \
-                                #     isTwilightFunction( culmination ) == 3
-
-                                if earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ) and isTwilight:
+                                if isTwilight and earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ):
                                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                                     data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
                                     alt, az, earthBodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
