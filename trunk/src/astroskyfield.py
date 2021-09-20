@@ -19,18 +19,6 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO Here is a list of attributes which used to be calculated before the big cull!
-# Which of them could be reinstated assuming they are available in BOTH PyEphem and Skyfield...
-    # DATA_CONSTELLATION:            Skyfield implements; incurs one menu item per object.
-    # DATA_DAWN:                     Skyfield currently does not implement but there is a ticket suggesting how.
-    # DATA_DISTANCE_TO_EARTH:        Skyfield calculates this distance
-    # DATA_DISTANCE_TO_EARTH_KM:     Skyfield calculates this distance       
-    # DATA_DISTANCE_TO_SUN:          Skyfield calculates this distance
-    # DATA_DUSK:                     Skyfield currently does not implement but there is a ticket suggesting how.
-    # DATA_MAGNITUDE:                Skyfield calculates/looksup planetary magnitudes.  Star and OE/comet come from the ephemeris/data files.            
-    # DATA_PHASE:            
-
-
 #TODO Do timing between each set of object types
 # (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
