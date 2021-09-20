@@ -692,11 +692,6 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         timeScale = load.timescale( builtin = True )
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36, utcNow.minute, utcNow.second ) # Satellite search window.
-        nowPlusOneDay = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 1, utcNow.hour, utcNow.minute, utcNow.second )
-        nowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31, utcNow.hour, utcNow.minute, utcNow.second ) # Moon phases search window.
-        nowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.hour, utcNow.minute, utcNow.second ) # Solstice/equinox search window.
-        nowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.hour, utcNow.minute, utcNow.second ) # Lunar eclipse search window.
 
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
@@ -705,21 +700,21 @@ class AstroSkyfield( astrobase.AstroBase ):
         location = wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )
 
-        AstroSkyfield.__calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, latitude, longitude, ephemerisPlanets )
-        AstroSkyfield.__calculateSun( now, nowPlusOneDay, nowPlusSevenMonths, data, locationAtNow, ephemerisPlanets )
-        AstroSkyfield.__calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum )
+        AstroSkyfield.__calculateMoon( now, timeScale, data, locationAtNow, latitude, longitude, ephemerisPlanets )
+        AstroSkyfield.__calculateSun( now, timeScale, data, locationAtNow, ephemerisPlanets )
+        AstroSkyfield.__calculatePlanets( now, timeScale, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum )
 
-        AstroSkyfield.__calculateStars( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
+        AstroSkyfield.__calculateStars( now, timeScale, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
 
-        AstroSkyfield.__calculateOrbitalElements( now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
+        AstroSkyfield.__calculateOrbitalElements( now, timeScale, data, locationAtNow, ephemerisPlanets,
                                                   astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
                                                   logging )
 
-        AstroSkyfield.__calculateOrbitalElements( now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
+        AstroSkyfield.__calculateOrbitalElements( now, timeScale, data, locationAtNow, ephemerisPlanets,
                                                   astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
                                                   logging )
 
-        AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
+        AstroSkyfield.__calculateSatellites( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
 
         return data
 
@@ -824,7 +819,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.geoastro.de/sundata/index.html
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
-    def __calculateMoon( utcNow, utcNowPlusOneDay, utcNowPlusThirtyOneDays, utcNowPlusOneYear, data, locationAtNow, latitude, longitude, ephemerisPlanets ):
+    def __calculateMoon( utcNow, timeScale, data, locationAtNow, latitude, longitude, ephemerisPlanets ):
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, utcNow ) * 100 )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
@@ -837,6 +832,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                                                                      math.radians( latitude ), math.radians( longitude ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
+        utcNowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31, utcNow.hour, utcNow.minute, utcNow.second ) # Moon phases search window.
         t, y = almanac.find_discrete( utcNow, utcNowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
@@ -845,6 +841,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
+        utcNowPlusOneDay = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 1, utcNow.hour, utcNow.minute, utcNow.second )
         neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusOneDay,
                                                    data, ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ),
                                                    locationAtNow,
@@ -864,6 +861,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = \
                 astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
 
+            utcNowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.hour, utcNow.minute, utcNow.second ) # Lunar eclipse search window.
             t, y, details = eclipselib.lunar_eclipses( utcNow, utcNowPlusOneYear, ephemerisPlanets ) # Zeroth result in t and y is the first result, so use that.
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
                 t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
@@ -879,7 +877,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://futureboy.us/fsp/sun.fsp
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
-    def __calculateSun( utcNow, utcNowPlusOneDay, utcNowPlusSevenMonths, data, locationAtNow, ephemerisPlanets ):
+    def __calculateSun( utcNow, timeScale, data, locationAtNow, ephemerisPlanets ):
+        utcNowPlusOneDay = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 1, utcNow.hour, utcNow.minute, utcNow.second )
         neverUp = AstroSkyfield.__calculateCommon( utcNow, utcNowPlusOneDay, 
                                                    data, ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ), 
                                                    locationAtNow,
@@ -887,6 +886,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         if not neverUp:
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            utcNowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.hour, utcNow.minute, utcNow.second ) # Solstice/equinox search window.
             t, y = almanac.find_discrete( utcNow, utcNowPlusSevenMonths, almanac.seasons( ephemerisPlanets ) )
             t = t.utc_datetime()
             if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or \
@@ -910,7 +910,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.geoastro.de/planets/index.html
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
-    def __calculatePlanets( utcNow, utcNowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum ):
+    def __calculatePlanets( utcNow, data, locationAtNow, timeScale, ephemerisPlanets, planets, magnitudeMaximum ):
+        utcNowPlusOneDay = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 1, utcNow.hour, utcNow.minute, utcNow.second )
         for planet in planets:
             if planet == astrobase.AstroBase.PLANET_MERCURY or \
                planet == astrobase.AstroBase.PLANET_VENUS or \
@@ -943,7 +944,8 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateStars( utcNow, utcNowPlusOneDay, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
+    def __calculateStars( utcNow, timeScale, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
+        utcNowPlusOneDay = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 1, utcNow.hour, utcNow.minute, utcNow.second )
         for star in stars:
             if star in astrobase.AstroBase.STARS:
                 theStar = ephemerisStars.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ]
@@ -955,8 +957,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements( utcNow, utcNowPlusOneDay, 
-                                    data, timeScale, locationAtNow, ephemerisPlanets,
+    def __calculateOrbitalElements( utcNow, timeScale, data, locationAtNow, ephemerisPlanets,
                                     bodyType, orbitalElements, orbitalElementData, magnitudeMaximum,
                                     logging ):
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
@@ -981,6 +982,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         alt, az, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
         sunAtNow = ephemerisPlanets[ AstroSkyfield.__SUN ].at( utcNow )
+        utcNowPlusOneDay = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 1, utcNow.hour, utcNow.minute, utcNow.second )
         for name, row in dataframe.iterrows():
             body = ephemerisPlanets[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
@@ -1054,7 +1056,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
-    def __calculateSatellites( utcNow, utcNowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
+    def __calculateSatellites( utcNow, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
+        utcNowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36, utcNow.minute, utcNow.second ) # Satellite search window.
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
