@@ -1297,6 +1297,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Planets/Stars.
         box = Gtk.Box( spacing = 20 )
 
+        PLANET_STORE_INDEX_HIDE_SHOW = 0
+        PLANET_STORE_INDEX_NAME = 1
+        PLANET_STORE_INDEX_TRANSLATED_NAME = 2
         planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planetName in astrobase.AstroBase.PLANETS:
             planetStore.append( [ planetName in self.planets, planetName, astrobase.AstroBase.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
@@ -1311,9 +1314,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for starName in astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.keys():
             stars.append( [ starName in self.stars, starName, astrobase.AstroBase.STAR_NAMES_TRANSLATIONS[ starName ] ] )
 
+        STAR_STORE_INDEX_HIDE_SHOW = 0
+        STAR_STORE_INDEX_NAME = 1
+        STAR_STORE_INDEX_TRANSLATED_NAME = 2
         starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
-#TODO Can we use defined indices here?
-        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ):
+        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
             starStore.append( star )
 
         toolTipText = _( "Check a star to display in the menu." ) + "\n\n" + \
@@ -1327,6 +1332,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Comets and minor planets.
         box = Gtk.Box( spacing = 20 )
 
+        COMET_STORE_INDEX_HIDE_SHOW = 0
+        COMET_STORE_INDEX_NAME = 1
         cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
         for comet in sorted( self.cometData.keys() ):
             cometStore.append( [ comet in self.comets, comet ] )
@@ -1345,6 +1352,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), 1 ), True, True, 0 )
 
+        MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
+        MINOR_PLANET_STORE_INDEX_NAME = 1
         minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
         for minorPlanet in sorted( self.minorPlanetData.keys() ):
             minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet ] )
@@ -1368,6 +1377,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Satellites.
         box = Gtk.Box()
 
+        SATELLITE_STORE_INDEX_HIDE_SHOW = 0
+        SATELLITE_STORE_INDEX_NAME = 1
+        SATELLITE_STORE_INDEX_NUMBER = 2
+        SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR = 3
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satelliteData:
             satelliteStore.append( [ satellite in self.satellites,
@@ -1561,36 +1574,35 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
 
-#TODO Can we use defined indices here?
             self.planets = [ ]
             for row in planetStore:
-                if row[ 0 ]:
-                    self.planets.append( row[ 1 ] )
+                if row[ PLANET_STORE_INDEX_HIDE_SHOW ]:
+                    self.planets.append( row[ PLANET_STORE_INDEX_NAME ] )
 
             self.stars = [ ]
             for row in starStore:
-                if row[ 0 ]:
-                    self.stars.append( row[ 1 ] )
+                if row[ STAR_STORE_INDEX_HIDE_SHOW ]:
+                    self.stars.append( row[ STAR_STORE_INDEX_NAME ] )
 
             # If the option to add new comets is checked, this will be handled out in the main update loop.
             # Otherwise, update the list of checked comets (ditto for minor planets and satellites).
             self.comets = [ ]
             if not self.cometsAddNew:
                 for comet in cometStore:
-                    if comet[ 0 ]:
-                        self.comets.append( comet[ 1 ].upper() )
+                    if comet[ COMET_STORE_INDEX_HIDE_SHOW ]:
+                        self.comets.append( comet[ COMET_STORE_INDEX_NAME ].upper() )
 
             self.minorPlanets = [ ]
             if not self.minorPlanetsAddNew:
                 for minorPlanet in minorPlanetStore:
-                    if minorPlanet[ 0 ]:
-                        self.minorPlanets.append( minorPlanet[ 1 ].upper() )
+                    if minorPlanet[ MINOR_PLANET_STORE_INDEX_HIDE_SHOW ]:
+                        self.minorPlanets.append( minorPlanet[ MINOR_PLANET_STORE_INDEX_NAME ].upper() )
 
             self.satellites = [ ]
             if not self.satellitesAddNew:
                 for satellite in satelliteStore:
-                    if satellite[ 0 ]:
-                        self.satellites.append( satellite[ 2 ] )
+                    if satellite[ SATELLITE_STORE_INDEX_HIDE_SHOW ]:
+                        self.satellites.append( satellite[ SATELLITE_STORE_INDEX_NUMBER ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             if not showSatelliteNotificationCheckbox.get_active(): self.satellitePreviousNotifications = { }
