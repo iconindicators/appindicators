@@ -737,9 +737,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getLatitudeLongitudeElevation( city ): return AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LATITUDE ], \
-                                                      AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LONGITUDE ], \
-                                                      AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
+    def getLatitudeLongitudeElevation( city ):
+        return AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LATITUDE ], \
+               AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LONGITUDE ], \
+               AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
 
 
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:

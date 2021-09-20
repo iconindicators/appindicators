@@ -969,9 +969,10 @@ class AstroPyEphem( astrobase.AstroBase ):
 
 
     @staticmethod
-    def getLatitudeLongitudeElevation( city ): return float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
-                                                      float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
-                                                      _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
+    def getLatitudeLongitudeElevation( city ):
+        return float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
+               float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
+               _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
 
 
     @staticmethod
