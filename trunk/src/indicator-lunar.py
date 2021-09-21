@@ -54,12 +54,16 @@ from gi.repository import Gtk, Notify
 import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement, re, sys, twolineelement, webbrowser
 
 
+#TODO For both PyEphem and Skyfield, do a timing test to see how long the backend takes versus the front end.
+#Front end should always be similar...and might be taking a long time compared to the front end.
+
+
 class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -907,7 +911,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes...
                     satellites.append( [
                         number,
-                        self.satelliteData[ number ].getName(), 
+                        self.satelliteData[ number ].getName(),
                         self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
                         self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
                         self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
@@ -929,13 +933,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(),
-                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+                                # self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
+                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
+                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
+                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )#TODO Remove these lines and put the commented line back in.
 
                     else: # There was no previous transit (for whatever reason); shouldn't happen, so just show next pass...
                         satellites.append( [
                             number,
                             self.satelliteData[ number ].getName(),
-                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+                            # self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )#TODO Remove these lines and put the commented line back in.
 
             elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is circumpolar (always up)...
                 satellitesPolar.append( [
