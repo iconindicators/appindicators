@@ -837,39 +837,80 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def updateMenuCommon( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
-        if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
-            if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-                label = indent + \
-                        _( "Rise: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
-                self.createMenuItem( menu, label, onClickURL )
+        # if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
+        #     if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
+        #         label = indent + \
+        #                 _( "Rise: " ) + \
+        #                 self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
+        #         self.createMenuItem( menu, label, onClickURL )
+        #
+        #     else:
+        #         label = indent + \
+        #                 _( "Azimuth: " ) + \
+        #                 self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
+        #         self.createMenuItem( menu, label, onClickURL )
+        #
+        #         label = indent + \
+        #                 _( "Altitude: " ) + \
+        #                 self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+        #         self.createMenuItem( menu, label, onClickURL )
+        #
+        #         label = indent + \
+        #                 _( "Set: " ) + \
+        #                 self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+        #         self.createMenuItem( menu, label, onClickURL )
+        #
+        # else: # Body is always up.
+        #     label = indent + \
+        #             _( "Azimuth: " ) + \
+        #             self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
+        #     self.createMenuItem( menu, label, onClickURL )
+        #
+        #     label = indent + \
+        #             _( "Altitude: " ) + \
+        #             self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+        #     self.createMenuItem( menu, label, onClickURL )
 
-            else:
+#TODO Seen exceptions during PyEphem running but don't know why...so try to catch.        
+        try:
+            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
+                if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
+                    label = indent + \
+                            _( "Rise: " ) + \
+                            self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
+                    self.createMenuItem( menu, label, onClickURL )
+    
+                else:
+                    label = indent + \
+                            _( "Azimuth: " ) + \
+                            self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
+                    self.createMenuItem( menu, label, onClickURL )
+    
+                    label = indent + \
+                            _( "Altitude: " ) + \
+                            self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+                    self.createMenuItem( menu, label, onClickURL )
+    
+                    label = indent + \
+                            _( "Set: " ) + \
+                            self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+                    self.createMenuItem( menu, label, onClickURL )
+    
+            else: # Body is always up.
                 label = indent + \
                         _( "Azimuth: " ) + \
                         self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
                 self.createMenuItem( menu, label, onClickURL )
-
+    
                 label = indent + \
                         _( "Altitude: " ) + \
                         self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
                 self.createMenuItem( menu, label, onClickURL )
 
-                label = indent + \
-                        _( "Set: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-                self.createMenuItem( menu, label, onClickURL )
-
-        else: # Body is always up.
-            label = indent + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-            self.createMenuItem( menu, label, onClickURL )
-
-            label = indent + \
-                    _( "Altitude: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-            self.createMenuItem( menu, label, onClickURL )
+        except Exception as e:
+            self.getLogging().exception( e )
+            self.getLogging().error( bodyType )
+            self.getLogging().error( nameTag )
 
 
     # Display the rise/set information for each satellite.
