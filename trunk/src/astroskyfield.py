@@ -19,6 +19,11 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO See 
+# https://rhodesmill.org/skyfield/examples.html#dark-twilight-day-example
+# and maybe use the Skyfield code in place of my own stuff?
+
+
 #TODO Do timing between each set of object types
 # (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
