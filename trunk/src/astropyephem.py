@@ -1126,8 +1126,13 @@ class AstroPyEphem( astrobase.AstroBase ):
         return neverUp
 
 
+    # Refer to
+    #    https://github.com/skyfielders/python-skyfield/issues/327
+    #    https://github.com/skyfielders/python-skyfield/issues/558
+    #    http://www.celestrak.com/columns/v03n01/
+    #
     # Use TLE data collated by Dr T S Kelso
-    # http://celestrak.com/NORAD/elements
+    #    http://celestrak.com/NORAD/elements
     #
     # Other sources/background:
     #    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
