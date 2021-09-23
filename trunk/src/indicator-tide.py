@@ -74,8 +74,9 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             version = "1.0.24",
             copyrightStartYear = "2015",
             comments = IndicatorTide.COMMENTS_LINE_FIRST + '\n' + IndicatorTide.COMMENTS_LINE_LAST,
-            creditz = [ _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
-                        _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
+            creditz = [
+                _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
+                _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
 
 
     def update( self, menu ):
@@ -443,8 +444,9 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         #    UTC offset negative: 2168
         #    UTC offset positive: 4000
 
-        url = "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
-              "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
+        url = \
+            "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
+            "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
 
         defaultLocale = locale.getlocale( locale.LC_TIME )
         locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.

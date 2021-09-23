@@ -82,12 +82,13 @@ class Reading( object ):
             dateTime = datetime.date( self.year, self.month, self.day )
 
         else:
-            dateString = str( self.year ) + " " + \
-                         str( self.month ) +  " " + \
-                         str( self.day ) +  " " + \
-                         str( self.hour ) + " " + \
-                         str( self.minute ) + " " + \
-                         str( self.timezone )
+            dateString = \
+                str( self.year ) + " " + \
+                str( self.month ) +  " " + \
+                str( self.day ) +  " " + \
+                str( self.hour ) + " " + \
+                str( self.minute ) + " " + \
+                str( self.timezone )
 
             dateTime = datetime.datetime.strptime( dateString, "%Y %m %d %H %M %z" )
 
@@ -95,29 +96,31 @@ class Reading( object ):
 
 
     def __str__( self ):
-        return self.portID + " | " + \
-               str( self.year ) + "-" + \
-               str( self.month ) + "-" + \
-               str( self.day ) + "-" + \
-               str( self.hour ) + "-" + \
-               str( self.minute ) + "-" + \
-               str( self.timezone ) + " | " + \
-               str( self.levelInMetres ) + " | " + \
-               ( "H" if self.tideType == Type.H else "L" )
+        return \
+            self.portID + " | " + \
+            str( self.year ) + "-" + \
+            str( self.month ) + "-" + \
+            str( self.day ) + "-" + \
+            str( self.hour ) + "-" + \
+            str( self.minute ) + "-" + \
+            str( self.timezone ) + " | " + \
+            str( self.levelInMetres ) + " | " + \
+            ( "H" if self.tideType == Type.H else "L" )
 
 
     def __repr__( self ): return self.__str__()
 
 
     def __eq__( self, other ): 
-        return self.__class__ == other.__class__ and \
-               self.getPortID() == other.getPortID() and \
-               self.getYear() == other.getYear() and \
-               self.getMonth() == other.getMonth() and \
-               self.getDay() == other.getDay() and \
-               self.getHour() == other.getHour() and \
-               self.getMinute() == other.getMinute() and \
-               self.getTimezone() == other.getTimezone() and \
-               self.getType() == other.getType() and \
-               self.getLevelInMetres() == other.getLevelInMetres() and \
-               self.getURL() == other.getURL()
+        return \
+            self.__class__ == other.__class__ and \
+            self.getPortID() == other.getPortID() and \
+            self.getYear() == other.getYear() and \
+            self.getMonth() == other.getMonth() and \
+            self.getDay() == other.getDay() and \
+            self.getHour() == other.getHour() and \
+            self.getMinute() == other.getMinute() and \
+            self.getTimezone() == other.getTimezone() and \
+            self.getType() == other.getType() and \
+            self.getLevelInMetres() == other.getLevelInMetres() and \
+            self.getURL() == other.getURL()
