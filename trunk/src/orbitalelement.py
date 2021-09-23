@@ -56,10 +56,11 @@ class OE( object ):
 
 
     def __eq__( self, other ): 
-        return self.__class__ == other.__class__ and \
-               self.getName() == other.getName() and \
-               self.getData() == other.getData() and \
-               self.getDataType() == other.getDataType()
+        return \
+            self.__class__ == other.__class__ and \
+            self.getName() == other.getName() and \
+            self.getData() == other.getData() and \
+            self.getDataType() == other.getDataType()
 
 
 # Download OE data; drop bad/missing data.

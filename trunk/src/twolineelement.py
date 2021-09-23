@@ -78,19 +78,21 @@ class TLE( object ):
 
 
     def __str__( self ):
-        return str( self.title ) + " | " + \
-               str( self.line1 ) + " | " + \
-               str( self.line2 )
+        return \
+            str( self.title ) + " | " + \
+            str( self.line1 ) + " | " + \
+            str( self.line2 )
 
 
     def __repr__( self ): return self.__str__()
 
 
     def __eq__( self, other ): 
-        return self.__class__ == other.__class__ and \
-               self.getTitle() == other.getTitle() and \
-               self.getLine1() == other.getLine1() and \
-               self.getLine2() == other.getLine2()
+        return \
+            self.__class__ == other.__class__ and \
+            self.getTitle() == other.getTitle() and \
+            self.getLine1() == other.getLine1() and \
+            self.getLine2() == other.getLine2()
 
 
 # Downloads TLE data from the URL.
