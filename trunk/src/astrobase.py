@@ -269,15 +269,16 @@ class AstroBase( ABC ):
     # Results can be verified using https://ssd.jpl.nasa.gov/horizons.cgi
     @staticmethod
     @abstractmethod
-    def calculate( utcNow,
-                   latitude, longitude, elevation,
-                   planets,
-                   stars,
-                   satellites, satelliteData,
-                   comets, cometData,
-                   minorPlanets, minorPlanetData,
-                   magnitudeMaximum,
-                   logging = None ):
+    def calculate(
+            utcNow,
+            latitude, longitude, elevation,
+            planets,
+            stars,
+            satellites, satelliteData,
+            comets, cometData,
+            minorPlanets, minorPlanetData,
+            magnitudeMaximum,
+            logging = None ):
         return { }
 
 
@@ -334,9 +335,10 @@ class AstroBase( ABC ):
     # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
     @staticmethod
     def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
-        return g_absoluteMagnitude + \
-               5 * math.log10( bodyEarthDistanceAU ) + \
-               2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
+        return \
+            g_absoluteMagnitude + \
+            5 * math.log10( bodyEarthDistanceAU ) + \
+            2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
 
 
     # Calculate apparent magnitude.
@@ -357,9 +359,11 @@ class AstroBase( ABC ):
         # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero.
         # Taking the subsequent logarithm is undefined!
         # Not really sure what can be done, or should be done; leave things as they are and catch the error/exception.
-        numerator = bodySunDistanceAU * bodySunDistanceAU + \
-                    bodyEarthDistanceAU * bodyEarthDistanceAU - \
-                    earthSunDistanceAU * earthSunDistanceAU
+        numerator = \
+            bodySunDistanceAU * bodySunDistanceAU + \
+            bodyEarthDistanceAU * bodyEarthDistanceAU - \
+            earthSunDistanceAU * earthSunDistanceAU
+        
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
         beta = math.acos( numerator / denominator )
 
@@ -368,9 +372,10 @@ class AstroBase( ABC ):
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
         Psi_2 = math.exp( -1.87 * psi_t )
 
-        apparentMagnitude = H_absoluteMagnitude + \
-                            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
-                            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
+        apparentMagnitude = \
+            H_absoluteMagnitude + \
+            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
+            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
 
         return apparentMagnitude
 
@@ -428,7 +433,8 @@ class AstroBase( ABC ):
         # Assume the date is always later than 15th October, 1582.
         y = utcNow.year
         m = utcNow.month
-        d = utcNow.day + \
+        d = \
+            utcNow.day + \
             ( utcNow.hour / 24 ) + \
             ( utcNow.minute / ( 60 * 24 ) ) + \
             ( utcNow.second / ( 60 * 60 * 24 ) ) + \

@@ -671,15 +671,16 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def calculate( utcNow,
-                   latitude, longitude, elevation,
-                   planets,
-                   stars,
-                   satellites, satelliteData,
-                   comets, cometData,
-                   minorPlanets, minorPlanetData,
-                   magnitudeMaximum,
-                   logging ):
+    def calculate(
+            utcNow,
+            latitude, longitude, elevation,
+            planets,
+            stars,
+            satellites, satelliteData,
+            comets, cometData,
+            minorPlanets, minorPlanetData,
+            magnitudeMaximum,
+            logging ):
 
         data = { }
 
@@ -704,13 +705,15 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         AstroSkyfield.__calculateStars( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
 
-        AstroSkyfield.__calculateOrbitalElements( now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
-                                                  astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
-                                                  logging )
+        AstroSkyfield.__calculateOrbitalElements(
+            now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
+            astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
+            logging )
 
-        AstroSkyfield.__calculateOrbitalElements( now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
-                                                  astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
-                                                  logging )
+        AstroSkyfield.__calculateOrbitalElements(
+            now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
+            astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
+            logging )
 
         AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
 
@@ -736,9 +739,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
     @staticmethod
     def getLatitudeLongitudeElevation( city ):
-        return AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LATITUDE ], \
-               AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LONGITUDE ], \
-               AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
+        return \
+            AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LATITUDE ], \
+            AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LONGITUDE ], \
+            AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
 
 
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
@@ -778,12 +782,16 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             try:
                 if bodyType == astrobase.AstroBase.BodyType.COMET:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ],
-                                                                                     earthBodyDistance.au, sunBodyDistance.au )
+                    apparentMagnitude = \
+                        astrobase.AstroBase.getApparentMagnitude_gk( \
+                            row[ "magnitude_g" ], row[ "magnitude_k" ], \
+                            earthBodyDistance.au, sunBodyDistance.au )
 
                 else:
-                    apparentMagnitude =  astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
-                                                                                      earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+                    apparentMagnitude = \
+                        astrobase.AstroBase.getApparentMagnitude_HG( \
+                            row[ "magnitude_H" ], row[ "magnitude_G" ], \
+                            earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
                 if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                     results[ name.upper() ] = orbitalElementData[ name.upper() ]
@@ -825,10 +833,13 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         moonRA, moonDec, earthMoonDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
         sunRA, sunDec, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
-        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( now.utc_datetime(), 
-                                                                     sunRA.radians, sunDec.radians, 
-                                                                     moonRA.radians, moonDec.radians, 
-                                                                     math.radians( latitude ), math.radians( longitude ) )
+        brightLimb = \
+            astrobase.AstroBase.getZenithAngleOfBrightLimb( \
+                now.utc_datetime(), \
+                sunRA.radians, sunDec.radians, \
+                moonRA.radians, moonDec.radians, \
+                math.radians( latitude ), math.radians( longitude ) )
+
         data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
@@ -839,11 +850,13 @@ class AstroSkyfield( astrobase.AstroBase ):
         lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
         data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
-        neverUp = AstroSkyfield.__calculateCommon( now, nowPlusOneDay,
-                                                   data, ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ),
-                                                   locationAtNow,
-                                                   ephemerisPlanets,
-                                                   ephemerisPlanets[ AstroSkyfield.__MOON ] )
+        neverUp = \
+            AstroSkyfield.__calculateCommon( \
+                now, nowPlusOneDay, \
+                data, ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ), \
+                locationAtNow, \
+                ephemerisPlanets, \
+                ephemerisPlanets[ AstroSkyfield.__MOON ] )
 
         if not neverUp:
             data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
@@ -874,10 +887,12 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( now, nowPlusOneDay, nowPlusSevenMonths, data, locationAtNow, ephemerisPlanets ):
-        neverUp = AstroSkyfield.__calculateCommon( now, nowPlusOneDay, 
-                                                   data, ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ), 
-                                                   locationAtNow,
-                                                   ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__SUN ] )
+        neverUp = \
+            AstroSkyfield.__calculateCommon( \
+                now, nowPlusOneDay, \
+                data, ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ), \
+                locationAtNow, \
+                ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__SUN ] )
 
         if not neverUp:
             key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
@@ -930,10 +945,11 @@ class AstroSkyfield( astrobase.AstroBase ):
                     apparentMagnitude = 14.0
 
             if apparentMagnitude <= magnitudeMaximum:
-                AstroSkyfield.__calculateCommon( now, nowPlusOneDay,
-                                                 data, ( astrobase.AstroBase.BodyType.PLANET, planet ),
-                                                 locationAtNow,
-                                                 ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] )
+                AstroSkyfield.__calculateCommon( \
+                    now, nowPlusOneDay, \
+                    data, ( astrobase.AstroBase.BodyType.PLANET, planet ), \
+                    locationAtNow, \
+                    ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] )
 
 
     @staticmethod
@@ -942,17 +958,19 @@ class AstroSkyfield( astrobase.AstroBase ):
             if star in astrobase.AstroBase.STARS:
                 theStar = ephemerisStars.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ]
                 if theStar.magnitude <= magnitudeMaximum:
-                    AstroSkyfield.__calculateCommon( now, nowPlusOneDay,
-                                                     data, ( astrobase.AstroBase.BodyType.STAR, star ),
-                                                     locationAtNow,
-                                                     ephemerisPlanets, Star.from_dataframe( theStar ) )
+                    AstroSkyfield.__calculateCommon( \
+                        now, nowPlusOneDay, \
+                        data, ( astrobase.AstroBase.BodyType.STAR, star ), \
+                        locationAtNow, \
+                        ephemerisPlanets, Star.from_dataframe( theStar ) )
 
 
     @staticmethod
-    def __calculateOrbitalElements( now, nowPlusOneDay, 
-                                    data, timeScale, locationAtNow, ephemerisPlanets,
-                                    bodyType, orbitalElements, orbitalElementData, magnitudeMaximum,
-                                    logging ):
+    def __calculateOrbitalElements(
+            now, nowPlusOneDay, 
+            data, timeScale, locationAtNow, ephemerisPlanets,
+            bodyType, orbitalElements, orbitalElementData, magnitudeMaximum,
+            logging ):
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for key in orbitalElements:
@@ -982,12 +1000,16 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             try:
                 if bodyType == astrobase.AstroBase.BodyType.COMET:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk( row[ "magnitude_g" ], row[ "magnitude_k" ], 
-                                                                                     earthBodyDistance.au, sunBodyDistance.au )
+                    apparentMagnitude = \
+                        astrobase.AstroBase.getApparentMagnitude_gk( \
+                            row[ "magnitude_g" ], row[ "magnitude_k" ], \
+                            earthBodyDistance.au, sunBodyDistance.au )
 
                 else:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG( row[ "magnitude_H" ], row[ "magnitude_G" ], 
-                                                                                     earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
+                    apparentMagnitude = \
+                        astrobase.AstroBase.getApparentMagnitude_HG( \
+                            row[ "magnitude_H" ], row[ "magnitude_G" ], \
+                            earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
                 if apparentMagnitude and apparentMagnitude <= magnitudeMaximum: # Minimum magnitudes have already been screened out in the filtering.
                     AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, ( bodyType, name ), locationAtNow, ephemerisPlanets, body )
@@ -1053,10 +1075,12 @@ class AstroSkyfield( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False
-                earthSatellite = EarthSatellite( satelliteData[ satellite ].getLine1(), 
-                                                 satelliteData[ satellite ].getLine2(), 
-                                                 satelliteData[ satellite ].getName(), 
-                                                 timeScale )
+                earthSatellite = \
+                    EarthSatellite( \
+                        satelliteData[ satellite ].getLine1(), \
+                        satelliteData[ satellite ].getLine2(), \
+                        satelliteData[ satellite ].getName(), \
+                        timeScale )
 
                 t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 )
                 riseTime = None
@@ -1129,10 +1153,11 @@ class AstroSkyfield( astrobase.AstroBase ):
         startDate = today - relativedelta( months = 1 ) 
         endDate = today.replace( year = today.year + 5 ) # Five years should be enough data.
         dateFormat = "%Y/%m/%d"
-        command = "python3 -m jplephem excerpt " + \
-                  startDate.strftime( dateFormat ) + " " + \
-                  endDate.strftime( dateFormat ) + " " + \
-                  ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
+        command = \
+            "python3 -m jplephem excerpt " + \
+            startDate.strftime( dateFormat ) + " " + \
+            endDate.strftime( dateFormat ) + " " + \
+            ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         print( "Creating planet ephemeris...\n\t", command )
         subprocess.call( command, shell = True )

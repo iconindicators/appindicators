@@ -917,15 +917,16 @@ class AstroPyEphem( astrobase.AstroBase ):
 
 
     @staticmethod
-    def calculate( utcNow,
-                   latitude, longitude, elevation,
-                   planets,
-                   stars,
-                   satellites, satelliteData,
-                   comets, cometData,
-                   minorPlanets, minorPlanetData,
-                   magnitudeMaximum,
-                   logging ):
+    def calculate(
+            utcNow,
+            latitude, longitude, elevation,
+            planets,
+            stars,
+            satellites, satelliteData,
+            comets, cometData,
+            minorPlanets, minorPlanetData,
+            magnitudeMaximum,
+            logging ):
 
         data = { }
 
@@ -970,9 +971,10 @@ class AstroPyEphem( astrobase.AstroBase ):
 
     @staticmethod
     def getLatitudeLongitudeElevation( city ):
-        return float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
-               float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
-               _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
+        return \
+            float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
+            float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
+            _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
 
 
     @staticmethod
@@ -998,8 +1000,9 @@ class AstroPyEphem( astrobase.AstroBase ):
     def getVersionMessage():
         message = None
         if LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
-            message = _( "PyEphem must be version {0} or greater. Please upgrade:\n\n" + \
-                         AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
+            message = \
+                _( "PyEphem must be version {0} or greater. Please upgrade:\n\n" + \
+                AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
 
         return message
 
@@ -1019,8 +1022,9 @@ class AstroPyEphem( astrobase.AstroBase ):
         moon = ephem.Moon()
         moon.compute( AstroPyEphem.__getCity( data, ephemNow ) )
         data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
-        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = \
-            astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+
+        phase = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = phase
 
         city = AstroPyEphem.__getCity( data, ephemNow )
         sun = ephem.Sun( city )
@@ -1206,16 +1210,17 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    Transit time exceeds set time.
     @staticmethod
     def __isSatellitePassValid( satellitePass ):
-        return satellitePass and \
-               len( satellitePass ) == 6 and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_ANGLE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
-               satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ]
+        return \
+            satellitePass and \
+            len( satellitePass ) == 6 and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_ANGLE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
+            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ]
 
 
     # Determine if a satellite pass is visible.
@@ -1233,9 +1238,10 @@ class AstroPyEphem( astrobase.AstroBase ):
         sun = ephem.Sun()
         sun.compute( city )
 
-        return satellite.eclipsed is False and \
-               sun.alt > ephem.degrees( "-18" ) and \
-               sun.alt < ephem.degrees( "-6" )
+        return \
+            satellite.eclipsed is False and \
+            sun.alt > ephem.degrees( "-18" ) and \
+            sun.alt < ephem.degrees( "-6" )
 
 
     @staticmethod
