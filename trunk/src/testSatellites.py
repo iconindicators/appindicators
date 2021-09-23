@@ -93,13 +93,13 @@ lon = 151
 elev = 100
 searchDuration = 48 # Hours
 tleData = "file:///./visual.txt"
+ephemerisPlanets = load( "de421.bsp" )
 
 utcNow = datetime.datetime.utcnow()
 timeScale = load.timescale( builtin = True )
 now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
 nowPlusSearchDuration = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + searchDuration, utcNow.second )
 location = wgs84.latlon( lat, lon, elev )
-ephemerisPlanets = load( "de421.bsp" )
 isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
 
 for satellite in load.tle_file( tleData ):
