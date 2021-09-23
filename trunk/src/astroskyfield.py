@@ -1075,6 +1075,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     satelliteData[ satellite ].getName(), \
                     timeScale )
 
+#TODO Update according to testSatellites.py
                 t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 )
                 riseTime = None
                 culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
