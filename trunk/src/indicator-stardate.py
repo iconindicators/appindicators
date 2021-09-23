@@ -45,8 +45,9 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
             version = "1.0.40",
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
-            creditz = [ _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
-                        _( "Wikipedia::Stardate" "https://en.wikipedia.org/wiki/Stardate" ) ] )
+            creditz = [ 
+                _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
+                _( "Wikipedia::Stardate" "https://en.wikipedia.org/wiki/Stardate" ) ] )
 
         self.requestMouseWheelScrollEvents()
         self.saveConfigTimerID = None
