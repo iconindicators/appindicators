@@ -92,21 +92,23 @@ class PublishedBinary( object ):
 
 
     def __str__( self ):
-        return self.getPackageName() + " | " + \
-               str( self.getPackageVersion() ) + " | " + \
-               str( self.getDownloadCount() ) + " | " + \
-               str( self.isArchitectureSpecific() ) # Must wrap str() around getPackageVersion() as it will return None when published binaries are combined.
+        return \
+            self.getPackageName() + " | " + \
+            str( self.getPackageVersion() ) + " | " + \
+            str( self.getDownloadCount() ) + " | " + \
+            str( self.isArchitectureSpecific() ) # Must wrap str() around getPackageVersion() as it will return None when published binaries are combined.
 
 
     def __repr__( self ): return self.__str__()
 
 
     def __eq__( self, other ): 
-        return self.__class__ == other.__class__ and \
-               self.getPackageName() == other.getPackageName() and \
-               self.getPackageVersion() == other.getPackageVersion() and \
-               self.getDownloadCount() == other.getDownloadCount() and \
-               self.isArchitectureSpecific() == other.isArchitectureSpecific()
+        return \
+            self.__class__ == other.__class__ and \
+            self.getPackageName() == other.getPackageName() and \
+            self.getPackageVersion() == other.getPackageVersion() and \
+            self.getDownloadCount() == other.getDownloadCount() and \
+            self.isArchitectureSpecific() == other.isArchitectureSpecific()
 
 
 class PPA( object ):
@@ -185,28 +187,29 @@ class PPA( object ):
 
 
     @staticmethod
-    def sort( listOfPPAs ):
-        listOfPPAs.sort( key = operator.methodcaller( "getDescriptor" ) )
+    def sort( listOfPPAs ): listOfPPAs.sort( key = operator.methodcaller( "getDescriptor" ) )
 
 
     def __str__( self ):
-        return self.user + " | " + \
-               self.name + " | " + \
-               str( self.series ) + " | " + \
-               str( self.architecture ) + " | " + \
-               self.publishedBinaries
+        return \
+            self.user + " | " + \
+            self.name + " | " + \
+            str( self.series ) + " | " + \
+            str( self.architecture ) + " | " + \
+            self.publishedBinaries
 
 
     def __repr__( self ): return self.__str__()
 
 
     def __eq__( self, other ): 
-        equal = self.__class__ == other.__class__ and \
-                self.getUser() == other.getUser() and \
-                self.getName() == other.getName() and \
-                self.getSeries() == other.getSeries() and \
-                self.getArchitecture() == other.getArchitecture() and \
-                self.getStatus() == other.getStatus()
+        equal = \
+            self.__class__ == other.__class__ and \
+            self.getUser() == other.getUser() and \
+            self.getName() == other.getName() and \
+            self.getSeries() == other.getSeries() and \
+            self.getArchitecture() == other.getArchitecture() and \
+            self.getStatus() == other.getStatus()
 
         equal &= len( self.getPublishedBinaries() ) == len( other.getPublishedBinaries() )
         if equal:

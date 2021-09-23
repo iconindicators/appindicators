@@ -45,13 +45,14 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
-    SERIES = [ "impish", "hirsute", "groovy", "focal", "eoan",
-               "disco", "cosmic", "bionic", "artful", "zesty",
-               "yakkety", "xenial", "wily", "vivid", "utopic",
-               "trusty", "saucy", "raring", "quantal", "precise",
-               "oneiric", "natty", "maverick", "lucid", "karmic",
-               "jaunty", "intrepid", "hardy", "gutsy", "feisty",
-               "edgy", "dapper", "breezy", "hoary", "warty" ]
+    SERIES = [
+        "impish", "hirsute", "groovy", "focal", "eoan",
+        "disco", "cosmic", "bionic", "artful", "zesty",
+        "yakkety", "xenial", "wily", "vivid", "utopic",
+        "trusty", "saucy", "raring", "quantal", "precise",
+        "oneiric", "natty", "maverick", "lucid", "karmic",
+        "jaunty", "intrepid", "hardy", "gutsy", "feisty",
+        "edgy", "dapper", "breezy", "hoary", "warty" ]
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
@@ -338,12 +339,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
 
     def hasPublishedBinaries( self, ppa ):
-        url = "https://api.launchpad.net/1.0/~" + \
-              ppa.getUser() + "/+archive/ubuntu/" + \
-              ppa.getName() + "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
-              ppa.getArchitecture() + "&status=Published" + \
-              "&exact_match=false&ordered=false"
+        url = \
+            "https://api.launchpad.net/1.0/~" + \
+            ppa.getUser() + "/+archive/ubuntu/" + \
+            ppa.getName() + "?ws.op=getPublishedBinaries" + \
+            "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
+            ppa.getArchitecture() + "&status=Published" + \
+            "&exact_match=false&ordered=false"
 
         try:
             publishedBinaries = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
@@ -363,12 +365,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
     #    https://pymotw.com/3/concurrent.futures
     #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def getPublishedBinaries( self, ppa, filterText ):
-        url = "https://api.launchpad.net/1.0/~" + \
-              ppa.getUser() + "/+archive/ubuntu/" + \
-              ppa.getName() + "?ws.op=getPublishedBinaries" + \
-              "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
-              ppa.getArchitecture() + "&status=Published" + \
-              "&exact_match=false&ordered=false&binary_name=" + filterText # A filterText of "" equates to no filterText.
+        url = \
+            "https://api.launchpad.net/1.0/~" + \
+            ppa.getUser() + "/+archive/ubuntu/" + \
+            ppa.getName() + "?ws.op=getPublishedBinaries" + \
+            "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.getSeries() + "/" + \
+            ppa.getArchitecture() + "&status=Published" + \
+            "&exact_match=false&ordered=false&binary_name=" + filterText # A filterText of "" equates to no filterText.
 
         pageNumber = 1
         publishedBinariesPerPage = 75 # Results are presented in at most 75 per page.
@@ -410,10 +413,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             try:
                 indexLastSlash = publishedBinaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 packageId = publishedBinaries[ "entries" ][ i ][ "self_link" ][ indexLastSlash + 1 : ]
-                url = "https://api.launchpad.net/1.0/~" + \
-                      ppa.getUser() + "/+archive/ubuntu/" + \
-                      ppa.getName() + "/+binarypub/" + \
-                      packageId + "?ws.op=getDownloadCount"
+                url = \
+                    "https://api.launchpad.net/1.0/~" + \
+                    ppa.getUser() + "/+archive/ubuntu/" + \
+                    ppa.getName() + "/+binarypub/" + \
+                    packageId + "?ws.op=getDownloadCount"
 
                 downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
