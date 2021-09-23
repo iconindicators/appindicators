@@ -1116,37 +1116,43 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 self.createMenuItem( subMenu, label, url )
                 
             else: # Satellite is in transit.
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
 
-                label = \
-                    self.indent( 2, 3 ) + \
-                    _( "Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
-
-                self.createMenuItem( subMenu, label, url )
-
-                label = \
-                    self.indent( 2, 3 ) + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] )
-
-                self.createMenuItem( subMenu, label, url )
-
-                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
-
-                label = \
-                    self.indent( 2, 3 ) + \
-                     _( "Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-
-                self.createMenuItem( subMenu, label, url )
-
-                label = \
-                    self.indent( 2, 3 ) + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] )
-
-                self.createMenuItem( subMenu, label, url )
+                try:
+                                    
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
+    
+                    label = \
+                        self.indent( 2, 3 ) + \
+                        _( "Date/Time: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO XXX
+    
+                    self.createMenuItem( subMenu, label, url )
+    
+                    label = \
+                        self.indent( 2, 3 ) + \
+                        _( "Azimuth: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] )
+    
+                    self.createMenuItem( subMenu, label, url )
+    
+                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
+    
+                    label = \
+                        self.indent( 2, 3 ) + \
+                         _( "Date/Time: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+    
+                    self.createMenuItem( subMenu, label, url )
+    
+                    label = \
+                        self.indent( 2, 3 ) + \
+                        _( "Azimuth: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] )
+    
+                    self.createMenuItem( subMenu, label, url )
+                except Exception as e: #TODO Got an exception above at XXX...maybe the try/catch in updateMenuCommon is a furfy and the exception happened at XXX?
+                    print( e )
+                    print( key )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
