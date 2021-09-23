@@ -187,9 +187,10 @@ class IndicatorBase( ABC ):
         aboutDialog.set_authors( self.authors )
         aboutDialog.set_comments( self.comments )
 
-        copyrightText = "Copyright \xa9 " + \
-                        self.copyrightStartYear + '-' + str( datetime.datetime.now().year ) + " " + \
-                        self.copyrightName
+        copyrightText = \
+            "Copyright \xa9 " + \
+            self.copyrightStartYear + '-' + str( datetime.datetime.now().year ) + " " + \
+            self.copyrightName
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -429,12 +430,13 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getThemeColour( self, defaultColour ):
-        themeNames = { "Adwaita"                : "bebebe",
-                       "elementary-xfce-darker" : "f3f3f3",
-                       "Lubuntu"                : "4c4c4c",
-                       "ubuntu-mono-dark"       : "dfdbd2",
-                       "ubuntu-mono-light"      : "3c3c3c",
-                       "Yaru"                   : "dbdbdb" }
+        themeNames = { 
+            "Adwaita"                : "bebebe",
+            "elementary-xfce-darker" : "f3f3f3",
+            "Lubuntu"                : "4c4c4c",
+            "ubuntu-mono-dark"       : "dfdbd2",
+            "ubuntu-mono-light"      : "3c3c3c",
+            "Yaru"                   : "dbdbdb" }
 
         themeName = self.getThemeName()
         themeColour = defaultColour
