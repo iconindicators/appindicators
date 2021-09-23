@@ -39,9 +39,10 @@ class VirtualMachine( object ):
 
 
     def __eq__( self, other ):
-        return self.__class__ == other.__class__ and \
-               self.getName() == other.getName() and \
-               self.getUUID() == other.getUUID()
+        return \
+            self.__class__ == other.__class__ and \
+            self.getName() == other.getName() and \
+            self.getUUID() == other.getUUID()
 
 
 class Group( object ):
@@ -67,9 +68,10 @@ class Group( object ):
 
 
     def __eq__( self, other ):
-        equal = self.__class__ == other.__class__ and \
-                self.getName() == other.getName() and \
-                len( self.getItems() ) == len( other.getItems( ) )
+        equal = \
+            self.__class__ == other.__class__ and \
+            self.getName() == other.getName() and \
+            len( self.getItems() ) == len( other.getItems( ) )
 
         if equal:
             for itemFromSelf, itemFromOther in zip( self.getItems(), other.getItems() ):
