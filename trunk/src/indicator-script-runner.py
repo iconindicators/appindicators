@@ -573,15 +573,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 row = [
-                        group,
-                        None, 
-                        script.getName(), 
-                        Gtk.STOCK_APPLY if script.getPlaySound() else None, 
-                        Gtk.STOCK_APPLY if script.getShowNotification() else None, 
-                        None, 
-                        None, 
-                        str( script.getIntervalInMinutes() ),
-                        Gtk.STOCK_APPLY if script.getForceUpdate() else None ]
+                    group,
+                    None, 
+                    script.getName(), 
+                    Gtk.STOCK_APPLY if script.getPlaySound() else None, 
+                    Gtk.STOCK_APPLY if script.getShowNotification() else None, 
+                    None, 
+                    None, 
+                    str( script.getIntervalInMinutes() ),
+                    Gtk.STOCK_APPLY if script.getForceUpdate() else None ]
 
                 treeStore.append( parent, row )
 

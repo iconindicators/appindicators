@@ -56,20 +56,22 @@ class Info( ABC ):
 
 
     def __eq__( self, other ): 
-        return self.__class__ == other.__class__ and \
-               self.getGroup() == other.getGroup() and \
-               self.getName() == other.getName() and \
-               self.getCommand() == other.getCommand() and \
-               self.getPlaySound() == other.getPlaySound() and \
-               self.getShowNotification() == other.getShowNotification()
+        return \
+            self.__class__ == other.__class__ and \
+            self.getGroup() == other.getGroup() and \
+            self.getName() == other.getName() and \
+            self.getCommand() == other.getCommand() and \
+            self.getPlaySound() == other.getPlaySound() and \
+            self.getShowNotification() == other.getShowNotification()
 
 
     def __str__( self ):
-        return self.group + " | " + \
-               self.name + " | " + \
-               self.command + " | " + \
-               str( self.playSound ) + " | " + \
-               str( self.showNotification )
+        return \
+            self.group + " | " + \
+            self.name + " | " + \
+            self.command + " | " + \
+            str( self.playSound ) + " | " + \
+            str( self.showNotification )
 
 
     def __repr__( self ): return self.__str__()
@@ -97,16 +99,18 @@ class Background( Info ):
 
 
     def __eq__( self, other ): 
-        return super().__eq__( other ) and \
-               self.__class__ == other.__class__ and \
-               self.getIntervalInMinutes() == other.getIntervalInMinutes() and \
-               self.getForceUpdate() == other.getForceUpdate()
+        return \
+            super().__eq__( other ) and \
+            self.__class__ == other.__class__ and \
+            self.getIntervalInMinutes() == other.getIntervalInMinutes() and \
+            self.getForceUpdate() == other.getForceUpdate()
 
 
     def __str__( self ):
-        return super().__str__() + " | " + \
-               str( self.intervalInMinutes ) + " | " + \
-               str( self.forceUpdate )
+        return \
+            super().__str__() + " | " + \
+            str( self.intervalInMinutes ) + " | " + \
+            str( self.forceUpdate )
 
 
     def __repr__( self ): return self.__str__()
@@ -134,16 +138,18 @@ class NonBackground( Info ):
 
 
     def __eq__( self, other ): 
-        return super().__eq__( other ) and \
-               self.__class__ == other.__class__ and \
-               self.getTerminalOpen() == other.getTerminalOpen() and \
-               self.getDefault() == other.getDefault()
+        return \
+            super().__eq__( other ) and \
+            self.__class__ == other.__class__ and \
+            self.getTerminalOpen() == other.getTerminalOpen() and \
+            self.getDefault() == other.getDefault()
 
 
     def __str__( self ):
-        return super().__str__() + " | " + \
-               str( self.terminalOpen ) + " | " + \
-               str( self.default )
+        return \
+            super().__str__() + " | " + \
+            str( self.terminalOpen ) + " | " + \
+            str( self.default )
 
 
     def __repr__( self ): return self.__str__()
