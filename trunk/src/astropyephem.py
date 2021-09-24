@@ -1150,7 +1150,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData ):
-        endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 50 ) # Stop looking for passes 36 hours from now.
         for satellite in satellites:
             if satellite in satelliteData:
                 currentDateTime = ephemNow
@@ -1159,11 +1159,60 @@ class AstroPyEphem( astrobase.AstroBase ):
 # https://rhodesmill.org/pyephem/date.html
                 startHour = 6 # 4pm Sydney 
                 endHour = 11 # 9pm Sydney 
-        
-                hour = ephemNow.tuple()[ 3 ]
-                if hour < startHour or hour > endHour:
-                    currentDateTime = startHour # Wrong...need to make a new date/time using the tuple method.
 
+#TODO Still possible to find a pass outside of the hours...so handle that!
+
+                # ephemNow = ephem.Date( "2021/09/24 13:00" )
+
+                while currentDateTime < endDateTime:
+                    currentDateTimeTuple = currentDateTime.tuple()
+                    currentHour = currentDateTime.tuple()[ 3 ]
+                    if currentHour < startHour:
+                        currentDateTimeTuple = currentDateTime.tuple()
+                        currentDateTime = ephem.Date( ( currentDateTimeTuple[ 0 ], currentDateTimeTuple[ 1 ], currentDateTimeTuple[ 2 ], startHour, 0, 0 ) )
+
+                    elif currentHour >= endHour:
+                        currentDateTime = ephem.Date( currentDateTime + 1 )
+                        currentDateTimeTuple = currentDateTime.tuple()
+                        currentDateTime = ephem.Date( ( currentDateTimeTuple[ 0 ], currentDateTimeTuple[ 1 ], currentDateTimeTuple[ 2 ], startHour, 0, 0 ) )
+
+                    city = AstroPyEphem.__getCity( data, currentDateTime )
+                    earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+                    earthSatellite.compute( city )
+                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
+                    try:
+                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
+                           AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
+                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
+                                repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
+                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
+                            break
+
+                        currentDateTime = ephem.Date( currentDateTime + ephem.minute * 30 )
+
+                    except ValueError:
+                        if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
+
+                        break
+
+
+    @staticmethod
+    def __calculateSatellitesORIGINAL( ephemNow, data, satellites, satelliteData ):
+        endDateTime = ephem.Date( ephemNow + ephem.hour * 36 ) # Stop looking for passes 36 hours from now.
+        for satellite in satellites:
+            if satellite in satelliteData:
+                currentDateTime = ephemNow
                 while currentDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, currentDateTime )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
