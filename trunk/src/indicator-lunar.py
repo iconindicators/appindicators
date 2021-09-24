@@ -44,6 +44,10 @@
 #TODO Do a timing test between each backend running and also the time to build the menu.
 
 
+#TODO For both PyEphem and Skyfield, do a timing test to see how long the backend takes versus the front end.
+#Front end should always be similar...and might be taking a long time compared to the front end.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -55,10 +59,6 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 
 import astrobase, datetime, eclipse, indicatorbase, locale, math, orbitalelement, re, sys, twolineelement, webbrowser
-
-
-#TODO For both PyEphem and Skyfield, do a timing test to see how long the backend takes versus the front end.
-#Front end should always be similar...and might be taking a long time compared to the front end.
 
 
 class IndicatorLunar( indicatorbase.IndicatorBase ):
@@ -1020,7 +1020,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             satellitesPolar = sorted(
                 satellitesPolar,
                 key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
-#TODO Need to test this...change the long to force polar satellites.
+#TODO Need to test this...change the longitude to force polar satellites.
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
@@ -1064,7 +1064,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 label = \
                     self.indent( 2, 3 ) + \
                     _( "Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO XXX
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO This line threw an exception..don't know why...
 
                 self.createMenuItem( subMenu, label, url )
 
