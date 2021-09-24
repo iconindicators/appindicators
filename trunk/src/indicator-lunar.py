@@ -41,6 +41,9 @@
 # To revert back to all visible passes, set to 3am to 10pm.
 
 
+#TODO Do a timing test between each backend running and also the time to build the menu.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -889,92 +892,39 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def updateMenuCommon( self, menu, bodyType, nameTag, indentUnity, indentGnomeShell, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.indent( indentUnity, indentGnomeShell )
-        # if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
-        #     if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-        #         label = indent + \
-        #                 _( "Rise: " ) + \
-        #                 self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
-        #         self.createMenuItem( menu, label, onClickURL )
-        #
-        #     else:
-        #         label = indent + \
-        #                 _( "Azimuth: " ) + \
-        #                 self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-        #         self.createMenuItem( menu, label, onClickURL )
-        #
-        #         label = indent + \
-        #                 _( "Altitude: " ) + \
-        #                 self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-        #         self.createMenuItem( menu, label, onClickURL )
-        #
-        #         label = indent + \
-        #                 _( "Set: " ) + \
-        #                 self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-        #         self.createMenuItem( menu, label, onClickURL )
-        #
-        # else: # Body is always up.
-        #     label = indent + \
-        #             _( "Azimuth: " ) + \
-        #             self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-        #     self.createMenuItem( menu, label, onClickURL )
-        #
-        #     label = indent + \
-        #             _( "Altitude: " ) + \
-        #             self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-        #     self.createMenuItem( menu, label, onClickURL )
-
-#TODO Seen exceptions during PyEphem running but don't know why...so try to catch.        
-        try:
-            if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
-                if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-                    label = \
-                        indent + \
+        if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
+            if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
+                label = indent + \
                         _( "Rise: " ) + \
                         self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
-
-                    self.createMenuItem( menu, label, onClickURL )
-    
-                else:
-                    label = \
-                        indent + \
+                self.createMenuItem( menu, label, onClickURL )
+        
+            else:
+                label = indent + \
                         _( "Azimuth: " ) + \
                         self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-
-                    self.createMenuItem( menu, label, onClickURL )
-    
-                    label = \
-                        indent + \
+                self.createMenuItem( menu, label, onClickURL )
+        
+                label = indent + \
                         _( "Altitude: " ) + \
                         self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-
-                    self.createMenuItem( menu, label, onClickURL )
-    
-                    label = \
-                        indent + \
+                self.createMenuItem( menu, label, onClickURL )
+        
+                label = indent + \
                         _( "Set: " ) + \
                         self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-
-                    self.createMenuItem( menu, label, onClickURL )
-    
-            else: # Body is always up.
-                label = \
-                    indent + \
+                self.createMenuItem( menu, label, onClickURL )
+        
+        else: # Body is always up.
+            label = indent + \
                     _( "Azimuth: " ) + \
                     self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-
-                self.createMenuItem( menu, label, onClickURL )
-    
-                label = \
-                    indent + \
+            self.createMenuItem( menu, label, onClickURL )
+        
+            label = indent + \
                     _( "Altitude: " ) + \
                     self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-
-                self.createMenuItem( menu, label, onClickURL )
-
-        except Exception as e:
-            self.getLogging().exception( e )
-            self.getLogging().error( bodyType )
-            self.getLogging().error( nameTag )
+            self.createMenuItem( menu, label, onClickURL )
 
 
     # Display the rise/set information for each satellite.
@@ -1038,21 +988,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(),
-                                # self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
-                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
-                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
-                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
-                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )#TODO Remove these lines and put the commented line back in.
+                                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                     else: # There was no previous transit (for whatever reason); shouldn't happen, so just show next pass...
                         satellites.append( [
                             number,
                             self.satelliteData[ number ].getName(),
-                            # self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
-                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
-                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ],
-                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
-                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )#TODO Remove these lines and put the commented line back in.
+                            self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
             elif key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is circumpolar (always up)...
                 satellitesPolar.append( [
@@ -1078,7 +1020,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             satellitesPolar = sorted(
                 satellitesPolar,
                 key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
-
+#TODO Need to test this...change the long to force polar satellites.
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
@@ -1117,42 +1059,37 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 
             else: # Satellite is in transit.
 
-                try:
-                                    
-                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
-    
-                    label = \
-                        self.indent( 2, 3 ) + \
-                        _( "Date/Time: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO XXX
-    
-                    self.createMenuItem( subMenu, label, url )
-    
-                    label = \
-                        self.indent( 2, 3 ) + \
-                        _( "Azimuth: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] )
-    
-                    self.createMenuItem( subMenu, label, url )
-    
-                    self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
-    
-                    label = \
-                        self.indent( 2, 3 ) + \
-                         _( "Date/Time: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-    
-                    self.createMenuItem( subMenu, label, url )
-    
-                    label = \
-                        self.indent( 2, 3 ) + \
-                        _( "Azimuth: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] )
-    
-                    self.createMenuItem( subMenu, label, url )
-                except Exception as e: #TODO Got an exception above at XXX...maybe the try/catch in updateMenuCommon is a furfy and the exception happened at XXX?
-                    print( e )
-                    print( key )
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
+
+                label = \
+                    self.indent( 2, 3 ) + \
+                    _( "Date/Time: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO XXX
+
+                self.createMenuItem( subMenu, label, url )
+
+                label = \
+                    self.indent( 2, 3 ) + \
+                    _( "Azimuth: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
+
+                self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Set" ), url )
+
+                label = \
+                    self.indent( 2, 3 ) + \
+                     _( "Date/Time: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
+
+                label = \
+                    self.indent( 2, 3 ) + \
+                    _( "Azimuth: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] )
+
+                self.createMenuItem( subMenu, label, url )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
