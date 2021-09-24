@@ -1154,6 +1154,16 @@ class AstroPyEphem( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 currentDateTime = ephemNow
+
+#TODO Thinking...                
+# https://rhodesmill.org/pyephem/date.html
+                startHour = 6 # 4pm Sydney 
+                endHour = 11 # 9pm Sydney 
+        
+                hour = ephemNow.tuple()[ 3 ]
+                if hour < startHour or hour > endHour:
+                    currentDateTime = startHour # Wrong...need to make a new date/time using the tuple method.
+
                 while currentDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, currentDateTime )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
