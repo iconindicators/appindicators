@@ -747,6 +747,11 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
 # https://github.com/skyfielders/python-skyfield/issues/490
+#
+#TODO https://rhodesmill.org/skyfield/kepler-orbits.html
+# Does this apply from the docs:
+        # Keep only the most recent orbit for each comet,
+        # and index by designation for fast lookup.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum, bodyType, latitude, longitude, elevation, logging ):
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
