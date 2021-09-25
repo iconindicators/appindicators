@@ -1155,6 +1155,8 @@ class AstroPyEphem( astrobase.AstroBase ):
             if satellite in satelliteData:
                 currentDateTime = ephemNow
 
+                # if satellite != "21819": continue
+
 #TODO Thinking...                
 # https://rhodesmill.org/pyephem/date.html
                 startHour = 6 # 4pm Sydney 
@@ -1183,6 +1185,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                     try:
                         nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
                         if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
+                           AstroPyEphem.__isSatetllitePassWithinTimes( nextPass, startHour, endHour ) and \
                            AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
 
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
@@ -1197,7 +1200,11 @@ class AstroPyEphem( astrobase.AstroBase ):
                             data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
                             break
 
-                        currentDateTime = ephem.Date( currentDateTime + ephem.minute * 30 )
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ):
+                            currentDateTime = ephem.Date( nextPass[ 4 ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
+#TODO Use an index definition for the 4.
+                        else:
+                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after the current time.
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
@@ -1280,6 +1287,23 @@ class AstroPyEphem( astrobase.AstroBase ):
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] and \
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ]
+
+
+    @staticmethod
+    def __isSatetllitePassWithinTimes( satellitePass, startHour, endHour ):
+        riseHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ 3 ] #TODO If this works, find all the indices and enumerate them!
+        setHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()[ 3 ] #TODO If this works, find all the indices and enumerate them!
+        x = riseHour > startHour and setHour < endHour
+        return x
+        
+        # if currentHour < startHour:
+        #     currentDateTimeTuple = currentDateTime.tuple()
+        #     currentDateTime = ephem.Date( ( currentDateTimeTuple[ 0 ], currentDateTimeTuple[ 1 ], currentDateTimeTuple[ 2 ], startHour, 0, 0 ) )
+        #
+        # elif currentHour >= endHour:
+        #     currentDateTime = ephem.Date( currentDateTime + 1 )
+        #     currentDateTimeTuple = currentDateTime.tuple()
+        #     currentDateTime = ephem.Date( ( currentDateTimeTuple[ 0 ], currentDateTimeTuple[ 1 ], currentDateTimeTuple[ 2 ], startHour, 0, 0 ) )
 
 
     # Determine if a satellite pass is visible.
