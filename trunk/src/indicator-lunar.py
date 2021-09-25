@@ -293,6 +293,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
+
+        #TODO Make preferences.
+        startHour = 6 # 4pm Sydney 
+        endHour = 11 # 9pm Sydney 
+
         # Update backend.
         self.dataPrevious = self.data
         self.data = IndicatorLunar.astroBackend.calculate(
@@ -300,7 +305,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
-            self.satellites, self.satelliteData,
+            self.satellites, self.satelliteData, startHour, endHour,
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude,

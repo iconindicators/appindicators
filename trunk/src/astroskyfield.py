@@ -676,7 +676,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData,
+            satellites, satelliteData, startHour, endHour,
             comets, cometData,
             minorPlanets, minorPlanetData,
             magnitudeMaximum,
@@ -715,7 +715,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
             logging )
 
-        AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData )
+        AstroSkyfield.__calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour )
 
         return data
 
@@ -1070,7 +1070,8 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
-    def __calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData ):
+    def __calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
+#TODO Handle startHour and endHour
         for satellite in satellites:
             if satellite in satelliteData:
                 foundVisiblePass = False

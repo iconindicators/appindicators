@@ -274,7 +274,7 @@ class AstroBase( ABC ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData,
+            satellites, satelliteData, startHour, endHour,
             comets, cometData,
             minorPlanets, minorPlanetData,
             magnitudeMaximum,
