@@ -1082,7 +1082,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     timeScale )
 
 #TODO Update according to testSatellites.py
-                t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = 30.0 )
+                t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
                 riseTime = None
                 culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
                 for ti, event in zip( t, events ):

@@ -217,6 +217,7 @@ class AstroBase( ABC ):
     # Names of stars (from STARS) and associated capitalised English string encapsulated as _( "" ) to be populated by implementing class.
     STAR_TAGS_TRANSLATIONS = { }
 
+    SATELLITE_SEARCH_DURATION_HOURS = 50 # Number of hours to search from 'now' for visible satellite passes.
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -242,7 +243,6 @@ class AstroBase( ABC ):
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
-
 
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
