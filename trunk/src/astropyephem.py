@@ -1208,6 +1208,7 @@ class AstroPyEphem( astrobase.AstroBase ):
 #TODO Comment!
     @staticmethod
     def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
+#TODO Make this generic (no PyEphem) and put into AstroBase so that Skyfield can use it too.
 
 # startHour = 19 # 5am Sydney 
 # endHour = 3 # 1pm Sydney 
@@ -1295,11 +1296,11 @@ class AstroPyEphem( astrobase.AstroBase ):
     #            0                6                12                18               0
     #           UTC              UTC               UTC               UTC             UTC
     #        
-    #               RISE    SET                                                            Out of bounds
-    #               RISE              SET                                                  In bounds
-    #               RISE                                   SET                             In bounds
-    #                                 RISE                 SET                             In bounds
-    #                                                      RISE    SET                     Out of bounds
+    #               RISE    SET                                                                     Out
+    #               RISE              SET                                                           In
+    #               RISE                                   SET                                      In
+    #                                 RISE                 SET                                      In
+    #                                                      RISE    SET                              Out
     #                             ^            ^ 
     #                           START         END
     #
@@ -1308,11 +1309,11 @@ class AstroPyEphem( astrobase.AstroBase ):
     #            0                6                12                18               0
     #           UTC              UTC               UTC               UTC             UTC
     #        
-    #                                               RISE    SET                                     Out of bounds
-    #                                               RISE              SET                           In bounds
-    #                                                       RISE                     SET            In bounds
-    #                                                                 RISE           SET            In bounds
-    #                                                                                RISE    SET    Out of bounds
+    #                                               RISE    SET                                     Out
+    #                                               RISE              SET                           In
+    #                                                       RISE                     SET            In
+    #                                                                 RISE           SET            In
+    #                                                                                RISE    SET    Out
     #                                                             ^            ^ 
     #                                                           START         END
     #
@@ -1321,12 +1322,12 @@ class AstroPyEphem( astrobase.AstroBase ):
     #            0                6                12                18               0
     #           UTC              UTC               UTC               UTC             UTC
     #        
-    #  RISE      SET                                                                                     
-    #            RISE        SET                                                                           In bounds
-    #            RISE                                                             SET                    In bounds
-    #                                    RISE           SET                                                In bounds
-    #                                                                RISE            SET                    Out of bounds
-    #                                                                            RISE            SET          Out of bounds
+    #  RISE      SET                                                                                In
+    #            RISE        SET                                                                    In
+    #            RISE                                                             SET               In
+    #                                    RISE           SET                                         Out
+    #                                                                RISE         SET               In
+    #                                                                             RISE       SET    In
     #                 ^                                                      ^ 
     #                END                                                   START
     #
@@ -1335,6 +1336,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     def __isSatetllitePassWithinTimes( satellitePass, startHour, endHour ):
         riseHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
         setHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
+#TODO Make this generic (no PyEphem) and put into AstroBase so that Skyfield can use it too.
 
 #TODO Maybe consider letting a pass through if it starts or ends within the time,
 # because the visibility test will remove the pass regardless if not visible.
