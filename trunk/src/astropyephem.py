@@ -1215,22 +1215,10 @@ class AstroPyEphem( astrobase.AstroBase ):
         currentDateTimeTuple = currentDateTime.tuple()
         currentHour = currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
         if currentHour < startHour:
-            # currentDateTime = \
-            #     ephem.Date( 
-            #         ( currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_YEAR ], 
-            #           currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_MONTH ], 
-            #           currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_DAY ], startHour, 0, 0 ) )
-
             currentDateTime = setHour( currentDateTimeTuple, startHour )
 
         elif currentHour >= endHour:
             currentDateTime = setHour( currentDateTimeTuple, startHour )
-            # currentDateTime = \
-            #     ephem.Date( 
-            #         ( currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_YEAR ], 
-            #           currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_MONTH ], 
-            #           currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_DAY ], startHour, 0, 0 ) )
-
             currentDateTime = ephem.Date( currentDateTime + 1 )
 
         return currentDateTime
