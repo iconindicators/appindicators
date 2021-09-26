@@ -1158,6 +1158,10 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
+        
+        # startHour = 19 # 5am Sydney 
+        # endHour = 1 # 11am Sydney 
+        
         endDateTime = ephem.Date( ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
         for satellite in satellites:
             if satellite in satelliteData:
@@ -1205,6 +1209,9 @@ class AstroPyEphem( astrobase.AstroBase ):
     @staticmethod
     def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
 
+# startHour = 19 # 5am Sydney 
+# endHour = 3 # 1pm Sydney 
+
         def setHour( dateTimeTuple, hour ):
             return \
                 ephem.Date( 
@@ -1214,12 +1221,23 @@ class AstroPyEphem( astrobase.AstroBase ):
 
         currentDateTimeTuple = currentDateTime.tuple()
         currentHour = currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
-        if currentHour < startHour:
-            currentDateTime = setHour( currentDateTimeTuple, startHour )
+        if startHour < endHour:
+            if currentHour < startHour:
+                currentDateTime = setHour( currentDateTimeTuple, startHour )
 
-        elif currentHour >= endHour:
-            currentDateTime = setHour( currentDateTimeTuple, startHour )
-            currentDateTime = ephem.Date( currentDateTime + 1 )
+            elif currentHour >= endHour:
+                currentDateTime = setHour( currentDateTimeTuple, startHour )
+                currentDateTime = ephem.Date( currentDateTime + 1 )
+
+        else:
+            if currentHour < endHour:
+            
+            if currentHour < startHour:
+                currentDateTime = setHour( currentDateTimeTuple, startHour )
+
+            elif currentHour >= endHour:
+                currentDateTime = setHour( currentDateTimeTuple, startHour )
+                currentDateTime = ephem.Date( currentDateTime + 1 )
 
         return currentDateTime
 
@@ -1261,15 +1279,80 @@ class AstroPyEphem( astrobase.AstroBase ):
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ]
 
 
+#TODO Comment!
+    # Determine if the satellite pass falls anywhere between a start hour and end hour.
+    # This is not to determine if a pass is visible; rather it is a hard border for a pass.
+    # Given that visibility is determined elsewhere, a pass need not completely fall with the boundary. 
+    #
+    # The end user will specify the start and end hour in the local time zone.
+    # As such, the start and end hour will be converted to UTC,
+    # which may result in the start hour coming after the end hour.
+    #
+    # Scenarios...not to scale!
+    #
+    #
+    # startHour = 6 UTC (4pm Sydney), endHour = 11 UTC (9pm Sydney)
+    #            0                6                12                18               0
+    #           UTC              UTC               UTC               UTC             UTC
+    #        
+    #               RISE    SET                                                            Out of bounds
+    #               RISE              SET                                                  In bounds
+    #               RISE                                   SET                             In bounds
+    #                                 RISE                 SET                             In bounds
+    #                                                      RISE    SET                     Out of bounds
+    #                             ^            ^ 
+    #                           START         END
+    #
+    #
+    # startHour = 17 UTC (3am Sydney), endHour = 20 UTC (6am Sydney)
+    #            0                6                12                18               0
+    #           UTC              UTC               UTC               UTC             UTC
+    #        
+    #                                               RISE    SET                                     Out of bounds
+    #                                               RISE              SET                           In bounds
+    #                                                       RISE                     SET            In bounds
+    #                                                                 RISE           SET            In bounds
+    #                                                                                RISE    SET    Out of bounds
+    #                                                             ^            ^ 
+    #                                                           START         END
+    #
+    #
+    # startHour = 21 UTC (3am India), endHour = 1 UTC (7am India)
+    #            0                6                12                18               0
+    #           UTC              UTC               UTC               UTC             UTC
+    #        
+    #  RISE      SET                                                                                     
+    #            RISE        SET                                                                           In bounds
+    #            RISE                                                             SET                    In bounds
+    #                                    RISE           SET                                                In bounds
+    #                                                                RISE            SET                    Out of bounds
+    #                                                                            RISE            SET          Out of bounds
+    #                 ^                                                      ^ 
+    #                END                                                   START
+    #
+    #
     @staticmethod
     def __isSatetllitePassWithinTimes( satellitePass, startHour, endHour ):
-        riseTuple = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()
-        riseIsGreaterThanOrEqualToStart = riseTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ] >= startHour
+        riseHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
+        setHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
 
-        setTuple = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()
-        setIsLessThanEnd = setTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ] < endHour
+#TODO Maybe consider letting a pass through if it starts or ends within the time,
+# because the visibility test will remove the pass regardless if not visible.
 
-        return riseIsGreaterThanOrEqualToStart and setIsLessThanEnd
+        if startHour < endHour:
+            passWithinTimes = \
+                ( riseHour >= startHour and riseHour < endHour ) \ or
+                ( setHour >= startHour and setHour < endHour )
+
+        else:
+#TODO Need to check this works...but also the >= and <.
+            passWithinTimes = \
+                ( riseHour >= startHour and riseHour < endHour ) \ or
+                ( setHour >= startHour and setHour < endHour )
+
+            passWithinTimes = not ( ( riseHour >= endHour ) and ( setHour < startHour ) )
+
+        return passWithinTimes
 
 
     # Determine if a satellite pass is visible.

@@ -289,7 +289,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def update( self, menu ):
         
         utcNow = datetime.datetime.utcnow()
-
+        
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
@@ -297,6 +297,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         #TODO Make preferences.
         startHour = 6 # 4pm Sydney 
         endHour = 11 # 9pm Sydney 
+
+        startHour = 17 # 3am Sydney 
+        endHour = 20 # 6am Sydney 
+
+        startHour = 19 # 5am Sydney 
+        endHour = 1 # 11am Sydney 
+        endHour = 3 # 1pm Sydney 
+
+
+#TODO Testing satellites
+        # print( utcNow )
+        # utcNow = utcNow + datetime.timedelta( hours = 4 )
+        # print( utcNow )
 
         # Update backend.
         self.dataPrevious = self.data
