@@ -6,6 +6,9 @@ indicator-lunar (1.0.90-1) bionic; urgency=low
   * Bug fix: Satellites rise time was not taken into account when determining
     indicator next update time.
 
+TODO Is the start/end hour for satellite passes is added in, 
+also mention that the passes are now looked for up to 50 hours from now rather than 36?
+
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Aug 2021 15:44:26 +1000    <-----TODO Set to date of release, whenever that happens!
 
 
