@@ -1161,7 +1161,6 @@ class AstroPyEphem( astrobase.AstroBase ):
         endDateTime = ephem.Date( ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
         for satellite in satellites:
             if satellite in satelliteData:
-                # currentDateTime = ephemNow #TODO Not needed...just testing.
                 currentDateTime = AstroPyEphem.__adjustCurrentDateTime( ephemNow, startHour, endHour )
                 while currentDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, currentDateTime )
@@ -1207,7 +1206,6 @@ class AstroPyEphem( astrobase.AstroBase ):
 #TODO Comment!
     @staticmethod
     def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
-#TODO Make this generic (no PyEphem) and put into AstroBase so that Skyfield can use it too.
 #TODO Verify!!!
         def setHour( dateTimeTuple, hour ):
             return \
