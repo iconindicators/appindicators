@@ -98,6 +98,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     CONFIG_PLANETS = "planets"
     CONFIG_SATELLITE_NOTIFICATION_MESSAGE = "satelliteNotificationMessage"
     CONFIG_SATELLITE_NOTIFICATION_SUMMARY = "satelliteNotificationSummary"
+    CONFIG_SATELLITE_LIMIT_START = "satelliteLimitStart"
+    CONFIG_SATELLITE_LIMIT_END = "satelliteLimitEnd"
     CONFIG_SATELLITES = "satellites"
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
     CONFIG_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
@@ -1379,6 +1381,39 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             "by Name then Number." ) )
         grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
 
+        box = Gtk.Box( spacing = 6 )
+
+        box.pack_start( Gtk.Label.new( _( "Restrict satellites passes from" ) ), False, False, 0 )
+
+        spinnerSatelliteLimitStart = Gtk.SpinButton()
+        spinnerSatelliteLimitStart.set_numeric( True )
+        spinnerSatelliteLimitStart.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerAdjustment = Gtk.Adjustment.new( self.satelliteLimitStart, 0, 23, 1, 1, 0 ) #TODO What is the 0 at the end?
+        spinnerSatelliteLimitStart.set_adjustment( spinnerAdjustment )
+        spinnerSatelliteLimitStart.set_value( self.satelliteLimitStart ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
+        spinnerSatelliteLimitStart.set_tooltip_text( _(
+            "Planets, stars, comets and minor planets\n" + \
+            "exceeding the magnitude will be hidden." ) ) #TODO Fix
+
+        box.pack_start( spinnerSatelliteLimitStart, False, False, 0 )
+
+        box.pack_start( Gtk.Label.new( _( "to" ) ), False, False, 0 )
+
+        spinnerSatelliteLimitEnd = Gtk.SpinButton()
+        spinnerSatelliteLimitEnd.set_numeric( True )
+        spinnerSatelliteLimitEnd.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinnerAdjustment = Gtk.Adjustment.new( self.satelliteLimitEnd, 0, 23, 1, 1, 0 ) #TODO What is the 0 at the end?
+        spinnerSatelliteLimitEnd.set_adjustment( spinnerAdjustment )
+        spinnerSatelliteLimitEnd.set_value( self.satelliteLimitEnd ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
+        spinnerSatelliteLimitEnd.set_tooltip_text( _(
+            "Planets, stars, comets and minor planets\n" + \
+            "exceeding the magnitude will be hidden." ) ) #TODO Fix
+
+        box.pack_start( spinnerSatelliteLimitEnd, False, False, 0 )
+
+        # box.pack_start( Gtk.Label.new( _( " (inclusive)" ) ), False, False, 0 )
+        grid.attach( box, 0, 6, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Planets/Stars.
@@ -2017,6 +2052,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astrobase.AstroBase.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
 
+        self.satelliteLimitStart = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 )
+        self.satelliteLimitEnd = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 21 )
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT )
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, [ ] )
@@ -2065,6 +2102,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW: self.minorPlanetsAddNew,
             IndicatorLunar.CONFIG_MAGNITUDE: self.magnitude,
             IndicatorLunar.CONFIG_PLANETS: self.planets,
+            IndicatorLunar.CONFIG_SATELLITE_LIMIT_START: self.satelliteLimitStart,
+            IndicatorLunar.CONFIG_SATELLITE_LIMIT_END: self.satelliteLimitEnd,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE: self.satelliteNotificationMessage,
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY: self.satelliteNotificationSummary,
             IndicatorLunar.CONFIG_SATELLITES: satellites,
