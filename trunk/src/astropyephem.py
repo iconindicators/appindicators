@@ -1174,8 +1174,10 @@ class AstroPyEphem( astrobase.AstroBase ):
                     key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
                     try:
                         nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
+                        riseHour = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
+                        setHour = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
                         if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
-                           AstroPyEphem.__isSatetllitePassWithinTimes( nextPass, startHour, endHour ) and \
+                           AstroPyEphem.isSatetllitePassWithinTimes( riseHour, setHour, startHour, endHour ) and \
                            AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
 
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
@@ -1196,6 +1198,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                         else:
                             currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after the current time.
 
+#TODO Figure out if this is still needed.
                         # currentDateTime = AstroPyEphem.__adjustCurrentDateTime( currentDateTime, startHour, endHour )
 
                     except ValueError:
@@ -1279,108 +1282,6 @@ class AstroPyEphem( astrobase.AstroBase ):
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] and \
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ] and \
             satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ]
-
-
-#TODO Comment!
-    # Determine if the satellite pass falls anywhere between a start hour and end hour.
-    # This is not to determine if a pass is visible; rather it is a hard border for a pass.
-    # Given that visibility is determined elsewhere, a pass need not completely fall with the boundary. 
-    #
-    # The end user will specify the start and end hour in the local time zone.
-    # As such, the start and end hour will be converted to UTC,
-    # which may result in the start hour coming after the end hour.
-    #
-    # Scenarios...not to scale!
-    #
-    #
-    # startHour = 6 UTC (4pm Sydney), endHour = 11 UTC (9pm Sydney)
-    #            0                6                12                18               0
-    #           UTC              UTC               UTC               UTC             UTC
-    #        
-    #               RISE    SET                                                                     Out
-    #               RISE              SET                                                           In
-    #               RISE                                   SET                                      In
-    #                                 RISE                 SET                                      In
-    #                                                      RISE    SET                              Out
-    #                             ^            ^ 
-    #                           START         END
-    #
-    #
-    # startHour = 17 UTC (3am Sydney), endHour = 20 UTC (6am Sydney)
-    #            0                6                12                18               0
-    #           UTC              UTC               UTC               UTC             UTC
-    #        
-    #                                               RISE    SET                                     Out
-    #                                               RISE              SET                           In
-    #                                                       RISE                     SET            In
-    #                                                                 RISE           SET            In
-    #                                                                                RISE    SET    Out
-    #                                                             ^            ^ 
-    #                                                           START         END
-    #
-    #
-    # startHour = 21 UTC (3am India), endHour = 1 UTC (7am India)
-    #            0                6                12                18               0
-    #           UTC              UTC               UTC               UTC             UTC
-    #        
-    #  RISE      SET                                                                                In
-    #            RISE        SET                                                                    In
-    #            RISE                                                             SET               In
-    #                                    RISE           SET                                         Out
-    #                                                                RISE         SET               In
-    #                                                                             RISE       SET    In
-    #                 ^                                                      ^ 
-    #                END                                                   START
-    #
-    #
-    #
-    #
-    #                       0/24                        12                        0/24
-    #                       UTC                         UTC                       UTC 
-    # Sydney
-    # 4pm - 9pm
-    # 6 - 11 UTC                            S---------E
-    #
-    # Sydney
-    # 3am - 6am
-    # 17 - 20 UTC                                                S---------E
-    #
-    # India
-    # 3am - 7am
-    # 21 - 1 UTC                                                               S---------E
-    #
-    # Los Angeles
-    # 4pm - 9pm
-    # 23 - 4 UTC                                                                  S---------E
-    @staticmethod
-    def __isSatetllitePassWithinTimes( satellitePass, startHour, endHour ):
-        riseHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
-        setHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
-#TODO Make this generic (no PyEphem) and put into AstroBase so that Skyfield can use it too.
-
-        # A pass must fall completely within the range of startHour and endHour, inclusive.
-        if startHour < endHour: #TODO Might need to be <=...wait until all is done and testing through the interface.
-            passWithinStartAndEnd = \
-                riseHour >= startHour and \
-                riseHour <= endHour and \
-                setHour >= startHour and \
-                setHour <= endHour 
-
-        else:
-            # Rise/set can happen:
-            #    After the start and before midnight; before the end.
-            #    After the start and after midnight; before the end.
-            riseWithinStartAndEnd = \
-                ( riseHour >= startHour and riseHour >= endHour ) or \
-                ( riseHour < startHour and riseHour <= endHour )
-
-            setWithinStartAndEnd = \
-                ( setHour >= startHour and setHour >= endHour ) or \
-                ( setHour < startHour and setHour <= endHour )
-
-            passWithinStartAndEnd = riseWithinStartAndEnd and setWithinStartAndEnd
-
-        return passWithinStartAndEnd
 
 
     # Determine if a satellite pass is visible.

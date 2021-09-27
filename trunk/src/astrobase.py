@@ -515,3 +515,53 @@ class AstroBase( ABC ):
 
     @staticmethod
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+
+
+    # Determine if the satellite pass falls completely between a start hour and end hour.
+    # This is not to determine if a pass is visible; rather it is a hard border for a pass.
+    #
+    # Scenarios:
+    #
+    #                       0/24                        12                        0/24
+    #                       UTC                         UTC                       UTC 
+    # Sydney
+    # 4pm - 9pm
+    # 6 - 11 UTC                            S---------E
+    #
+    # Sydney
+    # 3am - 6am
+    # 17 - 20 UTC                                                S---------E
+    #
+    # India
+    # 3am - 7am
+    # 21 - 1 UTC                                                               S---------E
+    #
+    # Los Angeles
+    # 4pm - 9pm
+    # 23 - 4 UTC                                                                  S---------E
+    @staticmethod
+    def isSatetllitePassWithinTimes( riseHour, setHour, startHour, endHour ):
+        # A pass must fall completely within the range of startHour and endHour, inclusive.
+ #TODO Double check all of this logic!!!
+        if startHour < endHour: #TODO Might need to be <=...wait until all is done and testing through the interface.
+            passWithinStartAndEnd = \
+                riseHour >= startHour and \
+                riseHour <= endHour and \
+                setHour >= startHour and \
+                setHour <= endHour 
+
+        else:
+            # The rise and set are split over midnight, so the rise/set can either be:
+            #    After the start and before midnight; before the end.
+            #    After the start and after midnight; before the end.
+            riseWithinStartAndEnd = \
+                ( riseHour >= startHour and riseHour >= endHour ) or \
+                ( riseHour < startHour and riseHour <= endHour )
+
+            setWithinStartAndEnd = \
+                ( setHour >= startHour and setHour >= endHour ) or \
+                ( setHour < startHour and setHour <= endHour )
+
+            passWithinStartAndEnd = riseWithinStartAndEnd and setWithinStartAndEnd
+
+        return passWithinStartAndEnd

@@ -298,12 +298,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         startHour = 6 # 4pm Sydney 
         endHour = 11 # 9pm Sydney 
 
-        startHour = 17 # 3am Sydney 
-        endHour = 20 # 6am Sydney 
+        # startHour = 17 # 3am Sydney 
+        # endHour = 20 # 6am Sydney 
 
-        startHour = 19 # 5am Sydney 
-        endHour = 1 # 11am Sydney 
-        endHour = 3 # 1pm Sydney 
+        # startHour = 21 # 3am India
+        # endHour = 1 # 7am India
+
+        # startHour = 23 # 4pm California 
+        # endHour = 4 # 9pm California
 
 
 #TODO Testing satellites
