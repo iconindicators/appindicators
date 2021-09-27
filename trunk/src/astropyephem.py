@@ -1333,6 +1333,25 @@ class AstroPyEphem( astrobase.AstroBase ):
     #                END                                                   START
     #
     #
+    #
+    #
+    #                       0/24                        12                        0/24
+    #                       UTC                         UTC                       UTC 
+    # Sydney
+    # 4pm - 9pm
+    # 6 - 11 UTC                            S---------E
+    #
+    # Sydney
+    # 3am - 6am
+    # 17 - 20 UTC                                                S---------E
+    #
+    # India
+    # 3am - 7am
+    # 21 - 1 UTC                                                               S---------E
+    #
+    # Los Angeles
+    # 4pm - 9pm
+    # 23 - 4 UTC                                                                  S---------E
     @staticmethod
     def __isSatetllitePassWithinTimes( satellitePass, startHour, endHour ):
         riseHour = satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
@@ -1341,20 +1360,27 @@ class AstroPyEphem( astrobase.AstroBase ):
 
         # A pass must fall completely within the range of startHour and endHour, inclusive.
         if startHour < endHour: #TODO Might need to be <=...wait until all is done and testing through the interface.
-            passWithinTimes = \
-                ( riseHour >= startHour and riseHour <= endHour ) or \
-                ( setHour >= startHour and setHour <= endHour )
+            passWithinStartAndEnd = \
+                riseHour >= startHour and \
+                riseHour <= endHour and \
+                setHour >= startHour and \
+                setHour <= endHour 
 
         else:
-#TODO Fix/implement!
-            # passWithinTimes = \
-            #     ( riseHour >= startHour and riseHour < endHour ) or \
-            #     ( setHour >= startHour and setHour < endHour )
-            #
-            # passWithinTimes = not ( ( riseHour >= endHour ) and ( setHour < startHour ) )
-            pass
+            # Rise/set can happen:
+            #    After the start and before midnight; before the end.
+            #    After the start and after midnight; before the end.
+            riseWithinStartAndEnd = \
+                ( riseHour >= startHour and riseHour >= endHour ) or \
+                ( riseHour < startHour and riseHour <= endHour )
 
-        return passWithinTimes
+            setWithinStartAndEnd = \
+                ( setHour >= startHour and setHour >= endHour ) or \
+                ( setHour < startHour and setHour <= endHour )
+
+            passWithinStartAndEnd = riseWithinStartAndEnd and setWithinStartAndEnd
+
+        return passWithinStartAndEnd
 
 
     # Determine if a satellite pass is visible.
