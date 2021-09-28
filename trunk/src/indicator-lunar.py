@@ -295,26 +295,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
-
-        #TODO Make preferences.
-        startHour = 6 # 4pm Sydney 
-        endHour = 11 # 9pm Sydney 
-
-        # startHour = 17 # 3am Sydney 
-        # endHour = 20 # 6am Sydney 
-
-        # startHour = 21 # 3am India
-        # endHour = 1 # 7am India
-
-        # startHour = 23 # 4pm California 
-        # endHour = 4 # 9pm California
-
-
-#TODO Testing satellites
-        # print( utcNow )
-        # utcNow = utcNow + datetime.timedelta( hours = 4 )
-        # print( utcNow )
-
         # Update backend.
         self.dataPrevious = self.data
         self.data = IndicatorLunar.astroBackend.calculate(
@@ -322,7 +302,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
-            self.satellites, self.satelliteData, startHour, endHour,
+            self.satellites, self.satelliteData, self.satelliteLimitStart, self.satelliteLimitEnd,
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude,
@@ -1352,15 +1332,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
 
-        spinnerMagnitude = Gtk.SpinButton()
-        spinnerMagnitude.set_numeric( True )
-        spinnerMagnitude.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerAdjustment = Gtk.Adjustment.new( self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, 0 )
-        spinnerMagnitude.set_adjustment( spinnerAdjustment )
-        spinnerMagnitude.set_value( self.magnitude ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
-        spinnerMagnitude.set_tooltip_text( _(
-            "Planets, stars, comets and minor planets\n" + \
-            "exceeding the magnitude will be hidden." ) )
+        spinnerMagnitude = self.createSpinButton(
+            self.magnitude, 
+            int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), 
+            int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ),
+            1,
+            5,
+            _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
@@ -1383,35 +1361,30 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label.new( _( "Restrict satellites passes from" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Allow satellites passes from" ) ), False, False, 0 )
 
-        spinnerSatelliteLimitStart = Gtk.SpinButton()
-        spinnerSatelliteLimitStart.set_numeric( True )
-        spinnerSatelliteLimitStart.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerAdjustment = Gtk.Adjustment.new( self.satelliteLimitStart, 0, 23, 1, 1, 0 ) #TODO What is the 0 at the end?
-        spinnerSatelliteLimitStart.set_adjustment( spinnerAdjustment )
-        spinnerSatelliteLimitStart.set_value( self.satelliteLimitStart ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
-        spinnerSatelliteLimitStart.set_tooltip_text( _(
-            "Planets, stars, comets and minor planets\n" + \
-            "exceeding the magnitude will be hidden." ) ) #TODO Fix
+        spinnerSatelliteLimitStart = self.createSpinButton(
+            self.satelliteLimitStart,
+            0,
+            23,
+            1,
+            4,
+            _( "TODO Tooltip!  Mention inclusive" ) )
 
         box.pack_start( spinnerSatelliteLimitStart, False, False, 0 )
 
         box.pack_start( Gtk.Label.new( _( "to" ) ), False, False, 0 )
 
-        spinnerSatelliteLimitEnd = Gtk.SpinButton()
-        spinnerSatelliteLimitEnd.set_numeric( True )
-        spinnerSatelliteLimitEnd.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinnerAdjustment = Gtk.Adjustment.new( self.satelliteLimitEnd, 0, 23, 1, 1, 0 ) #TODO What is the 0 at the end?
-        spinnerSatelliteLimitEnd.set_adjustment( spinnerAdjustment )
-        spinnerSatelliteLimitEnd.set_value( self.satelliteLimitEnd ) # In Ubuntu 13.10, the initial value set by the adjustment would not appear, so force by explicitly setting.
-        spinnerSatelliteLimitEnd.set_tooltip_text( _(
-            "Planets, stars, comets and minor planets\n" + \
-            "exceeding the magnitude will be hidden." ) ) #TODO Fix
+        spinnerSatelliteLimitEnd = self.createSpinButton(
+            self.satelliteLimitEnd,
+            0,
+            23,
+            1,
+            4,
+            _( "TODO Tooltip!  Mention inclusive" ) )
 
         box.pack_start( spinnerSatelliteLimitEnd, False, False, 0 )
 
-        # box.pack_start( Gtk.Label.new( _( " (inclusive)" ) ), False, False, 0 )
         grid.attach( box, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
@@ -1694,6 +1667,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active() # The update will add in new minor planets.
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
+            self.satelliteLimitStart = spinnerSatelliteLimitStart.get_value_as_int() #TODO COnvert to UTC
+            self.satelliteLimitEnd = spinnerSatelliteLimitEnd.get_value_as_int() #TODO Convert to UTC
 
             self.planets = [ ]
             for row in planetStore:
@@ -2052,8 +2027,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, astrobase.AstroBase.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
 
-        self.satelliteLimitStart = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 )
-        self.satelliteLimitEnd = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 21 )
+        self.satelliteLimitStart = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 ) # 4pm
+        self.satelliteLimitEnd = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 21 ) # 9pm
         self.satelliteNotificationMessage = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE, IndicatorLunar.SATELLITE_NOTIFICATION_MESSAGE_DEFAULT )
         self.satelliteNotificationSummary = config.get( IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY, IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT )
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, [ ] )
