@@ -1070,6 +1070,78 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
+    def __calculateSatellitesORIGINAL( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
+#TODO Handle startHour and endHour
+        for satellite in satellites:
+            if satellite in satelliteData:
+                foundVisiblePass = False
+                earthSatellite = EarthSatellite( \
+                    satelliteData[ satellite ].getLine1(), \
+                    satelliteData[ satellite ].getLine2(), \
+                    satelliteData[ satellite ].getName(), \
+                    timeScale )
+
+#TODO Update according to testSatellites.py
+                t, events = earthSatellite.find_events( location, now, nowPlusThirtySixHours, altitude_degrees = astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
+                riseTime = None
+                culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
+                for ti, event in zip( t, events ):
+                    if event == 0: # Rise
+                        riseTime = ti
+
+                    elif event == 1: # Culminate
+                        culminateTimes.append( ti )
+
+                    else: # Set
+                        if riseTime is not None and culminateTimes:
+                            for culmination in culminateTimes:
+                                isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
+                                isTwilight = \
+                                    isTwilightFunction( culmination ) == 1 or \
+                                    isTwilightFunction( culmination ) == 2 or \
+                                    isTwilightFunction( culmination ) == 3 # 1 = Astronomical, 2 = Nautical, 3 = Civil
+
+                                if isTwilight and earthSatellite.at( culmination ).is_sunlit( ephemerisPlanets ):
+                                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
+                                    alt, az, earthBodyDistance = ( earthSatellite - location ).at( riseTime ).altaz()
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
+                                    alt, az, earthBodyDistance = ( earthSatellite - location ).at( ti ).altaz()
+                                    data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                                    foundVisiblePass = True
+                                    break
+
+                            riseTime = None
+                            culminateTimes = [ ]
+
+                        else:
+                            riseTime = None
+                            culminateTimes = [ ]
+
+                    if foundVisiblePass:
+                        break
+
+
+    # Refer to
+    #    https://github.com/skyfielders/python-skyfield/issues/327
+    #    https://github.com/skyfielders/python-skyfield/issues/558
+    #    http://www.celestrak.com/columns/v03n01/
+    #
+    # Use TLE data collated by Dr T S Kelso
+    #     http://celestrak.com/NORAD/elements
+    #
+    # Other sources/background:
+    #    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+    #    http://spotthestation.nasa.gov/sightings
+    #    http://www.n2yo.com
+    #    http://www.heavens-above.com
+    #    http://in-the-sky.org
+    #    https://uphere.space/satellites
+    #    https://www.amsat.org/track
+    #    https://tracksat.space
+    #    https://g7vrd.co.uk/public-satellite-pass-rest-api
+    @staticmethod
     def __calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
 #TODO Handle startHour and endHour
         for satellite in satellites:
@@ -1121,6 +1193,60 @@ class AstroSkyfield( astrobase.AstroBase ):
 
                     if foundVisiblePass:
                         break
+
+
+# utcNow = datetime.datetime.utcnow()
+# timeScale = load.timescale( builtin = True )
+# now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+# nowPlusSearchDuration = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + searchDuration, utcNow.second )
+# location = wgs84.latlon( lat, lon, elev )
+# isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
+
+
+    @staticmethod
+    # def __calculateSatellites( now, nowPlusThirtySixHours, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
+    def findVisiblePassSteppingBetweenRiseAndSet( now, nowPlusSearchDuration, location, ephemerisPlanets, satellite ): 
+        riseTime, riseAz, setTime, setAz = None, None, None, None
+        culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
+        t, events = satellite.find_events( location, now, nowPlusSearchDuration, altitude_degrees = 30.0 )
+        for ti, event in zip( t, events ):
+            if event == 0: # Rise
+                riseTime = ti
+    
+            elif event == 1: # Culminate
+                culminateTimes.append( ti )
+    
+            else: # Set
+                if riseTime is not None and culminateTimes:
+                    totalSeconds = ( ti.utc_datetime() - riseTime.utc_datetime() ).total_seconds()
+                    step = 1.0 if ( totalSeconds / 10.0 ) < 1.0 else ( totalSeconds / 10.0 )
+                    timeRange = timeScale.utc( 
+                        riseTime.utc.year, 
+                        riseTime.utc.month, 
+                        riseTime.utc.day, 
+                        riseTime.utc.hour, 
+                        riseTime.utc.minute, 
+                        range( math.ceil( riseTime.utc.second ), math.ceil( totalSeconds + riseTime.utc.second ), math.ceil( step ) ) )
+    
+                    isTwilightAstronomical = isTwilightFunction( timeRange ) == 1
+                    isTwilightNautical = isTwilightFunction( timeRange ) == 2
+                    sunlit = satellite.at( timeRange ).is_sunlit( ephemerisPlanets )
+                    for twilightAstronomical, twilightNautical, isSunlit in zip( isTwilightAstronomical, isTwilightNautical, sunlit ):
+                        if isSunlit and ( twilightAstronomical or twilightNautical ):
+                            alt, riseAz, distance = ( satellite - location ).at( riseTime ).altaz()
+                            setTime = ti
+                            alt, setAz, distance = ( satellite - location ).at( ti ).altaz()
+                            break
+    
+                if setTime is not None:
+                    break
+    
+                riseTime = None
+    
+        return riseTime, riseAz, setTime, setAz # If a visible pass is found, setTime is not None; otherwise setTime is None.
+
+
+
 
 
     # Create a planet ephemeris from NASA filtering by date range:
