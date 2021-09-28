@@ -20,27 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Given that many more satellites are coming online,
-# it will be infeasible to display them all for the 36 hour window.
-# So need to limit the number of hours, so that many more satellites can be shown.
-# But what if I only want to keep an eye on a handful of satellites and extend the hours out to say a week?
-#
-# Perhaps have an option to change the number of hours?
-#
-#
-#
-# When only visible passes are shown, there are 59 out of 160 odd satellites.
-# Of which, 38 are for the next window.  This is for a 36 hour window.
-# So really not a LOT of satellites to cull.
-# Reducing from 36 hours to 30 did not change the number of satellites.
-# So maybe the 36 hour window is not an issue.
-#
-# One thing is the satellites displayed in the pre-dawn period.
-# Maybe have an option to limit the period/window.
-# So could have a start and end time (say 4pm to 10pm) which would drop all morning satellite passes.
-# To revert back to all visible passes, set to 3am to 10pm.
-
-
 #TODO Do a timing test between each backend running and also the time to build the menu.
 
 
