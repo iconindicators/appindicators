@@ -20,10 +20,6 @@
 # optionally display results in the icon label.
 
 
-#TODO Update tooltip somewhere telling user when a background script barfs there should be a log file and the tag will be left in the indicator text.
-#Need a similar tooltip for non-background scripts (log file)?         
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -227,10 +223,6 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         return indicatorTextProcessed[ 0 : - len( self.indicatorTextSeparator ) ] # Trim last separator.
 
 
-#TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
-# The indicator text on the icon tab is highlighted...why?
-# https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
-# https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
     def onPreferences( self, dialog ):
         copyOfScripts = copy.deepcopy( self.scripts )
 
@@ -396,6 +388,11 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Icon text settings.
+        #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
+        # The indicator text on the icon tab is highlighted...why?
+        # https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
+        # https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
+
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
@@ -408,8 +405,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "or tooltip where applicable.\n\n" + \
             "A background script must:\n" + \
             "\tAlways return non-empty text; or\n" + \
-            "\tReturn non-empty text on success and\n" + \
-            "\tempty text otherwise.\n\n" + \
+            "\tReturn non-empty text on success\n" + \
+            "\tand empty text otherwise.\n\n" + \
             "Only background scripts added to the\n" + \
             "icon text will be run." ) )
 
@@ -832,8 +829,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
         soundCheckbox.set_tooltip_text( _(
-            "For non-background scripts,\n" + \
-            "play a sound on script completion.\n\n" + \
+            "For non-background scripts, play a sound\n" + \
+            "on script completion.\n\n" + \
             "For background scripts, play a sound\n" + \
             "only if the script returns non-empty text." ) )
         soundCheckbox.set_active( False if add else script.getPlaySound() )
@@ -876,10 +873,14 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
         scriptBackgroundRadio.set_active( False if add else type( script ) == Background )
         scriptBackgroundRadio.set_tooltip_text(
-            "Background scripts run in the background\n" + \
+            "Background scripts automatically run\n" + \
             "at the interval specified, but only if\n" + \
-            "added to the icon text." )
-        
+            "added to the icon text.\n\n" + \
+            "Any exception which occurs during script\n" + \
+            "execution will be logged to a file in the\n" + \
+            "user's home directory and the script tag\n" + \
+            "will remain in the icon text." )
+
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -907,8 +908,8 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
         forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
         forceUpdateCheckbox.set_tooltip_text( _(
-            "If the background script returns non-empty\n" + \
-            "text on its update, this script will run\n" + \
+            "If the script returns non-empty text\n" + \
+            "on its update, the script will run\n" + \
             "on the next update of ANY script." ) )
         grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
 
