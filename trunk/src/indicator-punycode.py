@@ -201,15 +201,17 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Maximum results" ) ), False, False, 0 )
 
-        resultsAmountSpinner = Gtk.SpinButton()
-        resultsAmountSpinner.set_adjustment( Gtk.Adjustment.new( self.resultHistoryLength, 0, 1000, 1, 1, 0 ) )
-        resultsAmountSpinner.set_value( self.resultHistoryLength )
-        resultsAmountSpinner.set_tooltip_text( _(
-            "The number of most recent\n" + \
-            "results to show in the menu.\n\n" + \
-            "Selecting a menu item which\n" + \
-            "contains a result will copy\n" + \
-            "the result to the output." ) )
+        resultsAmountSpinner = self.createSpinButton(
+            self.resultHistoryLength,
+            0,
+            1000,
+            toolTip = _(
+                "The number of most recent\n" + \
+                "results to show in the menu.\n\n" + \
+                "Selecting a menu item which\n" + \
+                "contains a result will copy\n" + \
+                "the result to the output." ) )
+
         box.pack_start( resultsAmountSpinner, False, False, 0 )
 
         grid.attach( box, 0, 5, 1, 1 )
