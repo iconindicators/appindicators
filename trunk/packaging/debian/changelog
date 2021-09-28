@@ -3,7 +3,7 @@ indicator-virtual-box (1.0.67-1) bionic; urgency=low
   * Removed support for VirtualBox™ 4 (and earlier) configuration files.
   * Update release to bionic as xenial is end of life.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000    <-----TODO Set to date of release, whenever that happens!
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 28 Sep 2021 15:46:19 +1000
 
 
 indicator-virtual-box (1.0.66-1) xenial; urgency=low
