@@ -1158,6 +1158,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
+#TODO What happens if startHour = endHour?
         endDateTime = ephem.Date( ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
         for satellite in satellites:
             if satellite in satelliteData:
