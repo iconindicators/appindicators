@@ -889,11 +889,15 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         label.set_sensitive( False if add else type( script ) == Background )
         box.pack_start( label, False, False, 0 )
 
-        intervalSpinner = Gtk.SpinButton()
-        intervalSpinner.set_adjustment( Gtk.Adjustment.new( script.getIntervalInMinutes() if type( script ) == Background else 60, 1, 10000, 1, 1, 0 ) )
-        intervalSpinner.set_value( script.getIntervalInMinutes() if type( script ) == Background else 60 )
+        intervalSpinner = self.createSpinButton(
+            script.getIntervalInMinutes() if type( script ) == Background else 60,
+            1,
+            10000,
+            pageIncrement = 100,
+            toolTip = _( "Interval, in minutes, between runs." ) )
+
         intervalSpinner.set_sensitive( False if add else type( script ) == Background )
-        intervalSpinner.set_tooltip_text( _( "Interval, in minutes, between runs." ) )
+
         box.pack_start( intervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 18, 1, 1 )
