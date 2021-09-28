@@ -235,10 +235,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Lines" ) ), False, False, 0 )
 
-        spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment.new( self.lines, 1, 1000, 1, 10, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinner.set_value( self.lines ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( _( "The number of menu items available for display." ) )
+        spinner = self.createSpinButton( self.lines, 1, 1000, toolTip = _( "The number of menu items available for display." ) )
 
         box.pack_start( spinner, False, False, 0 )
 
