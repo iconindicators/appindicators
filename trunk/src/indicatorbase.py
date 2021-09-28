@@ -412,6 +412,15 @@ class IndicatorBase( ABC ):
         return grid
 
 
+    def createSpinButton( self, initialValue, minimumValue, maximumValue, stepIncrement = 1, pageIncrement = 10, toolTip = "" ):
+        spinner = Gtk.SpinButton()
+        spinner.set_adjustment( Gtk.Adjustment.new( initialValue, minimumValue, maximumValue, stepIncrement, pageIncrement, 0 ) )
+        spinner.set_numeric( True )
+        spinner.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+        spinner.set_tooltip_text( toolTip )
+        return spinner
+
+
     # Menu item indent spacing, given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
     def indent( self, indentUnity, indentGnomeShell ):
         INDENT = "      "
