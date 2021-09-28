@@ -568,6 +568,7 @@ class AstroBase( ABC ):
 
 
     # https://stackoverflow.com/a/64097432/2156453
+    # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
     @staticmethod
     def convertLocalHourToUTC( localHour ):
         return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour
