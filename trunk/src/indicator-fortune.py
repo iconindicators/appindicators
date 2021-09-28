@@ -270,10 +270,14 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
-        spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60 * 24, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes ) # ...so need to force the initial value by explicitly setting it.
-        spinnerRefreshInterval.set_tooltip_text( _( "How often a fortune is displayed." ) )
+        spinnerRefreshInterval = self.createSpinButton(
+            self.refreshIntervalInMinutes, 
+            1, 
+            60 * 24, 
+            1,
+            10,
+            _( "How often a fortune is displayed." ) )
+        
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
@@ -296,16 +300,20 @@ class IndicatorFortune( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Message character limit" ) ), False, False, 0 )
 
-        spinnerCharacterCount = Gtk.SpinButton()
-        spinnerCharacterCount.set_adjustment( Gtk.Adjustment.new( self.skipFortuneCharacterCount, 1, 1000, 1, 50, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinnerCharacterCount.set_value( self.skipFortuneCharacterCount ) # ...so need to force the initial value by explicitly setting it.
-        spinnerCharacterCount.set_tooltip_text( _(
+        spinnerCharacterCount = self.createSpinButton(
+            self.skipFortuneCharacterCount,
+            1,
+            1000,
+            1,
+            10,
+            toolTip = _(
             "If the fortune exceeds the limit,\n" + \
             "a new fortune is created.\n\n" + \
             "Do not set too low (below 50) as\n" + \
             "many fortunes may be dropped,\n" + \
             "resulting in excessive calls to the\n" + \
             "'fortune' program." ) )
+
         box.pack_start( spinnerCharacterCount, False, False, 0 )
 
         grid.attach( box, 0, 2, 1, 1 )
