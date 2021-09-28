@@ -22,7 +22,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-import math
+import datetime, math
 
 
 class AstroBase( ABC ):
@@ -565,3 +565,9 @@ class AstroBase( ABC ):
             passWithinStartAndEnd = riseWithinStartAndEnd and setWithinStartAndEnd
 
         return passWithinStartAndEnd
+
+
+    # https://stackoverflow.com/a/64097432/2156453
+    @staticmethod
+    def convertLocalHourToUTC( localHour ):
+        return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour

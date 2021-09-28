@@ -302,7 +302,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
-            self.satellites, self.satelliteData, self.satelliteLimitStart, self.satelliteLimitEnd,
+            self.satellites, self.satelliteData,
+            astrobase.AstroBase.convertLocalHourToUTC( self.satelliteLimitStart ),
+            astrobase.AstroBase.convertLocalHourToUTC( self.satelliteLimitEnd ),
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude,
@@ -1659,6 +1661,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 elevation.grab_focus()
                 continue
 
+#TODO Ensure start < end.
+# What about <=?            
+
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.indicatorTextSeparator = indicatorTextSeparator.get_text()
             self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
@@ -1667,8 +1672,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active() # The update will add in new minor planets.
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
-            self.satelliteLimitStart = spinnerSatelliteLimitStart.get_value_as_int() #TODO COnvert to UTC
-            self.satelliteLimitEnd = spinnerSatelliteLimitEnd.get_value_as_int() #TODO Convert to UTC
+            self.satelliteLimitStart = spinnerSatelliteLimitStart.get_value_as_int()
+            self.satelliteLimitEnd = spinnerSatelliteLimitEnd.get_value_as_int()
 
             self.planets = [ ]
             for row in planetStore:
