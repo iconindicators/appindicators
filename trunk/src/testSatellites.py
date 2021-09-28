@@ -78,6 +78,7 @@ def findVisiblePassSteppingBetweenRiseAndSet( now, nowPlusSearchDuration, locati
                 break
 
             riseTime = None
+            culminateTimes = [ ]
 
     return riseTime, riseAz, setTime, setAz # If a visible pass is found, setTime is not None; otherwise setTime is None.
 
