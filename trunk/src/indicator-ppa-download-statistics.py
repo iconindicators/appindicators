@@ -596,13 +596,16 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         label.set_margin_left( self.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
 
-        spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment.new( self.sortByDownloadAmount, 0, 10000, 1, 5, 0 ) ) # In Ubuntu 13.10 the initial value set by the adjustment would not appear...
-        spinner.set_value( self.sortByDownloadAmount ) # ...so need to force the initial value by explicitly setting it.
-        spinner.set_tooltip_text( _(
-            "Limit the number of entries\n" + \
-            "when sorting by download.\n\n" + \
-            "A value of zero will not clip." ) )
+        spinner = self.createSpinButton(
+            self.sortByDownloadAmount,
+            0,
+            10000,
+            1,
+            100,
+            _( "Limit the number of entries\n" + \
+               "when sorting by download.\n\n" + \
+               "A value of zero will not clip." ) )
+
         spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
         box.pack_start( spinner, False, False, 0 )
 
