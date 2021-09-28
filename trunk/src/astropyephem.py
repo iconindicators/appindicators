@@ -1204,6 +1204,20 @@ class AstroPyEphem( astrobase.AstroBase ):
                         break
 
 
+
+#TODO For testing
+# startHour = 6 # 4pm Sydney 
+# endHour = 11 # 9pm Sydney 
+
+# startHour = 17 # 3am Sydney 
+# endHour = 20 # 6am Sydney 
+
+# startHour = 21 # 3am India
+# endHour = 1 # 7am India
+
+# startHour = 23 # 4pm California 
+# endHour = 4 # 9pm California
+
 #TODO Comment!
     @staticmethod
     def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
