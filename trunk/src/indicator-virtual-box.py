@@ -412,12 +412,14 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
-        spinnerRefreshInterval = Gtk.SpinButton()
-        spinnerRefreshInterval.set_adjustment( Gtk.Adjustment.new( self.refreshIntervalInMinutes, 1, 60, 1, 5, 0 ) )
-        spinnerRefreshInterval.set_value( self.refreshIntervalInMinutes )
-        spinnerRefreshInterval.set_tooltip_text( _(
-            "How often the list of virtual machines\n" + \
-            "and their running status are updated." ) )
+        spinnerRefreshInterval = self.createSpinButton(
+            self.refreshIntervalInMinutes,
+            1,
+            60,
+            pageIncrement = 5,
+            toolTip = _(
+                "How often the list of virtual machines\n" + \
+                "and their running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
@@ -429,12 +431,14 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
-        spinnerDelay = Gtk.SpinButton()
-        spinnerDelay.set_adjustment( Gtk.Adjustment.new( self.delayBetweenAutoStartInSeconds, 1, 60, 1, 5, 0 ) )
-        spinnerDelay.set_value( self.delayBetweenAutoStartInSeconds )
-        spinnerDelay.set_tooltip_text( _(
-            "Amount of time to wait from automatically\n" + \
-            "starting one virtual machine to the next." ) )
+        spinnerDelay = self.createSpinButton(
+            self.delayBetweenAutoStartInSeconds,
+            1,
+            300,
+            pageIncrement = 30,
+            toolTip = _(
+                "Amount of time to wait from automatically\n" + \
+                "starting one virtual machine to the next." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
 
