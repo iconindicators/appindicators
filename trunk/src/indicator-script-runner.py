@@ -20,12 +20,6 @@
 # optionally display results in the icon label.
 
 
-#TODO The stackexchange script crashed, see log in home directory.
-# The tag was in the icon text, which is good.
-# Waited more than 15 minutes for the tag to disappear (from a forced refresh) and the tag remained.
-# Either there is a bug, say when a script crashes, or stack exchange was still down when the script DID refresh. 
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -394,17 +388,16 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Icon text settings.
-        #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
-        # The indicator text on the icon tab is highlighted...why?
-        # https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
-        # https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
-
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
+        # Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
+        # The indicator text on the icon tab is highlighted...why?
+        # https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
+        # https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
         indicatorTextEntry.set_text( self.indicatorText )
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
