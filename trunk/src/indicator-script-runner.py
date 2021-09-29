@@ -20,6 +20,12 @@
 # optionally display results in the icon label.
 
 
+#TODO The stackexchange script crashed, see log in home directory.
+# The tag was in the icon text, which is good.
+# Waited more than 15 minutes for the tag to disappear (from a forced refresh) and the tag remained.
+# Either there is a bug, say when a script crashes, or stack exchange was still down when the script DID refresh. 
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
