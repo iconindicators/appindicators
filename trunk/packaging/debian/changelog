@@ -20,7 +20,7 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
     the script are of value.
 
     Each background script is updated according to its respective interval and
-	only if the background script has been added to the icon text.  The result
+    only if the background script has been added to the icon text.  The result
     of the background script is cached and the icon text is updated.
 
     As background scripts may have different update intervals, one script may
@@ -33,7 +33,7 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
     quicker than its specified interval.  This option would typically be used
     for a script which reports exception conditions.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 30 Sep 2021 12:50:03 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 30 Sep 2021 00:50:03 +1000
 
 
 indicator-script-runner (1.0.15-1) bionic; urgency=low
