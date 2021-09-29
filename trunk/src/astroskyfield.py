@@ -1119,11 +1119,11 @@ class AstroSkyfield( astrobase.AstroBase ):
                     satelliteData[ satellite ].getName(), \
                     timeScale )
 
-                key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                startDateTime = timeScale.from_datetime( AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour ) )
-                endDateTime = startDateTime #TODO Needs to be startDateTime + ( start - end ) adjusted for end < start , if that can happen?  Or is end always > start?
+                startDateTime, endDateTime = AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour )
+                startDateTime = timeScale.from_datetime( startDateTime )
+                endDateTime = timeScale.from_datetime( endDateTime )
                 while( endDateTime <= nowPlusSatelliteSearchDuration ):
-                    AstroSkyfield.__calculateSatellite(
+                    key = AstroSkyfield.__calculateSatellite(
                         startDateTime,
                         endDateTime,
                         data,
@@ -1132,36 +1132,100 @@ class AstroSkyfield( astrobase.AstroBase ):
                         ephemerisPlanets,
                         satellite,
                         earthSatellite,
-                        isTwilightFunction,
-                        startHour,
-                        endHour ) 
+                        isTwilightFunction ) 
 
-                    if key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) in data:
-                        break
-                    
-                    #TODO Increase start time to after end time and readjust and reloop.
+                    if key is None:
+                        startDateTime, endDateTime = AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour )
+                        startDateTime = timeScale.from_datetime( startDateTime )
+                        endDateTime = timeScale.from_datetime( endDateTime )
+                        continue
+
+                    break
 
 
 #TODO Comment!
     @staticmethod
-    def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
+    def __adjustCurrentDateTime( currentDateTime, startHour, endHour, finalDateTime ):
 #TODO Verify!!!
+        startDateTime, endDateTime = None, None
         if startHour < endHour:
             if currentDateTime.hour < startHour:
-                currentDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+                # endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )
+                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 0, 0 )
 
-            elif currentDateTime.hour >= endHour:
-                currentDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
+            elif currentDateTime.hour > endHour:
+                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
+                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 0, 0 )
+                endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )
 
-        else:
+            else:
+                startDateTime = currentDateTime
+                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59 )
+
+        else: #TODO Check if start == end?  Can this happen or should it happen?
             if currentDateTime.hour < startHour and currentDateTime.hour > endHour:
-                currentDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
 
-        return currentDateTime
+
+#TODO At the end, need to check, somehow, that the start/end are not beyond the finalDateTime.
+#If so, trim...
+        
+        
+        return startDateTime, endDateTime
 
 
     @staticmethod
-    def __calculateSatellite( now, nowPlusSearchDuration, data, timeScale, location, ephemerisPlanets, satelliteNumber, earthSatellite, isTwilightFunction ): 
+    def __calculateSatellite( startDateTime, endDateTime, data, timeScale, location, ephemerisPlanets, satelliteNumber, earthSatellite, isTwilightFunction ): 
+        key, riseTime = None, None
+        culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
+        t, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = 30.0 )
+        for ti, event in zip( t, events ):
+            if event == 0: # Rise
+                riseTime = ti
+
+            elif event == 1: # Culminate
+                culminateTimes.append( ti )
+
+            else: # Set
+                if riseTime is not None and culminateTimes:
+                    totalSecondsFromRiseToSet = ( ti.utc_datetime() - riseTime.utc_datetime() ).total_seconds()
+                    step = 1.0 if ( totalSecondsFromRiseToSet / 10.0 ) < 1.0 else ( totalSecondsFromRiseToSet / 10.0 )
+                    timeRange = timeScale.utc( 
+                        riseTime.utc.year, 
+                        riseTime.utc.month, 
+                        riseTime.utc.day, 
+                        riseTime.utc.hour, 
+                        riseTime.utc.minute, 
+                        range( math.ceil( riseTime.utc.second ), math.ceil( totalSecondsFromRiseToSet + riseTime.utc.second ), math.ceil( step ) ) )
+
+                    isTwilightAstronomical = isTwilightFunction( timeRange ) == 1
+                    isTwilightNautical = isTwilightFunction( timeRange ) == 2
+                    sunlit = earthSatellite.at( timeRange ).is_sunlit( ephemerisPlanets )
+                    for twilightAstronomical, twilightNautical, isSunlit in zip( isTwilightAstronomical, isTwilightNautical, sunlit ):
+                        if isSunlit and ( twilightAstronomical or twilightNautical ):
+                            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
+                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
+                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                            break
+
+                if key is not None:
+                    break
+
+                riseTime = None
+                culminateTimes = [ ]
+
+        return key
+
+
+    @staticmethod
+    def __calculateSatelliteOLD( now, nowPlusSearchDuration, data, timeScale, location, ephemerisPlanets, satelliteNumber, earthSatellite, isTwilightFunction ): 
         key, riseTime = None, None
         culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
         t, events = earthSatellite.find_events( location, now, nowPlusSearchDuration, altitude_degrees = 30.0 )
