@@ -1039,6 +1039,8 @@ class AstroSkyfield( astrobase.AstroBase ):
             data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
+#TODO Verify from documentation the conditions for always up and never up.
+#Then test by setting high latitudes, north and south.
             if almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target )( now ): # Body is up (and so always up).
                 alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
                 data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
@@ -1095,6 +1097,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO In calculateCommon, if there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
 # Verify this is correct and then if so, see how to apply to satellites.
+# How also to determine if a satellite is never up?
 
     @staticmethod
     def __calculateSatellites( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
