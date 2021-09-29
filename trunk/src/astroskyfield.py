@@ -1117,7 +1117,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     timeScale )
 
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                startDateTime = AstroSkyfield.__adjustCurrentDateTime( now, startHour, endHour )
+                startDateTime = timeScale.from_datetime( AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour ) )
                 endDateTime = startDateTime #TODO Needs to be startDateTime + ( start - end ) adjusted for end < start , if that can happen?  Or is end always > start?
                 while( endDateTime <= nowPlusSatelliteSearchDuration ):
                     AstroSkyfield.__calculateSatellite(
@@ -1143,29 +1143,18 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
 #TODO Verify!!!
-        def setHour( dateTimeTuple, hour ):
-            return \
-                ephem.Date( 
-                    ( dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_YEAR ], 
-                      dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_MONTH ], 
-                      dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_DAY ], hour, 0, 0 ) )
-
-        currentDateTimeTuple = currentDateTime.tuple()
-        currentHour = currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
         if startHour < endHour:
-            if currentHour < startHour:
-                currentDateTime = setHour( currentDateTimeTuple, startHour )
+            if currentDateTime.hour < startHour:
+                currentDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
 
-            elif currentHour >= endHour:
-                currentDateTime = setHour( currentDateTimeTuple, startHour )
-                currentDateTime = ephem.Date( currentDateTime + 1 )
+            elif currentDateTime.hour >= endHour:
+                currentDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
 
         else:
-            if currentHour < startHour and currentHour > endHour:
-                currentDateTime = setHour( currentDateTimeTuple, startHour )
+            if currentDateTime.hour < startHour and currentDateTime.hour > endHour:
+                currentDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
 
         return currentDateTime
-                    
 
 
     @staticmethod
