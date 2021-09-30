@@ -1216,8 +1216,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                 startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
-#TODO THink I need to incorporate the endDateTime...and als use a curretnDateTime as in the previous code above.
-                while startDateTime is not None:
+                while startDateTime is not None and startDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     earthSatellite.compute( city )
@@ -1239,16 +1238,15 @@ class AstroPyEphem( astrobase.AstroBase ):
                             break
 
                         if AstroPyEphem.__isSatellitePassValid( nextPass ):
-                            startDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
+                            startDateTime = ephem.Date(
+                                nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc ) # Look for the next pass starting shortly after current set.
 
                         else:
-                            pass
-                        #TODO What to do here?  There is no currentDateTime any more...
-                            # startDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after the current time.
-
+                            startDateTime = ephem.Date(
+                                ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc )# Bad pass data, so look shortly after the current time.
 
                         startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
-                            ephem.Date( startDateTime ), nowPlusSatelliteSearchDuration, startHour, endHour )
+                            startDateTime, nowPlusSatelliteSearchDuration, startHour, endHour )
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.

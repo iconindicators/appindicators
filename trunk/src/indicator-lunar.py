@@ -45,7 +45,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:

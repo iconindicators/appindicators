@@ -1136,7 +1136,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
                     if key is None:
                         startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
-                            endDateTime + datetime.timedelta( hours = 1 ), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
+                            endDateTime + datetime.timedelta( minutes = 15 ), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
 
                         continue
 
