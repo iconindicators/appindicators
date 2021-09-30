@@ -29,7 +29,7 @@ except ImportError:
 
 from distutils.version import LooseVersion
 
-import astrobase, eclipse, locale, math
+import astrobase, datetime, eclipse, locale, math
 
 
 class AstroPyEphem( astrobase.AstroBase ):
@@ -1157,7 +1157,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
-    def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellitesORIGINAL( ephemNow, data, satellites, satelliteData, startHour, endHour ):
 #TODO What happens if startHour = endHour?
         endDateTime = ephem.Date( ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
         for satellite in satellites:
@@ -1204,6 +1204,58 @@ class AstroPyEphem( astrobase.AstroBase ):
                         break
 
 
+    @staticmethod
+    def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
+#TODO What happens if startHour = endHour?
+        nowPlusSatelliteSearchDuration = ephem.Date(
+            ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
+
+        for satellite in satellites:
+            if satellite in satelliteData:
+                key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
+                startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                    ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
+
+#TODO THink I need to incorporate the endDateTime...and als use a curretnDateTime as in the previous code above.
+                while startDateTime is not None:
+                    city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
+                    earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
+                    earthSatellite.compute( city )
+                    try:
+                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
+                           AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
+                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
+                                repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
+                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
+
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
+                            break
+
+                        if AstroPyEphem.__isSatellitePassValid( nextPass ):
+                            startDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
+
+                        else:
+                            pass
+                        #TODO What to do here?  There is no currentDateTime any more...
+                            # startDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after the current time.
+
+
+                        startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                            ephem.Date( startDateTime ), nowPlusSatelliteSearchDuration, startHour, endHour )
+
+                    except ValueError:
+                        if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
+                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
+
+                        break
 
 #TODO For testing
 # startHour = 6 # 4pm Sydney 

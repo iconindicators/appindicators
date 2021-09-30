@@ -1119,6 +1119,50 @@ class AstroSkyfield( astrobase.AstroBase ):
                     satelliteData[ satellite ].getName(), \
                     timeScale )
 
+                startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                    now.utc_datetime(), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
+
+                while startDateTime is not None:
+                    key = AstroSkyfield.__calculateSatellite(
+                        timeScale.from_datetime( startDateTime ),
+                        timeScale.from_datetime( endDateTime ),
+                        data,
+                        timeScale,
+                        location,
+                        ephemerisPlanets,
+                        satellite,
+                        earthSatellite,
+                        isTwilightFunction ) 
+
+                    if key is None:
+                        startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                            endDateTime + datetime.timedelta( hours = 1 ), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
+
+                        continue
+
+                    break
+
+
+    @staticmethod
+    def __calculateSatellitesBACKUP( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
+        nowPlusSatelliteSearchDuration = timeScale.utc(
+            now.utc.year,
+            now.utc.month,
+            now.utc.day,
+            now.utc.hour + astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS,
+            now.utc.minute,
+            now.utc.second )
+
+        isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
+
+        for satellite in satellites:
+            if satellite in satelliteData:
+                earthSatellite = EarthSatellite( \
+                    satelliteData[ satellite ].getLine1(), \
+                    satelliteData[ satellite ].getLine2(), \
+                    satelliteData[ satellite ].getName(), \
+                    timeScale )
+
                 startDateTime, endDateTime = AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour )
                 startDateTime = timeScale.from_datetime( startDateTime )
                 endDateTime = timeScale.from_datetime( endDateTime )
