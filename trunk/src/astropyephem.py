@@ -1216,6 +1216,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                 startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
+#TODO Still producing morning passes!
                 while startDateTime is not None and startDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
