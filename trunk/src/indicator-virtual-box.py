@@ -58,7 +58,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.67",
+            version = "1.0.68",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -278,6 +278,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                                 groupItems = group.getItems()
 
                             groupNamesAndUUIDs = parts[ 3 ].split( ',' )
+                            if groupNamesAndUUIDs[ 0 ] == "n=GLOBAL": # VritualBox 6 has added this to the config...not needed by the indicator.
+                                del groupNamesAndUUIDs[ 0 ]
+
                             for item in groupNamesAndUUIDs:
                                 if item.startswith( "go=" ):
                                     group.addItem( virtualmachine.Group( item.replace( "go=", "" ) ) )
@@ -349,9 +352,9 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 if type( item ) == virtualmachine.Group:
                     groupsExist = True
                     addItemsToStore( treeStore.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
-    
+
                 else:
-                    uuid = item.getUUID()        
+                    uuid = item.getUUID()
                     treeStore.append( parent, [ item.getName(), Gtk.STOCK_APPLY if self.isAutostart( uuid ) else None, self.getStartCommand( uuid ), uuid ] )
 
             return groupsExist

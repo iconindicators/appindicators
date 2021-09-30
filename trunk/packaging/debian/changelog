@@ -1,3 +1,11 @@
+indicator-virtual-box (1.0.68-1) bionic; urgency=low
+
+  * Bug fix: VirtualBox 6 contains "n=GLOBAL" in the configuration file which
+    breaks parsing of the configuration.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 30 Sep 2021 22:55:46 +1000
+
+
 indicator-virtual-box (1.0.67-1) bionic; urgency=low
 
   * Removed support for VirtualBox™ 4 (and earlier) configuration files.
