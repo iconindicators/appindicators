@@ -1220,7 +1220,7 @@ class AstroPyEphem( astrobase.AstroBase ):
 
 #TODO Comment!
     @staticmethod
-    def __adjustCurrentDateTime( currentDateTime, startHour, endHour ):
+    def __adjustCurrentDateTime( startDateTime, startHour, endHour ):
 #TODO Verify!!!
         def setHour( dateTimeTuple, hour ):
             return \
@@ -1229,21 +1229,21 @@ class AstroPyEphem( astrobase.AstroBase ):
                       dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_MONTH ], 
                       dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_DAY ], hour, 0, 0 ) )
 
-        currentDateTimeTuple = currentDateTime.tuple()
+        currentDateTimeTuple = startDateTime.tuple()
         currentHour = currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
         if startHour < endHour:
             if currentHour < startHour:
-                currentDateTime = setHour( currentDateTimeTuple, startHour )
+                startDateTime = setHour( currentDateTimeTuple, startHour )
 
             elif currentHour >= endHour:
-                currentDateTime = setHour( currentDateTimeTuple, startHour )
-                currentDateTime = ephem.Date( currentDateTime + 1 )
+                startDateTime = setHour( currentDateTimeTuple, startHour )
+                startDateTime = ephem.Date( startDateTime + 1 )
 
         else:
             if currentHour < startHour and currentHour > endHour:
-                currentDateTime = setHour( currentDateTimeTuple, startHour )
+                startDateTime = setHour( currentDateTimeTuple, startHour )
 
-        return currentDateTime
+        return startDateTime
 
 
     # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.

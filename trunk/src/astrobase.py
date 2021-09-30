@@ -567,6 +567,49 @@ class AstroBase( ABC ):
         return passWithinStartAndEnd
 
 
+#TODO Implementing ... not sure if this is the way to go...!
+#TODO Need a more descriptive name.
+    @staticmethod
+    def adjustCurrentDateTime( currentDateTime, finalDateTime, startHour, endHour ):
+#TODO Need to deal with startHour == endHour?  As its own clause, or <= or >=?
+        startDateTime, endDateTime = None, None
+
+        # Adjust the current date/time so that it fits within the start/end.
+        if startHour < endHour: #TODO Probably safe to use <=
+            if currentDateTime.hour < startHour:
+                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59 )
+
+            elif currentDateTime.hour > endHour:
+                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
+                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59 )
+                # endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )#TODO Original...but is this correct?
+
+            else:
+                startDateTime = currentDateTime
+                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59 )
+
+        else: #TODO Might need to be elif startHour > endHour.
+            if currentDateTime.hour < startHour and currentDateTime.hour > endHour:
+                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59 )
+
+            else:
+                startDateTime = currentDateTime
+                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59 ) + datetime.timedelta( day = 1 )
+
+        # Ensure the start/end date/time does not exceed the final date/time.
+        if startDateTime > finalDateTime:
+            startDateTime = None
+            endDateTime = None
+
+        elif endDateTime > finalDateTime:
+            endDateTime = finalDateTime
+
+        return startDateTime, endDateTime
+
+
+
     # https://stackoverflow.com/a/64097432/2156453
     # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
     @staticmethod

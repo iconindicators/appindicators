@@ -1145,27 +1145,27 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 #TODO Comment!
     @staticmethod
-    def __adjustCurrentDateTime( currentDateTime, startHour, endHour, finalDateTime ):
+    def __adjustCurrentDateTime( startDateTime, startHour, endHour, finalDateTime ):
 #TODO Verify!!!
         startDateTime, endDateTime = None, None
         if startHour < endHour:
-            if currentDateTime.hour < startHour:
-                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+            if startDateTime.hour < startHour:
+                startDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, startHour, 0, 0 )
                 # endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )
-                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 0, 0 )
+                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 0, 0 )
 
-            elif currentDateTime.hour > endHour:
-                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
+            elif startDateTime.hour > endHour:
+                startDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
                 endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 0, 0 )
                 endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )
 
             else:
-                startDateTime = currentDateTime
-                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59 )
+                startDateTime = startDateTime
+                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59 )
 
         else: #TODO Check if start == end?  Can this happen or should it happen?
-            if currentDateTime.hour < startHour and currentDateTime.hour > endHour:
-                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0 )
+            if startDateTime.hour < startHour and startDateTime.hour > endHour:
+                startDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, startHour, 0, 0 )
 
 
 #TODO At the end, need to check, somehow, that the start/end are not beyond the finalDateTime.
