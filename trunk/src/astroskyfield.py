@@ -19,6 +19,11 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO In calculateCommon, if there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
+# Verify this is correct and then if so, see how to apply to satellites.
+# How also to determine if a satellite is never up?
+
+
 #TODO See 
 # https://rhodesmill.org/skyfield/examples.html#dark-twilight-day-example
 # and maybe use the Skyfield code in place of my own stuff?
@@ -1071,35 +1076,6 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
-    def __calculateSatellitesORIGINAL( now, nowPlusSatelliteSearchDuration, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
-        isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
-        for satellite in satellites:
-            if satellite in satelliteData:
-                earthSatellite = EarthSatellite( \
-                    satelliteData[ satellite ].getLine1(), \
-                    satelliteData[ satellite ].getLine2(), \
-                    satelliteData[ satellite ].getName(), \
-                    timeScale )
-
-                AstroSkyfield.__calculateSatellite(
-                    now,
-                    nowPlusSatelliteSearchDuration,
-                    data,
-                    timeScale,
-                    location,
-                    ephemerisPlanets,
-                    satellite,
-                    earthSatellite,
-                    isTwilightFunction,
-                    startHour,
-                    endHour ) 
-
-
-#TODO In calculateCommon, if there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
-# Verify this is correct and then if so, see how to apply to satellites.
-# How also to determine if a satellite is never up?
-
-    @staticmethod
     def __calculateSatellites( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
         nowPlusSatelliteSearchDuration = timeScale.utc(
             now.utc.year,
@@ -1144,86 +1120,10 @@ class AstroSkyfield( astrobase.AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellitesBACKUP( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
-        nowPlusSatelliteSearchDuration = timeScale.utc(
-            now.utc.year,
-            now.utc.month,
-            now.utc.day,
-            now.utc.hour + astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS,
-            now.utc.minute,
-            now.utc.second )
-
-        isTwilightFunction = almanac.dark_twilight_day( ephemerisPlanets, location )
-
-        for satellite in satellites:
-            if satellite in satelliteData:
-                earthSatellite = EarthSatellite( \
-                    satelliteData[ satellite ].getLine1(), \
-                    satelliteData[ satellite ].getLine2(), \
-                    satelliteData[ satellite ].getName(), \
-                    timeScale )
-
-                startDateTime, endDateTime = AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour )
-                startDateTime = timeScale.from_datetime( startDateTime )
-                endDateTime = timeScale.from_datetime( endDateTime )
-                while( endDateTime <= nowPlusSatelliteSearchDuration ):
-                    key = AstroSkyfield.__calculateSatellite(
-                        startDateTime,
-                        endDateTime,
-                        data,
-                        timeScale,
-                        location,
-                        ephemerisPlanets,
-                        satellite,
-                        earthSatellite,
-                        isTwilightFunction ) 
-
-                    if key is None:
-                        startDateTime, endDateTime = AstroSkyfield.__adjustCurrentDateTime( now.utc_datetime(), startHour, endHour )
-                        startDateTime = timeScale.from_datetime( startDateTime )
-                        endDateTime = timeScale.from_datetime( endDateTime )
-                        continue
-
-                    break
-
-
-#TODO Comment!
-    @staticmethod
-    def __adjustCurrentDateTime( startDateTime, startHour, endHour, finalDateTime ):
-#TODO Verify!!!
-        startDateTime, endDateTime = None, None
-        if startHour < endHour:
-            if startDateTime.hour < startHour:
-                startDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, startHour, 0, 0 )
-                # endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )
-                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 0, 0 )
-
-            elif startDateTime.hour > endHour:
-                startDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, startHour, 0, 0 ) + datetime.timedelta( day = 1 )
-                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 0, 0 )
-                endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )
-
-            else:
-                startDateTime = startDateTime
-                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59 )
-
-        else: #TODO Check if start == end?  Can this happen or should it happen?
-            if startDateTime.hour < startHour and startDateTime.hour > endHour:
-                startDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, startHour, 0, 0 )
-
-
-#TODO At the end, need to check, somehow, that the start/end are not beyond the finalDateTime.
-#If so, trim...
-        
-        
-        return startDateTime, endDateTime
-
-
-    @staticmethod
     def __calculateSatellite( startDateTime, endDateTime, data, timeScale, location, ephemerisPlanets, satelliteNumber, earthSatellite, isTwilightFunction ): 
         key, riseTime = None, None
         culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        t, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = 30.0 )
+        t, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = 30.0 ) #TODO Compare the passes with n2y and heavens above...maybe a value of 20 or 25 is better to match against what they calculate?
         for ti, event in zip( t, events ):
             if event == 0: # Rise
                 riseTime = ti
@@ -1266,105 +1166,6 @@ class AstroSkyfield( astrobase.AstroBase ):
                 culminateTimes = [ ]
 
         return key
-
-
-    @staticmethod
-    def __calculateSatelliteOLD( now, nowPlusSearchDuration, data, timeScale, location, ephemerisPlanets, satelliteNumber, earthSatellite, isTwilightFunction ): 
-        key, riseTime = None, None
-        culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        t, events = earthSatellite.find_events( location, now, nowPlusSearchDuration, altitude_degrees = 30.0 )
-        for ti, event in zip( t, events ):
-            if event == 0: # Rise
-                riseTime = ti
-
-            elif event == 1: # Culminate
-                culminateTimes.append( ti )
-
-            else: # Set
-                if riseTime is not None and culminateTimes:
-                    totalSecondsFromRiseToSet = ( ti.utc_datetime() - riseTime.utc_datetime() ).total_seconds()
-                    step = 1.0 if ( totalSecondsFromRiseToSet / 10.0 ) < 1.0 else ( totalSecondsFromRiseToSet / 10.0 )
-                    timeRange = timeScale.utc( 
-                        riseTime.utc.year, 
-                        riseTime.utc.month, 
-                        riseTime.utc.day, 
-                        riseTime.utc.hour, 
-                        riseTime.utc.minute, 
-                        range( math.ceil( riseTime.utc.second ), math.ceil( totalSecondsFromRiseToSet + riseTime.utc.second ), math.ceil( step ) ) )
-
-                    isTwilightAstronomical = isTwilightFunction( timeRange ) == 1
-                    isTwilightNautical = isTwilightFunction( timeRange ) == 2
-                    sunlit = earthSatellite.at( timeRange ).is_sunlit( ephemerisPlanets )
-                    for twilightAstronomical, twilightNautical, isSunlit in zip( isTwilightAstronomical, isTwilightNautical, sunlit ):
-                        if isSunlit and ( twilightAstronomical or twilightNautical ):
-                            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
-                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
-                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
-                            break
-
-                if not key is None:
-                    break
-
-                riseTime = None
-                culminateTimes = [ ]
-
-
-    @staticmethod
-    def __calculateSatelliteORIGINAL(
-            now, nowPlusSearchDuration,
-            data, timeScale, location, ephemerisPlanets,
-            satelliteNumber, earthSatellite,
-            isTwilightFunction,
-            startHour, endHour ): 
-        key, riseTime = None, None
-        culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        t, events = earthSatellite.find_events( location, now, nowPlusSearchDuration, altitude_degrees = 30.0 )
-        for ti, event in zip( t, events ):
-            if event == 0: # Rise
-                riseTime = ti
-
-            elif event == 1: # Culminate
-                culminateTimes.append( ti )
-
-            else: # Set
-                if riseTime is not None and culminateTimes:
-                    totalSecondsFromRiseToSet = ( ti.utc_datetime() - riseTime.utc_datetime() ).total_seconds()
-                    step = 1.0 if ( totalSecondsFromRiseToSet / 10.0 ) < 1.0 else ( totalSecondsFromRiseToSet / 10.0 )
-                    timeRange = timeScale.utc( 
-                        riseTime.utc.year, 
-                        riseTime.utc.month, 
-                        riseTime.utc.day, 
-                        riseTime.utc.hour, 
-                        riseTime.utc.minute, 
-                        range( math.ceil( riseTime.utc.second ), math.ceil( totalSecondsFromRiseToSet + riseTime.utc.second ), math.ceil( step ) ) )
-
-                    isTwilightAstronomical = isTwilightFunction( timeRange ) == 1
-                    isTwilightNautical = isTwilightFunction( timeRange ) == 2
-                    sunlit = earthSatellite.at( timeRange ).is_sunlit( ephemerisPlanets )
-                    for twilightAstronomical, twilightNautical, isSunlit in zip( isTwilightAstronomical, isTwilightNautical, sunlit ):
-                        if isSunlit and ( twilightAstronomical or twilightNautical ):
-                            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
-                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
-                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
-                            break
-
-                if not key is None:
-                    break
-
-                riseTime = None
-                culminateTimes = [ ]
 
 
     # Create a planet ephemeris from NASA filtering by date range:

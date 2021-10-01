@@ -539,34 +539,6 @@ class AstroBase( ABC ):
     # Los Angeles
     # 4pm - 9pm
     # 23 - 4 UTC                                                                  S---------E
-    @staticmethod
-    def isSatetllitePassWithinTimes( riseHour, setHour, startHour, endHour ):
-        # A pass must fall completely within the range of startHour and endHour, inclusive.
- #TODO Double check all of this logic!!!
-        if startHour < endHour: #TODO Might need to be <=...wait until all is done and testing through the interface.
-            passWithinStartAndEnd = \
-                riseHour >= startHour and \
-                riseHour <= endHour and \
-                setHour >= startHour and \
-                setHour <= endHour 
-
-        else:
-            # The rise and set are split over midnight, so the rise/set can either be:
-            #    After the start and before midnight; before the end.
-            #    After the start and after midnight; before the end.
-            riseWithinStartAndEnd = \
-                ( riseHour >= startHour and riseHour >= endHour ) or \
-                ( riseHour < startHour and riseHour <= endHour )
-
-            setWithinStartAndEnd = \
-                ( setHour >= startHour and setHour >= endHour ) or \
-                ( setHour < startHour and setHour <= endHour )
-
-            passWithinStartAndEnd = riseWithinStartAndEnd and setWithinStartAndEnd
-
-        return passWithinStartAndEnd
-
-
 #TODO Implementing ... not sure if this is the way to go...!
 #TODO Need a more descriptive name.
 #TODO Note that current/final date/time need to be UTC timezone aware.
@@ -580,7 +552,7 @@ class AstroBase( ABC ):
             if currentDateTime.hour < startHour:
                 startDateTime = datetime.datetime( 
                     currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
-                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
+                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
 
             elif currentDateTime.hour > endHour:
                 startDateTime = datetime.datetime(
@@ -600,7 +572,7 @@ class AstroBase( ABC ):
             else:
                 startDateTime = currentDateTime
                 endDateTime = datetime.datetime(
-                    currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 )
+                    startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 )
 
         # Ensure the start/end date/time does not exceed the final date/time.
         if startDateTime > finalDateTime:
