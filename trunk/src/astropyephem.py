@@ -1157,54 +1157,6 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://tracksat.space
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
-    def __calculateSatellitesORIGINAL( ephemNow, data, satellites, satelliteData, startHour, endHour ):
-#TODO What happens if startHour = endHour?
-        endDateTime = ephem.Date( ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
-        for satellite in satellites:
-            if satellite in satelliteData:
-                currentDateTime = AstroPyEphem.__adjustCurrentDateTime( ephemNow, startHour, endHour )
-                while currentDateTime < endDateTime:
-                    city = AstroPyEphem.__getCity( data, currentDateTime )
-                    earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-                    earthSatellite.compute( city )
-                    key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                    try:
-                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
-                        riseHour = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
-                        setHour = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].tuple()[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
-                        if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
-                           astrobase.AstroBase.isSatetllitePassWithinTimes( riseHour, setHour, startHour, endHour ) and \
-                           AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
-                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
-                                repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
-                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
-
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
-                            break
-
-                        if AstroPyEphem.__isSatellitePassValid( nextPass ):
-                            currentDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ] + ephem.minute * 15 ) # Look for the next pass starting shortly after current set.
-
-                        else:
-                            currentDateTime = ephem.Date( currentDateTime + ephem.minute * 60 ) # Bad pass data, so look one hour after the current time.
-
-                        currentDateTime = AstroPyEphem.__adjustCurrentDateTime( currentDateTime, startHour, endHour )
-
-                    except ValueError:
-                        if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
-
-                        break
-
-
-    @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
 #TODO What happens if startHour = endHour?
         nowPlusSatelliteSearchDuration = ephem.Date(
@@ -1216,14 +1168,15 @@ class AstroPyEphem( astrobase.AstroBase ):
                 startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
-#TODO Still producing morning passes!
+#TODO Comment on why this loop is at it is rather than something simpler...
                 while startDateTime is not None and startDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     earthSatellite.compute( city )
                     try:
-                        nextPass = AstroPyEphem.__calculateNextSatellitePass( city, earthSatellite )
+                        nextPass = AstroPyEphem.__nextSatellitePass( city, earthSatellite )
                         if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
+                           nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime and \
                            AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
 
                             data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
@@ -1244,7 +1197,7 @@ class AstroPyEphem( astrobase.AstroBase ):
 
                         else:
                             startDateTime = ephem.Date(
-                                ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc )# Bad pass data, so look shortly after the current time.
+                                ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc ) # Bad pass data, so look shortly after the current time.
 
                         startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
                             startDateTime, nowPlusSatelliteSearchDuration, startHour, endHour )
@@ -1256,52 +1209,12 @@ class AstroPyEphem( astrobase.AstroBase ):
 
                         break
 
-#TODO For testing
-# startHour = 6 # 4pm Sydney 
-# endHour = 11 # 9pm Sydney 
-
-# startHour = 17 # 3am Sydney 
-# endHour = 20 # 6am Sydney 
-
-# startHour = 21 # 3am India
-# endHour = 1 # 7am India
-
-# startHour = 23 # 4pm California 
-# endHour = 4 # 9pm California
-
-#TODO Comment!
-    @staticmethod
-    def __adjustCurrentDateTime( startDateTime, startHour, endHour ):
-#TODO Verify!!!
-        def setHour( dateTimeTuple, hour ):
-            return \
-                ephem.Date( 
-                    ( dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_YEAR ], 
-                      dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_MONTH ], 
-                      dateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_DAY ], hour, 0, 0 ) )
-
-        currentDateTimeTuple = startDateTime.tuple()
-        currentHour = currentDateTimeTuple[ AstroPyEphem.__PYEPHEM_DATE_TUPLE_HOUR ]
-        if startHour < endHour:
-            if currentHour < startHour:
-                startDateTime = setHour( currentDateTimeTuple, startHour )
-
-            elif currentHour >= endHour:
-                startDateTime = setHour( currentDateTimeTuple, startHour )
-                startDateTime = ephem.Date( startDateTime + 1 )
-
-        else:
-            if currentHour < startHour and currentHour > endHour:
-                startDateTime = setHour( currentDateTimeTuple, startHour )
-
-        return startDateTime
-
 
     # Due to a change between PyEphem 3.7.6.0 and 3.7.7.0, need to check for passes differently.
     #    https://rhodesmill.org/pyephem/CHANGELOG.html#version-3-7-7-0-2019-august-18
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
-    def __calculateNextSatellitePass( city, satellite ):
+    def __nextSatellitePass( city, satellite ):
         if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
             nextPass = city.next_pass( satellite )
 
