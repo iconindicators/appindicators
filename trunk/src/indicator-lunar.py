@@ -291,6 +291,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # startHour = 23 # 4pm California 
 # endHour = 4 # 9pm California
 
+        #TODO Testing
+        self.satelliteLimitStart = 0
+        self.satelliteLimitEnd = 23
+
+
         # Update backend.
         self.dataPrevious = self.data
         self.data = IndicatorLunar.astroBackend.calculate(
@@ -561,8 +566,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     def updateIcon( self ):
         # Ideally overwrite the icon with the same name each time.
-        # Due to a bug, the icon name must change between calls to setting the icon.
-        # So change the name each time - using the current date/time.
+        # Due to a bug, the icon name must change between calls to set the icon.
+        # So change the name each time incorporating the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
         key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
@@ -593,12 +598,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
 
     def createFullMoonIcon( self ):
-        return \
-            self.writeCacheText( 
-                IndicatorLunar.ICON_FULL_MOON,
-                self.createIconText( 100, None ),
-                False,
-                IndicatorLunar.ICON_EXTENSION )
+        return self.writeCacheText( 
+            IndicatorLunar.ICON_FULL_MOON,
+            self.createIconText( 100, None ),
+            False,
+            IndicatorLunar.ICON_EXTENSION )
 
 
     def notificationSatellites( self ):
@@ -611,8 +615,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for number in self.satellites:
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
             if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
-                riseTime = datetime.datetime.strptime( \
-                    self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], \
+                riseTime = datetime.datetime.strptime(
+                    self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
                     astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
                 if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow: # Two minute buffer.
@@ -620,8 +624,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     self.satellitePreviousNotifications.append( number )
 
             if ( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ) in self.data:
-                setTime = datetime.datetime.strptime( \
-                    self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], \
+                setTime = datetime.datetime.strptime(
+                    self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
                     astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
                 if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
@@ -630,24 +634,24 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ INDEX_RISE_TIME ], x[ INDEX_NUMBER ] ) ):
             key = ( astrobase.AstroBase.BodyType.SATELLITE, number )
 
-            riseTime = self.formatData( \
-                astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, \
-                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ], \
+            riseTime = self.formatData(
+                astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME,
+                self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            riseAzimuth = self.formatData( \
+            riseAzimuth = self.formatData(
                 astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, 
                 self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ], 
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            setTime = self.formatData( \
+            setTime = self.formatData(
                 astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, 
                 self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ], 
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            setAzimuth = self.formatData( \
-                astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, \
-                self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ], \
+            setAzimuth = self.formatData(
+                astrobase.AstroBase.DATA_TAG_SET_AZIMUTH,
+                self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
             summary = \
@@ -682,12 +686,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, 0, 1, IndicatorLunar.SEARCH_URL_MOON )
 
-            label = \
+            self.createMenuItem(
+                subMenu,
                 self.indent( 0, 1 ) + \
                 _( "Phase: " ) + \
-                self.formatData( astrobase.AstroBase.DATA_TAG_PHASE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] )
-
-            self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_MOON )
+                self.formatData( astrobase.AstroBase.DATA_TAG_PHASE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] ),
+                IndicatorLunar.SEARCH_URL_MOON )
 
             self.createMenuItem( subMenu, self.indent( 0, 1 ) + _( "Next Phases" ), IndicatorLunar.SEARCH_URL_MOON )
 
@@ -713,12 +717,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             indent = self.indent( 1, 2 )
             for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ INDEX_KEY ] ):
-                label = \
+                self.createMenuItem(
+                    subMenu,
                     indent + \
                     displayText + \
-                    self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
-
-                self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_MOON )
+                    self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ),
+                    IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
@@ -731,19 +735,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, 0, 1, IndicatorLunar.SEARCH_URL_SUN )
 
-            label = \
+            self.createMenuItem(
+                subMenu,
                 self.indent( 0, 1 ) + \
                 _( "Equinox: " ) + \
-                self.formatData( astrobase.AstroBase.DATA_TAG_EQUINOX, self.data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] )
+                self.formatData( astrobase.AstroBase.DATA_TAG_EQUINOX, self.data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] ),
+                IndicatorLunar.SEARCH_URL_SUN )
 
-            self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_SUN )
-
-            label = \
+            self.createMenuItem(
+                subMenu,
                 self.indent( 0, 1 ) + \
                 _( "Solstice: " ) + \
-                self.formatData( astrobase.AstroBase.DATA_TAG_SOLSTICE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] )
-
-            self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_SUN )
+                self.formatData( astrobase.AstroBase.DATA_TAG_SOLSTICE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] ),
+                IndicatorLunar.SEARCH_URL_SUN )
 
             self.updateMenuEclipse( subMenu, astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
@@ -752,19 +756,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         key = ( bodyType, nameTag )
         self.createMenuItem( menu, self.indent( 0, 1 ) + _( "Eclipse" ), url )
 
-        label = \
+        self.createMenuItem(
+            menu,
             self.indent( 1, 2 ) + \
             _( "Date/Time: " ) + \
-            self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] )
+            self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
+            url )
 
-        self.createMenuItem( menu, label, url )
-
-        label = \
+        self.createMenuItem(
+            menu,
             self.indent( 1, 2 ) + \
             _( "Type: " ) + \
-            self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] )
-
-        self.createMenuItem( menu, label, url )
+            self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] ),
+            url )
 
         if key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
             latitude = self.formatData( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
@@ -894,37 +898,49 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         indent = self.indent( indentUnity, indentGnomeShell )
         if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
             if self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
-                label = indent + \
-                        _( "Rise: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
-                self.createMenuItem( menu, label, onClickURL )
-        
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Rise: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                    onClickURL )
+
             else:
-                label = indent + \
-                        _( "Azimuth: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-                self.createMenuItem( menu, label, onClickURL )
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Azimuth: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ),
+                    onClickURL )
         
-                label = indent + \
-                        _( "Altitude: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-                self.createMenuItem( menu, label, onClickURL )
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Altitude: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ),
+                    onClickURL )
         
-                label = indent + \
-                        _( "Set: " ) + \
-                        self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] )
-                self.createMenuItem( menu, label, onClickURL )
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Set: " ) + \
+                    self.formatData( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] ),
+                    onClickURL )
         
         else: # Body is always up.
-            label = indent + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
-            self.createMenuItem( menu, label, onClickURL )
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Azimuth: " ) + \
+                self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ),
+                onClickURL )
         
-            label = indent + \
-                    _( "Altitude: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
-            self.createMenuItem( menu, label, onClickURL )
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Altitude: " ) + \
+                self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ),
+                onClickURL )
 
 
     # Display the rise/set information for each satellite.
@@ -972,7 +988,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
                         self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
 
-                else: # Satellite will rise five minutes from now or much later, so look at previous rise to see if the satellite is in transit...
+                else: # Satellite will rise five minutes or later from now; look at previous rise to see if the satellite is in transit...
                     if key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
                         if self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
                            self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
@@ -990,7 +1006,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                 self.satelliteData[ number ].getName(),
                                 self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-                    else: # There was no previous transit (for whatever reason); shouldn't happen, so just show next pass...
+                    else: # No previous transit (this should not happen); show next pass...
                         satellites.append( [
                             number,
                             self.satelliteData[ number ].getName(),
@@ -1035,36 +1051,41 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
             menuItem = self.createMenuItem( subMenu, self.indent( 0, 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
             if len( info ) == 3: # Satellite yet to rise.
-                label = \
+                self.createMenuItem(
+                    subMenu,
                     self.indent( 1, 2 ) + \
                     _( "Rise Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )
-
-                self.createMenuItem( subMenu, label, url )
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                    url )
 
             elif len( info ) == 4: # Circumpolar (always up).
-                label = \
+                self.createMenuItem(
+                    subMenu,
                     self.indent( 1, 2 ) + \
                     _( "Azimuth: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] )
+                    self.formatData( astrobase.AstroBase.DATA_TAG_AZIMUTH, self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] ) ,
+                    url )
 
-                self.createMenuItem( subMenu, label, url )
-
-                label = \
+                self.createMenuItem(
+                    subMenu,
                     self.indent( 1, 2 ) + \
                     _( "Altitude: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] )
+                    self.formatData( astrobase.AstroBase.DATA_TAG_ALTITUDE, self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ),
+                    url )
 
-                self.createMenuItem( subMenu, label, url )
-                
             else: # Satellite is in transit.
 
                 self.createMenuItem( subMenu, self.indent( 1, 2 ) + _( "Rise" ), url )
 
-                label = \
-                    self.indent( 2, 3 ) + \
-                    _( "Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO This line threw an exception..don't know why...have not seen it for a while.
+                try:
+                    label = \
+                        self.indent( 2, 3 ) + \
+                        _( "Date/Time: " ) + \
+                        self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO This line threw an exception..don't know why...have not seen it for a while.
+
+                except Exception as e:
+                    print( e )
+                    label = str( e )
 
                 self.createMenuItem( subMenu, label, url )
 
@@ -1232,6 +1253,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def onPreferences( self, dialog ):
         notebook = Gtk.Notebook()
 
+        PAGE_ICON = 0
+        PAGE_MENU = 1
+        PAGE_PLANETS_STARS = 2
+        PAGE_COMETS_MINOR_PLANETS = 3
+        PAGE_SATELLITES = 4
+        PAGE_NOTIFICATIONS = 5
+        PAGE_GENERAL = 6
+
         # Icon text.
         grid = self.createGrid()
 
@@ -1330,13 +1359,9 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
 
+        toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." )
         spinnerMagnitude = self.createSpinButton(
-            self.magnitude, 
-            int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), 
-            int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ),
-            1,
-            5,
-            _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." ) )
+            self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
@@ -1359,28 +1384,14 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label.new( _( "Allow satellites passes from" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Show satellites passes from" ) ), False, False, 0 )
 
-        spinnerSatelliteLimitStart = self.createSpinButton(
-            self.satelliteLimitStart,
-            0,
-            23,
-            1,
-            4,
-            _( "TODO Tooltip!  Mention inclusive" ) )
-
+        spinnerSatelliteLimitStart = self.createSpinButton( self.satelliteLimitStart, 0, 23, 1, 4, _( "Show satellite passes after this hour (inclusive)" ) )
         box.pack_start( spinnerSatelliteLimitStart, False, False, 0 )
 
         box.pack_start( Gtk.Label.new( _( "to" ) ), False, False, 0 )
 
-        spinnerSatelliteLimitEnd = self.createSpinButton(
-            self.satelliteLimitEnd,
-            0,
-            23,
-            1,
-            4,
-            _( "TODO Tooltip!  Mention inclusive and up to 59:59" ) )
-
+        spinnerSatelliteLimitEnd = self.createSpinButton( self.satelliteLimitEnd, 0, 23, 1, 4, _( "Show satellite passes before this hour (inclusive)" ) )
         box.pack_start( spinnerSatelliteLimitEnd, False, False, 0 )
 
         grid.attach( box, 0, 6, 1, 1 )
@@ -1631,34 +1642,37 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                notebook.set_current_page( notebook.get_n_pages() - 1 )
+                notebook.set_current_page( PAGE_GENERAL )
                 self.showMessage( dialog, _( "City cannot be empty." ) )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                notebook.set_current_page( notebook.get_n_pages() - 1 )
+                notebook.set_current_page( PAGE_GENERAL )
                 self.showMessage( dialog, _( "Latitude must be a number between 90 and -90 inclusive." ) )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                notebook.set_current_page( notebook.get_n_pages() - 1 )
+                notebook.set_current_page( PAGE_GENERAL )
                 self.showMessage( dialog, _( "Longitude must be a number between 180 and -180 inclusive." ) )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                notebook.set_current_page( notebook.get_n_pages() - 1 )
+                notebook.set_current_page( PAGE_GENERAL )
                 self.showMessage( dialog, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
                 elevation.grab_focus()
                 continue
 
-#TODO Ensure start < end.
-# What about <=?            
+            if spinnerSatelliteLimitStart.get_value_as_int() >= spinnerSatelliteLimitEnd.get_value_as_int():
+                notebook.set_current_page( PAGE_MENU )
+                self.showMessage( dialog, _( "The start hour for satellite passes must be lower than the end hour." ) )
+                spinnerSatelliteLimitStart.grab_focus()
+                continue
 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.indicatorTextSeparator = indicatorTextSeparator.get_text()
