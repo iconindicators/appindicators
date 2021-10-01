@@ -45,7 +45,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -108,30 +108,34 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
+
+    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/"
     if astroBackendName == astroBackendPyEphem:
-        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt"
+        COMET_DATA_URL+= "Soft03Cmt.txt"
 
     else:
-        COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt"
+        COMET_DATA_URL+= "Soft00Cmt.txt"
 
-    MINOR_PLANET_CACHE_BASENAME_BRIGHT = "minorplanet-oe-" + "bright-" + astroBackendName.lower() + "-"
-    MINOR_PLANET_CACHE_BASENAME_CRITICAL = "minorplanet-oe-" + "critical-" + astroBackendName.lower() + "-"
-    MINOR_PLANET_CACHE_BASENAME_DISTANT = "minorplanet-oe-" + "distant-" + astroBackendName.lower() + "-"
-    MINOR_PLANET_CACHE_BASENAME_UNUSUAL = "minorplanet-oe-" + "unusual-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-"
+    MINOR_PLANET_CACHE_BASENAME_BRIGHT = MINOR_PLANET_CACHE_BASENAME + "bright-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME_CRITICAL = MINOR_PLANET_CACHE_BASENAME + "critical-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME_DISTANT = MINOR_PLANET_CACHE_BASENAME + "distant-" + astroBackendName.lower() + "-"
+    MINOR_PLANET_CACHE_BASENAME_UNUSUAL = MINOR_PLANET_CACHE_BASENAME + "unusual-" + astroBackendName.lower() + "-"
 
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
 
+    MINOR_PLANET_DATA_URL = "https://minorplanetcenter.net/iau/Ephemerides/"
     if astroBackendName == astroBackendPyEphem:
-        MINOR_PLANET_DATA_URL_BRIGHT = "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft03Bright.txt"
-        MINOR_PLANET_DATA_URL_CRITICAL = "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft03CritList.txt"
-        MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt"
-        MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft03Unusual.txt"
+        MINOR_PLANET_DATA_URL_BRIGHT = MINOR_PLANET_DATA_URL + "Bright/2018/Soft03Bright.txt"
+        MINOR_PLANET_DATA_URL_CRITICAL = MINOR_PLANET_DATA_URL + "CritList/Soft03CritList.txt"
+        MINOR_PLANET_DATA_URL_DISTANT = MINOR_PLANET_DATA_URL + "Distant/Soft03Distant.txt"
+        MINOR_PLANET_DATA_URL_UNUSUAL = MINOR_PLANET_DATA_URL + "Unusual/Soft03Unusual.txt"
 
     else:
-        MINOR_PLANET_DATA_URL_BRIGHT = "https://minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt"
-        MINOR_PLANET_DATA_URL_CRITICAL = "https://minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt"
-        MINOR_PLANET_DATA_URL_DISTANT = "https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt"
-        MINOR_PLANET_DATA_URL_UNUSUAL = "https://minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt"
+        MINOR_PLANET_DATA_URL_BRIGHT = MINOR_PLANET_DATA_URL + "Bright/2018/Soft00Bright.txt"
+        MINOR_PLANET_DATA_URL_CRITICAL = MINOR_PLANET_DATA_URL + "/CritList/Soft00CritList.txt"
+        MINOR_PLANET_DATA_URL_DISTANT = MINOR_PLANET_DATA_URL + "Distant/Soft00Distant.txt"
+        MINOR_PLANET_DATA_URL_UNUSUAL = MINOR_PLANET_DATA_URL + "Unusual/Soft00Unusual.txt"
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
@@ -1060,7 +1064,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 label = \
                     self.indent( 2, 3 ) + \
                     _( "Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO This line threw an exception..don't know why...
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, self.dataPrevious[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] )#TODO This line threw an exception..don't know why...have not seen it for a while.
 
                 self.createMenuItem( subMenu, label, url )
 
@@ -1375,7 +1379,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             23,
             1,
             4,
-            _( "TODO Tooltip!  Mention inclusive" ) )
+            _( "TODO Tooltip!  Mention inclusive and up to 59:59" ) )
 
         box.pack_start( spinnerSatelliteLimitEnd, False, False, 0 )
 
