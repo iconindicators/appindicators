@@ -554,11 +554,10 @@ class AstroBase( ABC ):
     # 23 - 4 UTC                                                                  S---------E
     @staticmethod
     def getAdjustedDateTime( currentDateTime, finalDateTime, startHour, endHour ):
-#TODO Need to deal with startHour == endHour?  As its own clause, or <= or >=?
         startDateTime, endDateTime = None, None
 
         # Adjust the current date/time so that it fits within the start/end.
-        if startHour < endHour: #TODO Probably safe to use <=
+        if startHour <= endHour:
             if currentDateTime.hour < startHour:
                 startDateTime = datetime.datetime( 
                     currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
@@ -573,7 +572,7 @@ class AstroBase( ABC ):
                 startDateTime = currentDateTime
                 endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
 
-        else: #TODO Might need to be elif startHour > endHour.
+        else:
             if currentDateTime.hour < startHour and currentDateTime.hour > endHour:
                 startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
                 endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
