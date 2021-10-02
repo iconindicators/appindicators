@@ -1029,24 +1029,24 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     self.data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ],
                     self.data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] ] )
 
-        if self.satellitesSortByDateTime:
-            satellites = sorted(
-                satellites,
-                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
-
-        else: # Sort by name/number.
-            satellites = sorted(
-                satellites,
-                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
-
         if satellites:
+            if self.satellitesSortByDateTime:
+                satellites = sorted(
+                    satellites,
+                    key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
+
+            else: # Sort by name/number.
+                satellites = sorted(
+                    satellites,
+                    key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
         if satellitesPolar:
             satellitesPolar = sorted(
                 satellitesPolar,
                 key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
-#TODO Need to test this...change the longitude to force polar satellites.
+
             self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
 
 
