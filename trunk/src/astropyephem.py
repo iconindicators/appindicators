@@ -1168,7 +1168,10 @@ class AstroPyEphem( astrobase.AstroBase ):
                 startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
-#TODO Comment on why this loop is at it is rather than something simpler...
+                # Typically to search for a visible satellite pass, would loop from 'now' to 'now' plus a duration,
+                # checking a pass as it is calculated for visibility.
+                # However, with a start/end window capability, searching is bound by each star/end hour pair
+                # within the 'now' to 'now' plus duration.
                 while startDateTime is not None and startDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
