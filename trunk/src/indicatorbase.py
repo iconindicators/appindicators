@@ -230,24 +230,6 @@ class IndicatorBase( ABC ):
         label = Gtk.Label()
         label.set_markup( markup )
         label.show()
-        # c1 = aboutDialog.get_content_area()
-        # print( c1, '\n' )
-        # c2 = aboutDialog.get_content_area().get_children()
-        # print( c2, '\n' )
-        # c3 = aboutDialog.get_content_area().get_children()[ 0 ].get_children()
-        # print( c3, '\n' )
-        theStack = aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ]
-        stackChildren = theStack.get_children()
-        # for child in stackChildren:
-        #     print( child, child.get_children() )
-
-        stackFirstChildThenChildren = theStack.get_children()[ 0 ].get_children()
-        for child in stackFirstChildThenChildren:
-            print( child, child.get_text() )
-            
-        print( type( aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ] ) )
-
-        # aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].add( label )
         aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
