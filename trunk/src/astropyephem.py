@@ -34,7 +34,7 @@ import astrobase, datetime, eclipse, locale, math
 
 class AstroPyEphem( astrobase.AstroBase ):
 
-    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" #TODO If we install Pyephem via PIP this will change...or be removed? Also warn user NOT to install via apt-get?
+    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" #TODO Look to install Pyephem via PIP (also warn using not to use apt-get).
     __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
 
 
@@ -1158,7 +1158,6 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
-#TODO What happens if startHour = endHour?
         nowPlusSatelliteSearchDuration = ephem.Date(
             ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
 
@@ -1168,10 +1167,11 @@ class AstroPyEphem( astrobase.AstroBase ):
                 startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
-                # Typically to search for a visible satellite pass, would loop from 'now' to 'now' plus a duration,
-                # checking a pass as it is calculated for visibility.
-                # However, with a start/end window capability, searching is bound by each star/end hour pair
-                # within the 'now' to 'now' plus duration.
+                # Typically to search for a visible satellite pass,
+                # start from 'now' until 'now' plus search duration,
+                # checking each pass as it is calculated for visibility.
+                # However, when filtering passes through a start/end window,
+                # searching is further bound within each star/end hour pair.
                 while startDateTime is not None and startDateTime < endDateTime:
                     city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
