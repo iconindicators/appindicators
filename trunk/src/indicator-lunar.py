@@ -27,7 +27,7 @@
 #Front end should always be similar...and might be taking a long time compared to the front end.
 
 
-#TODO Testing...
+#TODO To move from install PyEphem via apt/apt-get and use pip instead...
 # Need to test install first of pyephem using apt-get and an install via LaunchPad.
 # Then do another install via LaunchPad but using PIP...
 # Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
@@ -163,9 +163,12 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         astrobase.AstroBase.SATELLITE_TAG_NUMBER + " : " + \
         astrobase.AstroBase.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + _( " now rising..." )
 
+    # Satellite menu contains the satellite number then name,
+    # followed by other items depending on the satellite's status
+    # (rising, in transit or always up).
     SATELLITE_MENU_NUMBER = 0
     SATELLITE_MENU_NAME = 1
-    
+
     SATELLITE_MENU_RISE_DATE_TIME = 2
     SATELLITE_MENU_RISE_AZIMUTH = 3
     SATELLITE_MENU_SET_DATE_TIME = 4
@@ -193,7 +196,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.89",
+            version = "1.0.90",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz =
