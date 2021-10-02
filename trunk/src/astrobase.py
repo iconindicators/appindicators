@@ -517,10 +517,23 @@ class AstroBase( ABC ):
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
 
 
-    # Determine if the satellite pass falls completely between a start hour and end hour.
-    # This is not to determine if a pass is visible; rather it is a hard border for a pass.
+    # Satellite passes typically occur before dawn and after sunset, unless the
+    # observer is at very high latitudes. An observer may only be interested in
+    # the after sunset passes for example and so would want to limit the passes
+    # returned.
+    # 
+    # Given a date/time to search for passes, limit the passes to a start/end
+    # hour (to say before dawn or after sunset or no limit) and search up to the
+    # final date/time.
     #
-    # Scenarios:
+    # A start date/time and end date/time will be the returned representing the
+    # current date/time snapped to fall within the start/end hour.
+    #
+    # If the start/end date/time fall after the final date/time, each will be None.
+    #
+    # All date/time are UTC aware.
+    #
+    # Satellite pass scenarios:
     #
     #                       0/24                        12                        0/24
     #                       UTC                         UTC                       UTC 
@@ -539,11 +552,8 @@ class AstroBase( ABC ):
     # Los Angeles
     # 4pm - 9pm
     # 23 - 4 UTC                                                                  S---------E
-#TODO Implementing ... not sure if this is the way to go...!
-#TODO Need a more descriptive name.
-#TODO Note that current/final date/time need to be UTC timezone aware.
     @staticmethod
-    def adjustCurrentDateTime( currentDateTime, finalDateTime, startHour, endHour ):
+    def getAdjustedDateTime( currentDateTime, finalDateTime, startHour, endHour ):
 #TODO Need to deal with startHour == endHour?  As its own clause, or <= or >=?
         startDateTime, endDateTime = None, None
 
@@ -558,7 +568,6 @@ class AstroBase( ABC ):
                 startDateTime = datetime.datetime(
                     currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 )
                 endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
-                # endDateTime = ( startDateTime + datetime.timedelta( hour = ( endHour - startHour ) ) ).replace( minute = 59 ).replace( second = 59 )#TODO Original...but is this correct?
 
             else:
                 startDateTime = currentDateTime
@@ -583,11 +592,3 @@ class AstroBase( ABC ):
             endDateTime = finalDateTime
 
         return startDateTime, endDateTime
-
-
-
-    # https://stackoverflow.com/a/64097432/2156453
-    # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
-    @staticmethod
-    def convertLocalHourToUTC( localHour ):
-        return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour

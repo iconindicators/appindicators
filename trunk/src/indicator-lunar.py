@@ -45,7 +45,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -311,8 +311,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.planets,
             self.stars,
             self.satellites, self.satelliteData,
-            astrobase.AstroBase.convertLocalHourToUTC( self.satelliteLimitStart ),
-            astrobase.AstroBase.convertLocalHourToUTC( self.satelliteLimitEnd ),
+            self.convertLocalHourToUTC( self.satelliteLimitStart ),
+            self.convertLocalHourToUTC( self.satelliteLimitEnd ),
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
             self.magnitude,
@@ -1210,6 +1210,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
         return localDateTime.strftime( outputFormat )
 
+
+    # https://stackoverflow.com/a/64097432/2156453
+    # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
+    def convertLocalHourToUTC( self, localHour ):
+        return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour
 
 
     # Creates the SVG icon text representing the moon given the illumination and bright limb angle.

@@ -1165,7 +1165,7 @@ class AstroPyEphem( astrobase.AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
 #TODO Comment on why this loop is at it is rather than something simpler...
@@ -1199,7 +1199,7 @@ class AstroPyEphem( astrobase.AstroBase ):
                             startDateTime = ephem.Date(
                                 ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc ) # Bad pass data, so look shortly after the current time.
 
-                        startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                        startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
                             startDateTime, nowPlusSatelliteSearchDuration, startHour, endHour )
 
                     except ValueError:
@@ -1254,7 +1254,6 @@ class AstroPyEphem( astrobase.AstroBase ):
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
-        # if True: return True #TODO Testing
         city = AstroPyEphem.__getCity( data, passDateTime )
         city.pressure = 0
         city.horizon = "-0:34"

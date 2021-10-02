@@ -26,17 +26,20 @@
 
 #TODO See 
 # https://rhodesmill.org/skyfield/examples.html#dark-twilight-day-example
-# and maybe use the Skyfield code in place of my own stuff?
+# and maybe use any of the Skyfield example code in place of my own stuff?
 
 
 #TODO Do timing between each set of object types
 # (planets, stars, comets, minor planets and satellites)
 # comparing the time in PyEphem to that in Skyfield.
-# Should be similar if astroskyfield is to be publically released.
 
 
 #TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
-# switch completely to Skyfield.  Will need several changes:
+# switch completely to Skyfield...or not?  Is there any value in having both options
+# particularly since PyEphem will eventually be installed via PIP?
+# Both backends can run simultaneously.  So what is the downside of allowing a user to run either?
+#
+# Will need several changes:
 #
 #    Will need a temporary function to detect if the cache contains PyEphem specific files
 #    and if so, delete them.
@@ -118,16 +121,16 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
-    # Unlike PyEphem, Skyfield does not provide a list of stars.
+    # Skyfield does not provide a list of stars.
     #
     # However there is a list of named stars in the file skyfield/named_stars.py
-    # which was sourced from the (now deleted) Wikipedia page "Hipparcos Catalogue":
+    # which was gleaned from the (now deleted) Wikipedia page "Hipparcos Catalogue":
     #    https://web.archive.org/web/20131012032059/https://en.wikipedia.org/wiki/List_of_stars_in_the_Hipparcos_Catalogue
     #
     # Unfortunately, this list contains duplicates, misspellings and is not in use:
     #    https://github.com/skyfielders/python-skyfield/issues/304
     #
-    # Consequently, use the more reliable and recent source from the ESA Hipparcos catalogue:
+    # Better to use the more reliable and recent source from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # If the list below is ever modified, regenerate the stars.dat.gz file.
@@ -528,7 +531,9 @@ class AstroSkyfield( astrobase.AstroBase ):
         astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
 
-    # Taken from ephem/cities.py as Skyfield does not provide a list of cities.
+    # Skyfield does not provide a list of cities.
+    #
+    # However ephem/cities.py does provide such a list:
     #    https://github.com/skyfielders/python-skyfield/issues/316
     _city_data = {
         "Abu Dhabi"         :   ( 24.4666667, 54.3666667, 6.296038 ),
@@ -758,6 +763,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         # and index by designation for fast lookup.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum, bodyType, latitude, longitude, elevation, logging ):
+
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for value in orbitalElementData.values():
@@ -970,12 +976,14 @@ class AstroSkyfield( astrobase.AstroBase ):
                         ephemerisPlanets, Star.from_dataframe( theStar ) )
 
 
+#TODO See TODO in getOrbitalElementsLessThanMagnitude
     @staticmethod
     def __calculateOrbitalElements(
             now, nowPlusOneDay, 
             data, timeScale, locationAtNow, ephemerisPlanets,
             bodyType, orbitalElements, orbitalElementData, magnitudeMaximum,
             logging ):
+
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             for key in orbitalElements:
@@ -1095,7 +1103,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     satelliteData[ satellite ].getName(),
                     timeScale )
 
-                startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
                     now.utc_datetime(), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
 
                 while startDateTime is not None:
@@ -1111,7 +1119,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                         isTwilightFunction ) 
 
                     if key is None:
-                        startDateTime, endDateTime = astrobase.AstroBase.adjustCurrentDateTime(
+                        startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
                             endDateTime + datetime.timedelta( minutes = 15 ), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
 
                         continue
