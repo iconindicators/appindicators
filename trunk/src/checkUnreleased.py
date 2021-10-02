@@ -16,10 +16,10 @@ indicators = [
     [ "IndicatorOnThisDay", "indicator-on-this-day", "1.0.9" ],
     [ "IndicatorPPADownloadStatistics", "indicator-ppa-download-statistics", "1.0.73" ],
     [ "IndicatorPunycode", "indicator-punycode", "1.0.11" ],
-    [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.15" ],
+    [ "IndicatorScriptRunner", "indicator-script-runner", "1.0.16" ],
     [ "IndicatorStardate", "indicator-stardate", "1.0.40" ],
     [ "IndicatorTide", "indicator-tide", "1.0.24" ],
-    [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.66" ] ]
+    [ "IndicatorVirtualBox", "indicator-virtual-box", "1.0.68" ] ]
 
 
 for project, source, versionOnPPA in indicators:
