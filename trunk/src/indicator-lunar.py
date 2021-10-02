@@ -27,6 +27,19 @@
 #Front end should always be similar...and might be taking a long time compared to the front end.
 
 
+#TODO Testing...
+# Need to test install first of pyephem using apt-get and an install via LaunchPad.
+# Then do another install via LaunchPad but using PIP...
+# Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
+#
+# Need to create the test indicator to install python3-pyephem and verify the version number.
+# Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
+#
+# In astropyephem, need to update the line
+#    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" 
+# and maybe warn using not to use apt-get.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -45,7 +58,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     if astroBackend.getAvailabilityMessage() is not None:
@@ -189,16 +202,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                 _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                 _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
 
-#TODO Testing...
-# Need to test install first of pyephem using apt-get and an install via LaunchPad.
-# Then do another install via LaunchPad but using PIP...
-# Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
-#
-# Need to create the test indicator to install python3-pyephem and verify the version number.
-# Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
-        self.debug = True
-
-        utcNow = datetime.datetime.utcnow()
+        self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key is a combination of three tags: body type, body name and data name.
@@ -212,11 +216,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-        self.lastFullMoonNotfication = utcNow - datetime.timedelta( hours = 1 )
+        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
 
         self.__removeCacheFilesVersion89() # Cache data filenames changed in version 90, so remove old versions.
         self.flushCache()
-        self.initialiseDownloadCountsAndCacheDateTimes( utcNow )
+        self.initialiseDownloadCountsAndCacheDateTimes( datetime.datetime.utcnow() )
 
 
     def __removeCacheFilesVersion89( self ):
@@ -285,7 +289,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
-#TODO For testing
+#TODO Testing
 # startHour = 6 # 4pm Sydney 
 # endHour = 11 # 9pm Sydney 
 
@@ -298,9 +302,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 # startHour = 23 # 4pm California 
 # endHour = 4 # 9pm California
 
-        #TODO Testing
-        # self.satelliteLimitStart = 0
-        # self.satelliteLimitEnd = 23
+        # self.satelliteLimitStart = 18
+        # self.satelliteLimitEnd = 18
 
 
         # Update backend.
@@ -1087,7 +1090,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     subMenu,
                     self.indent( 2, 3 ) + \
                     _( "Date/Time: " ) + \
-                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] ),#TODO This line threw an exception..don't know why...have not seen it for a while.  Hopefully have fixed it...very difficult to reproduce.
+                    self.formatData( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] ),
                     url )
 
                 self.createMenuItem(
