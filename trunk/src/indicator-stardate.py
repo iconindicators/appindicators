@@ -118,39 +118,39 @@ class IndicatorStardate( indicatorbase.IndicatorBase ):
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
-        showClassicCheckbox = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
-        showClassicCheckbox.set_active( self.showClassic )
-        showClassicCheckbox.set_tooltip_text( _(
+        showClassicCheckbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
+        showClassicCheckbutton.set_active( self.showClassic )
+        showClassicCheckbutton.set_tooltip_text( _(
             "If checked, show stardate 'classic' based on\n\n" + \
             "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
             "Otherwise show stardate '2009 revised' based on\n\n" + \
             "\thttps://en.wikipedia.org/wiki/Stardate" ) )
-        grid.attach( showClassicCheckbox, 0, 0, 1, 1 )
+        grid.attach( showClassicCheckbutton, 0, 0, 1, 1 )
 
-        showIssueCheckbox = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
-        showIssueCheckbox.set_active( self.showIssue )
-        showIssueCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        showIssueCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        showIssueCheckbox.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
-        grid.attach( showIssueCheckbox, 0, 1, 1, 1 )
+        showIssueCheckbutton = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
+        showIssueCheckbutton.set_active( self.showIssue )
+        showIssueCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
+        showIssueCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        showIssueCheckbutton.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
+        grid.attach( showIssueCheckbutton, 0, 1, 1, 1 )
 
-        padIntegerCheckbox = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
-        padIntegerCheckbox.set_active( self.padInteger )
-        padIntegerCheckbox.set_sensitive( showClassicCheckbox.get_active() )
-        padIntegerCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        padIntegerCheckbox.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
-        grid.attach( padIntegerCheckbox, 0, 2, 1, 1 )
+        padIntegerCheckbutton = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
+        padIntegerCheckbutton.set_active( self.padInteger )
+        padIntegerCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
+        padIntegerCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        padIntegerCheckbutton.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
+        grid.attach( padIntegerCheckbutton, 0, 2, 1, 1 )
 
-        showClassicCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, showIssueCheckbox, padIntegerCheckbox )
+        showClassicCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showIssueCheckbutton, padIntegerCheckbutton )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
-            self.padInteger = padIntegerCheckbox.get_active()
-            self.showClassic = showClassicCheckbox.get_active()
-            self.showIssue = showIssueCheckbox.get_active()
+            self.padInteger = padIntegerCheckbutton.get_active()
+            self.showClassic = showClassicCheckbutton.get_active()
+            self.showIssue = showIssueCheckbutton.get_active()
 
         return responseType
 
