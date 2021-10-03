@@ -526,15 +526,15 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
         # General settings.
         grid = self.createGrid()
 
-        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
-        showAsSubmenusCheckbox.set_tooltip_text( _(
+        showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
+        showAsSubmenusCheckbutton.set_tooltip_text( _(
             "The download statistics for each PPA\n" + \
             "are shown in a separate submenu." ) )
-        showAsSubmenusCheckbox.set_active( self.showSubmenu )
-        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
+        showAsSubmenusCheckbutton.set_active( self.showSubmenu )
+        grid.attach( showAsSubmenusCheckbutton, 0, 0, 1, 1 )
 
-        combinePPAsCheckbox = Gtk.CheckButton.new_with_label( _( "Combine PPAs" ) )
-        combinePPAsCheckbox.set_tooltip_text( _(
+        combinePPAsCheckbutton = Gtk.CheckButton.new_with_label( _( "Combine PPAs" ) )
+        combinePPAsCheckbutton.set_tooltip_text( _(
             "Combine the statistics of binary\n" + \
             "packages when the PPA user/name\n" + \
             "are the same.\n\n" + \
@@ -554,13 +554,13 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "counts ARE summed.\n" + \
             "Packages such as compiled C fall into\n" + \
             "this category." ) )
-        combinePPAsCheckbox.set_active( self.combinePPAs )
-        combinePPAsCheckbox.set_margin_top( 10 )
-        grid.attach( combinePPAsCheckbox, 0, 1, 1, 1 )
+        combinePPAsCheckbutton.set_active( self.combinePPAs )
+        combinePPAsCheckbutton.set_margin_top( 10 )
+        grid.attach( combinePPAsCheckbutton, 0, 1, 1, 1 )
 
-        ignoreVersionArchitectureSpecificCheckbox = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
-        ignoreVersionArchitectureSpecificCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        ignoreVersionArchitectureSpecificCheckbox.set_tooltip_text( _(
+        ignoreVersionArchitectureSpecificCheckbutton = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
+        ignoreVersionArchitectureSpecificCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        ignoreVersionArchitectureSpecificCheckbutton.set_tooltip_text( _(
             "Sometimes architecture specific\n" + \
             "packages with the same package\n" + \
             "name but different version 'number'\n" + \
@@ -577,22 +577,22 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
             "The version number is retained only\n" + \
             "if it is identical across ALL\n" + \
             "instances of a published binary." ) )
-        ignoreVersionArchitectureSpecificCheckbox.set_active( self.ignoreVersionArchitectureSpecific )
-        ignoreVersionArchitectureSpecificCheckbox.set_sensitive( combinePPAsCheckbox.get_active() )
-        grid.attach( ignoreVersionArchitectureSpecificCheckbox, 0, 2, 1, 1 )
+        ignoreVersionArchitectureSpecificCheckbutton.set_active( self.ignoreVersionArchitectureSpecific )
+        ignoreVersionArchitectureSpecificCheckbutton.set_sensitive( combinePPAsCheckbutton.get_active() )
+        grid.attach( ignoreVersionArchitectureSpecificCheckbutton, 0, 2, 1, 1 )
 
-        combinePPAsCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, ignoreVersionArchitectureSpecificCheckbox )
+        combinePPAsCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, ignoreVersionArchitectureSpecificCheckbutton )
 
-        sortByDownloadCheckbox = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
-        sortByDownloadCheckbox.set_tooltip_text( _( "Sort by download count within each PPA." ) )
-        sortByDownloadCheckbox.set_active( self.sortByDownload )
-        sortByDownloadCheckbox.set_margin_top( 10 )
-        grid.attach( sortByDownloadCheckbox, 0, 3, 1, 1 )
+        sortByDownloadCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
+        sortByDownloadCheckbutton.set_tooltip_text( _( "Sort by download count within each PPA." ) )
+        sortByDownloadCheckbutton.set_active( self.sortByDownload )
+        sortByDownloadCheckbutton.set_margin_top( 10 )
+        grid.attach( sortByDownloadCheckbutton, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
 
         label = Gtk.Label.new( _( "  Clip amount" ) )
-        label.set_sensitive( sortByDownloadCheckbox.get_active() )
+        label.set_sensitive( sortByDownloadCheckbutton.get_active() )
         label.set_margin_left( self.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
 
@@ -606,18 +606,18 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
                "when sorting by download.\n\n" + \
                "A value of zero will not clip." ) )
 
-        spinner.set_sensitive( sortByDownloadCheckbox.get_active() )
+        spinner.set_sensitive( sortByDownloadCheckbutton.get_active() )
         box.pack_start( spinner, False, False, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
 
-        sortByDownloadCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, label, spinner )
+        sortByDownloadCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, label, spinner )
 
-        lowBandwitdhCheckbox = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
-        lowBandwitdhCheckbox.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
-        lowBandwitdhCheckbox.set_active( self.lowBandwidth )
-        lowBandwitdhCheckbox.set_margin_top( 10 )
-        grid.attach( lowBandwitdhCheckbox, 0, 5, 1, 1 )
+        lowBandwidthCheckbutton = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
+        lowBandwidthCheckbutton.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
+        lowBandwidthCheckbutton.set_active( self.lowBandwidth )
+        lowBandwidthCheckbutton.set_margin_top( 10 )
+        grid.attach( lowBandwidthCheckbutton, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
@@ -626,11 +626,11 @@ class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
-            self.showSubmenu = showAsSubmenusCheckbox.get_active()
-            self.combinePPAs = combinePPAsCheckbox.get_active()
-            self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbox.get_active()
-            self.lowBandwidth = lowBandwitdhCheckbox.get_active()
-            self.sortByDownload = sortByDownloadCheckbox.get_active()
+            self.showSubmenu = showAsSubmenusCheckbutton.get_active()
+            self.combinePPAs = combinePPAsCheckbutton.get_active()
+            self.ignoreVersionArchitectureSpecific = ignoreVersionArchitectureSpecificCheckbutton.get_active()
+            self.lowBandwidth = lowBandwidthCheckbutton.get_active()
+            self.sortByDownload = sortByDownloadCheckbutton.get_active()
             self.sortByDownloadAmount = spinner.get_value_as_int()
 
             self.ppas = [ ]
