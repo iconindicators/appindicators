@@ -284,21 +284,21 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
         # General settings.
         grid = self.createGrid()
 
-        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
-        showAsSubmenusCheckbox.set_active( self.showAsSubMenus )
-        showAsSubmenusCheckbox.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
+        showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
+        showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
+        showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
 
-        grid.attach( showAsSubmenusCheckbox, 0, 0, 1, 1 )
+        grid.attach( showAsSubmenusCheckbutton, 0, 0, 1, 1 )
 
-        showAsSubmenusExceptFirstDayCheckbox = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
-        showAsSubmenusExceptFirstDayCheckbox.set_sensitive( showAsSubmenusCheckbox.get_active() )
-        showAsSubmenusExceptFirstDayCheckbox.set_active( self.showAsSubMenusExceptFirstDay )
-        showAsSubmenusExceptFirstDayCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        showAsSubmenusExceptFirstDayCheckbox.set_tooltip_text( _( "Show the first day's tide in full." ) )
+        showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
+        showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
+        showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
+        showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
 
-        grid.attach( showAsSubmenusExceptFirstDayCheckbox, 0, 1, 1, 1 )
+        grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 1, 1, 1 )
 
-        showAsSubmenusCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbox )
+        showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -372,8 +372,8 @@ class IndicatorTide( indicatorbase.IndicatorBase ):
             model, treeiter = portsTree.get_selection().get_selected()
             port = model[ treeiter ][ COLUMN_PORT ]
             self.portID = ports.getPortIDForCountryAndPortName( country, port )
-            self.showAsSubMenus = showAsSubmenusCheckbox.get_active()
-            self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbox.get_active()
+            self.showAsSubMenus = showAsSubmenusCheckbutton.get_active()
+            self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbutton.get_active()
 
             if dateFormat.get_text():
                 self.menuItemDateFormat = dateFormat.get_text()
