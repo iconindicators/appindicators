@@ -372,18 +372,18 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
-        hideGroupsCheckbox = Gtk.CheckButton.new_with_label( _( "Hide groups" ) )
-        hideGroupsCheckbox.set_active( self.hideGroups )
-        hideGroupsCheckbox.set_sensitive( not self.showScriptsInSubmenus )
-        hideGroupsCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        hideGroupsCheckbox.set_tooltip_text( _(
+        hideGroupsCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide groups" ) )
+        hideGroupsCheckbutton.set_active( self.hideGroups )
+        hideGroupsCheckbutton.set_sensitive( not self.showScriptsInSubmenus )
+        hideGroupsCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        hideGroupsCheckbutton.set_tooltip_text( _(
             "If checked, only script names are displayed.\n" + \
             "Otherwise, script names are indented\n" + \
             "within their respective group." ) )
 
-        radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbox )
+        radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbutton )
 
-        grid.attach( hideGroupsCheckbox, 0, 2, 1, 1 )
+        grid.attach( hideGroupsCheckbutton, 0, 2, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
@@ -477,7 +477,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         if responseType == Gtk.ResponseType.OK:
             self.scripts = copyOfScripts
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
-            self.hideGroups = hideGroupsCheckbox.get_active()
+            self.hideGroups = hideGroupsCheckbutton.get_active()
             self.indicatorText = indicatorTextEntry.get_text()
             self.indicatorTextSeparator = indicatorTextSeparatorEntry.get_text()
             self.initialiseBackgroundScripts()
@@ -826,23 +826,23 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 10 )
 
-        soundCheckbox = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
-        soundCheckbox.set_tooltip_text( _(
+        soundCheckbutton = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
+        soundCheckbutton.set_tooltip_text( _(
             "For non-background scripts, play a sound\n" + \
             "on script completion.\n\n" + \
             "For background scripts, play a sound\n" + \
             "only if the script returns non-empty text." ) )
-        soundCheckbox.set_active( False if add else script.getPlaySound() )
-        grid.attach( soundCheckbox, 0, 12, 1, 1 )
+        soundCheckbutton.set_active( False if add else script.getPlaySound() )
+        grid.attach( soundCheckbutton, 0, 12, 1, 1 )
 
-        notificationCheckbox = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
-        notificationCheckbox.set_tooltip_text( _(
+        notificationCheckbutton = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
+        notificationCheckbutton.set_tooltip_text( _(
             "For non-background scripts, show a\n" + \
             "notification on script completion.\n\n" + \
             "For background scripts, show a notification\n" + \
             "only if the script returns non-empty text." ) )
-        notificationCheckbox.set_active( False if add else script.getShowNotification() )
-        grid.attach( notificationCheckbox, 0, 13, 1, 1 )
+        notificationCheckbutton.set_active( False if add else script.getShowNotification() )
+        grid.attach( notificationCheckbutton, 0, 13, 1, 1 )
 
         scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
         scriptNonBackgroundRadio.set_active( True if add else type( script ) == NonBackground )
@@ -852,22 +852,22 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
             "clicks on the corresponding menu item." )
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
 
-        terminalCheckbox = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
-        terminalCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        terminalCheckbox.set_tooltip_text( _( "Leave the terminal open on script completion." ) )
-        terminalCheckbox.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
-        terminalCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
-        grid.attach( terminalCheckbox, 0, 15, 1, 1 )
+        terminalCheckbutton = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
+        terminalCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        terminalCheckbutton.set_tooltip_text( _( "Leave the terminal open on script completion." ) )
+        terminalCheckbutton.set_active( False if add else type( script ) == NonBackground and script.getTerminalOpen() )
+        terminalCheckbutton.set_sensitive( True if add else type( script ) == NonBackground )
+        grid.attach( terminalCheckbutton, 0, 15, 1, 1 )
 
-        defaultScriptCheckbox = Gtk.CheckButton.new_with_label( _( "Default script" ) )
-        defaultScriptCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        defaultScriptCheckbox.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
-        defaultScriptCheckbox.set_sensitive( True if add else type( script ) == NonBackground )
-        defaultScriptCheckbox.set_tooltip_text( _(
+        defaultScriptCheckbutton = Gtk.CheckButton.new_with_label( _( "Default script" ) )
+        defaultScriptCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        defaultScriptCheckbutton.set_active( False if add else type( script ) == NonBackground and script.getDefault() )
+        defaultScriptCheckbutton.set_sensitive( True if add else type( script ) == NonBackground )
+        defaultScriptCheckbutton.set_tooltip_text( _(
             "One script may be set as default\n" + \
             "which is run on a middle mouse\n" + \
             "click of the indicator icon." ) )
-        grid.attach( defaultScriptCheckbox, 0, 16, 1, 1 )
+        grid.attach( defaultScriptCheckbutton, 0, 16, 1, 1 )
 
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
         scriptBackgroundRadio.set_active( False if add else type( script ) == Background )
@@ -902,20 +902,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
         grid.attach( box, 0, 18, 1, 1 )
 
-        forceUpdateCheckbox = Gtk.CheckButton.new_with_label( _( "Force update" ) )
-        forceUpdateCheckbox.set_margin_left( self.INDENT_WIDGET_LEFT )
-        forceUpdateCheckbox.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
-        forceUpdateCheckbox.set_sensitive( True if add else type( script ) == Background )
-        forceUpdateCheckbox.set_tooltip_text( _(
+        forceUpdateCheckbutton = Gtk.CheckButton.new_with_label( _( "Force update" ) )
+        forceUpdateCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        forceUpdateCheckbutton.set_active( False if add else type( script ) == Background and script.getForceUpdate() )
+        forceUpdateCheckbutton.set_sensitive( True if add else type( script ) == Background )
+        forceUpdateCheckbutton.set_tooltip_text( _(
             "If the script returns non-empty text\n" + \
             "on its update, the script will run\n" + \
             "on the next update of ANY script." ) )
-        grid.attach( forceUpdateCheckbox, 0, 19, 1, 1 )
+        grid.attach( forceUpdateCheckbutton, 0, 19, 1, 1 )
 
-        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbox, defaultScriptCheckbox )
-        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, label, intervalSpinner, forceUpdateCheckbox )
-        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, label, intervalSpinner, forceUpdateCheckbox )
-        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, terminalCheckbox, defaultScriptCheckbox )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbutton, defaultScriptCheckbutton )
+        scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, label, intervalSpinner, forceUpdateCheckbutton )
+        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, label, intervalSpinner, forceUpdateCheckbutton )
+        scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, terminalCheckbutton, defaultScriptCheckbutton )
 
         dialog = self.createDialog( scriptsTreeView, _( "Add Script" ) if add else _( "Edit Script" ), grid )
         newScript = None
@@ -960,7 +960,7 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
 
                 # If this script is marked as default (and is non-background),
                 # check for an existing default script and if found, undefault it...
-                if scriptNonBackgroundRadio.get_active() and defaultScriptCheckbox.get_active():
+                if scriptNonBackgroundRadio.get_active() and defaultScriptCheckbutton.get_active():
                     i = 0
                     for skript in scripts:
                         if type( skript ) == NonBackground and skript.getDefault():
@@ -985,20 +985,20 @@ class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
                         groupCombo.get_active_text().strip(),
                         nameEntry.get_text().strip(),
                         self.getTextViewText( commandTextView ).strip(),
-                        soundCheckbox.get_active(),
-                        notificationCheckbox.get_active(),
+                        soundCheckbutton.get_active(),
+                        notificationCheckbutton.get_active(),
                         intervalSpinner.get_value_as_int(),
-                        forceUpdateCheckbox.get_active() )
+                        forceUpdateCheckbutton.get_active() )
 
                 else:
                     newScript = NonBackground(
                         groupCombo.get_active_text().strip(),
                         nameEntry.get_text().strip(),
                         self.getTextViewText( commandTextView ).strip(),
-                        soundCheckbox.get_active(),
-                        notificationCheckbox.get_active(),
-                        terminalCheckbox.get_active(),
-                        defaultScriptCheckbox.get_active() )
+                        soundCheckbutton.get_active(),
+                        notificationCheckbutton.get_active(),
+                        terminalCheckbutton.get_active(),
+                        defaultScriptCheckbutton.get_active() )
 
                 scripts.append( newScript )
 
