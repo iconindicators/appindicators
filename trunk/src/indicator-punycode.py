@@ -178,23 +178,23 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         inputPrimaryRadio.set_margin_left( self.INDENT_WIDGET_LEFT )
         grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
 
-        outputBothCheckbox = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )
-        outputBothCheckbox.set_tooltip_text( _(
+        outputBothCheckbutton = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )
+        outputBothCheckbutton.set_tooltip_text( _(
             "If checked, the output text is sent\n" + \
             "to both the clipboard and primary.\n\n" + \
             "Otherwise the output is sent back\n" + \
             "only to the input source." ) )
-        outputBothCheckbox.set_active( self.outputBoth )
-        outputBothCheckbox.set_margin_top( 10 )
-        grid.attach( outputBothCheckbox, 0, 3, 1, 1 )
+        outputBothCheckbutton.set_active( self.outputBoth )
+        outputBothCheckbutton.set_margin_top( 10 )
+        grid.attach( outputBothCheckbutton, 0, 3, 1, 1 )
 
-        dropPathQueryCheckbox = Gtk.CheckButton.new_with_label( _( "Drop path/query in output" ) )
-        dropPathQueryCheckbox.set_tooltip_text( _(
+        dropPathQueryCheckbutton = Gtk.CheckButton.new_with_label( _( "Drop path/query in output" ) )
+        dropPathQueryCheckbutton.set_tooltip_text( _(
             "If checked, the output text will not\n" + \
             "contain any path/query (if present)." ) )
-        dropPathQueryCheckbox.set_active( self.dropPathQuery )
-        dropPathQueryCheckbox.set_margin_top( 10 )
-        grid.attach( dropPathQueryCheckbox, 0, 4, 1, 1 )
+        dropPathQueryCheckbutton.set_active( self.dropPathQuery )
+        dropPathQueryCheckbutton.set_margin_top( 10 )
+        grid.attach( dropPathQueryCheckbutton, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -222,8 +222,8 @@ class IndicatorPunycode( indicatorbase.IndicatorBase ):
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.inputClipboard = inputClipboardRadio.get_active()
-            self.outputBoth = outputBothCheckbox.get_active()
-            self.dropPathQuery = dropPathQueryCheckbox.get_active()
+            self.outputBoth = outputBothCheckbutton.get_active()
+            self.dropPathQuery = dropPathQueryCheckbutton.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
 
         return responseType
