@@ -1348,26 +1348,15 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         # Menu.
         grid = self.createGrid()
 
-        hideBodiesBelowTheHorizonCheckbox = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
-        hideBodiesBelowTheHorizonCheckbox.set_active( self.hideBodiesBelowHorizon )
-        hideBodiesBelowTheHorizonCheckbox.set_tooltip_text( _(
+        hideBodiesBelowTheHorizonCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
+        hideBodiesBelowTheHorizonCheckbutton.set_active( self.hideBodiesBelowHorizon )
+        hideBodiesBelowTheHorizonCheckbutton.set_tooltip_text( _(
             "If checked, all bodies below the horizon\n" + \
             "are hidden (excludes satellites)." ) )
-        grid.attach( hideBodiesBelowTheHorizonCheckbox, 0, 0, 1, 1 )
-
-        cometsAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
-        cometsAddNewCheckbox.set_margin_top( 10 )
-        cometsAddNewCheckbox.set_active( self.cometsAddNew )
-        cometsAddNewCheckbox.set_tooltip_text( _( "If checked, all comets are added." ) )
-        grid.attach( cometsAddNewCheckbox, 0, 1, 1, 1 )
-
-        minorPlanetsAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
-        minorPlanetsAddNewCheckbox.set_margin_top( 10 )
-        minorPlanetsAddNewCheckbox.set_active( self.minorPlanetsAddNew )
-        minorPlanetsAddNewCheckbox.set_tooltip_text( _( "If checked, all minor planets are added." ) )
-        grid.attach( minorPlanetsAddNewCheckbox, 0, 2, 1, 1 )
+        grid.attach( hideBodiesBelowTheHorizonCheckbutton, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
 
@@ -1376,7 +1365,19 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             self.magnitude, int( astrobase.AstroBase.MAGNITUDE_MINIMUM ), int( astrobase.AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
-        grid.attach( box, 0, 3, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
+
+        cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
+        cometsAddNewCheckbutton.set_margin_top( 10 )
+        cometsAddNewCheckbutton.set_active( self.cometsAddNew )
+        cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
+        grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 )
+
+        minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
+        minorPlanetsAddNewCheckbutton.set_margin_top( 10 )
+        minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
+        minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "If checked, all minor planets are added." ) )
+        grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 10 )
@@ -1384,17 +1385,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesAddNewCheckbox.set_tooltip_text( _( "If checked, all satellites are added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 4, 1, 1 )
 
-        sortSatellitesByDateTimeCheckbox = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
-        sortSatellitesByDateTimeCheckbox.set_margin_top( 10 )
-        sortSatellitesByDateTimeCheckbox.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbox.set_tooltip_text( _(
+        sortSatellitesByDateTimeCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
+        sortSatellitesByDateTimeCheckbutton.set_margin_top( 10 )
+        sortSatellitesByDateTimeCheckbutton.set_active( self.satellitesSortByDateTime )
+        sortSatellitesByDateTimeCheckbutton.set_tooltip_text( _(
             "If checked, satellites are sorted\n" + \
             "by rise date/time.\n\n" + \
             "Otherwise satellites are sorted\n" + \
             "by Name then Number." ) )
-        grid.attach( sortSatellitesByDateTimeCheckbox, 0, 5, 1, 1 )
+        grid.attach( sortSatellitesByDateTimeCheckbutton, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Show satellites passes from" ) ), False, False, 0 )
 
@@ -1688,11 +1690,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
             self.indicatorText = self.translateTags( displayTagsStore, False, indicatorText.get_text() )
             self.indicatorTextSeparator = indicatorTextSeparator.get_text()
-            self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbox.get_active()
+            self.hideBodiesBelowHorizon = hideBodiesBelowTheHorizonCheckbutton.get_active()
             self.magnitude = spinnerMagnitude.get_value_as_int()
-            self.cometsAddNew = cometsAddNewCheckbox.get_active() # The update will add in new comets.
-            self.minorPlanetsAddNew = minorPlanetsAddNewCheckbox.get_active() # The update will add in new minor planets.
-            self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbox.get_active()
+            self.cometsAddNew = cometsAddNewCheckbutton.get_active() # The update will add in new comets.
+            self.minorPlanetsAddNew = minorPlanetsAddNewCheckbutton.get_active() # The update will add in new minor planets.
+            self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbutton.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
             self.satelliteLimitStart = spinnerSatelliteLimitStart.get_value_as_int()
             self.satelliteLimitEnd = spinnerSatelliteLimitEnd.get_value_as_int()
@@ -1910,10 +1912,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             testButtonText, testButtonTooltip,
             isMoonNotification ):
 
-        checkbox = Gtk.CheckButton.new_with_label( checkboxLabel )
-        checkbox.set_active( checkboxIsActive )
-        checkbox.set_tooltip_text( checkboxTooltip )
-        grid.attach( checkbox, 0, gridStartIndex, 1, 1 )
+        checkbutton = Gtk.CheckButton.new_with_label( checkboxLabel )
+        checkbutton.set_active( checkboxIsActive )
+        checkbutton.set_tooltip_text( checkboxTooltip )
+        grid.attach( checkbutton, 0, gridStartIndex, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
@@ -1925,10 +1927,10 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         summaryTextEntry.set_text( summaryText )
         summaryTextEntry.set_tooltip_text( summaryTooltip )
         box.pack_start( summaryTextEntry, True, True, 0 )
-        box.set_sensitive( checkbox.get_active() )
+        box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, gridStartIndex + 1, 1, 1 )
 
-        checkbox.connect( "toggled", self.onRadioOrCheckbox, True, box )
+        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( self.INDENT_TEXT_LEFT )
@@ -1946,21 +1948,21 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         scrolledWindow.set_vexpand( True )
         scrolledWindow.add( messageTextView )
         box.pack_start( scrolledWindow, True, True, 0 )
-        box.set_sensitive( checkbox.get_active() )
+        box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, gridStartIndex + 2, 1, 1 )
 
-        checkbox.connect( "toggled", self.onRadioOrCheckbox, True, box )
+        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
         test = Gtk.Button.new_with_label( testButtonText )
         test.set_halign( Gtk.Align.END )
-        test.set_sensitive( checkbox.get_active() )
+        test.set_sensitive( checkbutton.get_active() )
         test.connect( "clicked", self.onTestNotificationClicked, summaryTextEntry, messageTextView, isMoonNotification )
         test.set_tooltip_text( testButtonTooltip )
         grid.attach( test, 0, gridStartIndex + 3, 1, 1 )
 
-        checkbox.connect( "toggled", self.onRadioOrCheckbox, True, test )
+        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, test )
 
-        return checkbox, summaryTextEntry, messageTextView
+        return checkbutton, summaryTextEntry, messageTextView
 
 
     def onTestNotificationClicked( self, button, summaryEntry, messageTextView, isMoonNotification ):
