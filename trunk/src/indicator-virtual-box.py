@@ -509,12 +509,12 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
 
-        autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-        autostartCheckbox.set_active(
+        autostartCheckbutton = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
+        autostartCheckbutton.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
+        autostartCheckbutton.set_active(
             model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
             model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
-        grid.attach( autostartCheckbox, 0, 1, 2, 1 )
+        grid.attach( autostartCheckbutton, 0, 1, 2, 1 )
 
         dialog = self.createDialog( tree, _( "Virtual Machine Properties" ), grid )
         while True:
@@ -533,7 +533,7 @@ class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
                 startCommand.grab_focus()
                 continue
 
-            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] = Gtk.STOCK_APPLY if autostartCheckbox.get_active() else None
+            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] = Gtk.STOCK_APPLY if autostartCheckbutton.get_active() else None
             model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = startCommand.get_text().strip()
 
             break
