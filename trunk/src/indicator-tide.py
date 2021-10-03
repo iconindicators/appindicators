@@ -31,6 +31,16 @@
     # https://www.tide-forecast.com/
 
 
+#TODO Some of the above links use Javascript to post render the page,
+# so parsing the HTML source may not contain tide data until the Javascript is executed.
+# Possible solutions are:
+    # http://theautomatic.net/2019/01/19/scraping-data-from-javascript-webpage-python/
+    # https://stackoverflow.com/questions/29996001/using-python-requests-get-to-parse-html-code-that-does-not-load-at-once
+    # https://selenium-python.readthedocs.io/
+    # https://pypi.org/project/requests-html/
+    # https://stackoverflow.com/questions/26393231/using-python-requests-with-javascript-pages
+
+
 INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
