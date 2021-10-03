@@ -284,13 +284,13 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         radioCopyToClipboard.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
         radioInternetSearch.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
 
-        notifyCheckbox = Gtk.CheckButton.new_with_label( _( "Notify" ) )
-        notifyCheckbox.set_tooltip_text( _(
+        notifyCheckbutton = Gtk.CheckButton.new_with_label( _( "Notify" ) )
+        notifyCheckbutton.set_tooltip_text( _(
             "On startup or when saving preferences,\n" + \
             "show a notification for each of today's events." ) )
-        notifyCheckbox.set_active( self.notify )
-        notifyCheckbox.set_margin_top( 10 )
-        grid.attach( notifyCheckbox, 0, 5, 1, 1 )
+        notifyCheckbutton.set_active( self.notify )
+        notifyCheckbutton.set_margin_top( 10 )
+        grid.attach( notifyCheckbutton, 0, 5, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
@@ -311,7 +311,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
 
             self.copyToClipboard = radioCopyToClipboard.get_active()
             self.searchURL = searchEngineEntry.get_text().strip()
-            self.notify = notifyCheckbox.get_active()
+            self.notify = notifyCheckbutton.get_active()
 
         return responseType
 
@@ -401,14 +401,14 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
         box.pack_start( browseButton, False, False, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        enabledCheckbox = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
+        enabledCheckbutton = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
         if rowNumber is None: # This is an add.
-            enabledCheckbox.set_active( True )
+            enabledCheckbutton.set_active( True )
 
         else:
-            enabledCheckbox.set_active( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
+            enabledCheckbutton.set_active( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
 
-        grid.attach( enabledCheckbox, 0, 1, 1, 1 )
+        grid.attach( enabledCheckbutton, 0, 1, 1, 1 )
 
         title = _( "Add Calendar" )
         if rowNumber:
@@ -436,7 +436,7 @@ class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
                 if rowNumber:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.
 
-                model.get_model().append( [ fileEntry.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbox.get_active() else None ] )
+                model.get_model().append( [ fileEntry.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbutton.get_active() else None ] )
 
             break
 
