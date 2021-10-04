@@ -885,7 +885,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             t, y, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, ephemerisPlanets ) # Zeroth result in t and y is the first result, so use that.
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
-                t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+                t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
             data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 

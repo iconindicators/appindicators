@@ -245,7 +245,7 @@ class AstroBase( ABC ):
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
 
     # Miscellaneous.
-    DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S" #TODO Surely the word 'colon' should say 'dash' right??????!
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which brighter than the sun, so set a lower limit.
 
@@ -514,7 +514,7 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+    def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
 
     # Satellite passes typically occur before dawn and after sunset, unless the

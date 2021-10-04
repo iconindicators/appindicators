@@ -541,10 +541,11 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
         # Do an update at least every twenty minutes to ensure:
         #    The moon icon reflects reality.
-        #    Objects don't move too much between updates.
-        #    Download of comet/minor planet/satellite data occurs no more than twenty minutes from when they are supposed to happen.
+        #    Bodies don't move too much between updates.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
 
+        body, bodyDateTime = None, None #TODO Testing
+        bodyName = None
         for key in self.data:
             dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             if dataName == astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
@@ -556,13 +557,27 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                dataName == astrobase.AstroBase.DATA_TAG_SOLSTICE or \
                dataName == astrobase.AstroBase.DATA_TAG_THIRD_QUARTER or \
                dataName == astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME:
-                dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+                dateTime = datetime.datetime.strptime( self.data[ key ], astrobase.AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
+                    body = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] #TODO Testing
+                    bodyName = key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] #TODO Testing
+                    bodyDateTime = self.data[ key ] #TODO Testing
 
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
+        # if nextUpdateInSeconds <= 60:
+        #     nextUpdateInSeconds = 60 # Ensure updates occur at most every minute avoiding consuming resources.
+
+ #TODO Testing Want to take into accoutn the first satellite to rise...do an update 4 minutes before the rise time so we show the rise/set not just the rise.
+        if body is not None and body == astrobase.AstroBase.BodyType.SATELLITE:
+            print( bodyName )
+            nextUpdateInSeconds-= 240
+
+        # else:
+        #     print( "not a satellite" )
+
         if nextUpdateInSeconds <= 60:
-            nextUpdateInSeconds = 60 # Give at least a minute between updates, to avoid consuming resources.
+            nextUpdateInSeconds = 60 # Ensure updates occur at most every minute avoiding consuming resources.
 
         return nextUpdateInSeconds
 
@@ -630,7 +645,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if ( key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
                 riseTime = datetime.datetime.strptime(
                     self.data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ],
-                    astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+                    astrobase.AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
                 if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow: # Two minute buffer.
                     satelliteCurrentNotifications.append( [ number, riseTime ] )
@@ -639,7 +654,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
             if ( key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ) in self.data:
                 setTime = datetime.datetime.strptime(
                     self.data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
-                    astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+                    astrobase.AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
                 if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
                     self.satellitePreviousNotifications.remove( number )
@@ -1212,7 +1227,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
 
     # Converts a UTC date/time string to a local date/time string in the given format.
     def toLocalDateTimeString( self, utcDateTimeString, outputFormat ):
-        utcDateTime = datetime.datetime.strptime( utcDateTimeString, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYcolonMMcolonDDspaceHHcolonMMcolonSS )
+        utcDateTime = datetime.datetime.strptime( utcDateTimeString, astrobase.AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
         localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
         return localDateTime.strftime( outputFormat )
 
