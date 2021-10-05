@@ -62,19 +62,17 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
-    if astroBackend.getAvailabilityMessage() is not None:
-        dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, astroBackend.getAvailabilityMessage() )
+    message = astroBackend.getAvailabilityMessage()
+    if message is None:
+        message = astroBackend.getVersionMessage()
+
+    if message is not None:
+        dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message )
         dialog.set_title( INDICATOR_NAME )
         dialog.run()
         dialog.destroy()
         sys.exit()
 
-    if astroBackend.getVersionMessage() is not None:
-        dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, astroBackend.getVersionMessage() )
-        dialog.set_title( INDICATOR_NAME )
-        dialog.run()
-        dialog.destroy()
-        sys.exit()
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
@@ -566,10 +564,8 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                     bodyDateTime = self.data[ key ] #TODO Testing
 
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
-        # if nextUpdateInSeconds <= 60:
-        #     nextUpdateInSeconds = 60 # Ensure updates occur at most every minute avoiding consuming resources.
 
- #TODO Testing Want to take into accoutn the first satellite to rise...do an update 4 minutes before the rise time so we show the rise/set not just the rise.
+ #TODO Testing Want to take into account the first satellite to rise...do an update 4 minutes before the rise time so we show the rise/set not just the rise.
         # if body is not None and body == AstroBase.BodyType.SATELLITE:
         #     print( bodyName )
         #     nextUpdateInSeconds-= 240
@@ -1005,11 +1001,6 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
         satellitesPolar = [ ]
         now = AstroBase.toDateTimeString( utcNow )
         nowPlusFiveMinutes = AstroBase.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
-        # print(
-        #     utcNow,
-        #     self.satelliteLimitStart, 
-        #     self.satelliteLimitEnd, 
-        #     AstroBase.getAdjustedDateTime( utcNow.replace( tzinfo = datetime.timezone.utc ), utcNow.replace( tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 10 ), self.satelliteLimitStart, self.satelliteLimitEnd ) )
         visibleStartHour, visibleEndHour = AstroBase.getAdjustedDateTime(
             utcNow.replace( tzinfo = datetime.timezone.utc ),
             utcNow.replace( tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 ),
@@ -1028,20 +1019,18 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                         self.data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
                         self.data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
 
-                else: # Satellite will rise five minutes or later from now; look at previous rise to see if the satellite is in transit...
+                else: # Satellite will rise five minutes or later from now; look at previous rise to see if the satellite is in transit and within start/end hour...
                     if key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
                         inTransit = \
                             self.dataPrevious[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
                             self.dataPrevious[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now
 
+                        # If the user changed the hourly start/end between previous calculation and now, the previous pass may now be invalid, so cannot use it.
                         withinLimit = \
                             self.dataPrevious[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] >= AstroBase.toDateTimeString( visibleStartHour ) and \
                             self.dataPrevious[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] <= AstroBase.toDateTimeString( visibleEndHour )
 
                         if inTransit and withinLimit:
-                            
-                        # if self.dataPrevious[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
-                        #    self.dataPrevious[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] > now: # Satellite is in transit...
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(), 
@@ -1050,13 +1039,13 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
                                 self.dataPrevious[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ],
                                 self.dataPrevious[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] ] )
 
-                        else: # Previous transit is complete, so show next pass...
+                        else: # Previous transit is complete or invalid, so show next pass...
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(),
                                 self.data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-                    else: # No previous transit (this should not happen); show next pass...
+                    else: # No previous transit (this should not happen), so show next pass...
                         satellites.append( [
                             number,
                             self.satelliteData[ number ].getName(),
