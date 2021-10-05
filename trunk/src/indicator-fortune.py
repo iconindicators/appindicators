@@ -29,11 +29,12 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
+from indicatorbase import IndicatorBase
 
-import codecs, indicatorbase, os
+import codecs, os
 
 
-class IndicatorFortune( indicatorbase.IndicatorBase ):
+class IndicatorFortune( IndicatorBase ):
 
     CONFIG_FORTUNES = "fortunes"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
