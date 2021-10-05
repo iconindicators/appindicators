@@ -27,12 +27,13 @@ try:
 except ImportError:
     available = False
 
+from astrobase import AstroBase
 from distutils.version import LooseVersion
 
-import astrobase, datetime, eclipse, locale, math
+import datetime, eclipse, locale, math
 
 
-class AstroPyEphem( astrobase.AstroBase ):
+class AstroPyEphem( AstroBase ):
 
     __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem"
     __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
@@ -41,7 +42,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     # Taken from ephem/stars.py
     # Version 3.7.7.0 added new stars but must still support 3.7.6.0 for Ubuntu 16.04/18.04.
     if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
-        astrobase.AstroBase.STARS.extend( [
+        AstroBase.STARS.extend( [
             "ACHERNAR",
             "ADARA",
             "AGENA",
@@ -137,7 +138,7 @@ class AstroPyEphem( astrobase.AstroBase ):
             "WEZEN",
             "ZAURAK" ] )
 
-        astrobase.AstroBase.STARS_TO_HIP.update( {
+        AstroBase.STARS_TO_HIP.update( {
             "ACHERNAR"          :   7588,
             "ADARA"             :   33579,
             "AGENA"             :   68702,
@@ -233,201 +234,201 @@ class AstroPyEphem( astrobase.AstroBase ):
             "WEZEN"             :   34444,
             "ZAURAK"            :   18543 } )
 
-        astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.update( {
-            astrobase.AstroBase.STARS[ 0 ]  :   _( "Achernar" ),
-            astrobase.AstroBase.STARS[ 1 ]  :   _( "Adara" ),
-            astrobase.AstroBase.STARS[ 2 ]  :   _( "Agena" ),
-            astrobase.AstroBase.STARS[ 3 ]  :   _( "Albereo" ),
-            astrobase.AstroBase.STARS[ 4 ]  :   _( "Alcaid" ),
-            astrobase.AstroBase.STARS[ 5 ]  :   _( "Alcor" ),
-            astrobase.AstroBase.STARS[ 6 ]  :   _( "Alcyone" ),
-            astrobase.AstroBase.STARS[ 7 ]  :   _( "Aldebaran" ),
-            astrobase.AstroBase.STARS[ 8 ]  :   _( "Alderamin" ),
-            astrobase.AstroBase.STARS[ 9 ]  :   _( "Alfirk" ),
-            astrobase.AstroBase.STARS[ 10 ] :   _( "Algenib" ),
-            astrobase.AstroBase.STARS[ 11 ] :   _( "Algieba" ),
-            astrobase.AstroBase.STARS[ 12 ] :   _( "Algol" ),
-            astrobase.AstroBase.STARS[ 13 ] :   _( "Alhena" ),
-            astrobase.AstroBase.STARS[ 14 ] :   _( "Alioth" ),
-            astrobase.AstroBase.STARS[ 15 ] :   _( "Almach" ),
-            astrobase.AstroBase.STARS[ 16 ] :   _( "Alnair" ),
-            astrobase.AstroBase.STARS[ 17 ] :   _( "Alnilam" ),
-            astrobase.AstroBase.STARS[ 18 ] :   _( "Alnitak" ),
-            astrobase.AstroBase.STARS[ 19 ] :   _( "Alphard" ),
-            astrobase.AstroBase.STARS[ 20 ] :   _( "Alphecca" ),
-            astrobase.AstroBase.STARS[ 21 ] :   _( "Alshain" ),
-            astrobase.AstroBase.STARS[ 22 ] :   _( "Altair" ),
-            astrobase.AstroBase.STARS[ 23 ] :   _( "Antares" ),
-            astrobase.AstroBase.STARS[ 24 ] :   _( "Arcturus" ),
-            astrobase.AstroBase.STARS[ 25 ] :   _( "Arkab Posterior" ),
-            astrobase.AstroBase.STARS[ 26 ] :   _( "Arkab Prior" ),
-            astrobase.AstroBase.STARS[ 27 ] :   _( "Arneb" ),
-            astrobase.AstroBase.STARS[ 28 ] :   _( "Atlas" ),
-            astrobase.AstroBase.STARS[ 29 ] :   _( "Bellatrix" ),
-            astrobase.AstroBase.STARS[ 30 ] :   _( "Betelgeuse" ),
-            astrobase.AstroBase.STARS[ 31 ] :   _( "Canopus" ),
-            astrobase.AstroBase.STARS[ 32 ] :   _( "Capella" ),
-            astrobase.AstroBase.STARS[ 33 ] :   _( "Caph" ),
-            astrobase.AstroBase.STARS[ 34 ] :   _( "Castor" ),
-            astrobase.AstroBase.STARS[ 35 ] :   _( "Cebalrai" ),
-            astrobase.AstroBase.STARS[ 36 ] :   _( "Deneb" ),
-            astrobase.AstroBase.STARS[ 37 ] :   _( "Denebola" ),
-            astrobase.AstroBase.STARS[ 38 ] :   _( "Dubhe" ),
-            astrobase.AstroBase.STARS[ 39 ] :   _( "Electra" ),
-            astrobase.AstroBase.STARS[ 40 ] :   _( "Elnath" ),
-            astrobase.AstroBase.STARS[ 41 ] :   _( "Enif" ),
-            astrobase.AstroBase.STARS[ 42 ] :   _( "Etamin" ),
-            astrobase.AstroBase.STARS[ 43 ] :   _( "Fomalhaut" ),
-            astrobase.AstroBase.STARS[ 44 ] :   _( "Gienah Corvi" ),
-            astrobase.AstroBase.STARS[ 45 ] :   _( "Hamal" ),
-            astrobase.AstroBase.STARS[ 46 ] :   _( "Izar" ),
-            astrobase.AstroBase.STARS[ 47 ] :   _( "Kaus Australis" ),
-            astrobase.AstroBase.STARS[ 48 ] :   _( "Kochab" ),
-            astrobase.AstroBase.STARS[ 49 ] :   _( "Maia" ),
-            astrobase.AstroBase.STARS[ 50 ] :   _( "Markab" ),
-            astrobase.AstroBase.STARS[ 51 ] :   _( "Megrez" ),
-            astrobase.AstroBase.STARS[ 52 ] :   _( "Menkalinan" ),
-            astrobase.AstroBase.STARS[ 53 ] :   _( "Menkar" ),
-            astrobase.AstroBase.STARS[ 54 ] :   _( "Merak" ),
-            astrobase.AstroBase.STARS[ 55 ] :   _( "Merope" ),
-            astrobase.AstroBase.STARS[ 56 ] :   _( "Mimosa" ),
-            astrobase.AstroBase.STARS[ 57 ] :   _( "Minkar" ),
-            astrobase.AstroBase.STARS[ 58 ] :   _( "Mintaka" ),
-            astrobase.AstroBase.STARS[ 59 ] :   _( "Mirach" ),
-            astrobase.AstroBase.STARS[ 60 ] :   _( "Mirzam" ),
-            astrobase.AstroBase.STARS[ 61 ] :   _( "Mizar" ),
-            astrobase.AstroBase.STARS[ 62 ] :   _( "Naos" ),
-            astrobase.AstroBase.STARS[ 63 ] :   _( "Nihal" ),
-            astrobase.AstroBase.STARS[ 64 ] :   _( "Nunki" ),
-            astrobase.AstroBase.STARS[ 65 ] :   _( "Peacock" ),
-            astrobase.AstroBase.STARS[ 66 ] :   _( "Phecda" ),
-            astrobase.AstroBase.STARS[ 67 ] :   _( "Polaris" ),
-            astrobase.AstroBase.STARS[ 68 ] :   _( "Pollux" ),
-            astrobase.AstroBase.STARS[ 69 ] :   _( "Procyon" ),
-            astrobase.AstroBase.STARS[ 70 ] :   _( "Rasalgethi" ),
-            astrobase.AstroBase.STARS[ 71 ] :   _( "Rasalhague" ),
-            astrobase.AstroBase.STARS[ 72 ] :   _( "Regulus" ),
-            astrobase.AstroBase.STARS[ 73 ] :   _( "Rigel" ),
-            astrobase.AstroBase.STARS[ 74 ] :   _( "Rukbat" ),
-            astrobase.AstroBase.STARS[ 75 ] :   _( "Sadalmelik" ),
-            astrobase.AstroBase.STARS[ 76 ] :   _( "Sadr" ),
-            astrobase.AstroBase.STARS[ 77 ] :   _( "Saiph" ),
-            astrobase.AstroBase.STARS[ 78 ] :   _( "Scheat" ),
-            astrobase.AstroBase.STARS[ 79 ] :   _( "Schedar" ),
-            astrobase.AstroBase.STARS[ 80 ] :   _( "Shaula" ),
-            astrobase.AstroBase.STARS[ 81 ] :   _( "Sheliak" ),
-            astrobase.AstroBase.STARS[ 82 ] :   _( "Sirius" ),
-            astrobase.AstroBase.STARS[ 83 ] :   _( "Sirrah" ),
-            astrobase.AstroBase.STARS[ 84 ] :   _( "Spica" ),
-            astrobase.AstroBase.STARS[ 85 ] :   _( "Sulafat" ),
-            astrobase.AstroBase.STARS[ 86 ] :   _( "Tarazed" ),
-            astrobase.AstroBase.STARS[ 87 ] :   _( "Taygeta" ),
-            astrobase.AstroBase.STARS[ 88 ] :   _( "Thuban" ),
-            astrobase.AstroBase.STARS[ 89 ] :   _( "Unukalhai" ),
-            astrobase.AstroBase.STARS[ 90 ] :   _( "Vega" ),
-            astrobase.AstroBase.STARS[ 91 ] :   _( "Vindemiatrix" ),
-            astrobase.AstroBase.STARS[ 92 ] :   _( "Wezen" ),
-            astrobase.AstroBase.STARS[ 93 ] :   _( "Zaurak" ) } )
+        AstroBase.STAR_NAMES_TRANSLATIONS.update( {
+            AstroBase.STARS[ 0 ]  :   _( "Achernar" ),
+            AstroBase.STARS[ 1 ]  :   _( "Adara" ),
+            AstroBase.STARS[ 2 ]  :   _( "Agena" ),
+            AstroBase.STARS[ 3 ]  :   _( "Albereo" ),
+            AstroBase.STARS[ 4 ]  :   _( "Alcaid" ),
+            AstroBase.STARS[ 5 ]  :   _( "Alcor" ),
+            AstroBase.STARS[ 6 ]  :   _( "Alcyone" ),
+            AstroBase.STARS[ 7 ]  :   _( "Aldebaran" ),
+            AstroBase.STARS[ 8 ]  :   _( "Alderamin" ),
+            AstroBase.STARS[ 9 ]  :   _( "Alfirk" ),
+            AstroBase.STARS[ 10 ] :   _( "Algenib" ),
+            AstroBase.STARS[ 11 ] :   _( "Algieba" ),
+            AstroBase.STARS[ 12 ] :   _( "Algol" ),
+            AstroBase.STARS[ 13 ] :   _( "Alhena" ),
+            AstroBase.STARS[ 14 ] :   _( "Alioth" ),
+            AstroBase.STARS[ 15 ] :   _( "Almach" ),
+            AstroBase.STARS[ 16 ] :   _( "Alnair" ),
+            AstroBase.STARS[ 17 ] :   _( "Alnilam" ),
+            AstroBase.STARS[ 18 ] :   _( "Alnitak" ),
+            AstroBase.STARS[ 19 ] :   _( "Alphard" ),
+            AstroBase.STARS[ 20 ] :   _( "Alphecca" ),
+            AstroBase.STARS[ 21 ] :   _( "Alshain" ),
+            AstroBase.STARS[ 22 ] :   _( "Altair" ),
+            AstroBase.STARS[ 23 ] :   _( "Antares" ),
+            AstroBase.STARS[ 24 ] :   _( "Arcturus" ),
+            AstroBase.STARS[ 25 ] :   _( "Arkab Posterior" ),
+            AstroBase.STARS[ 26 ] :   _( "Arkab Prior" ),
+            AstroBase.STARS[ 27 ] :   _( "Arneb" ),
+            AstroBase.STARS[ 28 ] :   _( "Atlas" ),
+            AstroBase.STARS[ 29 ] :   _( "Bellatrix" ),
+            AstroBase.STARS[ 30 ] :   _( "Betelgeuse" ),
+            AstroBase.STARS[ 31 ] :   _( "Canopus" ),
+            AstroBase.STARS[ 32 ] :   _( "Capella" ),
+            AstroBase.STARS[ 33 ] :   _( "Caph" ),
+            AstroBase.STARS[ 34 ] :   _( "Castor" ),
+            AstroBase.STARS[ 35 ] :   _( "Cebalrai" ),
+            AstroBase.STARS[ 36 ] :   _( "Deneb" ),
+            AstroBase.STARS[ 37 ] :   _( "Denebola" ),
+            AstroBase.STARS[ 38 ] :   _( "Dubhe" ),
+            AstroBase.STARS[ 39 ] :   _( "Electra" ),
+            AstroBase.STARS[ 40 ] :   _( "Elnath" ),
+            AstroBase.STARS[ 41 ] :   _( "Enif" ),
+            AstroBase.STARS[ 42 ] :   _( "Etamin" ),
+            AstroBase.STARS[ 43 ] :   _( "Fomalhaut" ),
+            AstroBase.STARS[ 44 ] :   _( "Gienah Corvi" ),
+            AstroBase.STARS[ 45 ] :   _( "Hamal" ),
+            AstroBase.STARS[ 46 ] :   _( "Izar" ),
+            AstroBase.STARS[ 47 ] :   _( "Kaus Australis" ),
+            AstroBase.STARS[ 48 ] :   _( "Kochab" ),
+            AstroBase.STARS[ 49 ] :   _( "Maia" ),
+            AstroBase.STARS[ 50 ] :   _( "Markab" ),
+            AstroBase.STARS[ 51 ] :   _( "Megrez" ),
+            AstroBase.STARS[ 52 ] :   _( "Menkalinan" ),
+            AstroBase.STARS[ 53 ] :   _( "Menkar" ),
+            AstroBase.STARS[ 54 ] :   _( "Merak" ),
+            AstroBase.STARS[ 55 ] :   _( "Merope" ),
+            AstroBase.STARS[ 56 ] :   _( "Mimosa" ),
+            AstroBase.STARS[ 57 ] :   _( "Minkar" ),
+            AstroBase.STARS[ 58 ] :   _( "Mintaka" ),
+            AstroBase.STARS[ 59 ] :   _( "Mirach" ),
+            AstroBase.STARS[ 60 ] :   _( "Mirzam" ),
+            AstroBase.STARS[ 61 ] :   _( "Mizar" ),
+            AstroBase.STARS[ 62 ] :   _( "Naos" ),
+            AstroBase.STARS[ 63 ] :   _( "Nihal" ),
+            AstroBase.STARS[ 64 ] :   _( "Nunki" ),
+            AstroBase.STARS[ 65 ] :   _( "Peacock" ),
+            AstroBase.STARS[ 66 ] :   _( "Phecda" ),
+            AstroBase.STARS[ 67 ] :   _( "Polaris" ),
+            AstroBase.STARS[ 68 ] :   _( "Pollux" ),
+            AstroBase.STARS[ 69 ] :   _( "Procyon" ),
+            AstroBase.STARS[ 70 ] :   _( "Rasalgethi" ),
+            AstroBase.STARS[ 71 ] :   _( "Rasalhague" ),
+            AstroBase.STARS[ 72 ] :   _( "Regulus" ),
+            AstroBase.STARS[ 73 ] :   _( "Rigel" ),
+            AstroBase.STARS[ 74 ] :   _( "Rukbat" ),
+            AstroBase.STARS[ 75 ] :   _( "Sadalmelik" ),
+            AstroBase.STARS[ 76 ] :   _( "Sadr" ),
+            AstroBase.STARS[ 77 ] :   _( "Saiph" ),
+            AstroBase.STARS[ 78 ] :   _( "Scheat" ),
+            AstroBase.STARS[ 79 ] :   _( "Schedar" ),
+            AstroBase.STARS[ 80 ] :   _( "Shaula" ),
+            AstroBase.STARS[ 81 ] :   _( "Sheliak" ),
+            AstroBase.STARS[ 82 ] :   _( "Sirius" ),
+            AstroBase.STARS[ 83 ] :   _( "Sirrah" ),
+            AstroBase.STARS[ 84 ] :   _( "Spica" ),
+            AstroBase.STARS[ 85 ] :   _( "Sulafat" ),
+            AstroBase.STARS[ 86 ] :   _( "Tarazed" ),
+            AstroBase.STARS[ 87 ] :   _( "Taygeta" ),
+            AstroBase.STARS[ 88 ] :   _( "Thuban" ),
+            AstroBase.STARS[ 89 ] :   _( "Unukalhai" ),
+            AstroBase.STARS[ 90 ] :   _( "Vega" ),
+            AstroBase.STARS[ 91 ] :   _( "Vindemiatrix" ),
+            AstroBase.STARS[ 92 ] :   _( "Wezen" ),
+            AstroBase.STARS[ 93 ] :   _( "Zaurak" ) } )
 
         # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
-        astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
-            astrobase.AstroBase.STARS[ 0 ]  :   _( "ACHERNAR" ),
-            astrobase.AstroBase.STARS[ 1 ]  :   _( "ADARA" ),
-            astrobase.AstroBase.STARS[ 2 ]  :   _( "AGENA" ),
-            astrobase.AstroBase.STARS[ 3 ]  :   _( "ALBEREO" ),
-            astrobase.AstroBase.STARS[ 4 ]  :   _( "ALCAID" ),
-            astrobase.AstroBase.STARS[ 5 ]  :   _( "ALCOR" ),
-            astrobase.AstroBase.STARS[ 6 ]  :   _( "ALCYONE" ),
-            astrobase.AstroBase.STARS[ 7 ]  :   _( "ALDEBARAN" ),
-            astrobase.AstroBase.STARS[ 8 ]  :   _( "ALDERAMIN" ),
-            astrobase.AstroBase.STARS[ 9 ]  :   _( "ALFIRK" ),
-            astrobase.AstroBase.STARS[ 10 ] :   _( "ALGENIB" ),
-            astrobase.AstroBase.STARS[ 11 ] :   _( "ALGIEBA" ),
-            astrobase.AstroBase.STARS[ 12 ] :   _( "ALGOL" ),
-            astrobase.AstroBase.STARS[ 13 ] :   _( "ALHENA" ),
-            astrobase.AstroBase.STARS[ 14 ] :   _( "ALIOTH" ),
-            astrobase.AstroBase.STARS[ 15 ] :   _( "ALMACH" ),
-            astrobase.AstroBase.STARS[ 16 ] :   _( "ALNAIR" ),
-            astrobase.AstroBase.STARS[ 17 ] :   _( "ALNILAM" ),
-            astrobase.AstroBase.STARS[ 18 ] :   _( "ALNITAK" ),
-            astrobase.AstroBase.STARS[ 19 ] :   _( "ALPHARD" ),
-            astrobase.AstroBase.STARS[ 20 ] :   _( "ALPHECCA" ),
-            astrobase.AstroBase.STARS[ 21 ] :   _( "ALSHAIN" ),
-            astrobase.AstroBase.STARS[ 22 ] :   _( "ALTAIR" ),
-            astrobase.AstroBase.STARS[ 23 ] :   _( "ANTARES" ),
-            astrobase.AstroBase.STARS[ 24 ] :   _( "ARCTURUS" ),
-            astrobase.AstroBase.STARS[ 25 ] :   _( "ARKAB POSTERIOR" ),
-            astrobase.AstroBase.STARS[ 26 ] :   _( "ARKAB PRIOR" ),
-            astrobase.AstroBase.STARS[ 27 ] :   _( "ARNEB" ),
-            astrobase.AstroBase.STARS[ 28 ] :   _( "ATLAS" ),
-            astrobase.AstroBase.STARS[ 29 ] :   _( "BELLATRIX" ),
-            astrobase.AstroBase.STARS[ 30 ] :   _( "BETELGEUSE" ),
-            astrobase.AstroBase.STARS[ 31 ] :   _( "CANOPUS" ),
-            astrobase.AstroBase.STARS[ 32 ] :   _( "CAPELLA" ),
-            astrobase.AstroBase.STARS[ 33 ] :   _( "CAPH" ),
-            astrobase.AstroBase.STARS[ 34 ] :   _( "CASTOR" ),
-            astrobase.AstroBase.STARS[ 35 ] :   _( "CEBALRAI" ),
-            astrobase.AstroBase.STARS[ 36 ] :   _( "DENEB" ),
-            astrobase.AstroBase.STARS[ 37 ] :   _( "DENEBOLA" ),
-            astrobase.AstroBase.STARS[ 38 ] :   _( "DUBHE" ),
-            astrobase.AstroBase.STARS[ 39 ] :   _( "ELECTRA" ),
-            astrobase.AstroBase.STARS[ 40 ] :   _( "ELNATH" ),
-            astrobase.AstroBase.STARS[ 41 ] :   _( "ENIF" ),
-            astrobase.AstroBase.STARS[ 42 ] :   _( "ETAMIN" ),
-            astrobase.AstroBase.STARS[ 43 ] :   _( "FOMALHAUT" ),
-            astrobase.AstroBase.STARS[ 44 ] :   _( "GIENAH CORVI" ),
-            astrobase.AstroBase.STARS[ 45 ] :   _( "HAMAL" ),
-            astrobase.AstroBase.STARS[ 46 ] :   _( "IZAR" ),
-            astrobase.AstroBase.STARS[ 47 ] :   _( "KAUS AUSTRALIS" ),
-            astrobase.AstroBase.STARS[ 48 ] :   _( "KOCHAB" ),
-            astrobase.AstroBase.STARS[ 49 ] :   _( "MAIA" ),
-            astrobase.AstroBase.STARS[ 50 ] :   _( "MARKAB" ),
-            astrobase.AstroBase.STARS[ 51 ] :   _( "MEGREZ" ),
-            astrobase.AstroBase.STARS[ 52 ] :   _( "MENKALINAN" ),
-            astrobase.AstroBase.STARS[ 53 ] :   _( "MENKAR" ),
-            astrobase.AstroBase.STARS[ 54 ] :   _( "MERAK" ),
-            astrobase.AstroBase.STARS[ 55 ] :   _( "MEROPE" ),
-            astrobase.AstroBase.STARS[ 56 ] :   _( "MIMOSA" ),
-            astrobase.AstroBase.STARS[ 57 ] :   _( "MINKAR" ),
-            astrobase.AstroBase.STARS[ 58 ] :   _( "MINTAKA" ),
-            astrobase.AstroBase.STARS[ 59 ] :   _( "MIRACH" ),
-            astrobase.AstroBase.STARS[ 60 ] :   _( "MIRZAM" ),
-            astrobase.AstroBase.STARS[ 61 ] :   _( "MIZAR" ),
-            astrobase.AstroBase.STARS[ 62 ] :   _( "NAOS" ),
-            astrobase.AstroBase.STARS[ 63 ] :   _( "NIHAL" ),
-            astrobase.AstroBase.STARS[ 64 ] :   _( "NUNKI" ),
-            astrobase.AstroBase.STARS[ 65 ] :   _( "PEACOCK" ),
-            astrobase.AstroBase.STARS[ 66 ] :   _( "PHECDA" ),
-            astrobase.AstroBase.STARS[ 67 ] :   _( "POLARIS" ),
-            astrobase.AstroBase.STARS[ 68 ] :   _( "POLLUX" ),
-            astrobase.AstroBase.STARS[ 69 ] :   _( "PROCYON" ),
-            astrobase.AstroBase.STARS[ 70 ] :   _( "RASALGETHI" ),
-            astrobase.AstroBase.STARS[ 71 ] :   _( "RASALHAGUE" ),
-            astrobase.AstroBase.STARS[ 72 ] :   _( "REGULUS" ),
-            astrobase.AstroBase.STARS[ 73 ] :   _( "RIGEL" ),
-            astrobase.AstroBase.STARS[ 74 ] :   _( "RUKBAT" ),
-            astrobase.AstroBase.STARS[ 75 ] :   _( "SADALMELIK" ),
-            astrobase.AstroBase.STARS[ 76 ] :   _( "SADR" ),
-            astrobase.AstroBase.STARS[ 77 ] :   _( "SAIPH" ),
-            astrobase.AstroBase.STARS[ 78 ] :   _( "SCHEAT" ),
-            astrobase.AstroBase.STARS[ 79 ] :   _( "SCHEDAR" ),
-            astrobase.AstroBase.STARS[ 80 ] :   _( "SHAULA" ),
-            astrobase.AstroBase.STARS[ 81 ] :   _( "SHELIAK" ),
-            astrobase.AstroBase.STARS[ 82 ] :   _( "SIRIUS" ),
-            astrobase.AstroBase.STARS[ 83 ] :   _( "SIRRAH" ),
-            astrobase.AstroBase.STARS[ 84 ] :   _( "SPICA" ),
-            astrobase.AstroBase.STARS[ 85 ] :   _( "SULAFAT" ),
-            astrobase.AstroBase.STARS[ 86 ] :   _( "TARAZED" ),
-            astrobase.AstroBase.STARS[ 87 ] :   _( "TAYGETA" ),
-            astrobase.AstroBase.STARS[ 88 ] :   _( "THUBAN" ),
-            astrobase.AstroBase.STARS[ 89 ] :   _( "UNUKALHAI" ),
-            astrobase.AstroBase.STARS[ 90 ] :   _( "VEGA" ),
-            astrobase.AstroBase.STARS[ 91 ] :   _( "VINDEMIATRIX" ),
-            astrobase.AstroBase.STARS[ 92 ] :   _( "WEZEN" ),
-            astrobase.AstroBase.STARS[ 93 ] :   _( "ZAURAK" ) } )
+        AstroBase.STAR_TAGS_TRANSLATIONS.update( {
+            AstroBase.STARS[ 0 ]  :   _( "ACHERNAR" ),
+            AstroBase.STARS[ 1 ]  :   _( "ADARA" ),
+            AstroBase.STARS[ 2 ]  :   _( "AGENA" ),
+            AstroBase.STARS[ 3 ]  :   _( "ALBEREO" ),
+            AstroBase.STARS[ 4 ]  :   _( "ALCAID" ),
+            AstroBase.STARS[ 5 ]  :   _( "ALCOR" ),
+            AstroBase.STARS[ 6 ]  :   _( "ALCYONE" ),
+            AstroBase.STARS[ 7 ]  :   _( "ALDEBARAN" ),
+            AstroBase.STARS[ 8 ]  :   _( "ALDERAMIN" ),
+            AstroBase.STARS[ 9 ]  :   _( "ALFIRK" ),
+            AstroBase.STARS[ 10 ] :   _( "ALGENIB" ),
+            AstroBase.STARS[ 11 ] :   _( "ALGIEBA" ),
+            AstroBase.STARS[ 12 ] :   _( "ALGOL" ),
+            AstroBase.STARS[ 13 ] :   _( "ALHENA" ),
+            AstroBase.STARS[ 14 ] :   _( "ALIOTH" ),
+            AstroBase.STARS[ 15 ] :   _( "ALMACH" ),
+            AstroBase.STARS[ 16 ] :   _( "ALNAIR" ),
+            AstroBase.STARS[ 17 ] :   _( "ALNILAM" ),
+            AstroBase.STARS[ 18 ] :   _( "ALNITAK" ),
+            AstroBase.STARS[ 19 ] :   _( "ALPHARD" ),
+            AstroBase.STARS[ 20 ] :   _( "ALPHECCA" ),
+            AstroBase.STARS[ 21 ] :   _( "ALSHAIN" ),
+            AstroBase.STARS[ 22 ] :   _( "ALTAIR" ),
+            AstroBase.STARS[ 23 ] :   _( "ANTARES" ),
+            AstroBase.STARS[ 24 ] :   _( "ARCTURUS" ),
+            AstroBase.STARS[ 25 ] :   _( "ARKAB POSTERIOR" ),
+            AstroBase.STARS[ 26 ] :   _( "ARKAB PRIOR" ),
+            AstroBase.STARS[ 27 ] :   _( "ARNEB" ),
+            AstroBase.STARS[ 28 ] :   _( "ATLAS" ),
+            AstroBase.STARS[ 29 ] :   _( "BELLATRIX" ),
+            AstroBase.STARS[ 30 ] :   _( "BETELGEUSE" ),
+            AstroBase.STARS[ 31 ] :   _( "CANOPUS" ),
+            AstroBase.STARS[ 32 ] :   _( "CAPELLA" ),
+            AstroBase.STARS[ 33 ] :   _( "CAPH" ),
+            AstroBase.STARS[ 34 ] :   _( "CASTOR" ),
+            AstroBase.STARS[ 35 ] :   _( "CEBALRAI" ),
+            AstroBase.STARS[ 36 ] :   _( "DENEB" ),
+            AstroBase.STARS[ 37 ] :   _( "DENEBOLA" ),
+            AstroBase.STARS[ 38 ] :   _( "DUBHE" ),
+            AstroBase.STARS[ 39 ] :   _( "ELECTRA" ),
+            AstroBase.STARS[ 40 ] :   _( "ELNATH" ),
+            AstroBase.STARS[ 41 ] :   _( "ENIF" ),
+            AstroBase.STARS[ 42 ] :   _( "ETAMIN" ),
+            AstroBase.STARS[ 43 ] :   _( "FOMALHAUT" ),
+            AstroBase.STARS[ 44 ] :   _( "GIENAH CORVI" ),
+            AstroBase.STARS[ 45 ] :   _( "HAMAL" ),
+            AstroBase.STARS[ 46 ] :   _( "IZAR" ),
+            AstroBase.STARS[ 47 ] :   _( "KAUS AUSTRALIS" ),
+            AstroBase.STARS[ 48 ] :   _( "KOCHAB" ),
+            AstroBase.STARS[ 49 ] :   _( "MAIA" ),
+            AstroBase.STARS[ 50 ] :   _( "MARKAB" ),
+            AstroBase.STARS[ 51 ] :   _( "MEGREZ" ),
+            AstroBase.STARS[ 52 ] :   _( "MENKALINAN" ),
+            AstroBase.STARS[ 53 ] :   _( "MENKAR" ),
+            AstroBase.STARS[ 54 ] :   _( "MERAK" ),
+            AstroBase.STARS[ 55 ] :   _( "MEROPE" ),
+            AstroBase.STARS[ 56 ] :   _( "MIMOSA" ),
+            AstroBase.STARS[ 57 ] :   _( "MINKAR" ),
+            AstroBase.STARS[ 58 ] :   _( "MINTAKA" ),
+            AstroBase.STARS[ 59 ] :   _( "MIRACH" ),
+            AstroBase.STARS[ 60 ] :   _( "MIRZAM" ),
+            AstroBase.STARS[ 61 ] :   _( "MIZAR" ),
+            AstroBase.STARS[ 62 ] :   _( "NAOS" ),
+            AstroBase.STARS[ 63 ] :   _( "NIHAL" ),
+            AstroBase.STARS[ 64 ] :   _( "NUNKI" ),
+            AstroBase.STARS[ 65 ] :   _( "PEACOCK" ),
+            AstroBase.STARS[ 66 ] :   _( "PHECDA" ),
+            AstroBase.STARS[ 67 ] :   _( "POLARIS" ),
+            AstroBase.STARS[ 68 ] :   _( "POLLUX" ),
+            AstroBase.STARS[ 69 ] :   _( "PROCYON" ),
+            AstroBase.STARS[ 70 ] :   _( "RASALGETHI" ),
+            AstroBase.STARS[ 71 ] :   _( "RASALHAGUE" ),
+            AstroBase.STARS[ 72 ] :   _( "REGULUS" ),
+            AstroBase.STARS[ 73 ] :   _( "RIGEL" ),
+            AstroBase.STARS[ 74 ] :   _( "RUKBAT" ),
+            AstroBase.STARS[ 75 ] :   _( "SADALMELIK" ),
+            AstroBase.STARS[ 76 ] :   _( "SADR" ),
+            AstroBase.STARS[ 77 ] :   _( "SAIPH" ),
+            AstroBase.STARS[ 78 ] :   _( "SCHEAT" ),
+            AstroBase.STARS[ 79 ] :   _( "SCHEDAR" ),
+            AstroBase.STARS[ 80 ] :   _( "SHAULA" ),
+            AstroBase.STARS[ 81 ] :   _( "SHELIAK" ),
+            AstroBase.STARS[ 82 ] :   _( "SIRIUS" ),
+            AstroBase.STARS[ 83 ] :   _( "SIRRAH" ),
+            AstroBase.STARS[ 84 ] :   _( "SPICA" ),
+            AstroBase.STARS[ 85 ] :   _( "SULAFAT" ),
+            AstroBase.STARS[ 86 ] :   _( "TARAZED" ),
+            AstroBase.STARS[ 87 ] :   _( "TAYGETA" ),
+            AstroBase.STARS[ 88 ] :   _( "THUBAN" ),
+            AstroBase.STARS[ 89 ] :   _( "UNUKALHAI" ),
+            AstroBase.STARS[ 90 ] :   _( "VEGA" ),
+            AstroBase.STARS[ 91 ] :   _( "VINDEMIATRIX" ),
+            AstroBase.STARS[ 92 ] :   _( "WEZEN" ),
+            AstroBase.STARS[ 93 ] :   _( "ZAURAK" ) } )
 
     else: # 3.7.7.0 or better.
-        astrobase.AstroBase.STARS.extend( [
+        AstroBase.STARS.extend( [
             "ACAMAR",
             "ACHERNAR",
             "ACRUX",
@@ -544,7 +545,7 @@ class AstroPyEphem( astrobase.AstroBase ):
             "ZAURAK",
             "ZUBENELGENUBI" ] )
 
-        astrobase.AstroBase.STARS_TO_HIP.update( {
+        AstroBase.STARS_TO_HIP.update( {
             "ACAMAR"            :   13847,
             "ACHERNAR"          :   7588,
             "ACRUX"             :   60718,
@@ -661,240 +662,240 @@ class AstroPyEphem( astrobase.AstroBase ):
             "ZAURAK"            :   18543,
             "ZUBENELGENUBI"     :   72603 } )
 
-        astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.update( {
-            astrobase.AstroBase.STARS[ 0 ]      :   _( "Acamar" ),
-            astrobase.AstroBase.STARS[ 1 ]      :   _( "Achernar" ),
-            astrobase.AstroBase.STARS[ 2 ]      :   _( "Acrux" ),
-            astrobase.AstroBase.STARS[ 3 ]      :   _( "Adara" ),
-            astrobase.AstroBase.STARS[ 4 ]      :   _( "Adhara" ),
-            astrobase.AstroBase.STARS[ 5 ]      :   _( "Agena" ),
-            astrobase.AstroBase.STARS[ 6 ]      :   _( "Albereo" ),
-            astrobase.AstroBase.STARS[ 7 ]      :   _( "Alcaid" ),
-            astrobase.AstroBase.STARS[ 8 ]      :   _( "Alcor" ),
-            astrobase.AstroBase.STARS[ 9 ]      :   _( "Alcyone" ),
-            astrobase.AstroBase.STARS[ 10 ]     :   _( "Aldebaran" ),
-            astrobase.AstroBase.STARS[ 11 ]     :   _( "Alderamin" ),
-            astrobase.AstroBase.STARS[ 12 ]     :   _( "Alfirk" ),
-            astrobase.AstroBase.STARS[ 13 ]     :   _( "Algenib" ),
-            astrobase.AstroBase.STARS[ 14 ]     :   _( "Algieba" ),
-            astrobase.AstroBase.STARS[ 15 ]     :   _( "Algol" ),
-            astrobase.AstroBase.STARS[ 16 ]     :   _( "Alhena" ),
-            astrobase.AstroBase.STARS[ 17 ]     :   _( "Alioth" ),
-            astrobase.AstroBase.STARS[ 18 ]     :   _( "Alkaid" ),
-            astrobase.AstroBase.STARS[ 19 ]     :   _( "Almach" ),
-            astrobase.AstroBase.STARS[ 20 ]     :   _( "Alnair" ),
-            astrobase.AstroBase.STARS[ 21 ]     :   _( "Alnilam" ),
-            astrobase.AstroBase.STARS[ 22 ]     :   _( "Alnitak" ),
-            astrobase.AstroBase.STARS[ 23 ]     :   _( "Alphard" ),
-            astrobase.AstroBase.STARS[ 24 ]     :   _( "Alphecca" ),
-            astrobase.AstroBase.STARS[ 25 ]     :   _( "Alpheratz" ),
-            astrobase.AstroBase.STARS[ 26 ]     :   _( "Alshain" ),
-            astrobase.AstroBase.STARS[ 27 ]     :   _( "Altair" ),
-            astrobase.AstroBase.STARS[ 28 ]     :   _( "Ankaa" ),
-            astrobase.AstroBase.STARS[ 29 ]     :   _( "Antares" ),
-            astrobase.AstroBase.STARS[ 30 ]     :   _( "Arcturus" ),
-            astrobase.AstroBase.STARS[ 31 ]     :   _( "Arkab Posterior" ),
-            astrobase.AstroBase.STARS[ 32 ]     :   _( "Arkab Prior" ),
-            astrobase.AstroBase.STARS[ 33 ]     :   _( "Arneb" ),
-            astrobase.AstroBase.STARS[ 34 ]     :   _( "Atlas" ),
-            astrobase.AstroBase.STARS[ 35 ]     :   _( "Atria" ),
-            astrobase.AstroBase.STARS[ 36 ]     :   _( "Avior" ),
-            astrobase.AstroBase.STARS[ 37 ]     :   _( "Bellatrix" ),
-            astrobase.AstroBase.STARS[ 38 ]     :   _( "Betelgeuse" ),
-            astrobase.AstroBase.STARS[ 39 ]     :   _( "Canopus" ),
-            astrobase.AstroBase.STARS[ 40 ]     :   _( "Capella" ),
-            astrobase.AstroBase.STARS[ 41 ]     :   _( "Caph" ),
-            astrobase.AstroBase.STARS[ 42 ]     :   _( "Castor" ),
-            astrobase.AstroBase.STARS[ 43 ]     :   _( "Cebalrai" ),
-            astrobase.AstroBase.STARS[ 44 ]     :   _( "Deneb" ),
-            astrobase.AstroBase.STARS[ 45 ]     :   _( "Denebola" ),
-            astrobase.AstroBase.STARS[ 46 ]     :   _( "Diphda" ),
-            astrobase.AstroBase.STARS[ 47 ]     :   _( "Dubhe" ),
-            astrobase.AstroBase.STARS[ 48 ]     :   _( "Electra" ),
-            astrobase.AstroBase.STARS[ 49 ]     :   _( "Elnath" ),
-            astrobase.AstroBase.STARS[ 50 ]     :   _( "Eltanin" ),
-            astrobase.AstroBase.STARS[ 51 ]     :   _( "Enif" ),
-            astrobase.AstroBase.STARS[ 52 ]     :   _( "Etamin" ),
-            astrobase.AstroBase.STARS[ 53 ]     :   _( "Fomalhaut" ),
-            astrobase.AstroBase.STARS[ 54 ]     :   _( "Formalhaut" ),
-            astrobase.AstroBase.STARS[ 55 ]     :   _( "Gacrux" ),
-            astrobase.AstroBase.STARS[ 56 ]     :   _( "Gienah" ),
-            astrobase.AstroBase.STARS[ 57 ]     :   _( "Gienah Corvi" ),
-            astrobase.AstroBase.STARS[ 58 ]     :   _( "Hadar" ),
-            astrobase.AstroBase.STARS[ 59 ]     :   _( "Hamal" ),
-            astrobase.AstroBase.STARS[ 60 ]     :   _( "Izar" ),
-            astrobase.AstroBase.STARS[ 61 ]     :   _( "Kaus Australis" ),
-            astrobase.AstroBase.STARS[ 62 ]     :   _( "Kochab" ),
-            astrobase.AstroBase.STARS[ 63 ]     :   _( "Maia" ),
-            astrobase.AstroBase.STARS[ 64 ]     :   _( "Markab" ),
-            astrobase.AstroBase.STARS[ 65 ]     :   _( "Megrez" ),
-            astrobase.AstroBase.STARS[ 66 ]     :   _( "Menkalinan" ),
-            astrobase.AstroBase.STARS[ 67 ]     :   _( "Menkar" ),
-            astrobase.AstroBase.STARS[ 68 ]     :   _( "Menkent" ),
-            astrobase.AstroBase.STARS[ 69 ]     :   _( "Merak" ),
-            astrobase.AstroBase.STARS[ 70 ]     :   _( "Merope" ),
-            astrobase.AstroBase.STARS[ 71 ]     :   _( "Miaplacidus" ),
-            astrobase.AstroBase.STARS[ 72 ]     :   _( "Mimosa" ),
-            astrobase.AstroBase.STARS[ 73 ]     :   _( "Minkar" ),
-            astrobase.AstroBase.STARS[ 74 ]     :   _( "Mintaka" ),
-            astrobase.AstroBase.STARS[ 75 ]     :   _( "Mirach" ),
-            astrobase.AstroBase.STARS[ 76 ]     :   _( "Mirfak" ),
-            astrobase.AstroBase.STARS[ 77 ]     :   _( "Mirzam" ),
-            astrobase.AstroBase.STARS[ 78 ]     :   _( "Mizar" ),
-            astrobase.AstroBase.STARS[ 79 ]     :   _( "Naos" ),
-            astrobase.AstroBase.STARS[ 80 ]     :   _( "Nihal" ),
-            astrobase.AstroBase.STARS[ 81 ]     :   _( "Nunki" ),
-            astrobase.AstroBase.STARS[ 82 ]     :   _( "Peacock" ),
-            astrobase.AstroBase.STARS[ 83 ]     :   _( "Phecda" ),
-            astrobase.AstroBase.STARS[ 84 ]     :   _( "Polaris" ),
-            astrobase.AstroBase.STARS[ 85 ]     :   _( "Pollux" ),
-            astrobase.AstroBase.STARS[ 86 ]     :   _( "Procyon" ),
-            astrobase.AstroBase.STARS[ 87 ]     :   _( "Rasalgethi" ),
-            astrobase.AstroBase.STARS[ 88 ]     :   _( "Rasalhague" ),
-            astrobase.AstroBase.STARS[ 89 ]     :   _( "Regulus" ),
-            astrobase.AstroBase.STARS[ 90 ]     :   _( "Rigel" ),
-            astrobase.AstroBase.STARS[ 91 ]     :   _( "Rigil Kentaurus" ),
-            astrobase.AstroBase.STARS[ 92 ]     :   _( "Rukbat" ),
-            astrobase.AstroBase.STARS[ 93 ]     :   _( "Sabik" ),
-            astrobase.AstroBase.STARS[ 94 ]     :   _( "Sadalmelik" ),
-            astrobase.AstroBase.STARS[ 95 ]     :   _( "Sadr" ),
-            astrobase.AstroBase.STARS[ 96 ]     :   _( "Saiph" ),
-            astrobase.AstroBase.STARS[ 97 ]     :   _( "Scheat" ),
-            astrobase.AstroBase.STARS[ 98 ]     :   _( "Schedar" ),
-            astrobase.AstroBase.STARS[ 99 ]     :   _( "Shaula" ),
-            astrobase.AstroBase.STARS[ 100 ]    :   _( "Sheliak" ),
-            astrobase.AstroBase.STARS[ 101 ]    :   _( "Sirius" ),
-            astrobase.AstroBase.STARS[ 102 ]    :   _( "Sirrah" ),
-            astrobase.AstroBase.STARS[ 103 ]    :   _( "Spica" ),
-            astrobase.AstroBase.STARS[ 104 ]    :   _( "Suhail" ),
-            astrobase.AstroBase.STARS[ 105 ]    :   _( "Sulafat" ),
-            astrobase.AstroBase.STARS[ 106 ]    :   _( "Tarazed" ),
-            astrobase.AstroBase.STARS[ 107 ]    :   _( "Taygeta" ),
-            astrobase.AstroBase.STARS[ 108 ]    :   _( "Thuban" ),
-            astrobase.AstroBase.STARS[ 109 ]    :   _( "Unukalhai" ),
-            astrobase.AstroBase.STARS[ 110 ]    :   _( "Vega" ),
-            astrobase.AstroBase.STARS[ 111 ]    :   _( "Vindemiatrix" ),
-            astrobase.AstroBase.STARS[ 112 ]    :   _( "Wezen" ),
-            astrobase.AstroBase.STARS[ 113 ]    :   _( "Zaurak" ),
-            astrobase.AstroBase.STARS[ 114 ]    :   _( "Zubenelgenubi" ) } )
+        AstroBase.STAR_NAMES_TRANSLATIONS.update( {
+            AstroBase.STARS[ 0 ]      :   _( "Acamar" ),
+            AstroBase.STARS[ 1 ]      :   _( "Achernar" ),
+            AstroBase.STARS[ 2 ]      :   _( "Acrux" ),
+            AstroBase.STARS[ 3 ]      :   _( "Adara" ),
+            AstroBase.STARS[ 4 ]      :   _( "Adhara" ),
+            AstroBase.STARS[ 5 ]      :   _( "Agena" ),
+            AstroBase.STARS[ 6 ]      :   _( "Albereo" ),
+            AstroBase.STARS[ 7 ]      :   _( "Alcaid" ),
+            AstroBase.STARS[ 8 ]      :   _( "Alcor" ),
+            AstroBase.STARS[ 9 ]      :   _( "Alcyone" ),
+            AstroBase.STARS[ 10 ]     :   _( "Aldebaran" ),
+            AstroBase.STARS[ 11 ]     :   _( "Alderamin" ),
+            AstroBase.STARS[ 12 ]     :   _( "Alfirk" ),
+            AstroBase.STARS[ 13 ]     :   _( "Algenib" ),
+            AstroBase.STARS[ 14 ]     :   _( "Algieba" ),
+            AstroBase.STARS[ 15 ]     :   _( "Algol" ),
+            AstroBase.STARS[ 16 ]     :   _( "Alhena" ),
+            AstroBase.STARS[ 17 ]     :   _( "Alioth" ),
+            AstroBase.STARS[ 18 ]     :   _( "Alkaid" ),
+            AstroBase.STARS[ 19 ]     :   _( "Almach" ),
+            AstroBase.STARS[ 20 ]     :   _( "Alnair" ),
+            AstroBase.STARS[ 21 ]     :   _( "Alnilam" ),
+            AstroBase.STARS[ 22 ]     :   _( "Alnitak" ),
+            AstroBase.STARS[ 23 ]     :   _( "Alphard" ),
+            AstroBase.STARS[ 24 ]     :   _( "Alphecca" ),
+            AstroBase.STARS[ 25 ]     :   _( "Alpheratz" ),
+            AstroBase.STARS[ 26 ]     :   _( "Alshain" ),
+            AstroBase.STARS[ 27 ]     :   _( "Altair" ),
+            AstroBase.STARS[ 28 ]     :   _( "Ankaa" ),
+            AstroBase.STARS[ 29 ]     :   _( "Antares" ),
+            AstroBase.STARS[ 30 ]     :   _( "Arcturus" ),
+            AstroBase.STARS[ 31 ]     :   _( "Arkab Posterior" ),
+            AstroBase.STARS[ 32 ]     :   _( "Arkab Prior" ),
+            AstroBase.STARS[ 33 ]     :   _( "Arneb" ),
+            AstroBase.STARS[ 34 ]     :   _( "Atlas" ),
+            AstroBase.STARS[ 35 ]     :   _( "Atria" ),
+            AstroBase.STARS[ 36 ]     :   _( "Avior" ),
+            AstroBase.STARS[ 37 ]     :   _( "Bellatrix" ),
+            AstroBase.STARS[ 38 ]     :   _( "Betelgeuse" ),
+            AstroBase.STARS[ 39 ]     :   _( "Canopus" ),
+            AstroBase.STARS[ 40 ]     :   _( "Capella" ),
+            AstroBase.STARS[ 41 ]     :   _( "Caph" ),
+            AstroBase.STARS[ 42 ]     :   _( "Castor" ),
+            AstroBase.STARS[ 43 ]     :   _( "Cebalrai" ),
+            AstroBase.STARS[ 44 ]     :   _( "Deneb" ),
+            AstroBase.STARS[ 45 ]     :   _( "Denebola" ),
+            AstroBase.STARS[ 46 ]     :   _( "Diphda" ),
+            AstroBase.STARS[ 47 ]     :   _( "Dubhe" ),
+            AstroBase.STARS[ 48 ]     :   _( "Electra" ),
+            AstroBase.STARS[ 49 ]     :   _( "Elnath" ),
+            AstroBase.STARS[ 50 ]     :   _( "Eltanin" ),
+            AstroBase.STARS[ 51 ]     :   _( "Enif" ),
+            AstroBase.STARS[ 52 ]     :   _( "Etamin" ),
+            AstroBase.STARS[ 53 ]     :   _( "Fomalhaut" ),
+            AstroBase.STARS[ 54 ]     :   _( "Formalhaut" ),
+            AstroBase.STARS[ 55 ]     :   _( "Gacrux" ),
+            AstroBase.STARS[ 56 ]     :   _( "Gienah" ),
+            AstroBase.STARS[ 57 ]     :   _( "Gienah Corvi" ),
+            AstroBase.STARS[ 58 ]     :   _( "Hadar" ),
+            AstroBase.STARS[ 59 ]     :   _( "Hamal" ),
+            AstroBase.STARS[ 60 ]     :   _( "Izar" ),
+            AstroBase.STARS[ 61 ]     :   _( "Kaus Australis" ),
+            AstroBase.STARS[ 62 ]     :   _( "Kochab" ),
+            AstroBase.STARS[ 63 ]     :   _( "Maia" ),
+            AstroBase.STARS[ 64 ]     :   _( "Markab" ),
+            AstroBase.STARS[ 65 ]     :   _( "Megrez" ),
+            AstroBase.STARS[ 66 ]     :   _( "Menkalinan" ),
+            AstroBase.STARS[ 67 ]     :   _( "Menkar" ),
+            AstroBase.STARS[ 68 ]     :   _( "Menkent" ),
+            AstroBase.STARS[ 69 ]     :   _( "Merak" ),
+            AstroBase.STARS[ 70 ]     :   _( "Merope" ),
+            AstroBase.STARS[ 71 ]     :   _( "Miaplacidus" ),
+            AstroBase.STARS[ 72 ]     :   _( "Mimosa" ),
+            AstroBase.STARS[ 73 ]     :   _( "Minkar" ),
+            AstroBase.STARS[ 74 ]     :   _( "Mintaka" ),
+            AstroBase.STARS[ 75 ]     :   _( "Mirach" ),
+            AstroBase.STARS[ 76 ]     :   _( "Mirfak" ),
+            AstroBase.STARS[ 77 ]     :   _( "Mirzam" ),
+            AstroBase.STARS[ 78 ]     :   _( "Mizar" ),
+            AstroBase.STARS[ 79 ]     :   _( "Naos" ),
+            AstroBase.STARS[ 80 ]     :   _( "Nihal" ),
+            AstroBase.STARS[ 81 ]     :   _( "Nunki" ),
+            AstroBase.STARS[ 82 ]     :   _( "Peacock" ),
+            AstroBase.STARS[ 83 ]     :   _( "Phecda" ),
+            AstroBase.STARS[ 84 ]     :   _( "Polaris" ),
+            AstroBase.STARS[ 85 ]     :   _( "Pollux" ),
+            AstroBase.STARS[ 86 ]     :   _( "Procyon" ),
+            AstroBase.STARS[ 87 ]     :   _( "Rasalgethi" ),
+            AstroBase.STARS[ 88 ]     :   _( "Rasalhague" ),
+            AstroBase.STARS[ 89 ]     :   _( "Regulus" ),
+            AstroBase.STARS[ 90 ]     :   _( "Rigel" ),
+            AstroBase.STARS[ 91 ]     :   _( "Rigil Kentaurus" ),
+            AstroBase.STARS[ 92 ]     :   _( "Rukbat" ),
+            AstroBase.STARS[ 93 ]     :   _( "Sabik" ),
+            AstroBase.STARS[ 94 ]     :   _( "Sadalmelik" ),
+            AstroBase.STARS[ 95 ]     :   _( "Sadr" ),
+            AstroBase.STARS[ 96 ]     :   _( "Saiph" ),
+            AstroBase.STARS[ 97 ]     :   _( "Scheat" ),
+            AstroBase.STARS[ 98 ]     :   _( "Schedar" ),
+            AstroBase.STARS[ 99 ]     :   _( "Shaula" ),
+            AstroBase.STARS[ 100 ]    :   _( "Sheliak" ),
+            AstroBase.STARS[ 101 ]    :   _( "Sirius" ),
+            AstroBase.STARS[ 102 ]    :   _( "Sirrah" ),
+            AstroBase.STARS[ 103 ]    :   _( "Spica" ),
+            AstroBase.STARS[ 104 ]    :   _( "Suhail" ),
+            AstroBase.STARS[ 105 ]    :   _( "Sulafat" ),
+            AstroBase.STARS[ 106 ]    :   _( "Tarazed" ),
+            AstroBase.STARS[ 107 ]    :   _( "Taygeta" ),
+            AstroBase.STARS[ 108 ]    :   _( "Thuban" ),
+            AstroBase.STARS[ 109 ]    :   _( "Unukalhai" ),
+            AstroBase.STARS[ 110 ]    :   _( "Vega" ),
+            AstroBase.STARS[ 111 ]    :   _( "Vindemiatrix" ),
+            AstroBase.STARS[ 112 ]    :   _( "Wezen" ),
+            AstroBase.STARS[ 113 ]    :   _( "Zaurak" ),
+            AstroBase.STARS[ 114 ]    :   _( "Zubenelgenubi" ) } )
 
         # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
-        astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
-            astrobase.AstroBase.STARS[ 0 ]      :   _( "ACAMAR" ),
-            astrobase.AstroBase.STARS[ 1 ]      :   _( "ACHERNAR" ),
-            astrobase.AstroBase.STARS[ 2 ]      :   _( "ACRUX" ),
-            astrobase.AstroBase.STARS[ 3 ]      :   _( "ADARA" ),
-            astrobase.AstroBase.STARS[ 4 ]      :   _( "ADHARA" ),
-            astrobase.AstroBase.STARS[ 5 ]      :   _( "AGENA" ),
-            astrobase.AstroBase.STARS[ 6 ]      :   _( "ALBEREO" ),
-            astrobase.AstroBase.STARS[ 7 ]      :   _( "ALCAID" ),
-            astrobase.AstroBase.STARS[ 8 ]      :   _( "ALCOR" ),
-            astrobase.AstroBase.STARS[ 9 ]      :   _( "ALCYONE" ),
-            astrobase.AstroBase.STARS[ 10 ]     :   _( "ALDEBARAN" ),
-            astrobase.AstroBase.STARS[ 11 ]     :   _( "ALDERAMIN" ),
-            astrobase.AstroBase.STARS[ 12 ]     :   _( "ALFIRK" ),
-            astrobase.AstroBase.STARS[ 13 ]     :   _( "ALGENIB" ),
-            astrobase.AstroBase.STARS[ 14 ]     :   _( "ALGIEBA" ),
-            astrobase.AstroBase.STARS[ 15 ]     :   _( "ALGOL" ),
-            astrobase.AstroBase.STARS[ 16 ]     :   _( "ALHENA" ),
-            astrobase.AstroBase.STARS[ 17 ]     :   _( "ALIOTH" ),
-            astrobase.AstroBase.STARS[ 18 ]     :   _( "ALKAID" ),
-            astrobase.AstroBase.STARS[ 19 ]     :   _( "ALMACH" ),
-            astrobase.AstroBase.STARS[ 20 ]     :   _( "ALNAIR" ),
-            astrobase.AstroBase.STARS[ 21 ]     :   _( "ALNILAM" ),
-            astrobase.AstroBase.STARS[ 22 ]     :   _( "ALNITAK" ),
-            astrobase.AstroBase.STARS[ 23 ]     :   _( "ALPHARD" ),
-            astrobase.AstroBase.STARS[ 24 ]     :   _( "ALPHECCA" ),
-            astrobase.AstroBase.STARS[ 25 ]     :   _( "ALPHERATZ" ),
-            astrobase.AstroBase.STARS[ 26 ]     :   _( "ALSHAIN" ),
-            astrobase.AstroBase.STARS[ 27 ]     :   _( "ALTAIR" ),
-            astrobase.AstroBase.STARS[ 28 ]     :   _( "ANKAA" ),
-            astrobase.AstroBase.STARS[ 29 ]     :   _( "ANTARES" ),
-            astrobase.AstroBase.STARS[ 30 ]     :   _( "ARCTURUS" ),
-            astrobase.AstroBase.STARS[ 31 ]     :   _( "ARKAB POSTERIOR" ),
-            astrobase.AstroBase.STARS[ 32 ]     :   _( "ARKAB PRIOR" ),
-            astrobase.AstroBase.STARS[ 33 ]     :   _( "ARNEB" ),
-            astrobase.AstroBase.STARS[ 34 ]     :   _( "ATLAS" ),
-            astrobase.AstroBase.STARS[ 35 ]     :   _( "ATRIA" ),
-            astrobase.AstroBase.STARS[ 36 ]     :   _( "AVIOR" ),
-            astrobase.AstroBase.STARS[ 37 ]     :   _( "BELLATRIX" ),
-            astrobase.AstroBase.STARS[ 38 ]     :   _( "BETELGEUSE" ),
-            astrobase.AstroBase.STARS[ 39 ]     :   _( "CANOPUS" ),
-            astrobase.AstroBase.STARS[ 40 ]     :   _( "CAPELLA" ),
-            astrobase.AstroBase.STARS[ 41 ]     :   _( "CAPH" ),
-            astrobase.AstroBase.STARS[ 42 ]     :   _( "CASTOR" ),
-            astrobase.AstroBase.STARS[ 43 ]     :   _( "CEBALRAI" ),
-            astrobase.AstroBase.STARS[ 44 ]     :   _( "DENEB" ),
-            astrobase.AstroBase.STARS[ 45 ]     :   _( "DENEBOLA" ),
-            astrobase.AstroBase.STARS[ 46 ]     :   _( "DIPHDA" ),
-            astrobase.AstroBase.STARS[ 47 ]     :   _( "DUBHE" ),
-            astrobase.AstroBase.STARS[ 48 ]     :   _( "ELECTRA" ),
-            astrobase.AstroBase.STARS[ 49 ]     :   _( "ELNATH" ),
-            astrobase.AstroBase.STARS[ 50 ]     :   _( "ELTANIN" ),
-            astrobase.AstroBase.STARS[ 51 ]     :   _( "ENIF" ),
-            astrobase.AstroBase.STARS[ 52 ]     :   _( "ETAMIN" ),
-            astrobase.AstroBase.STARS[ 53 ]     :   _( "FOMALHAUT" ),
-            astrobase.AstroBase.STARS[ 54 ]     :   _( "FORMALHAUT" ),
-            astrobase.AstroBase.STARS[ 55 ]     :   _( "GACRUX" ),
-            astrobase.AstroBase.STARS[ 56 ]     :   _( "GIENAH" ),
-            astrobase.AstroBase.STARS[ 57 ]     :   _( "GIENAH CORVI" ),
-            astrobase.AstroBase.STARS[ 58 ]     :   _( "HADAR" ),
-            astrobase.AstroBase.STARS[ 59 ]     :   _( "HAMAL" ),
-            astrobase.AstroBase.STARS[ 60 ]     :   _( "IZAR" ),
-            astrobase.AstroBase.STARS[ 61 ]     :   _( "KAUS AUSTRALIS" ),
-            astrobase.AstroBase.STARS[ 62 ]     :   _( "KOCHAB" ),
-            astrobase.AstroBase.STARS[ 63 ]     :   _( "MAIA" ),
-            astrobase.AstroBase.STARS[ 64 ]     :   _( "MARKAB" ),
-            astrobase.AstroBase.STARS[ 65 ]     :   _( "MEGREZ" ),
-            astrobase.AstroBase.STARS[ 66 ]     :   _( "MENKALINAN" ),
-            astrobase.AstroBase.STARS[ 67 ]     :   _( "MENKAR" ),
-            astrobase.AstroBase.STARS[ 68 ]     :   _( "MENKENT" ),
-            astrobase.AstroBase.STARS[ 69 ]     :   _( "MERAK" ),
-            astrobase.AstroBase.STARS[ 70 ]     :   _( "MEROPE" ),
-            astrobase.AstroBase.STARS[ 71 ]     :   _( "MIAPLACIDUS" ),
-            astrobase.AstroBase.STARS[ 72 ]     :   _( "MIMOSA" ),
-            astrobase.AstroBase.STARS[ 73 ]     :   _( "MINKAR" ),
-            astrobase.AstroBase.STARS[ 74 ]     :   _( "MINTAKA" ),
-            astrobase.AstroBase.STARS[ 75 ]     :   _( "MIRACH" ),
-            astrobase.AstroBase.STARS[ 76 ]     :   _( "MIRFAK" ),
-            astrobase.AstroBase.STARS[ 77 ]     :   _( "MIRZAM" ),
-            astrobase.AstroBase.STARS[ 78 ]     :   _( "MIZAR" ),
-            astrobase.AstroBase.STARS[ 79 ]     :   _( "NAOS" ),
-            astrobase.AstroBase.STARS[ 80 ]     :   _( "NIHAL" ),
-            astrobase.AstroBase.STARS[ 81 ]     :   _( "NUNKI" ),
-            astrobase.AstroBase.STARS[ 82 ]     :   _( "PEACOCK" ),
-            astrobase.AstroBase.STARS[ 83 ]     :   _( "PHECDA" ),
-            astrobase.AstroBase.STARS[ 84 ]     :   _( "POLARIS" ),
-            astrobase.AstroBase.STARS[ 85 ]     :   _( "POLLUX" ),
-            astrobase.AstroBase.STARS[ 86 ]     :   _( "PROCYON" ),
-            astrobase.AstroBase.STARS[ 87 ]     :   _( "RASALGETHI" ),
-            astrobase.AstroBase.STARS[ 88 ]     :   _( "RASALHAGUE" ),
-            astrobase.AstroBase.STARS[ 89 ]     :   _( "REGULUS" ),
-            astrobase.AstroBase.STARS[ 90 ]     :   _( "RIGEL" ),
-            astrobase.AstroBase.STARS[ 91 ]     :   _( "RIGIL KENTAURUS" ),
-            astrobase.AstroBase.STARS[ 92 ]     :   _( "RUKBAT" ),
-            astrobase.AstroBase.STARS[ 93 ]     :   _( "SABIK" ),
-            astrobase.AstroBase.STARS[ 94 ]     :   _( "SADALMELIK" ),
-            astrobase.AstroBase.STARS[ 95 ]     :   _( "SADR" ),
-            astrobase.AstroBase.STARS[ 96 ]     :   _( "SAIPH" ),
-            astrobase.AstroBase.STARS[ 97 ]     :   _( "SCHEAT" ),
-            astrobase.AstroBase.STARS[ 98 ]     :   _( "SCHEDAR" ),
-            astrobase.AstroBase.STARS[ 99 ]     :   _( "SHAULA" ),
-            astrobase.AstroBase.STARS[ 100 ]    :   _( "SHELIAK" ),
-            astrobase.AstroBase.STARS[ 101 ]    :   _( "SIRIUS" ),
-            astrobase.AstroBase.STARS[ 102 ]    :   _( "SIRRAH" ),
-            astrobase.AstroBase.STARS[ 103 ]    :   _( "SPICA" ),
-            astrobase.AstroBase.STARS[ 104 ]    :   _( "SUHAIL" ),
-            astrobase.AstroBase.STARS[ 105 ]    :   _( "SULAFAT" ),
-            astrobase.AstroBase.STARS[ 106 ]    :   _( "TARAZED" ),
-            astrobase.AstroBase.STARS[ 107 ]    :   _( "TAYGETA" ),
-            astrobase.AstroBase.STARS[ 108 ]    :   _( "THUBAN" ),
-            astrobase.AstroBase.STARS[ 109 ]    :   _( "UNUKALHAI" ),
-            astrobase.AstroBase.STARS[ 110 ]    :   _( "VEGA" ),
-            astrobase.AstroBase.STARS[ 111 ]    :   _( "VINDEMIATRIX" ),
-            astrobase.AstroBase.STARS[ 112 ]    :   _( "WEZEN" ),
-            astrobase.AstroBase.STARS[ 113 ]    :   _( "ZAURAK" ),
-            astrobase.AstroBase.STARS[ 114 ]    :   _( "ZUBENELGENUBI" ) } )
+        AstroBase.STAR_TAGS_TRANSLATIONS.update( {
+            AstroBase.STARS[ 0 ]      :   _( "ACAMAR" ),
+            AstroBase.STARS[ 1 ]      :   _( "ACHERNAR" ),
+            AstroBase.STARS[ 2 ]      :   _( "ACRUX" ),
+            AstroBase.STARS[ 3 ]      :   _( "ADARA" ),
+            AstroBase.STARS[ 4 ]      :   _( "ADHARA" ),
+            AstroBase.STARS[ 5 ]      :   _( "AGENA" ),
+            AstroBase.STARS[ 6 ]      :   _( "ALBEREO" ),
+            AstroBase.STARS[ 7 ]      :   _( "ALCAID" ),
+            AstroBase.STARS[ 8 ]      :   _( "ALCOR" ),
+            AstroBase.STARS[ 9 ]      :   _( "ALCYONE" ),
+            AstroBase.STARS[ 10 ]     :   _( "ALDEBARAN" ),
+            AstroBase.STARS[ 11 ]     :   _( "ALDERAMIN" ),
+            AstroBase.STARS[ 12 ]     :   _( "ALFIRK" ),
+            AstroBase.STARS[ 13 ]     :   _( "ALGENIB" ),
+            AstroBase.STARS[ 14 ]     :   _( "ALGIEBA" ),
+            AstroBase.STARS[ 15 ]     :   _( "ALGOL" ),
+            AstroBase.STARS[ 16 ]     :   _( "ALHENA" ),
+            AstroBase.STARS[ 17 ]     :   _( "ALIOTH" ),
+            AstroBase.STARS[ 18 ]     :   _( "ALKAID" ),
+            AstroBase.STARS[ 19 ]     :   _( "ALMACH" ),
+            AstroBase.STARS[ 20 ]     :   _( "ALNAIR" ),
+            AstroBase.STARS[ 21 ]     :   _( "ALNILAM" ),
+            AstroBase.STARS[ 22 ]     :   _( "ALNITAK" ),
+            AstroBase.STARS[ 23 ]     :   _( "ALPHARD" ),
+            AstroBase.STARS[ 24 ]     :   _( "ALPHECCA" ),
+            AstroBase.STARS[ 25 ]     :   _( "ALPHERATZ" ),
+            AstroBase.STARS[ 26 ]     :   _( "ALSHAIN" ),
+            AstroBase.STARS[ 27 ]     :   _( "ALTAIR" ),
+            AstroBase.STARS[ 28 ]     :   _( "ANKAA" ),
+            AstroBase.STARS[ 29 ]     :   _( "ANTARES" ),
+            AstroBase.STARS[ 30 ]     :   _( "ARCTURUS" ),
+            AstroBase.STARS[ 31 ]     :   _( "ARKAB POSTERIOR" ),
+            AstroBase.STARS[ 32 ]     :   _( "ARKAB PRIOR" ),
+            AstroBase.STARS[ 33 ]     :   _( "ARNEB" ),
+            AstroBase.STARS[ 34 ]     :   _( "ATLAS" ),
+            AstroBase.STARS[ 35 ]     :   _( "ATRIA" ),
+            AstroBase.STARS[ 36 ]     :   _( "AVIOR" ),
+            AstroBase.STARS[ 37 ]     :   _( "BELLATRIX" ),
+            AstroBase.STARS[ 38 ]     :   _( "BETELGEUSE" ),
+            AstroBase.STARS[ 39 ]     :   _( "CANOPUS" ),
+            AstroBase.STARS[ 40 ]     :   _( "CAPELLA" ),
+            AstroBase.STARS[ 41 ]     :   _( "CAPH" ),
+            AstroBase.STARS[ 42 ]     :   _( "CASTOR" ),
+            AstroBase.STARS[ 43 ]     :   _( "CEBALRAI" ),
+            AstroBase.STARS[ 44 ]     :   _( "DENEB" ),
+            AstroBase.STARS[ 45 ]     :   _( "DENEBOLA" ),
+            AstroBase.STARS[ 46 ]     :   _( "DIPHDA" ),
+            AstroBase.STARS[ 47 ]     :   _( "DUBHE" ),
+            AstroBase.STARS[ 48 ]     :   _( "ELECTRA" ),
+            AstroBase.STARS[ 49 ]     :   _( "ELNATH" ),
+            AstroBase.STARS[ 50 ]     :   _( "ELTANIN" ),
+            AstroBase.STARS[ 51 ]     :   _( "ENIF" ),
+            AstroBase.STARS[ 52 ]     :   _( "ETAMIN" ),
+            AstroBase.STARS[ 53 ]     :   _( "FOMALHAUT" ),
+            AstroBase.STARS[ 54 ]     :   _( "FORMALHAUT" ),
+            AstroBase.STARS[ 55 ]     :   _( "GACRUX" ),
+            AstroBase.STARS[ 56 ]     :   _( "GIENAH" ),
+            AstroBase.STARS[ 57 ]     :   _( "GIENAH CORVI" ),
+            AstroBase.STARS[ 58 ]     :   _( "HADAR" ),
+            AstroBase.STARS[ 59 ]     :   _( "HAMAL" ),
+            AstroBase.STARS[ 60 ]     :   _( "IZAR" ),
+            AstroBase.STARS[ 61 ]     :   _( "KAUS AUSTRALIS" ),
+            AstroBase.STARS[ 62 ]     :   _( "KOCHAB" ),
+            AstroBase.STARS[ 63 ]     :   _( "MAIA" ),
+            AstroBase.STARS[ 64 ]     :   _( "MARKAB" ),
+            AstroBase.STARS[ 65 ]     :   _( "MEGREZ" ),
+            AstroBase.STARS[ 66 ]     :   _( "MENKALINAN" ),
+            AstroBase.STARS[ 67 ]     :   _( "MENKAR" ),
+            AstroBase.STARS[ 68 ]     :   _( "MENKENT" ),
+            AstroBase.STARS[ 69 ]     :   _( "MERAK" ),
+            AstroBase.STARS[ 70 ]     :   _( "MEROPE" ),
+            AstroBase.STARS[ 71 ]     :   _( "MIAPLACIDUS" ),
+            AstroBase.STARS[ 72 ]     :   _( "MIMOSA" ),
+            AstroBase.STARS[ 73 ]     :   _( "MINKAR" ),
+            AstroBase.STARS[ 74 ]     :   _( "MINTAKA" ),
+            AstroBase.STARS[ 75 ]     :   _( "MIRACH" ),
+            AstroBase.STARS[ 76 ]     :   _( "MIRFAK" ),
+            AstroBase.STARS[ 77 ]     :   _( "MIRZAM" ),
+            AstroBase.STARS[ 78 ]     :   _( "MIZAR" ),
+            AstroBase.STARS[ 79 ]     :   _( "NAOS" ),
+            AstroBase.STARS[ 80 ]     :   _( "NIHAL" ),
+            AstroBase.STARS[ 81 ]     :   _( "NUNKI" ),
+            AstroBase.STARS[ 82 ]     :   _( "PEACOCK" ),
+            AstroBase.STARS[ 83 ]     :   _( "PHECDA" ),
+            AstroBase.STARS[ 84 ]     :   _( "POLARIS" ),
+            AstroBase.STARS[ 85 ]     :   _( "POLLUX" ),
+            AstroBase.STARS[ 86 ]     :   _( "PROCYON" ),
+            AstroBase.STARS[ 87 ]     :   _( "RASALGETHI" ),
+            AstroBase.STARS[ 88 ]     :   _( "RASALHAGUE" ),
+            AstroBase.STARS[ 89 ]     :   _( "REGULUS" ),
+            AstroBase.STARS[ 90 ]     :   _( "RIGEL" ),
+            AstroBase.STARS[ 91 ]     :   _( "RIGIL KENTAURUS" ),
+            AstroBase.STARS[ 92 ]     :   _( "RUKBAT" ),
+            AstroBase.STARS[ 93 ]     :   _( "SABIK" ),
+            AstroBase.STARS[ 94 ]     :   _( "SADALMELIK" ),
+            AstroBase.STARS[ 95 ]     :   _( "SADR" ),
+            AstroBase.STARS[ 96 ]     :   _( "SAIPH" ),
+            AstroBase.STARS[ 97 ]     :   _( "SCHEAT" ),
+            AstroBase.STARS[ 98 ]     :   _( "SCHEDAR" ),
+            AstroBase.STARS[ 99 ]     :   _( "SHAULA" ),
+            AstroBase.STARS[ 100 ]    :   _( "SHELIAK" ),
+            AstroBase.STARS[ 101 ]    :   _( "SIRIUS" ),
+            AstroBase.STARS[ 102 ]    :   _( "SIRRAH" ),
+            AstroBase.STARS[ 103 ]    :   _( "SPICA" ),
+            AstroBase.STARS[ 104 ]    :   _( "SUHAIL" ),
+            AstroBase.STARS[ 105 ]    :   _( "SULAFAT" ),
+            AstroBase.STARS[ 106 ]    :   _( "TARAZED" ),
+            AstroBase.STARS[ 107 ]    :   _( "TAYGETA" ),
+            AstroBase.STARS[ 108 ]    :   _( "THUBAN" ),
+            AstroBase.STARS[ 109 ]    :   _( "UNUKALHAI" ),
+            AstroBase.STARS[ 110 ]    :   _( "VEGA" ),
+            AstroBase.STARS[ 111 ]    :   _( "VINDEMIATRIX" ),
+            AstroBase.STARS[ 112 ]    :   _( "WEZEN" ),
+            AstroBase.STARS[ 113 ]    :   _( "ZAURAK" ),
+            AstroBase.STARS[ 114 ]    :   _( "ZUBENELGENUBI" ) } )
 
 
     # Internally used for city.
@@ -949,8 +950,8 @@ class AstroPyEphem( astrobase.AstroBase ):
         AstroPyEphem.__calculateSun( ephemNow, data )
         AstroPyEphem.__calculatePlanets( ephemNow, data, planets, magnitudeMaximum )
         AstroPyEphem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
-        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
-        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
         AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
@@ -994,7 +995,7 @@ class AstroPyEphem( astrobase.AstroBase ):
             body = ephem.readdb( orbitalElementData[ key ].getData() )
             body.compute( city )
             bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
-            if not bad and body.mag >= astrobase.AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitudeMaximum:
+            if not bad and body.mag >= AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitudeMaximum:
                 results[ key ] = orbitalElementData[ key ]
 
         return results
@@ -1026,32 +1027,32 @@ class AstroPyEphem( astrobase.AstroBase ):
     @staticmethod
     def __calculateMoon( ephemNow, data ):
         # Used for internal processing; indirectly presented to the user.
-        key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+        key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
         moon = ephem.Moon()
         moon.compute( AstroPyEphem.__getCity( data, ephemNow ) )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
 
-        phase = astrobase.AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
-        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = phase
+        phase = AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
+        data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase
 
         city = AstroPyEphem.__getCity( data, ephemNow )
         sun = ephem.Sun( city )
         moon = ephem.Moon()
         moon.compute( city )
-        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
+        brightLimb = AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
-        if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Moon(), astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ):
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = astrobase.AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+        if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Moon(), AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ):
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
 
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( ephemNow.datetime(), True )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -1063,18 +1064,18 @@ class AstroPyEphem( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( ephemNow, data ):
-        if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Sun(), astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ):
-            key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+        if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Sun(), AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
+            key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             equinox = ephem.next_equinox( ephemNow )
             solstice = ephem.next_solstice( ephemNow )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( equinox.datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( solstice.datetime() )
+            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( equinox.datetime() )
+            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( solstice.datetime() )
 
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( ephemNow.datetime(), False )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     # http://www.geoastro.de/planets/index.html
@@ -1085,18 +1086,18 @@ class AstroPyEphem( astrobase.AstroBase ):
             planetObject = getattr( ephem, planet.title() )()
             planetObject.compute( AstroPyEphem.__getCity( data, ephemNow ) )
             if planetObject.mag <= magnitudeMaximum:
-                AstroPyEphem.__calculateCommon( ephemNow, data, planetObject, astrobase.AstroBase.BodyType.PLANET, planet )
+                AstroPyEphem.__calculateCommon( ephemNow, data, planetObject, AstroBase.BodyType.PLANET, planet )
 
 
     # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
     def __calculateStars( ephemNow, data, stars, magnitudeMaximum ):
         for star in stars:
-            if star in astrobase.AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
+            if star in AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
                 starObject = ephem.star( star.title() )
                 starObject.compute( AstroPyEphem.__getCity( data, ephemNow ) )
                 if starObject.mag <= magnitudeMaximum:
-                    AstroPyEphem.__calculateCommon( ephemNow, data, starObject, astrobase.AstroBase.BodyType.STAR, star )
+                    AstroPyEphem.__calculateCommon( ephemNow, data, starObject, AstroBase.BodyType.STAR, star )
 
 
     # Compute data for comets or minor planets.
@@ -1120,17 +1121,17 @@ class AstroPyEphem( astrobase.AstroBase ):
         key = ( bodyType, nameTag )
         try:
             city = AstroPyEphem.__getCity( data, ephemNow )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( city.next_rising( body ).datetime() )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( city.next_setting( body ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( city.next_rising( body ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( city.next_setting( body ).datetime() )
 
             body.compute( AstroPyEphem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
         except ephem.AlwaysUpError:
             body.compute( AstroPyEphem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
-            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
         except ephem.NeverUpError:
             neverUp = True
@@ -1159,7 +1160,7 @@ class AstroPyEphem( astrobase.AstroBase ):
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
         nowPlusSatelliteSearchDuration = ephem.Date(
-            ephemNow + ephem.hour * astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
+            ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
 
 #TODO Set the pass from 16 to 21 and set visible passes to always true and saw satellites rising/transiting at before 16.
 # Set window to 0 and 23 then run.
@@ -1168,8 +1169,8 @@ class AstroPyEphem( astrobase.AstroBase ):
 
         for satellite in satellites:
             if satellite in satelliteData:
-                key = ( astrobase.AstroBase.BodyType.SATELLITE, satellite )
-                startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
+                key = ( AstroBase.BodyType.SATELLITE, satellite )
+                startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
                     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
 
                 # Typically to search for a visible satellite pass,
@@ -1187,16 +1188,16 @@ class AstroPyEphem( astrobase.AstroBase ):
                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime and \
                            AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
 
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
-                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
+                            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
+                                AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
 
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
+                            data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
                                 repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_ANGLE ] )
 
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
-                                astrobase.AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
+                            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
+                                AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime() )
 
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
+                            data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_ANGLE ] )
                             break
 
                         if AstroPyEphem.__isSatellitePassValid( nextPass ):
@@ -1207,13 +1208,13 @@ class AstroPyEphem( astrobase.AstroBase ):
                             startDateTime = ephem.Date(
                                 ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc ) # Bad pass data, so look shortly after the current time.
 
-                        startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
+                        startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
                             startDateTime, nowPlusSatelliteSearchDuration, startHour, endHour )
 
                     except ValueError:
                         if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
+                            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
+                            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
 
                         break
 

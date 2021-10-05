@@ -89,12 +89,13 @@ try:
 except ImportError:
     available = False
 
+from astrobase import AstroBase
 from distutils.version import LooseVersion
 
-import astrobase, datetime, eclipse, importlib, io, locale, math
+import datetime, eclipse, importlib, io, locale, math
 
 
-class AstroSkyfield( astrobase.AstroBase ):
+class AstroSkyfield( AstroBase ):
 
     __SKYFIELD_INSTALLATION_COMMAND = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas skyfield"
     __SKYFIELD_REQUIRED_VERSION = "1.39" # Required version, or better.
@@ -111,14 +112,14 @@ class AstroSkyfield( astrobase.AstroBase ):
     __PLANET_EARTH = "EARTH"
 
     __PLANET_MAPPINGS = {
-        astrobase.AstroBase.PLANET_MERCURY : "MERCURY BARYCENTER",
-        astrobase.AstroBase.PLANET_VENUS   : "VENUS BARYCENTER",
-        astrobase.AstroBase.PLANET_MARS    : "MARS BARYCENTER",
-        astrobase.AstroBase.PLANET_JUPITER : "JUPITER BARYCENTER",
-        astrobase.AstroBase.PLANET_SATURN  : "SATURN BARYCENTER",
-        astrobase.AstroBase.PLANET_URANUS  : "URANUS BARYCENTER",
-        astrobase.AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
-        astrobase.AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
+        AstroBase.PLANET_MERCURY : "MERCURY BARYCENTER",
+        AstroBase.PLANET_VENUS   : "VENUS BARYCENTER",
+        AstroBase.PLANET_MARS    : "MARS BARYCENTER",
+        AstroBase.PLANET_JUPITER : "JUPITER BARYCENTER",
+        AstroBase.PLANET_SATURN  : "SATURN BARYCENTER",
+        AstroBase.PLANET_URANUS  : "URANUS BARYCENTER",
+        AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
+        AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
 
     # Skyfield does not provide a list of stars.
@@ -134,7 +135,7 @@ class AstroSkyfield( astrobase.AstroBase ):
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # If the list below is ever modified, regenerate the stars.dat.gz file.
-    astrobase.AstroBase.STARS.extend( [
+    AstroBase.STARS.extend( [
         "ACAMAR",
         "ACHERNAR",
         "ACRUX",
@@ -233,7 +234,7 @@ class AstroSkyfield( astrobase.AstroBase ):
         "3C 273" ] )
 
 
-    astrobase.AstroBase.STARS_TO_HIP.update( {
+    AstroBase.STARS_TO_HIP.update( {
         "ACAMAR"            :   13847,
         "ACHERNAR"          :   7588,
         "ACRUX"             :   60718,
@@ -332,203 +333,203 @@ class AstroSkyfield( astrobase.AstroBase ):
         "3C 273"            :   60936 } )
 
 
-    astrobase.AstroBase.STAR_NAMES_TRANSLATIONS.update( {
-        astrobase.AstroBase.STARS[ 0 ]  :   _( "Acamar" ),
-        astrobase.AstroBase.STARS[ 1 ]  :   _( "Achernar" ),
-        astrobase.AstroBase.STARS[ 2 ]  :   _( "Acrux" ),
-        astrobase.AstroBase.STARS[ 3 ]  :   _( "Adhara" ),
-        astrobase.AstroBase.STARS[ 4 ]  :   _( "Agena" ),
-        astrobase.AstroBase.STARS[ 5 ]  :   _( "Albireo" ),
-        astrobase.AstroBase.STARS[ 6 ]  :   _( "Alcor" ),
-        astrobase.AstroBase.STARS[ 7 ]  :   _( "Alcyone" ),
-        astrobase.AstroBase.STARS[ 8 ]  :   _( "Aldebaran" ),
-        astrobase.AstroBase.STARS[ 9 ]  :   _( "Alderamin" ),
-        astrobase.AstroBase.STARS[ 10 ] :   _( "Algenib" ),
-        astrobase.AstroBase.STARS[ 11 ] :   _( "Algieba" ),
-        astrobase.AstroBase.STARS[ 12 ] :   _( "Algol" ),
-        astrobase.AstroBase.STARS[ 13 ] :   _( "Alhena" ),
-        astrobase.AstroBase.STARS[ 14 ] :   _( "Alioth" ),
-        astrobase.AstroBase.STARS[ 15 ] :   _( "Alkaid" ),
-        astrobase.AstroBase.STARS[ 16 ] :   _( "Almaak" ),
-        astrobase.AstroBase.STARS[ 17 ] :   _( "Alnair" ),
-        astrobase.AstroBase.STARS[ 18 ] :   _( "Alnath" ),
-        astrobase.AstroBase.STARS[ 19 ] :   _( "Alnilam" ),
-        astrobase.AstroBase.STARS[ 20 ] :   _( "Alnitak" ),
-        astrobase.AstroBase.STARS[ 21 ] :   _( "Alphard" ),
-        astrobase.AstroBase.STARS[ 22 ] :   _( "Alphekka" ),
-        astrobase.AstroBase.STARS[ 23 ] :   _( "Alpheratz" ),
-        astrobase.AstroBase.STARS[ 24 ] :   _( "Alshain" ),
-        astrobase.AstroBase.STARS[ 25 ] :   _( "Altair" ),
-        astrobase.AstroBase.STARS[ 26 ] :   _( "Ankaa" ),
-        astrobase.AstroBase.STARS[ 27 ] :   _( "Antares" ),
-        astrobase.AstroBase.STARS[ 28 ] :   _( "Arcturus" ),
-        astrobase.AstroBase.STARS[ 29 ] :   _( "Arneb" ),
-        astrobase.AstroBase.STARS[ 30 ] :   _( "Babcock's Star" ),
-        astrobase.AstroBase.STARS[ 31 ] :   _( "Barnard's Star" ),
-        astrobase.AstroBase.STARS[ 32 ] :   _( "Bellatrix" ),
-        astrobase.AstroBase.STARS[ 33 ] :   _( "Betelgeuse" ),
-        astrobase.AstroBase.STARS[ 34 ] :   _( "Campbell's Star" ),
-        astrobase.AstroBase.STARS[ 35 ] :   _( "Canopus" ),
-        astrobase.AstroBase.STARS[ 36 ] :   _( "Capella" ),
-        astrobase.AstroBase.STARS[ 37 ] :   _( "Caph" ),
-        astrobase.AstroBase.STARS[ 38 ] :   _( "Castor" ),
-        astrobase.AstroBase.STARS[ 39 ] :   _( "Cor Caroli" ),
-        astrobase.AstroBase.STARS[ 40 ] :   _( "Cyg X-1" ),
-        astrobase.AstroBase.STARS[ 41 ] :   _( "Deneb" ),
-        astrobase.AstroBase.STARS[ 42 ] :   _( "Denebola" ),
-        astrobase.AstroBase.STARS[ 43 ] :   _( "Diphda" ),
-        astrobase.AstroBase.STARS[ 44 ] :   _( "Dubhe" ),
-        astrobase.AstroBase.STARS[ 45 ] :   _( "Enif" ),
-        astrobase.AstroBase.STARS[ 46 ] :   _( "Etamin" ),
-        astrobase.AstroBase.STARS[ 47 ] :   _( "Fomalhaut" ),
-        astrobase.AstroBase.STARS[ 48 ] :   _( "Groombridge 1830" ),
-        astrobase.AstroBase.STARS[ 49 ] :   _( "Hadar" ),
-        astrobase.AstroBase.STARS[ 50 ] :   _( "Hamal" ),
-        astrobase.AstroBase.STARS[ 51 ] :   _( "Izar" ),
-        astrobase.AstroBase.STARS[ 52 ] :   _( "Kapteyn's Star" ),
-        astrobase.AstroBase.STARS[ 53 ] :   _( "Kaus Australis" ),
-        astrobase.AstroBase.STARS[ 54 ] :   _( "Kocab" ),
-        astrobase.AstroBase.STARS[ 55 ] :   _( "Kruger 60" ),
-        astrobase.AstroBase.STARS[ 56 ] :   _( "Luyten's Star" ),
-        astrobase.AstroBase.STARS[ 57 ] :   _( "Markab" ),
-        astrobase.AstroBase.STARS[ 58 ] :   _( "Megrez" ),
-        astrobase.AstroBase.STARS[ 59 ] :   _( "Menkar" ),
-        astrobase.AstroBase.STARS[ 60 ] :   _( "Merak" ),
-        astrobase.AstroBase.STARS[ 61 ] :   _( "Mintaka" ),
-        astrobase.AstroBase.STARS[ 62 ] :   _( "Mira" ),
-        astrobase.AstroBase.STARS[ 63 ] :   _( "Mirach" ),
-        astrobase.AstroBase.STARS[ 64 ] :   _( "Mirphak" ),
-        astrobase.AstroBase.STARS[ 65 ] :   _( "Mizar" ),
-        astrobase.AstroBase.STARS[ 66 ] :   _( "Nihal" ),
-        astrobase.AstroBase.STARS[ 67 ] :   _( "Nunki" ),
-        astrobase.AstroBase.STARS[ 68 ] :   _( "Phad" ),
-        astrobase.AstroBase.STARS[ 69 ] :   _( "Pleione" ),
-        astrobase.AstroBase.STARS[ 70 ] :   _( "Polaris" ),
-        astrobase.AstroBase.STARS[ 71 ] :   _( "Pollux" ),
-        astrobase.AstroBase.STARS[ 72 ] :   _( "Procyon" ),
-        astrobase.AstroBase.STARS[ 73 ] :   _( "Proxima" ),
-        astrobase.AstroBase.STARS[ 74 ] :   _( "Rasalgethi" ),
-        astrobase.AstroBase.STARS[ 75 ] :   _( "Rasalhague" ),
-        astrobase.AstroBase.STARS[ 76 ] :   _( "Red Rectangle" ),
-        astrobase.AstroBase.STARS[ 77 ] :   _( "Regulus" ),
-        astrobase.AstroBase.STARS[ 78 ] :   _( "Rigel" ),
-        astrobase.AstroBase.STARS[ 79 ] :   _( "Rigil Kent" ),
-        astrobase.AstroBase.STARS[ 80 ] :   _( "Sadalmelik" ),
-        astrobase.AstroBase.STARS[ 81 ] :   _( "Saiph" ),
-        astrobase.AstroBase.STARS[ 82 ] :   _( "Scheat" ),
-        astrobase.AstroBase.STARS[ 83 ] :   _( "Shaula" ),
-        astrobase.AstroBase.STARS[ 84 ] :   _( "Shedir" ),
-        astrobase.AstroBase.STARS[ 85 ] :   _( "Sheliak" ),
-        astrobase.AstroBase.STARS[ 86 ] :   _( "Sirius" ),
-        astrobase.AstroBase.STARS[ 87 ] :   _( "Spica" ),
-        astrobase.AstroBase.STARS[ 88 ] :   _( "Tarazed" ),
-        astrobase.AstroBase.STARS[ 89 ] :   _( "Thuban" ),
-        astrobase.AstroBase.STARS[ 90 ] :   _( "Unukalhai" ),
-        astrobase.AstroBase.STARS[ 91 ] :   _( "Van Maanen 2" ),
-        astrobase.AstroBase.STARS[ 92 ] :   _( "Vega" ),
-        astrobase.AstroBase.STARS[ 93 ] :   _( "Vindemiatrix" ),
-        astrobase.AstroBase.STARS[ 94 ] :   _( "Zaurak" ),
-        astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
+    AstroBase.STAR_NAMES_TRANSLATIONS.update( {
+        AstroBase.STARS[ 0 ]  :   _( "Acamar" ),
+        AstroBase.STARS[ 1 ]  :   _( "Achernar" ),
+        AstroBase.STARS[ 2 ]  :   _( "Acrux" ),
+        AstroBase.STARS[ 3 ]  :   _( "Adhara" ),
+        AstroBase.STARS[ 4 ]  :   _( "Agena" ),
+        AstroBase.STARS[ 5 ]  :   _( "Albireo" ),
+        AstroBase.STARS[ 6 ]  :   _( "Alcor" ),
+        AstroBase.STARS[ 7 ]  :   _( "Alcyone" ),
+        AstroBase.STARS[ 8 ]  :   _( "Aldebaran" ),
+        AstroBase.STARS[ 9 ]  :   _( "Alderamin" ),
+        AstroBase.STARS[ 10 ] :   _( "Algenib" ),
+        AstroBase.STARS[ 11 ] :   _( "Algieba" ),
+        AstroBase.STARS[ 12 ] :   _( "Algol" ),
+        AstroBase.STARS[ 13 ] :   _( "Alhena" ),
+        AstroBase.STARS[ 14 ] :   _( "Alioth" ),
+        AstroBase.STARS[ 15 ] :   _( "Alkaid" ),
+        AstroBase.STARS[ 16 ] :   _( "Almaak" ),
+        AstroBase.STARS[ 17 ] :   _( "Alnair" ),
+        AstroBase.STARS[ 18 ] :   _( "Alnath" ),
+        AstroBase.STARS[ 19 ] :   _( "Alnilam" ),
+        AstroBase.STARS[ 20 ] :   _( "Alnitak" ),
+        AstroBase.STARS[ 21 ] :   _( "Alphard" ),
+        AstroBase.STARS[ 22 ] :   _( "Alphekka" ),
+        AstroBase.STARS[ 23 ] :   _( "Alpheratz" ),
+        AstroBase.STARS[ 24 ] :   _( "Alshain" ),
+        AstroBase.STARS[ 25 ] :   _( "Altair" ),
+        AstroBase.STARS[ 26 ] :   _( "Ankaa" ),
+        AstroBase.STARS[ 27 ] :   _( "Antares" ),
+        AstroBase.STARS[ 28 ] :   _( "Arcturus" ),
+        AstroBase.STARS[ 29 ] :   _( "Arneb" ),
+        AstroBase.STARS[ 30 ] :   _( "Babcock's Star" ),
+        AstroBase.STARS[ 31 ] :   _( "Barnard's Star" ),
+        AstroBase.STARS[ 32 ] :   _( "Bellatrix" ),
+        AstroBase.STARS[ 33 ] :   _( "Betelgeuse" ),
+        AstroBase.STARS[ 34 ] :   _( "Campbell's Star" ),
+        AstroBase.STARS[ 35 ] :   _( "Canopus" ),
+        AstroBase.STARS[ 36 ] :   _( "Capella" ),
+        AstroBase.STARS[ 37 ] :   _( "Caph" ),
+        AstroBase.STARS[ 38 ] :   _( "Castor" ),
+        AstroBase.STARS[ 39 ] :   _( "Cor Caroli" ),
+        AstroBase.STARS[ 40 ] :   _( "Cyg X-1" ),
+        AstroBase.STARS[ 41 ] :   _( "Deneb" ),
+        AstroBase.STARS[ 42 ] :   _( "Denebola" ),
+        AstroBase.STARS[ 43 ] :   _( "Diphda" ),
+        AstroBase.STARS[ 44 ] :   _( "Dubhe" ),
+        AstroBase.STARS[ 45 ] :   _( "Enif" ),
+        AstroBase.STARS[ 46 ] :   _( "Etamin" ),
+        AstroBase.STARS[ 47 ] :   _( "Fomalhaut" ),
+        AstroBase.STARS[ 48 ] :   _( "Groombridge 1830" ),
+        AstroBase.STARS[ 49 ] :   _( "Hadar" ),
+        AstroBase.STARS[ 50 ] :   _( "Hamal" ),
+        AstroBase.STARS[ 51 ] :   _( "Izar" ),
+        AstroBase.STARS[ 52 ] :   _( "Kapteyn's Star" ),
+        AstroBase.STARS[ 53 ] :   _( "Kaus Australis" ),
+        AstroBase.STARS[ 54 ] :   _( "Kocab" ),
+        AstroBase.STARS[ 55 ] :   _( "Kruger 60" ),
+        AstroBase.STARS[ 56 ] :   _( "Luyten's Star" ),
+        AstroBase.STARS[ 57 ] :   _( "Markab" ),
+        AstroBase.STARS[ 58 ] :   _( "Megrez" ),
+        AstroBase.STARS[ 59 ] :   _( "Menkar" ),
+        AstroBase.STARS[ 60 ] :   _( "Merak" ),
+        AstroBase.STARS[ 61 ] :   _( "Mintaka" ),
+        AstroBase.STARS[ 62 ] :   _( "Mira" ),
+        AstroBase.STARS[ 63 ] :   _( "Mirach" ),
+        AstroBase.STARS[ 64 ] :   _( "Mirphak" ),
+        AstroBase.STARS[ 65 ] :   _( "Mizar" ),
+        AstroBase.STARS[ 66 ] :   _( "Nihal" ),
+        AstroBase.STARS[ 67 ] :   _( "Nunki" ),
+        AstroBase.STARS[ 68 ] :   _( "Phad" ),
+        AstroBase.STARS[ 69 ] :   _( "Pleione" ),
+        AstroBase.STARS[ 70 ] :   _( "Polaris" ),
+        AstroBase.STARS[ 71 ] :   _( "Pollux" ),
+        AstroBase.STARS[ 72 ] :   _( "Procyon" ),
+        AstroBase.STARS[ 73 ] :   _( "Proxima" ),
+        AstroBase.STARS[ 74 ] :   _( "Rasalgethi" ),
+        AstroBase.STARS[ 75 ] :   _( "Rasalhague" ),
+        AstroBase.STARS[ 76 ] :   _( "Red Rectangle" ),
+        AstroBase.STARS[ 77 ] :   _( "Regulus" ),
+        AstroBase.STARS[ 78 ] :   _( "Rigel" ),
+        AstroBase.STARS[ 79 ] :   _( "Rigil Kent" ),
+        AstroBase.STARS[ 80 ] :   _( "Sadalmelik" ),
+        AstroBase.STARS[ 81 ] :   _( "Saiph" ),
+        AstroBase.STARS[ 82 ] :   _( "Scheat" ),
+        AstroBase.STARS[ 83 ] :   _( "Shaula" ),
+        AstroBase.STARS[ 84 ] :   _( "Shedir" ),
+        AstroBase.STARS[ 85 ] :   _( "Sheliak" ),
+        AstroBase.STARS[ 86 ] :   _( "Sirius" ),
+        AstroBase.STARS[ 87 ] :   _( "Spica" ),
+        AstroBase.STARS[ 88 ] :   _( "Tarazed" ),
+        AstroBase.STARS[ 89 ] :   _( "Thuban" ),
+        AstroBase.STARS[ 90 ] :   _( "Unukalhai" ),
+        AstroBase.STARS[ 91 ] :   _( "Van Maanen 2" ),
+        AstroBase.STARS[ 92 ] :   _( "Vega" ),
+        AstroBase.STARS[ 93 ] :   _( "Vindemiatrix" ),
+        AstroBase.STARS[ 94 ] :   _( "Zaurak" ),
+        AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
 
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
-    astrobase.AstroBase.STAR_TAGS_TRANSLATIONS.update( {
-        astrobase.AstroBase.STARS[ 0 ]  :   _( "ACAMAR" ),
-        astrobase.AstroBase.STARS[ 1 ]  :   _( "ACHERNAR" ),
-        astrobase.AstroBase.STARS[ 2 ]  :   _( "ACRUX" ),
-        astrobase.AstroBase.STARS[ 3 ]  :   _( "ADHARA" ),
-        astrobase.AstroBase.STARS[ 4 ]  :   _( "AGENA" ),
-        astrobase.AstroBase.STARS[ 5 ]  :   _( "ALBIREO" ),
-        astrobase.AstroBase.STARS[ 6 ]  :   _( "ALCOR" ),
-        astrobase.AstroBase.STARS[ 7 ]  :   _( "ALCYONE" ),
-        astrobase.AstroBase.STARS[ 8 ]  :   _( "ALDEBARAN" ),
-        astrobase.AstroBase.STARS[ 9 ]  :   _( "ALDERAMIN" ),
-        astrobase.AstroBase.STARS[ 10 ] :   _( "ALGENIB" ),
-        astrobase.AstroBase.STARS[ 11 ] :   _( "ALGIEBA" ),
-        astrobase.AstroBase.STARS[ 12 ] :   _( "ALGOL" ),
-        astrobase.AstroBase.STARS[ 13 ] :   _( "ALHENA" ),
-        astrobase.AstroBase.STARS[ 14 ] :   _( "ALIOTH" ),
-        astrobase.AstroBase.STARS[ 15 ] :   _( "ALKAID" ),
-        astrobase.AstroBase.STARS[ 16 ] :   _( "ALMAAK" ),
-        astrobase.AstroBase.STARS[ 17 ] :   _( "ALNAIR" ),
-        astrobase.AstroBase.STARS[ 18 ] :   _( "ALNATH" ),
-        astrobase.AstroBase.STARS[ 19 ] :   _( "ALNILAM" ),
-        astrobase.AstroBase.STARS[ 20 ] :   _( "ALNITAK" ),
-        astrobase.AstroBase.STARS[ 21 ] :   _( "ALPHARD" ),
-        astrobase.AstroBase.STARS[ 22 ] :   _( "ALPHEKKA" ),
-        astrobase.AstroBase.STARS[ 23 ] :   _( "ALPHERATZ" ),
-        astrobase.AstroBase.STARS[ 24 ] :   _( "ALSHAIN" ),
-        astrobase.AstroBase.STARS[ 25 ] :   _( "ALTAIR" ),
-        astrobase.AstroBase.STARS[ 26 ] :   _( "ANKAA" ),
-        astrobase.AstroBase.STARS[ 27 ] :   _( "ANTARES" ),
-        astrobase.AstroBase.STARS[ 28 ] :   _( "ARCTURUS" ),
-        astrobase.AstroBase.STARS[ 29 ] :   _( "ARNEB" ),
-        astrobase.AstroBase.STARS[ 30 ] :   _( "BABCOCK'S STAR" ),
-        astrobase.AstroBase.STARS[ 31 ] :   _( "BARNARD'S STAR" ),
-        astrobase.AstroBase.STARS[ 32 ] :   _( "BELLATRIX" ),
-        astrobase.AstroBase.STARS[ 33 ] :   _( "BETELGEUSE" ),
-        astrobase.AstroBase.STARS[ 34 ] :   _( "CAMPBELL'S STAR" ),
-        astrobase.AstroBase.STARS[ 35 ] :   _( "CANOPUS" ),
-        astrobase.AstroBase.STARS[ 36 ] :   _( "CAPELLA" ),
-        astrobase.AstroBase.STARS[ 37 ] :   _( "CAPH" ),
-        astrobase.AstroBase.STARS[ 38 ] :   _( "CASTOR" ),
-        astrobase.AstroBase.STARS[ 39 ] :   _( "COR CAROLI" ),
-        astrobase.AstroBase.STARS[ 40 ] :   _( "CYG X-1" ),
-        astrobase.AstroBase.STARS[ 41 ] :   _( "DENEB" ),
-        astrobase.AstroBase.STARS[ 42 ] :   _( "DENEBOLA" ),
-        astrobase.AstroBase.STARS[ 43 ] :   _( "DIPHDA" ),
-        astrobase.AstroBase.STARS[ 44 ] :   _( "DUBHE" ),
-        astrobase.AstroBase.STARS[ 45 ] :   _( "ENIF" ),
-        astrobase.AstroBase.STARS[ 46 ] :   _( "ETAMIN" ),
-        astrobase.AstroBase.STARS[ 47 ] :   _( "FOMALHAUT" ),
-        astrobase.AstroBase.STARS[ 48 ] :   _( "GROOMBRIDGE 1830" ),
-        astrobase.AstroBase.STARS[ 49 ] :   _( "HADAR" ),
-        astrobase.AstroBase.STARS[ 50 ] :   _( "HAMAL" ),
-        astrobase.AstroBase.STARS[ 51 ] :   _( "IZAR" ),
-        astrobase.AstroBase.STARS[ 52 ] :   _( "KAPTEYN'S STAR" ),
-        astrobase.AstroBase.STARS[ 53 ] :   _( "KAUS AUSTRALIS" ),
-        astrobase.AstroBase.STARS[ 54 ] :   _( "KOCAB" ),
-        astrobase.AstroBase.STARS[ 55 ] :   _( "KRUGER 60" ),
-        astrobase.AstroBase.STARS[ 56 ] :   _( "LUYTEN'S STAR" ),
-        astrobase.AstroBase.STARS[ 57 ] :   _( "MARKAB" ),
-        astrobase.AstroBase.STARS[ 58 ] :   _( "MEGREZ" ),
-        astrobase.AstroBase.STARS[ 59 ] :   _( "MENKAR" ),
-        astrobase.AstroBase.STARS[ 60 ] :   _( "MERAK" ),
-        astrobase.AstroBase.STARS[ 61 ] :   _( "MINTAKA" ),
-        astrobase.AstroBase.STARS[ 62 ] :   _( "MIRA" ),
-        astrobase.AstroBase.STARS[ 63 ] :   _( "MIRACH" ),
-        astrobase.AstroBase.STARS[ 64 ] :   _( "MIRPHAK" ),
-        astrobase.AstroBase.STARS[ 65 ] :   _( "MIZAR" ),
-        astrobase.AstroBase.STARS[ 66 ] :   _( "NIHAL" ),
-        astrobase.AstroBase.STARS[ 67 ] :   _( "NUNKI" ),
-        astrobase.AstroBase.STARS[ 68 ] :   _( "PHAD" ),
-        astrobase.AstroBase.STARS[ 69 ] :   _( "PLEIONE" ),
-        astrobase.AstroBase.STARS[ 70 ] :   _( "POLARIS" ),
-        astrobase.AstroBase.STARS[ 71 ] :   _( "POLLUX" ),
-        astrobase.AstroBase.STARS[ 72 ] :   _( "PROCYON" ),
-        astrobase.AstroBase.STARS[ 73 ] :   _( "PROXIMA" ),
-        astrobase.AstroBase.STARS[ 74 ] :   _( "RASALGETHI" ),
-        astrobase.AstroBase.STARS[ 75 ] :   _( "RASALHAGUE" ),
-        astrobase.AstroBase.STARS[ 76 ] :   _( "RED RECTANGLE" ),
-        astrobase.AstroBase.STARS[ 77 ] :   _( "REGULUS" ),
-        astrobase.AstroBase.STARS[ 78 ] :   _( "RIGEL" ),
-        astrobase.AstroBase.STARS[ 79 ] :   _( "RIGIL KENT" ),
-        astrobase.AstroBase.STARS[ 80 ] :   _( "SADALMELIK" ),
-        astrobase.AstroBase.STARS[ 81 ] :   _( "SAIPH" ),
-        astrobase.AstroBase.STARS[ 82 ] :   _( "SCHEAT" ),
-        astrobase.AstroBase.STARS[ 83 ] :   _( "SHAULA" ),
-        astrobase.AstroBase.STARS[ 84 ] :   _( "SHEDIR" ),
-        astrobase.AstroBase.STARS[ 85 ] :   _( "SHELIAK" ),
-        astrobase.AstroBase.STARS[ 86 ] :   _( "SIRIUS" ),
-        astrobase.AstroBase.STARS[ 87 ] :   _( "SPICA" ),
-        astrobase.AstroBase.STARS[ 88 ] :   _( "TARAZED" ),
-        astrobase.AstroBase.STARS[ 89 ] :   _( "THUBAN" ),
-        astrobase.AstroBase.STARS[ 90 ] :   _( "UNUKALHAI" ),
-        astrobase.AstroBase.STARS[ 91 ] :   _( "VAN MAANEN 2" ),
-        astrobase.AstroBase.STARS[ 92 ] :   _( "VEGA" ),
-        astrobase.AstroBase.STARS[ 93 ] :   _( "VINDEMIATRIX" ),
-        astrobase.AstroBase.STARS[ 94 ] :   _( "ZAURAK" ),
-        astrobase.AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
+    AstroBase.STAR_TAGS_TRANSLATIONS.update( {
+        AstroBase.STARS[ 0 ]  :   _( "ACAMAR" ),
+        AstroBase.STARS[ 1 ]  :   _( "ACHERNAR" ),
+        AstroBase.STARS[ 2 ]  :   _( "ACRUX" ),
+        AstroBase.STARS[ 3 ]  :   _( "ADHARA" ),
+        AstroBase.STARS[ 4 ]  :   _( "AGENA" ),
+        AstroBase.STARS[ 5 ]  :   _( "ALBIREO" ),
+        AstroBase.STARS[ 6 ]  :   _( "ALCOR" ),
+        AstroBase.STARS[ 7 ]  :   _( "ALCYONE" ),
+        AstroBase.STARS[ 8 ]  :   _( "ALDEBARAN" ),
+        AstroBase.STARS[ 9 ]  :   _( "ALDERAMIN" ),
+        AstroBase.STARS[ 10 ] :   _( "ALGENIB" ),
+        AstroBase.STARS[ 11 ] :   _( "ALGIEBA" ),
+        AstroBase.STARS[ 12 ] :   _( "ALGOL" ),
+        AstroBase.STARS[ 13 ] :   _( "ALHENA" ),
+        AstroBase.STARS[ 14 ] :   _( "ALIOTH" ),
+        AstroBase.STARS[ 15 ] :   _( "ALKAID" ),
+        AstroBase.STARS[ 16 ] :   _( "ALMAAK" ),
+        AstroBase.STARS[ 17 ] :   _( "ALNAIR" ),
+        AstroBase.STARS[ 18 ] :   _( "ALNATH" ),
+        AstroBase.STARS[ 19 ] :   _( "ALNILAM" ),
+        AstroBase.STARS[ 20 ] :   _( "ALNITAK" ),
+        AstroBase.STARS[ 21 ] :   _( "ALPHARD" ),
+        AstroBase.STARS[ 22 ] :   _( "ALPHEKKA" ),
+        AstroBase.STARS[ 23 ] :   _( "ALPHERATZ" ),
+        AstroBase.STARS[ 24 ] :   _( "ALSHAIN" ),
+        AstroBase.STARS[ 25 ] :   _( "ALTAIR" ),
+        AstroBase.STARS[ 26 ] :   _( "ANKAA" ),
+        AstroBase.STARS[ 27 ] :   _( "ANTARES" ),
+        AstroBase.STARS[ 28 ] :   _( "ARCTURUS" ),
+        AstroBase.STARS[ 29 ] :   _( "ARNEB" ),
+        AstroBase.STARS[ 30 ] :   _( "BABCOCK'S STAR" ),
+        AstroBase.STARS[ 31 ] :   _( "BARNARD'S STAR" ),
+        AstroBase.STARS[ 32 ] :   _( "BELLATRIX" ),
+        AstroBase.STARS[ 33 ] :   _( "BETELGEUSE" ),
+        AstroBase.STARS[ 34 ] :   _( "CAMPBELL'S STAR" ),
+        AstroBase.STARS[ 35 ] :   _( "CANOPUS" ),
+        AstroBase.STARS[ 36 ] :   _( "CAPELLA" ),
+        AstroBase.STARS[ 37 ] :   _( "CAPH" ),
+        AstroBase.STARS[ 38 ] :   _( "CASTOR" ),
+        AstroBase.STARS[ 39 ] :   _( "COR CAROLI" ),
+        AstroBase.STARS[ 40 ] :   _( "CYG X-1" ),
+        AstroBase.STARS[ 41 ] :   _( "DENEB" ),
+        AstroBase.STARS[ 42 ] :   _( "DENEBOLA" ),
+        AstroBase.STARS[ 43 ] :   _( "DIPHDA" ),
+        AstroBase.STARS[ 44 ] :   _( "DUBHE" ),
+        AstroBase.STARS[ 45 ] :   _( "ENIF" ),
+        AstroBase.STARS[ 46 ] :   _( "ETAMIN" ),
+        AstroBase.STARS[ 47 ] :   _( "FOMALHAUT" ),
+        AstroBase.STARS[ 48 ] :   _( "GROOMBRIDGE 1830" ),
+        AstroBase.STARS[ 49 ] :   _( "HADAR" ),
+        AstroBase.STARS[ 50 ] :   _( "HAMAL" ),
+        AstroBase.STARS[ 51 ] :   _( "IZAR" ),
+        AstroBase.STARS[ 52 ] :   _( "KAPTEYN'S STAR" ),
+        AstroBase.STARS[ 53 ] :   _( "KAUS AUSTRALIS" ),
+        AstroBase.STARS[ 54 ] :   _( "KOCAB" ),
+        AstroBase.STARS[ 55 ] :   _( "KRUGER 60" ),
+        AstroBase.STARS[ 56 ] :   _( "LUYTEN'S STAR" ),
+        AstroBase.STARS[ 57 ] :   _( "MARKAB" ),
+        AstroBase.STARS[ 58 ] :   _( "MEGREZ" ),
+        AstroBase.STARS[ 59 ] :   _( "MENKAR" ),
+        AstroBase.STARS[ 60 ] :   _( "MERAK" ),
+        AstroBase.STARS[ 61 ] :   _( "MINTAKA" ),
+        AstroBase.STARS[ 62 ] :   _( "MIRA" ),
+        AstroBase.STARS[ 63 ] :   _( "MIRACH" ),
+        AstroBase.STARS[ 64 ] :   _( "MIRPHAK" ),
+        AstroBase.STARS[ 65 ] :   _( "MIZAR" ),
+        AstroBase.STARS[ 66 ] :   _( "NIHAL" ),
+        AstroBase.STARS[ 67 ] :   _( "NUNKI" ),
+        AstroBase.STARS[ 68 ] :   _( "PHAD" ),
+        AstroBase.STARS[ 69 ] :   _( "PLEIONE" ),
+        AstroBase.STARS[ 70 ] :   _( "POLARIS" ),
+        AstroBase.STARS[ 71 ] :   _( "POLLUX" ),
+        AstroBase.STARS[ 72 ] :   _( "PROCYON" ),
+        AstroBase.STARS[ 73 ] :   _( "PROXIMA" ),
+        AstroBase.STARS[ 74 ] :   _( "RASALGETHI" ),
+        AstroBase.STARS[ 75 ] :   _( "RASALHAGUE" ),
+        AstroBase.STARS[ 76 ] :   _( "RED RECTANGLE" ),
+        AstroBase.STARS[ 77 ] :   _( "REGULUS" ),
+        AstroBase.STARS[ 78 ] :   _( "RIGEL" ),
+        AstroBase.STARS[ 79 ] :   _( "RIGIL KENT" ),
+        AstroBase.STARS[ 80 ] :   _( "SADALMELIK" ),
+        AstroBase.STARS[ 81 ] :   _( "SAIPH" ),
+        AstroBase.STARS[ 82 ] :   _( "SCHEAT" ),
+        AstroBase.STARS[ 83 ] :   _( "SHAULA" ),
+        AstroBase.STARS[ 84 ] :   _( "SHEDIR" ),
+        AstroBase.STARS[ 85 ] :   _( "SHELIAK" ),
+        AstroBase.STARS[ 86 ] :   _( "SIRIUS" ),
+        AstroBase.STARS[ 87 ] :   _( "SPICA" ),
+        AstroBase.STARS[ 88 ] :   _( "TARAZED" ),
+        AstroBase.STARS[ 89 ] :   _( "THUBAN" ),
+        AstroBase.STARS[ 90 ] :   _( "UNUKALHAI" ),
+        AstroBase.STARS[ 91 ] :   _( "VAN MAANEN 2" ),
+        AstroBase.STARS[ 92 ] :   _( "VEGA" ),
+        AstroBase.STARS[ 93 ] :   _( "VINDEMIATRIX" ),
+        AstroBase.STARS[ 94 ] :   _( "ZAURAK" ),
+        AstroBase.STARS[ 95 ] :   _( "3C 273" ) } )
 
 
     # Skyfield does not provide a list of cities.
@@ -716,12 +717,12 @@ class AstroSkyfield( astrobase.AstroBase ):
 
         AstroSkyfield.__calculateOrbitalElements(
             now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
-            astrobase.AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
+            AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum,
             logging )
 
         AstroSkyfield.__calculateOrbitalElements(
             now, nowPlusOneDay, data, timeScale, locationAtNow, ephemerisPlanets,
-            astrobase.AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
+            AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum,
             logging )
 
         AstroSkyfield.__calculateSatellites( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour )
@@ -771,7 +772,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             f.seek( 0 )
 
-            if bodyType == astrobase.AstroBase.BodyType.COMET:
+            if bodyType == AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
                 message = "Unable to compute apparent magnitude for comet: "
@@ -796,17 +797,17 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
 
             try:
-                if bodyType == astrobase.AstroBase.BodyType.COMET:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk(
+                if bodyType == AstroBase.BodyType.COMET:
+                    apparentMagnitude = AstroBase.getApparentMagnitude_gk(
                         row[ "magnitude_g" ], row[ "magnitude_k" ],
                         earthBodyDistance.au, sunBodyDistance.au )
 
                 else:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG(
+                    apparentMagnitude = AstroBase.getApparentMagnitude_HG(
                         row[ "magnitude_H" ], row[ "magnitude_G" ],
                         earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
-                if apparentMagnitude and apparentMagnitude >= astrobase.AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
+                if apparentMagnitude and apparentMagnitude >= AstroBase.MAGNITUDE_MINIMUM and apparentMagnitude <= magnitudeMaximum:
                     results[ name.upper() ] = orbitalElementData[ name.upper() ]
 
             except Exception as e:
@@ -841,53 +842,53 @@ class AstroSkyfield( astrobase.AstroBase ):
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, latitude, longitude, ephemerisPlanets ):
-        key = ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON )
+        key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, now ) * 100 )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         moonRA, moonDec, earthMoonDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
         sunRA, sunDec, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
-        brightLimb = astrobase.AstroBase.getZenithAngleOfBrightLimb(
+        brightLimb = AstroBase.getZenithAngleOfBrightLimb(
             now.utc_datetime(),
             sunRA.radians, sunDec.radians,
             moonRA.radians, moonDec.radians,
             math.radians( latitude ), math.radians( longitude ) )
 
-        data[ key + ( astrobase.AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
         nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ]
         nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ]
-        lunarPhase = astrobase.AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
-        data[ key + ( astrobase.AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
+        lunarPhase = AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
+        data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusOneDay,
-            data, ( astrobase.AstroBase.BodyType.MOON, astrobase.AstroBase.NAME_TAG_MOON ),
+            data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ),
             locationAtNow,
             ephemerisPlanets,
             ephemerisPlanets[ AstroSkyfield.__MOON ] )
 
         if not neverUp:
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
-                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ] ) ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
+                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ] ) ) ] )
 
-            data[ key + ( astrobase.AstroBase.DATA_TAG_FULL, ) ] = \
-                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = \
+                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ) ] )
 
-            data[ key + ( astrobase.AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
-                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_LAST_QUARTER ] ) ) ] )
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
+                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_LAST_QUARTER ] ) ) ] )
 
-            data[ key + ( astrobase.AstroBase.DATA_TAG_NEW, ) ] = \
-                astrobase.AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = \
+                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
 
             t, y, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, ephemerisPlanets ) # Zeroth result in t and y is the first result, so use that.
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
-                t[ 0 ].utc_strftime( astrobase.AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
+                t[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
     # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
@@ -901,30 +902,30 @@ class AstroSkyfield( astrobase.AstroBase ):
     def __calculateSun( now, nowPlusOneDay, nowPlusSevenMonths, data, locationAtNow, ephemerisPlanets ):
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusOneDay,
-            data, ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN ),
+            data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ),
             locationAtNow,
             ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__SUN ] )
 
         if not neverUp:
-            key = ( astrobase.AstroBase.BodyType.SUN, astrobase.AstroBase.NAME_TAG_SUN )
+            key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             t, y = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( ephemerisPlanets ) )
             t = t.utc_datetime()
             if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or \
                almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( t[ 0 ] )
+                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( t[ 1 ] )
 
             else:
-                data[ key + ( astrobase.AstroBase.DATA_TAG_SOLSTICE, ) ] = astrobase.AstroBase.toDateTimeString( t[ 0 ] )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_EQUINOX, ) ] = astrobase.AstroBase.toDateTimeString( t[ 1 ] )
+                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( t[ 0 ] )
+                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( t[ 1 ] )
 
 #TODO Once solar eclipses are implemented in Skyfield, replace the code below with similar functionality to lunar eclipses above.        
 # https://github.com/skyfielders/python-skyfield/issues/445
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( now.utc_datetime(), False )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     # http://www.geoastro.de/planets/index.html
@@ -932,10 +933,10 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum ):
         for planet in planets:
-            if planet == astrobase.AstroBase.PLANET_MERCURY or \
-               planet == astrobase.AstroBase.PLANET_VENUS or \
-               planet == astrobase.AstroBase.PLANET_JUPITER or \
-               planet == astrobase.AstroBase.PLANET_URANUS:
+            if planet == AstroBase.PLANET_MERCURY or \
+               planet == AstroBase.PLANET_VENUS or \
+               planet == AstroBase.PLANET_JUPITER or \
+               planet == AstroBase.PLANET_URANUS:
                 position = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) 
                 apparentMagnitude = planetary_magnitude( position )
 
@@ -943,22 +944,22 @@ class AstroSkyfield( astrobase.AstroBase ):
                 #TODO Skyfield does not calculate apparent magnitude for all bodies as yet, so hard code for now...
                 # https://github.com/skyfielders/python-skyfield/issues/210
                 # https://rhodesmill.org/skyfield/api.html#skyfield.magnitudelib.planetary_magnitude
-                if planet == astrobase.AstroBase.PLANET_MARS:
+                if planet == AstroBase.PLANET_MARS:
                     apparentMagnitude = -3.0
 
-                elif planet == astrobase.AstroBase.PLANET_SATURN:
+                elif planet == AstroBase.PLANET_SATURN:
                     apparentMagnitude = 0.0
 
-                elif planet == astrobase.AstroBase.PLANET_NEPTUNE:
+                elif planet == AstroBase.PLANET_NEPTUNE:
                     apparentMagnitude = 8.0
 
-                elif planet == astrobase.AstroBase.PLANET_PLUTO:
+                elif planet == AstroBase.PLANET_PLUTO:
                     apparentMagnitude = 14.0
 
             if apparentMagnitude <= magnitudeMaximum:
                 AstroSkyfield.__calculateCommon(
                     now, nowPlusOneDay,
-                    data, ( astrobase.AstroBase.BodyType.PLANET, planet ),
+                    data, ( AstroBase.BodyType.PLANET, planet ),
                     locationAtNow,
                     ephemerisPlanets, ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] )
 
@@ -966,12 +967,12 @@ class AstroSkyfield( astrobase.AstroBase ):
     @staticmethod
     def __calculateStars( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
         for star in stars:
-            if star in astrobase.AstroBase.STARS:
-                theStar = ephemerisStars.loc[ astrobase.AstroBase.STARS_TO_HIP[ star ] ]
+            if star in AstroBase.STARS:
+                theStar = ephemerisStars.loc[ AstroBase.STARS_TO_HIP[ star ] ]
                 if theStar.magnitude <= magnitudeMaximum:
                     AstroSkyfield.__calculateCommon(
                         now, nowPlusOneDay,
-                        data, ( astrobase.AstroBase.BodyType.STAR, star ),
+                        data, ( AstroBase.BodyType.STAR, star ),
                         locationAtNow,
                         ephemerisPlanets, Star.from_dataframe( theStar ) )
 
@@ -992,7 +993,7 @@ class AstroSkyfield( astrobase.AstroBase ):
 
             f.seek( 0 )
 
-            if bodyType == astrobase.AstroBase.BodyType.COMET:
+            if bodyType == AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
                 message = "Error computing apparent magnitude for comet: "
@@ -1012,13 +1013,13 @@ class AstroSkyfield( astrobase.AstroBase ):
             ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
 
             try:
-                if bodyType == astrobase.AstroBase.BodyType.COMET:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_gk(
+                if bodyType == AstroBase.BodyType.COMET:
+                    apparentMagnitude = AstroBase.getApparentMagnitude_gk(
                         row[ "magnitude_g" ], row[ "magnitude_k" ],
                         earthBodyDistance.au, sunBodyDistance.au )
 
                 else:
-                    apparentMagnitude = astrobase.AstroBase.getApparentMagnitude_HG(
+                    apparentMagnitude = AstroBase.getApparentMagnitude_HG(
                         row[ "magnitude_H" ], row[ "magnitude_G" ],
                         earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
@@ -1044,20 +1045,20 @@ class AstroSkyfield( astrobase.AstroBase ):
                 riseDateTime = t[ 1 ]
                 setDateTime = t[ 0 ]
 
-            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseDateTime )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( setDateTime )
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime )
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( setDateTime )
 
             alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-            data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
 #TODO Verify from documentation the conditions for always up and never up.
 #Then test by setting high latitudes, north and south.
             if almanac.risings_and_settings( ephemerisPlanets, body, locationAtNow.target )( now ): # Body is up (and so always up).
                 alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-                data[ key + ( astrobase.AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-                data[ key + ( astrobase.AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+                data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+                data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
             else:
                 neverUp = True # Body is down (and so never up).
@@ -1089,7 +1090,7 @@ class AstroSkyfield( astrobase.AstroBase ):
             now.utc.year,
             now.utc.month,
             now.utc.day,
-            now.utc.hour + astrobase.AstroBase.SATELLITE_SEARCH_DURATION_HOURS,
+            now.utc.hour + AstroBase.SATELLITE_SEARCH_DURATION_HOURS,
             now.utc.minute,
             now.utc.second )
 
@@ -1103,7 +1104,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                     satelliteData[ satellite ].getName(),
                     timeScale )
 
-                startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
+                startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
                     now.utc_datetime(), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
 
                 while startDateTime is not None:
@@ -1119,7 +1120,7 @@ class AstroSkyfield( astrobase.AstroBase ):
                         isTwilightFunction ) 
 
                     if key is None:
-                        startDateTime, endDateTime = astrobase.AstroBase.getAdjustedDateTime(
+                        startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
                             endDateTime + datetime.timedelta( minutes = 15 ), nowPlusSatelliteSearchDuration.utc_datetime(), startHour, endHour )
 
                         continue
@@ -1156,15 +1157,15 @@ class AstroSkyfield( astrobase.AstroBase ):
                     sunlit = earthSatellite.at( timeRange ).is_sunlit( ephemerisPlanets )
                     for twilightAstronomical, twilightNautical, isSunlit in zip( isTwilightAstronomical, isTwilightNautical, sunlit ):
                         if isSunlit and ( twilightAstronomical or twilightNautical ):
-                            key = ( astrobase.AstroBase.BodyType.SATELLITE, satelliteNumber )
+                            key = ( AstroBase.BodyType.SATELLITE, satelliteNumber )
 
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( riseTime.utc_datetime() )
+                            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseTime.utc_datetime() )
                             alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
+                            data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
 
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = astrobase.AstroBase.toDateTimeString( ti.utc_datetime() )
+                            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( ti.utc_datetime() )
                             alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
-                            data[ key + ( astrobase.AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                            data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
                             break
 
                 if key is not None:
