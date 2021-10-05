@@ -50,11 +50,12 @@ gi.require_version( "Notify", "0.7" )
 
 from astrobase import AstroBase
 from gi.repository import Gtk, Notify
+from indicatorbase import IndicatorBase
 
-import datetime, eclipse, indicatorbase, locale, math, orbitalelement, re, sys, twolineelement, webbrowser
+import datetime, eclipse, locale, math, orbitalelement, re, sys, twolineelement, webbrowser
 
 
-class IndicatorLunar( indicatorbase.IndicatorBase ):
+class IndicatorLunar( IndicatorBase ):
 
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
