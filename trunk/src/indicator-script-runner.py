@@ -28,13 +28,14 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 
 from gi.repository import Gtk, Pango
+from indicatorbase import IndicatorBase
 from script import Background, NonBackground
 from threading import Thread
 
-import concurrent.futures, copy, datetime, indicatorbase, math
+import concurrent.futures, copy, datetime, math
 
 
-class IndicatorScriptRunner( indicatorbase.IndicatorBase ):
+class IndicatorScriptRunner( IndicatorBase ):
 
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_INDICATOR_TEXT = "indicatorText"
