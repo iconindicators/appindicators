@@ -731,15 +731,6 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def getAvailabilityMessage():
-        message = None
-        if not available:
-            message = _( "Skyfield could not be found. Install using:\n\n" + AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND )
-
-        return message
-
-
-    @staticmethod
     def getCities(): return sorted( AstroSkyfield._city_data.keys(), key = locale.strxfrm )
 
 
@@ -818,18 +809,21 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def getVersion(): return skyfield.__version__
-
-
-    @staticmethod
-    def getVersionMessage():
+    def getStatusMessage():
         message = None
-        if LooseVersion( skyfield.__version__ ) < LooseVersion( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ):
+        if not available:
+            message = _( "Skyfield could not be found. Install using:\n\n" + AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND )
+
+        elif LooseVersion( skyfield.__version__ ) < LooseVersion( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ):
             message = \
                 _( "Skyfield must be version {0} or greater. Please upgrade:\n\n" + \
                 AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND ).format( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION )
 
         return message
+
+
+    @staticmethod
+    def getVersion(): return skyfield.__version__
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp

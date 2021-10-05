@@ -962,15 +962,6 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def getAvailabilityMessage():
-        message = None
-        if not available:
-            message = _( "PyEphem could not be found. Install using:\n\n" + AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND )
-
-        return message
-
-
-    @staticmethod
     def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
@@ -1002,18 +993,21 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def getVersion(): return ephem.__version__
-
-
-    @staticmethod
-    def getVersionMessage():
+    def getStatusMessage():
         message = None
-        if LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
+        if not available:
+            message = _( "PyEphem could not be found. Install using:\n\n" + AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND )
+
+        elif LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
             message = \
                 _( "PyEphem must be version {0} or greater. Please upgrade:\n\n" + \
                 AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
 
         return message
+
+
+    @staticmethod
+    def getVersion(): return ephem.__version__
 
 
     # http://www.ga.gov.au/geodesy/astro/moonrise.jsp

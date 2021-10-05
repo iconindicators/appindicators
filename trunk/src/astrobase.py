@@ -282,12 +282,6 @@ class AstroBase( ABC ):
         return { }
 
 
-    # Returns None if the backend and third party library is available; an error message otherwise.
-    @staticmethod
-    @abstractmethod
-    def getAvailabilityMessage(): return None
-
-
     # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
     @abstractmethod
@@ -316,16 +310,18 @@ class AstroBase( ABC ):
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ): return { }
 
 
+    # If the minimum version of the third party library is met and
+    # the backend and third party library is available, returns None.
+    # Otherwise returns an error message.
+    @staticmethod
+    @abstractmethod
+    def getStatusMessage(): return None
+
+
     # Returns the version of the underlying astronomical library.
     @staticmethod
     @abstractmethod
     def getVersion(): return None
-
-
-    # Returns None if the minimum version of the third party library is met; an error message otherwise.
-    @staticmethod
-    @abstractmethod
-    def getVersionMessage(): return None
 
 
     # Calculate apparent magnitude.

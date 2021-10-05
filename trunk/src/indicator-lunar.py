@@ -62,10 +62,7 @@ class IndicatorLunar( indicatorbase.IndicatorBase ):
     astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
-    message = astroBackend.getAvailabilityMessage()
-    if message is None:
-        message = astroBackend.getVersionMessage()
-
+    message = astroBackend.getStatusMessage()
     if message is not None:
         dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message )
         dialog.set_title( INDICATOR_NAME )
