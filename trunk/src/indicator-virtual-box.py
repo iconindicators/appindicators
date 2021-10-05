@@ -29,11 +29,12 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
+from indicatorbase import IndicatorBase
 
-import indicatorbase, datetime, os, time, virtualmachine
+import datetime, os, time, virtualmachine
 
 
-class IndicatorVirtualBox( indicatorbase.IndicatorBase ):
+class IndicatorVirtualBox( IndicatorBase ):
 
     CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
