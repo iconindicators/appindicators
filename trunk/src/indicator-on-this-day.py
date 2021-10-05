@@ -31,11 +31,12 @@ gi.require_version( "Notify", "0.7" )
 from event import Event
 from datetime import date, datetime, timedelta
 from gi.repository import Gdk, Gtk, Notify
+from indicatorbase import IndicatorBase
 
-import fnmatch, indicatorbase, os, webbrowser
+import fnmatch, os, webbrowser
 
 
-class IndicatorOnThisDay( indicatorbase.IndicatorBase ):
+class IndicatorOnThisDay( IndicatorBase ):
 
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
