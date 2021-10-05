@@ -50,12 +50,13 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gtk, Notify
+from indicatorbase import IndicatorBase
 from urllib.request import urlopen
 
-import datetime, indicatorbase, locale, ports, re, tide, time, webbrowser
+import datetime, locale, ports, re, tide, time, webbrowser
 
 
-class IndicatorTide( indicatorbase.IndicatorBase ):
+class IndicatorTide( IndicatorBase ):
 
     CONFIG_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
     CONFIG_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
