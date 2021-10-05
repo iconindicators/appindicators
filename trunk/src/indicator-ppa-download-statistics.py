@@ -28,13 +28,14 @@ gi.require_version( "Gtk", "3.0" )
 
 from copy import deepcopy
 from gi.repository import Gtk
+from indicatorbase import IndicatorBase
 from ppa import Filters, PPA, PublishedBinary
 from urllib.request import urlopen
 
-import concurrent.futures, indicatorbase, json, locale, tempfile, webbrowser
+import concurrent.futures, json, locale, tempfile, webbrowser
 
 
-class IndicatorPPADownloadStatistics( indicatorbase.IndicatorBase ):
+class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
