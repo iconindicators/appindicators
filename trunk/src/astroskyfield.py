@@ -97,10 +97,6 @@ import datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( AstroBase ):
 
-    __SKYFIELD_INSTALLATION_COMMAND = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas skyfield"
-    __SKYFIELD_REQUIRED_VERSION = "1.39" # Required version, or better.
-
-
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat.gz"
 
@@ -810,14 +806,16 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
+        installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --upgrade pip pandas skyfield"
+        requiredVersion = "1.39" # Required version, or better.
         message = None
         if not available:
-            message = _( "Skyfield could not be found. Install using:\n\n" + AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND )
+            message = _( "Skyfield could not be found. Install using:\n\n" + installationCommand )
 
-        elif LooseVersion( skyfield.__version__ ) < LooseVersion( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION ):
+        elif LooseVersion( skyfield.__version__ ) < LooseVersion( requiredVersion ):
             message = \
                 _( "Skyfield must be version {0} or greater. Please upgrade:\n\n" + \
-                AstroSkyfield.__SKYFIELD_INSTALLATION_COMMAND ).format( AstroSkyfield.__SKYFIELD_REQUIRED_VERSION )
+                installationCommand ).format( requiredVersion )
 
         return message
 

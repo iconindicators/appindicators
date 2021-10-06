@@ -35,10 +35,6 @@ import datetime, eclipse, locale, math
 
 class AstroPyEphem( AstroBase ):
 
-    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem"
-    __PYEPHEM_REQUIRED_VERSION = "3.7.6.0" # Required version, or better.
-
-
     # Taken from ephem/stars.py
     # Version 3.7.7.0 added new stars but must still support 3.7.6.0 for Ubuntu 16.04/18.04.
     if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
@@ -985,7 +981,9 @@ class AstroPyEphem( AstroBase ):
             city.date = utcNow
             body = ephem.readdb( orbitalElementData[ key ].getData() )
             body.compute( city )
-            bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+
+            # Have found the data file may contain ***** in lieu of actual data!
+            bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance )
             if not bad and body.mag >= AstroBase.MAGNITUDE_MINIMUM and body.mag <= magnitudeMaximum:
                 results[ key ] = orbitalElementData[ key ]
 
@@ -994,14 +992,16 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
+        installationCommand = "sudo apt-get install -y python3-ephem"
+        requiredVersion = "3.7.6.0" # Required version, or better.
         message = None
         if not available:
-            message = _( "PyEphem could not be found. Install using:\n\n" + AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND )
+            message = _( "PyEphem could not be found. Install using:\n\n" + installationCommand )
 
-        elif LooseVersion( ephem.__version__ ) < LooseVersion( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION ):
+        elif LooseVersion( ephem.__version__ ) < LooseVersion( requiredVersion ):
             message = \
                 _( "PyEphem must be version {0} or greater. Please upgrade:\n\n" + \
-                AstroPyEphem.__PYEPHEM_INSTALLATION_COMMAND ).format( AstroPyEphem.__PYEPHEM_REQUIRED_VERSION )
+               installationCommand ).format( requiredVersion )
 
         return message
 
