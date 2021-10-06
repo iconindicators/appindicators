@@ -19,6 +19,48 @@
 # Base class for calculating astronomical information for use with Indicator Lunar.
 
 
+# References
+#
+# Moon
+#    http://www.ga.gov.au/geodesy/astro/moonrise.jsp
+#    http://futureboy.us/fsp/moon.fsp
+#    http://www.geoastro.de/moondata/index.html
+#    http://www.geoastro.de/SME/index.htm
+#    http://www.geoastro.de/elevazmoon/index.htm
+#    http://www.geoastro.de/altazsunmoon/index.htm
+#    http://www.geoastro.de/sundata/index.html
+#    http://www.satellite-calculations.com/Satellite/suncalc.htm
+#
+# Sun
+#    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+#    http://www.ga.gov.au/geodesy/astro/sunrise.jsp
+#    http://www.geoastro.de/elevaz/index.htm
+#    http://www.geoastro.de/SME/index.htm
+#    http://www.geoastro.de/altazsunmoon/index.htm
+#    http://futureboy.us/fsp/sun.fsp
+#    http://www.satellite-calculations.com/Satellite/suncalc.htm
+#
+# Planets
+#    http://www.geoastro.de/planets/index.html
+#    http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
+#
+# Stars
+#    http://aa.usno.navy.mil/data/docs/mrst.php
+#
+# Satellites
+#    http://www.celestrak.com/columns/v03n01/
+#    http://celestrak.com/NORAD/elements
+#    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
+#    http://spotthestation.nasa.gov/sightings
+#    http://www.n2yo.com
+#    http://www.heavens-above.com
+#    http://in-the-sky.org
+#    https://uphere.space/satellites
+#    https://www.amsat.org/track
+#    https://tracksat.space
+#    https://g7vrd.co.uk/public-satellite-pass-rest-api
+
+
 from abc import ABC, abstractmethod
 from enum import Enum
 

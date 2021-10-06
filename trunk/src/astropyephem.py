@@ -1010,14 +1010,6 @@ class AstroPyEphem( AstroBase ):
     def getVersion(): return ephem.__version__
 
 
-    # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
-    # http://futureboy.us/fsp/moon.fsp
-    # http://www.geoastro.de/moondata/index.html
-    # http://www.geoastro.de/SME/index.htm
-    # http://www.geoastro.de/elevazmoon/index.htm
-    # http://www.geoastro.de/altazsunmoon/index.htm
-    # http://www.geoastro.de/sundata/index.html
-    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateMoon( ephemNow, data ):
         # Used for internal processing; indirectly presented to the user.
@@ -1049,13 +1041,6 @@ class AstroPyEphem( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
-    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-    # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
-    # http://www.geoastro.de/elevaz/index.htm
-    # http://www.geoastro.de/SME/index.htm
-    # http://www.geoastro.de/altazsunmoon/index.htm
-    # http://futureboy.us/fsp/sun.fsp
-    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( ephemNow, data ):
         if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Sun(), AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
@@ -1072,8 +1057,6 @@ class AstroPyEphem( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
-    # http://www.geoastro.de/planets/index.html
-    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
     def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum ):
         for planet in planets:
@@ -1083,7 +1066,6 @@ class AstroPyEphem( AstroBase ):
                 AstroPyEphem.__calculateCommon( ephemNow, data, planetObject, AstroBase.BodyType.PLANET, planet )
 
 
-    # http://aa.usno.navy.mil/data/docs/mrst.php
     @staticmethod
     def __calculateStars( ephemNow, data, stars, magnitudeMaximum ):
         for star in stars:
@@ -1094,7 +1076,6 @@ class AstroPyEphem( AstroBase ):
                     AstroPyEphem.__calculateCommon( ephemNow, data, starObject, AstroBase.BodyType.STAR, star )
 
 
-    # Compute data for comets or minor planets.
     @staticmethod
     def __calculateOrbitalElements( ephemNow, data, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
         for key in orbitalElements:
@@ -1133,24 +1114,6 @@ class AstroPyEphem( AstroBase ):
         return neverUp
 
 
-    # Refer to
-    #    https://github.com/skyfielders/python-skyfield/issues/327
-    #    https://github.com/skyfielders/python-skyfield/issues/558
-    #    http://www.celestrak.com/columns/v03n01/
-    #
-    # Use TLE data collated by Dr T S Kelso
-    #    http://celestrak.com/NORAD/elements
-    #
-    # Other sources/background:
-    #    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
-    #    http://spotthestation.nasa.gov/sightings
-    #    http://www.n2yo.com
-    #    http://www.heavens-above.com
-    #    http://in-the-sky.org
-    #    https://uphere.space/satellites
-    #    https://www.amsat.org/track
-    #    https://tracksat.space
-    #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
         nowPlusSatelliteSearchDuration = ephem.Date(
@@ -1160,6 +1123,7 @@ class AstroPyEphem( AstroBase ):
 # Set window to 0 and 23 then run.
 # Should show all satellites.
 # Change 0 to 16 and should show first pass at 16, but now see earlier passes.
+#Is this still a problem?
 
         for satellite in satellites:
             if satellite in satelliteData:

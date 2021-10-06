@@ -811,14 +811,6 @@ class AstroSkyfield( AstroBase ):
     def getVersion(): return skyfield.__version__
 
 
-    # http://www.ga.gov.au/geodesy/astro/moonrise.jsp
-    # http://futureboy.us/fsp/moon.fsp
-    # http://www.geoastro.de/moondata/index.html
-    # http://www.geoastro.de/SME/index.htm
-    # http://www.geoastro.de/elevazmoon/index.htm
-    # http://www.geoastro.de/altazsunmoon/index.htm
-    # http://www.geoastro.de/sundata/index.html
-    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, ephemerisPlanets ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
@@ -865,13 +857,6 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
 
 
-    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
-    # http://www.ga.gov.au/geodesy/astro/sunrise.jsp
-    # http://www.geoastro.de/elevaz/index.htm
-    # http://www.geoastro.de/SME/index.htm
-    # http://www.geoastro.de/altazsunmoon/index.htm
-    # http://futureboy.us/fsp/sun.fsp
-    # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
     def __calculateSun( now, nowPlusOneDay, nowPlusSevenMonths, data, locationAtNow, ephemerisPlanets ):
         neverUp = AstroSkyfield.__calculateCommon(
@@ -902,17 +887,15 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
-    # http://www.geoastro.de/planets/index.html
-    # http://www.ga.gov.au/earth-monitoring/astronomical-information/planet-rise-and-set-information.html
     @staticmethod
     def __calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum ):
+        earthAtNow = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now ) 
         for planet in planets:
             if planet == AstroBase.PLANET_MERCURY or \
                planet == AstroBase.PLANET_VENUS or \
                planet == AstroBase.PLANET_JUPITER or \
                planet == AstroBase.PLANET_URANUS:
-                position = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now ).observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) 
-                apparentMagnitude = planetary_magnitude( position )
+                apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
 
             else:
                 #TODO Skyfield does not calculate apparent magnitude for all bodies as yet, so hard code for now...
@@ -1040,24 +1023,9 @@ class AstroSkyfield( AstroBase ):
         return neverUp
 
 
-    # Refer to
+    # References:
     #    https://github.com/skyfielders/python-skyfield/issues/327
     #    https://github.com/skyfielders/python-skyfield/issues/558
-    #    http://www.celestrak.com/columns/v03n01/
-    #
-    # Use TLE data collated by Dr T S Kelso
-    #     http://celestrak.com/NORAD/elements
-    #
-    # Other sources/background:
-    #    http://spaceflight.nasa.gov/realdata/sightings/SSapplications/Post/JavaSSOP/SSOP_Help/tle_def.html
-    #    http://spotthestation.nasa.gov/sightings
-    #    http://www.n2yo.com
-    #    http://www.heavens-above.com
-    #    http://in-the-sky.org
-    #    https://uphere.space/satellites
-    #    https://www.amsat.org/track
-    #    https://tracksat.space
-    #    https://g7vrd.co.uk/public-satellite-pass-rest-api
     @staticmethod
     def __calculateSatellites( now, data, timeScale, location, ephemerisPlanets, satellites, satelliteData, startHour, endHour ):
         nowPlusSatelliteSearchDuration = timeScale.utc(
