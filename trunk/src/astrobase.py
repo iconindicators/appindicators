@@ -310,8 +310,7 @@ class AstroBase( ABC ):
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ): return { }
 
 
-    # If the minimum version of the third party library is met and
-    # the backend and third party library is available, returns None.
+    # If the minimum version of the third party library is met and available, returns None.
     # Otherwise returns an error message.
     @staticmethod
     @abstractmethod
