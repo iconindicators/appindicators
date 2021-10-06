@@ -20,13 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Do a timing test between each backend running and also the time to build the menu.
-
-
-#TODO For both PyEphem and Skyfield, do a timing test to see how long the backend takes versus the front end.
-#Front end should always be similar...and might be taking a long time compared to the front end.
-
-
 #TODO To move from install PyEphem via apt/apt-get and use pip instead...
 # Need to test install first of pyephem using apt-get and an install via LaunchPad.
 # Then do another install via LaunchPad but using PIP...
