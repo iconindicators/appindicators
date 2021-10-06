@@ -107,8 +107,7 @@ def download( url, dataType, logging = None ):
                 if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
                     continue
 
-                # Missing semi-major-axis (only applies to minor planets).
-                # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                # Missing semi-major-axis; https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
                 if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
                     continue
 
@@ -120,13 +119,10 @@ def download( url, dataType, logging = None ):
         elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
             # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
             for i in range( 0, len( data ) ):
-                # Skip comment lines.
-                if data[ i ].startswith( "#" ):
+                if data[ i ].startswith( "#" ): # Skip comment lines.
                     continue
 
-                # Drop if spurious "****" is present.
-                # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-                if "****" in data[ i ]:
+                if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
                     continue
 
                 # Drop lines with missing magnitude component.
