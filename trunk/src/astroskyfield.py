@@ -29,11 +29,6 @@
 # and maybe use any of the Skyfield example code in place of my own stuff?
 
 
-#TODO Do timing between each set of object types
-# (planets, stars, comets, minor planets and satellites)
-# comparing the time in PyEphem to that in Skyfield.
-
-
 #TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
 # switch completely to Skyfield...or not?  Is there any value in having both options
 # particularly since PyEphem will eventually be installed via PIP?
@@ -72,11 +67,7 @@
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
 
 
-# When creating the stars/planets ephemerides (functions at the end of the file),
-# uncomment the lines below as they are required!
-# import gettext
-# gettext.install( "astroskyfield" )
-
+# import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
 
 try:
     from skyfield import almanac, constants, eclipselib
@@ -1238,7 +1229,6 @@ class AstroSkyfield( AstroBase ):
         print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
 
 
-# Functions to create the stars/planets ephemerides.
-# Must uncomment the gettext lines at the top of the file!
+# Create/update the stars/planets ephemerides; uncomment the gettext import at the top of the file!
 # AstroSkyfield.createEphemerisPlanets()
 # AstroSkyfield.createEphemerisStars()
