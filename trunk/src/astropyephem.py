@@ -992,16 +992,16 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
+        minimalRequiredVersion = "3.7.6.0"
         installationCommand = "sudo apt-get install -y python3-ephem"
-        requiredVersion = "3.7.6.0" # Required version, or better.
         message = None
         if not available:
             message = _( "PyEphem could not be found. Install using:\n\n" + installationCommand )
 
-        elif LooseVersion( ephem.__version__ ) < LooseVersion( requiredVersion ):
+        elif LooseVersion( ephem.__version__ ) < LooseVersion( minimalRequiredVersion ):
             message = \
                 _( "PyEphem must be version {0} or greater. Please upgrade:\n\n" + \
-               installationCommand ).format( requiredVersion )
+               installationCommand ).format( minimalRequiredVersion )
 
         return message
 
