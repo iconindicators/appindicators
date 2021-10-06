@@ -69,6 +69,7 @@ try:
     from skyfield.api import EarthSatellite, load, Star, wgs84
     from skyfield.data import hipparcos, mpc
     from skyfield.magnitudelib import planetary_magnitude
+    from skyfield.trigonometry import position_angle_of
     import skyfield
     available = True
 
@@ -691,7 +692,7 @@ class AstroSkyfield( AstroBase ):
         location = wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = ( ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )
 
-        AstroSkyfield.__calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, latitude, longitude, ephemerisPlanets )
+        AstroSkyfield.__calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, ephemerisPlanets )
         AstroSkyfield.__calculateSun( now, nowPlusOneDay, nowPlusSevenMonths, data, locationAtNow, ephemerisPlanets )
         AstroSkyfield.__calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum )
 
@@ -819,31 +820,15 @@ class AstroSkyfield( AstroBase ):
     # http://www.geoastro.de/sundata/index.html
     # http://www.satellite-calculations.com/Satellite/suncalc.htm
     @staticmethod
-    def __calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, latitude, longitude, ephemerisPlanets ):
+    def __calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, ephemerisPlanets ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
+
         illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, now ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        moonRA, moonDec, earthMoonDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().radec()
-        sunRA, sunDec, earthSunDistance = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().radec()
-        brightLimb = AstroBase.getZenithAngleOfBrightLimb(
-            now.utc_datetime(),
-            sunRA.radians, sunDec.radians,
-            moonRA.radians, moonDec.radians,
-            math.radians( latitude ), math.radians( longitude ) )
-
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
-
-        #TODO The Skyfield code below produces the same position angle as what I internally calculate.
-        # Do more testing/verification, then consider using that. 
-        print( brightLimb )
-        print( math.degrees( brightLimb))
-        from skyfield.trigonometry import position_angle_of
-        positionAngle = position_angle_of(
-            locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().altaz(),
-            locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz() )
-        print( positionAngle.radians )
-        print( positionAngle )
+        moonAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().altaz()
+        sunAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAltAz, sunAltAz ).radians ) # Needed for icon.
 
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
