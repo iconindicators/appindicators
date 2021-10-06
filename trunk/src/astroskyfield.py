@@ -24,11 +24,6 @@
 # How also to determine if a satellite is never up?
 
 
-#TODO See 
-# https://rhodesmill.org/skyfield/examples.html#dark-twilight-day-example
-# and maybe use any of the Skyfield example code in place of my own stuff?
-
-
 #TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
 # switch completely to Skyfield...or not?  Is there any value in having both options
 # particularly since PyEphem will eventually be installed via PIP?
@@ -838,6 +833,17 @@ class AstroSkyfield( AstroBase ):
             math.radians( latitude ), math.radians( longitude ) )
 
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
+
+        #TODO The Skyfield code below produces the same position angle as what I internally calculate.
+        # Do more testing/verification, then consider using that. 
+        print( brightLimb )
+        print( math.degrees( brightLimb))
+        from skyfield.trigonometry import position_angle_of
+        positionAngle = position_angle_of(
+            locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().altaz(),
+            locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz() )
+        print( positionAngle.radians )
+        print( positionAngle )
 
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
