@@ -214,7 +214,6 @@ class IndicatorLunar( IndicatorBase ):
         self.__removeCacheFilesVersion89() # Cache data filenames changed in version 90, so remove old versions.
         self.flushCache()
         self.initialiseDownloadCountsAndCacheDateTimes( datetime.datetime.utcnow() )
-        print( IndicatorLunar.astroBackendName )#TODO Testing
 
 
     def __removeCacheFilesVersion89( self ):
