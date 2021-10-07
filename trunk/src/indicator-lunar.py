@@ -136,7 +136,7 @@ class IndicatorLunar( IndicatorBase ):
 
     else:
         MINOR_PLANET_DATA_URL_BRIGHT = MINOR_PLANET_DATA_URL + "Bright/2018/Soft00Bright.txt"
-        MINOR_PLANET_DATA_URL_CRITICAL = MINOR_PLANET_DATA_URL + "/CritList/Soft00CritList.txt"
+        MINOR_PLANET_DATA_URL_CRITICAL = MINOR_PLANET_DATA_URL + "CritList/Soft00CritList.txt"
         MINOR_PLANET_DATA_URL_DISTANT = MINOR_PLANET_DATA_URL + "Distant/Soft00Distant.txt"
         MINOR_PLANET_DATA_URL_UNUSUAL = MINOR_PLANET_DATA_URL + "Unusual/Soft00Unusual.txt"
 
