@@ -72,10 +72,8 @@ class OE( object ):
 # Otherwise, returns an empty dictionary and may write to the log.
 def download( url, dataType, logging = None ):
     oeData = { }
-    names = { }
     try:
         data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-        print( url )#TODO Testing 
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
@@ -148,13 +146,6 @@ def download( url, dataType, logging = None ):
                 name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
 
                 oe = OE( name, data[ i ], dataType )
-
-                if name in names:
-                    print( url )
-                    print( name )
-                    
-                names[ name ] = name
-
                 oeData[ oe.getName().upper() ] = oe
 
         if not oeData and logging:
@@ -162,32 +153,8 @@ def download( url, dataType, logging = None ):
 
     except Exception as e:
         oeData = { }
-        print( e )
         if logging:
             logging.error( "Error retrieving OE data from " + str( url ) )
             logging.exception( e )
 
     return oeData
-
-
-#TODO https://rhodesmill.org/skyfield/kepler-orbits.html
-# Look at the code with .last()
-# Maybe look at each comet and minor planet text file and see if there are duplicates...
-# If so, can we drop them at the download point?
-#
-# Should this also be investigated for PyEphem?
-
-
-url = "file:///home/bernard/Downloads/Test/"
-
-download( url + "Soft03Cmt.txt", OE.DataType.XEPHEM_COMET )
-download( url + "Soft03Bright.txt", OE.DataType.XEPHEM_MINOR_PLANET )
-download( url + "Soft03CritList.txt", OE.DataType.XEPHEM_MINOR_PLANET )
-download( url + "Soft03Distant.txt", OE.DataType.XEPHEM_MINOR_PLANET )
-download( url + "Soft03Unusual.txt", OE.DataType.XEPHEM_MINOR_PLANET )
-
-download( url + "Soft00Cmt.txt", OE.DataType.SKYFIELD_COMET )
-download( url + "Soft00Bright.txt", OE.DataType.SKYFIELD_MINOR_PLANET )
-download( url + "Soft00CritList.txt", OE.DataType.SKYFIELD_MINOR_PLANET )
-download( url + "Soft00Distant.txt", OE.DataType.SKYFIELD_MINOR_PLANET )
-download( url + "Soft00Unusual.txt", OE.DataType.SKYFIELD_MINOR_PLANET )
