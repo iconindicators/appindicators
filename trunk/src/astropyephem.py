@@ -1013,19 +1013,19 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def __calculateMoon( ephemNow, data ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
-        city = AstroPyEphem.__getCity( data, ephemNow )
-        moon = ephem.Moon( city )
-        sun = ephem.Sun( city )
+        observer = AstroPyEphem.__getCity( data, ephemNow )
+        moon = ephem.Moon( observer )
+        sun = ephem.Sun( observer )
 
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
 
         phase = AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase
 
-        brightLimb = AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
+        brightLimb = AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( observer.lat ), float( observer.lon ) )
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
-        if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Moon(), AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ):
+        if not AstroPyEphem.__calculateCommon( ephemNow, data, observer, moon, AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ):
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
             data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
@@ -1040,7 +1040,10 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def __calculateSun( ephemNow, data ):
-        if not AstroPyEphem.__calculateCommon( ephemNow, data, ephem.Sun(), AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
+        observer = AstroPyEphem.__getCity( data, ephemNow )
+        sun = ephem.Sun()
+        sun.compute( observer )
+        if not AstroPyEphem.__calculateCommon( ephemNow, data, observer, sun, AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             equinox = ephem.next_equinox( ephemNow )
             solstice = ephem.next_solstice( ephemNow )
@@ -1058,10 +1061,10 @@ class AstroPyEphem( AstroBase ):
     def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum ):
         observer = AstroPyEphem.__getCity( data, ephemNow )
         for planet in planets:
-            planetObject = getattr( ephem, planet.title() )()
-            planetObject.compute( observer )
-            if planetObject.mag <= magnitudeMaximum:
-                AstroPyEphem.__calculateCommon( ephemNow, data, planetObject, AstroBase.BodyType.PLANET, planet )
+            body = getattr( ephem, planet.title() )()
+            body.compute( observer )
+            if body.mag <= magnitudeMaximum:
+                AstroPyEphem.__calculateCommon( ephemNow, data, observer, body, AstroBase.BodyType.PLANET, planet )
 
 
     @staticmethod
@@ -1069,10 +1072,10 @@ class AstroPyEphem( AstroBase ):
         observer = AstroPyEphem.__getCity( data, ephemNow )
         for star in stars:
             if star in AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
-                starObject = ephem.star( star.title() )
-                starObject.compute( observer )
-                if starObject.mag <= magnitudeMaximum:
-                    AstroPyEphem.__calculateCommon( ephemNow, data, starObject, AstroBase.BodyType.STAR, star )
+                body = ephem.star( star.title() )
+                body.compute( observer )
+                if body.mag <= magnitudeMaximum:
+                    AstroPyEphem.__calculateCommon( ephemNow, data, observer, body, AstroBase.BodyType.STAR, star )
 
 
     @staticmethod
@@ -1082,29 +1085,32 @@ class AstroPyEphem( AstroBase ):
             if key in orbitalElementData:
                 body = ephem.readdb( orbitalElementData[ key ].getData() )
                 body.compute( observer )
-                bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+                bad = \
+                    math.isnan( body.earth_distance ) or \
+                    math.isnan( body.phase ) or \
+                    math.isnan( body.size ) or \
+                    math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+
                 if not bad and body.mag <= magnitudeMaximum:
-                    AstroPyEphem.__calculateCommon( ephemNow, data, body, bodyType, key )
+                    AstroPyEphem.__calculateCommon( ephemNow, data, observer, body, bodyType, key )
 
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
     #
     # Returns True if the body is never up; false otherwise.
     @staticmethod
-    def __calculateCommon( ephemNow, data, body, bodyType, nameTag ):
+    def __calculateCommon( ephemNow, data, observer, body, bodyType, nameTag ):
         neverUp = False
         key = ( bodyType, nameTag )
         try:
-            city = AstroPyEphem.__getCity( data, ephemNow )
-            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( city.next_rising( body ).datetime() )
-            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( city.next_setting( body ).datetime() )
-
-            body.compute( AstroPyEphem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            # Must compute az/alt BEFORE rise/set otherwise results will be incorrect.
             data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( observer.next_rising( body ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( observer.next_setting( body ).datetime() )
 
         except ephem.AlwaysUpError:
-            body.compute( AstroPyEphem.__getCity( data, ephemNow ) ) # Need to recompute the body otherwise the azimuth/altitude are incorrectly calculated.
+            body.compute( observer ) # Must recompute otherwise the azimuth/altitude are incorrectly calculated.
             data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
