@@ -1012,19 +1012,16 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def __calculateMoon( ephemNow, data ):
-        # Used for internal processing; indirectly presented to the user.
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
-        moon = ephem.Moon()
-        moon.compute( AstroPyEphem.__getCity( data, ephemNow ) )
+        city = AstroPyEphem.__getCity( data, ephemNow )
+        moon = ephem.Moon( city )
+        sun = ephem.Sun( city )
+
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
 
         phase = AstroBase.getLunarPhase( int( moon.phase ), ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase
 
-        city = AstroPyEphem.__getCity( data, ephemNow )
-        sun = ephem.Sun( city )
-        moon = ephem.Moon()
-        moon.compute( city )
         brightLimb = AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( city.lat ), float( city.lon ) )
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
