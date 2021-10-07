@@ -1056,29 +1056,32 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum ):
+        observer = AstroPyEphem.__getCity( data, ephemNow )
         for planet in planets:
             planetObject = getattr( ephem, planet.title() )()
-            planetObject.compute( AstroPyEphem.__getCity( data, ephemNow ) )
+            planetObject.compute( observer )
             if planetObject.mag <= magnitudeMaximum:
                 AstroPyEphem.__calculateCommon( ephemNow, data, planetObject, AstroBase.BodyType.PLANET, planet )
 
 
     @staticmethod
     def __calculateStars( ephemNow, data, stars, magnitudeMaximum ):
+        observer = AstroPyEphem.__getCity( data, ephemNow )
         for star in stars:
             if star in AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
                 starObject = ephem.star( star.title() )
-                starObject.compute( AstroPyEphem.__getCity( data, ephemNow ) )
+                starObject.compute( observer )
                 if starObject.mag <= magnitudeMaximum:
                     AstroPyEphem.__calculateCommon( ephemNow, data, starObject, AstroBase.BodyType.STAR, star )
 
 
     @staticmethod
     def __calculateOrbitalElements( ephemNow, data, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
+        observer = AstroPyEphem.__getCity( data, ephemNow )
         for key in orbitalElements:
             if key in orbitalElementData:
                 body = ephem.readdb( orbitalElementData[ key ].getData() )
-                body.compute( AstroPyEphem.__getCity( data, ephemNow ) )
+                body.compute( observer )
                 bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
                 if not bad and body.mag <= magnitudeMaximum:
                     AstroPyEphem.__calculateCommon( ephemNow, data, body, bodyType, key )
