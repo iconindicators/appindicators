@@ -1143,11 +1143,11 @@ class AstroPyEphem( AstroBase ):
                 # However, when filtering passes through a start/end window,
                 # searching is further bound within each star/end hour pair.
                 while startDateTime is not None and startDateTime < endDateTime:
-                    city = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
+                    observer = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
-                    earthSatellite.compute( city )
+                    earthSatellite.compute( observer )
                     try:
-                        nextPass = AstroPyEphem.__nextSatellitePass( city, earthSatellite )
+                        nextPass = AstroPyEphem.__nextSatellitePass( observer, earthSatellite )
                         if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime and \
                            AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
@@ -1187,16 +1187,16 @@ class AstroPyEphem( AstroBase ):
     #    https://rhodesmill.org/pyephem/CHANGELOG.html#version-3-7-7-0-2019-august-18
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
-    def __nextSatellitePass( city, satellite ):
+    def __nextSatellitePass( observer, satellite ):
         if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
-            nextPass = city.next_pass( satellite )
+            nextPass = observer.next_pass( satellite )
 
         else:
             # Must set singlepass = False to avoid the new code in PyEphem (and so behave prior to this change).
             # It is possible a pass is too quick/low and an exception is thrown.
             # https://github.com/brandon-rhodes/pyephem/issues/164
             # https://github.com/brandon-rhodes/pyephem/pull/85/files
-            nextPass = city.next_pass( satellite, singlepass = False )
+            nextPass = observer.next_pass( satellite, singlepass = False )
 
         return nextPass
 
@@ -1227,13 +1227,13 @@ class AstroPyEphem( AstroBase ):
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
-        city = AstroPyEphem.__getCity( data, passDateTime )
-        city.pressure = 0
-        city.horizon = "-0:34"
+        observer = AstroPyEphem.__getCity( data, passDateTime )
+        observer.pressure = 0
+        observer.horizon = "-0:34"
 
-        satellite.compute( city )
+        satellite.compute( observer )
         sun = ephem.Sun()
-        sun.compute( city )
+        sun.compute( observer )
 
         return \
             satellite.eclipsed is False and \
