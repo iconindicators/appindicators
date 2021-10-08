@@ -1025,7 +1025,7 @@ class AstroPyEphem( AstroBase ):
         brightLimb = AstroBase.getZenithAngleOfBrightLimb( ephemNow.datetime(), sun.ra, sun.dec, moon.ra, moon.dec, float( observer.lat ), float( observer.lon ) )
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
-        if not AstroPyEphem.__calculateCommon( ephemNow, data, observer, moon, AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ):
+        if not AstroPyEphem.__calculateCommon( data, observer, moon, AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ):
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
             data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
@@ -1043,7 +1043,7 @@ class AstroPyEphem( AstroBase ):
         observer = AstroPyEphem.__getCity( data, ephemNow )
         sun = ephem.Sun()
         sun.compute( observer )
-        if not AstroPyEphem.__calculateCommon( ephemNow, data, observer, sun, AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
+        if not AstroPyEphem.__calculateCommon( data, observer, sun, AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             equinox = ephem.next_equinox( ephemNow )
             solstice = ephem.next_solstice( ephemNow )
@@ -1064,7 +1064,7 @@ class AstroPyEphem( AstroBase ):
             body = getattr( ephem, planet.title() )()
             body.compute( observer )
             if body.mag <= magnitudeMaximum:
-                AstroPyEphem.__calculateCommon( ephemNow, data, observer, body, AstroBase.BodyType.PLANET, planet )
+                AstroPyEphem.__calculateCommon( data, observer, body, AstroBase.BodyType.PLANET, planet )
 
 
     @staticmethod
@@ -1075,7 +1075,7 @@ class AstroPyEphem( AstroBase ):
                 body = ephem.star( star.title() )
                 body.compute( observer )
                 if body.mag <= magnitudeMaximum:
-                    AstroPyEphem.__calculateCommon( ephemNow, data, observer, body, AstroBase.BodyType.STAR, star )
+                    AstroPyEphem.__calculateCommon( data, observer, body, AstroBase.BodyType.STAR, star )
 
 
     @staticmethod
@@ -1092,14 +1092,14 @@ class AstroPyEphem( AstroBase ):
                     math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
 
                 if not bad and body.mag <= magnitudeMaximum:
-                    AstroPyEphem.__calculateCommon( ephemNow, data, observer, body, bodyType, key )
+                    AstroPyEphem.__calculateCommon( data, observer, body, bodyType, key )
 
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.
     #
     # Returns True if the body is never up; false otherwise.
     @staticmethod
-    def __calculateCommon( ephemNow, data, observer, body, bodyType, nameTag ):
+    def __calculateCommon( data, observer, body, bodyType, nameTag ):
         neverUp = False
         key = ( bodyType, nameTag )
         try:
