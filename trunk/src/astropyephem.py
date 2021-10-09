@@ -949,7 +949,7 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateStars( observer, data, stars, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
-        AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour )
+        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ]
@@ -1117,7 +1117,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour ):
         nowPlusSatelliteSearchDuration = ephem.Date(
             ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
 
@@ -1139,7 +1139,8 @@ class AstroPyEphem( AstroBase ):
                 # However, when filtering passes through a start/end window,
                 # searching is further bound within each star/end hour pair.
                 while startDateTime is not None and startDateTime < endDateTime:
-                    observer = AstroPyEphem.__getObserver( data, ephem.Date( startDateTime ) )
+                    # observer = AstroPyEphem.__getObserver( data, ephem.Date( startDateTime ) )
+                    observer.date = ephem.Date( startDateTime )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     earthSatellite.compute( observer )
                     try:
