@@ -941,7 +941,7 @@ class AstroPyEphem( AstroBase ):
         data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_ELEVATION ) ] = str( elevation )
 
         ephemNow = ephem.Date( utcNow )
-        observer = AstroPyEphem.__getCity( data, ephemNow )
+        observer = AstroPyEphem.__getObserver( data, ephemNow )
 
         AstroPyEphem.__calculateMoon( ephemNow, observer, data )
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
@@ -1139,7 +1139,7 @@ class AstroPyEphem( AstroBase ):
                 # However, when filtering passes through a start/end window,
                 # searching is further bound within each star/end hour pair.
                 while startDateTime is not None and startDateTime < endDateTime:
-                    observer = AstroPyEphem.__getCity( data, ephem.Date( startDateTime ) )
+                    observer = AstroPyEphem.__getObserver( data, ephem.Date( startDateTime ) )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     earthSatellite.compute( observer )
                     try:
@@ -1223,7 +1223,7 @@ class AstroPyEphem( AstroBase ):
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( data, passDateTime, satellite ):
-        observer = AstroPyEphem.__getCity( data, passDateTime )
+        observer = AstroPyEphem.__getObserver( data, passDateTime )
         observer.pressure = 0
         observer.horizon = "-0:34"
 
@@ -1238,7 +1238,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __getCity( data, date ):
+    def __getObserver( data, date ):
         city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
         city.date = date
         city.lat = data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
