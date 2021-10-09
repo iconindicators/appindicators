@@ -945,10 +945,10 @@ class AstroPyEphem( AstroBase ):
 
         AstroPyEphem.__calculateMoon( ephemNow, observer, data )
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
-        AstroPyEphem.__calculatePlanets( ephemNow, observer, data, planets, magnitudeMaximum )
-        AstroPyEphem.__calculateStars( ephemNow, observer, data, stars, magnitudeMaximum )
-        AstroPyEphem.__calculateOrbitalElements( ephemNow, observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
-        AstroPyEphem.__calculateOrbitalElements( ephemNow, observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+        AstroPyEphem.__calculatePlanets( observer, data, planets, magnitudeMaximum )
+        AstroPyEphem.__calculateStars( observer, data, stars, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
         AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
@@ -977,9 +977,9 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ):
         results = { }
+        city = ephem.city( "London" ) # Use any city; makes no difference to obtain the magnitude.
+        city.date = utcNow
         for key in orbitalElementData:
-            city = ephem.city( "London" ) # Use any city; makes no difference to obtain the magnitude.
-            city.date = utcNow
             body = ephem.readdb( orbitalElementData[ key ].getData() )
             body.compute( city )
 
