@@ -30,7 +30,7 @@
 #
 # In astropyephem, need to update the line
 #    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" 
-# and maybe warn using not to use apt-get.
+# and maybe warn user not to use apt-get.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -328,8 +328,6 @@ class IndicatorLunar( IndicatorBase ):
 
         if self.showSatelliteNotification:
             self.notificationSatellites()
-
-        print( ( datetime.datetime.utcnow() - utcNow ).total_seconds() ) #TODO Testing.
 
         return self.getNextUpdateTimeInSeconds()
 
