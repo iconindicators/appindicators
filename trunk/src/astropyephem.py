@@ -941,13 +941,14 @@ class AstroPyEphem( AstroBase ):
         data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_ELEVATION ) ] = str( elevation )
 
         ephemNow = ephem.Date( utcNow )
+        observer = AstroPyEphem.__getCity( data, ephemNow )
 
-        AstroPyEphem.__calculateMoon( ephemNow, data )
-        AstroPyEphem.__calculateSun( ephemNow, data )
-        AstroPyEphem.__calculatePlanets( ephemNow, data, planets, magnitudeMaximum )
-        AstroPyEphem.__calculateStars( ephemNow, data, stars, magnitudeMaximum )
-        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
-        AstroPyEphem.__calculateOrbitalElements( ephemNow, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+        AstroPyEphem.__calculateMoon( ephemNow, observer, data )
+        AstroPyEphem.__calculateSun( ephemNow, observer, data )
+        AstroPyEphem.__calculatePlanets( ephemNow, observer, data, planets, magnitudeMaximum )
+        AstroPyEphem.__calculateStars( ephemNow, observer, data, stars, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( ephemNow, observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
+        AstroPyEphem.__calculateOrbitalElements( ephemNow, observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
         AstroPyEphem.__calculateSatellites( ephemNow, data, satellites, satelliteData, startHour, endHour )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
@@ -1011,9 +1012,8 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateMoon( ephemNow, data ):
+    def __calculateMoon( ephemNow, observer, data ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
-        observer = AstroPyEphem.__getCity( data, ephemNow )
         moon = ephem.Moon( observer )
         sun = ephem.Sun( observer )
 
@@ -1039,8 +1039,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateSun( ephemNow, data ):
-        observer = AstroPyEphem.__getCity( data, ephemNow )
+    def __calculateSun( ephemNow, observer, data ):
         sun = ephem.Sun()
         sun.compute( observer )
         if not AstroPyEphem.__calculateCommon( data, observer, sun, AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
@@ -1058,8 +1057,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculatePlanets( ephemNow, data, planets, magnitudeMaximum ):
-        observer = AstroPyEphem.__getCity( data, ephemNow )
+    def __calculatePlanets( observer, data, planets, magnitudeMaximum ):
         for planet in planets:
             body = getattr( ephem, planet.title() )()
             body.compute( observer )
@@ -1068,8 +1066,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateStars( ephemNow, data, stars, magnitudeMaximum ):
-        observer = AstroPyEphem.__getCity( data, ephemNow )
+    def __calculateStars( observer, data, stars, magnitudeMaximum ):
         for star in stars:
             if star in AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
                 body = ephem.star( star.title() )
@@ -1079,8 +1076,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements( ephemNow, data, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
-        observer = AstroPyEphem.__getCity( data, ephemNow )
+    def __calculateOrbitalElements( observer, data, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
         for key in orbitalElements:
             if key in orbitalElementData:
                 body = ephem.readdb( orbitalElementData[ key ].getData() )
