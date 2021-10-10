@@ -33,14 +33,6 @@
 # and maybe warn user not to use apt-get.
 
 
-#TODO Set the pass from 16 to 21 and set visible passes to always true and saw satellites rising/transiting at before 16.
-# Set window to 0 and 23 then run.
-# Should show all satellites.
-# Change 0 to 16 and should show first pass at 16, but now see earlier passes.
-#Is this still a problem?
-
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -289,23 +281,6 @@ class IndicatorLunar( IndicatorBase ):
         
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
-
-#TODO Testing
-# startHour = 6 # 4pm Sydney 
-# endHour = 11 # 9pm Sydney 
-
-# startHour = 17 # 3am Sydney 
-# endHour = 20 # 6am Sydney 
-
-# startHour = 21 # 3am India
-# endHour = 1 # 7am India
-
-# startHour = 23 # 4pm California 
-# endHour = 4 # 9pm California
-
-        # self.satelliteLimitStart = 18
-        # self.satelliteLimitEnd = 18
-
 
         # Update backend.
         self.dataPrevious = self.data
