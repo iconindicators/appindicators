@@ -33,6 +33,14 @@
 # and maybe warn user not to use apt-get.
 
 
+#TODO Set the pass from 16 to 21 and set visible passes to always true and saw satellites rising/transiting at before 16.
+# Set window to 0 and 23 then run.
+# Should show all satellites.
+# Change 0 to 16 and should show first pass at 16, but now see earlier passes.
+#Is this still a problem?
+
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
