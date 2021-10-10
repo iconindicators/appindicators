@@ -1121,6 +1121,11 @@ class AstroPyEphem( AstroBase ):
         nowPlusSatelliteSearchDuration = ephem.Date(
             ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
 
+        observerVisiblePasses = AstroPyEphem.__getObserver( data, ephemNow )
+        observerVisiblePasses.pressure = 0
+        observerVisiblePasses.horizon = "-0:34"
+
+
 #TODO Set the pass from 16 to 21 and set visible passes to always true and saw satellites rising/transiting at before 16.
 # Set window to 0 and 23 then run.
 # Should show all satellites.
@@ -1139,7 +1144,6 @@ class AstroPyEphem( AstroBase ):
                 # However, when filtering passes through a start/end window,
                 # searching is further bound within each star/end hour pair.
                 while startDateTime is not None and startDateTime < endDateTime:
-                    # observer = AstroPyEphem.__getObserver( data, ephem.Date( startDateTime ) )
                     observer.date = ephem.Date( startDateTime )
                     earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() ) # Need to fetch on each iteration as the visibility check (down below) may alter the object's internals.
                     earthSatellite.compute( observer )
@@ -1147,7 +1151,7 @@ class AstroPyEphem( AstroBase ):
                         nextPass = AstroPyEphem.__nextSatellitePass( observer, earthSatellite )
                         if AstroPyEphem.__isSatellitePassValid( nextPass ) and \
                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime and \
-                           AstroPyEphem.__isSatellitePassVisible( data, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ], earthSatellite ):
+                           AstroPyEphem.__isSatellitePassVisible( observerVisiblePasses, earthSatellite, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_CULMINATION_DATE ] ):
 
                             data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
                                 AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_PASS_RISING_DATE ].datetime() )
@@ -1223,14 +1227,12 @@ class AstroPyEphem( AstroBase ):
     #    https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     #    https://www.celestrak.com/columns/v03n01
     @staticmethod
-    def __isSatellitePassVisible( data, passDateTime, satellite ):
-        observer = AstroPyEphem.__getObserver( data, passDateTime )
-        observer.pressure = 0
-        observer.horizon = "-0:34"
+    def __isSatellitePassVisible( observerVisiblePasses, satellite, passDateTime ):
+        observerVisiblePasses.date = passDateTime
 
-        satellite.compute( observer )
+        satellite.compute( observerVisiblePasses )
         sun = ephem.Sun()
-        sun.compute( observer )
+        sun.compute( observerVisiblePasses )
 
         return \
             satellite.eclipsed is False and \
