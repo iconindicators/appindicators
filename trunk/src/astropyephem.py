@@ -1190,15 +1190,9 @@ class AstroPyEphem( AstroBase ):
                         break
 
 
-#TODO Set the pass from 16 to 21 and set visible passes to always true and saw satellites rising/transiting at before 16.
-# Set window to 0 and 23 then run.
-# Should show all satellites.
-# Change 0 to 16 and should show first pass at 16, but now see earlier passes.
-#Is this still a problem?
     @staticmethod
     def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour ):
-        nowPlusSatelliteSearchDuration = ephem.Date(
-            ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
+        finalDateTime = ephem.Date( ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
 
         observerVisiblePasses = AstroPyEphem.__getObserver( data, ephemNow )
         observerVisiblePasses.pressure = 0
@@ -1209,15 +1203,14 @@ class AstroPyEphem( AstroBase ):
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
                 earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() )
                 startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
-                    ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), nowPlusSatelliteSearchDuration, startHour, endHour )
+                    ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), finalDateTime, startHour, endHour )
 
                 AstroPyEphem.__calculateSatellite(
-                    startDateTime, endDateTime, nowPlusSatelliteSearchDuration, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite )
+                    startDateTime, endDateTime, finalDateTime, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite )
 
 
     @staticmethod
-    def __calculateSatellite(
-            startDateTime, endDateTime, nowPlusSatelliteSearchDuration, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite ):
+    def __calculateSatellite( startDateTime, endDateTime, finalDateTime, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite ):
 
         # Typically to search for a visible satellite pass,
         # start from 'now' until 'now' plus search duration,
@@ -1231,8 +1224,7 @@ class AstroPyEphem( AstroBase ):
                 nextPass = AstroPyEphem.__nextSatellitePass( observer, earthSatellite )
                 passIsValid = AstroPyEphem.__isSatellitePassValid( nextPass )
                 if passIsValid:
-                    passBeforeEndDateTime = \
-                        nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime
+                    passBeforeEndDateTime = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime
 
                     passIsVisible = AstroPyEphem.__isSatellitePassVisible(
                         observerVisiblePasses, earthSatellite, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] )
@@ -1241,8 +1233,7 @@ class AstroPyEphem( AstroBase ):
                         data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
                             AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ].datetime() )
 
-                        data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
-                            repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] )
+                        data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] )
 
                         data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
                             AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime() )
@@ -1256,11 +1247,9 @@ class AstroPyEphem( AstroBase ):
 
                 else:
                     # Bad pass data, so look shortly after the current time.
-                    startDateTime = ephem.Date(
-                        ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc )
+                    startDateTime = ephem.Date( ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc )
 
-                startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
-                    startDateTime, nowPlusSatelliteSearchDuration, startHour, endHour )
+                startDateTime, endDateTime = AstroBase.getAdjustedDateTime( startDateTime, finalDateTime, startHour, endHour )
 
             except ValueError:
                 if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
