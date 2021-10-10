@@ -928,23 +928,7 @@ class AstroPyEphem( AstroBase ):
 
         data = { }
         ephemNow = ephem.Date( utcNow )
-
-        # observer = ephem.city( "London" ) # Any name will do; add in the correct lat/long/elev. 
-        # observer.date = ephemNow
-        # observer.lat = str( latitude )
-        # observer.lon = str( longitude )
-        # observer.elev = elevation
         observer = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
-
-        # To find a visible satellite pass, need a modified observer.
-        # observerVisiblePasses = ephem.city( "London" ) # Any name will do; add in the correct lat/long/elev.
-        # observerVisiblePasses.date = ephemNow
-        # observerVisiblePasses.lat = str( latitude )
-        # observerVisiblePasses.lon = str( longitude )
-        # observerVisiblePasses.elev = elevation
-        observerVisiblePasses = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
-        observerVisiblePasses.pressure = 0
-        observerVisiblePasses.horizon = "-0:34"
 
         AstroPyEphem.__calculateMoon( ephemNow, observer, data )
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
@@ -952,6 +936,12 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateStars( observer, data, stars, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
+
+        # To find a visible satellite pass, need a modified observer.
+        observerVisiblePasses = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
+        observerVisiblePasses.pressure = 0
+        observerVisiblePasses.horizon = "-0:34"
+
         AstroPyEphem.__calculateSatellites( ephemNow, observer, observerVisiblePasses, data, satellites, satelliteData, startHour, endHour )
 
         return data
@@ -1012,7 +1002,7 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def __getObserver( ephemNow, latitude, longitude, elevation ):
-        observer = ephem.city( "London" ) # Any name will do; add in the correct lat/long/elev. 
+        observer = ephem.city( "London" ) # Any name will do; add in the correct latitude/longitude/elevation.
         observer.date = ephemNow
         observer.lat = str( latitude )
         observer.lon = str( longitude )
