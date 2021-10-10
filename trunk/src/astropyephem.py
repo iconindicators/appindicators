@@ -894,13 +894,6 @@ class AstroPyEphem( AstroBase ):
             AstroBase.STARS[ 114 ]    :   _( "ZUBENELGENUBI" ) } )
 
 
-    # Internally used for city.
-    __DATA_TAG_ELEVATION = "ELEVATION"
-    __DATA_TAG_LATITUDE = "LATITUDE"
-    __DATA_TAG_LONGITUDE = "LONGITUDE"
-    __NAME_TAG_CITY = "CITY"
-
-
     # Internally used to reference PyEphem objects.
     __PYEPHEM_CITY_LATITUDE = 0
     __PYEPHEM_CITY_LONGITUDE = 1
@@ -934,26 +927,22 @@ class AstroPyEphem( AstroBase ):
             logging ):
 
         data = { }
-
-        # Used internally; removed before passing back to the caller.
-        # data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ] = str( latitude )
-        # data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ] = str( longitude )
-        # data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_ELEVATION ) ] = str( elevation )
-
         ephemNow = ephem.Date( utcNow )
-        # observer = AstroPyEphem.__getObserver( data, ephemNow )
 
-        observer = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
-        observer.date = ephemNow
-        observer.lat = str( latitude )
-        observer.lon = str( longitude )
-        observer.elev = elevation
+        # observer = ephem.city( "London" ) # Any name will do; add in the correct lat/long/elev. 
+        # observer.date = ephemNow
+        # observer.lat = str( latitude )
+        # observer.lon = str( longitude )
+        # observer.elev = elevation
+        observer = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
 
-        observerVisiblePasses = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
-        observerVisiblePasses.date = ephemNow
-        observerVisiblePasses.lat = str( latitude )
-        observerVisiblePasses.lon = str( longitude )
-        observerVisiblePasses.elev = elevation
+        # To find a visible satellite pass, need a modified observer.
+        # observerVisiblePasses = ephem.city( "London" ) # Any name will do; add in the correct lat/long/elev.
+        # observerVisiblePasses.date = ephemNow
+        # observerVisiblePasses.lat = str( latitude )
+        # observerVisiblePasses.lon = str( longitude )
+        # observerVisiblePasses.elev = elevation
+        observerVisiblePasses = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
         observerVisiblePasses.pressure = 0
         observerVisiblePasses.horizon = "-0:34"
 
@@ -964,10 +953,6 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
         AstroPyEphem.__calculateSatellites( ephemNow, observer, observerVisiblePasses, data, satellites, satelliteData, startHour, endHour )
-
-        # del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
-        # del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ]
-        # del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_ELEVATION ) ]
 
         return data
 
@@ -1023,6 +1008,16 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getVersion(): return ephem.__version__
+
+
+    @staticmethod
+    def __getObserver( ephemNow, latitude, longitude, elevation ):
+        observer = ephem.city( "London" ) # Any name will do; add in the correct lat/long/elev. 
+        observer.date = ephemNow
+        observer.lat = str( latitude )
+        observer.lon = str( longitude )
+        observer.elev = elevation
+        return observer
 
 
     @staticmethod
@@ -1133,11 +1128,6 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def __calculateSatellites( ephemNow, observer, observerVisiblePasses, data, satellites, satelliteData, startHour, endHour ):
         finalDateTime = ephem.Date( ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
-
-        # observerVisiblePasses = AstroPyEphem.__getObserver( data, ephemNow )
-        # observerVisiblePasses.pressure = 0
-        # observerVisiblePasses.horizon = "-0:34"
-
         for satellite in satellites:
             if satellite in satelliteData:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
@@ -1253,14 +1243,3 @@ class AstroPyEphem( AstroBase ):
             satellite.eclipsed is False and \
             sun.alt > ephem.degrees( "-18" ) and \
             sun.alt < ephem.degrees( "-6" )
-
-
-    # @staticmethod
-    # def __getObserver( data, date ):
-    #     city = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
-    #     city.date = date
-    #     city.lat = data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
-    #     city.lon = data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ]
-    #     city.elev = float( data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_ELEVATION ) ] )
-    #
-    #     return city
