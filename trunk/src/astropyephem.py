@@ -941,7 +941,15 @@ class AstroPyEphem( AstroBase ):
         data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_ELEVATION ) ] = str( elevation )
 
         ephemNow = ephem.Date( utcNow )
-        observer = AstroPyEphem.__getObserver( data, ephemNow )
+        # observer = AstroPyEphem.__getObserver( data, ephemNow )
+        
+        observer = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
+        observer.date = ephemNow
+        observer.lat = str( latitude )
+        observer.lon = str( longitude )
+        observer.elev = elevation
+        
+        
 
         AstroPyEphem.__calculateMoon( ephemNow, observer, data )
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
@@ -949,7 +957,7 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateStars( observer, data, stars, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
-        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
+        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour, latitude, longitude, elevation )
 
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LATITUDE ) ]
         del data[ ( None, AstroPyEphem.__NAME_TAG_CITY, AstroPyEphem.__DATA_TAG_LONGITUDE ) ]
@@ -1117,12 +1125,23 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour, latitude, longitude, elevation ):
         finalDateTime = ephem.Date( ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
 
-        observerVisiblePasses = AstroPyEphem.__getObserver( data, ephemNow )
+        # observerVisiblePasses = AstroPyEphem.__getObserver( data, ephemNow )
+        # observerVisiblePasses.pressure = 0
+        # observerVisiblePasses.horizon = "-0:34"
+
+
+        observerVisiblePasses = ephem.city( "London" ) # Put in a city name known to exist in PyEphem then doctor to the correct lat/long/elev.
+        observerVisiblePasses.date = ephemNow
+        observerVisiblePasses.lat = str( latitude )
+        observerVisiblePasses.lon = str( longitude )
+        observerVisiblePasses.elev = elevation
         observerVisiblePasses.pressure = 0
         observerVisiblePasses.horizon = "-0:34"
+
+
 
         for satellite in satellites:
             if satellite in satelliteData:
