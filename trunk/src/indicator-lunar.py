@@ -1380,9 +1380,9 @@ class IndicatorLunar( IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( 5 )
+        box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
-
         toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." )
         spinnerMagnitude = self.createSpinButton(
             self.magnitude, int( AstroBase.MAGNITUDE_MINIMUM ), int( AstroBase.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
@@ -1391,25 +1391,25 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( box, 0, 1, 1, 1 )
 
         cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
-        cometsAddNewCheckbutton.set_margin_top( 10 )
+        cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
         grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 )
 
         minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
-        minorPlanetsAddNewCheckbutton.set_margin_top( 10 )
+        minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
         minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
         minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "If checked, all minor planets are added." ) )
         grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
-        satellitesAddNewCheckbox.set_margin_top( 10 )
+        satellitesAddNewCheckbox.set_margin_top( 5 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
         satellitesAddNewCheckbox.set_tooltip_text( _( "If checked, all satellites are added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 4, 1, 1 )
 
         sortSatellitesByDateTimeCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
-        sortSatellitesByDateTimeCheckbutton.set_margin_top( 10 )
+        sortSatellitesByDateTimeCheckbutton.set_margin_top( 5 )
         sortSatellitesByDateTimeCheckbutton.set_active( self.satellitesSortByDateTime )
         sortSatellitesByDateTimeCheckbutton.set_tooltip_text( _(
             "If checked, satellites are sorted\n" + \
@@ -1419,6 +1419,7 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( sortSatellitesByDateTimeCheckbutton, 0, 5, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 5 )
         box.set_margin_left( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Show satellites passes from" ) ), False, False, 0 )
@@ -1614,6 +1615,7 @@ class IndicatorLunar( IndicatorBase ):
         grid = self.createGrid()
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "City" ) ), False, False, 0 )
 
@@ -1634,6 +1636,7 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( box, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Latitude" ) ), False, False, 0 )
 
@@ -1643,6 +1646,7 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( box, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Longitude" ) ), False, False, 0 )
 
@@ -1652,6 +1656,7 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( box, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Elevation" ) ), False, False, 0 )
 
