@@ -524,10 +524,10 @@ class IndicatorLunar( IndicatorBase ):
                dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
                dataName == AstroBase.DATA_TAG_FULL or \
                dataName == AstroBase.DATA_TAG_NEW or \
+               dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
                dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
                dataName == AstroBase.DATA_TAG_SOLSTICE or \
-               dataName == AstroBase.DATA_TAG_THIRD_QUARTER or \
-               dataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
+               dataName == AstroBase.DATA_TAG_THIRD_QUARTER:
                 dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
