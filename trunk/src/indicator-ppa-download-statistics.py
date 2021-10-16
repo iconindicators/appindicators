@@ -47,6 +47,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
     SERIES = [
+        "jammy",
         "impish", "hirsute", "groovy", "focal", "eoan",
         "disco", "cosmic", "bionic", "artful", "zesty",
         "yakkety", "xenial", "wily", "vivid", "utopic",

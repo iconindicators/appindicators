@@ -2,10 +2,11 @@ indicator-ppa-download-statistics (1.0.74-1) bionic; urgency=low
 
   * Updated LaunchPad PPA URL to include "ubuntu".
   * PPA menu items now have a more specific URL.
-  * Update release to bionic as xenial is end of life.
   * Added impish to the list of series.
+  * Added jammy to the list of series.
+  * Update release to bionic as xenial is end of life.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000    <-----TODO Set to date of release, whenever that happens!
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 16 Oct 2021 19:32:37 +1000
 
 
 indicator-ppa-download-statistics (1.0.73-1) xenial; urgency=low
