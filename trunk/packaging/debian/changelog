@@ -1,6 +1,6 @@
 indicator-lunar (1.0.90-1) bionic; urgency=low
 
-  * Bug fix: Removed separator character follwing empty { } in icon text.
+  * Bug fix: Removed separator character following empty { } in icon text.
   * Bug fix: Satellites sometimes not showing set information when in transit.
   * Bug fix: Satellite rise time was not taken into account when determining
     indicator next update.
