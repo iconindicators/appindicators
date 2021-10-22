@@ -1105,11 +1105,11 @@ class AstroPyEphem( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( observer.next_setting( body ).datetime() )
 
         except ephem.AlwaysUpError:
-            body.compute( observer ) # Must recompute otherwise the azimuth/altitude are incorrectly calculated.
-            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
-            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
+            pass
 
         except ephem.NeverUpError:
+            del data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ]
+            del data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ]
             neverUp = True
 
         return neverUp
