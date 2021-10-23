@@ -549,7 +549,8 @@ class IndicatorLunar( IndicatorBase ):
             if dateTime > nextUpdateTime:
                 break
 
-            if dateTime < nextUpdateTime and dateTime > utcNowPlusOneMinute:
+            # if dateTime < nextUpdateTime and dateTime > utcNowPlusOneMinute:
+            if dateTime > utcNowPlusOneMinute:
                 nextUpdateTime = dateTime
                 nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
                 break
