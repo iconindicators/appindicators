@@ -510,17 +510,25 @@ class IndicatorLunar( IndicatorBase ):
     def getNextUpdateTimeInSeconds( self ):
         dateTimes = [ ]
         for key in self.data:
-            dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
+            isSatellite = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE
+            displayBody = self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] )
 
+            if isSatellite or ( not isSatellite and displayBody ):
+            
+            if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] != AstroBase.BodyType.SATELLITE and not self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] ):
+                continue
+
+            dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE:
                 if dataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
                     dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                     dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 ) #TODO Need a comment here.
-                    # dateTimes.append( AstroBase.toDateTimeString( dateTimeMinusFourMinutes ) )#TODO Can delete this if this works.
-                    dateTimes.append( dateTimeMinusFourMinutes )
+                    # dateTimes.append( dateTimeMinusFourMinutes )
+                    dateTimes.append( [ dateTimeMinusFourMinutes, dataName, key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] ] )
 
                 elif dataName == AstroBase.DATA_TAG_SET_DATE_TIME:
-                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+                    # dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), dataName, key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] ] )
 
             else:
                 if dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
@@ -532,13 +540,18 @@ class IndicatorLunar( IndicatorBase ):
                    dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
                    dataName == AstroBase.DATA_TAG_SOLSTICE or \
                    dataName == AstroBase.DATA_TAG_THIRD_QUARTER:
-                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+                    # dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), dataName, key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] ] )
 
         utcNow = datetime.datetime.utcnow()
+        print( utcNow )
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
+        print( nextUpdateTime )
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
-        for dateTime in sorted( dateTimes ):
+        # for dateTime in sorted( dateTimes ):
+        for dateTime, dataName, bodyType in sorted( dateTimes, key = lambda x: ( x[ 0 ] ) ):
+            print( dateTime, dataName, bodyType )
             if dateTime < nextUpdateTime and dateTime > utcNowPlusOneMinute:
                 nextUpdateTime = dateTime
                 nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
@@ -970,7 +983,7 @@ class IndicatorLunar( IndicatorBase ):
     #        The rise/set/az/alt is present for a body which rises and sets.
     #        The az/alt is present for a body 'always up'.
     #        No data is present for a body 'never up'.
-    def display( self, bodyType, nameTag ):
+    def display( self, bodyType, nameTag ): #TODO Rename nameTag to bodyName or similar?
         displayBody = False
         key = ( bodyType, nameTag )
         if ( bodyType, nameTag, AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Body will rise or set or is 'always up'.
