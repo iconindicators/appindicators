@@ -515,8 +515,8 @@ class IndicatorLunar( IndicatorBase ):
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE:
                 if dataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
                     dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-                    dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 )
-                    # dateTimes.append( AstroBase.toDateTimeString( dateTimeMinusFourMinutes ) )
+                    dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 ) #TODO Need a comment here.
+                    # dateTimes.append( AstroBase.toDateTimeString( dateTimeMinusFourMinutes ) )#TODO Can delete this if this works.
                     dateTimes.append( dateTimeMinusFourMinutes )
 
                 elif dataName == AstroBase.DATA_TAG_SET_DATE_TIME:
@@ -547,6 +547,7 @@ class IndicatorLunar( IndicatorBase ):
         return nextUpdateInSeconds
 
 
+#TODO Delete this if the above works.
     def getNextUpdateTimeInSecondsORIGINAL( self ):
         utcNow = datetime.datetime.utcnow()
 
