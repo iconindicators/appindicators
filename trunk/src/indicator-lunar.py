@@ -515,7 +515,7 @@ class IndicatorLunar( IndicatorBase ):
         #    Bodies don't move too much between updates.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
 
-        body, bodyDateTime = None, None #TODO Testing
+        bodyType, bodyDataName, bodyDateTime = None, None, None #TODO Testing
         bodyName = None
         for key in self.data:
             dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
@@ -531,16 +531,67 @@ class IndicatorLunar( IndicatorBase ):
                 dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                 if dateTime < nextUpdateTime:
                     nextUpdateTime = dateTime
-                    body = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] #TODO Testing
+                    bodyType = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] #TODO Testing
                     bodyName = key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] #TODO Testing
                     bodyDateTime = self.data[ key ] #TODO Testing
+                    bodyDataName = dataName
 
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
 
+        #
+        # R1/S1: rise/set for satellite 1.
+        # R2/S2: rise/set for satellite 2.
+        #
+        #
+        #                R1        R2                         S1          S2
+        #                |         |                          |           | 
+        #   utcNow       |         |                          |           | 
+        #                |         |                          |           | 
+        #
+        # For bodies other than satellites, schedule an update at the time of the next change.
+        # For example, update at the next body rise/set or eclipse/solstice/equinox or moon phase.
+        # This ensures the next equivalent data will be calculated and displayed,
+        # as there is no point displaying stale or prior-to-now data.
+        #
+        # For satellites which rise/set quickly, show the satellite full rise/set information a few minutes before the rise.
+        # When building the satellite menu, if a rise is more than five minutes away from utcNow, only the rise is shown.
+        # Otherwise, the full rise/set is displayed as the satellite is deemed to be in transit.
+        #
+        # 
+        #
+        #
+        #
+        # When building the satellite menu, if a rise is more than five minutes away from utcNow, only the rise is shown.
+        # Otherwise, the full rise/set is displayed as the satellite is deemed to be in transit.
+        #
+        # If the next update is calculated to be at R1 and that is more than five minutes from utcNow, only the rise will be shown.
+        # The next update will occur when the satellite is rising which is unsatisfactory as the rise and set should have been shown.
+        #
+        # When the next update is at a rise of a satellite, set the update to four minutes earlier.
+        # This allows the indicator to update and determine the satellite will rise within five minutes
+        # and so the rise and set will be displayed.
+        #
+        #
+        #
+        #  (a rise AND set are only shown if the rise/set will occur within five minutes of utcNow).
+        # and if that amount is before the
+        # 
+        #
+        # If the next update is determined to be at R1, set the next update to be ( R1 - 4 minutes ).
+        # This ensures the full rise and set is displayed in the menu.
+        # and if that amount is before the
+        # 
+        # 
+        # 
+        # 
+        # 
+
+
  #TODO Testing Want to take into account the first satellite to rise...do an update 4 minutes before the rise time so we show the rise/set not just the rise.
-        # if body is not None and body == AstroBase.BodyType.SATELLITE:
-        #     print( bodyName )
-        #     nextUpdateInSeconds-= 240
+        if bodyType is not None and bodyType == AstroBase.BodyType.SATELLITE and bodyDataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
+            print( bodyName )
+            nextUpdateInSeconds-= 60 # Initially set the next update four minutes before the satellite rise.
+            
 
         # else:
         #     print( "not a satellite" )
