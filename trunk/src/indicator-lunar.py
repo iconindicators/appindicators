@@ -523,7 +523,8 @@ class IndicatorLunar( IndicatorBase ):
                     dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
 
             else:
-                if self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] ) and \
+                # if self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] ) and \
+                if \
                    ( dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
                      dataName == AstroBase.DATA_TAG_EQUINOX or \
                      dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
@@ -545,6 +546,9 @@ class IndicatorLunar( IndicatorBase ):
         # for dateTime in sorted( dateTimes ):
         for dateTime, dataName, bodyType in sorted( dateTimes, key = lambda x: ( x[ 0 ] ) ):
             print( dateTime, dataName, bodyType )
+            if dateTime > nextUpdateTime:
+                break
+
             if dateTime < nextUpdateTime and dateTime > utcNowPlusOneMinute:
                 nextUpdateTime = dateTime
                 nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
@@ -981,9 +985,9 @@ class IndicatorLunar( IndicatorBase ):
     def display( self, bodyType, nameTag ): #TODO Rename nameTag to bodyName or similar?
         displayBody = False
         key = ( bodyType, nameTag )
-        if ( bodyType, nameTag, AstroBase.DATA_TAG_AZIMUTH ) in self.data: # Body will rise or set or is 'always up'.
+        if key + ( AstroBase.DATA_TAG_AZIMUTH, ) in self.data: # Body will rise or set or is 'always up'.
             displayBody = True
-            if ( bodyType, nameTag, AstroBase.DATA_TAG_RISE_DATE_TIME ) in self.data:
+            if key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
                 if self.data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ]:
                     displayBody = not self.hideBodiesBelowHorizon
 
