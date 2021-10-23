@@ -510,38 +510,31 @@ class IndicatorLunar( IndicatorBase ):
     def getNextUpdateTimeInSeconds( self ):
         dateTimes = [ ]
         for key in self.data:
-            isSatellite = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE
-            displayBody = self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] )
-
-            if isSatellite or ( not isSatellite and displayBody ):
-            
-            if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] != AstroBase.BodyType.SATELLITE and not self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] ):
-                continue
-
             dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE:
                 if dataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
                     dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
                     dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 ) #TODO Need a comment here.
                     # dateTimes.append( dateTimeMinusFourMinutes )
-                    dateTimes.append( [ dateTimeMinusFourMinutes, dataName, key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] ] )
+                    dateTimes.append( [ dateTimeMinusFourMinutes, key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
 
                 elif dataName == AstroBase.DATA_TAG_SET_DATE_TIME:
                     # dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
-                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), dataName, key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] ] )
+                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
 
             else:
-                if dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-                   dataName == AstroBase.DATA_TAG_EQUINOX or \
-                   dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
-                   dataName == AstroBase.DATA_TAG_FULL or \
-                   dataName == AstroBase.DATA_TAG_NEW or \
-                   dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
-                   dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
-                   dataName == AstroBase.DATA_TAG_SOLSTICE or \
-                   dataName == AstroBase.DATA_TAG_THIRD_QUARTER:
+                if self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] ) and \
+                   ( dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+                     dataName == AstroBase.DATA_TAG_EQUINOX or \
+                     dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
+                     dataName == AstroBase.DATA_TAG_FULL or \
+                     dataName == AstroBase.DATA_TAG_NEW or \
+                     dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
+                     dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
+                     dataName == AstroBase.DATA_TAG_SOLSTICE or \
+                     dataName == AstroBase.DATA_TAG_THIRD_QUARTER ):
                     # dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
-                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), dataName, key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] ] )
+                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
 
         utcNow = datetime.datetime.utcnow()
         print( utcNow )
@@ -556,6 +549,8 @@ class IndicatorLunar( IndicatorBase ):
                 nextUpdateTime = dateTime
                 nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
                 break
+
+        print()
 
         return nextUpdateInSeconds
 
