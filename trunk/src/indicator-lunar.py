@@ -508,6 +508,46 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def getNextUpdateTimeInSeconds( self ):
+        dateTimes = [ ]
+        for key in self.data:
+            dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
+
+            if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE:
+                if dataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
+                    dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+                    dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 )
+                    # dateTimes.append( AstroBase.toDateTimeString( dateTimeMinusFourMinutes ) )
+                    dateTimes.append( dateTimeMinusFourMinutes )
+
+                elif dataName == AstroBase.DATA_TAG_SET_DATE_TIME:
+                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+
+            else:
+                if dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+                   dataName == AstroBase.DATA_TAG_EQUINOX or \
+                   dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
+                   dataName == AstroBase.DATA_TAG_FULL or \
+                   dataName == AstroBase.DATA_TAG_NEW or \
+                   dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
+                   dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
+                   dataName == AstroBase.DATA_TAG_SOLSTICE or \
+                   dataName == AstroBase.DATA_TAG_THIRD_QUARTER:
+                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+
+        utcNow = datetime.datetime.utcnow()
+        utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
+        nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
+        nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
+        for dateTime in sorted( dateTimes ):
+            if dateTime < nextUpdateTime and dateTime > utcNowPlusOneMinute:
+                nextUpdateTime = dateTime
+                nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
+                break
+
+        return nextUpdateInSeconds
+
+
+    def getNextUpdateTimeInSecondsORIGINAL( self ):
         utcNow = datetime.datetime.utcnow()
 
         # Do an update at least every twenty minutes to ensure:
