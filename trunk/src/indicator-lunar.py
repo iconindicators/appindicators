@@ -538,7 +538,6 @@ class IndicatorLunar( IndicatorBase ):
                     dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
 
         utcNow = datetime.datetime.utcnow()
-        print( utcNow )
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
         print( nextUpdateTime )
