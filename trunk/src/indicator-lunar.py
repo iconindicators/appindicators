@@ -514,143 +514,36 @@ class IndicatorLunar( IndicatorBase ):
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == AstroBase.BodyType.SATELLITE:
                 if dataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
                     dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-                    dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 ) #TODO Need a comment here.
-                    # dateTimes.append( dateTimeMinusFourMinutes )
-                    dateTimes.append( [ dateTimeMinusFourMinutes, key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
+                    dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 ) # Set an earlier time for the rise to ensure the rise and set are displayed.
+                    dateTimes.append( dateTimeMinusFourMinutes )
 
                 elif dataName == AstroBase.DATA_TAG_SET_DATE_TIME:
-                    # dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
-                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
+                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
 
             else:
-                # if self.display( key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ], key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] ) and \
-                if \
-                   ( dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-                     dataName == AstroBase.DATA_TAG_EQUINOX or \
-                     dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
-                     dataName == AstroBase.DATA_TAG_FULL or \
-                     dataName == AstroBase.DATA_TAG_NEW or \
-                     dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
-                     dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
-                     dataName == AstroBase.DATA_TAG_SOLSTICE or \
-                     dataName == AstroBase.DATA_TAG_THIRD_QUARTER ):
-                    # dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
-                    dateTimes.append( [ datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ), key[ IndicatorLunar.DATA_INDEX_BODY_NAME ], dataName ] )
+                if dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
+                   dataName == AstroBase.DATA_TAG_EQUINOX or \
+                   dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
+                   dataName == AstroBase.DATA_TAG_FULL or \
+                   dataName == AstroBase.DATA_TAG_NEW or \
+                   dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
+                   dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
+                   dataName == AstroBase.DATA_TAG_SOLSTICE or \
+                   dataName == AstroBase.DATA_TAG_THIRD_QUARTER:
+                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
 
         utcNow = datetime.datetime.utcnow()
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
-        print( nextUpdateTime )
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
-        # for dateTime in sorted( dateTimes ):
-        for dateTime, dataName, bodyType in sorted( dateTimes, key = lambda x: ( x[ 0 ] ) ):
-            print( dateTime, dataName, bodyType )
+        for dateTime in sorted( dateTimes ):
             if dateTime > nextUpdateTime:
                 break
 
-            # if dateTime < nextUpdateTime and dateTime > utcNowPlusOneMinute:
             if dateTime > utcNowPlusOneMinute:
                 nextUpdateTime = dateTime
                 nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
                 break
-
-        print()
-
-        return nextUpdateInSeconds
-
-
-#TODO Delete this if the above works.
-    def getNextUpdateTimeInSecondsORIGINAL( self ):
-        utcNow = datetime.datetime.utcnow()
-
-        # Do an update at least every twenty minutes to ensure:
-        #    The moon icon reflects reality.
-        #    Bodies don't move too much between updates.
-        nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 )
-
-        bodyType, bodyDataName, bodyDateTime = None, None, None #TODO Testing
-        bodyName = None
-        for key in self.data:
-            dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
-            if dataName == AstroBase.DATA_TAG_ECLIPSE_DATE_TIME or \
-               dataName == AstroBase.DATA_TAG_EQUINOX or \
-               dataName == AstroBase.DATA_TAG_FIRST_QUARTER or \
-               dataName == AstroBase.DATA_TAG_FULL or \
-               dataName == AstroBase.DATA_TAG_NEW or \
-               dataName == AstroBase.DATA_TAG_RISE_DATE_TIME or \
-               dataName == AstroBase.DATA_TAG_SET_DATE_TIME or \
-               dataName == AstroBase.DATA_TAG_SOLSTICE or \
-               dataName == AstroBase.DATA_TAG_THIRD_QUARTER:
-                dateTime = datetime.datetime.strptime( self.data[ key ], AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-                if dateTime < nextUpdateTime:
-                    nextUpdateTime = dateTime
-                    bodyType = key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] #TODO Testing
-                    bodyName = key[ IndicatorLunar.DATA_INDEX_BODY_NAME ] #TODO Testing
-                    bodyDateTime = self.data[ key ] #TODO Testing
-                    bodyDataName = dataName
-
-        nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
-
-        #
-        # R1/S1: rise/set for satellite 1.
-        # R2/S2: rise/set for satellite 2.
-        #
-        #
-        #                R1        R2                         S1          S2
-        #                |         |                          |           | 
-        #   utcNow       |         |                          |           | 
-        #                |         |                          |           | 
-        #
-        # For bodies other than satellites, schedule an update at the time of the next change.
-        # For example, update at the next body rise/set or eclipse/solstice/equinox or moon phase.
-        # This ensures the next equivalent data will be calculated and displayed,
-        # as there is no point displaying stale or prior-to-now data.
-        #
-        # For satellites which rise/set quickly, show the satellite full rise/set information a few minutes before the rise.
-        # When building the satellite menu, if a rise is more than five minutes away from utcNow, only the rise is shown.
-        # Otherwise, the full rise/set is displayed as the satellite is deemed to be in transit.
-        #
-        # 
-        #
-        #
-        #
-        # When building the satellite menu, if a rise is more than five minutes away from utcNow, only the rise is shown.
-        # Otherwise, the full rise/set is displayed as the satellite is deemed to be in transit.
-        #
-        # If the next update is calculated to be at R1 and that is more than five minutes from utcNow, only the rise will be shown.
-        # The next update will occur when the satellite is rising which is unsatisfactory as the rise and set should have been shown.
-        #
-        # When the next update is at a rise of a satellite, set the update to four minutes earlier.
-        # This allows the indicator to update and determine the satellite will rise within five minutes
-        # and so the rise and set will be displayed.
-        #
-        #
-        #
-        #  (a rise AND set are only shown if the rise/set will occur within five minutes of utcNow).
-        # and if that amount is before the
-        # 
-        #
-        # If the next update is determined to be at R1, set the next update to be ( R1 - 4 minutes ).
-        # This ensures the full rise and set is displayed in the menu.
-        # and if that amount is before the
-        # 
-        # 
-        # 
-        # 
-        # 
-
-
- #TODO Testing Want to take into account the first satellite to rise...do an update 4 minutes before the rise time so we show the rise/set not just the rise.
-        if bodyType is not None and bodyType == AstroBase.BodyType.SATELLITE and bodyDataName == AstroBase.DATA_TAG_RISE_DATE_TIME:
-            print( bodyName )
-            nextUpdateInSeconds-= 60 # Initially set the next update four minutes before the satellite rise.
-            
-
-        # else:
-        #     print( "not a satellite" )
-
-        if nextUpdateInSeconds <= 60:
-            nextUpdateInSeconds = 60 # Ensure updates occur at most every minute avoiding consuming resources.
 
         return nextUpdateInSeconds
 
