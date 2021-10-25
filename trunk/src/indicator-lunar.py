@@ -213,7 +213,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.__removeCacheFilesVersion89() # Cache data filenames changed in version 90, so remove old versions.
         self.flushCache()
-        self.initialiseDownloadCountsAndCacheDateTimes( datetime.datetime.utcnow() )
+        self.initialiseDownloadCountsAndCacheDateTimes()
 
 
     def __removeCacheFilesVersion89( self ):
@@ -235,7 +235,9 @@ class IndicatorLunar( IndicatorBase ):
         self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
 
 
-    def initialiseDownloadCountsAndCacheDateTimes( self, utcNow ):
+    def initialiseDownloadCountsAndCacheDateTimes( self ):
+        utcNow = datetime.datetime.utcnow() 
+
         self.downloadCountComet = 0
         self.downloadCountMinorPlanetBright = 0
         self.downloadCountMinorPlanetCritical = 0
@@ -276,9 +278,8 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def update( self, menu ):
-        
         utcNow = datetime.datetime.utcnow()
-        
+
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
