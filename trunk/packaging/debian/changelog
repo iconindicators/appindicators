@@ -5,7 +5,7 @@ indicator-lunar (1.0.90-1) bionic; urgency=low
   * Bug fix: Satellite rise time was omitted when computing next update time.
   * New preference to limit satellite passes to a time range.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Aug 2021 15:44:26 +1000    <-----TODO Set to date of release, whenever that happens!
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 26 Oct 2021 9:24:17 +1000
 
 
 indicator-lunar (1.0.89-1) bionic; urgency=low
