@@ -2,8 +2,7 @@ indicator-lunar (1.0.90-1) bionic; urgency=low
 
   * Bug fix: Removed separator character following empty { } in icon text.
   * Bug fix: Satellites sometimes not showing set information when in transit.
-  * Bug fix: Satellite rise time was not taken into account when determining
-    indicator next update.
+  * Bug fix: Satellite rise time was omitted when computing next update time.
   * New preference to limit satellite passes to a time range.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 18 Aug 2021 15:44:26 +1000    <-----TODO Set to date of release, whenever that happens!
