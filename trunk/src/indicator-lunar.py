@@ -876,9 +876,9 @@ class IndicatorLunar( IndicatorBase ):
     #        The rise/set/az/alt is present for a body which rises and sets.
     #        The az/alt is present for a body 'always up'.
     #        No data is present for a body 'never up'.
-    def display( self, bodyType, nameTag ): #TODO Rename nameTag to bodyName or similar?
+    def display( self, bodyType, bodyName ):
         displayBody = False
-        key = ( bodyType, nameTag )
+        key = ( bodyType, bodyName )
         if key + ( AstroBase.DATA_TAG_AZIMUTH, ) in self.data: # Body will rise or set or is 'always up'.
             displayBody = True
             if key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) in self.data:
