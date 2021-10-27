@@ -822,8 +822,6 @@ class IndicatorBase( ABC ):
             result = subprocess.run( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE ).stdout.decode()
             if not result:
                 result = None
-            
-            # result = subprocess.check_output( command, shell = True, stderr = subprocess.PIPE, universal_newlines = True )
 
         except subprocess.CalledProcessError as e:
             self.getLogging().error( e )
