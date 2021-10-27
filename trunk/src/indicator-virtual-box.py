@@ -279,7 +279,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                                 groupItems = group.getItems()
 
                             groupNamesAndUUIDs = parts[ 3 ].split( ',' )
-                            if groupNamesAndUUIDs[ 0 ] == "n=GLOBAL": # VritualBox 6 has added this to the config...not needed by the indicator.
+                            if groupNamesAndUUIDs[ 0 ] == "n=GLOBAL": # VirtualBox 6 has added this to the config...not needed by the indicator.
                                 del groupNamesAndUUIDs[ 0 ]
 
                             for item in groupNamesAndUUIDs:
