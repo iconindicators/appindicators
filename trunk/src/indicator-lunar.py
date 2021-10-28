@@ -31,6 +31,12 @@
 # In astropyephem, need to update the line
 #    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" 
 # and maybe warn user not to use apt-get.
+#
+#
+# Tested indicator-test using the --ignore-installed command for PIP 
+# to install new PyEphem via PIP despite the old PyEpehm via apt-get still present.
+# Seems to work, but then when the computer restarts, an
+# error message appears about the install failing during the postinst....why???
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -194,6 +200,10 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
                 _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                 _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
+
+        self.getTerminal() #TODO Testing...when the terminal is not found get an exception and log...not good.
+        
+
 
         self.debug = True #TODO Testing
 
