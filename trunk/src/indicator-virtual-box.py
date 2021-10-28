@@ -72,14 +72,13 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def update( self, menu ):
-        virtualMachines = self.getVirtualMachines()
-
-        if self.autoStartRequired and self.isVBoxManageInstalled():
+        if self.autoStartRequired: # Start VMs here so that the indicator icon is displayed immediately.
             self.autoStartRequired = False
-            self.autoStartVirtualMachines( virtualMachines )
+            if self.isVBoxManageInstalled():
+                self.autoStartVirtualMachines( self.getVirtualMachines() )
 
         if self.isVBoxManageInstalled():
-            self.buildMenu( menu, virtualMachines )
+            self.buildMenu( menu, self.getVirtualMachines() )
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
@@ -139,7 +138,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def autoStartVirtualMachines( self, virtualMachines ):
-        firstMachine = True # Use this to 
         for item in virtualMachines:
             if type( item ) == virtualmachine.Group:
                 self.autoStartVirtualMachines( item.getItems() )
@@ -147,23 +145,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             else:
                 if self.isAutostart( item.getUUID() ):
                     self.startVirtualMachine( None, item.getUUID(), False )
-
-                    if firstMachine:
-                        firstMachine = False
-
-                    else:
-                        time.sleep( self.delayBetweenAutoStartInSeconds )
-
-        
-        
-        # for item in virtualMachines:
-        #     if type( item ) == virtualmachine.Group:
-        #         self.autoStartVirtualMachines( item.getItems() )
-        #
-        #     else:
-        #         if self.isAutostart( item.getUUID() ):
-        #             time.sleep( self.delayBetweenAutoStartInSeconds )
-        #             self.startVirtualMachine( None, item.getUUID(), False )
+                    time.sleep( self.delayBetweenAutoStartInSeconds ) 
 
 
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
