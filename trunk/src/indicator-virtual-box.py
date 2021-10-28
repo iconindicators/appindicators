@@ -139,14 +139,31 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def autoStartVirtualMachines( self, virtualMachines ):
+        firstMachine = True # Use this to 
         for item in virtualMachines:
             if type( item ) == virtualmachine.Group:
                 self.autoStartVirtualMachines( item.getItems() )
 
             else:
                 if self.isAutostart( item.getUUID() ):
-                    time.sleep( self.delayBetweenAutoStartInSeconds )
                     self.startVirtualMachine( None, item.getUUID(), False )
+
+                    if firstMachine:
+                        firstMachine = False
+
+                    else:
+                        time.sleep( self.delayBetweenAutoStartInSeconds )
+
+        
+        
+        # for item in virtualMachines:
+        #     if type( item ) == virtualmachine.Group:
+        #         self.autoStartVirtualMachines( item.getItems() )
+        #
+        #     else:
+        #         if self.isAutostart( item.getUUID() ):
+        #             time.sleep( self.delayBetweenAutoStartInSeconds )
+        #             self.startVirtualMachine( None, item.getUUID(), False )
 
 
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
