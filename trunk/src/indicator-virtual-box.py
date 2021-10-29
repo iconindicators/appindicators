@@ -75,7 +75,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.autoStartRequired: # Start VMs here so that the indicator icon is displayed immediately.
             self.autoStartRequired = False
             if self.isVBoxManageInstalled():
-                self.autoStartVirtualMachines( self.getVirtualMachines() )
+                self.autoStartVirtualMachines( self.getVirtualMachines(), 0 )
 
         if self.isVBoxManageInstalled():
             self.buildMenu( menu, self.getVirtualMachines() )
@@ -137,15 +137,48 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu.append( menuItem )
 
 
-    def autoStartVirtualMachines( self, virtualMachines ):
+    def autoStartVirtualMachines( self, virtualMachines, count ):
+        virtualMachinesForAutoStart = [ ]
+        self.__getVirtualMachinesForAutoStart( virtualMachines, virtualMachinesForAutoStart )
+        print( virtualMachinesForAutoStart )
+        count = 0
+        for uuid in virtualMachinesForAutoStart:
+            count += 1
+            if count > 1:
+                print( "Sleeping" )#TODO Testing
+                time.sleep( self.delayBetweenAutoStartInSeconds ) 
+
+            print( "Starting", uuid )
+            self.startVirtualMachine( None, uuid, False )
+
+
+    def __getVirtualMachinesForAutoStart( self, virtualMachines, virtualMachinesForAutoStart ):
         for item in virtualMachines:
             if type( item ) == virtualmachine.Group:
-                self.autoStartVirtualMachines( item.getItems() )
+                self.__getVirtualMachinesForAutoStart( item.getItems(), virtualMachinesForAutoStart )
 
             else:
                 if self.isAutostart( item.getUUID() ):
+                    virtualMachinesForAutoStart.append( item.getUUID() )
+                    # virtualMachinesForAutoStart.append( item.getName() )
+
+
+    def autoStartVirtualMachinesORIGINAL( self, virtualMachines, count ):
+        print( count )#TODO Testing
+        for item in virtualMachines:
+            if type( item ) == virtualmachine.Group:
+                print( "Group:", item.getName() )#TODO Testing
+                self.autoStartVirtualMachines( item.getItems(), count )
+
+            else:
+                print( "Machine:", item.getName() )#TODO Testing
+                if self.isAutostart( item.getUUID() ):
+                    print( "Machine autostart:", item.getName() )#TODO Testing
                     self.startVirtualMachine( None, item.getUUID(), False )
-                    time.sleep( self.delayBetweenAutoStartInSeconds ) 
+                    count += 1
+                    if count > 1:
+                        print( "Sleeping" )#TODO Testing
+                        time.sleep( self.delayBetweenAutoStartInSeconds ) 
 
 
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
