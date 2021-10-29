@@ -140,13 +140,20 @@ class IndicatorVirtualBox( IndicatorBase ):
     def autoStartVirtualMachines( self, virtualMachines ):
         virtualMachinesForAutoStart = [ ]
         self.__getVirtualMachinesForAutoStart( virtualMachines, virtualMachinesForAutoStart )
-        atLeastOneMachineHasStarted = False
-        for uuid in virtualMachinesForAutoStart:
+        while len( virtualMachinesForAutoStart ) > 0:
+            uuid = virtualMachinesForAutoStart.pop()
+            print( "Starting", uuid )
             windowBroughtToFront = self.startVirtualMachine( None, uuid, False )
-            if atLeastOneMachineHasStarted and not windowBroughtToFront:
-                time.sleep( self.delayBetweenAutoStartInSeconds ) 
+            if windowBroughtToFront:
+                print( "Window brought to front", uuid )
+                continue
 
-            atLeastOneMachineHasStarted = True
+            if len( virtualMachinesForAutoStart ) > 0:
+                print( "Sleeping", uuid )
+                time.sleep( self.delayBetweenAutoStartInSeconds )
+
+            else:
+                print( "Not sleeping", uuid )
 
 
     def __getVirtualMachinesForAutoStart( self, virtualMachines, virtualMachinesForAutoStart ):
@@ -169,7 +176,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.requestUpdate()
 
         else:
-            result = self.processGet( "VBoxManage list vms | awk \'/" + uuid + "/ {print}\'" ) # Using grep returns non zero error codes which results in unwanted log file.
+            result = self.processGet( "VBoxManage list vms | grep " + uuid )
             if result is None or uuid not in result:
                 message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
                 Notify.Notification.new( _( "Error" ), message, self.icon ).show()
@@ -183,7 +190,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def bringWindowToFront( self, virtualMachineName ):
-        numberOfWindowsWithTheSameName = self.processGet( "wmctrl -l | awk \'/" + virtualMachineName + "/ {print}\' | wc -l" ).strip() # Using grep returns non zero error codes which results in unwanted log file.
+        numberOfWindowsWithTheSameName = self.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
             summary = _( "Warning" )
@@ -197,9 +204,10 @@ class IndicatorVirtualBox( IndicatorBase ):
                     break
 
         else:
-#TODO Maybe motify this message; more than one window with overlapping or similar names.
+#TODO Modify the message to something like more than one window with overlapping or similar names.
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
             summary = _( "Warning" )
+            print( message )
             self.sendNotificationWithDelay( summary, message )
 
 
@@ -240,7 +248,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         # because the executable might be a script which calls another executable.
         # So using processes to find the window kept failing.
         # Instead, now have the user type in the title of the window into the preferences and find the window by that.
-        result = self.processGet( "wmctrl -l | awk \'/" + self.virtualboxManagerWindowName + "/ {print}\'" ) # Using grep returns non zero error codes which results in unwanted log file.
+        result = self.processGet( "wmctrl -l | grep \"" + self.virtualboxManagerWindowName + "\"" )
         windowID = None
         if result:
             windowID = result.split()[ 0 ]
