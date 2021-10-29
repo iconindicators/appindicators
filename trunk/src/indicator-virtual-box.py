@@ -75,7 +75,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.autoStartRequired: # Start VMs here so that the indicator icon is displayed immediately.
             self.autoStartRequired = False
             if self.isVBoxManageInstalled():
-                self.autoStartVirtualMachines( self.getVirtualMachines(), 0 )
+                self.autoStartVirtualMachines( self.getVirtualMachines() )
 
         if self.isVBoxManageInstalled():
             self.buildMenu( menu, self.getVirtualMachines() )
@@ -137,19 +137,16 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu.append( menuItem )
 
 
-    def autoStartVirtualMachines( self, virtualMachines, count ):
+    def autoStartVirtualMachines( self, virtualMachines ):
         virtualMachinesForAutoStart = [ ]
         self.__getVirtualMachinesForAutoStart( virtualMachines, virtualMachinesForAutoStart )
-        print( virtualMachinesForAutoStart )
-        count = 0
+        atLeastOneMachineHasStarted = False
         for uuid in virtualMachinesForAutoStart:
-            count += 1
-            if count > 1:
-                print( "Sleeping" )#TODO Testing
+            windowBroughtToFront = self.startVirtualMachine( None, uuid, False )
+            if atLeastOneMachineHasStarted and not windowBroughtToFront:
                 time.sleep( self.delayBetweenAutoStartInSeconds ) 
 
-            print( "Starting", uuid )
-            self.startVirtualMachine( None, uuid, False )
+            atLeastOneMachineHasStarted = True
 
 
     def __getVirtualMachinesForAutoStart( self, virtualMachines, virtualMachinesForAutoStart ):
@@ -160,31 +157,14 @@ class IndicatorVirtualBox( IndicatorBase ):
             else:
                 if self.isAutostart( item.getUUID() ):
                     virtualMachinesForAutoStart.append( item.getUUID() )
-                    # virtualMachinesForAutoStart.append( item.getName() )
-
-
-    def autoStartVirtualMachinesORIGINAL( self, virtualMachines, count ):
-        print( count )#TODO Testing
-        for item in virtualMachines:
-            if type( item ) == virtualmachine.Group:
-                print( "Group:", item.getName() )#TODO Testing
-                self.autoStartVirtualMachines( item.getItems(), count )
-
-            else:
-                print( "Machine:", item.getName() )#TODO Testing
-                if self.isAutostart( item.getUUID() ):
-                    print( "Machine autostart:", item.getName() )#TODO Testing
-                    self.startVirtualMachine( None, item.getUUID(), False )
-                    count += 1
-                    if count > 1:
-                        print( "Sleeping" )#TODO Testing
-                        time.sleep( self.delayBetweenAutoStartInSeconds ) 
 
 
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
+        broughtToFront = False
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
         if uuid in runningVMUUIDs:
             self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
+            broughtToFront = True
             if requiresUpdate:
                 self.requestUpdate()
 
@@ -198,6 +178,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
                 if requiresUpdate:
                     self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+
+        return broughtToFront
 
 
     def bringWindowToFront( self, virtualMachineName ):
@@ -215,6 +197,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     break
 
         else:
+#TODO Maybe motify this message; more than one window with overlapping or similar names.
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
             summary = _( "Warning" )
             self.sendNotificationWithDelay( summary, message )
