@@ -815,11 +815,14 @@ class IndicatorBase( ABC ):
 
 
     # Executes the command and returns the result.
+    #
+    # logNonZeroErrorCode If True, will log any exception arising from a non-zero return code; otherwise will ignore.
+    #
     # On exception, logs to file.
-    def processGet( self, command ):
+    def processGet( self, command, logNonZeroErrorCode = False ):
         result = None
         try:
-            result = subprocess.run( command, shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE ).stdout.decode()
+            result = subprocess.run( command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True, check = logNonZeroErrorCode ).stdout.decode()
             if not result:
                 result = None
 
