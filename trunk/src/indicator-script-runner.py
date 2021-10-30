@@ -193,7 +193,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
-        commandResult = self.processGet( script.getCommand() )
+        commandResult = self.processGet( script.getCommand(), logNonZeroErrorCode = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
         if commandResult:
             commandResult = commandResult.strip()
 
