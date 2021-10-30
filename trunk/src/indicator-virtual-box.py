@@ -75,10 +75,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.autoStartRequired: # Start VMs here so that the indicator icon is displayed immediately.
             self.autoStartRequired = False
             if self.isVBoxManageInstalled():
-                self.autoStartVirtualMachines( self.getVirtualMachines() )
+                self.autoStartVirtualMachines()
 
         if self.isVBoxManageInstalled():
-            self.buildMenu( menu, self.getVirtualMachines() )
+            self.buildMenu( menu )
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
@@ -86,7 +86,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         return int( 60 * self.refreshIntervalInMinutes )
 
 
-    def buildMenu( self, menu, virtualMachines ):
+    def buildMenu( self, menu ):
+        virtualMachines = self.getVirtualMachines()
         if virtualMachines:
             runningNames, runningUUIDs = self.getRunningVirtualMachines()
             for item in virtualMachines:
@@ -133,27 +134,40 @@ class IndicatorVirtualBox( IndicatorBase ):
         else:
             menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )
 
-        menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() )
+        # menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() ) #TODO Old
+        menuItem.connect( "activate", self._onVirtualMachine, virtualMachine )
         menu.append( menuItem )
 
 
-    def autoStartVirtualMachines( self, virtualMachines ):
-        virtualMachinesForAutoStart = [ ]
-        self.__getVirtualMachinesForAutoStart( virtualMachines, virtualMachinesForAutoStart )
-        while len( virtualMachinesForAutoStart ) > 0:
-            uuid = virtualMachinesForAutoStart.pop()
-            print( "Starting", uuid )
-            windowBroughtToFront = self.startVirtualMachine( None, uuid, False )
-            if windowBroughtToFront:
-                print( "Window brought to front", uuid )
-                continue
+    def _onVirtualMachine( self, widget, virtualMachine ):
+        # print( virtualMachine.getName() ) #TODO Testing
+        if self.isVirtualMachineRunning( virtualMachine.getUUID() ):
+            self.bringWindowToFront( virtualMachine.getName() )
 
-            if len( virtualMachinesForAutoStart ) > 0:
-                print( "Sleeping", uuid )
-                time.sleep( self.delayBetweenAutoStartInSeconds )
+        else:
+            self.startVirtualMachineNew( virtualMachine.getUUID() )
+            self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+
+
+    def autoStartVirtualMachines( self ):
+        virtualMachinesForAutoStart = [ ]
+        self.__getVirtualMachinesForAutoStart( self.getVirtualMachines(), virtualMachinesForAutoStart )
+        previousVirtualMachineWasAlreadyRunning = True
+        while len( virtualMachinesForAutoStart ) > 0:
+            virtualMachine = virtualMachinesForAutoStart.pop()
+            if self.isVirtualMachineRunning( virtualMachine.getUUID() ):
+                self.bringWindowToFront( virtualMachine.getName() )
+                previousVirtualMachineWasAlreadyRunning = True
+                print( "Already running and bringing to front:", virtualMachine.getName() )
 
             else:
-                print( "Not sleeping", uuid )
+                if not previousVirtualMachineWasAlreadyRunning:
+                    print( "Sleeping:", virtualMachine.getName() )
+                    time.sleep( self.delayBetweenAutoStartInSeconds )
+
+                self.startVirtualMachineNew( virtualMachine.getUUID() )
+                previousVirtualMachineWasAlreadyRunning = False
+                print( "Starting:", virtualMachine.getName() )
 
 
     def __getVirtualMachinesForAutoStart( self, virtualMachines, virtualMachinesForAutoStart ):
@@ -163,9 +177,21 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             else:
                 if self.isAutostart( item.getUUID() ):
-                    virtualMachinesForAutoStart.append( item.getUUID() )
+                    virtualMachinesForAutoStart.append( item )
 
 
+#TODO New...need requiresUpdate?
+    def startVirtualMachineNew( self, uuid ):
+        result = self.processGet( "VBoxManage list vms | grep " + uuid )
+        if result is None or uuid not in result:
+            message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
+            Notify.Notification.new( _( "Error" ), message, self.icon ).show()
+
+        else:
+            self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
+
+
+#TODO Likely old and delete eventually.
     def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
         broughtToFront = False
         runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
@@ -189,12 +215,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         return broughtToFront
 
 
-    def bringWindowToFront( self, virtualMachineName ):
+    def bringWindowToFront( self, virtualMachineName, delayInSeconds = 0 ):
         numberOfWindowsWithTheSameName = self.processGet( 'wmctrl -l | grep "' + virtualMachineName + '" | wc -l' ).strip()
         if numberOfWindowsWithTheSameName == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtualMachineName )
             summary = _( "Warning" )
-            self.sendNotificationWithDelay( summary, message )
+            self.sendNotificationWithDelay( summary, message, delayInSeconds )
 
         elif numberOfWindowsWithTheSameName == "1":
             for line in self.processGet( "wmctrl -l" ).splitlines():
@@ -207,14 +233,14 @@ class IndicatorVirtualBox( IndicatorBase ):
 #TODO Modify the message to something like more than one window with overlapping or similar names.
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
             summary = _( "Warning" )
-            print( message )
-            self.sendNotificationWithDelay( summary, message )
+            print( message )#TODO Testing
+            self.sendNotificationWithDelay( summary, message, delayInSeconds )
 
 
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
     # Prevent notifications from appearing until a set time has elapsed since the previous notification.
-    def sendNotificationWithDelay( self, summary, message ):
-        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = 10 ) < datetime.datetime.now() ):
+    def sendNotificationWithDelay( self, summary, message, delayInSeconds = 0 ):
+        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = delayInSeconds ) < datetime.datetime.now() ):
             Notify.Notification.new( summary, message, self.icon ).show()
             self.dateTimeOfLastNotification = datetime.datetime.now()
 
@@ -236,7 +262,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.scrollUUID = runningUUIDs[ index ]
                 self.scrollDirectionIsUp = False
 
-            self.bringWindowToFront( runningNames[ runningUUIDs.index( self.scrollUUID ) ] )
+            self.bringWindowToFront( runningNames[ runningUUIDs.index( self.scrollUUID ) ], 10 )
 
 
     def onLaunchVirtualBoxManager( self, menuItem ):
@@ -276,6 +302,10 @@ class IndicatorVirtualBox( IndicatorBase ):
                     pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         return names, uuids
+
+
+#TODO Testing
+    def isVirtualMachineRunning( self, uuid ): return self.processGet( "VBoxManage list runningvms | grep " + uuid ) is not None
 
 
     # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and the configuration file.
