@@ -77,35 +77,35 @@ class IndicatorVirtualBox( IndicatorBase ):
             if self.isVBoxManageInstalled():
                 self.autoStartVirtualMachines()
 
-        if self.isVBoxManageInstalled():
-            self.buildMenu( menu )
-
-        else:
-            menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
+        self.buildMenu( menu )
 
         return int( 60 * self.refreshIntervalInMinutes )
 
 
     def buildMenu( self, menu ):
-        virtualMachines = self.getVirtualMachines()
-        if virtualMachines:
-            runningNames, runningUUIDs = self.getRunningVirtualMachines()
-            for item in virtualMachines:
-                if type( item ) == virtualmachine.Group:
-                    self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
+        if self.isVBoxManageInstalled():
+            virtualMachines = self.getVirtualMachines()
+            if virtualMachines:
+                runningNames, runningUUIDs = self.getRunningVirtualMachines()
+                for item in virtualMachines:
+                    if type( item ) == virtualmachine.Group:
+                        self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
 
-                else:
-                    self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningUUIDs )
+                    else:
+                        self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningUUIDs )
+
+            else:
+                menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
+
+            menu.append( Gtk.SeparatorMenuItem() )
+
+            menuItem = Gtk.MenuItem.new_with_label( _( "Launch VirtualBox™ Manager" ) )
+            menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
+            menu.append( menuItem )
+            self.secondaryActivateTarget = menuItem
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
-
-        menu.append( Gtk.SeparatorMenuItem() )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Launch VirtualBox™ Manager" ) )
-        menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
-        menu.append( menuItem )
-        self.secondaryActivateTarget = menuItem
+            menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
 
 
     def addMenuItemForGroup( self, menu, group, level, runningUUIDs ):
@@ -146,7 +146,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         else:
             self.startVirtualMachineNew( virtualMachine.getUUID() )
-            self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+
+        self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
 
     def autoStartVirtualMachines( self ):
@@ -312,7 +313,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     def getVirtualMachines( self ):
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
-            virtualMachinesFromVBoxManage = self.getVirtualMachinesFromVBoxManage()
+            virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage()
             if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
                 try:
                     with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, 'r' ) as f:
@@ -359,7 +360,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     # Returns a list of virtualmachine objects from calling VBoxManage.
     # Contains no group information, nor sort order which is set by the user in the GUI.
     # Safe to call without checking if VBoxManage is installed.
-    def getVirtualMachinesFromVBoxManage( self ):
+    def __getVirtualMachinesFromVBoxManage( self ):
         virtualMachines = [ ]
         result = self.processGet( "VBoxManage list vms" )
         if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
