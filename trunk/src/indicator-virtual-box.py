@@ -59,7 +59,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.68",
+            version = "1.0.69",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
@@ -134,41 +134,36 @@ class IndicatorVirtualBox( IndicatorBase ):
         else:
             menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )
 
-        # menuItem.connect( "activate", self.startVirtualMachine, virtualMachine.getUUID() ) #TODO Old
         menuItem.connect( "activate", self._onVirtualMachine, virtualMachine )
         menu.append( menuItem )
 
 
     def _onVirtualMachine( self, widget, virtualMachine ):
-        # print( virtualMachine.getName() ) #TODO Testing
         if self.isVirtualMachineRunning( virtualMachine.getUUID() ):
             self.bringWindowToFront( virtualMachine.getName() )
+            self.requestUpdate( 1 )
 
         else:
-            self.startVirtualMachineNew( virtualMachine.getUUID() )
-
-        self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+            self.startVirtualMachine( virtualMachine.getUUID() )
+            self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
 
     def autoStartVirtualMachines( self ):
         virtualMachinesForAutoStart = [ ]
         self.__getVirtualMachinesForAutoStart( self.getVirtualMachines(), virtualMachinesForAutoStart )
         previousVirtualMachineWasAlreadyRunning = True
-        while len( virtualMachinesForAutoStart ) > 0:
+        while len( virtualMachinesForAutoStart ) > 0: # Start up each virtual machine and only insert the time delay if a machine was not already running.
             virtualMachine = virtualMachinesForAutoStart.pop()
             if self.isVirtualMachineRunning( virtualMachine.getUUID() ):
                 self.bringWindowToFront( virtualMachine.getName() )
                 previousVirtualMachineWasAlreadyRunning = True
-                print( "Already running and bringing to front:", virtualMachine.getName() )
 
             else:
                 if not previousVirtualMachineWasAlreadyRunning:
-                    print( "Sleeping:", virtualMachine.getName() )
                     time.sleep( self.delayBetweenAutoStartInSeconds )
 
-                self.startVirtualMachineNew( virtualMachine.getUUID() )
+                self.startVirtualMachine( virtualMachine.getUUID() )
                 previousVirtualMachineWasAlreadyRunning = False
-                print( "Starting:", virtualMachine.getName() )
 
 
     def __getVirtualMachinesForAutoStart( self, virtualMachines, virtualMachinesForAutoStart ):
@@ -181,8 +176,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     virtualMachinesForAutoStart.append( item )
 
 
-#TODO New...need requiresUpdate?
-    def startVirtualMachineNew( self, uuid ):
+    def startVirtualMachine( self, uuid ):
         result = self.processGet( "VBoxManage list vms | grep " + uuid )
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
@@ -190,30 +184,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         else:
             self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
-
-
-#TODO Likely old and delete eventually.
-    def startVirtualMachine( self, menuItem, uuid, requiresUpdate = True ):
-        broughtToFront = False
-        runningVMNames, runningVMUUIDs = self.getRunningVirtualMachines()
-        if uuid in runningVMUUIDs:
-            self.bringWindowToFront( runningVMNames[ runningVMUUIDs.index( uuid ) ] )
-            broughtToFront = True
-            if requiresUpdate:
-                self.requestUpdate()
-
-        else:
-            result = self.processGet( "VBoxManage list vms | grep " + uuid )
-            if result is None or uuid not in result:
-                message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
-                Notify.Notification.new( _( "Error" ), message, self.icon ).show()
-
-            else:
-                self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
-                if requiresUpdate:
-                    self.requestUpdate( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
-
-        return broughtToFront
 
 
     def bringWindowToFront( self, virtualMachineName, delayInSeconds = 0 ):
@@ -231,10 +201,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                     break
 
         else:
-#TODO Modify the message to something like more than one window with overlapping or similar names.
-            message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window of the same name." ).format( virtualMachineName )
+            message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtualMachineName )
             summary = _( "Warning" )
-            print( message )#TODO Testing
             self.sendNotificationWithDelay( summary, message, delayInSeconds )
 
 
@@ -305,7 +273,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         return names, uuids
 
 
-#TODO Testing
     def isVirtualMachineRunning( self, uuid ): return self.processGet( "VBoxManage list runningvms | grep " + uuid ) is not None
 
 
