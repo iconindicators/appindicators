@@ -2,8 +2,8 @@ indicator-virtual-box (1.0.69-1) bionic; urgency=low
 
   * Bug fix: When bringing a running virtual machine window to front, if that
     failed (unable to uniquely identify the window), a notification informing
-    the user would not display.
-  * Removed the delay inserted for an autostart virtual machine if that virtual
+    the user failed to display.
+  * Removed the delay inserted for virtual machine autostart if a virtual
     machine is already running and only needs its window brought to front.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 1 Nov 2021 12:28:37 +1000
