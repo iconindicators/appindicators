@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicator-virtual-box 1.0.68\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2021-09-12 17:01+1000\n"
-"PO-Revision-Date: 2021-09-27 15:02+0300\n"
+"POT-Creation-Date: 2021-11-01 12:54+1100\n"
+"PO-Revision-Date: 2021-11-03 15:53+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -18,23 +18,23 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicator-virtual-box.py:63
+#: indicator-virtual-box.py:64
 msgid "Shows VirtualBox™ virtual machines and allows them to be started."
 msgstr "Показывает виртуальные машины VirtualBox™ и позволяет запускать их."
 
-#: indicator-virtual-box.py:84
-msgid "(VirtualBox™ is not installed)"
-msgstr "(VirtualBox не установлен)"
-
-#: indicator-virtual-box.py:100
+#: indicator-virtual-box.py:98
 msgid "(no virtual machines exist)"
 msgstr "(виртуальные машины не найдены)"
 
-#: indicator-virtual-box.py:104
+#: indicator-virtual-box.py:102
 msgid "Launch VirtualBox™ Manager"
 msgstr "Запустить Менеджер VirtualBox"
 
-#: indicator-virtual-box.py:161
+#: indicator-virtual-box.py:108
+msgid "(VirtualBox™ is not installed)"
+msgstr "(VirtualBox не установлен)"
+
+#: indicator-virtual-box.py:182
 msgid ""
 "The virtual machine could not be found - perhaps it has been renamed or "
 "deleted.  The list of virtual machines has been refreshed - please try again."
@@ -42,11 +42,11 @@ msgstr ""
 "Виртуальная машина не найдена: возможно, она была переименована или удалена. "
 "Список виртуальных машин был обновлён - пожалуйста, повторите попытку."
 
-#: indicator-virtual-box.py:162
+#: indicator-virtual-box.py:183
 msgid "Error"
 msgstr "Ошибка"
 
-#: indicator-virtual-box.py:173
+#: indicator-virtual-box.py:192
 msgid ""
 "Unable to find the window for the virtual machine '{0}' - perhaps it is "
 "running as headless."
@@ -54,43 +54,43 @@ msgstr ""
 "Не удалось найти окно виртуальной машины '{0}': вероятно, она запущена в "
 "автономном режиме."
 
-#: indicator-virtual-box.py:174 indicator-virtual-box.py:186
+#: indicator-virtual-box.py:193 indicator-virtual-box.py:205
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: indicator-virtual-box.py:185
+#: indicator-virtual-box.py:204
 msgid ""
 "Unable to bring the virtual machine '{0}' to front as there is more than one "
-"window of the same name."
+"window with overlapping names."
 msgstr ""
 "Невозможно переместить виртуальную машину '{0}' на передний план, так как "
-"существует несколько окон с одинаковым именем."
+"существует несколько окон, чьи имена совпадают."
 
-#: indicator-virtual-box.py:367
+#: indicator-virtual-box.py:392
 msgid "Virtual Machine"
 msgstr "Виртуальная машина"
 
-#: indicator-virtual-box.py:368 indicator-virtual-box.py:505
+#: indicator-virtual-box.py:393 indicator-virtual-box.py:534
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicator-virtual-box.py:369 indicator-virtual-box.py:487
+#: indicator-virtual-box.py:394 indicator-virtual-box.py:516
 msgid "Start Command"
 msgstr "Команда запуска"
 
-#: indicator-virtual-box.py:370
+#: indicator-virtual-box.py:395
 msgid "Double click to edit a virtual machine's properties."
 msgstr "Щёлкните дважды, чтобы отредактировать свойства виртуальной машины."
 
-#: indicator-virtual-box.py:378
+#: indicator-virtual-box.py:403
 msgid "Virtual Machines"
 msgstr "Виртуальные машины"
 
-#: indicator-virtual-box.py:386
+#: indicator-virtual-box.py:411
 msgid "VirtualBox™ Manager"
 msgstr "Менеджер VirtualBox"
 
-#: indicator-virtual-box.py:392
+#: indicator-virtual-box.py:417
 msgid ""
 "The window title of VirtualBox™ Manager.\n"
 "You may have to adjust for your local language."
@@ -98,11 +98,11 @@ msgstr ""
 "Заголовок окна Менеджера VirtualBox.\n"
 "Настройте название для вашего языка."
 
-#: indicator-virtual-box.py:399
+#: indicator-virtual-box.py:424
 msgid "Show groups as submenus"
 msgstr "Показывать подменю для групп"
 
-#: indicator-virtual-box.py:401
+#: indicator-virtual-box.py:426
 msgid ""
 "If checked, groups are shown using submenus.\n"
 "\n"
@@ -113,11 +113,11 @@ msgstr ""
 "\n"
 "Иначе группы отображаются в виде списка с отступом."
 
-#: indicator-virtual-box.py:413
+#: indicator-virtual-box.py:438
 msgid "Refresh interval (minutes)"
 msgstr "Интервал обновления (в минутах)"
 
-#: indicator-virtual-box.py:419
+#: indicator-virtual-box.py:446
 msgid ""
 "How often the list of virtual machines\n"
 "and their running status are updated."
@@ -125,11 +125,11 @@ msgstr ""
 "Насколько часто обновляется список\n"
 "виртуальных машин и их статус."
 
-#: indicator-virtual-box.py:430
+#: indicator-virtual-box.py:457
 msgid "Startup delay (seconds)"
 msgstr "Задержка запуска (в секундах)"
 
-#: indicator-virtual-box.py:436
+#: indicator-virtual-box.py:465
 msgid ""
 "Amount of time to wait from automatically\n"
 "starting one virtual machine to the next."
@@ -137,11 +137,11 @@ msgstr ""
 "Интервал времени до автоматического запуска следующей\n"
 "виртуальной машины после запуска предыдущей."
 
-#: indicator-virtual-box.py:444
+#: indicator-virtual-box.py:473
 msgid "General"
 msgstr "Общие"
 
-#: indicator-virtual-box.py:498
+#: indicator-virtual-box.py:527
 msgid ""
 "The terminal command to start the virtual machine such as\n"
 "\n"
@@ -155,19 +155,19 @@ msgstr ""
 "или\n"
 "\tVBoxHeadless --startvm %VM% --vrde off"
 
-#: indicator-virtual-box.py:506
+#: indicator-virtual-box.py:535
 msgid "Run the virtual machine when the indicator starts."
 msgstr "Запускать виртуальную машину при старте индикатора."
 
-#: indicator-virtual-box.py:512
+#: indicator-virtual-box.py:541
 msgid "Virtual Machine Properties"
 msgstr "Свойства виртуальной машины"
 
-#: indicator-virtual-box.py:520
+#: indicator-virtual-box.py:549
 msgid "The start command cannot be empty."
 msgstr "Команда запуска не может быть пустой."
 
-#: indicator-virtual-box.py:525
+#: indicator-virtual-box.py:554
 msgid ""
 "The start command must contain %VM% which is substituted for the virtual "
 "machine name/id."
