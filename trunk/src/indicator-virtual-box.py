@@ -307,6 +307,10 @@ class IndicatorVirtualBox( IndicatorBase ):
                                 if item.startswith( "go=" ):
                                     group.addItem( virtualmachine.Group( item.replace( "go=", "" ) ) )
 
+#TODO Temporary fix for Stephane; waiting on him to verify it fixes things.
+                                elif item.startswith( "gc=" ):
+                                    group.addItem( virtualmachine.Group( item.replace( "gc=", "" ) ) )
+
                                 else:
                                     uuid = item.replace( "m=", "" )
                                     name = next( x for x in virtualMachinesFromVBoxManage if x.getUUID() == uuid ).getName()
