@@ -93,7 +93,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         #     print( item )
 
 
-        self.getVirtualMachinesNEW()
+        # self.getVirtualMachinesNEW()
 
         if self.autoStartRequired: # Start VMs here so that the indicator icon is displayed immediately.
             self.autoStartRequired = False
@@ -300,7 +300,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and the configuration file.
-    def getVirtualMachines( self ):
+    def getVirtualMachinesORIG( self ):
         virtualMachines = [ ]
         if self.isVBoxManageInstalled():
             virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage()
@@ -379,7 +379,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
 #TODO Testing
-    def getVirtualMachinesNEW( self ):
+    def getVirtualMachines( self ):
 # ['Windows XP', '/', 'bc161180-2cde-47b1-a3ee-b8c44d335417']
 # ['Windows 10', '/New group 4/New group 5', '628a6317-792a-45ff-8f0a-de3227f14724']
 # ['Ubuntu 18.04', '/New group 4/New group 5', '54ba0488-739c-4e4a-8aca-eaeb786681d1']
@@ -398,17 +398,16 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.isVBoxManageInstalled():
             try:
                 def addVirtualMachine( group, name, uuid, groups ):
-                    groupName = groups.pop( 0 )
-                    g = next( ( x for x in group.getItems() if type( x ) == virtualmachine.Group and x.getName() == groupName ), group )
-                    # virtualMachines.append
-                    #                                         group.addItem( virtualmachine.Group( item.replace( "go=", "" ) ) )
-                    #
-                    #     addVirtualMachine( name, uuid, groups, virtualMachines)
-                    #
-                    # else:
-                    #     virtualMachines.append( virtualmachine.VirtualMachine( name, uuid ) )
+                    for groupName in groups:
+                        theGroup = next( ( x for x in group.getItems() if type( x ) == virtualmachine.Group and x.getName() == groupName ), None )
+                        if theGroup is None:
+                            theGroup = virtualmachine.Group( groupName )
+                            group.addItem( theGroup )
 
-                    print( name, uuid, groups )
+                        group = theGroup
+
+                    group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
+
 
                 topGroup = virtualmachine.Group( "" ) # Create a dummy group to make it easier to parse the first line of the configuration file.
                 listVirtualMachines = self.processGet( "VBoxManage list vms --long" )
@@ -418,6 +417,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
                     elif line.startswith( "Groups:" ):
                         groups = line.split( '/' )[ 1 : ]
+                        if groups[ 0 ] == '':
+                            del groups[ 0 ]
 
                     elif line.startswith( "UUID:" ):
                         uuid = line.split( "UUID:" )[ 1 ].strip()
