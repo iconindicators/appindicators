@@ -86,7 +86,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             virtualMachines = self.getVirtualMachines()
             if virtualMachines:
                 runningNames, runningUUIDs = self.getRunningVirtualMachines()
-                # for item in virtualMachines:
                 for item in sorted( virtualMachines, key = lambda item: item.getName().lower() ):
                     if type( item ) == virtualmachine.Group:
                         self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
@@ -117,7 +116,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             menu = Gtk.Menu()
             menuItem.set_submenu( menu )
 
-        # for item in group.getItems():
         for item in sorted( group.getItems(), key = lambda item: item.getName().lower() ):
             if type( item ) == virtualmachine.Group:
                 self.addMenuItemForGroup( menu, item, level + 1, runningUUIDs )
