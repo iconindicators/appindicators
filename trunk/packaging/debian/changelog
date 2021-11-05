@@ -1,12 +1,16 @@
 indicator-virtual-box (1.0.69-1) bionic; urgency=low
 
-  * Bug fix: When bringing a running virtual machine window to front, if that
-    failed (unable to uniquely identify the window), a notification informing
-    the user failed to display.
-  * Removed the delay inserted for virtual machine autostart if a virtual
+  * Bug fix: When bringing a running virtual machine window to front fails
+    (unable to uniquely identify the window), a notification informing the
+    user subsequently failed to display.
+  * Virtual machine name, UUID and group information now obtained directly
+    from VBoxManage rather than the XML configuration file which is somewhat
+    of a moving target.  As the sort order cannot be obtained from VBoxManage,
+    group names are sorted alphabetically along with machine names.
+  * Removed the delay inserted on virtual machine autostart if the virtual
     machine is already running and only needs its window brought to front.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 1 Nov 2021 12:28:37 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 6 Nov 2021 9:54:02 +1000
 
 
 indicator-virtual-box (1.0.68-1) bionic; urgency=low
