@@ -213,24 +213,24 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.dateTimeOfLastNotification = datetime.datetime.now()
 
 
-    # It is assumed that VirtualBox is installed!
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        runningNames, runningUUIDs = self.getRunningVirtualMachines()
-        if runningUUIDs:
-            if self.scrollUUID is None or self.scrollUUID not in runningUUIDs:
-                self.scrollUUID = runningUUIDs[ 0 ]
+        if self.isVBoxManageInstalled():
+            runningNames, runningUUIDs = self.getRunningVirtualMachines()
+            if runningUUIDs:
+                if self.scrollUUID is None or self.scrollUUID not in runningUUIDs:
+                    self.scrollUUID = runningUUIDs[ 0 ]
 
-            if scrollDirection == Gdk.ScrollDirection.UP:
-                index = ( runningUUIDs.index( self.scrollUUID ) + 1 ) % len( runningUUIDs )
-                self.scrollUUID = runningUUIDs[ index ]
-                self.scrollDirectionIsUp = True
+                if scrollDirection == Gdk.ScrollDirection.UP:
+                    index = ( runningUUIDs.index( self.scrollUUID ) + 1 ) % len( runningUUIDs )
+                    self.scrollUUID = runningUUIDs[ index ]
+                    self.scrollDirectionIsUp = True
 
-            else:
-                index = ( runningUUIDs.index( self.scrollUUID ) - 1 ) % len( runningUUIDs )
-                self.scrollUUID = runningUUIDs[ index ]
-                self.scrollDirectionIsUp = False
+                else:
+                    index = ( runningUUIDs.index( self.scrollUUID ) - 1 ) % len( runningUUIDs )
+                    self.scrollUUID = runningUUIDs[ index ]
+                    self.scrollDirectionIsUp = False
 
-            self.bringWindowToFront( runningNames[ runningUUIDs.index( self.scrollUUID ) ], 10 )
+                self.bringWindowToFront( runningNames[ runningUUIDs.index( self.scrollUUID ) ], 10 )
 
 
     def onLaunchVirtualBoxManager( self, menuItem ):
@@ -275,6 +275,45 @@ class IndicatorVirtualBox( IndicatorBase ):
     def isVirtualMachineRunning( self, uuid ): return self.processGet( "VBoxManage list runningvms | grep " + uuid ) is not None
 
 
+    def getVirtualMachines( self ):
+        virtualMachines = [ ]
+        try:
+            def addVirtualMachine( group, name, uuid, groups ):
+                for groupName in groups:
+                    theGroup = next( ( x for x in group.getItems() if type( x ) == virtualmachine.Group and x.getName() == groupName ), None )
+                    if theGroup is None:
+                        theGroup = virtualmachine.Group( groupName )
+                        group.addItem( theGroup )
+
+                    group = theGroup
+
+                group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
+
+
+            topGroup = virtualmachine.Group( "" ) # Only needed whilst parsing results from VBoxManage...
+            listVirtualMachines = self.processGet( "VBoxManage list vms --long" )
+            for line in listVirtualMachines.splitlines():
+                if line.startswith( "Name:" ):
+                    name = line.split( "Name:" )[ 1 ].strip()
+
+                elif line.startswith( "Groups:" ):
+                    groups = line.split( '/' )[ 1 : ]
+                    if groups[ 0 ] == '':
+                        del groups[ 0 ]
+
+                elif line.startswith( "UUID:" ):
+                    uuid = line.split( "UUID:" )[ 1 ].strip()
+                    addVirtualMachine( topGroup, name, uuid, groups )
+
+            virtualMachines = topGroup.getItems()
+
+        except Exception as e:
+            self.getLogging().exception( e )
+            virtualMachines = [ ]
+
+        return virtualMachines
+
+
     def isVBoxManageInstalled( self ):
         isInstalled = False
         result = self.processGet( "which VBoxManage" )
@@ -282,46 +321,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             isInstalled = result.find( "VBoxManage" ) > -1
 
         return isInstalled
-
-
-    def getVirtualMachines( self ):
-        virtualMachines = [ ]
-        if self.isVBoxManageInstalled():
-            try:
-                def addVirtualMachine( group, name, uuid, groups ):
-                    for groupName in groups:
-                        theGroup = next( ( x for x in group.getItems() if type( x ) == virtualmachine.Group and x.getName() == groupName ), None )
-                        if theGroup is None:
-                            theGroup = virtualmachine.Group( groupName )
-                            group.addItem( theGroup )
-
-                        group = theGroup
-
-                    group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
-
-
-                topGroup = virtualmachine.Group( "" ) # Only needed whilst parsing results from VBoxManage...
-                listVirtualMachines = self.processGet( "VBoxManage list vms --long" )
-                for line in listVirtualMachines.splitlines():
-                    if line.startswith( "Name:" ):
-                        name = line.split( "Name:" )[ 1 ].strip()
-
-                    elif line.startswith( "Groups:" ):
-                        groups = line.split( '/' )[ 1 : ]
-                        if groups[ 0 ] == '':
-                            del groups[ 0 ]
-
-                    elif line.startswith( "UUID:" ):
-                        uuid = line.split( "UUID:" )[ 1 ].strip()
-                        addVirtualMachine( topGroup, name, uuid, groups )
-
-                virtualMachines = topGroup.getItems()
-
-            except Exception as e:
-                self.getLogging().exception( e )
-                virtualMachines = [ ]
-
-        return virtualMachines
 
 
     def getStartCommand( self, uuid ):
@@ -356,7 +355,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         # List of groups and virtual machines.
         treeStore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
-        groupsExist = addItemsToStore( None, self.getVirtualMachines() )
+        groupsExist = addItemsToStore( None, self.getVirtualMachines() if self.isVBoxManageInstalled() else [ ] )
 
         treeView = Gtk.TreeView.new_with_model( treeStore )
         treeView.expand_all()
