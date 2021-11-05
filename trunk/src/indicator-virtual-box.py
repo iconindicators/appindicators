@@ -302,7 +302,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
 
 
-                topGroup = virtualmachine.Group( "" ) # Create a dummy group to make it easier to parse the first line of the configuration file.
+                topGroup = virtualmachine.Group( "" ) # Only needed whilst parsing results from VBoxManage...
                 listVirtualMachines = self.processGet( "VBoxManage list vms --long" )
                 for line in listVirtualMachines.splitlines():
                     if line.startswith( "Name:" ):
@@ -317,7 +317,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                         uuid = line.split( "UUID:" )[ 1 ].strip()
                         addVirtualMachine( topGroup, name, uuid, groups )
 
-                virtualMachines = topGroup.getItems() # Return the items (groups and/or virtual machines) of the dummy top group.
+                virtualMachines = topGroup.getItems()
 
             except Exception as e:
                 self.getLogging().exception( e )
