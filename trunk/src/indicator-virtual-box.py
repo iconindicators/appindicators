@@ -72,29 +72,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def update( self, menu ):
-
-#TODO Testing
-        # s = [ ]
-        # listVirtualMachines = self.processGet( "VBoxManage list vms --long" )
-        # for line in listVirtualMachines.splitlines():
-        #     if line.startswith( "Name:" ):
-        #         a = [ ]
-        #         a.append( line.split( "Name:" )[ 1 ].strip() )
-        #
-        #     elif line.startswith( "Groups:" ):
-        #         a.append( line.split( "Groups:" )[ 1 ].strip() )
-        #
-        #     if line.startswith( "UUID:" ):
-        #         a.append( line.split( "UUID:" )[ 1 ].strip() )
-        #         s.append( a )
-        #
-        # for item in sorted( s, key = lambda x: x[ 1 ] ):
-        # # for item in s:
-        #     print( item )
-
-
-        # self.getVirtualMachinesNEW()
-
         if self.autoStartRequired: # Start VMs here so that the indicator icon is displayed immediately.
             self.autoStartRequired = False
             if self.isVBoxManageInstalled():
@@ -110,7 +87,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             virtualMachines = self.getVirtualMachines()
             if virtualMachines:
                 runningNames, runningUUIDs = self.getRunningVirtualMachines()
-                for item in virtualMachines:
+                # for item in virtualMachines:
+                for item in sorted( virtualMachines, key = lambda item: item.getName().lower() ):
                     if type( item ) == virtualmachine.Group:
                         self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
 
@@ -140,7 +118,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             menu = Gtk.Menu()
             menuItem.set_submenu( menu )
 
-        for item in group.getItems():
+        # for item in group.getItems():
+        for item in sorted( group.getItems(), key = lambda item: item.getName().lower() ):
             if type( item ) == virtualmachine.Group:
                 self.addMenuItemForGroup( menu, item, level + 1, runningUUIDs )
 
@@ -299,74 +278,74 @@ class IndicatorVirtualBox( IndicatorBase ):
     def isVirtualMachineRunning( self, uuid ): return self.processGet( "VBoxManage list runningvms | grep " + uuid ) is not None
 
 
-    # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and the configuration file.
-    def getVirtualMachinesORIG( self ):
-        virtualMachines = [ ]
-        if self.isVBoxManageInstalled():
-            virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage()
-            if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
-                try:
-                    with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, 'r' ) as f:
-                        lines = f.readlines()
+#     # Returns a list of virtualmachine and group objects reflecting VMs and groups as found via VBoxManage and the configuration file.
+#     def getVirtualMachinesORIG( self ):
+#         virtualMachines = [ ]
+#         if self.isVBoxManageInstalled():
+#             virtualMachinesFromVBoxManage = self.__getVirtualMachinesFromVBoxManage()
+#             if os.path.isfile( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION ):
+#                 try:
+#                     with open( IndicatorVirtualBox.VIRTUAL_BOX_CONFIGURATION, 'r' ) as f:
+#                         lines = f.readlines()
+#
+#                     # The VirtualBox configuration file contains lines detailing the groups (if any) and virtual machines.
+#                     # This gives the sort of virtual machines and the group to which they belong (if applicable).
+#                     # Groups may contain groups and/or virtual machines.
+#                     topGroup = virtualmachine.Group( "" ) # Create a dummy group to make it easier to parse the first line of the configuration file.
+#                     for line in lines:
+#                         if "GUI/GroupDefinitions/" in line:
+#                             parts = line.split( "\"" )
+#                             groupPath = parts[ 1 ].split( '/' )[ 2 : ]
+#                             groupItems = topGroup.getItems()
+#                             for groupName in groupPath: # Traverse the paths to find the final group...
+#                                 group = next( ( x for x in groupItems if type( x ) == virtualmachine.Group and x.getName() == groupName ), topGroup )
+#                                 groupItems = group.getItems()
+#
+#                             groupNamesAndUUIDs = parts[ 3 ].split( ',' )
+#                             if groupNamesAndUUIDs[ 0 ] == "n=GLOBAL": # VirtualBox 6 has added this to the config...not needed by the indicator.
+#                                 del groupNamesAndUUIDs[ 0 ]
+#
+#                             for item in groupNamesAndUUIDs:
+#                                 if item.startswith( "go=" ):
+#                                     group.addItem( virtualmachine.Group( item.replace( "go=", "" ) ) )
+#
+# #TODO Temporary fix for Stephane; waiting on him to verify it fixes things.
+#                                 elif item.startswith( "gc=" ):
+#                                     group.addItem( virtualmachine.Group( item.replace( "gc=", "" ) ) )
+#
+#                                 else:
+#                                     uuid = item.replace( "m=", "" )
+#                                     name = next( x for x in virtualMachinesFromVBoxManage if x.getUUID() == uuid ).getName()
+#                                     group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
+#
+#                     virtualMachines = topGroup.getItems() # Return the items (groups and/or virtual machines) of the dummy top group.
+#
+#                 except Exception as e:
+#                     self.getLogging().exception( e )
+#                     virtualMachines = [ ]
+#
+#             else:
+#                 virtualMachines = virtualMachinesFromVBoxManage
+#
+#         return virtualMachines
 
-                    # The VirtualBox configuration file contains lines detailing the groups (if any) and virtual machines.
-                    # This gives the sort of virtual machines and the group to which they belong (if applicable).
-                    # Groups may contain groups and/or virtual machines.
-                    topGroup = virtualmachine.Group( "" ) # Create a dummy group to make it easier to parse the first line of the configuration file.
-                    for line in lines:
-                        if "GUI/GroupDefinitions/" in line:
-                            parts = line.split( "\"" )
-                            groupPath = parts[ 1 ].split( '/' )[ 2 : ]
-                            groupItems = topGroup.getItems()
-                            for groupName in groupPath: # Traverse the paths to find the final group...
-                                group = next( ( x for x in groupItems if type( x ) == virtualmachine.Group and x.getName() == groupName ), topGroup )
-                                groupItems = group.getItems()
 
-                            groupNamesAndUUIDs = parts[ 3 ].split( ',' )
-                            if groupNamesAndUUIDs[ 0 ] == "n=GLOBAL": # VirtualBox 6 has added this to the config...not needed by the indicator.
-                                del groupNamesAndUUIDs[ 0 ]
-
-                            for item in groupNamesAndUUIDs:
-                                if item.startswith( "go=" ):
-                                    group.addItem( virtualmachine.Group( item.replace( "go=", "" ) ) )
-
-#TODO Temporary fix for Stephane; waiting on him to verify it fixes things.
-                                elif item.startswith( "gc=" ):
-                                    group.addItem( virtualmachine.Group( item.replace( "gc=", "" ) ) )
-
-                                else:
-                                    uuid = item.replace( "m=", "" )
-                                    name = next( x for x in virtualMachinesFromVBoxManage if x.getUUID() == uuid ).getName()
-                                    group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
-
-                    virtualMachines = topGroup.getItems() # Return the items (groups and/or virtual machines) of the dummy top group.
-
-                except Exception as e:
-                    self.getLogging().exception( e )
-                    virtualMachines = [ ]
-
-            else:
-                virtualMachines = virtualMachinesFromVBoxManage
-
-        return virtualMachines
-
-
-    # Returns a list of virtualmachine objects from calling VBoxManage.
-    # Contains no group information, nor sort order which is set by the user in the GUI.
-    # Safe to call without checking if VBoxManage is installed.
-    def __getVirtualMachinesFromVBoxManage( self ):
-        virtualMachines = [ ]
-        result = self.processGet( "VBoxManage list vms" )
-        if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
-            for line in result.splitlines():
-                try:
-                    nameAndUUID = line[ 1 : -1 ].split( "\" {" )
-                    virtualMachines.append( virtualmachine.VirtualMachine( nameAndUUID[ 0 ], nameAndUUID[ 1 ] ) )
-
-                except Exception:
-                    pass # Sometimes VBoxManage emits a warning message along with the VM information.
-
-        return virtualMachines
+    # # Returns a list of virtualmachine objects from calling VBoxManage.
+    # # Contains no group information, nor sort order which is set by the user in the GUI.
+    # # Safe to call without checking if VBoxManage is installed.
+    # def __getVirtualMachinesFromVBoxManage( self ):
+    #     virtualMachines = [ ]
+    #     result = self.processGet( "VBoxManage list vms" )
+    #     if result: # If a VM is corrupt/missing, VBoxManage can give back a spurious (None) result.
+    #         for line in result.splitlines():
+    #             try:
+    #                 nameAndUUID = line[ 1 : -1 ].split( "\" {" )
+    #                 virtualMachines.append( virtualmachine.VirtualMachine( nameAndUUID[ 0 ], nameAndUUID[ 1 ] ) )
+    #
+    #             except Exception:
+    #                 pass # Sometimes VBoxManage emits a warning message along with the VM information.
+    #
+    #     return virtualMachines
 
 
     def isVBoxManageInstalled( self ):
