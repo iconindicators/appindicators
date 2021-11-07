@@ -519,6 +519,30 @@ class IndicatorBase( ABC ):
         return executionFlag
 
 
+#TODO Test on Ubuntu and Lubuntu.
+    # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
+    def getTerminalAndExecuationFlag( self ):
+        terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
+        executionFlag = "--"
+
+        if terminal is None:
+            terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXDE )
+            executionFlag = "-e"
+
+            if terminal is None:
+                terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_XFCE )
+                executionFlag = "-x"
+
+        if terminal:
+            terminal = terminal.strip()
+
+        if terminal == "":
+            terminal = None
+            executionFlag = None
+
+        return terminal, executionFlag
+
+
     # Converts a list of inner lists to a GTK ListStore.
     #
     # If the list of inner lists is of the form:
