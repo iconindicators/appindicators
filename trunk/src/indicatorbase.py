@@ -321,57 +321,56 @@ class IndicatorBase( ABC ):
         self.__setMenuSensitivity( True, True )
 
 
+
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     #    title: If None, will default to the indicator name.
-    def showMessage( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__showMessage( self.__getParent( parentWidget ), message, messageType, self.indicatorName if title is None else title )
-        # dialog = Gtk.MessageDialog( self.__getParent( parentWidget ), Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
-        # if title is None:
-        #     dialog.set_title( self.indicatorName )
-        #
-        # else:
-        #     dialog.set_title( title )
-        #
-        # messageArea = dialog.get_message_area()
-        # for child in messageArea.get_children():
-        #     if type( child ) == Gtk.Label:
-        #         child.set_selectable( True )
-        #
-        # dialog.run()
-        # dialog.destroy()
+    #
+    # Reference: https://stackoverflow.com/a/29910543/2156453
+    
+    
+    def showMessage( self = None, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
+        if self is None: # Static
+            _parentWidget = Gtk.Dialog() if parentWidget is None else parentWidget
+            _title = "" if title is None else title
+
+        else: # Instance
+            _parentWidget = self.__getParent( parentWidget )
+            _title = self.indicatorName if title is None else title
+
+        dialog = Gtk.MessageDialog( _parentWidget, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+        dialog.set_title( _title )
+        messageArea = dialog.get_message_area()
+        for child in messageArea.get_children():
+            if type( child ) == Gtk.Label:
+                child.set_selectable( True )
+
+        dialog.run()
+        dialog.destroy()
 
 
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     #    title: If None, will default to the indicator name.
+    def showMessageORIGINAL( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
+        IndicatorBase.__showMessageInternal( self.__getParent( parentWidget ), message, messageType, self.indicatorName if title is None else title )
+
+
+    # Show a message dialog.
+    #
+    #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     @staticmethod
-    def showMessageExternal( message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__showMessage( Gtk.Dialog(), message, messageType, "" if title is None else title )
-        # dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
-        # if title is None:
-        #     dialog.set_title( "" ) #TODO Test this.
-        #
-        # else:
-        #     dialog.set_title( title )
-        #
-        # messageArea = dialog.get_message_area()
-        # for child in messageArea.get_children():
-        #     if type( child ) == Gtk.Label:
-        #         child.set_selectable( True )
-        #
-        # dialog.run()
-        # dialog.destroy()
+    def showMessageStaticORIGINAL( message, messageType = Gtk.MessageType.ERROR, title = None ):
+        IndicatorBase.__showMessageInternal( Gtk.Dialog(), message, messageType, "" if title is None else title )
 
 
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
-    #    title: If None, will default to the indicator name.
     @staticmethod
-    def __showMessage( parentWidget, message, messageType, title ):
+    def __showMessageInternalORIGINAL( parentWidget, message, messageType, title ):
         dialog = Gtk.MessageDialog( parentWidget, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
         dialog.set_title( title )
         messageArea = dialog.get_message_area()
