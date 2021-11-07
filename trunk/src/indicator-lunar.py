@@ -64,10 +64,7 @@ class IndicatorLunar( IndicatorBase ):
 
     message = astroBackend.getStatusMessage()
     if message is not None:
-        dialog = Gtk.MessageDialog( Gtk.Dialog(), Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, message )
-        dialog.set_title( INDICATOR_NAME )
-        dialog.run()
-        dialog.destroy()
+        IndicatorBase.showMessageStatic( message, Gtk.MessageType.ERROR, INDICATOR_NAME )
         sys.exit()
 
 
@@ -200,10 +197,6 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
                 _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                 _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
-
-        self.getTerminal() #TODO Testing...when the terminal is not found get an exception and log...not good.
-        
-
 
         self.debug = True #TODO Testing
 
