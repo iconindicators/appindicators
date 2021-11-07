@@ -351,7 +351,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.showMessage( treeView, _( "No calendar has been selected." ) )
 
         elif model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.getCalendars():
-            self.showMessage( treeView, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.WARNING )
+            self.showMessage( treeView, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.INFO )
 
         elif self.showOKCancel( treeView, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
