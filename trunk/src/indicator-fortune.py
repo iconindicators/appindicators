@@ -387,7 +387,7 @@ class IndicatorFortune( IndicatorBase ):
             self.showMessage( treeView, _( "No fortune has been selected for removal." ) )
 
         elif model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE:
-            self.showMessage( treeView, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.WARNING )
+            self.showMessage( treeView, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )
 
         elif self.showOKCancel( treeView, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
