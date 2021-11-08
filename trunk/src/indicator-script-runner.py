@@ -144,10 +144,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def onScriptMenuItem( self, menuItem, script ):
-        terminal = self.getTerminal()
-        terminalExecutionFlag = self.getTerminalExecutionFlag( terminal )
+        terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
         command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-
         command += script.getCommand()
 
         if script.getShowNotification():
