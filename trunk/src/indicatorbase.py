@@ -462,11 +462,8 @@ class IndicatorBase( ABC ):
         return spinner
 
 
-    # Menu item indent spacing, given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
-    def indent( self, indentUnity, indentGnomeShell ):
-        INDENT = "      "
-        indent = INDENT * indentGnomeShell
-        return indent
+    # Standardised amount of indent spacing used in menus.
+    def getMenuIndent( self, indent ): return "      " * indent
 
 
     def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
