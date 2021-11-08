@@ -485,43 +485,8 @@ class IndicatorBase( ABC ):
             return False
 
 
-    # Return the full path and name of the executable for the current terminal; None on failure.
-    def getTerminal( self ):
-        terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
-        if terminal is None:
-            terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXDE )
-
-            if terminal is None:
-                terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_XFCE )
-
-        if terminal:
-            terminal = terminal.strip()
-
-        if terminal == "":
-            terminal = None
-
-        return terminal
-
-
-    # Return the execution flag for the given terminal; None on failure.
-    def getTerminalExecutionFlag( self, terminal ):
-        executionFlag = None
-        if terminal:
-            if terminal.endswith( IndicatorBase.__TERMINAL_GNOME ):
-                executionFlag = "--"
-
-            elif terminal.endswith( IndicatorBase.__TERMINAL_LXDE ):
-                executionFlag = "-e"
-
-            elif terminal.endswith( IndicatorBase.__TERMINAL_XFCE ):
-                executionFlag = "-x"
-
-        return executionFlag
-
-
-#TODO Test on Ubuntu and Lubuntu.
     # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
-    def getTerminalAndExecuationFlag( self ):
+    def getTerminalAndExecutionFlag( self ):
         terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
         executionFlag = "--"
 
