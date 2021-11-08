@@ -37,6 +37,7 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 from abc import ABC
+from bisect import bisect_right
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
 
 import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
@@ -400,21 +401,44 @@ class IndicatorBase( ABC ):
             widget.set_sensitive( sense and radioOrCheckbox.get_active() )
 
 
-    def isUbuntu1604( self ): return self.processGet( "lsb_release -sc" ).strip() == "xenial"
-
-
-    # Makes a guess at how many menu items will fit into an indicator menu.
-    #
-    # By experiment under Unity, a screen height of 900 pixels accommodates 37 menu items before a scroll bar appears.
-    # For an initial guess, compute a divisor: 900 / 37 = 25.
-    #
-    # For GNOME Shell, the equivalent divisor is 36.
+    # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
     def getMenuItemsGuess( self ):
-        divisor = 36
-        if self.isUbuntu1604():
-            divisor = 25
+        screenHeightsInPixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
+        numbersOfMenuItems = [ 18, 24, 25, 29, 32, 33, 34 ]
 
-        return Gtk.Window().get_screen().get_height() / divisor
+        screenHeightInPixels = Gtk.Window().get_screen().get_height()
+        if screenHeightInPixels < screenHeightsInPixels[ 0 ]:
+            numberOfMenuItems = numbersOfMenuItems[ 0 ] * screenHeightInPixels / screenHeightsInPixels[ 0 ] # Best guess.
+
+        elif screenHeightInPixels > screenHeightsInPixels[ -1 ]:
+            numberOfMenuItems = numbersOfMenuItems[ -1 ] * screenHeightInPixels / screenHeightsInPixels[ -1 ] # Best guess.
+
+        else:
+            numberOfMenuItems = IndicatorBase.interpolate( screenHeightsInPixels, numbersOfMenuItems, screenHeightInPixels )
+
+        return numberOfMenuItems
+
+
+    # Reference: https://stackoverflow.com/a/56233642/2156453
+    @staticmethod
+    def interpolate( xValues, yValues, x ):
+        if not ( xValues[ 0 ] <= x <= xValues[ -1 ] ):
+            raise ValueError( "x out of bounds!" )
+
+        if any( y - x <= 0 for x, y in zip( xValues, xValues[ 1 : ] ) ):
+            raise ValueError( "xValues must be in strictly ascending order!" )
+
+        intervals = zip( xValues, xValues[ 1 : ], yValues, yValues[ 1 : ] )
+        slopes = [ ( y2 - y1 ) / ( x2 - x1 ) for x1, x2, y1, y2 in intervals ]
+
+        if x == xValues[ -1 ]:
+            y = yValues[ -1 ]
+
+        else:
+            i = bisect_right( xValues, x ) - 1
+            y = yValues[ i ] + slopes[ i ] * ( x - xValues[ i ] )
+
+        return y
 
 
     def createGrid( self ):
@@ -441,12 +465,7 @@ class IndicatorBase( ABC ):
     # Menu item indent spacing, given Ubuntu 16.04 (Unity) and Ubuntu 18.04+ (GNOME Shell) differences.
     def indent( self, indentUnity, indentGnomeShell ):
         INDENT = "      "
-        if self.isUbuntu1604():
-            indent = INDENT * indentUnity
-
-        else:
-            indent = INDENT * indentGnomeShell
-
+        indent = INDENT * indentGnomeShell
         return indent
 
 
