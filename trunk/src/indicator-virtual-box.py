@@ -108,7 +108,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def addMenuItemForGroup( self, menu, group, level, runningUUIDs ):
-        indent = level * self.indent( 0, 1 )
+        indent = level * self.getMenuIndent( 1 )
         menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
         menu.append( menuItem )
 
@@ -125,7 +125,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def addMenuItemForVirtualMachine( self, menu, virtualMachine, level, isRunning ):
-        indent = level * self.indent( 0, 1 )
+        indent = level * self.getMenuIndent( 1 )
         if isRunning:
             menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
             menuItem.set_active( True )
