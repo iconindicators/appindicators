@@ -128,30 +128,30 @@ class IndicatorTide( IndicatorBase ):
             for item in menuItemTexts:
                 if isinstance( item, str ):
                     if self.showAsSubMenusExceptFirstDay and firstTidalReading:
-                        self.__createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, url )
+                        self.__createAndAppendMenuItem( menu, self.getMenuIndent( 1 ) + item, url )
 
                     else:
                         subMenu = Gtk.Menu()
-                        self.__createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, None ).set_submenu( subMenu )
+                        self.__createAndAppendMenuItem( menu, self.getMenuIndent( 1 ) + item, None ).set_submenu( subMenu )
 
                 else:
                     if self.showAsSubMenusExceptFirstDay and firstTidalReading:
                         firstTidalReading = False
                         for menuItemText in item:
-                            self.__createAndAppendMenuItem( menu, self.indent( 2, 2 ) + menuItemText, url )
+                            self.__createAndAppendMenuItem( menu, self.getMenuIndent( 2 ) + menuItemText, url )
 
                     else:
                         for menuItemText in item:
-                            self.__createAndAppendMenuItem( subMenu, self.indent( 0, 2 ) + menuItemText, url )
+                            self.__createAndAppendMenuItem( subMenu, self.getMenuIndent( 2 ) + menuItemText, url )
 
         else:
             for item in menuItemTexts:
                 if isinstance( item, str ):
-                    self.__createAndAppendMenuItem( menu, self.indent( 1, 1 ) + item, url )
+                    self.__createAndAppendMenuItem( menu, self.getMenuIndent( 1 ) + item, url )
 
                 else:
                     for menuItemText in item:
-                        self.__createAndAppendMenuItem( menu, self.indent( 2, 2 ) + menuItemText, url )
+                        self.__createAndAppendMenuItem( menu, self.getMenuIndent( 2 ) + menuItemText, url )
 
 
     # Returns a list of data...
