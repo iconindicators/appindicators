@@ -111,7 +111,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def updateMenu( self, menu ):
         if self.showScriptsInSubmenus:
             scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
-            indent = self.indent( 0, 1 )
+            indent = self.getMenuIndent( 1 )
             for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                 menuItem = Gtk.MenuItem( group )
                 menu.append( menuItem )
@@ -127,7 +127,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             else:
                 scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
-                indent = self.indent( 1, 1 )
+                indent = self.getMenuIndent( 1 )
                 for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                     menu.append( Gtk.MenuItem( group + "..." ) )
                     self.addScriptsToMenu( scriptsByGroup[ group ], group, menu, indent )
