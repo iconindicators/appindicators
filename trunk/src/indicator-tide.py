@@ -21,14 +21,14 @@
 
 #TODO Looks like the UKHO is dropping all ports other than those of the UK.
 # If so, need another source, possible ones (local and/or global) are...
-    # https://tidesnear.me/tide_stations/6671
-    # https://www.tidetime.org/australia-pacific/australia/palm-beach.htm
+    # https://tidesnear.me/tide_stations/6671                    Matches EXACTLY with BOM.
+    # https://www.tidetime.org/australia-pacific/australia/palm-beach.htm        Matches with BOM.
     # http://www.bom.gov.au/australia/tides/#!/nsw-sand-point-pittwater
     # http://www.bom.gov.au/australia/tides/print.php?aac=NSW_TP032&type=tide&date=29-8-2021&region=NSW&tz=Australia/Sydney&tz_js=AEDT&days=7
-    # https://www.aquatera.co.uk/tools/tidal-database
-    # https://www.thetidetimes.com/
-    # https://www.tideschart.com/
-    # https://www.tide-forecast.com/
+    # https://www.aquatera.co.uk/tools/tidal-database        Sells data and got no repsone to email.
+    # https://www.thetidetimes.com/            Domain no longer exists.
+    # https://www.tideschart.com/                Matches with BOM.
+    # https://www.tide-forecast.com/            Could not find Fort Denison (to compare with BOM).
 
 
 #TODO Some of the above links use Javascript to post render the page,
