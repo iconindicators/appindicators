@@ -694,7 +694,7 @@ class AstroSkyfield( AstroBase ):
 
         AstroSkyfield.__calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, ephemerisPlanets )
         AstroSkyfield.__calculateSun( now, nowPlusOneDay, nowPlusSevenMonths, data, locationAtNow, ephemerisPlanets )
-        AstroSkyfield.__calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum )
+        AstroSkyfield.__calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum, logging )
 
         AstroSkyfield.__calculateStars( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum )
 
@@ -883,30 +883,24 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def __calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum ):
-        earthAtNow = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now ) 
+    def __calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum, logging ):
+        earthAtNow = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now )
         for planet in planets:
-            if planet == AstroBase.PLANET_MERCURY or \
-               planet == AstroBase.PLANET_VENUS or \
-               planet == AstroBase.PLANET_JUPITER or \
-               planet == AstroBase.PLANET_URANUS:
-                apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
+            if planet == AstroBase.PLANET_PLUTO:
+                apparentMagnitude = 13.65 # Skyfield does not compute this so hard code: https://en.wikipedia.org/wiki/Pluto
 
             else:
-                #TODO Skyfield does not calculate apparent magnitude for all bodies as yet, so hard code for now...
-                # https://github.com/skyfielders/python-skyfield/issues/210
-                # https://rhodesmill.org/skyfield/api.html#skyfield.magnitudelib.planetary_magnitude
-                if planet == AstroBase.PLANET_MARS:
-                    apparentMagnitude = -3.0
+                apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
+                if math.isnan( apparentMagnitude ): # In some instances a NaN can be returned..
+                    if planet == AstroBase.PLANET_SATURN:
+                        apparentMagnitude = -0.55
 
-                elif planet == AstroBase.PLANET_SATURN:
-                    apparentMagnitude = 0.0
+                    elif planet == AstroBase.PLANET_NEPTUNE:
+                        apparentMagnitude = 7.67
 
-                elif planet == AstroBase.PLANET_NEPTUNE:
-                    apparentMagnitude = 8.0
-
-                elif planet == AstroBase.PLANET_PLUTO:
-                    apparentMagnitude = 14.0
+                    else:
+                        apparentMagnitude = 1008.0 # Should NEVER happen; set to a high value so the planet is filtered out.
+                        logging.error( "Apparent magnitude NaN for " + planet + " at " + str( now.utc_strftime() ) + " at " + str( locationAtNow.target ) )
 
             if apparentMagnitude <= magnitudeMaximum:
                 AstroSkyfield.__calculateCommon(
