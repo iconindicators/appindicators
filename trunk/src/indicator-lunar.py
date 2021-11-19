@@ -856,6 +856,32 @@ class IndicatorLunar( IndicatorBase ):
 
         else:
 #TODO I suspect this will not work for MPC format when Skyfield is running...has lots of ( ) around names!
+# XEphem format:
+#     1 Ceres
+#
+#     1915 1953 EA
+#
+#     944 Hidalgo
+#     15788 1993 SB
+#     1993 RP
+#
+#     433 Eros
+#     7236 1987 PA
+#     1979 XB
+#
+# Skyfield format:
+#     (1) Ceres
+#
+#     (1915)
+#
+#     (944) Hidalgo
+#     (15788)
+#     1993 RP
+#
+#     (433) Eros
+#     (7236)
+#     1979 XB
+
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
                 hip = components[ 0 ]
