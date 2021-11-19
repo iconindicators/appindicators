@@ -855,6 +855,7 @@ class IndicatorLunar( IndicatorBase ):
                     hip = name[ : name.find( "/" ) ].strip()
 
         else:
+#TODO I suspect this will not work for MPC format when Skyfield is running...has lots of ( ) around names!
             components = name.split( ' ' )
             if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
                 hip = components[ 0 ]
