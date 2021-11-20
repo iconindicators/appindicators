@@ -40,7 +40,7 @@ def getData( url ):
 # Ephem comet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC comet format: https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
 def compareComets( cometsEphem, cometsMPC ):
-    
+
     def getHIP( name ):
 #TODO Once naming/HIP is done for minor planets, look for a naming description for comets...
 #...is there a temporary designation for comets?
