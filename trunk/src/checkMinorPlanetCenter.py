@@ -3,7 +3,7 @@
 
 
 from pathlib import Path    
-import math, requests
+import math, re, requests
 
 
 COMET_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/"
@@ -40,16 +40,41 @@ def getData( url ):
 # Ephem comet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC comet format: https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
 def compareComets( cometsEphem, cometsMPC ):
+    
+    def getHIP( name ):
+#TODO Once naming/HIP is done for minor planets, look for a naming description for comets...
+#...is there a temporary designation for comets?
+        if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
+            hip = name[ : name.find( "(" ) ].strip()
+
+        else:
+            postSlash = name[ name.find( "/" ) + 1 : ]
+            if re.search( '\d', postSlash ): # C/1931 AN
+                hip = name
+
+            else: # 97P/Metcalf-Brewington
+                hip = name[ : name.find( "/" ) ].strip()
+
+        return hip
+
+
     ephem = { }
+# C/1995 O1 (Hale-Bopp)
+# 2I/Borisov
     for i in range( 0, len( cometsEphem ) ):
         if not cometsEphem[ i ].startswith( "#" ):
             firstCommaIndex = cometsEphem[ i ].index( ',' )
-            ephem[ cometsEphem[ i ][ 0 : firstCommaIndex ] ] = ',' + cometsEphem[ i ]
+            name = cometsEphem[ i ][ 0 : firstCommaIndex ]
+            hip = getHIP( name )
+            ephem[ hip ] = ',' + cometsEphem[ i ] # Add extra ',' to offset the zero column.
 
-#TODO Need to sort out the name differences between ephem and mpc!!!
     mpc = { }
+# C/1995 O1 (Hale-Bopp) 
+# 2I/Borisov
     for i in range( 0, len( cometsMPC ) ):
-        mpc[ cometsMPC[ i ][ 102 : 158 ].strip() ] = ' ' + cometsMPC[ i ] # Columns are offset by one (list index versus column index). 
+        name = cometsMPC[ i ][ 102 : 158 ].strip() # Indices are offset by 1.
+        hip = getHIP( name )
+        mpc[ hip ] = ' ' + cometsMPC[ i ] # Add ' ' to align column index with list index.
 
     print( "Comets in Ephem not in MPC:", [ k for k in ephem.keys() if k not in mpc ] )    
 
@@ -126,6 +151,9 @@ def compareComets( cometsEphem, cometsMPC ):
                 if float( ephemData[ 10 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
                     print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
+#TODO Why isn't eccentricity checked for 'p'?
+
+
             else:
                 print( "Unknown object type for Ephem comet:", ephem[ k ], '\n' )
 
@@ -133,38 +161,85 @@ def compareComets( cometsEphem, cometsMPC ):
 # Ephem minor planet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC minor planet format: https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
+
+
+# Ephem examples
+# 1 Ceres
+#
+# 1915 1953 EA
+#
+# 944 Hidalgo
+# 15788 1993 SB
+# 1993 RP
+#
+# 433 Eros
+# 3102 Krok
+# 7236 1987 PA
+# 1979 XB
+# 3271 Ul
+#
+# MPC Examples
+# (1) Ceres
+#
+# (1915)
+#
+# (944) Hidalgo
+# (15788)
+# 1993 RP
+#
+# (433) Eros
+# (3102) Krok
+# (7236)
+# 1979 XB
+# (3271) Ul
+
+    # https://www.iau.org/public/themes/naming/
+    # https://minorplanetcenter.net/iau/info/DesDoc.html
+    # https://minorplanetcenter.net/iau/info/PackedDes.html
+    def getHIP( name ):
+#TODO Handle pre 1925 discoveries mentioned in above document at bottom of first section.
+# Also best to find a real example to ensure the search works.
+# A904 OA    This is a non-real example...maybe iterate through all minor planets looking for alphanumericnumericnumericspacealphaalpha
+        components = name.split( ' ' )
+        components[ 0 ] = components[ 0 ].strip( '(' ).strip( ')' )
+
+        isProvisionalDesignation = \
+            len( components ) == 2 and \
+            len( components[ 0 ] ) == 4 and components[ 0 ].isnumeric() and \
+            ( ( len( components[ 1 ] ) == 2 and components[ 1 ].isalpha() and components[ 1 ].isupper() ) or \
+              ( len( components[ 1 ] ) > 2 and components[ 1 ][ 0 : 2 ].isalpha() and components[ 1 ][ 0 : 2 ].isupper() and components[ 1 ][ 2 : ].isnumeric() ) )
+
+        if isProvisionalDesignation:
+            hip = name
+
+        else:
+            hip = components[ 0 ]
+
+        return hip
+
+
     ephem = { }
     for i in range( 0, len( minorPlanetsEphem ) ):
         if not minorPlanetsEphem[ i ].startswith( "#" ):
-#TODO Name I think should be the first part up to first whitespace.
             firstCommaIndex = minorPlanetsEphem[ i ].index( ',' )
-            ephem[ minorPlanetsEphem[ i ][ 0 : firstCommaIndex ] ] = ',' + minorPlanetsEphem[ i ]
+            name = minorPlanetsEphem[ i ][ 0 : firstCommaIndex ]
+            hip = getHIP( name )
+            ephem[ hip ] = ',' + minorPlanetsEphem[ i ] # Add extra ',' to offset the zero column.
 
     mpc = { }
-# 00944   10.77  0.15 K194R  13.07782   56.65079   21.42004   42.52077  0.6607813  0.07165187   5.7409580  0 MPO467620  1233  25 1920-2019 0.62 M-v 38h MPC        0000            (944) Hidalgo
-# J93R00P  9.0   0.15 J939A 359.97882  180.63985  192.09028    2.57044  0.1135465  0.00399610  39.3289056  E MPC 23493     6   1    2 days              Marsden    0000         1993 RP
-# s0205   14.4   0.15 K194R  22.43903  296.09920  135.84783   42.68213  0.4476657  0.06408109   6.1846641  0 MPO465885    87   4 2003-2019 0.22 M-v 38h MPC        0000         (540205)
-
     for i in range( 0, len( minorPlanetsMPC ) ):
-        name = minorPlanetsMPC[ i ][ 166 : 194 ].strip() # Columns are offset by one (list index versus column index).
-        if name.startswith( '(' ):
-            if name.endswith( ')' ):
-                name = name[ 1 : -1 ]
-                
-            else:
-                name = name[ 1 : name.index( ')' ) ]
+        name = minorPlanetsMPC[ i ][ 166 : 194 ].strip() # Indices are offset by 1.
+        hip = getHIP( name )
+        mpc[ hip ] = ' ' + minorPlanetsMPC[ i ] # Add ' ' to align column index with list index.
 
-        else:
-            print( name )
-
-
-
-    #     mpc[ minorPlanetsMPC[ i ][ 102 : 158 ].strip() ] = ' ' + minorPlanetsMPC[ i ]
-    #
-    # print( "Comets in Ephem not in MPC:", [ k for k in ephem.keys() if k not in mpc ] )    
-    #
-    # print( "Comets in MPC not in Ephem:", [ k for k in mpc.keys() if k not in ephem ] )    
-    #
+    print( "Comets in Ephem not in MPC:", [ k for k in ephem.keys() if k not in mpc ] )    
+    
+    print( "Comets in MPC not in Ephem:", [ k for k in mpc.keys() if k not in ephem ] )    
+    
+    for k in ephem.keys():
+        print( ephem[ k ].split( ',' )[ 2 ] )
+    
+    
     # for k in ephem.keys():
     #     if k in mpc:
     #         ephemData = ephem[ k ].split( ',' )
