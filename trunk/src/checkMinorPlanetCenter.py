@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from pathlib import Path    
+from pathlib import Path
 import math, re, requests
 
 
@@ -42,27 +42,11 @@ def getData( url ):
 def compareComets( cometsEphem, cometsMPC ):
 
     def getDesignation( name ):
-
-# C/1995 O1 (Hale-Bopp)
-# P/1998 VS24 (LINEAR)
-# P/2011 UA134 (Spacewatch-PANSTARRS)
-# C/2019 Y4-D (ATLAS)
-# 1P/Halley
-# 332P/Ikeya-Murakami
-# 332P-B/Ikeya-Murakami
-# 332P-C/Ikeya-Murakami
-# 1I/`Oumuamua
-
-# C/1995 O1 (Hale-Bopp)
-# P/1998 VS24 (LINEAR)  
-# P/2011 UA134 (Spacewatch-PANSTARRS)
-# C/2019 Y4-D (ATLAS)        
-# 1P/Halley
-# 332P/Ikeya-Murakami
-# 332P-B/Ikeya-Murakami
-# 332P-C/Ikeya-Murakami
-# 1I/`Oumuamua
-
+        # https://minorplanetcenter.net//iau/lists/CometResolution.html
+        # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
+        # http://www.icq.eps.harvard.edu/cometnames.html
+        # https://en.wikipedia.org/wiki/Naming_of_comets
+        # https://slate.com/technology/2013/11/comet-naming-a-quick-guide.html
         if name[ 0 ].isnumeric():
             # 1P/Halley
             # 332P/Ikeya-Murakami
@@ -70,12 +54,17 @@ def compareComets( cometsEphem, cometsMPC ):
             # 332P-C/Ikeya-Murakami
             # 1I/`Oumuamua
             slash = name.find( '/' )
-            dash = name[ 0 : slash ].find( '-' )
-            if dash == -1:
-                designation = name[ 0 : slash ]
+            if slash == -1:
+                # Special case for '282P' which is MPC format, whereas the XEphem format is '282P/'.
+                designation = name
 
-            else:
-                designation = name[ 0 : dash ]
+            else:            
+                dash = name[ 0 : slash ].find( '-' )
+                if dash == -1:
+                    designation = name[ 0 : slash ]
+
+                else:
+                    designation = name[ 0 : dash ]
 
         elif name[ 0 ].isalpha():
             # C/1995 O1 (Hale-Bopp)
@@ -90,39 +79,22 @@ def compareComets( cometsEphem, cometsMPC ):
 
         return designation
 
-        # if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
-        #     hip = name[ : name.find( "(" ) ].strip()
-        #
-        # else:
-        #     postSlash = name[ name.find( "/" ) + 1 : ]
-        #     if re.search( '\d', postSlash ): # C/1931 AN
-        #         hip = name
-        #
-        #     else: # 97P/Metcalf-Brewington
-        #         hip = name[ : name.find( "/" ) ].strip()
-        #
-        # return hip
-
 
     ephem = { }
     for i in range( 0, len( cometsEphem ) ):
         if not cometsEphem[ i ].startswith( "#" ):
             firstCommaIndex = cometsEphem[ i ].find( ',' )
             name = cometsEphem[ i ][ 0 : firstCommaIndex ]
-            # if '/' not in name: print( name )
             designation = getDesignation( name )
-            print( name, '\t', designation )
             ephem[ designation ] = ',' + cometsEphem[ i ] # Add extra ',' to offset the zero column.
 
     mpc = { }
     for i in range( 0, len( cometsMPC ) ):
         name = cometsMPC[ i ][ 102 : 158 ].strip() # Indices are offset by 1.
-        # if '/' not in name: print( name )
         designation = getDesignation( name )
-        print( name, '\t', designation )
         mpc[ designation ] = ' ' + cometsMPC[ i ] # Add ' ' to align column index with list index.
 
-    if True: return #TODO Testing
+    # if True: return #TODO Testing
 
     print( "Comets in Ephem not in MPC:", [ k for k in ephem.keys() if k not in mpc ] )    
 
