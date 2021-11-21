@@ -252,7 +252,6 @@ def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
         if not minorPlanetsEphem[ i ].startswith( "#" ):
             firstCommaIndex = minorPlanetsEphem[ i ].find( ',' )
             name = minorPlanetsEphem[ i ][ 0 : firstCommaIndex ]
-            if '/' in name: print( name )
             designation = getDesignation( name )
             if designation == -1:
                 print( "Unknown/bad designation:\n", minorPlanetsEphem[ i ] )
@@ -263,7 +262,6 @@ def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
     mpc = { }
     for i in range( 0, len( minorPlanetsMPC ) ):
         name = minorPlanetsMPC[ i ][ 166 : 194 ].strip() # Indices are offset by 1.
-        if '/' in name: print( name )
         designation = getDesignation( name )
         if designation == -1:
             print( "Unknown/bad designation:\n", minorPlanetsMPC[ i ] )
@@ -274,84 +272,49 @@ def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
     print( "Comets in Ephem not in MPC:", [ k for k in ephem.keys() if k not in mpc ] )    
     
     print( "Comets in MPC not in Ephem:", [ k for k in mpc.keys() if k not in ephem ] )    
-    
-    # for k in ephem.keys():
-    #     print( ephem[ k ].split( ',' )[ 2 ] )
-    
-    
-    # for k in ephem.keys():
-    #     if k in mpc:
-    #         ephemData = ephem[ k ].split( ',' )
-    #         if ephemData[ 2 ] == 'e':
-    #             if float( ephemData[ 3 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-    #                 print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 4 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-    #                 print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-    #                 print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if not math.isclose( float( ephemData[ 8 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
-    #                 print( "Mismatch eccentricity:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-    #                 print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 13 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-    #                 print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #         elif ephemData[ 2 ] == 'h':
-    #             ephemDate = ephemData[ 3 ].split( '/' )
-    #             if not( ephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( ephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and ephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-    #                 print( "Mismatch epoch of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-    #                 print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 5 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-    #                 print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 6 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-    #                 print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if not math.isclose( float( ephemData[ 7 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
-    #                 print( "Mismatch eccentricity:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if not math.isclose( float( ephemData[ 8 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
-    #                 print( "Mismatch perihelion distance:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 10 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-    #                 print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 11 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-    #                 print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #         elif ephemData[ 2 ] == 'p':
-    #             ephemDate = ephemData[ 3 ].split( '/' )
-    #             if not( ephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( ephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and ephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-    #                 print( "Mismatch epoch of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-    #                 print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-    #                 print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if not math.isclose( float( ephemData[ 6 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
-    #                 print( "Mismatch perihelion distance:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 7 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-    #                 print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 9 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-    #                 print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #             if float( ephemData[ 10 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-    #                 print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-    #
-    #         else:
-    #             print( "Unknown object type for Ephem comet:", ephem[ k ], '\n' )
+
+    for k in ephem.keys():
+        if k in mpc:
+            ephemData = ephem[ k ].split( ',' )
+            if float( ephemData[ 3 ] ) != float( mpc[ k ][ 60 : 68 + 1 ] ):
+                print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+            if float( ephemData[ 4 ] ) != float( mpc[ k ][ 49 : 57 + 1 ] ):
+                print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+            if float( ephemData[ 5 ] ) != float( mpc[ k ][ 38 : 46 + 1 ] ):
+                print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+            
+            if not math.isclose( float( ephemData[ 7 ] ), float( mpc[ k ][ 81 : 91 + 1 ] ), abs_tol = 1e-06 ):
+                print( "Mismatch eccentricity:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+            if float( ephemData[ 8 ][ 1 : ] ) != float( mpc[ k ][ 71 : 79 + 1 ] ):
+                print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+            if float( ephemData[ 9 ] ) != float( mpc[ k ][ 27 : 35 + 1 ] ):
+                print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+            # ephemDate = ephemData[ 10 ].split( '/' )
+            # if not( ephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( ephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and ephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
+            #     print( "Mismatch epoch date (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+# Mismatch argument of slope parameter: 
+#  ['', '2004 PC112', 'e', '2.3578', '69.5341', '277.3016', '44.34810', '0.0033373', '0.04178361', '0.0336', '08/23.0/2004', '2000', 'H', '0.15\n'] 
+#   K04PB2C             K048N   0.03358  277.30161   69.53412    2.35778  0.0417836  0.00333727  44.3481040  E MPO 70391     4   1   29 days 0.23         MPC        0000         2004 PC112
+#
+#
+# Traceback (most recent call last):
+#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/checkMinorPlanetCenter.py", line 324, in <module>
+#     getData( MINOR_PLANET_DISTANT_URL_MPC_FORMAT ) )
+#   File "/home/bernard/Programming/Subversion/IndicatorLunar/src/checkMinorPlanetCenter.py", line 301, in compareMinorPlanets
+#     if float( ephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ):
+# ValueError: could not convert string to float: 
+
+            if float( ephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ):
+                print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+            if float( ephemData[ 13 ] ) != float( mpc[ k ][ 15 : 19 + 1 ] ):
+                print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
 
 compareComets(
