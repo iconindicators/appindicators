@@ -105,74 +105,75 @@ def compareComets( cometsEphem, cometsMPC ):
             ephemData = ephem[ k ].split( ',' )
             if ephemData[ 2 ] == 'e':
                 if float( ephemData[ 3 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-                    print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch inclination (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 4 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-                    print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch longitude of ascending node (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-                    print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of perihelion (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if not math.isclose( float( ephemData[ 8 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch eccentricity:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch eccentricity (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
+
+                ephemDate = ephemData[ 10 ].split( '/' )
+                if not( ephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( ephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and ephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
+                    print( "Mismatch epoch date (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-                    print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of absolute magnitude (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 13 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-                    print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of slope parameter (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
             elif ephemData[ 2 ] == 'h':
                 ephemDate = ephemData[ 3 ].split( '/' )
                 if not( ephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( ephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and ephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-                    print( "Mismatch epoch of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch epoch date (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-                    print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch inclination (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 5 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-                    print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch longitude of ascending node (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 6 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-                    print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of perihelion (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if not math.isclose( float( ephemData[ 7 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch eccentricity:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch eccentricity (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if not math.isclose( float( ephemData[ 8 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch perihelion distance:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch perihelion distance (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 10 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-                    print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of absolute magnitude (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 11 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-                    print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of slope paramete (XEphem/MPC)r:", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
             elif ephemData[ 2 ] == 'p':
                 ephemDate = ephemData[ 3 ].split( '/' )
                 if not( ephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( ephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and ephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-                    print( "Mismatch epoch of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch epoch date (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-                    print( "Mismatch inclination:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch inclination (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-                    print( "Mismatch argument of perihelion:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of perihelion (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if not math.isclose( float( ephemData[ 6 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch perihelion distance:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch perihelion distance (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 7 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-                    print( "Mismatch longitude of ascending node:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch longitude of ascending node (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 9 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-                    print( "Mismatch argument of absolute magnitude:", '\n', ephemData, '\n', mpc[ k ], '\n' )
+                    print( "Mismatch argument of absolute magnitude (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
                 if float( ephemData[ 10 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-                    print( "Mismatch argument of slope parameter:", '\n', ephemData, '\n', mpc[ k ], '\n' )
-
-#TODO Why isn't eccentricity checked for 'p'?
-
+                    print( "Mismatch argument of slope parameter (XEphem/MPC):", '\n', ephemData, '\n', mpc[ k ], '\n' )
 
             else:
                 print( "Unknown object type for Ephem comet:", ephem[ k ], '\n' )
