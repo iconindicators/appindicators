@@ -41,12 +41,12 @@ def getData( url ):
 # MPC comet format: https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
 def compareComets( cometsEphem, cometsMPC ):
 
+    # https://minorplanetcenter.net//iau/lists/CometResolution.html
+    # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
+    # http://www.icq.eps.harvard.edu/cometnames.html
+    # https://en.wikipedia.org/wiki/Naming_of_comets
+    # https://slate.com/technology/2013/11/comet-naming-a-quick-guide.html
     def getDesignation( name ):
-        # https://minorplanetcenter.net//iau/lists/CometResolution.html
-        # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
-        # http://www.icq.eps.harvard.edu/cometnames.html
-        # https://en.wikipedia.org/wiki/Naming_of_comets
-        # https://slate.com/technology/2013/11/comet-naming-a-quick-guide.html
         if name[ 0 ].isnumeric():
             # 1P/Halley
             # 332P/Ikeya-Murakami
@@ -86,15 +86,21 @@ def compareComets( cometsEphem, cometsMPC ):
             firstCommaIndex = cometsEphem[ i ].find( ',' )
             name = cometsEphem[ i ][ 0 : firstCommaIndex ]
             designation = getDesignation( name )
-            ephem[ designation ] = ',' + cometsEphem[ i ] # Add extra ',' to offset the zero column.
+            if designation == -1:
+                print( "Unknown/bad designation:\n", cometsEphem[ i ] )
+
+            else:
+                ephem[ designation ] = ',' + cometsEphem[ i ] # Add extra ',' to offset the zero column.
 
     mpc = { }
     for i in range( 0, len( cometsMPC ) ):
         name = cometsMPC[ i ][ 102 : 158 ].strip() # Indices are offset by 1.
         designation = getDesignation( name )
-        mpc[ designation ] = ' ' + cometsMPC[ i ] # Add ' ' to align column index with list index.
+        if designation == -1:
+            print( "Unknown/bad designation:\n", cometsMPC[ i ] )
 
-    # if True: return #TODO Testing
+        else:
+            mpc[ designation ] = ' ' + cometsMPC[ i ] # Add ' ' to align column index with list index.
 
     print( "Comets in Ephem not in MPC:", [ k for k in ephem.keys() if k not in mpc ] )    
 
@@ -183,6 +189,10 @@ def compareComets( cometsEphem, cometsMPC ):
 # MPC minor planet format: https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
 
+    # https://www.iau.org/public/themes/naming/
+    # https://minorplanetcenter.net/iau/info/DesDoc.html
+    # https://minorplanetcenter.net/iau/info/PackedDes.html
+    def getDesignation( name ):
 
 # Ephem examples
 # 1 Ceres
@@ -214,14 +224,12 @@ def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
 # 1979 XB
 # (3271) Ul
 
-    # https://www.iau.org/public/themes/naming/
-    # https://minorplanetcenter.net/iau/info/DesDoc.html
-    # https://minorplanetcenter.net/iau/info/PackedDes.html
-    def getDesignation( name ):
-#TODO Handle pre 1925 discoveries mentioned in above document at bottom of first section.
-# Also best to find a real example to ensure the search works.
+#TODO Handle pre 1925 discoveries mentioned in above document at bottom of first section.  Need to find an example if possible.
 # A904 OA    This is a non-real example...maybe iterate through all minor planets looking for alphanumericnumericnumericspacealphaalpha
-        components = name.split( ' ' )
+#
+#TODO Maybe download the MPC database (30MB) and look inside...is it just minor planets, or comets too?
+        # components = name.split( ' ' ) #TODO Try without the ' ' below...
+        components = name.split()
         components[ 0 ] = components[ 0 ].strip( '(' ).strip( ')' )
 
         isProvisionalDesignation = \
@@ -231,12 +239,12 @@ def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
               ( len( components[ 1 ] ) > 2 and components[ 1 ][ 0 : 2 ].isalpha() and components[ 1 ][ 0 : 2 ].isupper() and components[ 1 ][ 2 : ].isnumeric() ) )
 
         if isProvisionalDesignation:
-            hip = name
+            designation = name
 
         else:
-            hip = components[ 0 ]
+            designation = components[ 0 ]
 
-        return hip
+        return designation
 
 
     ephem = { }
@@ -338,25 +346,25 @@ def compareMinorPlanets( minorPlanetsEphem, minorPlanetsMPC ):
     #             print( "Unknown object type for Ephem comet:", ephem[ k ], '\n' )
 
 
-compareComets(
-    getData( COMET_URL_EPHEM_FORMAT ),
-    getData( COMET_URL_MPC_FORMAT ) )
+# compareComets(
+#     getData( COMET_URL_EPHEM_FORMAT ),
+#     getData( COMET_URL_MPC_FORMAT ) )
 
-# compareMinorPlanets(
-#     getData( MINOR_PLANET_BRIGHT_URL_EPHEM_FORMAT ),
-#     getData( MINOR_PLANET_BRIGHT_URL_MPC_FORMAT ) )
-#
-#
-# compareMinorPlanets(
-#     getData( MINOR_PLANET_CRITICAL_URL_EPHEM_FORMAT ),
-#     getData( MINOR_PLANET_CRITICAL_URL_MPC_FORMAT ) )
-#
-#
-# compareMinorPlanets(
-#     getData( MINOR_PLANET_DISTANT_URL_EPHEM_FORMAT ),
-#     getData( MINOR_PLANET_DISTANT_URL_MPC_FORMAT ) )
-#
-#
-# compareMinorPlanets(
-#     getData( MINOR_PLANET_UNUSUAL_URL_EPHEM_FORMAT ),
-#     getData( MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT ) )
+compareMinorPlanets(
+    getData( MINOR_PLANET_BRIGHT_URL_EPHEM_FORMAT ),
+    getData( MINOR_PLANET_BRIGHT_URL_MPC_FORMAT ) )
+
+
+compareMinorPlanets(
+    getData( MINOR_PLANET_CRITICAL_URL_EPHEM_FORMAT ),
+    getData( MINOR_PLANET_CRITICAL_URL_MPC_FORMAT ) )
+
+
+compareMinorPlanets(
+    getData( MINOR_PLANET_DISTANT_URL_EPHEM_FORMAT ),
+    getData( MINOR_PLANET_DISTANT_URL_MPC_FORMAT ) )
+
+
+compareMinorPlanets(
+    getData( MINOR_PLANET_UNUSUAL_URL_EPHEM_FORMAT ),
+    getData( MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT ) )
