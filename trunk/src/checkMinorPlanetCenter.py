@@ -386,3 +386,22 @@ minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT )
 minorPlanetsUnusualXephem = getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT )
 # checkXephem( minorPlanetsUnusualXephem )                                            
 # compareMinorPlanets( minorPlanetsUnusualMPC, minorPlanetsUnusualXephem )            
+
+
+
+
+            # for i in range( 0, len( data ) ):
+            #     if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+            #         continue
+            #
+            #     # Missing absolute magnitude.
+            #     if data[ i ][ firstMagnitudeFieldStart : firstMagnitudeFieldEnd + 1 ].isspace():
+            #         continue
+            #
+            #     # Missing slope parameter.
+            #     if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
+            #         continue
+            #
+            #     # Missing semi-major-axis; https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+            #     if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
+            #         continue
