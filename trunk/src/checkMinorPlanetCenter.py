@@ -41,18 +41,21 @@ def checkXephem( cometsOrMinorPlanets ):
     for i in range( 0, len( cometsOrMinorPlanets ) ):
         if not cometsOrMinorPlanets[ i ].startswith( "#" ):
             data = ( ',' + cometsOrMinorPlanets[ i ] ).split( ',' ) # Add extra ',' to offset the zero column.
+            message = ""
             if "****" in data: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-                print( "Asterisks present:", data )
+                message += "Asterisks present\n"
 
             if data[ 2 ] == 'e' and len( data[ 12 ] ) == 1: # https://github.com/brandon-rhodes/pyephem/issues/196
-                print( "Bad absolute magnitude:", data )
+                message += "Bad absolute magnitude\n"
 
             if data[ 2 ] == 'h' and len( data[ 10 ] ) == 1: # https://github.com/brandon-rhodes/pyephem/issues/196
-                print( "Bad absolute magnitude:", data )
+                message += "Bad absolute magnitude\n"
 
             if data[ 2 ] == 'p' and len( data[ 9 ] ) == 1: # https://github.com/brandon-rhodes/pyephem/issues/196
-                print( "Bad absolute magnitude:", data )
+                message += "Bad absolute magnitude\n"
 
+            if message:
+                print( message, data )
 
 
 # https://minorplanetcenter.net//iau/lists/CometResolution.html
@@ -119,93 +122,111 @@ def compareComets( cometsMPC, cometsXephem ):
         else:
             mpc[ designation ] = ' ' + cometsMPC[ i ] # Add ' ' to align column index with list index.
 
-    print( "Comets in XEphem not in MPC:", [ k for k in xephem.keys() if k not in mpc ] )    
+    missing = [ k for k in xephem.keys() if k not in mpc ]
+    if missing:    
+        print( "Comets in XEphem not in MPC:", missing )
 
-    print( "Comets in MPC not in XEphem:", [ k for k in mpc.keys() if k not in xephem ] )    
+    missing = [ k for k in mpc.keys() if k not in xephem ]
+    if missing:
+        print( "Comets in MPC not in XEphem:", missing )    
 
     for k in xephem.keys():
         if k in mpc:
             xephemData = xephem[ k ].split( ',' )
+            message = ""
             if xephemData[ 2 ] == 'e':
                 if float( xephemData[ 3 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-                    print( "Mismatch of inclination:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of inclination\n"
 
                 if float( xephemData[ 4 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-                    print( "Mismatch of longitude of ascending node:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of longitude of ascending node\n"
 
                 if float( xephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-                    print( "Mismatch of argument of perihelion:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of argument of perihelion\n"
 
                 if not math.isclose( float( xephemData[ 8 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch of eccentricity:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of eccentricity\n"
 
                 xephemDate = xephemData[ 10 ].split( '/' )
                 if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-                    print( "Mismatch of epoch date:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of epoch date\n"
 
                 if float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-                    print( "Mismatch of absolute magnitude:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of absolute magnitude\n"
 
                 if float( xephemData[ 13 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-                    print( "Mismatch of slope parameter:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of slope parameter\n"
 
             elif xephemData[ 2 ] == 'h':
                 xephemDate = xephemData[ 3 ].split( '/' )
                 if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-                    print( "Mismatch of epoch date:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of epoch date\n"
 
                 if float( xephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-                    print( "Mismatch of inclination:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of inclination\n"
 
                 if float( xephemData[ 5 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-                    print( "Mismatch of longitude of ascending node:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of longitude of ascending node\n"
 
                 if float( xephemData[ 6 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-                    print( "Mismatch of argument of perihelion:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of argument of perihelion\n"
 
                 if not math.isclose( float( xephemData[ 7 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch of eccentricity:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of eccentricity\n"
 
                 if not math.isclose( float( xephemData[ 8 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch of perihelion distance:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of perihelion distance\n"
 
                 if float( xephemData[ 10 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-                    print( "Mismatch of absolute magnitude:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of absolute magnitude\n"
 
                 if float( xephemData[ 11 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-                    print( "Mismatch of slope parameter:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of slope parameter\n"
 
             elif xephemData[ 2 ] == 'p':
                 xephemDate = xephemData[ 3 ].split( '/' )
                 if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-                    print( "Mismatch of epoch date:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of epoch date\n"
 
                 if float( xephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
-                    print( "Mismatch of inclination:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of inclination\n"
 
                 if float( xephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
-                    print( "Mismatch of argument of perihelion:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of argument of perihelion\n"
 
                 if not math.isclose( float( xephemData[ 6 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
-                    print( "Mismatch of perihelion distance:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of perihelion distance\n"
 
                 if float( xephemData[ 7 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
-                    print( "Mismatch of longitude of ascending node:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of longitude of ascending node\n"
 
                 if float( xephemData[ 9 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
-                    print( "Mismatch of absolute magnitude:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of absolute magnitude\n"
 
                 if float( xephemData[ 10 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
-                    print( "Mismatch of slope parameter:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                    message = "Mismatch of slope parameter\n"
 
             else:
                 print( "Unknown object type for XEphem comet:", xephem[ k ], '\n' )
 
+            if message:
+                print( message, xephemData, '\n', mpc[ k ], '\n' )
+
 
 def checkMPC( cometsOrMinorPlanets ):
     for i in range( 0, len( cometsOrMinorPlanets ) ):
+        message = ""
         if "****" in cometsOrMinorPlanets[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-            print( "Asterisks present:", cometsOrMinorPlanets[ i ] )
+            message += "Asterisks present\n"
+
+        if len( cometsOrMinorPlanets[ i ][ 9 : 13 + 1 ].strip() ) == 0:
+            message += "Missingf absolute magnitude\n"
+
+        if len( cometsOrMinorPlanets[ i ][ 15 : 19 + 1 ].strip() ) == 0:
+            message += "Missingf slope parameter\n"
+
+        if message:
+            print( message, cometsOrMinorPlanets[ i ] )
 
 
 # https://www.iau.org/public/themes/naming/
@@ -291,69 +312,77 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
         else:
             mpc[ designation ] = ' ' + minorPlanetsMPC[ i ] # Add ' ' to align column index with list index.
 
-    print( "Comets in XEphem not in MPC:", [ k for k in xephem.keys() if k not in mpc ] )    
-    
-    print( "Comets in MPC not in XEphem:", [ k for k in mpc.keys() if k not in xephem ] )    
+    missing = [ k for k in xephem.keys() if k not in mpc ]
+    if missing:    
+        print( "Minor planets in XEphem not in MPC:", missing )
+
+    missing = [ k for k in mpc.keys() if k not in xephem ]
+    if missing:
+        print( "Minor planets in MPC not in XEphem:", missing )    
 
     for k in xephem.keys():
         if k in mpc:
             xephemData = xephem[ k ].split( ',' )
+            message = ""
             if float( xephemData[ 3 ] ) != float( mpc[ k ][ 60 : 68 + 1 ] ):
-                print( "Mismatch of inclination:", '\n', xephemData, '\n', mpc[ k ], '\n' )
-            
+                message += "Mismatch of inclination\n"
+
             if float( xephemData[ 4 ] ) != float( mpc[ k ][ 49 : 57 + 1 ] ):
-                print( "Mismatch of longitude of ascending node:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                message += "Mismatch of longitude of ascending node\n"
             
             if float( xephemData[ 5 ] ) != float( mpc[ k ][ 38 : 46 + 1 ] ):
-                print( "Mismatch of argument of perihelion:", '\n', xephemData, '\n', mpc[ k ], '\n' )
-            
+                message += "Mismatch of argument of perihelion\n"
+
             if not math.isclose( float( xephemData[ 7 ] ), float( mpc[ k ][ 81 : 91 + 1 ] ), abs_tol = 1e-06 ):
-                print( "Mismatch of mean daily motion:", '\n', xephemData, '\n', mpc[ k ], '\n' )
-            
+                message += "Mismatch of mean daily motion\n"
+
             if float( xephemData[ 8 ][ 1 : ] ) != float( mpc[ k ][ 71 : 79 + 1 ] ):
-                print( "Mismatch of eccentricity:", '\n', xephemData, '\n', mpc[ k ], '\n' )
-            
+                message += "Mismatch of eccentricity\n"
+
             if float( xephemData[ 9 ] ) != float( mpc[ k ][ 27 : 35 + 1 ] ):
-                print( "Mismatch of mean anomoly:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                message += "Mismatch of mean anomoly\n"
 
 #TODO Fix compact date format.
             # xephemDate = xephemData[ 10 ].split( '/' )
             # if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
-            #     print( "Mismatch of epoch date:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+            #     message += "Mismatch of epoch date\n"
 
-            if float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ):
-                print( "Mismatch of absolute magnitude:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+            if len( xephemData[ 12 ] ) > 2 and float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ): # Skip of absolute magnitude missing number component.
+                message += "Mismatch of absolute magnitude\n"
                 
             if float( xephemData[ 13 ] ) != float( mpc[ k ][ 15 : 19 + 1 ] ):
-                print( "Mismatch of slope parameter:", '\n', xephemData, '\n', mpc[ k ], '\n' )
+                message += "Mismatch of slope parameter\n"
+
+            if message:
+                print( message, xephemData, '\n', mpc[ k ], '\n' )
 
 
 cometsMPC = getData( COMET_URL_MPC_FORMAT )
-checkMPC( cometsMPC )
+# checkMPC( cometsMPC )
 cometsXephem = getData( COMET_URL_XEPHEM_FORMAT )
-checkXephem( cometsXephem )
+# checkXephem( cometsXephem )
 # compareComets( cometsMPC, cometsXephem )                                            # Lots of epoch date mismatches!
 
 minorPlanetsBrightMPC = getData( MINOR_PLANET_BRIGHT_URL_MPC_FORMAT )
-checkMPC( minorPlanetsBrightMPC )
+# checkMPC( minorPlanetsBrightMPC )
 minorPlanetsBrightXephem = getData( MINOR_PLANET_BRIGHT_URL_XEPHEM_FORMAT )
-checkXephem( minorPlanetsBrightXephem )
-compareMinorPlanets( minorPlanetsBrightMPC, minorPlanetsBrightXephem )
+# checkXephem( minorPlanetsBrightXephem )
+# compareMinorPlanets( minorPlanetsBrightMPC, minorPlanetsBrightXephem )              # Lots of mismatches!
 
 minorPlanetsCriticalMPC = getData( MINOR_PLANET_CRITICAL_URL_MPC_FORMAT )
-checkMPC( minorPlanetsCriticalMPC )
+# checkMPC( minorPlanetsCriticalMPC )
 minorPlanetsCriticalXephem = getData( MINOR_PLANET_CRITICAL_URL_XEPHEM_FORMAT )
-checkXephem( minorPlanetsCriticalXephem )
-compareMinorPlanets( minorPlanetsCriticalMPC, minorPlanetsCriticalXephem )
+# checkXephem( minorPlanetsCriticalXephem )
+# compareMinorPlanets( minorPlanetsCriticalMPC, minorPlanetsCriticalXephem )            # Lots of mismatches!
 
-# minorPlanetsCriticalMPC = getData( MINOR_PLANET_CRITICAL_URL_MPC_FORMAT )
-# minorPlanetsCriticalXephem = getData( MINOR_PLANET_CRITICAL_URL_XEPHEM_FORMAT )
-# compareMinorPlanets( minorPlanetsCriticalMPC, minorPlanetsCriticalXephem )
+minorPlanetsDistantMPC = getData( MINOR_PLANET_DISTANT_URL_MPC_FORMAT )
+# checkMPC( minorPlanetsDistantMPC )
+minorPlanetsDistantXephem = getData( MINOR_PLANET_DISTANT_URL_XEPHEM_FORMAT )
+# checkXephem( minorPlanetsDistantXephem )                                             # Bad absolute magnitudes.
+# compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )            # Lots of mismatches!
 
-# minorPlanetsDistantMPC = getData( MINOR_PLANET_DISTANT_URL_MPC_FORMAT )
-# minorPlanetsDistantXephem = getData( MINOR_PLANET_DISTANT_URL_XEPHEM_FORMAT )
-# compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )
-
-# minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT )
-# minorPlanetsUnusualXephem = getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT )
-# compareMinorPlanets( minorPlanetsUnusualMPC, minorPlanetsUnusualXephem )
+minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT )
+# checkMPC( minorPlanetsUnusualMPC )
+minorPlanetsUnusualXephem = getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT )
+# checkXephem( minorPlanetsUnusualXephem )                                            
+# compareMinorPlanets( minorPlanetsUnusualMPC, minorPlanetsUnusualXephem )            
