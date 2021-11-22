@@ -7,21 +7,21 @@ import math, requests
 
 
 COMET_URL = "https://www.minorplanetcenter.net/iau/Ephemerides/Comets/"
-COMET_URL_MPC_FORMAT = COMET_URL + "Soft00Cmt.txt"
-COMET_URL_XEPHEM_FORMAT = COMET_URL + "Soft03Cmt.txt"
+COMET_URL_MPC = COMET_URL + "Soft00Cmt.txt"
+COMET_URL_XEPHEM = COMET_URL + "Soft03Cmt.txt"
 
 MINOR_PLANET_URL = "https://minorplanetcenter.net/iau/Ephemerides/"
 
-MINOR_PLANET_BRIGHT_URL_MPC_FORMAT = MINOR_PLANET_URL + "Bright/2018/Soft00Bright.txt"
-MINOR_PLANET_BRIGHT_URL_XEPHEM_FORMAT = MINOR_PLANET_URL + "Bright/2018/Soft03Bright.txt"
+MINOR_PLANET_BRIGHT_URL_MPC = MINOR_PLANET_URL + "Bright/2018/Soft00Bright.txt"
+MINOR_PLANET_BRIGHT_URL_XEPHEM = MINOR_PLANET_URL + "Bright/2018/Soft03Bright.txt"
 
-MINOR_PLANET_CRITICAL_URL_MPC_FORMAT = MINOR_PLANET_URL + "CritList/Soft00CritList.txt"
-MINOR_PLANET_CRITICAL_URL_XEPHEM_FORMAT = MINOR_PLANET_URL + "CritList/Soft03CritList.txt"
+MINOR_PLANET_CRITICAL_URL_MPC = MINOR_PLANET_URL + "CritList/Soft00CritList.txt"
+MINOR_PLANET_CRITICAL_URL_XEPHEM = MINOR_PLANET_URL + "CritList/Soft03CritList.txt"
 
-MINOR_PLANET_DISTANT_URL_MPC_FORMAT = MINOR_PLANET_URL + "Distant/Soft00Distant.txt"
-MINOR_PLANET_DISTANT_URL_XEPHEM_FORMAT = MINOR_PLANET_URL + "Distant/Soft03Distant.txt"
+MINOR_PLANET_DISTANT_URL_MPC = MINOR_PLANET_URL + "Distant/Soft00Distant.txt"
+MINOR_PLANET_DISTANT_URL_XEPHEM = MINOR_PLANET_URL + "Distant/Soft03Distant.txt"
 
-MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT = MINOR_PLANET_URL + "Unusual/Soft00Unusual.txt"
+MINOR_PLANET_UNUSUAL_URL = MINOR_PLANET_URL + "Unusual/Soft00Unusual.txt"
 MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT = MINOR_PLANET_URL + "Unusual/Soft03Unusual.txt"
 
 
@@ -37,25 +37,21 @@ def getData( url ):
     return contents
 
 
-def checkXephem( cometsOrMinorPlanets ):
-    for i in range( 0, len( cometsOrMinorPlanets ) ):
-        if not cometsOrMinorPlanets[ i ].startswith( "#" ):
-            data = ( ',' + cometsOrMinorPlanets[ i ] ).split( ',' ) # Add extra ',' to offset the zero column.
+def checkXephem( data ):
+    for i in range( 0, len( data ) ):
+        if not data[ i ].startswith( "#" ):
+            line = ( ',' + data[ i ] ).split( ',' ) # Add extra ',' to offset the zero column.
             message = ""
-            if "****" in data: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+            if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
                 message += "Asterisks present\n"
 
-            if data[ 2 ] == 'e' and len( data[ 12 ] ) == 1: # https://github.com/brandon-rhodes/pyephem/issues/196
-                message += "Bad absolute magnitude\n"
-
-            if data[ 2 ] == 'h' and len( data[ 10 ] ) == 1: # https://github.com/brandon-rhodes/pyephem/issues/196
-                message += "Bad absolute magnitude\n"
-
-            if data[ 2 ] == 'p' and len( data[ 9 ] ) == 1: # https://github.com/brandon-rhodes/pyephem/issues/196
-                message += "Bad absolute magnitude\n"
+            if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
+               ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
+               ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
+                message += "Missing absolute magnitude\n"
 
             if message:
-                print( message, data )
+                print( message, line )
 
 
 # https://minorplanetcenter.net//iau/lists/CometResolution.html
@@ -213,20 +209,41 @@ def compareComets( cometsMPC, cometsXephem ):
                 print( message, xephemData, '\n', mpc[ k ], '\n' )
 
 
-def checkMPC( cometsOrMinorPlanets ):
-    for i in range( 0, len( cometsOrMinorPlanets ) ):
+def checkMPCComet( data ):
+    for i in range( 0, len( data ) ):
+        line = " " + data[ i ] # Add extra ' ' to offset the zero column.
         message = ""
-        if "****" in cometsOrMinorPlanets[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+        if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
             message += "Asterisks present\n"
 
-        if len( cometsOrMinorPlanets[ i ][ 9 : 13 + 1 ].strip() ) == 0:
-            message += "Missingf absolute magnitude\n"
+        if len( line[ 92 : 95 + 1 ].strip() ) == 0:
+            message += "Missing absolute magnitude\n"
 
-        if len( cometsOrMinorPlanets[ i ][ 15 : 19 + 1 ].strip() ) == 0:
-            message += "Missingf slope parameter\n"
+        if len( line[ 97 : 100 + 1 ].strip() ) == 0:
+            message += "Missing slope parameter\n"
 
         if message:
-            print( message, cometsOrMinorPlanets[ i ] )
+            print( message, line )
+
+
+def checkMPCMinorPlanet( data ):
+    for i in range( 0, len( data ) ):
+        line = " " + data[ i ] # Add extra ' ' to offset the zero column.
+        message = ""
+        if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+            message += "Asterisks present\n"
+
+        if len( line[ 9 : 13 + 1 ].strip() ) == 0:
+            message += "Missing absolute magnitude\n"
+
+        if len( line[ 15 : 19 + 1 ].strip() ) == 0:
+            message += "Missing slope parameter\n"
+
+        if len( line[ 93 : 103 + 1 ].strip() ) == 0: # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+            message += "Missing semi-major axis\n"
+
+        if message:
+            print( message, line )
 
 
 # https://www.iau.org/public/themes/naming/
@@ -287,6 +304,33 @@ def getDesignationMinorPlanet( name ):
     return designation
 
 
+def getUnpackedDate( packedDate ):
+    values = [ 'OFFSET ', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' ]
+    packedDatePadded = " " + packedDate # Add extra space for zero offset.
+
+    year = str( values.index( packedDatePadded[ 1 ] ) ) + packedDatePadded[ 2 : 4 ]
+
+    month = str( values.index( packedDatePadded[ 4 ] ) )
+    if len( month ) == 1:
+        month = '0' + month
+
+    day = str( values.index( packedDatePadded[ 5 ] ) )
+    if len( day ) == 1:
+        day = '0' + day
+
+    if len( packedDate ) == 5:
+        day += ".0"
+
+    else:
+        day += "." + packedDatePadded[ 6 : ]
+
+    return month + '/' + day + '/' + year
+
+
+#  # ['', '506074 2015 UM67', 'e', '6.0025', '150.1033', '132.1864', '1.558187', '0.5067277', '0.68704842', '10.0259', '09/04.0/2017', '2000', 'H18.9', '0.15\n'] 
+#  #  o6074   18.9   0.15 K1794  10.02591  132.18641  150.10332    6.00251  0.6870484  0.50672775   1.5581871  1 MPO420174   266   3 2015-2017 0.31 M-v 3Eh MPC        0000         (506074)
+# 09/04/2017
+
 # Ephem minor planet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC minor planet format: https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
@@ -324,84 +368,69 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
         if k in mpc:
             xephemData = xephem[ k ].split( ',' )
             message = ""
-            if float( xephemData[ 3 ] ) != float( mpc[ k ][ 60 : 68 + 1 ] ):
-                message += "Mismatch of inclination\n"
+            # if float( xephemData[ 3 ] ) != float( mpc[ k ][ 60 : 68 + 1 ] ):
+            #     message += "Mismatch of inclination\n"
+            #
+            # if float( xephemData[ 4 ] ) != float( mpc[ k ][ 49 : 57 + 1 ] ):
+            #     message += "Mismatch of longitude of ascending node\n"
+            #
+            # if float( xephemData[ 5 ] ) != float( mpc[ k ][ 38 : 46 + 1 ] ):
+            #     message += "Mismatch of argument of perihelion\n"
 
-            if float( xephemData[ 4 ] ) != float( mpc[ k ][ 49 : 57 + 1 ] ):
-                message += "Mismatch of longitude of ascending node\n"
-            
-            if float( xephemData[ 5 ] ) != float( mpc[ k ][ 38 : 46 + 1 ] ):
-                message += "Mismatch of argument of perihelion\n"
+            if not math.isclose( float( xephemData[ 6 ] ), float( mpc[ k ][ 93 : 103 + 1 ] ), abs_tol = 1e-03 ):
+                message += "Mismatch of semi-major axis (mean distance)\n"
 
-            if not math.isclose( float( xephemData[ 7 ] ), float( mpc[ k ][ 81 : 91 + 1 ] ), abs_tol = 1e-06 ):
-                message += "Mismatch of mean daily motion\n"
-
-            if float( xephemData[ 8 ][ 1 : ] ) != float( mpc[ k ][ 71 : 79 + 1 ] ):
-                message += "Mismatch of eccentricity\n"
-
-            if float( xephemData[ 9 ] ) != float( mpc[ k ][ 27 : 35 + 1 ] ):
-                message += "Mismatch of mean anomoly\n"
-
-#TODO Fix compact date format.
-            # xephemDate = xephemData[ 10 ].split( '/' )
-            # if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
+            # if not math.isclose( float( xephemData[ 7 ] ), float( mpc[ k ][ 81 : 91 + 1 ] ), abs_tol = 1e-06 ):
+            #     message += "Mismatch of mean daily motion\n"
+            #
+            # if float( xephemData[ 8 ][ 1 : ] ) != float( mpc[ k ][ 71 : 79 + 1 ] ):
+            #     message += "Mismatch of eccentricity\n"
+            #
+            # if float( xephemData[ 9 ] ) != float( mpc[ k ][ 27 : 35 + 1 ] ):
+            #     message += "Mismatch of mean anomoly\n"
+            #
+            # if xephemData[ 10 ] != getUnpackedDate( mpc[ k ][ 21 : 25 + 1 ] ):
             #     message += "Mismatch of epoch date\n"
-
-            if len( xephemData[ 12 ] ) > 2 and float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ): # Skip of absolute magnitude missing number component.
-                message += "Mismatch of absolute magnitude\n"
-                
-            if float( xephemData[ 13 ] ) != float( mpc[ k ][ 15 : 19 + 1 ] ):
-                message += "Mismatch of slope parameter\n"
+            #
+            # if len( xephemData[ 12 ] ) > 2 and float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ): # Skip of absolute magnitude missing number component.
+            #     message += "Mismatch of absolute magnitude\n"
+            #
+            # if len( mpc[ k ][ 15 : 19 + 1 ].strip() ) > 0 and float( xephemData[ 13 ] ) != float( mpc[ k ][ 15 : 19 + 1 ] ):
+            #     message += "Mismatch of slope parameter\n"
 
             if message:
                 print( message, xephemData, '\n', mpc[ k ], '\n' )
 
 
-cometsMPC = getData( COMET_URL_MPC_FORMAT )
-# checkMPC( cometsMPC )
-cometsXephem = getData( COMET_URL_XEPHEM_FORMAT )
+cometsMPC = getData( COMET_URL_MPC )
+# checkMPCComet( cometsMPC )
+cometsXephem = getData( COMET_URL_XEPHEM )
 # checkXephem( cometsXephem )
 # compareComets( cometsMPC, cometsXephem )                                            # Lots of epoch date mismatches!
 
-minorPlanetsBrightMPC = getData( MINOR_PLANET_BRIGHT_URL_MPC_FORMAT )
-# checkMPC( minorPlanetsBrightMPC )
-minorPlanetsBrightXephem = getData( MINOR_PLANET_BRIGHT_URL_XEPHEM_FORMAT )
+minorPlanetsBrightMPC = getData( MINOR_PLANET_BRIGHT_URL_MPC )
+# checkMPCMinorPlanet( minorPlanetsBrightMPC )
+minorPlanetsBrightXephem = getData( MINOR_PLANET_BRIGHT_URL_XEPHEM )
 # checkXephem( minorPlanetsBrightXephem )
 # compareMinorPlanets( minorPlanetsBrightMPC, minorPlanetsBrightXephem )              # Lots of mismatches!
 
-minorPlanetsCriticalMPC = getData( MINOR_PLANET_CRITICAL_URL_MPC_FORMAT )
-# checkMPC( minorPlanetsCriticalMPC )
-minorPlanetsCriticalXephem = getData( MINOR_PLANET_CRITICAL_URL_XEPHEM_FORMAT )
+minorPlanetsCriticalMPC = getData( MINOR_PLANET_CRITICAL_URL_MPC )
+# checkMPCMinorPlanet( minorPlanetsCriticalMPC )
+minorPlanetsCriticalXephem = getData( MINOR_PLANET_CRITICAL_URL_XEPHEM )
 # checkXephem( minorPlanetsCriticalXephem )
 # compareMinorPlanets( minorPlanetsCriticalMPC, minorPlanetsCriticalXephem )            # Lots of mismatches!
 
-minorPlanetsDistantMPC = getData( MINOR_PLANET_DISTANT_URL_MPC_FORMAT )
-# checkMPC( minorPlanetsDistantMPC )
-minorPlanetsDistantXephem = getData( MINOR_PLANET_DISTANT_URL_XEPHEM_FORMAT )
-# checkXephem( minorPlanetsDistantXephem )                                             # Bad absolute magnitudes.
-# compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )            # Lots of mismatches!
+minorPlanetsDistantMPC = getData( MINOR_PLANET_DISTANT_URL_MPC )
+# checkMPCMinorPlanet( minorPlanetsDistantMPC )                                        # Missing absolute magnitude and slope parameter.
+minorPlanetsDistantXephem = getData( MINOR_PLANET_DISTANT_URL_XEPHEM )
+# checkXephem( minorPlanetsDistantXephem )                                              # Missing absolute magnitude and slope parameter.
+compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )            # Lots of mismatches!
 
-minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL_MPC_FORMAT )
-# checkMPC( minorPlanetsUnusualMPC )
+minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL )
+# checkMPCMinorPlanet( minorPlanetsUnusualMPC )                                        # Missing absolute magnitude and slope parameter.
 minorPlanetsUnusualXephem = getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT )
-# checkXephem( minorPlanetsUnusualXephem )                                            
-# compareMinorPlanets( minorPlanetsUnusualMPC, minorPlanetsUnusualXephem )            
+# checkXephem( minorPlanetsUnusualXephem )                                             # Missing absolute magnitude and slope parameter.
+# compareMinorPlanets( minorPlanetsUnusualMPC, minorPlanetsUnusualXephem )            # Lots of mismatches!
 
-
-
-
-            # for i in range( 0, len( data ) ):
-            #     if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-            #         continue
-            #
-            #     # Missing absolute magnitude.
-            #     if data[ i ][ firstMagnitudeFieldStart : firstMagnitudeFieldEnd + 1 ].isspace():
-            #         continue
-            #
-            #     # Missing slope parameter.
-            #     if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
-            #         continue
-            #
-            #     # Missing semi-major-axis; https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-            #     if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
-            #         continue
+# minorPlanetsDatabaseMPC = getData( "file:///home/bernard/Programming/Subversion/IndicatorLunar/src/MPCORB_WITHOUT_HEADER.DAT" )
+# checkMPCMinorPlanet( minorPlanetsDatabaseMPC )
