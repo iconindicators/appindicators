@@ -377,6 +377,8 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
             # if float( xephemData[ 5 ] ) != float( mpc[ k ][ 38 : 46 + 1 ] ):
             #     message += "Mismatch of argument of perihelion\n"
 
+#TODO What happens if one format is missing the data but not the other?
+# How/when to check for bad data...maybe here in the compare rather than a separate check function?
             if not math.isclose( float( xephemData[ 6 ] ), float( mpc[ k ][ 93 : 103 + 1 ] ), abs_tol = 1e-03 ):
                 message += "Mismatch of semi-major axis (mean distance)\n"
 
