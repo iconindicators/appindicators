@@ -28,11 +28,11 @@ MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT = MINOR_PLANET_URL + "Unusual/Soft03Unusu
 def getData( url ):
     filename = Path( url ).name
     if not Path( filename ).exists():
-        with open( filename, 'wb' ) as file:
-            file.write( requests.get( url ).content )
+        with open( filename, 'wb' ) as f:
+            f.write( requests.get( url ).content )
 
-    with open( filename, 'r' ) as theFile:
-        contents = theFile.readlines()
+    with open( filename, 'r' ) as f:
+        contents = f.readlines()
 
     return contents
 
@@ -420,6 +420,33 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
                 print( message, xephem[ k ], '\n', mpc[ k ], '\n' )
 
 
+#TODO Read in big file, then read in each file and check line for line in big file.
+# https://www.minorplanetcenter.org/iau/MPCORB/MPCORB.DAT
+def compareMPCDatabaseAgainstFiles( MPCORBdotDAT, *minorPlanetMPCFiles ):
+    minorPlanetFilesContents = { }
+    for file in minorPlanetMPCFiles:
+        with open( file, 'r' ) as f:
+            minorPlanetFilesContents[ file ] = f.readlines()
+
+    foundEndOfHeader = False
+    with open( MPCORBdotDAT, 'r' ) as f:
+        for line in f:        
+            if line.startswith( "----------" ):
+                foundEndOfHeader = True
+                continue
+
+            if foundEndOfHeader:
+                print( line )
+
+    # with open( MPCORBdotDAT, 'r' ) as theFile:
+    #     contents = theFile.readlines()
+
+    # print( minorPlanetFilesContents.keys() )
+    # for key in minorPlanetFilesContents.keys():
+    #     print( len( minorPlanetFilesContents[ key ] ) )
+   
+
+
 # compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )
 
 # compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )
@@ -430,6 +457,11 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
 
 # compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )
 
-#TODO Want a function to compare the MPC files to the big database?
-# Just check for the presence of each line in each file in the database (match line for line, not field for field)?
-# checkMPCMinorPlanet( getData( "file:///home/bernard/Programming/Subversion/IndicatorLunar/src/MPCORB_WITHOUT_HEADER.DAT" ) )
+compareMPCDatabaseAgainstFiles(
+    "MPCORB.DAT",
+    Path( MINOR_PLANET_BRIGHT_URL_MPC ).name,
+    Path( MINOR_PLANET_CRITICAL_URL_MPC ).name,
+    Path( MINOR_PLANET_DISTANT_URL_MPC ).name,
+    Path( MINOR_PLANET_UNUSUAL_URL ).name )
+
+# mpc@cfa.harvard.edu.
