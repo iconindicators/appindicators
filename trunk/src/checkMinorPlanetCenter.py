@@ -37,21 +37,22 @@ def getData( url ):
     return contents
 
 
-def checkXephem( data ):
-    for i in range( 0, len( data ) ):
-        if not data[ i ].startswith( "#" ):
-            line = ( ',' + data[ i ] ).split( ',' ) # Add extra ',' to offset the zero column.
-            message = ""
-            if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-                message += "Asterisks present\n"
-
-            if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
-               ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
-               ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
-                message += "Missing absolute magnitude\n"
-
-            if message:
-                print( message, line )
+#TODO Probably delete.
+# def checkXephem( data ):
+#     for i in range( 0, len( data ) ):
+#         if not data[ i ].startswith( "#" ):
+#             line = ( ',' + data[ i ] ).split( ',' ) # Add extra ',' to offset the zero column.
+#             message = ""
+#             if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+#                 message += "Asterisks present\n"
+#
+#             if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
+#                ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
+#                ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
+#                 message += "Missing absolute magnitude\n"
+#
+#             if message:
+#                 print( message, line )
 
 
 # https://minorplanetcenter.net//iau/lists/CometResolution.html
@@ -96,27 +97,57 @@ def getDesignationComet( name ):
 # Ephem comet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC comet format: https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
 def compareComets( cometsMPC, cometsXephem ):
+
+    # Extract XEphem data and verify.
     xephem = { }
     for i in range( 0, len( cometsXephem ) ):
-        if not cometsXephem[ i ].startswith( "#" ):
-            firstCommaIndex = cometsXephem[ i ].find( ',' )
-            name = cometsXephem[ i ][ 0 : firstCommaIndex ]
-            designation = getDesignationComet( name )
-            if designation == -1:
-                print( "Unknown/bad designation:\n", cometsXephem[ i ] )
+        if cometsXephem[ i ].startswith( "#" ):
+            continue
 
-            else:
-                xephem[ designation ] = ',' + cometsXephem[ i ] # Add extra ',' to offset the zero column.
+        if "****" in cometsXephem[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+            print( "Asterisks present:\n", cometsXephem[ i ] )
+            continue
 
+        line = ( ',' + cometsXephem[ i ] ).split( ',' ) # Add extra ',' to offset the zero index.
+        name = line[ 1 ]
+        designation = getDesignationComet( name )
+        if designation == -1:
+            print( "Unknown/bad designation:\n", cometsXephem[ i ] )
+            continue
+
+        if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
+           ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
+           ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
+            print( "Missing absolute magnitude\n", cometsXephem[ i ] )
+            continue
+
+        xephem[ designation ] = line
+
+    # Extract MPC data and verify.
     mpc = { }
     for i in range( 0, len( cometsMPC ) ):
-        name = cometsMPC[ i ][ 102 : 158 ].strip() # Indices are offset by 1.
+        if "****" in cometsMPC[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+            print( "Asterisks present\n", cometsMPC[ i ] )
+            continue
+
+        line = ' ' + cometsMPC[ i ] # Add ' ' to offset zero index.
+        name = line[ 103 : 158 + 1 ].strip()
         designation = getDesignationComet( name )
         if designation == -1:
             print( "Unknown/bad designation:\n", cometsMPC[ i ] )
+            continue
 
-        else:
-            mpc[ designation ] = ' ' + cometsMPC[ i ] # Add ' ' to align column index with list index.
+        if len( line[ 92 : 95 + 1 ].strip() ) == 0:
+            print( "Missing absolute magnitude\n", cometsMPC[ i ] )
+            continue
+
+        if len( line[ 97 : 100 + 1 ].strip() ) == 0:
+            print( "Missing slope parameter\n", cometsMPC[ i ] )
+            continue
+
+        mpc[ designation ] = line
+
+    if True: return 
 
     missing = [ k for k in xephem.keys() if k not in mpc ]
     if missing:    
@@ -407,8 +438,7 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
 cometsMPC = getData( COMET_URL_MPC )
 # checkMPCComet( cometsMPC )
 cometsXephem = getData( COMET_URL_XEPHEM )
-# checkXephem( cometsXephem )
-# compareComets( cometsMPC, cometsXephem )                                            # Lots of epoch date mismatches!
+compareComets( cometsMPC, cometsXephem )                                            # Lots of epoch date mismatches!
 
 minorPlanetsBrightMPC = getData( MINOR_PLANET_BRIGHT_URL_MPC )
 # checkMPCMinorPlanet( minorPlanetsBrightMPC )
@@ -426,7 +456,7 @@ minorPlanetsDistantMPC = getData( MINOR_PLANET_DISTANT_URL_MPC )
 # checkMPCMinorPlanet( minorPlanetsDistantMPC )                                        # Missing absolute magnitude and slope parameter.
 minorPlanetsDistantXephem = getData( MINOR_PLANET_DISTANT_URL_XEPHEM )
 # checkXephem( minorPlanetsDistantXephem )                                              # Missing absolute magnitude and slope parameter.
-compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )            # Lots of mismatches!
+# compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )            # Lots of mismatches!
 
 minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL )
 # checkMPCMinorPlanet( minorPlanetsUnusualMPC )                                        # Missing absolute magnitude and slope parameter.
