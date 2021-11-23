@@ -94,6 +94,69 @@ def getDesignationComet( name ):
     return designation
 
 
+def checkXephem( line ):
+    message = None
+    if line.startswith( "#" ):
+        message = None
+
+    elif "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+        message = "Asterisks present"
+
+    else:
+        line = ( ',' + line ).split( ',' ) # Add extra ',' to offset the zero index.
+        name = line[ 1 ]
+        designation = getDesignationComet( name )
+        if designation == -1:
+            message = "Unknown/bad designation"
+
+        elif ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
+             ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
+             ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
+            message = "Missing absolute magnitude"
+
+    return message
+
+
+def checkMPC( line, isComet ):
+    message = None
+    if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+        message = "Asterisks present"
+
+    else:
+        line = ' ' + line # Add ' ' to offset zero index.
+        if isComet:
+            name = line[ 103 : 158 + 1 ].strip()
+            designation = getDesignationComet( name )
+            if designation == -1:
+                message = "Unknown/bad designation"
+
+            elif len( line[ 92 : 95 + 1 ].strip() ) == 0:
+                message = "Missing absolute magnitude"
+
+            elif len( line[ 97 : 100 + 1 ].strip() ) == 0:
+                message = "Missing slope parameter"
+
+        else:
+            name = line[ 167 : 194 + 1 ].strip()
+            designation = getDesignationMinorPlanet( name )
+            if designation == -1:
+                message = "Unknown/bad designation"
+
+            elif len( line[ 9 : 13 + 1 ].strip() ) == 0:
+                message = "Missing absolute magnitude"
+
+            elif len( line[ 15 : 19 + 1 ].strip() ) == 0:
+                message = "Missing slope parameter"
+
+            elif len( line[ 15 : 19 + 1 ].strip() ) == 0:
+                message = "Missing slope parameter"
+
+            elif len( line[ 93 : 103 + 1 ].strip() ) == 0: # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+                message = "Missing semi-major axis"
+
+    return message
+
+
 # Ephem comet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC comet format: https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
 def compareComets( cometsMPC, cometsXephem ):
@@ -101,54 +164,63 @@ def compareComets( cometsMPC, cometsXephem ):
     # Extract XEphem data and verify.
     xephem = { }
     for i in range( 0, len( cometsXephem ) ):
-        if cometsXephem[ i ].startswith( "#" ):
+        message = checkXephem( cometsXephem[ i ] )
+        if message is not None:
+            print( message, cometsXephem[ i ] )
             continue
 
-        if "****" in cometsXephem[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-            print( "Asterisks present:\n", cometsXephem[ i ] )
-            continue
+        # if cometsXephem[ i ].startswith( "#" ):
+        #     continue
+        #
+        # if "****" in cometsXephem[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+        #     print( "Asterisks present:\n", cometsXephem[ i ] )
+        #     continue
 
         line = ( ',' + cometsXephem[ i ] ).split( ',' ) # Add extra ',' to offset the zero index.
         name = line[ 1 ]
         designation = getDesignationComet( name )
-        if designation == -1:
-            print( "Unknown/bad designation:\n", cometsXephem[ i ] )
-            continue
-
-        if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
-           ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
-           ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
-            print( "Missing absolute magnitude\n", cometsXephem[ i ] )
-            continue
+        # if designation == -1:
+        #     print( "Unknown/bad designation:\n", cometsXephem[ i ] )
+        #     continue
+        #
+        # if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
+        #    ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
+        #    ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
+        #     print( "Missing absolute magnitude\n", cometsXephem[ i ] )
+        #     continue
 
         xephem[ designation ] = line
 
     # Extract MPC data and verify.
     mpc = { }
     for i in range( 0, len( cometsMPC ) ):
-        if "****" in cometsMPC[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-            print( "Asterisks present\n", cometsMPC[ i ] )
+        message = checkMPC( cometsMPC[ i ], True )
+        if message is not None:
+            print( message, cometsMPC[ i ] )
             continue
+
+        # if "****" in cometsMPC[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+        #     print( "Asterisks present\n", cometsMPC[ i ] )
+        #     continue
 
         line = ' ' + cometsMPC[ i ] # Add ' ' to offset zero index.
         name = line[ 103 : 158 + 1 ].strip()
         designation = getDesignationComet( name )
-        if designation == -1:
-            print( "Unknown/bad designation:\n", cometsMPC[ i ] )
-            continue
-
-        if len( line[ 92 : 95 + 1 ].strip() ) == 0:
-            print( "Missing absolute magnitude\n", cometsMPC[ i ] )
-            continue
-
-        if len( line[ 97 : 100 + 1 ].strip() ) == 0:
-            print( "Missing slope parameter\n", cometsMPC[ i ] )
-            continue
+        # if designation == -1:
+        #     print( "Unknown/bad designation:\n", cometsMPC[ i ] )
+        #     continue
+        #
+        # if len( line[ 92 : 95 + 1 ].strip() ) == 0:
+        #     print( "Missing absolute magnitude\n", cometsMPC[ i ] )
+        #     continue
+        #
+        # if len( line[ 97 : 100 + 1 ].strip() ) == 0:
+        #     print( "Missing slope parameter\n", cometsMPC[ i ] )
+        #     continue
 
         mpc[ designation ] = line
 
-    if True: return 
-
+    # Check for a body in one data set but absent in the other...
     missing = [ k for k in xephem.keys() if k not in mpc ]
     if missing:    
         print( "Comets in XEphem not in MPC:", missing )
@@ -157,124 +229,126 @@ def compareComets( cometsMPC, cometsXephem ):
     if missing:
         print( "Comets in MPC not in XEphem:", missing )    
 
+    # Check for mismatch of field values between each data format...
     for k in xephem.keys():
         if k in mpc:
-            xephemData = xephem[ k ].split( ',' )
             message = ""
-            if xephemData[ 2 ] == 'e':
-                if float( xephemData[ 3 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
+            if xephem[ k ][ 2 ] == 'e':
+                if float( xephem[ k ][ 3 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
                     message = "Mismatch of inclination\n"
 
-                if float( xephemData[ 4 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
+                if float( xephem[ k ][ 4 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
                     message = "Mismatch of longitude of ascending node\n"
 
-                if float( xephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
+                if float( xephem[ k ][ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
                     message = "Mismatch of argument of perihelion\n"
 
-                if not math.isclose( float( xephemData[ 8 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
+                if not math.isclose( float( xephem[ k ][ 8 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
                     message = "Mismatch of eccentricity\n"
 
-                xephemDate = xephemData[ 10 ].split( '/' )
+                xephemDate = xephem[ k ][ 10 ].split( '/' )
                 if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
                     message = "Mismatch of epoch date\n"
 
-                if float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
+                if float( xephem[ k ][ 12 ][ 1 : ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
                     message = "Mismatch of absolute magnitude\n"
 
-                if float( xephemData[ 13 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
+                if float( xephem[ k ][ 13 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
                     message = "Mismatch of slope parameter\n"
 
-            elif xephemData[ 2 ] == 'h':
-                xephemDate = xephemData[ 3 ].split( '/' )
+            elif xephem[ k ][ 2 ] == 'h':
+                xephemDate = xephem[ k ][ 3 ].split( '/' )
                 if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
                     message = "Mismatch of epoch date\n"
 
-                if float( xephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
+                if float( xephem[ k ][ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
                     message = "Mismatch of inclination\n"
 
-                if float( xephemData[ 5 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
+                if float( xephem[ k ][ 5 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
                     message = "Mismatch of longitude of ascending node\n"
 
-                if float( xephemData[ 6 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
+                if float( xephem[ k ][ 6 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
                     message = "Mismatch of argument of perihelion\n"
 
-                if not math.isclose( float( xephemData[ 7 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
+                if not math.isclose( float( xephem[ k ][ 7 ] ), float( mpc[ k ][ 42 : 49 + 1 ] ), abs_tol = 1e-06 ):
                     message = "Mismatch of eccentricity\n"
 
-                if not math.isclose( float( xephemData[ 8 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
+                if not math.isclose( float( xephem[ k ][ 8 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
                     message = "Mismatch of perihelion distance\n"
 
-                if float( xephemData[ 10 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
+                if float( xephem[ k ][ 10 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
                     message = "Mismatch of absolute magnitude\n"
 
-                if float( xephemData[ 11 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
+                if float( xephem[ k ][ 11 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
                     message = "Mismatch of slope parameter\n"
 
-            elif xephemData[ 2 ] == 'p':
-                xephemDate = xephemData[ 3 ].split( '/' )
+            elif xephem[ k ][ 2 ] == 'p':
+                xephemDate = xephem[ k ][ 3 ].split( '/' )
                 if not( xephemDate[ 0 ] == mpc[ k ][ 20 : 21 + 1 ] and math.isclose( float( xephemDate[ 1 ] ), float( mpc[ k ][ 23 : 29 + 1 ] ), abs_tol = 1e-03 ) and xephemDate[ 2 ] == mpc[ k ][ 15 : 18 + 1 ] ):
                     message = "Mismatch of epoch date\n"
 
-                if float( xephemData[ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
+                if float( xephem[ k ][ 4 ] ) != float( mpc[ k ][ 72 : 79 + 1 ] ):
                     message = "Mismatch of inclination\n"
 
-                if float( xephemData[ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
+                if float( xephem[ k ][ 5 ] ) != float( mpc[ k ][ 52 : 59 + 1 ] ):
                     message = "Mismatch of argument of perihelion\n"
 
-                if not math.isclose( float( xephemData[ 6 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
+                if not math.isclose( float( xephem[ k ][ 6 ] ), float( mpc[ k ][ 31 : 39 + 1 ] ), abs_tol = 1e-06 ):
                     message = "Mismatch of perihelion distance\n"
 
-                if float( xephemData[ 7 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
+                if float( xephem[ k ][ 7 ] ) != float( mpc[ k ][ 62 : 69 + 1 ] ):
                     message = "Mismatch of longitude of ascending node\n"
 
-                if float( xephemData[ 9 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
+                if float( xephem[ k ][ 9 ] ) != float( mpc[ k ][ 92 : 95 + 1 ] ):
                     message = "Mismatch of absolute magnitude\n"
 
-                if float( xephemData[ 10 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
+                if float( xephem[ k ][ 10 ] ) != float( mpc[ k ][ 97 : 100 + 1 ] ):
                     message = "Mismatch of slope parameter\n"
 
             else:
                 print( "Unknown object type for XEphem comet:", xephem[ k ], '\n' )
 
             if message:
-                print( message, xephemData, '\n', mpc[ k ], '\n' )
+                print( message, xephem[ k ], '\n', mpc[ k ], '\n' )
 
 
-def checkMPCComet( data ):
-    for i in range( 0, len( data ) ):
-        line = " " + data[ i ] # Add extra ' ' to offset the zero column.
-        message = ""
-        if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-            message += "Asterisks present\n"
+#TODO Hopefully not needed.
+# def checkMPCComet( data ):
+#     for i in range( 0, len( data ) ):
+#         line = " " + data[ i ] # Add extra ' ' to offset the zero column.
+#         message = ""
+#         if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+#             message += "Asterisks present\n"
+#
+#         if len( line[ 92 : 95 + 1 ].strip() ) == 0:
+#             message += "Missing absolute magnitude\n"
+#
+#         if len( line[ 97 : 100 + 1 ].strip() ) == 0:
+#             message += "Missing slope parameter\n"
+#
+#         if message:
+#             print( message, line )
 
-        if len( line[ 92 : 95 + 1 ].strip() ) == 0:
-            message += "Missing absolute magnitude\n"
 
-        if len( line[ 97 : 100 + 1 ].strip() ) == 0:
-            message += "Missing slope parameter\n"
-
-        if message:
-            print( message, line )
-
-
-def checkMPCMinorPlanet( data ):
-    for i in range( 0, len( data ) ):
-        line = " " + data[ i ] # Add extra ' ' to offset the zero column.
-        message = ""
-        if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-            message += "Asterisks present\n"
-
-        if len( line[ 9 : 13 + 1 ].strip() ) == 0:
-            message += "Missing absolute magnitude\n"
-
-        if len( line[ 15 : 19 + 1 ].strip() ) == 0:
-            message += "Missing slope parameter\n"
-
-        if len( line[ 93 : 103 + 1 ].strip() ) == 0: # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-            message += "Missing semi-major axis\n"
-
-        if message:
-            print( message, line )
+#TODO Hopefully not needed
+# def checkMPCMinorPlanet( data ):
+#     for i in range( 0, len( data ) ):
+#         line = " " + data[ i ] # Add extra ' ' to offset the zero column.
+#         message = ""
+#         if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+#             message += "Asterisks present\n"
+#
+#         if len( line[ 9 : 13 + 1 ].strip() ) == 0:
+#             message += "Missing absolute magnitude\n"
+#
+#         if len( line[ 15 : 19 + 1 ].strip() ) == 0:
+#             message += "Missing slope parameter\n"
+#
+#         if len( line[ 93 : 103 + 1 ].strip() ) == 0: # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
+#             message += "Missing semi-major axis\n"
+#
+#         if message:
+#             print( message, line )
 
 
 # https://www.iau.org/public/themes/naming/
@@ -435,10 +509,7 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
                 print( message, xephemData, '\n', mpc[ k ], '\n' )
 
 
-cometsMPC = getData( COMET_URL_MPC )
-# checkMPCComet( cometsMPC )
-cometsXephem = getData( COMET_URL_XEPHEM )
-compareComets( cometsMPC, cometsXephem )                                            # Lots of epoch date mismatches!
+compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )                                            # Lots of epoch date mismatches!
 
 minorPlanetsBrightMPC = getData( MINOR_PLANET_BRIGHT_URL_MPC )
 # checkMPCMinorPlanet( minorPlanetsBrightMPC )
