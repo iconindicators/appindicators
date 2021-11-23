@@ -160,10 +160,7 @@ def getDesignationMinorPlanet( name ):
 
 def checkXephem( line ):
     message = None
-    if line.startswith( "#" ):
-        message = None
-
-    elif "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
+    if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
         message = "Asterisks present"
 
     else:
@@ -218,13 +215,16 @@ def checkMPC( line, isComet ):
     return message
 
 
-# Ephem comet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC comet format: https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
+# Ephem comet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 def compareComets( cometsMPC, cometsXephem ):
 
     # Extract XEphem data and verify.
     xephem = { }
     for i in range( 0, len( cometsXephem ) ):
+        if cometsXephem[ i ].startswith( "#" ):
+            continue
+
         message = checkXephem( cometsXephem[ i ] )
         if message is not None:
             print( message, cometsXephem[ i ] )
@@ -240,6 +240,9 @@ def compareComets( cometsMPC, cometsXephem ):
         line = ( ',' + cometsXephem[ i ] ).split( ',' ) # Add extra ',' to offset the zero index.
         name = line[ 1 ]
         designation = getDesignationComet( name )
+        if designation == -1:
+            print()
+        
         # if designation == -1:
         #     print( "Unknown/bad designation:\n", cometsXephem[ i ] )
         #     continue
@@ -373,13 +376,16 @@ def compareComets( cometsMPC, cometsXephem ):
                 print( message, xephem[ k ], '\n', mpc[ k ], '\n' )
 
 
-# Ephem minor planet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC minor planet format: https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
+# Ephem minor planet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
 
     # Extract XEphem data and verify.
     xephem = { }
     for i in range( 0, len( minorPlanetsXephem ) ):
+        if minorPlanetsXephem[ i ].startswith( "#" ):
+            continue
+
         message = checkXephem( minorPlanetsXephem[ i ] )
         if message is not None:
             print( message, minorPlanetsXephem[ i ] )
@@ -453,13 +459,13 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
 
 compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )                                            # Lots of epoch date mismatches!
 
-compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )              # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )              # Lots of mismatches!
 
-compareMinorPlanets( getData( MINOR_PLANET_CRITICAL_URL_MPC ), getData( MINOR_PLANET_CRITICAL_URL_XEPHEM ) )            # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_CRITICAL_URL_MPC ), getData( MINOR_PLANET_CRITICAL_URL_XEPHEM ) )            # Lots of mismatches!
 
-compareMinorPlanets( getData( MINOR_PLANET_DISTANT_URL_MPC ), getData( MINOR_PLANET_DISTANT_URL_XEPHEM ) )            # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_DISTANT_URL_MPC ), getData( MINOR_PLANET_DISTANT_URL_XEPHEM ) )            # Lots of mismatches!
 
-compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )            # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )            # Lots of mismatches!
 
 #TODO Want a function to compare the MPC files to the big database?
 # Just check for the presence of each line in each file in the database (match line for line, not field for field)?
