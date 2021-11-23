@@ -230,29 +230,9 @@ def compareComets( cometsMPC, cometsXephem ):
             print( message, cometsXephem[ i ] )
             continue
 
-        # if cometsXephem[ i ].startswith( "#" ):
-        #     continue
-        #
-        # if "****" in cometsXephem[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-        #     print( "Asterisks present:\n", cometsXephem[ i ] )
-        #     continue
-
         line = ( ',' + cometsXephem[ i ] ).split( ',' ) # Add extra ',' to offset the zero index.
         name = line[ 1 ]
         designation = getDesignationComet( name )
-        if designation == -1:
-            print()
-        
-        # if designation == -1:
-        #     print( "Unknown/bad designation:\n", cometsXephem[ i ] )
-        #     continue
-        #
-        # if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
-        #    ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
-        #    ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
-        #     print( "Missing absolute magnitude\n", cometsXephem[ i ] )
-        #     continue
-
         xephem[ designation ] = line
 
     # Extract MPC data and verify.
@@ -263,25 +243,9 @@ def compareComets( cometsMPC, cometsXephem ):
             print( message, cometsMPC[ i ] )
             continue
 
-        # if "****" in cometsMPC[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-        #     print( "Asterisks present\n", cometsMPC[ i ] )
-        #     continue
-
         line = ' ' + cometsMPC[ i ] # Add ' ' to offset zero index.
         name = line[ 103 : 158 + 1 ].strip()
         designation = getDesignationComet( name )
-        # if designation == -1:
-        #     print( "Unknown/bad designation:\n", cometsMPC[ i ] )
-        #     continue
-        #
-        # if len( line[ 92 : 95 + 1 ].strip() ) == 0:
-        #     print( "Missing absolute magnitude\n", cometsMPC[ i ] )
-        #     continue
-        #
-        # if len( line[ 97 : 100 + 1 ].strip() ) == 0:
-        #     print( "Missing slope parameter\n", cometsMPC[ i ] )
-        #     continue
-
         mpc[ designation ] = line
 
     # Check for a body in one data set but absent in the other...
@@ -409,6 +373,7 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
         designation = getDesignationMinorPlanet( name )
         mpc[ designation ] = line
 
+    # Check for a body in one data set but absent in the other...
     missing = [ k for k in xephem.keys() if k not in mpc ]
     if missing:    
         print( "Minor planets in XEphem not in MPC:", missing )
@@ -417,55 +382,53 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
     if missing:
         print( "Minor planets in MPC not in XEphem:", missing )    
 
+    # Check for mismatch of field values between each data format...
     for k in xephem.keys():
         if k in mpc:
-            xephemData = xephem[ k ].split( ',' )
             message = ""
-            # if float( xephemData[ 3 ] ) != float( mpc[ k ][ 60 : 68 + 1 ] ):
-            #     message += "Mismatch of inclination\n"
-            #
-            # if float( xephemData[ 4 ] ) != float( mpc[ k ][ 49 : 57 + 1 ] ):
-            #     message += "Mismatch of longitude of ascending node\n"
-            #
-            # if float( xephemData[ 5 ] ) != float( mpc[ k ][ 38 : 46 + 1 ] ):
-            #     message += "Mismatch of argument of perihelion\n"
+            if not math.isclose( float( xephem[ k ][ 3 ] ), float( mpc[ k ][ 60 : 68 + 1 ] ), abs_tol = 1e-03 ):
+                message += "Mismatch of inclination\n"
 
-#TODO What happens if one format is missing the data but not the other?
-# How/when to check for bad data...maybe here in the compare rather than a separate check function?
-            if not math.isclose( float( xephemData[ 6 ] ), float( mpc[ k ][ 93 : 103 + 1 ] ), abs_tol = 1e-03 ):
+            if not math.isclose( float( xephem[ k ][ 4 ] ), float( mpc[ k ][ 49 : 57 + 1 ] ), abs_tol = 1e-03 ):
+                message += "Mismatch of longitude of ascending node\n"
+
+            if not math.isclose( float( xephem[ k ][ 5 ] ), float( mpc[ k ][ 38 : 46 + 1 ] ), abs_tol = 1e-03 ):
+                message += "Mismatch of argument of perihelion\n"
+
+            if not math.isclose( float( xephem[ k ][ 6 ] ), float( mpc[ k ][ 93 : 103 + 1 ] ), abs_tol = 1e-4 ):
                 message += "Mismatch of semi-major axis (mean distance)\n"
 
-            # if not math.isclose( float( xephemData[ 7 ] ), float( mpc[ k ][ 81 : 91 + 1 ] ), abs_tol = 1e-06 ):
-            #     message += "Mismatch of mean daily motion\n"
-            #
-            # if float( xephemData[ 8 ][ 1 : ] ) != float( mpc[ k ][ 71 : 79 + 1 ] ):
-            #     message += "Mismatch of eccentricity\n"
-            #
-            # if float( xephemData[ 9 ] ) != float( mpc[ k ][ 27 : 35 + 1 ] ):
-            #     message += "Mismatch of mean anomoly\n"
-            #
-            # if xephemData[ 10 ] != getUnpackedDate( mpc[ k ][ 21 : 25 + 1 ] ):
-            #     message += "Mismatch of epoch date\n"
-            #
-            # if len( xephemData[ 12 ] ) > 2 and float( xephemData[ 12 ][ 1 : ] ) != float( mpc[ k ][ 9 : 13 + 1 ] ): # Skip of absolute magnitude missing number component.
-            #     message += "Mismatch of absolute magnitude\n"
-            #
-            # if len( mpc[ k ][ 15 : 19 + 1 ].strip() ) > 0 and float( xephemData[ 13 ] ) != float( mpc[ k ][ 15 : 19 + 1 ] ):
-            #     message += "Mismatch of slope parameter\n"
+            if not math.isclose( float( xephem[ k ][ 7 ] ), float( mpc[ k ][ 81 : 91 + 1 ] ), abs_tol = 1e-6 ):
+                message += "Mismatch of mean daily motion\n"
+
+            if not math.isclose( float( xephem[ k ][ 8 ][ 1 : ] ), float( mpc[ k ][ 71 : 79 + 1 ] ), abs_tol = 1e-6 ):
+                message += "Mismatch of eccentricity\n"
+
+            if not math.isclose( float( xephem[ k ][ 9 ] ), float( mpc[ k ][ 27 : 35 + 1 ] ), abs_tol = 1e-3 ):
+                message += "Mismatch of mean anomaly\n"
+
+            if xephem[ k ][ 10 ] != getUnpackedDate( mpc[ k ][ 21 : 25 + 1 ] ):
+                message += "Mismatch of epoch date\n"
+
+            if not math.isclose( float( xephem[ k ][ 12 ][ 1 : ] ), float( mpc[ k ][ 9 : 13 + 1 ] ), abs_tol = 1e-2 ):
+                message += "Mismatch of absolute magnitude\n"
+
+            if not math.isclose( float( xephem[ k ][ 13 ][ 1 : ] ), float( mpc[ k ][ 15 : 19 + 1 ] ), abs_tol = 1e-2 ):
+                message += "Mismatch of slope parameter\n"
 
             if message:
-                print( message, xephemData, '\n', mpc[ k ], '\n' )
+                print( message, xephem[ k ], '\n', mpc[ k ], '\n' )
 
 
-compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )                                            # Lots of epoch date mismatches!
+# compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )
 
-# compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )              # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )
 
-# compareMinorPlanets( getData( MINOR_PLANET_CRITICAL_URL_MPC ), getData( MINOR_PLANET_CRITICAL_URL_XEPHEM ) )            # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_CRITICAL_URL_MPC ), getData( MINOR_PLANET_CRITICAL_URL_XEPHEM ) )
 
-# compareMinorPlanets( getData( MINOR_PLANET_DISTANT_URL_MPC ), getData( MINOR_PLANET_DISTANT_URL_XEPHEM ) )            # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_DISTANT_URL_MPC ), getData( MINOR_PLANET_DISTANT_URL_XEPHEM ) )
 
-# compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )            # Lots of mismatches!
+# compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )
 
 #TODO Want a function to compare the MPC files to the big database?
 # Just check for the presence of each line in each file in the database (match line for line, not field for field)?
