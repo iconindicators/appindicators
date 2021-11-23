@@ -37,22 +37,28 @@ def getData( url ):
     return contents
 
 
-#TODO Probably delete.
-# def checkXephem( data ):
-#     for i in range( 0, len( data ) ):
-#         if not data[ i ].startswith( "#" ):
-#             line = ( ',' + data[ i ] ).split( ',' ) # Add extra ',' to offset the zero column.
-#             message = ""
-#             if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-#                 message += "Asterisks present\n"
-#
-#             if ( line[ 2 ] == 'e' and len( line[ 12 ] ) == 1 ) or \
-#                ( line[ 2 ] == 'h' and len( line[ 10 ] ) == 1 ) or \
-#                ( line[ 2 ] == 'p' and len( line[ 9 ] ) == 1 ): # https://github.com/brandon-rhodes/pyephem/issues/196
-#                 message += "Missing absolute magnitude\n"
-#
-#             if message:
-#                 print( message, line )
+# https://www.minorplanetcenter.net/iau/info/PackedDates.html
+def getUnpackedDate( packedDate ):
+    values = [ 'OFFSET ', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' ]
+    packedDatePadded = " " + packedDate # Add extra space for zero offset.
+
+    year = str( values.index( packedDatePadded[ 1 ] ) ) + packedDatePadded[ 2 : 3 + 1 ]
+
+    month = str( values.index( packedDatePadded[ 4 ] ) )
+    if len( month ) == 1:
+        month = '0' + month
+
+    day = str( values.index( packedDatePadded[ 5 ] ) )
+    if len( day ) == 1:
+        day = '0' + day
+
+    if len( packedDate ) == 5:
+        day += ".0"
+
+    else:
+        day += "." + packedDatePadded[ 6 : ]
+
+    return month + '/' + day + '/' + year
 
 
 # https://minorplanetcenter.net//iau/lists/CometResolution.html
@@ -90,6 +96,64 @@ def getDesignationComet( name ):
 
     else:
         designation = -1
+
+    return designation
+
+
+# https://www.iau.org/public/themes/naming/
+# https://minorplanetcenter.net/iau/info/DesDoc.html
+# https://minorplanetcenter.net/iau/info/PackedDes.html
+def getDesignationMinorPlanet( name ):
+
+# Ephem examples
+# 1 Ceres
+#
+# 1915 1953 EA
+#
+# 944 Hidalgo
+# 15788 1993 SB
+# 1993 RP
+#
+# 433 Eros
+# 3102 Krok
+# 7236 1987 PA
+# 1979 XB
+# 3271 Ul
+#
+# MPC Examples
+# (1) Ceres
+#
+# (1915)
+#
+# (944) Hidalgo
+# (15788)
+# 1993 RP
+#
+# (433) Eros
+# (3102) Krok
+# (7236)
+# 1979 XB
+# (3271) Ul
+
+#TODO Handle pre 1925 discoveries mentioned in above document at bottom of first section.  Need to find an example if possible.
+# A904 OA    This is a non-real example...maybe iterate through all minor planets looking for alphanumericnumericnumericspacealphaalpha
+#
+#TODO Maybe download the MPC database (30MB) and look inside...is it just minor planets, or comets too?
+    # components = name.split( ' ' ) #TODO Try without the ' ' below...
+    components = name.split()
+    components[ 0 ] = components[ 0 ].strip( '(' ).strip( ')' )
+
+    isProvisionalDesignation = \
+        len( components ) == 2 and \
+        len( components[ 0 ] ) == 4 and components[ 0 ].isnumeric() and \
+        ( ( len( components[ 1 ] ) == 2 and components[ 1 ].isalpha() and components[ 1 ].isupper() ) or \
+          ( len( components[ 1 ] ) > 2 and components[ 1 ][ 0 : 2 ].isalpha() and components[ 1 ][ 0 : 2 ].isupper() and components[ 1 ][ 2 : ].isnumeric() ) )
+
+    if isProvisionalDesignation:
+        designation = name
+
+    else:
+        designation = components[ 0 ]
 
     return designation
 
@@ -144,9 +208,6 @@ def checkMPC( line, isComet ):
 
             elif len( line[ 9 : 13 + 1 ].strip() ) == 0:
                 message = "Missing absolute magnitude"
-
-            elif len( line[ 15 : 19 + 1 ].strip() ) == 0:
-                message = "Missing slope parameter"
 
             elif len( line[ 15 : 19 + 1 ].strip() ) == 0:
                 message = "Missing slope parameter"
@@ -312,154 +373,35 @@ def compareComets( cometsMPC, cometsXephem ):
                 print( message, xephem[ k ], '\n', mpc[ k ], '\n' )
 
 
-#TODO Hopefully not needed.
-# def checkMPCComet( data ):
-#     for i in range( 0, len( data ) ):
-#         line = " " + data[ i ] # Add extra ' ' to offset the zero column.
-#         message = ""
-#         if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-#             message += "Asterisks present\n"
-#
-#         if len( line[ 92 : 95 + 1 ].strip() ) == 0:
-#             message += "Missing absolute magnitude\n"
-#
-#         if len( line[ 97 : 100 + 1 ].strip() ) == 0:
-#             message += "Missing slope parameter\n"
-#
-#         if message:
-#             print( message, line )
-
-
-#TODO Hopefully not needed
-# def checkMPCMinorPlanet( data ):
-#     for i in range( 0, len( data ) ):
-#         line = " " + data[ i ] # Add extra ' ' to offset the zero column.
-#         message = ""
-#         if "****" in line: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-#             message += "Asterisks present\n"
-#
-#         if len( line[ 9 : 13 + 1 ].strip() ) == 0:
-#             message += "Missing absolute magnitude\n"
-#
-#         if len( line[ 15 : 19 + 1 ].strip() ) == 0:
-#             message += "Missing slope parameter\n"
-#
-#         if len( line[ 93 : 103 + 1 ].strip() ) == 0: # https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-#             message += "Missing semi-major axis\n"
-#
-#         if message:
-#             print( message, line )
-
-
-# https://www.iau.org/public/themes/naming/
-# https://minorplanetcenter.net/iau/info/DesDoc.html
-# https://minorplanetcenter.net/iau/info/PackedDes.html
-def getDesignationMinorPlanet( name ):
-
-# Ephem examples
-# 1 Ceres
-#
-# 1915 1953 EA
-#
-# 944 Hidalgo
-# 15788 1993 SB
-# 1993 RP
-#
-# 433 Eros
-# 3102 Krok
-# 7236 1987 PA
-# 1979 XB
-# 3271 Ul
-#
-# MPC Examples
-# (1) Ceres
-#
-# (1915)
-#
-# (944) Hidalgo
-# (15788)
-# 1993 RP
-#
-# (433) Eros
-# (3102) Krok
-# (7236)
-# 1979 XB
-# (3271) Ul
-
-#TODO Handle pre 1925 discoveries mentioned in above document at bottom of first section.  Need to find an example if possible.
-# A904 OA    This is a non-real example...maybe iterate through all minor planets looking for alphanumericnumericnumericspacealphaalpha
-#
-#TODO Maybe download the MPC database (30MB) and look inside...is it just minor planets, or comets too?
-    # components = name.split( ' ' ) #TODO Try without the ' ' below...
-    components = name.split()
-    components[ 0 ] = components[ 0 ].strip( '(' ).strip( ')' )
-
-    isProvisionalDesignation = \
-        len( components ) == 2 and \
-        len( components[ 0 ] ) == 4 and components[ 0 ].isnumeric() and \
-        ( ( len( components[ 1 ] ) == 2 and components[ 1 ].isalpha() and components[ 1 ].isupper() ) or \
-          ( len( components[ 1 ] ) > 2 and components[ 1 ][ 0 : 2 ].isalpha() and components[ 1 ][ 0 : 2 ].isupper() and components[ 1 ][ 2 : ].isnumeric() ) )
-
-    if isProvisionalDesignation:
-        designation = name
-
-    else:
-        designation = components[ 0 ]
-
-    return designation
-
-
-def getUnpackedDate( packedDate ):
-    values = [ 'OFFSET ', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V' ]
-    packedDatePadded = " " + packedDate # Add extra space for zero offset.
-
-    year = str( values.index( packedDatePadded[ 1 ] ) ) + packedDatePadded[ 2 : 4 ]
-
-    month = str( values.index( packedDatePadded[ 4 ] ) )
-    if len( month ) == 1:
-        month = '0' + month
-
-    day = str( values.index( packedDatePadded[ 5 ] ) )
-    if len( day ) == 1:
-        day = '0' + day
-
-    if len( packedDate ) == 5:
-        day += ".0"
-
-    else:
-        day += "." + packedDatePadded[ 6 : ]
-
-    return month + '/' + day + '/' + year
-
-
-#  # ['', '506074 2015 UM67', 'e', '6.0025', '150.1033', '132.1864', '1.558187', '0.5067277', '0.68704842', '10.0259', '09/04.0/2017', '2000', 'H18.9', '0.15\n'] 
-#  #  o6074   18.9   0.15 K1794  10.02591  132.18641  150.10332    6.00251  0.6870484  0.50672775   1.5581871  1 MPO420174   266   3 2015-2017 0.31 M-v 3Eh MPC        0000         (506074)
-# 09/04/2017
-
 # Ephem minor planet format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
 # MPC minor planet format: https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
+
+    # Extract XEphem data and verify.
     xephem = { }
     for i in range( 0, len( minorPlanetsXephem ) ):
-        if not minorPlanetsXephem[ i ].startswith( "#" ):
-            firstCommaIndex = minorPlanetsXephem[ i ].find( ',' )
-            name = minorPlanetsXephem[ i ][ 0 : firstCommaIndex ]
-            designation = getDesignationMinorPlanet(name )
-            if designation == -1:
-                print( "Unknown/bad designation:\n", minorPlanetsXephem[ i ] )
+        message = checkXephem( minorPlanetsXephem[ i ] )
+        if message is not None:
+            print( message, minorPlanetsXephem[ i ] )
+            continue
 
-            else:
-                xephem[ designation ] = ',' + minorPlanetsXephem[ i ] # Add extra ',' to offset the zero column.
+        line = ( ',' + minorPlanetsXephem[ i ] ).split( ',' ) # Add extra ',' to offset the zero index.
+        name = line[ 1 ]
+        designation = getDesignationMinorPlanet( name )
+        xephem[ designation ] = line
 
+    # Extract MPC data and verify.
     mpc = { }
     for i in range( 0, len( minorPlanetsMPC ) ):
-        name = minorPlanetsMPC[ i ][ 166 : 194 ].strip() # Indices are offset by 1.
-        designation = getDesignationMinorPlanet( name )
-        if designation == -1:
-            print( "Unknown/bad designation:\n", minorPlanetsMPC[ i ] )
+        message = checkMPC( minorPlanetsMPC[ i ], False )
+        if message is not None:
+            print( message, minorPlanetsMPC[ i ] )
+            continue
 
-        else:
-            mpc[ designation ] = ' ' + minorPlanetsMPC[ i ] # Add ' ' to align column index with list index.
+        line = ' ' + minorPlanetsMPC[ i ] # Add ' ' to offset zero index.
+        name = line[ 167 : 194 + 1 ].strip()
+        designation = getDesignationMinorPlanet( name )
+        mpc[ designation ] = line
 
     missing = [ k for k in xephem.keys() if k not in mpc ]
     if missing:    
@@ -511,29 +453,14 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
 
 compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )                                            # Lots of epoch date mismatches!
 
-minorPlanetsBrightMPC = getData( MINOR_PLANET_BRIGHT_URL_MPC )
-# checkMPCMinorPlanet( minorPlanetsBrightMPC )
-minorPlanetsBrightXephem = getData( MINOR_PLANET_BRIGHT_URL_XEPHEM )
-# checkXephem( minorPlanetsBrightXephem )
-# compareMinorPlanets( minorPlanetsBrightMPC, minorPlanetsBrightXephem )              # Lots of mismatches!
+compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )              # Lots of mismatches!
 
-minorPlanetsCriticalMPC = getData( MINOR_PLANET_CRITICAL_URL_MPC )
-# checkMPCMinorPlanet( minorPlanetsCriticalMPC )
-minorPlanetsCriticalXephem = getData( MINOR_PLANET_CRITICAL_URL_XEPHEM )
-# checkXephem( minorPlanetsCriticalXephem )
-# compareMinorPlanets( minorPlanetsCriticalMPC, minorPlanetsCriticalXephem )            # Lots of mismatches!
+compareMinorPlanets( getData( MINOR_PLANET_CRITICAL_URL_MPC ), getData( MINOR_PLANET_CRITICAL_URL_XEPHEM ) )            # Lots of mismatches!
 
-minorPlanetsDistantMPC = getData( MINOR_PLANET_DISTANT_URL_MPC )
-# checkMPCMinorPlanet( minorPlanetsDistantMPC )                                        # Missing absolute magnitude and slope parameter.
-minorPlanetsDistantXephem = getData( MINOR_PLANET_DISTANT_URL_XEPHEM )
-# checkXephem( minorPlanetsDistantXephem )                                              # Missing absolute magnitude and slope parameter.
-# compareMinorPlanets( minorPlanetsDistantMPC, minorPlanetsDistantXephem )            # Lots of mismatches!
+compareMinorPlanets( getData( MINOR_PLANET_DISTANT_URL_MPC ), getData( MINOR_PLANET_DISTANT_URL_XEPHEM ) )            # Lots of mismatches!
 
-minorPlanetsUnusualMPC = getData( MINOR_PLANET_UNUSUAL_URL )
-# checkMPCMinorPlanet( minorPlanetsUnusualMPC )                                        # Missing absolute magnitude and slope parameter.
-minorPlanetsUnusualXephem = getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT )
-# checkXephem( minorPlanetsUnusualXephem )                                             # Missing absolute magnitude and slope parameter.
-# compareMinorPlanets( minorPlanetsUnusualMPC, minorPlanetsUnusualXephem )            # Lots of mismatches!
+compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )            # Lots of mismatches!
 
-# minorPlanetsDatabaseMPC = getData( "file:///home/bernard/Programming/Subversion/IndicatorLunar/src/MPCORB_WITHOUT_HEADER.DAT" )
-# checkMPCMinorPlanet( minorPlanetsDatabaseMPC )
+#TODO Want a function to compare the MPC files to the big database?
+# Just check for the presence of each line in each file in the database (match line for line, not field for field)?
+# checkMPCMinorPlanet( getData( "file:///home/bernard/Programming/Subversion/IndicatorLunar/src/MPCORB_WITHOUT_HEADER.DAT" ) )
