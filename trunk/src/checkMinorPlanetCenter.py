@@ -25,6 +25,7 @@ MINOR_PLANET_UNUSUAL_URL = MINOR_PLANET_URL + "Unusual/Soft00Unusual.txt"
 MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT = MINOR_PLANET_URL + "Unusual/Soft03Unusual.txt"
 
 
+#TODO Change to reading in an existing file.
 def getData( url ):
     filename = Path( url ).name
     if not Path( filename ).exists():
@@ -422,29 +423,51 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
 
 #TODO Read in big file, then read in each file and check line for line in big file.
 # https://www.minorplanetcenter.org/iau/MPCORB/MPCORB.DAT
-def compareMPCDatabaseAgainstFiles( MPCORBdotDAT, *minorPlanetMPCFiles ):
-    minorPlanetFilesContents = { }
-    for file in minorPlanetMPCFiles:
-        with open( file, 'r' ) as f:
-            minorPlanetFilesContents[ file ] = f.readlines()
+def compareMPCDatabaseAgainstFiles( mpcorbDOTdat, *minorPlanetMPCFiles ):
+    minorPlanetFiles = { }
+    for filename in minorPlanetMPCFiles:
+        with open( filename, 'r' ) as f:
+            minorPlanetFiles[ filename ] = f.readlines()
+
+    for filename in minorPlanetFiles:
+        print( filename, len( minorPlanetFiles[ filename ] ) )
 
     foundEndOfHeader = False
-    with open( MPCORBdotDAT, 'r' ) as f:
-        for line in f:        
-            if line.startswith( "----------" ):
-                foundEndOfHeader = True
+    count = 0
+    i = 0
+    databaseChunks = [ ]
+    with open( mpcorbDOTdat, 'r' ) as f:
+        for line in f:
+            if not foundEndOfHeader:
+                if line.startswith( "----------" ):
+                    foundEndOfHeader = True
+
                 continue
 
-            if foundEndOfHeader:
-                print( line )
+            databaseChunks.append( line )
+            count += 1
+            if count == 10000:
+                for filename in minorPlanetFiles:
+                    present = [ line for line in minorPlanetFiles[ filename ] if line in databaseChunks ]
+                    print( len( present ) )
+                # missing = [ k for k in xephem.keys() if k not in mpc ]
 
-    # with open( MPCORBdotDAT, 'r' ) as theFile:
-    #     contents = theFile.readlines()
+                    # if for eachLine in minorPlanetFiles[ filename ]:
+                    #
+                    #
+                    #     if eachLine in databaseChunks:
+                    #         del minorPlanetFiles[ filename ]
+                    #
+                    #     for filename in minorPlanetFiles:
+                    #         print( filename, len( minorPlanetFiles[ filename ] ) )
 
-    # print( minorPlanetFilesContents.keys() )
-    # for key in minorPlanetFilesContents.keys():
-    #     print( len( minorPlanetFilesContents[ key ] ) )
-   
+                        # break
+
+                databaseChunks = [ ]
+                count = 0
+
+    for filename in minorPlanetFiles:
+        print( filename, len( minorPlanetFiles[ filename ] ) )
 
 
 # compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )
