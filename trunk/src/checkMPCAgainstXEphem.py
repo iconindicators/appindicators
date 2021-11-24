@@ -421,55 +421,6 @@ def compareMinorPlanets( minorPlanetsMPC, minorPlanetsXephem ):
                 print( message, xephem[ k ], '\n', mpc[ k ], '\n' )
 
 
-#TODO Read in big file, then read in each file and check line for line in big file.
-# https://www.minorplanetcenter.org/iau/MPCORB/MPCORB.DAT
-def compareMPCDatabaseAgainstFiles( mpcorbDOTdat, *minorPlanetMPCFiles ):
-    minorPlanetFiles = { }
-    for filename in minorPlanetMPCFiles:
-        with open( filename, 'r' ) as f:
-            minorPlanetFiles[ filename ] = f.readlines()
-
-    for filename in minorPlanetFiles:
-        print( filename, len( minorPlanetFiles[ filename ] ) )
-
-    foundEndOfHeader = False
-    count = 0
-    i = 0
-    databaseChunks = [ ]
-    with open( mpcorbDOTdat, 'r' ) as f:
-        for line in f:
-            if not foundEndOfHeader:
-                if line.startswith( "----------" ):
-                    foundEndOfHeader = True
-
-                continue
-
-            databaseChunks.append( line )
-            count += 1
-            if count == 10000:
-                for filename in minorPlanetFiles:
-                    present = [ line for line in minorPlanetFiles[ filename ] if line in databaseChunks ]
-                    print( len( present ) )
-                # missing = [ k for k in xephem.keys() if k not in mpc ]
-
-                    # if for eachLine in minorPlanetFiles[ filename ]:
-                    #
-                    #
-                    #     if eachLine in databaseChunks:
-                    #         del minorPlanetFiles[ filename ]
-                    #
-                    #     for filename in minorPlanetFiles:
-                    #         print( filename, len( minorPlanetFiles[ filename ] ) )
-
-                        # break
-
-                databaseChunks = [ ]
-                count = 0
-
-    for filename in minorPlanetFiles:
-        print( filename, len( minorPlanetFiles[ filename ] ) )
-
-
 # compareComets( getData( COMET_URL_MPC ), getData( COMET_URL_XEPHEM ) )
 
 # compareMinorPlanets( getData( MINOR_PLANET_BRIGHT_URL_MPC ), getData( MINOR_PLANET_BRIGHT_URL_XEPHEM ) )
@@ -479,12 +430,3 @@ def compareMPCDatabaseAgainstFiles( mpcorbDOTdat, *minorPlanetMPCFiles ):
 # compareMinorPlanets( getData( MINOR_PLANET_DISTANT_URL_MPC ), getData( MINOR_PLANET_DISTANT_URL_XEPHEM ) )
 
 # compareMinorPlanets( getData( MINOR_PLANET_UNUSUAL_URL ), getData( MINOR_PLANET_UNUSUAL_URL_XEPHEM_FORMAT ) )
-
-compareMPCDatabaseAgainstFiles(
-    "MPCORB.DAT",
-    Path( MINOR_PLANET_BRIGHT_URL_MPC ).name,
-    Path( MINOR_PLANET_CRITICAL_URL_MPC ).name,
-    Path( MINOR_PLANET_DISTANT_URL_MPC ).name,
-    Path( MINOR_PLANET_UNUSUAL_URL ).name )
-
-# mpc@cfa.harvard.edu.
