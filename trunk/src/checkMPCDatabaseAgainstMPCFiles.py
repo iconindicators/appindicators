@@ -2,73 +2,67 @@
 # -*- coding: utf-8 -*-
 
 
-# mpc@cfa.harvard.edu
-
 # Download the following files:
 
-# https://www.minorplanetcenter.org/iau/MPCORB/MPCORB.DAT
-# https://www.minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt
-# https://www.minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt
-# https://www.minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt
-# https://www.minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt
+# From https://minorplanetcenter.net/data
+    # https://www.minorplanetcenter.net/iau/MPCORB/MPCORB.DAT
+
+# From https://minorplanetcenter.net/data
+    # https://www.minorplanetcenter.net/iau/MPCORB/DAILY.DAT
+    # https://www.minorplanetcenter.net/iau/MPCORB/NEA.txt
+    # https://www.minorplanetcenter.net/iau/MPCORB/PHA.txt
+    # https://www.minorplanetcenter.net/iau/MPCORB/Distant.txt
+    # https://www.minorplanetcenter.net/iau/MPCORB/Unusual.txt
+
+# From https://minorplanetcenter.net/iau/Ephemerides/Soft00.html
+    # https://www.minorplanetcenter.net/iau/Ephemerides/Bright/2018/Soft00Bright.txt
+    # https://www.minorplanetcenter.net/iau/Ephemerides/CritList/Soft00CritList.txt
+    # https://www.minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt
+    # https://www.minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt
 
 
-minorPlanetFilenames = [
-    "Soft00Bright.txt",
-    "Soft00CritList.txt",
-    "Soft00Distant.txt",
-    "Soft00Unusual.txt" ]
-
-# minorPlanets = [ ]
-# for filename in minorPlanetFilenames:
-#     with open( filename, 'r' ) as f:
-#         minorPlanets += f.readlines()
-
-minorPlanets = { }
-for filename in minorPlanetFilenames:
-    with open( filename, 'r' ) as f:
+def checkAgainstDatabase( file ):
+    minorPlanets = { }
+    with open( file, 'r' ) as f:
         for line in f:
             name = line[ 0 : 6 + 1 ]
             minorPlanets[ name ] = line
 
-print( "Minor planets in files:", len( minorPlanets ) )
+    print( "Minor planets in", file + ':', len( minorPlanets ) )
 
-minorPlanetsDifferent = [ ]
-foundBeginningOfData = False
-chunkCount = 0
-chunks = { }
-with open( "MPCORB.DAT", 'r' ) as f:
+    minorPlanetsDifferent = { }
+    foundBeginningOfData = False
     names = minorPlanets.keys()
-    for line in f:
-        if not foundBeginningOfData:
-            if line.startswith( "----------" ):
-                foundBeginningOfData = True
+    with open( "MPCORB.DAT", 'r' ) as f:
+        for line in f:
+            if not foundBeginningOfData:
+                if line.startswith( "----------" ):
+                    foundBeginningOfData = True
 
-            continue
+                continue
 
-        # chunks[ line[ 0 : 6 + 1 ] ] = line # Use minor planet designation/name as key.
-        # chunkCount += 1
-        # if chunkCount == 10000:
-        #     keys = chunks.keys()
-        #     for minorPlanet in minorPlanets:
-        #         designation = minorPlanet[ 0 : 6 + 1 ]
-        #         if designation in keys and minorPlanet != chunks[ designation ]:
-        #             minorPlanetsDifferent.append( designation )
-        #
-        #     chunks = { }
-        #     chunkCount = 0
+            name = line[ 0 : 6 + 1 ]
+            if name in names and line != minorPlanets[ name ]:
+                minorPlanetsDifferent[ name ] = ""
 
-        name = line[ 0 : 6 + 1 ]
-        if name in names:
-            if line != minorPlanets[ name ]:
-                minorPlanetsDifferent.append( name )
+    if minorPlanetsDifferent:
+        print( "Different to database:", len( minorPlanetsDifferent ) )
+        # print( '\t', minorPlanetsDifferent ) # Uncomment to show specific bodies.
 
-print( "Minor planets in files differing to database:", len( minorPlanetsDifferent ) )
+    minorPlanetsMissing = minorPlanets.keys() - minorPlanetsDifferent.keys()
+    if minorPlanetsMissing:
+        print( "Missing from database:", len( minorPlanetsMissing ) )
+        # print( '\t', minorPlanetsMissing ) # Uncomment to show specific bodies.
 
-minorPlanetMissing = [ ]
-for minorPlanet in minorPlanets:
-    designation = minorPlanet[ 0 : 6 + 1 ]
-    if designation not in minorPlanetsDifferent:
-        minorPlanetMissing.append( designation )
+    print()
 
-print( "Minor planets in files missing from database:", len( minorPlanetMissing ) )
+
+checkAgainstDatabase( "DAILY.DAT" )
+checkAgainstDatabase( "NEA.txt" )
+checkAgainstDatabase( "PHA.txt" )
+checkAgainstDatabase( "Distant.txt" )
+checkAgainstDatabase( "Unusual.txt" )
+checkAgainstDatabase( "Soft00Bright.txt" )
+checkAgainstDatabase( "Soft00CritList.txt" )
+checkAgainstDatabase( "Soft00Distant.txt" )
+checkAgainstDatabase( "Soft00Unusual.txt" )
