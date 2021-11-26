@@ -21,6 +21,8 @@
     # https://www.minorplanetcenter.net/iau/Ephemerides/Unusual/Soft00Unusual.txt
 
 
+# Format for files:
+    # https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 def checkAgainstDatabase( file ):
     minorPlanets = { }
     with open( file, 'r' ) as f:
