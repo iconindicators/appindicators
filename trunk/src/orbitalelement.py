@@ -117,7 +117,7 @@ def download( url, dataType, logging = None ):
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
 
-        elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
+        else: # OE.DataType.XEPHEM_COMET or OE.DataType.XEPHEM_MINOR_PLANET
             # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
             for i in range( 0, len( data ) ):
                 if data[ i ].startswith( "#" ): # Skip comment lines.
