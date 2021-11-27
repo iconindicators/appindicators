@@ -1,11 +1,11 @@
 indicator-lunar (1.0.91-1) bionic; urgency=low
 
-  * Bug fix: The on-click URL for comets and minor planets did not work for
-    all variants of name.
+  * Bug fix: Improved the accuracy/coverage of the on-click URL for comets and
+    minor planets names (hopefully all variants are now covered).
   * Comets and Minor Planets displayed in the menu and preferences are no
-    longer upper cased.
+    longer upper cased, but rather displayed as shown in the data files.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 26 Oct 1021 9:24:17 +1000   TODO Fix to date of release
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 28 Nov 2021 5:22:41 +1000
 
 
 indicator-lunar (1.0.90-1) bionic; urgency=low
