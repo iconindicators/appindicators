@@ -39,6 +39,11 @@
 # error message appears about the install failing during the postinst....why???
 
 
+#TODO Comets and minor planets when displayed in the menu are all upper cased.  Why....?
+# The upper casing occurs when the data is first downloaded and the  
+
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
