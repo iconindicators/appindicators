@@ -607,7 +607,11 @@ class AstroBase( ABC ):
         return startDateTime, endDateTime
 
 
-#TODO Add comment about source of name coming from MPC data files.
+    # Retrieve the designation from the full name which uniquely identifies a comet
+    # at the Minor Planet Center.
+    #
+    # Supports the MPC and XEphem data file formats from which the full name is obtained.
+    #
     # https://minorplanetcenter.net//iau/lists/CometResolution.html
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
     # http://www.icq.eps.harvard.edu/cometnames.html
@@ -650,7 +654,11 @@ class AstroBase( ABC ):
         return designation
 
 
-#TODO Add comment about source of name coming from MPC data files.
+    # Retrieve the designation from the full name which uniquely identifies a minor planet
+    # at the Minor Planet Center.
+    #
+    # Supports the MPC and XEphem data file formats from which the full name is obtained.
+    #
     # https://www.iau.org/public/themes/naming/
     # https://minorplanetcenter.net/iau/info/DesDoc.html
     # https://minorplanetcenter.net/iau/info/PackedDes.html
