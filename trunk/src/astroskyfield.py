@@ -892,6 +892,8 @@ class AstroSkyfield( AstroBase ):
 # and compare.
 # Ditto for PyEphem...if the MPC data is ever verified to be correct!
 # Then perhaps drop Pluto from planets list and add to minor planets list (for both Skyfield and PyEphem).
+# https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt
+# https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt
                 apparentMagnitude = 13.65 # Skyfield does not compute this so hard code: https://en.wikipedia.org/wiki/Pluto
 
             else:
