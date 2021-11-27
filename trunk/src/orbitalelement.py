@@ -159,3 +159,25 @@ def download( url, dataType, logging = None ):
             logging.exception( e )
 
     return oeData
+
+
+def getName( line, dataType ):
+    if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
+        if dataType == OE.DataType.SKYFIELD_COMET:
+            # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+            # The format starts from 1, whereas the data is in a list/string which starts from 0, therefore, for all indices, subtract 1.
+            nameStart = 103 - 1
+            nameEnd = 158 - 1
+
+        else:
+            # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+            nameStart = 167 - 1
+            nameEnd = 194 - 1
+
+        name = line[ nameStart : nameEnd + 1 ].strip()
+
+    else: # OE.DataType.XEPHEM_COMET or OE.DataType.XEPHEM_MINOR_PLANET
+        # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
+        name = re.sub( "\s\s+", "", line[ 0 : line.find( "," ) ] ) # The name can have multiple whitespace, so remove.
+
+    return name
