@@ -20,25 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO To move from install PyEphem via apt/apt-get and use pip instead...
-# Need to test install first of pyephem using apt-get and an install via LaunchPad.
-# Then do another install via LaunchPad but using PIP...
-# Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
-#
-# Need to create the test indicator to install python3-pyephem and verify the version number.
-# Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
-#
-# In astropyephem, need to update the line
-#    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" 
-# and maybe warn user not to use apt-get.
-#
-#
-# Tested indicator-test using the --ignore-installed command for PIP 
-# to install new PyEphem via PIP despite the old PyEpehm via apt-get still present.
-# Seems to work, but then when the computer restarts, an
-# error message appears about the install failing during the postinst....why???
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -197,8 +178,6 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
                 _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                 _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
-
-        self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key is a combination of three tags: body type, body name and data name.
@@ -468,7 +447,6 @@ class IndicatorLunar( IndicatorBase ):
             downloadCount, nextDownloadTime,
             magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
-        # if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 
