@@ -140,7 +140,6 @@ def getDesignationMinorPlanet( name ):
 # A904 OA    This is a non-real example...maybe iterate through all minor planets looking for alphanumericnumericnumericspacealphaalpha
 #
 #TODO Maybe download the MPC database (30MB) and look inside...is it just minor planets, or comets too?
-    # components = name.split( ' ' ) #TODO Try without the ' ' below...
     components = name.split()
     components[ 0 ] = components[ 0 ].strip( '(' ).strip( ')' )
 
