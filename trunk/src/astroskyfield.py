@@ -887,6 +887,11 @@ class AstroSkyfield( AstroBase ):
         earthAtNow = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now )
         for planet in planets:
             if planet == AstroBase.PLANET_PLUTO:
+#TODO Perhaps try to compute via data from
+# https://www.minorplanetcenter.net/iau/MPCORB/Distant.txt
+# and compare.
+# Ditto for PyEphem...if the MPC data is ever verified to be correct!
+# Then perhaps drop Pluto from planets list and add to minor planets list (for both Skyfield and PyEphem).
                 apparentMagnitude = 13.65 # Skyfield does not compute this so hard code: https://en.wikipedia.org/wiki/Pluto
 
             else:
