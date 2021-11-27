@@ -39,11 +39,6 @@
 # error message appears about the install failing during the postinst....why???
 
 
-#TODO Comets and minor planets when displayed in the menu are all upper cased.  Why....?
-# The upper casing occurs when the data is first downloaded and the  
-
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -194,7 +189,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.90",
+            version = "1.0.91",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz =
@@ -834,73 +829,27 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == AstroBase.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
+            if bodyType == AstroBase.BodyType.COMET:
+                data = self.cometData
+                designationFunction = AstroBase.getDesignationComet
+                dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
+                    if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+
+            else: # AstroBase.BodyType.MINOR_PLANET
+                data = self.minorPlanetData
+                designationFunction = AstroBase.getDesignationMinorPlanet
+                dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
+                    if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+
             for name in sorted( orbitalElements ):
-                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + self.getCometMinorPlanetOnClickURL( name, bodyType )
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + name, url )
+                humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType )
+                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName )
+                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url )
                 self.updateMenuCommon( subMenu, bodyType, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
             subMenu.remove( separator )
-
-
-    # https://www.iau.org/public/themes/naming
-    # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
-    def getCometMinorPlanetOnClickURL( self, name, bodyType ):
-        if bodyType == AstroBase.BodyType.COMET:
-            if "(" in name: # P/1997 T3 (Lagerkvist-Carsenty)
-                hip = name[ : name.find( "(" ) ].strip()
-
-            else:
-                postSlash = name[ name.find( "/" ) + 1 : ]
-                if re.search( '\d', postSlash ): # C/1931 AN
-                    hip = name
-
-                else: # 97P/Metcalf-Brewington
-                    hip = name[ : name.find( "/" ) ].strip()
-
-        else:
-#TODO I suspect this will not work for MPC format when Skyfield is running...has lots of ( ) around names!
-# XEphem format:
-#     1 Ceres
-#
-#     1915 1953 EA
-#
-#     944 Hidalgo
-#     15788 1993 SB
-#     1993 RP
-#
-#     433 Eros
-#     7236 1987 PA
-#     1979 XB
-#
-# Skyfield format:
-#     (1) Ceres
-#
-#     (1915)
-#
-#     (944) Hidalgo
-#     (15788)
-#     1993 RP
-#
-#     (433) Eros
-#     (7236)
-#     1979 XB
-
-            components = name.split( ' ' )
-            if components[ 0 ].isnumeric() and components[ 1 ].isalpha(): # 433 Eros
-                hip = components[ 0 ]
-
-            elif components[ 0 ].isnumeric() and components[ 1 ].isnumeric(): # 465402 2008 HW1
-                hip = components[ 0 ]
-
-            elif components[ 0 ].isnumeric() and components[ 1 ].isalnum(): # 1999 KL17
-                hip = components[ 0 ] + " " + components[ 1 ]
-
-            else: # 229762 G!kunll'homdima
-                hip = components[ 0 ]
-
-        return hip
 
 
     # Determine if a body should be displayed taking into account:
@@ -1484,9 +1433,12 @@ class IndicatorLunar( IndicatorBase ):
 
         COMET_STORE_INDEX_HIDE_SHOW = 0
         COMET_STORE_INDEX_NAME = 1
-        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
+        COMET_STORE_INDEX_HUMAN_READABLE_NAME = 2
+        cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
+        dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
         for comet in sorted( self.cometData.keys() ):
-            cometStore.append( [ comet in self.comets, comet ] )
+            cometStore.append( [ comet in self.comets, comet, orbitalelement.getName( self.cometData[ comet ].getData(), dataType ) ] )
 
         if self.cometData:
             toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
@@ -1500,13 +1452,16 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
-        minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
+        MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME = 2
+        minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
+        dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
         for minorPlanet in sorted( self.minorPlanetData.keys() ):
-            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet ] )
+            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, orbitalelement.getName( self.minorPlanetData[ minorPlanet ].getData(), dataType ) ] )
 
         if self.minorPlanetData:
             toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
@@ -1520,7 +1475,7 @@ class IndicatorLunar( IndicatorBase ):
                 "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
 
