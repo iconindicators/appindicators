@@ -77,23 +77,24 @@ def download( url, dataType, logging = None ):
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-                start = 102
-                end = 158
-                firstMagnitudeFieldStart = 91
-                firstMagnitudeFieldEnd = 95
-                secondMagnitudeFieldStart = 96
-                secondMagnitudeFieldEnd = 100
+                # The format starts from 1, whereas the data is in a list/string which starts from 0, therefore, for all indices, subtract 1.
+                nameStart = 103 - 1
+                nameEnd = 158 - 1
+                firstMagnitudeFieldStart = 92 - 1
+                firstMagnitudeFieldEnd = 95 - 1
+                secondMagnitudeFieldStart = 97 - 1
+                secondMagnitudeFieldEnd = 100 - 1
 
             else:
                 # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                start = 166
-                end = 194
-                firstMagnitudeFieldStart = 8
-                firstMagnitudeFieldEnd = 13
-                secondMagnitudeFieldStart = 14
-                secondMagnitudeFieldEnd = 19
-                semiMajorAxisFieldStart = 92
-                semiMajorAxisFieldEnd = 103
+                nameStart = 167 - 1
+                nameEnd = 194 - 1
+                firstMagnitudeFieldStart = 9 - 1
+                firstMagnitudeFieldEnd = 13 - 1
+                secondMagnitudeFieldStart = 15 - 1
+                secondMagnitudeFieldEnd = 19 - 1
+                semiMajorAxisFieldStart = 93 - 1
+                semiMajorAxisFieldEnd = 103 - 1
 
             for i in range( 0, len( data ) ):
                 if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
@@ -111,7 +112,7 @@ def download( url, dataType, logging = None ):
                 if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
                     continue
 
-                name = data[ i ][ start : end ].strip()
+                name = data[ i ][ nameStart : nameEnd + 1 ].strip()
 
                 oe = OE( name, data[ i ], dataType )
                 oeData[ oe.getName().upper() ] = oe
