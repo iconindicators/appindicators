@@ -39,6 +39,26 @@
 # error message appears about the install failing during the postinst....why???
 
 
+# TODO
+# Have opened a ticket 
+# https://bitbucket.org/delx/webdl/issues?status=new&status=open
+# which points out differences between the comet and minor planet values (for a given body)
+# between the MPC data format and the XEphem data format.
+# The response is that it is likely none of the files have been updated for some time.
+# Have also sent a follow up email...
+# Still waiting on a reply...but if the files are never to be updated, then there are two options.
+# 1) If possible take the files from the main data page (which are in MPC format) and convert to XEphem format.
+#    There are no files for bright/critical, so that's that.
+# 2a) Drop (or really hide) the comet and minor planet functionality.
+# 2b) If the comet and minor planet functionality is to be dropped, then may as well move to Skyfield.
+#     Skyfield still has the slowness issue of comet and minor planet...so there is no difference between
+#     that and PyEphem with no current data files.
+#
+# Bottom line: consider switching to Skyfield with comet and minor planet functionality turned off
+# (until fixed in Skyfield).
+# This is all contingent upon the MPC responding to my issue/email. 
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
