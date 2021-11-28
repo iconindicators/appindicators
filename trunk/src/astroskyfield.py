@@ -21,7 +21,7 @@
 
 #TODO In calculateCommon, if there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
 # Verify this is correct and then if so, see how to apply to satellites.
-# How also to determine if a satellite is never up?
+# How also to determine if a satellite (or any object/body) is never up?
 
 
 #TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
