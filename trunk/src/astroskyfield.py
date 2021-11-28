@@ -930,8 +930,8 @@ class AstroSkyfield( AstroBase ):
                         ephemerisPlanets, Star.from_dataframe( theStar ) )
 
 
-#TODO See TODO in getOrbitalElementsLessThanMagnitude
-#TODO Once fixed in Skyfield, compare results against PyEphem. 
+#TODO See TODO in getOrbitalElementsLessThanMagnitude.
+# Once fixed in Skyfield, compare results against PyEphem (assuming the XEphem data files from MPC are updated). 
     @staticmethod
     def __calculateOrbitalElements(
             now, nowPlusOneDay, 
