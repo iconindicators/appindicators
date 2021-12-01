@@ -1128,11 +1128,11 @@ class AstroSkyfield( AstroBase ):
         from dateutil.relativedelta import relativedelta
         import os, subprocess, urllib
 
-        ephemerisFile = "de440s.bsp"
-        if not os.path.isfile( ephemerisFile ):
-            print( "Unable to locate", ephemerisFile, "on the file system.  Downloading..." )
-            ephemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemerisFile
-            urllib.request.urlretrieve ( ephemerisURL, ephemerisFile )
+        ephemeris = "de440s.bsp"
+        if not os.path.isfile( ephemeris ):
+            print( "Unable to locate", ephemeris, "on the file system.  Downloading..." )
+            url = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemeris
+            urllib.request.urlretrieve ( url, ephemeris )
 
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
@@ -1149,9 +1149,9 @@ class AstroSkyfield( AstroBase ):
             "python3 -m jplephem excerpt " + \
             startDate.strftime( dateFormat ) + " " + \
             endDate.strftime( dateFormat ) + " " + \
-            ephemerisFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
+            ephemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
-        print( "Creating planet ephemeris...\n\t", command )
+        print( "Creating planets ephemeris...\n\t", command )
         subprocess.call( command, shell = True )
         print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
@@ -1165,9 +1165,9 @@ class AstroSkyfield( AstroBase ):
     def createEphemerisStars():
         import gzip, os
 
-        catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
-        if not os.path.isfile( catalogue ):
-            print( "Unable to locate", catalogue, "on the file system.  Downloading..." )
+        ephemeris = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
+        if not os.path.isfile( ephemeris ):
+            print( "Unable to locate", ephemeris, "on the file system.  Downloading..." )
             load.open( hipparcos.URL )
 
         hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
@@ -1175,7 +1175,7 @@ class AstroSkyfield( AstroBase ):
             os.remove( AstroSkyfield.__EPHEMERIS_STARS )
 
         print( "Creating stars ephemeris..." )
-        with load.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
+        with load.open( ephemeris, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
                 if hip in hipparcosIdentifiers:
