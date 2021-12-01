@@ -104,7 +104,6 @@ class AstroSkyfield( AstroBase ):
         AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
         AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
 
-
     # Skyfield does not provide a list of stars.
     #
     # However there is a list of named stars in the file skyfield/named_stars.py
@@ -1168,14 +1167,14 @@ class AstroSkyfield( AstroBase ):
 
         catalogue = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
         if not os.path.isfile( catalogue ):
-            print( "Downloading star catalogue..." )
+            print( "Unable to locate", catalogue, "on the file system.  Downloading..." )
             load.open( hipparcos.URL )
 
         hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS ):
             os.remove( AstroSkyfield.__EPHEMERIS_STARS )
 
-        print( "Creating list of stars..." )
+        print( "Creating stars ephemeris..." )
         with load.open( catalogue, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
