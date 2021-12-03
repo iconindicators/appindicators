@@ -496,14 +496,25 @@ class IndicatorLunar( IndicatorBase ):
             downloadCount, nextDownloadTime,
             magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
-        # if cacheBaseName != IndicatorLunar.SATELLITE_CACHE_BASENAME: return { }, cacheDateTime, downloadCount, nextDownloadTime #TODO Testing
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            data = self.readCacheBinary( cacheBaseName )
+            # data = self.readCacheBinary( cacheBaseName )  #TODO Check how this works...If the time/date is such that we read from the cache, what happens if the file is not there...?
+            # Ordinarily should load comet, minor planet and satellite cached data.
+            # It seems the Minor Planet Center's data files for comets and minor planets have not been updated for some time.
+            # Until resolved, using stale data files is pointless and therefore no comets or minor planets will be calculated/displayed.
+            data = { }
+            if cacheBaseName == IndicatorLunar.SATELLITE_CACHE_BASENAME:
+                data = self.readCacheBinary( cacheBaseName )
 
         else:
             data = { }
             if nextDownloadTime < utcNow:
-                data = downloadDataFunction( *downloadDataArguments )
+                # data = downloadDataFunction( *downloadDataArguments )
+                # Ordinarily should download comet, minor planet and satellite data files.
+                # It seems the Minor Planet Center's data files for comets and minor planets have not been updated for some time.
+                # Until resolved, downloading stale data files is pointless and therefore no comets or minor planets will be calculated/displayed.
+                if cacheBaseName == IndicatorLunar.SATELLITE_CACHE_BASENAME:
+                    data = downloadDataFunction( *downloadDataArguments )
+
                 downloadCount += 1
                 if data:
                     if magnitudeFilterFunction:
@@ -1271,6 +1282,10 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def onPreferences( self, dialog ):
+        summary = "No comets nor minor planets..."
+        message = "The data from the Minor Planet Center is stale and has been for some time.  Until resolved, comets and minor planets will not be calculated nor displayed."
+        Notify.Notification.new( summary, message, self.icon ).show()
+
         notebook = Gtk.Notebook()
 
         PAGE_ICON = 0
