@@ -37,7 +37,7 @@ class AstroPyEphem( AstroBase ):
 
     # Taken from ephem/stars.py
     # Version 3.7.7.0 added new stars but must still support 3.7.6.0 for Ubuntu 16.04/18.04.
-    if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
+    if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ): #TODO Review this if we upgrade to latest version.
         AstroBase.STARS.extend( [
             "ACHERNAR",
             "ADARA",
@@ -982,8 +982,10 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
-        minimalRequiredVersion = "3.7.6.0"
-        installationCommand = "sudo apt-get install -y python3-ephem"
+        # minimalRequiredVersion = "3.7.6.0" #TODO Original
+        minimalRequiredVersion = "4.1.1"
+        # installationCommand = "sudo apt-get install -y python3-ephem" #TODO Original
+        installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade ephem"
         message = None
         if not available:
             message = _( "PyEphem could not be found. Install using:\n\n" + installationCommand )
@@ -1112,6 +1114,12 @@ class AstroPyEphem( AstroBase ):
             del data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ]
             neverUp = True
 
+        except ValueError: # Typically a mathematical error in which a division by zero or similar occurs.
+            del data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ]
+            del data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ]
+            neverUp = True
+
+
         return neverUp
 
 
@@ -1184,7 +1192,7 @@ class AstroPyEphem( AstroBase ):
     #    https://github.com/brandon-rhodes/pyephem/issues/63#issuecomment-144263243
     @staticmethod
     def __nextSatellitePass( observer, satellite ):
-        if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ):
+        if LooseVersion( ephem.__version__ ) < LooseVersion( "3.7.7.0" ): #TODO Review this if we upgrade to latest version.
             nextPass = observer.next_pass( satellite )
 
         else:
