@@ -982,10 +982,10 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
-        # minimalRequiredVersion = "3.7.6.0" #TODO Original
-        minimalRequiredVersion = "4.1.1"
-        # installationCommand = "sudo apt-get install -y python3-ephem" #TODO Original
-        installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade ephem"
+        minimalRequiredVersion = "3.7.6.0" #TODO Original
+        # minimalRequiredVersion = "4.1.1"
+        installationCommand = "sudo apt-get install -y python3-ephem" #TODO Original
+        # installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade ephem"
         message = None
         if not available:
             message = _( "PyEphem could not be found. Install using:\n\n" + installationCommand )
@@ -1114,6 +1114,8 @@ class AstroPyEphem( AstroBase ):
             del data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ]
             neverUp = True
 
+#TODO This should not have to be here...seems 'never up' was dropped or something since 3.7.6.0.
+# https://github.com/brandon-rhodes/pyephem/issues/221
         except ValueError: # Typically a mathematical error in which a division by zero or similar occurs.
             del data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ]
             del data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ]
