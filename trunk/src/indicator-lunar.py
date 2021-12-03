@@ -59,6 +59,14 @@
 # This is all contingent upon the MPC responding to my issue/email. 
 
 
+#TODO Need to hide and disable the comet / minor planet functionality for now.
+# Stop the downloading from the MPC website.
+# Stop the calculation of comets and minor planets.
+# Stop the display of comets and minor planets.
+# Disable or hide the comets and minor planets in the preferences.
+# Notify the user somehow; notification when the indicator starts up or when preferences are opened.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
