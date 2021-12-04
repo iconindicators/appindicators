@@ -20,9 +20,6 @@
 # comet, minor planet and satellite information.
 
 
-#TODO Need to check results for each body type between version 3.7.6.0 and 4.1.1
-
-
 #TODO To move from install PyEphem via apt/apt-get and use pip instead...
 # Need to test install first of pyephem using apt-get and an install via LaunchPad.
 # Then do another install via LaunchPad but using PIP...
