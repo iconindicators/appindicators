@@ -1,3 +1,14 @@
+indicator-lunar (1.0.92-1) bionic; urgency=low
+
+  * Now uses PyEphem 4.1.2 which should be automatically installed via the PPA
+    process.  If not, the manual instructions are:
+
+        sudo apt-get install -y python3-pip
+        sudo pip3 install --ignore-installed --upgrade ephem
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 28 Nov 2021 5:22:41 +1000   <----TODO Set to date of release.
+
+
 indicator-lunar (1.0.91-1) bionic; urgency=low
 
   * Bug fix: Improved the accuracy/coverage of the on-click URL for comets and
