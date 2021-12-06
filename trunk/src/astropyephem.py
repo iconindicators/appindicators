@@ -539,8 +539,14 @@ class AstroPyEphem( AstroBase ):
             logging ):
 
         data = { }
+
         ephemNow = ephem.Date( utcNow )
-        observer = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
+
+        observer = ephem.city( "London" ) # Any name will do; add in the correct latitude/longitude/elevation.
+        observer.date = ephemNow
+        observer.lat = str( latitude )
+        observer.lon = str( longitude )
+        observer.elev = elevation
 
         AstroPyEphem.__calculateMoon( ephemNow, observer, data )
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
@@ -548,13 +554,7 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateStars( observer, data, stars, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.COMET, comets, cometData, magnitudeMaximum )
         AstroPyEphem.__calculateOrbitalElements( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, magnitudeMaximum )
-
-        # To find a visible satellite pass, need a modified observer.
-        observerVisiblePasses = AstroPyEphem.__getObserver( ephemNow, latitude, longitude, elevation )
-        observerVisiblePasses.pressure = 0
-        observerVisiblePasses.horizon = "-0:34"
-
-        AstroPyEphem.__calculateSatellites( ephemNow, observer, observerVisiblePasses, data, satellites, satelliteData, startHour, endHour )
+        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
 
         return data
 
@@ -610,16 +610,6 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getVersion(): return ephem.__version__
-
-
-    @staticmethod
-    def __getObserver( ephemNow, latitude, longitude, elevation ):
-        observer = ephem.city( "London" ) # Any name will do; add in the correct latitude/longitude/elevation.
-        observer.date = ephemNow
-        observer.lat = str( latitude )
-        observer.lon = str( longitude )
-        observer.elev = elevation
-        return observer
 
 
     @staticmethod
@@ -728,7 +718,12 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellites( ephemNow, observer, observerVisiblePasses, data, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour ):
+        # To find a VISIBLE satellite pass, need a modified observer.
+        observerVisiblePasses = observer.copy()
+        observerVisiblePasses.pressure = 0
+        observerVisiblePasses.horizon = "-0:34"
+
         finalDateTime = ephem.Date( ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
         for satellite in satellites:
             if satellite in satelliteData:
