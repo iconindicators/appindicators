@@ -77,6 +77,31 @@ class AstroBase( ABC ):
     DATA_TAG_SOLSTICE = "SOLSTICE"
     DATA_TAG_THIRD_QUARTER = "THIRD QUARTER"
 
+
+    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
+    DATA_TAGS_TRANSLATIONS = {
+        DATA_TAG_ALTITUDE           : _( "ALTITUDE" ),
+        DATA_TAG_AZIMUTH            : _( "AZIMUTH" ),
+        DATA_TAG_BRIGHT_LIMB        : _( "BRIGHT LIMB" ),
+        DATA_TAG_ECLIPSE_DATE_TIME  : _( "ECLIPSE DATE TIME" ),
+        DATA_TAG_ECLIPSE_LATITUDE   : _( "ECLIPSE LATITUDE" ),
+        DATA_TAG_ECLIPSE_LONGITUDE  : _( "ECLIPSE LONGITUDE" ),
+        DATA_TAG_ECLIPSE_TYPE       : _( "ECLIPSE TYPE" ),
+        DATA_TAG_EQUINOX            : _( "EQUINOX" ),
+        DATA_TAG_FIRST_QUARTER      : _( "FIRST QUARTER" ),
+        DATA_TAG_ILLUMINATION       : _( "ILLUMINATION" ),
+        DATA_TAG_FULL               : _( "FULL" ),
+        DATA_TAG_NEW                : _( "NEW" ),
+        DATA_TAG_PHASE              : _( "PHASE" ),
+        DATA_TAG_RISE_AZIMUTH       : _( "RISE AZIMUTH" ),
+        DATA_TAG_RISE_DATE_TIME     : _( "RISE DATE TIME" ),
+        DATA_TAG_SET_AZIMUTH        : _( "SET AZIMUTH" ),
+        DATA_TAG_SET_DATE_TIME      : _( "SET DATE TIME" ),
+        DATA_TAG_SOLSTICE           : _( "SOLSTICE" ),
+        DATA_TAG_THIRD_QUARTER      : _( "THIRD QUARTER" ) }
+
+
+    # Data tags of attributes for specific body types.
     DATA_TAGS_COMET = [
         DATA_TAG_ALTITUDE,
         DATA_TAG_AZIMUTH,
@@ -135,28 +160,6 @@ class AstroBase( ABC ):
         DATA_TAG_RISE_DATE_TIME,
         DATA_TAG_SET_DATE_TIME,
         DATA_TAG_SOLSTICE ]
-
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
-    DATA_TAGS_TRANSLATIONS = {
-        DATA_TAG_ALTITUDE           : _( "ALTITUDE" ),
-        DATA_TAG_AZIMUTH            : _( "AZIMUTH" ),
-        DATA_TAG_BRIGHT_LIMB        : _( "BRIGHT LIMB" ),
-        DATA_TAG_ECLIPSE_DATE_TIME  : _( "ECLIPSE DATE TIME" ),
-        DATA_TAG_ECLIPSE_LATITUDE   : _( "ECLIPSE LATITUDE" ),
-        DATA_TAG_ECLIPSE_LONGITUDE  : _( "ECLIPSE LONGITUDE" ),
-        DATA_TAG_ECLIPSE_TYPE       : _( "ECLIPSE TYPE" ),
-        DATA_TAG_EQUINOX            : _( "EQUINOX" ),
-        DATA_TAG_FIRST_QUARTER      : _( "FIRST QUARTER" ),
-        DATA_TAG_ILLUMINATION       : _( "ILLUMINATION" ),
-        DATA_TAG_FULL               : _( "FULL" ),
-        DATA_TAG_NEW                : _( "NEW" ),
-        DATA_TAG_PHASE              : _( "PHASE" ),
-        DATA_TAG_RISE_AZIMUTH       : _( "RISE AZIMUTH" ),
-        DATA_TAG_RISE_DATE_TIME     : _( "RISE DATE TIME" ),
-        DATA_TAG_SET_AZIMUTH        : _( "SET AZIMUTH" ),
-        DATA_TAG_SET_DATE_TIME      : _( "SET DATE TIME" ),
-        DATA_TAG_SOLSTICE           : _( "SOLSTICE" ),
-        DATA_TAG_THIRD_QUARTER      : _( "THIRD QUARTER" ) }
 
 
     # Tags used to uniquely name particular objects/items.
@@ -236,6 +239,8 @@ class AstroBase( ABC ):
     # Names of stars (from STARS) and associated capitalised English string encapsulated as _( "" ) to be populated by implementing class.
     STAR_TAGS_TRANSLATIONS = { }
 
+
+    # Satellites.
     SATELLITE_SEARCH_DURATION_HOURS = 50 # Number of hours to search from 'now' for visible satellite passes.
 
     SATELLITE_TAG_NAME = "[NAME]"
@@ -262,6 +267,7 @@ class AstroBase( ABC ):
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
+
 
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
