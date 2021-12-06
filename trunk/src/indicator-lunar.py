@@ -57,9 +57,7 @@
 # Bottom line: consider switching to Skyfield with comet and minor planet functionality turned off
 # (until fixed in Skyfield).
 # This is all contingent upon the MPC responding to my issue/email. 
-
-
-#TODO Need to hide and disable the comet / minor planet functionality for now.
+#
 # Stop the downloading from the MPC website.
 # Stop the calculation of comets and minor planets.
 # Stop the display of comets and minor planets.
