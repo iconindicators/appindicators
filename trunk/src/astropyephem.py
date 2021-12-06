@@ -738,7 +738,6 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def __calculateSatellite( startDateTime, endDateTime, finalDateTime, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite ):
-
         # Typically to search for a visible satellite pass,
         # start from 'now' until 'now' plus search duration,
         # checking each pass as it is calculated for visibility.
