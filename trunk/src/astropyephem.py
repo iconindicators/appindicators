@@ -543,10 +543,10 @@ class AstroPyEphem( AstroBase ):
         ephemNow = ephem.Date( utcNow )
 
         observer = ephem.city( "London" ) # Any name will do; add in the correct latitude/longitude/elevation.
-        observer.date = ephemNow
         observer.lat = str( latitude )
         observer.lon = str( longitude )
         observer.elev = elevation
+        observer.date = ephemNow
 
         AstroPyEphem.__calculateMoon( ephemNow, observer, data )
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
