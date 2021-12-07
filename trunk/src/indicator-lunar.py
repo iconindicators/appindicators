@@ -285,6 +285,7 @@ class IndicatorLunar( IndicatorBase ):
         self.nextDownloadTimeMinorPlanetUnusual = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
+#TODO I don't follow this logic...
         self.cacheDateTimeComet = self.getCacheDateTime( 
             IndicatorLunar.COMET_CACHE_BASENAME, 
             utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
@@ -500,6 +501,7 @@ class IndicatorLunar( IndicatorBase ):
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )  #TODO Check how this works...If the time/date is such that we read from the cache, what happens if the file is not there...?
+            # To put it another way, what if the cache is empty?
 
         else:
             data = { }
