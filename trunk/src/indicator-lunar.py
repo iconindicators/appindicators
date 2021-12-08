@@ -285,12 +285,6 @@ class IndicatorLunar( IndicatorBase ):
         self.nextDownloadTimeMinorPlanetUnusual = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
-#TODO I don't follow this logic...
-# The cache is checked for the most recent file and that date/time is returned.
-# Otherwise if no file is found (no files present or files are older than the time specified)
-# the default value is used.
-# Does this default value make sense?
-# Check in the updateData function (where this value is ultimately used).
         self.cacheDateTimeComet = self.getCacheDateTime( 
             IndicatorLunar.COMET_CACHE_BASENAME, 
             utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
@@ -505,8 +499,7 @@ class IndicatorLunar( IndicatorBase ):
             magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            data = self.readCacheBinary( cacheBaseName )  #TODO Check how this works...If the time/date is such that we read from the cache, what happens if the file is not there...?
-            # To put it another way, what if the cache is empty?
+            data = self.readCacheBinary( cacheBaseName )
 
         else:
             data = { }
