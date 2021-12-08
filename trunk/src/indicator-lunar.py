@@ -41,7 +41,7 @@
 
 # TODO
 # Have opened a ticket 
-# https://bitbucket.org/delx/webdl/issues?status=new&status=open
+# https://mpc-service.atlassian.net/servicedesk/customer/portal/15/DATAPR-110
 # which points out differences between the comet and minor planet values (for a given body)
 # between the MPC data format and the XEphem data format.
 # The response is that it is likely none of the files have been updated for some time.
