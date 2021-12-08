@@ -69,6 +69,13 @@
 # Delay this issue until it becomes a bigger issue.
 
 
+#TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
+# https://telescopenights.com/stars-in-the-daytime/
+# Excludes the sun and moon (maybe mercury?).
+# Could either use an hourly window similar to that in satellites, or
+# a check box that simply defaults to one hour before sunset and one hour after sunrise as the visible window.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
