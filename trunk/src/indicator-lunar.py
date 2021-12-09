@@ -74,6 +74,8 @@
 # Excludes the sun and moon (maybe mercury?).
 # Could either use an hourly window similar to that in satellites, or
 # a check box that simply defaults to one hour before sunset and one hour after sunrise as the visible window.
+#
+# Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
 
 
 INDICATOR_NAME = "indicator-lunar"
