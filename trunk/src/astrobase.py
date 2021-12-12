@@ -20,6 +20,7 @@
 
 
 # References:
+#    https://ssd.jpl.nasa.gov/horizons.cgi
 #    https://stellarium-web.org/
 #    https://theskylive.com/
 #    https://www.wolframalpha.com
@@ -101,7 +102,7 @@ class AstroBase( ABC ):
         DATA_TAG_THIRD_QUARTER      : _( "THIRD QUARTER" ) }
 
 
-    # Data tags of attributes for specific body types.
+    # Data tags of attributes for each of the body types.
     DATA_TAGS_COMET = [
         DATA_TAG_ALTITUDE,
         DATA_TAG_AZIMUTH,
@@ -272,11 +273,11 @@ class AstroBase( ABC ):
     # Miscellaneous.
     DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
-    MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which brighter than the sun, so set a lower limit.
+    MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which are brighter than the sun, so set a lower limit.
 
 
     # Returns a dictionary with astronomical information:
-    #     Key is a tuple of BodyType, a name tag and a data tag.
+    #     Key is a tuple of a BodyType, a name tag and a data tag.
     #     Value is the calculated astronomical information as a string.
     #
     # Latitude, longitude are floating point numbers representing decimal degrees.
@@ -289,9 +290,7 @@ class AstroBase( ABC ):
     # For satellites, a satellite which is yet to rise or in transit will have the rise and set date/time and azimuth/altitude.
     # For a polar satellite, only the azimuth/altitude is added.
     #
-    # NOTE: Any error when computing a body or if a body never rises, no result is added for that body.
-    #
-    # Results can be verified using https://ssd.jpl.nasa.gov/horizons.cgi
+    # NOTE: Any error when computing a body no result is added for that body.
     @staticmethod
     @abstractmethod
     def calculate(
@@ -369,15 +368,14 @@ class AstroBase( ABC ):
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
-        # Have seen the division resolve to a number that is greater than 1 in the fifth or sixth decimal place,
-        # which subsequently throws a 'ValueError: math domain error' when arccos is executed.
-        # A solution posted in
+        # Have seen the division resolve to a number greater than 1 in the fifth or sixth decimal place which throws
+        #    'ValueError: math domain error'
+        # when arccos is executed.  A solution posted in
         #
         #    https://math.stackexchange.com/questions/4060964/floating-point-division-resulting-in-a-value-exceeding-1-but-should-be-equal-to
         #
         # suggests setting an upper bound to the division with a value +/- 1.0.
-        # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero.
-        # Taking the subsequent logarithm is undefined!
+        # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero and the immediate logarithm is undefined!
         # Not really sure what can be done, or should be done; leave things as they are and catch the error/exception.
         numerator = \
             bodySunDistanceAU * bodySunDistanceAU + \
@@ -400,7 +398,7 @@ class AstroBase( ABC ):
         return apparentMagnitude
 
 
-    # Get the lunar phase for the given date/time and illumination percentage.
+    # Get the lunar phase.
     #
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
     #    nextFullMoonDate The date of the next full moon.
@@ -443,7 +441,7 @@ class AstroBase( ABC ):
         return phase
 
 
-    # Compute the sidereal time for the given longitude (floating point radians) as a decimal time.
+    # Compute the sidereal decimal time for the given longitude (in floating point radians).
     #
     # Reference:
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
@@ -489,7 +487,7 @@ class AstroBase( ABC ):
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in radians counter clockwise from a positive y axis.
+    # Measured in radians, counter clockwise from a positive y axis.
     #
     # Right ascension, declination, latitude and longitude are floating point radians.
     #
@@ -613,8 +611,8 @@ class AstroBase( ABC ):
         return startDateTime, endDateTime
 
 
-    # Retrieve the designation from the full name which uniquely identifies a comet
-    # at the Minor Planet Center.
+    # Retrieve the comet's designation from the full name
+    # which uniquely identifies a comet at the Minor Planet Center.
     #
     # Supports the MPC and XEphem data file formats from which the full name is obtained.
     #
@@ -660,8 +658,8 @@ class AstroBase( ABC ):
         return designation
 
 
-    # Retrieve the designation from the full name which uniquely identifies a minor planet
-    # at the Minor Planet Center.
+    # Retrieve the minor planet's designation from the full name
+    # which uniquely identifies a minor planet at the Minor Planet Center.
     #
     # Supports the MPC and XEphem data file formats from which the full name is obtained.
     #
@@ -684,7 +682,6 @@ class AstroBase( ABC ):
         #     7236 1987 PA                    (7236)
         #     1979 XB                         1979 XB
         #     3271 Ul                         (3271) Ul
-
         components = name.split()
         components[ 0 ] = components[ 0 ].strip( '(' ).strip( ')' )
 
