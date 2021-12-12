@@ -366,8 +366,8 @@ class IndicatorLunar( IndicatorBase ):
             magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
         else:
-            magnitudeFilterAdditionalArguments = [ ]
             dataType = orbitalelement.OE.DataType.XEPHEM_COMET
+            magnitudeFilterAdditionalArguments = [ ]
 
         self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
             utcNow,
@@ -388,8 +388,8 @@ class IndicatorLunar( IndicatorBase ):
             magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.MINOR_PLANET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
         else:
-            magnitudeFilterAdditionalArguments = [ ]
             dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET
+            magnitudeFilterAdditionalArguments = [ ]
 
         minorPlanetData, self.cacheDateTimeMinorPlanetBright, self.downloadCountMinorPlanetBright, self.nextDownloadTimeMinorPlanetBright = self.__updateData( 
             utcNow,
