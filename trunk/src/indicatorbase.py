@@ -526,17 +526,18 @@ class IndicatorBase( ABC ):
 
     # Converts a list of inner lists to a GTK ListStore.
     #
-    # If the list of inner lists is of the form:
+    # If the list of inner lists is of the form below,
+    # each inner list must be of the same length.
     #
-    #    [ [ dataA, dataB, dataC, ...],
-    #    ...
-    #    ...
-    #      [ dataX, dataY, dataZ, ...] ]
+    #    [
+    #        [ dataA, dataB, dataC, ... ],
+    #        ...
+    #        ...
+    #        ...
+    #        [ dataX, dataY, dataZ, ... ]
+    #    ]
     #
-    # Each inner list must be of the same length.
-    #
-    # Corresponding indices of elements of each inner list must be of the same data type.
-    # That is:
+    # Corresponding indices of elements of each inner list must be of the same data type:
     #
     #    type( dataA ) == type( dataX ) and type( dataB ) == type( dataY ) and type( dataC ) == type( dataZ ).
     #
@@ -600,12 +601,6 @@ class IndicatorBase( ABC ):
 
     # Return the full directory path to the user config directory for the current indicator.
     def __getConfigDirectory( self ): return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
-
-
-    # Obtain the full path to a cache file, creating the underlying path if necessary.
-    #
-    # filename: The file name.
-    def getCachePath( self, filename ): return self.__getCacheDirectory() + filename
 
 
     # Remove a file from the cache.
@@ -792,6 +787,10 @@ class IndicatorBase( ABC ):
             cacheFile = None
 
         return cacheFile
+
+
+    # Return the full directory path to the user cache directory for the current indicator.
+    def getCacheDirectory( self ): return self.__getCacheDirectory()
 
 
     # Return the full directory path to the user cache directory for the current indicator.
