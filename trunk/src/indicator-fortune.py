@@ -99,7 +99,7 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def showHistory( self, widget ):
-        historyFile = self.getCachePath( IndicatorFortune.HISTORY_FILE )
+        historyFile = self.getCacheDirectory() + IndicatorFortune.HISTORY_FILE
         text = None
         if os.path.isfile( historyFile ):
             try:
