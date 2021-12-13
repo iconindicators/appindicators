@@ -120,7 +120,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
-        command = "calendar -f " + self.getCachePath( "calendars" ) + " -A 366"
+        command = "calendar -f " + self.getCacheDirectory() + "calendars" + " -A 366"
         for line in self.processGet( command ).splitlines():
             if( line is None or len( line.strip() ) == 0 ):
                 continue # Ubuntu 17.04 inserts an empty line between events.
