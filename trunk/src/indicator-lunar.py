@@ -20,6 +20,64 @@
 # comet, minor planet and satellite information.
 
 
+#TODO To move from install PyEphem via apt/apt-get and use pip instead...
+# Need to test install first of pyephem using apt-get and an install via LaunchPad.
+# Then do another install via LaunchPad but using PIP...
+# Does the newer version of PyEphem get installed from PIP over the top of the existing apt-get?
+#
+# Need to create the test indicator to install python3-pyephem and verify the version number.
+# Then remove python3-ephem (from the control file) and replace with python3-pip and add in the postinst file with pip3/ephem.
+#
+# In astropyephem, need to update the line
+#    __PYEPHEM_INSTALLATION_COMMAND = "sudo apt-get install -y python3-ephem" 
+# and maybe warn user not to use apt-get.
+#
+#
+# Tested indicator-test using the --ignore-installed command for PIP 
+# to install new PyEphem via PIP despite the old PyEpehm via apt-get still present.
+# Seems to work, but then when the computer restarts, an
+# error message appears about the install failing during the postinst....why???
+
+
+# TODO
+# Have opened a ticket 
+# https://mpc-service.atlassian.net/servicedesk/customer/portal/15/DATAPR-110
+# which points out differences between the comet and minor planet values (for a given body)
+# between the MPC data format and the XEphem data format.
+# The response is that it is likely none of the files have been updated for some time.
+# Have also sent a follow up email...
+# Still waiting on a reply...but if the files are never to be updated, then there are two options.
+# 1) If possible take the files from the main data page (which are in MPC format) and convert to XEphem format.
+#    There are no files for bright/critical, so that's that.
+# 2a) Drop (or really hide) the comet and minor planet functionality.
+# 2b) If the comet and minor planet functionality is to be dropped, then may as well move to Skyfield.
+#     Skyfield still has the slowness issue of comet and minor planet...so there is no difference between
+#     that and PyEphem with no current data files.
+#
+# Bottom line: consider switching to Skyfield with comet and minor planet functionality turned off
+# (until fixed in Skyfield).
+# This is all contingent upon the MPC responding to my issue/email. 
+#
+# Stop the downloading from the MPC website.
+# Stop the calculation of comets and minor planets.
+# Stop the display of comets and minor planets.
+# Disable or hide the comets and minor planets in the preferences.
+# Notify the user somehow; notification when the indicator starts up or when preferences are opened.
+#
+# Have compared the RA and Dec of several comets and minor planets against online sources...seems to match closely.
+# So maybe the stale files are not too bad after all.
+# Delay this issue until it becomes a bigger issue.
+
+
+#TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
+# https://telescopenights.com/stars-in-the-daytime/
+# Excludes the sun and moon (maybe mercury?).
+# Could either use an hourly window similar to that in satellites, or
+# a check box that simply defaults to one hour before sunset and one hour after sunrise as the visible window.
+#
+# Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -178,6 +236,8 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
                 _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
                 _( "Comet and Minor Planet OE data by Minor Planet Center. https://www.minorplanetcenter.net" ) ] )
+
+        self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key is a combination of three tags: body type, body name and data name.
