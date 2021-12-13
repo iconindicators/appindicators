@@ -6,7 +6,7 @@ indicator-lunar (1.0.92-1) bionic; urgency=low
         sudo apt-get install -y python3-pip
         sudo pip3 install --ignore-installed --upgrade ephem
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 28 Nov 2021 5:22:41 +1000   <----TODO Set to date of release.
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 13 Dec 2021 17:48:41 +1000
 
 
 indicator-lunar (1.0.91-1) bionic; urgency=low
