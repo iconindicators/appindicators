@@ -59,6 +59,9 @@
 # Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
 
 
+#TODO Consider moving Pluto from the list of planets to list of minor planets.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
