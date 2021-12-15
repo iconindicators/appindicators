@@ -885,8 +885,8 @@ class AstroSkyfield( AstroBase ):
     def __calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum, logging ):
         earthAtNow = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now )
         for planet in planets:
-            apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
-            if math.isnan( apparentMagnitude ): # In some instances a NaN can be returned..
+            apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) ) # Saturn and Neptune can return NaN, so handle...
+            if math.isnan( apparentMagnitude ):
                 if planet == AstroBase.PLANET_SATURN:
                     apparentMagnitude = -0.55
 
