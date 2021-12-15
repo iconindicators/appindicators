@@ -59,9 +59,6 @@
 # Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
 
 
-#TODO Consider moving Pluto from the list of planets to list of minor planets.
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -212,7 +209,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.92",
+            version = "1.0.93",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
             creditz =
@@ -807,12 +804,7 @@ class IndicatorLunar( IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
-                if name == IndicatorLunar.astroBackend.PLANET_PLUTO:
-                    url = IndicatorLunar.SEARCH_URL_DWARF_PLANET + name.lower()
-
-                else:
-                    url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
-
+                url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
                 self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
@@ -2067,7 +2059,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 3 ) # Although a value of 6 is visible with the naked eye, that gives too many minor planets initially.
 
-        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, IndicatorLunar.astroBackend.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
+        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, IndicatorLunar.astroBackend.PLANETS[ : 6 ] ) # Drop Neptune as not visible with naked eye.
 
         self.satelliteLimitStart = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 ) # 4pm
         self.satelliteLimitEnd = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 22 ) # 10pm

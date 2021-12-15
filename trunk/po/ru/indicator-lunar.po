@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-lunar 1.0.92\n"
+"Project-Id-Version: indicator-lunar 1.0.93\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2021-10-03 08:57+1100\n"
 "PO-Revision-Date: 2021-10-19 10:48+0300\n"
@@ -130,10 +130,6 @@ msgstr "Уран"
 msgid "Neptune"
 msgstr "Нептун"
 
-#: astrobase.py:172
-msgid "Pluto"
-msgstr "Плутон"
-
 #: astrobase.py:176
 msgid "MERCURY"
 msgstr "МЕРКУРИЙ"
@@ -161,10 +157,6 @@ msgstr "УРАН"
 #: astrobase.py:182
 msgid "NEPTUNE"
 msgstr "НЕПТУН"
-
-#: astrobase.py:183
-msgid "PLUTO"
-msgstr "ПЛУТОН"
 
 #: astrobase.py:198
 msgid "Full Moon"

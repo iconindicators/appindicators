@@ -101,8 +101,8 @@ class AstroSkyfield( AstroBase ):
         AstroBase.PLANET_JUPITER : "JUPITER BARYCENTER",
         AstroBase.PLANET_SATURN  : "SATURN BARYCENTER",
         AstroBase.PLANET_URANUS  : "URANUS BARYCENTER",
-        AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER",
-        AstroBase.PLANET_PLUTO   : "PLUTO BARYCENTER" }
+        AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER" }
+
 
     # Skyfield does not provide a list of stars.
     #
@@ -885,28 +885,17 @@ class AstroSkyfield( AstroBase ):
     def __calculatePlanets( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, planets, magnitudeMaximum, logging ):
         earthAtNow = ephemerisPlanets[ AstroSkyfield.__PLANET_EARTH ].at( now )
         for planet in planets:
-            if planet == AstroBase.PLANET_PLUTO:
-#TODO Perhaps try to compute via data from
-# https://www.minorplanetcenter.net/iau/MPCORB/Distant.txt
-# and compare.
-# Ditto for PyEphem...if the MPC data is ever verified to be correct!
-# Then perhaps drop Pluto from planets list and add to minor planets list (for both Skyfield and PyEphem).
-# https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft00Distant.txt
-# https://minorplanetcenter.net/iau/Ephemerides/Distant/Soft03Distant.txt
-                apparentMagnitude = 13.65 # Skyfield does not compute this so hard code: https://en.wikipedia.org/wiki/Pluto
+            apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
+            if math.isnan( apparentMagnitude ): # In some instances a NaN can be returned..
+                if planet == AstroBase.PLANET_SATURN:
+                    apparentMagnitude = -0.55
 
-            else:
-                apparentMagnitude = planetary_magnitude( earthAtNow.observe( ephemerisPlanets[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
-                if math.isnan( apparentMagnitude ): # In some instances a NaN can be returned..
-                    if planet == AstroBase.PLANET_SATURN:
-                        apparentMagnitude = -0.55
+                elif planet == AstroBase.PLANET_NEPTUNE:
+                    apparentMagnitude = 7.67
 
-                    elif planet == AstroBase.PLANET_NEPTUNE:
-                        apparentMagnitude = 7.67
-
-                    else:
-                        apparentMagnitude = 1008.0 # Should NEVER happen; set to a high value so the planet is filtered out.
-                        logging.error( "Apparent magnitude NaN for " + planet + " at " + str( now.utc_strftime() ) + " at " + str( locationAtNow.target ) )
+                else:
+                    apparentMagnitude = 1008.0 # Should NEVER happen; set to a high value so the planet is filtered out.
+                    logging.error( "Apparent magnitude NaN for " + planet + " at " + str( now.utc_strftime() ) + " at " + str( locationAtNow.target ) )
 
             if apparentMagnitude <= magnitudeMaximum:
                 AstroSkyfield.__calculateCommon(

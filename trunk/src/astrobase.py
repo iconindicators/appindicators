@@ -180,9 +180,8 @@ class AstroBase( ABC ):
     PLANET_SATURN = "SATURN"
     PLANET_URANUS = "URANUS"
     PLANET_NEPTUNE = "NEPTUNE"
-    PLANET_PLUTO = "PLUTO"
 
-    PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
+    PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE ]
 
     PLANET_NAMES_TRANSLATIONS = {
         PLANET_MERCURY  : _( "Mercury" ),
@@ -191,8 +190,7 @@ class AstroBase( ABC ):
         PLANET_JUPITER  : _( "Jupiter" ),
         PLANET_SATURN   : _( "Saturn" ),
         PLANET_URANUS   : _( "Uranus" ),
-        PLANET_NEPTUNE  : _( "Neptune" ),
-        PLANET_PLUTO    : _( "Pluto" ) }
+        PLANET_NEPTUNE  : _( "Neptune" ) }
 
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     PLANET_TAGS_TRANSLATIONS = {
@@ -202,8 +200,7 @@ class AstroBase( ABC ):
         PLANET_JUPITER  : _( "JUPITER" ),
         PLANET_SATURN   : _( "SATURN" ),
         PLANET_URANUS   : _( "URANUS" ),
-        PLANET_NEPTUNE  : _( "NEPTUNE" ),
-        PLANET_PLUTO    : _( "PLUTO" ) }
+        PLANET_NEPTUNE  : _( "NEPTUNE" ) }
 
 
     # Lunar phases.
