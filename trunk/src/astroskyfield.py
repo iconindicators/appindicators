@@ -908,7 +908,7 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateStars( now, nowPlusOneDay, data, locationAtNow, ephemerisPlanets, ephemerisStars, stars, magnitudeMaximum ):
         for star in stars:
-            if star in AstroBase.STARS:
+            if star in AstroBase.STARS: # Ensure that a star is present if/when switching between PyEphem and Skyfield.
                 theStar = ephemerisStars.loc[ AstroBase.STARS_TO_HIP[ star ] ]
                 if theStar.magnitude <= magnitudeMaximum:
                     AstroSkyfield.__calculateCommon(
