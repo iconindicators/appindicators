@@ -19,44 +19,22 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO In calculateCommon, if there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
-# Verify this is correct and then if so, see how to apply to satellites.
-# How also to determine if a satellite (or any object/body) is never up?
-
-
-#TODO When Skyfield becomes available and is comparable in speed/accuracy/features to PyEphem,
-# switch completely to Skyfield...or not?  Is there any value in having both options
-# particularly since PyEphem will eventually be installed via PIP?
-# Both backends can run simultaneously.  So what is the downside of allowing a user to run either?
-#
+#TODO If/when switching to Skyfield (PyEphem may still be chosen as a backend by the user),
 # Will need several changes:
-#
-#    Will need a temporary function to detect if the cache contains PyEphem specific files
-#    and if so, delete them.
-#
-#    Remove python3-ephem from debian/control Depends.
-#
-#    Add python3-pip to debian/control Depends.
-#
-#    Add dh-python to debian/control Build-Depends.
 #
 #    Add astroskyfield.py to build-debian.
 #
-#    Remove astropyephem.py from build-debian.
+#    Remove astropyephem.py from build-debian (if only running Skyfield).
 #
-#    Remove astropyephem.py from debian/install.
+#    Remove astropyephem.py from debian/install (if only running Skyfield).
 #
 #    Add astroskyfield.py to debian/install.
 #
-#    Create the file debian/postinst with permissions rwx for Owner and r/x for Group and Others (755).
-#    Add content as follows:
-#         #!/bin/bash
-#         
-#         set -e
-#         
-#         sudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield
-#         
-#         #DEBHELPER#
+#    Add to debian/postinst the line
+#        sudo pip3 install --ignore-installed --upgrade skyfield || true
+#
+#        Do we need the other packages?
+#             sudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield
 #
 # https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
@@ -973,6 +951,9 @@ class AstroSkyfield( AstroBase ):
                 logging.exception( e )
 
 
+#TODO If there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
+# Verify this is correct and then if so, see how to apply to satellites (if possible).
+# How also to determine if a satellite (or any object/body) is never up?
     @staticmethod
     def __calculateCommon( now, nowPlusOneDay, data, key, locationAtNow, ephemerisPlanets, body ):
         neverUp = False
