@@ -15,15 +15,15 @@ from datetime import datetime
 basePath = "../../"
 changeLogPath = "/packaging/debian/changelog"
 changeLogs = [
-    "IndicatorFortune",
-    "IndicatorLunar",
-    "IndicatorOnThisDay",
-    "IndicatorPPADownloadStatistics",
-    "IndicatorPunycode",
-    "IndicatorScriptRunner",
-    "IndicatorStardate",
-     "IndicatorTide",
-    "IndicatorVirtualBox" ]
+    "indicator-fortune",
+    "indicator-lunar",
+    "indicator-on-this-day",
+    "indicator-ppa-download-statistics",
+    "indicator-punycode",
+    "indicator-script-runner",
+    "indicator-stardate",
+    "indicator-tide",
+    "indicator-virtual-box" ]
 
 for changeLog in changeLogs:
     try:
