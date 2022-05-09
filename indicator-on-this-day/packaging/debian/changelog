@@ -2,7 +2,7 @@ indicator-on-this-day (1.0.10-1) bionic; urgency=low
 
   * Update release to bionic as xenial is end of life.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 5 Apr 2021 15:10:51 +1000    <-----TODO Set to date of release, whenever that happens!
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 May 2022 23:12:37 +1000
 
 
 indicator-on-this-day (1.0.9-1) xenial; urgency=low

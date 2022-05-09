@@ -1,12 +1,12 @@
 # Portable Object Template for indicator-fortune.
-# Copyright (C) 2015-2020 Bernard Giannetti
+# Copyright (C) 2015-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-fortune package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-fortune 1.0.35\n"
+"Project-Id-Version: indicator-fortune 1.0.36\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2020-04-20 22:20+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

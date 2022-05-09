@@ -1,11 +1,11 @@
 # Russian translation for indicator-punycode.
-# Copyright (C) 2016-2020 Bernard Giannetti
+# Copyright (C) 2016-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-punycode package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2016-2020.
+# Oleg Moiseichuk <berroll@mail.ru>, 2016-2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-punycode 1.0.11\n"
+"Project-Id-Version: indicator-punycode 1.0.12\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2019-10-17 09:48+1100\n"
 "PO-Revision-Date: 2019-10-17 09:48+1100\n"

@@ -1,11 +1,11 @@
 # Russian translation for indicator-stardate.
-# Copyright (C) 2015-2020 Bernard Giannetti
+# Copyright (C) 2015-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-stardate package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2020.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-stardate 1.0.40\n"
+"Project-Id-Version: indicator-stardate 1.0.41\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2019-11-19 14:17+1100\n"
 "PO-Revision-Date: 2019-12-04 15:13+0300\n"

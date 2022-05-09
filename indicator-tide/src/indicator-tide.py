@@ -82,7 +82,7 @@ class IndicatorTide( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.24",
+            version = "1.0.25",
             copyrightStartYear = "2015",
             comments = IndicatorTide.COMMENTS_LINE_FIRST + '\n' + IndicatorTide.COMMENTS_LINE_LAST,
             creditz = [
