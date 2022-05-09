@@ -14,5 +14,5 @@ source=( $NAME".py" ppa.py ) # List of source files.
 hicolorIcons=( $NAME".svg" ) # List of hicolor icons.
 hicolorColours=( 6496dc ) # List of colours present across all the hicolor icons.
 
-. ../PythonUtils/build-debian-common
+. ../indicator-base/build-debian-common
 doStandardBuild source hicolorIcons hicolorColours

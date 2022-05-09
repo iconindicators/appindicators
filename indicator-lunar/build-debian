@@ -14,5 +14,5 @@ source=( $NAME".py" astrobase.py astropyephem.py eclipse.py orbitalelement.py tw
 hicolorIcons=( $NAME".svg" "indicator-lunar-satellite.svg" ) # List of hicolor icons.
 hicolorColours=( fff200 ) # List of colours in all the hicolor icons.
 
-. ../PythonUtils/build-debian-common
+. ../indicator-base/build-debian-common
 doStandardBuild source hicolorIcons hicolorColours
