@@ -1,3 +1,10 @@
+indicator-ppa-download-statistics (1.0.75-1) bionic; urgency=low
+
+  * Added kinetic to the list of series.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 May 2022 22:45:02 +1000
+
+
 indicator-ppa-download-statistics (1.0.74-1) bionic; urgency=low
 
   * Updated LaunchPad PPA URL to include "ubuntu".

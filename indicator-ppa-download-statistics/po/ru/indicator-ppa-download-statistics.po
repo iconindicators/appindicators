@@ -1,11 +1,11 @@
 # Russian translation for indicator-ppa-download-statistics.
-# Copyright (C) 2015-2021 Bernard Giannetti
+# Copyright (C) 2015-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-ppa-download-statistics package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2021.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-ppa-download-statistics 1.0.74\n"
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.75\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2020-04-02 13:10+1100\n"
 "PO-Revision-Date: 2020-04-06 11:15+0300\n"
