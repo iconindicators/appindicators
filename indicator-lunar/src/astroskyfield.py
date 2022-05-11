@@ -787,7 +787,7 @@ class AstroSkyfield( AstroBase ):
     def __calculateMoon( now, nowPlusOneDay, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow, ephemerisPlanets ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
 
-        illumination = int( almanac.fraction_illuminated( ephemerisPlanets, AstroSkyfield.__MOON, now ) * 100 )
+        illumination = int( locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).fraction_illuminated( ephemerisPlanets[ AstroSkyfield.__SUN ] ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         moonAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().altaz()
