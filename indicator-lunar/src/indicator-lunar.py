@@ -55,6 +55,10 @@
 # If comets and minor planets are generally the same always, then only need to download 
 # once in a blue moon.
 # Does this allow then to somehow reduce the processing time to filter out bodies out of visible range?
+#
+# Look at https://web.archive.org/web/20100501000000*/https://www.minorplanetcenter.net/
+# compare the data files for comets/minorplanets over time for each of XEphem and MPC formats
+# to determine how things have changed (for existing bodies, do the numbers remain constant?).
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
