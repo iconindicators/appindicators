@@ -22,19 +22,15 @@
 #TODO If/when switching to Skyfield (PyEphem may still be chosen as a backend by the user),
 # Will need several changes:
 #
-#    Add astroskyfield.py to build-debian.
+#    Add astroskyfield.py to build-debian and debian/install.
 #
-#    Remove astropyephem.py from build-debian (if only running Skyfield).
-#
-#    Remove astropyephem.py from debian/install (if only running Skyfield).
-#
-#    Add astroskyfield.py to debian/install.
+#    Remove astropyephem.py from build-debian and debian/install (if ONLY running Skyfield).
 #
 #    Add to debian/postinst the line
 #        sudo pip3 install --ignore-installed --upgrade skyfield || true
 #
-#        Do we need the other packages?
-#             sudo pip3 install --upgrade jplephem numpy pandas pip pytz skyfield
+#    Do we need the other packages in the debian/postinst?
+#             sudo pip3 install --ignore-installed --upgrade jplephem numpy pandas pip pytz skyfield || true
 #
 # https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
