@@ -31,6 +31,8 @@
 # 
 # https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
+#
+# Will also need to include the latest versions of planets.bsp and stars.dat.gz (not sure which files needs to list the filenames).
 
 
 # import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
