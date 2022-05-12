@@ -28,20 +28,6 @@
 #
 #   Add to debian/postinst the line
 #       sudo pip3 install --ignore-installed --upgrade pandas pip skyfield || true
-#
-#   Do we need the other packages in the debian/postinst?
-#       sudo pip3 install --ignore-installed --upgrade jplephem numpy pandas pip pytz skyfield || true
-#
-#   Note that the 'installationCommand' below in getStatusMessage() only contains pandas, pip, skyfield.
-#   There is no mention of jplephem, numpy, pytz.
-#   How to determine the dependencies of installing skyfield (to determine if all the other stuff other than pip are pulled in for free)?
-#
-#   Running 'pip3 show skyfield' yields the requires as 'jplephem, numpy, sgp4'.
-#   No mention of pandas, nor pytz.
-#   I suspect pytz is no longer needed (given using python 3.6+).
-#   I suspect pandas is required for the orbitalelement magnitude stuff...so test running that code without pandas installed.
-#   Pandas is needed by Skyfiled internally in the MPC stuff.
-#   Given jplephem and numpy are listed within skyfield's requires, no longer needed to explicitly mention in the pip3 install command above.
 # 
 # https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
