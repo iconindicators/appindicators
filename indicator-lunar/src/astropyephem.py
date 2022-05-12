@@ -594,7 +594,7 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
-        minimalRequiredVersion = "4.1.2"
+        minimalRequiredVersion = "4.1.3"
         installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade ephem"
         message = None
         if not available:
