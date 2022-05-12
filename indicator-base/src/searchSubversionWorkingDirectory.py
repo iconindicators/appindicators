@@ -10,8 +10,8 @@
 import re, subprocess
 
 
-fullPathToFile = "/home/bernard/Programming/Subversion/IndicatorVirtualBox/src/indicator-virtual-box.py"
-regularExpressionToFind = "TreeStore"
+fullPathToFile = "/home/bernard/Programming/Indicators/indicator-lunar/src/astroskyfield.py"
+regularExpressionToFind = "pytz"
 
 
 def runCommand( cmd ): return subprocess.check_output( cmd.split(), universal_newlines = True )
