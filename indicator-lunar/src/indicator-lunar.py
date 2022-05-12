@@ -48,6 +48,13 @@
 # Have compared the RA and Dec of several comets and minor planets against online sources...seems to match closely.
 # So maybe the stale files are not too bad after all.
 # Delay this issue until it becomes a bigger issue.
+#
+# Another point...
+# Once the "correct" or "valid" minor planet and comet files are determined,
+# for both PyEphem and Skyfield, try to determine how often these files actually change.
+# If comets and minor planets are generally the same always, then only need to download 
+# once in a blue moon.
+# Does this allow then to somehow reduce the processing time to filter out bodies out of visible range?
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
