@@ -694,4 +694,4 @@ class AstroBase( ABC ):
         else:
             designation = components[ 0 ]
 
-        return designation    
+        return designation
