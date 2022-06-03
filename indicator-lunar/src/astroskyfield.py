@@ -35,7 +35,7 @@
 # Will also need to include the latest versions of planets.bsp and stars.dat.gz (not sure which files needs to list the filenames).
 
 
-# import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
+import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
 
 try:
     from skyfield import almanac, constants, eclipselib
@@ -58,7 +58,7 @@ import datetime, eclipse, importlib, io, locale, math
 class AstroSkyfield( AstroBase ):
 
     __EPHEMERIS_PLANETS = "planets.bsp"
-    __EPHEMERIS_STARS = "stars.dat.gz"
+    __EPHEMERIS_STARS = "stars.dat" 
 
 
     # Name tags for bodies.
@@ -1094,9 +1094,12 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/123
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
-    def createEphemerisPlanets( ephemerisBSPFile, yearsToKeep ):
+    def createEphemerisPlanets( ephemerisBSPFile, yearsToKeep = 5 ):
         from dateutil.relativedelta import relativedelta
         import os, subprocess
+
+        if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
+            os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
 
         # Set the start date a little earlier to avoid sticky situations...
         # For example, the lunar eclipse code starts searching prior to the search date.
@@ -1116,37 +1119,35 @@ class AstroSkyfield( AstroBase ):
         print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS )
 
 
-    # Create a star ephemeris from the Hipparcos catalogue and filtering out stars not listed at:
+    # Create a star ephemeris from hip_main.dat (must be present in the file system),
+    # containing only the stars listed at:
+    #
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
+    #
+    # The file hip_main.dat can be downloaded from:
+    #
+    #    https://cdsarc.u-strasbg.fr/ftp/cats/I/239/hip_main.dat
     #
     # Format of Hipparcos catalogue:
     #    ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
     @staticmethod
-    def createEphemerisStars():
-        import gzip, os
+    def createEphemerisStars( hip_mainDOTdat  ):
+        import os
 
-        ephemeris = hipparcos.URL[ hipparcos.URL.rindex( "/" ) + 1 : ]
-        if not os.path.isfile( ephemeris ):
-            print( "Unable to locate", ephemeris, "on the file system.  Downloading..." )
-            load.open( hipparcos.URL )
-
-        hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS ):
             os.remove( AstroSkyfield.__EPHEMERIS_STARS )
 
+        hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
         print( "Creating stars ephemeris..." )
-        with load.open( ephemeris, "rb" ) as inFile, gzip.open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
+        with load.open( hip_mainDOTdat, "rb" ) as inFile, open( AstroSkyfield.__EPHEMERIS_STARS, "wb" ) as outFile:
             for line in inFile:
-                hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
+                hip = int( line.decode()[ 8 : 14 ].strip() ) # FYI Absolute magnitude can be found at indices [ 42 : 46 ].
                 if hip in hipparcosIdentifiers:
-#TODO Perhaps as each star is written out, remove it from the list of stars...
-# ...then at the end of each loop iteration, if there are no more stars, break.
-# See if this saves time overall. 
                     outFile.write( line )
 
         print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
 
 
 # Create/update the stars/planets ephemerides; uncomment the gettext import at the top of the file!
-# AstroSkyfield.createEphemerisPlanets( "de440s.bsp", 5 )
-# AstroSkyfield.createEphemerisStars()
+# AstroSkyfield.createEphemerisPlanets( "de440s.bsp" )
+# AstroSkyfield.createEphemerisStars( "hip_main.dat" )

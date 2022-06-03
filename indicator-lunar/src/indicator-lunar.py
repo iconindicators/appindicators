@@ -319,7 +319,7 @@ class IndicatorLunar( IndicatorBase ):
         utcNow = datetime.datetime.utcnow()
 
         # Update comet minor planet and satellite cached data.
-        self.updateData( utcNow )
+        self.updateData( utcNow ) #TODO COmment out to avoid download of comets/mpc/satellites.
 
         # Update backend.
         self.dataPrevious = self.data
