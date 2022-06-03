@@ -35,7 +35,7 @@
 # Will also need to include the latest versions of planets.bsp and stars.dat.gz (not sure which files needs to list the filenames).
 
 
-import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
+# import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
 
 try:
     from skyfield import almanac, constants, eclipselib
@@ -1094,7 +1094,7 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/123
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
-    def createEphemerisPlanets( ephemerisBSPFile, yearsToKeep = 5 ):
+    def createEphemerisPlanets( ephemerisBSPFile, yearsToKeepFromToday = 5 ):
         from dateutil.relativedelta import relativedelta
         import os, subprocess
 
@@ -1106,7 +1106,7 @@ class AstroSkyfield( AstroBase ):
         # https://github.com/skyfielders/python-skyfield/issues/531
         today = datetime.date.today()
         startDate = today - relativedelta( months = 1 )
-        endDate = today.replace( year = today.year + yearsToKeep )
+        endDate = today.replace( year = today.year + yearsToKeepFromToday )
         dateFormat = "%Y/%m/%d"
         command = \
             "python3 -m jplephem excerpt " + \
