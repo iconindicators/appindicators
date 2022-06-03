@@ -94,7 +94,6 @@ def getVersion(): return "Version 5.0 (2019-10-07)"
 #    stardate issue
 #    stardate integer
 #    stardate fraction
-#    fractionalPeriod (time in seconds when the fractional part changes).
 def getStardateClassic( gregorianDateTime ):
     if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ):
         raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
@@ -161,7 +160,6 @@ def getStardateClassic( gregorianDateTime ):
 # Returns a '2009 revised' stardate with the components:
 #    stardate integer
 #    stardate fraction
-#    fractionalPeriod (time in seconds when the fractional part changes).
 def getStardate2009Revised( gregorianDateTime ):
     if ( gregorianDateTime.year < 1900 ) or ( gregorianDateTime.year > 9500 ):
         raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
