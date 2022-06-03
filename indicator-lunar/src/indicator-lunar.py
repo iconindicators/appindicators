@@ -59,7 +59,15 @@
 # Look at https://web.archive.org/web/20100501000000*/https://www.minorplanetcenter.net/
 # compare the data files for comets/minorplanets over time for each of XEphem and MPC formats
 # to determine how things have changed (for existing bodies, do the numbers remain constant?).
-
+#
+# Gets MUCH worse!
+# In short, the minor planet files for XEphem are no longer officially provided via hyperlinks.
+# The files on the main MPC 'data' page for Distant/NEA/PHA/Unusual don't contain bodies such as Ceres, Vesta, etc.
+# Have to use the MPCORB.DAT to get latest bodies.
+# Looks like unless a source can be found to provide a stripped down version of MPCORB.DAT, then no more minor planets.
+# (stripped down by only containing bodies of apparent magnitude of 15 or less)
+# For comets, the comet data file on the main MPC 'data' page seems good (for now).
+# Long story: https://github.com/skyfielders/python-skyfield/discussions/747
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
 # https://telescopenights.com/stars-in-the-daytime/
