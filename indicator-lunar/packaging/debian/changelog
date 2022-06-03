@@ -1,6 +1,7 @@
 indicator-lunar (1.0.93-1) bionic; urgency=low
 
-  * Removed Pluto from list of planets; accessible from minor planets.
+  * Removed Pluto from list of planets; accessible from minor planets
+    (when its apparent magnitude is less than 15).
   * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 13 Dec 2021 17:48:41 +1000   <--- TODO Set to day of release!!!!
