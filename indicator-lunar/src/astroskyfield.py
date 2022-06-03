@@ -1079,41 +1079,37 @@ class AstroSkyfield( AstroBase ):
         return key
 
 
-    # Create a planet ephemeris from NASA filtering by date range:
-    #     https://github.com/skyfielders/python-skyfield/issues/123
-    #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
-    #     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
+    # Create a planet ephemeris from an original BSP file.
+    # The resultant ephemeris will commence from today's date and end at the specified number of years from today.
+    #
+    # Source for BSP files:
+    #    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
+    #
+    # References:
+    #    https://github.com/skyfielders/python-skyfield/issues/123
+    #    ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
+    #    ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
     #
     # Alternate method: Download a .bsp and use spkmerge to create a smaller subset:
     #    https://github.com/skyfielders/python-skyfield/issues/123
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
-    def createEphemerisPlanets():
+    def createEphemerisPlanets( ephemerisBSPFile, yearsToKeep ):
         from dateutil.relativedelta import relativedelta
-        import os, subprocess, urllib
-
-        ephemeris = "de440s.bsp"
-        if not os.path.isfile( ephemeris ):
-            print( "Unable to locate", ephemeris, "on the file system.  Downloading..." )
-            url = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/" + ephemeris
-            urllib.request.urlretrieve ( url, ephemeris )
-
-        if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS ):
-            os.remove( AstroSkyfield.__EPHEMERIS_PLANETS )
-
-        today = datetime.date.today()
+        import os, subprocess
 
         # Set the start date a little earlier to avoid sticky situations...
         # For example, the lunar eclipse code starts searching prior to the search date.
         # https://github.com/skyfielders/python-skyfield/issues/531
-        startDate = today - relativedelta( months = 1 ) 
-        endDate = today.replace( year = today.year + 5 ) # Five years should be enough data.
+        today = datetime.date.today()
+        startDate = today - relativedelta( months = 1 )
+        endDate = today.replace( year = today.year + yearsToKeep )
         dateFormat = "%Y/%m/%d"
         command = \
             "python3 -m jplephem excerpt " + \
             startDate.strftime( dateFormat ) + " " + \
             endDate.strftime( dateFormat ) + " " + \
-            ephemeris + " " + AstroSkyfield.__EPHEMERIS_PLANETS
+            ephemerisBSPFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS
 
         print( "Creating planets ephemeris...\n\t", command )
         subprocess.call( command, shell = True )
@@ -1143,11 +1139,14 @@ class AstroSkyfield( AstroBase ):
             for line in inFile:
                 hip = int( line.decode()[ 8 : 14 ].strip() ) # Magnitude can be found at indices [ 42 : 46 ].
                 if hip in hipparcosIdentifiers:
+#TODO Perhaps as each star is written out, remove it from the list of stars...
+# ...then at the end of each loop iteration, if there are no more stars, break.
+# See if this saves time overall. 
                     outFile.write( line )
 
         print( "Created", AstroSkyfield.__EPHEMERIS_STARS )
 
 
 # Create/update the stars/planets ephemerides; uncomment the gettext import at the top of the file!
-# AstroSkyfield.createEphemerisPlanets()
+# AstroSkyfield.createEphemerisPlanets( "de440s.bsp", 5 )
 # AstroSkyfield.createEphemerisStars()
