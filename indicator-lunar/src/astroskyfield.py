@@ -700,7 +700,7 @@ class AstroSkyfield( AstroBase ):
             AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
 
 
-#TODO Check and ensure the APPARENT magnitude is used to filter, not ABSOLUTE. 
+#TODO Check and ensure the APPARENT magnitude is used to filter, not ABSOLUTE.
 #
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
 # https://github.com/skyfielders/python-skyfield/issues/490
