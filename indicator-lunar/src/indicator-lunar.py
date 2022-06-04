@@ -604,6 +604,8 @@ class IndicatorLunar( IndicatorBase ):
 # If the cache is old, a download will occur and be written to the cache.
 # If the cache is valid and the data is { }, the cache will be read.
 # If the cache is valid and the data is NOT { } (second time and subsequent), the cache will be not be read and the data simply returned.
+# Take into account when the indicator is running for some time (longer than a cache interval)...
+# will need to always check the cache before just simply just sending back the passed in data (and may need to do a fresh download).
 #If this logic is valid, implement first before any minor planet / comet changes. 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
