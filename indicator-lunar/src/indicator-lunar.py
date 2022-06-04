@@ -591,7 +591,7 @@ class IndicatorLunar( IndicatorBase ):
 
     # Get the data from the cache, or if stale, download from the source.
     #
-    # Returns a dictionary (may be empty).
+    # Returns a dictionary (may be empty). #TODO Update this!
     def __updateData(
             self, utcNow,
             cacheDateTime, cacheMaximumAge, cacheBaseName,
