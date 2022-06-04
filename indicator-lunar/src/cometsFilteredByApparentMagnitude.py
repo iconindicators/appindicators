@@ -20,7 +20,7 @@
 # If a body's apparent magnitude is less than the maximum specified at any point, keep the body.
 #
 # The CometEls.txt data which is in MPC format, must first be converted to XEphem format.
-# Refer to # Inspired by https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+# Refer to https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
 #
 # MPC format: 
 #    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
