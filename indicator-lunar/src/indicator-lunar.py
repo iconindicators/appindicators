@@ -274,6 +274,8 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def flushCache( self ):
+#TODO Can removeOldFilesFromCache() be renamed to flushCache()?
+# If so, the flushCache() function here needs a new name...but not a big deal.
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
@@ -607,6 +609,9 @@ class IndicatorLunar( IndicatorBase ):
 # Take into account when the indicator is running for some time (longer than a cache interval)...
 # will need to always check the cache before just simply just sending back the passed in data (and may need to do a fresh download).
 #If this logic is valid, implement first before any minor planet / comet changes. 
+#
+#TODO Not sure about this...
+# Why pass in the cache age...why not just read from the file system each time?
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
             data = self.readCacheBinary( cacheBaseName )
 

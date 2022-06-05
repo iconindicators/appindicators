@@ -630,6 +630,8 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # and is older than the cache maximum age is discarded.
+#TODO The function above, removeFileFromCache() removes the specified file (without caveats irrespective of file age).
+# This function removes files (of a certain base name) based on age...therefore this is more of a flush cache not remove cache.
     def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
@@ -764,6 +766,7 @@ class IndicatorBase( ABC ):
     # extension: The file extension (without period).
     #
     # Returns the full path and file name on success, None otherwise.
+#TODO Why is the parameter list so convoluted (compare with the readCacheText() and the writeCacheBinary())?    
     def writeCacheText( self, fileNameOrBaseName, text, isFileName = True, extension = None ):
         if isFileName:
             cacheFile = self.__getCacheDirectory() + fileNameOrBaseName
