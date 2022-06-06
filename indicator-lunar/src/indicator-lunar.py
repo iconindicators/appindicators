@@ -68,6 +68,39 @@
 # (stripped down by only containing bodies of apparent magnitude of 15 or less)
 # For comets, the comet data file on the main MPC 'data' page seems good (for now).
 # Long story: https://github.com/skyfielders/python-skyfield/discussions/747
+#
+# Skyfield/Comets:
+#    Download MPC format file once per week (updated a couple of times per month).
+#    Filter by apparent magnitude using download date and one week from download.
+#    Save filtered data out to cache in same text format as that downloaded.
+#
+# Skyfield/Minor Planets:
+#    MPC file is too large to download AND filter through the indicator.
+#    If an external source/mechanism can obtain the MPC file and filter by apparent magnitude,
+#    perhaps by the download date and once a week for a month, then make that file available for download
+#    in the same text format, then minor planets can be brought back in to the indicator.
+# 
+# PyEphem/Comets:
+#    Download MPC format file once per week (updated a couple of times per month).
+#    Filter by apparent magnitude using download date and one week from download.
+#    Save filtered data out to cache in same text format as that downloaded.
+#    Given the original file will be in MPC format, when magnitude filtering the format will have to change,
+#    so perhaps write out the filtered file in PyEphem format (saves changing the format each time the file is read in).
+#
+# Skyfield/Minor Planets:
+#    MPC file is too large to download AND filter through the indicator.
+#    If an external source/mechanism can obtain the MPC file and filter by apparent magnitude,
+#    perhaps by the download date and once a week for a month, then make that file available for download
+#    in the same text format, then minor planets can be brought back in to the indicator.
+#    When the filtered file is downloaded, best to save out in PyEphem format.
+# 
+# CHECK: Once a file is downloaded, filtered and saved to the cache,
+# the filtered file will only be read in when the indicator starts up (once per day).
+# So is there a speed difference between reading in a text file compared to reading in a binary file?
+#
+# Might need to check if the old cache files need to be removed for users upgrading.
+# https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
+
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
 # https://telescopenights.com/stars-in-the-daytime/
@@ -80,7 +113,6 @@
 # If this goes ahead, consider moving the start/end hour window functionality out of each backend and into the frontend.
 # So calculate the satellite passes and screen out those not within the desired window and calculate again moving the start date/time forward to the next window.
 # Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
-
 
 INDICATOR_NAME = "indicator-lunar"
 import gettext
