@@ -322,6 +322,14 @@ class AstroBase( ABC ):
     def getLatitudeLongitudeElevation( city ): return 0.0, 0.0, 0.0
 
 
+#TODO The implementations might need to somewhat change...
+# Given the idea now to take (hopefully) the minor planet data and filter for a date range,
+# rather than a single date, this function should take an end date (start date is always current date)
+# and number of intervals.
+# Each body is computed at every interval and the apparent magnitude computed and if valid,
+# keep that body (no need to keep checking that body).
+# So if downloading the comet data weekly, then the end date will be a week or so from the download date,
+# and the interval could be say two (compute for today and then the end date as the range is quite short).
     # Takes a dictionary of orbital element data (for comets or minor planets),
     # in which the key is the body name and value is the orbital element data.
     #
