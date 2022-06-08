@@ -415,6 +415,7 @@ class IndicatorTide( IndicatorBase ):
 
     def getTidalData( self, portID ):
         self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
+#TODO readCacheBinary no longer exists...change to a text based file.
         tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
         if tidalReadings:
             tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
@@ -433,6 +434,7 @@ class IndicatorTide( IndicatorBase ):
         if tidalReadings is None: # There was no cached version or the cached version was stale; either way, need to do a download.
             tidalReadings = self.removeTidalReadingsPriorToToday( self.__getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
             if tidalReadings:
+#TODO writeCacheBinary no longer exists...change to a text based file.
                 self.writeCacheBinary( IndicatorTide.CACHE_BASENAME, tidalReadings )
 
         return tidalReadings
