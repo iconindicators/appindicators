@@ -72,7 +72,7 @@ class IndicatorTide( IndicatorBase ):
     MENU_ITEM_TIDE_DEFAULT_FORMAT = MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIME_DEFAULT_FORMAT + "    " + MENU_ITEM_TIDE_LEVEL_TAG
     MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME = MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
 
-    CACHE_BASENAME = "tidal-"
+    CACHE_BASENAME = "tidal-" #TODO If tidal data is ever found and this indicator rises from the ashes, add a ".txt" to the and of the cache files.
     CACHE_MAXIMUM_AGE_HOURS = 24
 
     COMMENTS_LINE_FIRST = _( "Displays tidal information." )
