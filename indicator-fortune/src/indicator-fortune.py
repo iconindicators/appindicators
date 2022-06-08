@@ -46,7 +46,7 @@ class IndicatorFortune( IndicatorBase ):
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
     DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", Gtk.STOCK_APPLY ]
-    HISTORY_FILE = "fortune-history"
+    HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
     NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
@@ -63,7 +63,12 @@ class IndicatorFortune( IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
+        self.__removeOldHistoryFileVersion36() # History file had the ".txt" extension added in version 36 so remove old file.
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
+
+
+    def __removeOldHistoryFileVersion36( self ):
+        self.removeFileFromCache( "fortune-history" )
 
 
     def update( self, menu ):
@@ -99,21 +104,9 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def showHistory( self, widget ):
-        historyFile = self.getCacheDirectory() + IndicatorFortune.HISTORY_FILE
-        text = None
-        if os.path.isfile( historyFile ):
-            try:
-                with open( historyFile, "r" ) as f:
-                    text = f.read()
-
-            except Exception as e:
-                text = None
-                logging.exception( e )
-                logging.error( "Error reading from cache: " + historyFile )
-
         textView = Gtk.TextView()
         textView.set_editable( False )
-        textView.get_buffer().set_text( text )
+        textView.get_buffer().set_text( self.readCacheText( IndicatorFortune.HISTORY_FILE ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_hexpand( True )
@@ -173,8 +166,7 @@ class IndicatorFortune( IndicatorBase ):
                         output += c                   
 
                     self.fortune = output
-                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n" )
-
+                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n", extension = "" )
                     break
 
 
