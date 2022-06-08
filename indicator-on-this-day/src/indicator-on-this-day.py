@@ -48,8 +48,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
     COLUMN_CALENDAR_ENABLED = 1 # tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
 
-    CALENDARS_BASENAME = "calendars" 
-    CALENDARS_EXTENSION = ".txt" 
+    CALENDARS_FILENAME = "calendars.txt" 
 
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
@@ -125,11 +124,11 @@ class IndicatorOnThisDay( IndicatorBase ):
             if os.path.isfile( calendar ):
                 content += "#include <" +calendar + ">\n"
 
-        self.writeCacheText( content, IndicatorOnThisDay.CALENDARS_BASENAME, IndicatorOnThisDay.CALENDARS_EXTENSION )
+        self.writeCacheText( content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
-        command = "calendar -f " + self.getCacheDirectory() + IndicatorOnThisDay.CALENDARS_BASENAME + IndicatorOnThisDay.CALENDARS_EXTENSION + " -A 366"
+        command = "calendar -f " + self.getCacheDirectory() + IndicatorOnThisDay.CALENDARS_FILENAME + " -A 366"
         for line in self.processGet( command ).splitlines():
             if( line is None or len( line.strip() ) == 0 ):
                 continue # Ubuntu 17.04 inserts an empty line between events.
