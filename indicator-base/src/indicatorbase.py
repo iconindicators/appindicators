@@ -59,7 +59,7 @@ class IndicatorBase( ABC ):
     CONFIG_VERSION = "version"
     INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
-    URL_TIMEOUT_IN_SECONDS = 5
+    URL_TIMEOUT_IN_SECONDS = 20
 
 
     def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None, debug = False ):
@@ -616,9 +616,10 @@ class IndicatorBase( ABC ):
         for file in os.listdir( cacheDirectory ):
             if file == fileName:
                 os.remove( cacheDirectory + file )
+                break
 
 
-    # Removes out of date cache files.
+    # Removes out of date cache files of a given base filename.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
     # cacheMaximumAgeInHours: Anything older than the maximum age (hours) is deleted.
@@ -630,14 +631,14 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # and is older than the cache maximum age is discarded.
-#TODO The function above, removeFileFromCache() removes the specified file (without caveats irrespective of file age).
-# This function removes files (of a certain base name) based on age...therefore this is more of a flush cache not remove cache.
-    def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
+    #
+    # Any file extension is ignored in determining if the file should be deleted or not.
+    def flushCache( self, baseName, cacheMaximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( baseName ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
-                dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYMMDDHHMMSS is 14 characters.
+                dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
                     fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
                     if fileDateTime < cacheMaximumAgeDateTime:
@@ -658,7 +659,7 @@ class IndicatorBase( ABC ):
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
-            expiry = datetime.datetime.strptime( theFile[ len( theFile ) - 14 : ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            expiry = datetime.datetime.strptime( theFile[ len( baseName ) : len( baseName ) + 14 ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
 
         if expiry is None:
             expiry = defaultExpiry
@@ -666,6 +667,7 @@ class IndicatorBase( ABC ):
         return expiry
 
 
+#TODO Use these two headers to document new read/write text file functions below.
     # Read the most recent binary object from the cache.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
@@ -682,26 +684,6 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-    def readCacheBinary( self, baseName ):
-        cacheDirectory = self.__getCacheDirectory()
-        data = None
-        theFile = ""
-        for file in os.listdir( cacheDirectory ):
-            if file.startswith( baseName ) and file > theFile:
-                theFile = file
-
-        if theFile: # A value of "" evaluates to False.
-            filename = cacheDirectory + theFile
-            try:
-                with open( filename, 'rb' ) as f:
-                    data = pickle.load( f )
-
-            except Exception as e:
-                data = None
-                logging.exception( e )
-                logging.error( "Error reading from cache: " + filename )
-
-        return data
 
 
     # Writes an object as a binary file.
@@ -715,107 +697,6 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # Returns True on success; False otherwise.
-    def writeCacheBinary( self, baseName, binaryData ):
-        success = True
-        cacheFile = \
-            self.__getCacheDirectory() + \
-            baseName + \
-            datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-
-        try:
-            with open( cacheFile, 'wb' ) as f:
-                pickle.dump( binaryData, f )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing to cache: " + cacheFile )
-            success = False
-
-        return success
-
-
-#TODO Not sure if this will be kept...if so, update header.
-    # Writes an object as a binary file.
-    #
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    # binaryData: The object to write.
-    #
-    # The object will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # Returns True on success; False otherwise.
-    # def getCacheDateTimeStamp( self ): return datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-
-
-#TODO Will likely need a version that incorporates timestamps as per readCacheBinary.
-    # Read a text file from the cache.
-    #
-    # fileName: The file name of the text file.
-    #
-    # Returns the text contents or None on error.
-    # def readCacheText( self, fileName ):
-    #     cacheFile = self.__getCacheDirectory() + fileName
-    #     text = None
-    #     if os.path.isfile( cacheFile ):
-    #         try:
-    #             with open( cacheFile, 'r' ) as f:
-    #                 text = f.read()
-    #
-    #         except Exception as e:
-    #             text = None
-    #             logging.exception( e )
-    #             logging.error( "Error reading from cache: " + cacheFile )
-    #
-    #     if text is None or len( text ) == 0: # Return either None or non-empty text.
-    #         text = None
-    #
-    #     return text
-
-
-    # Read the most recent binary object from the cache.
-    #
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    #
-    # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
-    #    ~/.cache/fred/apple-20170629174950
-    #    ~/.cache/fred/orange-20170629174951
-    #
-    # Files which pass the filter are sorted by date/time and the most recent file is read.
-    #
-    # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-    # def readCacheText( self, baseName, extension = ".txt", timeStamp = False ):
-    #     cacheDirectory = self.__getCacheDirectory()
-    #     if timeStamp:
-    #         cacheFile = ""
-    #         for file in os.listdir( cacheDirectory ):
-    #             if file.startswith( baseName ) and file.endswith( extension ) and file > cacheFile:
-    #                 cacheFile = file
-    #
-    #         if cacheFile:
-    #             cacheFile = cacheDirectory + cacheFile
-    #
-    #     else:            
-    #         cacheFile = cacheDirectory + baseName + extension
-    #
-    #     text = ""
-    #     if os.path.isfile( cacheFile ):
-    #         try:
-    #             with open( cacheFile, 'r' ) as f:
-    #                 text = f.read()
-    #
-    #         except Exception as e:
-    #             text = ""
-    #             logging.exception( e )
-    #             logging.error( "Error reading from cache: " + cacheFile )
-    #
-    #     return text
 
 
     def readCacheText( self, filename ): return self.__readCacheText( self.__getCacheDirectory() + filename )
@@ -829,8 +710,6 @@ class IndicatorBase( ABC ):
                 cacheFile = file
 
         if cacheFile:
-#TODO What happens if no cache file is present...does an error occur when trying to read from the cache?
-# If no cache file is present, no point trying to do a read!
             cacheFile = cacheDirectory + cacheFile
 
         return self.__readCacheText( cacheFile )
@@ -849,60 +728,6 @@ class IndicatorBase( ABC ):
                 logging.error( "Error reading from cache: " + cacheFile )
 
         return text
-
-
-    # Write a text file to the cache.
-    #
-    # fileNameOrBaseName: The file name of the text file or the base name of the text file.
-    # text: The text to write.
-    # isFileName: If True (default), the full file name is provided by the caller, otherwise only the base name.
-    # extension: The file extension (without period).
-    #
-    # Returns the full path and file name on success, None otherwise.
-#TODO Why is the parameter list so convoluted (compare with the readCacheText() and the writeCacheBinary())?    
-    # def writeCacheText( self, fileNameOrBaseName, text, isFileName = True, extension = None ):
-    #     if isFileName:
-    #         cacheFile = self.__getCacheDirectory() + fileNameOrBaseName
-    #
-    #     else:
-    #         cacheFile = \
-    #             self.__getCacheDirectory() + \
-    #             fileNameOrBaseName + \
-    #             datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-    #
-    #     if extension is not None:
-    #         cacheFile += '.' + extension
-    #
-    #     try:
-    #         with open( cacheFile, 'w' ) as f:
-    #             f.write( text )
-    #
-    #     except Exception as e:
-    #         logging.exception( e )
-    #         logging.error( "Error writing to cache: " + cacheFile )
-    #         cacheFile = None
-    #
-    #     return cacheFile
-
-
-    # def writeCacheText( self, text, baseName, extension = ".txt", timeStamp = False ):
-    #     cacheFile = self.__getCacheDirectory() + baseName
-    #
-    #     if timeStamp:
-    #         cacheFile += datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-    #
-    #     cacheFile += extension
-    #
-    #     try:
-    #         with open( cacheFile, 'w' ) as f:
-    #             f.write( text )
-    #
-    #     except Exception as e:
-    #         logging.exception( e )
-    #         logging.error( "Error writing to cache: " + cacheFile )
-    #         cacheFile = None
-    #
-    #     return cacheFile
 
 
     def writeCacheText( self, text, filename ): return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
