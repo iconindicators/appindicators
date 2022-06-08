@@ -48,6 +48,9 @@ class IndicatorOnThisDay( IndicatorBase ):
     COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
     COLUMN_CALENDAR_ENABLED = 1 # tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
 
+    CALENDARS_BASENAME = "calendars" 
+    CALENDARS_EXTENSION = ".txt" 
+
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
@@ -59,6 +62,12 @@ class IndicatorOnThisDay( IndicatorBase ):
             version = "1.0.10",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
+
+        self.__removeOldCalendarsFileVersion10() # Cached calendars file had ".txt" extension added in version 10, so remove old file.
+
+
+    def __removeOldCalendarsFileVersion10( self ):
+        self.removeFileFromCache( "calendars" )
 
 
     def update( self, menu ):
@@ -116,11 +125,11 @@ class IndicatorOnThisDay( IndicatorBase ):
             if os.path.isfile( calendar ):
                 content += "#include <" +calendar + ">\n"
 
-        self.writeCacheText( "calendars", content )
+        self.writeCacheText( content, IndicatorOnThisDay.CALENDARS_BASENAME, IndicatorOnThisDay.CALENDARS_EXTENSION )
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
-        command = "calendar -f " + self.getCacheDirectory() + "calendars" + " -A 366"
+        command = "calendar -f " + self.getCacheDirectory() + IndicatorOnThisDay.CALENDARS_BASENAME + IndicatorOnThisDay.CALENDARS_EXTENSION + " -A 366"
         for line in self.processGet( command ).splitlines():
             if( line is None or len( line.strip() ) == 0 ):
                 continue # Ubuntu 17.04 inserts an empty line between events.

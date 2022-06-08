@@ -1,5 +1,6 @@
 indicator-on-this-day (1.0.10-1) bionic; urgency=low
 
+  * Added the ".txt" extension to the calendars file located in the user cache.
   * Update release to bionic as xenial is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 May 2022 23:12:37 +1000
