@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from ephem import newton
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -118,6 +117,7 @@ from ephem import newton
 # So calculate the satellite passes and screen out those not within the desired window and calculate again moving the start date/time forward to the next window.
 # Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
 
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -172,17 +172,23 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
+    DATA_INDEX_BODY_TYPE = 0
+    DATA_INDEX_BODY_NAME = 1
+    DATA_INDEX_DATA_NAME = 2
+
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
+
+    EXTENSION_ICON = ".svg"
+    EXTENSION_TEXT = ".txt"
+
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
-    ICON_EXTENSION = ".svg"
     ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
     INDICATOR_TEXT_DEFAULT = " [" + astroBackend.NAME_TAG_MOON + " " + astroBackend.DATA_TAG_PHASE + "]"
     INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
-
-    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
     BODY_TAGS_TRANSLATIONS = dict(
         list( astroBackend.NAME_TAG_MOON_TRANSLATION.items() ) +
@@ -238,10 +244,6 @@ class IndicatorLunar( IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    DATA_INDEX_BODY_TYPE = 0
-    DATA_INDEX_BODY_NAME = 1
-    DATA_INDEX_DATA_NAME = 2
-
 
     def __init__( self ):
         super().__init__(
@@ -276,16 +278,6 @@ class IndicatorLunar( IndicatorBase ):
         self.__removeCacheFilesVersion93() # Cache data filenames changed in version 93, so remove old versions.
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
-
-
-#TODO Testing
-        # downloadedTLE = twolineelement.download( IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() )
-        #
-        # text = twolineelement.toText( downloadedTLE )
-        # self.writeCacheText( IndicatorLunar.SATELLITE_CACHE_BASENAME, text, ".txt", True )
-
-        # newText = self.readCacheTextWithTimestamp( IndicatorLunar.SATELLITE_CACHE_BASENAME )
-        # dict = twolineelement.toDictionary( newText )
 
 
     def __removeCacheFilesVersion89( self ):
@@ -416,10 +408,9 @@ class IndicatorLunar( IndicatorBase ):
         #     self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         # Update satellite data.
-#TODO .txt needs to be a constant.        
         self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData( 
             utcNow, self.satelliteData,
-            self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME, ".txt",
+            self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
             twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
             None,
@@ -530,9 +521,7 @@ class IndicatorLunar( IndicatorBase ):
 
         else: # Cache is fresh.
             if not data: # No data passed in, so read from cache.
-                cachedData = self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension )
-                cachedData = toObjectFunction( cachedData )
-                data = cachedData
+                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ) )
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
@@ -648,7 +637,7 @@ class IndicatorLunar( IndicatorBase ):
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
-        iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_EXTENSION )
+        iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_ICON )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -674,7 +663,7 @@ class IndicatorLunar( IndicatorBase ):
 #TODO Test this by setting the date/time close to next full moon.
 #TODO Why give the full moon icon it's own name?  Can't the format of icon-YYYYMMDDHHMMSS.svg be used?
     def createFullMoonIcon( self ):
-        return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.ICON_EXTENSION )
+        return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_ICON )
 
 
     def notificationSatellites( self ):
