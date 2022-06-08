@@ -414,6 +414,8 @@ class IndicatorTide( IndicatorBase ):
 
 
     def getTidalData( self, portID ):
+#TODO This function to remove old files from cache may not exist in the future!
+# Might need to handle change of cache file format/extension/naming in any future release (remove legacy files from cache).        
         self.removeOldFilesFromCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
 #TODO readCacheBinary no longer exists...change to a text based file.
         tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
