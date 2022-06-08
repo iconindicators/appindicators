@@ -166,7 +166,7 @@ class IndicatorFortune( IndicatorBase ):
                         output += c                   
 
                     self.fortune = output
-                    self.writeCacheText( IndicatorFortune.HISTORY_FILE, history + self.fortune + "\n\n", extension = "" )
+                    self.writeCacheText( history + self.fortune + "\n\n", IndicatorFortune.HISTORY_FILE )
                     break
 
 
