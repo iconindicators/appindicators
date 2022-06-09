@@ -17,7 +17,9 @@
 
 
 # Convert comet data in MPC format to XEphem format.
-# Inspired by https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+#
+# Inspired by:
+#    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
 #
 # MPC format: 
 #    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
@@ -32,7 +34,7 @@ import sys
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
         name = line[ 103 - 1 : 158 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = line[ 92 - 1 : 95 ].strip()
+        absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
 
         if len( name ) == 0:
             print( "Missing name:\n" + line )
@@ -41,22 +43,22 @@ def processAndWriteOneLine( line, outputFile ):
             print( "Missing absolute magnitude:\n" + line )
 
         else:
-            inclination = line[ 72 - 1 : 79 ].strip()
-            longitudeAscendingNode = line[ 62 - 1 : 69 ].strip()
-            argumentPerihelion = line[ 52 - 1 : 59 ].strip()
-            perihelionDistance = line[ 31 - 1 : 39 ].strip()
-            orbitalEccentricity = line[ 42 - 1 : 49 ].strip()
+            inclination = line[ 72 - 1 : 79 ].strip() # $i The Perl script uses 71 instead of 72. 
+            longitudeAscendingNode = line[ 62 - 1 : 69 ].strip() # $O The Perl script uses 61 instead of 62.
+            argumentPerihelion = line[ 52 - 1 : 59 ].strip() # $o The Perl script uses 51 instead of 52.
+            perihelionDistance = line[ 31 - 1 : 39 ].strip() # $q
+            orbitalEccentricity = line[ 42 - 1 : 49 ].strip() # $e The Perl script uses 41 instead of 42.
 
             month = line[ 20 - 1 : 21 ].strip()
             day = line[ 23 - 1 : 29 ].strip()
             year = line[ 15 - 1 : 18 ].strip()
-            epochDate = month + '/' + day + '/' + year
+            epochDate = month + '/' + day + '/' + year # $E
 
-            slopeParameter = line[ 97 - 1 : 100 ].strip()
+            slopeParameter = line[ 97 - 1 : 100 ].strip() # $H
 
-            if float( orbitalEccentricity ) < 0.99:
-                meanAnomaly = str( 0.0 )
-                meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) )
+            if float( orbitalEccentricity ) < 0.99: # Elliptical orbit
+                meanAnomaly = str( 0.0 ) # $M
+                meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) ) # $a
 
                 components = [
                     name, 'e', inclination, longitudeAscendingNode, argumentPerihelion,
