@@ -198,7 +198,8 @@ class IndicatorLunar( IndicatorBase ):
 
     COMET_CACHE_BASENAME = "comets-oe-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 24 * 7 # Comet data is updated a few times a month, so a weekly download should be sufficient.
-    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt"
+#    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt"
+    COMET_DATA_URL = "file:///home/bernard/Programming/Indicators/indicator-lunar/data/CometEls.txt" #TODO For testing
 
 #TODO Figure out if this (and the rest of minor planet stuff in the menu/preferences) should be commented out or nuked!
     MINOR_PLANET_CACHE_BASENAME = "minorplanets-oe-"
@@ -370,23 +371,22 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-        # if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
-        #     dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
-        #     magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
-        #
-        # else:
-        #     dataType = orbitalelement.OE.DataType.XEPHEM_COMET
-        #     magnitudeFilterAdditionalArguments = [ ]
-        #
-        # self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
-        #     utcNow,
-        #     self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
-        #     orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ],
-        #     self.downloadCountComet, self.nextDownloadTimeComet,
-        #     IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
-        #
-        # if self.cometsAddNew:
-        #     self.addNewBodies( self.cometData, self.comets )
+        magnitudeFilterAdditionalArguments = [ ]
+        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
+            magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
+
+        self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
+            utcNow, self.cometData,
+            self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
+            self.downloadCountComet, self.nextDownloadTimeComet,
+            orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, orbitalelement.OE.DataType.SKYFIELD_COMET, self.getLogging() ],
+            orbitalelement.convertCometFromMPCToXEphem,
+            IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments,
+            orbitalelement.toText, [ ],
+            orbitalelement.toDictionary, [ True ] )
+
+        if self.cometsAddNew:
+            self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
         # if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
@@ -415,8 +415,8 @@ class IndicatorLunar( IndicatorBase ):
             twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
             None,
             None, [ ],
-            twolineelement.toText,
-            twolineelement.toDictionary )
+            twolineelement.toText, [ ],
+            twolineelement.toDictionary, [ ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -495,8 +495,8 @@ class IndicatorLunar( IndicatorBase ):
             downloadDataFunction, downloadDataArguments,
             formatConversionFunction,
             magnitudeFilterFunction, magnitudeFilterAdditionalArguments,
-            toTextFunction,
-            toObjectFunction ):
+            toTextFunction, toTextAdditionalArgunemts,
+            toObjectFunction, toObjectAdditionalArgunemts ):
 
         if ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow: # Cache is stale.
             downloadedData = { }
@@ -510,7 +510,7 @@ class IndicatorLunar( IndicatorBase ):
                     if magnitudeFilterFunction:
                         downloadedData = magnitudeFilterFunction( utcNow, downloadedData, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
-                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData ), cacheBaseName, cacheExtension )
+                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName, cacheExtension )
                     downloadCount = 0
                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
@@ -521,7 +521,7 @@ class IndicatorLunar( IndicatorBase ):
 
         else: # Cache is fresh.
             if not data: # No data passed in, so read from cache.
-                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ) )
+                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
 

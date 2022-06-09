@@ -161,97 +161,6 @@ def download( url, dataType, logging = None ):
     return oeData
 
 
-def downloadNEW( url, dataType, logging = None ):
-    oeData = { }
-    try:
-        data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-        if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-            if dataType == OE.DataType.SKYFIELD_COMET:
-                # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-                # The format starts from 1, whereas the data is in a list/string which starts from 0, therefore, for all indices, subtract 1.
-                nameStart = 103 - 1
-                nameEnd = 158 - 1
-                firstMagnitudeFieldStart = 92 - 1
-                firstMagnitudeFieldEnd = 95 - 1
-                secondMagnitudeFieldStart = 97 - 1
-                secondMagnitudeFieldEnd = 100 - 1
-
-            else:
-                # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                nameStart = 167 - 1
-                nameEnd = 194 - 1
-                firstMagnitudeFieldStart = 9 - 1
-                firstMagnitudeFieldEnd = 13 - 1
-                secondMagnitudeFieldStart = 15 - 1
-                secondMagnitudeFieldEnd = 19 - 1
-                semiMajorAxisFieldStart = 93 - 1
-                semiMajorAxisFieldEnd = 103 - 1
-
-            for i in range( 0, len( data ) ):
-                if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-                    continue
-
-                # Missing absolute magnitude.
-                if data[ i ][ firstMagnitudeFieldStart : firstMagnitudeFieldEnd + 1 ].isspace():
-                    continue
-
-                # Missing slope parameter.
-                if data[ i ][ secondMagnitudeFieldStart : secondMagnitudeFieldEnd + 1 ].isspace():
-                    continue
-
-                # Missing semi-major-axis; https://github.com/skyfielders/python-skyfield/issues/449#issuecomment-694159517
-                if dataType == OE.DataType.SKYFIELD_MINOR_PLANET and data[ i ][ semiMajorAxisFieldStart : semiMajorAxisFieldEnd + 1 ].isspace():
-                    continue
-
-                name = data[ i ][ nameStart : nameEnd + 1 ].strip()
-
-                oe = OE( name, data[ i ], dataType )
-                oeData[ oe.getName().upper() ] = oe
-
-        else: # OE.DataType.XEPHEM_COMET or OE.DataType.XEPHEM_MINOR_PLANET
-            # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
-            for i in range( 0, len( data ) ):
-                if data[ i ].startswith( "#" ): # Skip comment lines.
-                    continue
-
-                if "****" in data[ i ]: # https://github.com/skyfielders/python-skyfield/issues/503#issuecomment-745277162
-                    continue
-
-                # Drop lines with missing magnitude component.
-                # There are three possible data formats depending on the second field value: either 'e', 'p' or 'h'.
-                # Have noticed for format 'e' the magnitude component may be absent.
-                # https://github.com/brandon-rhodes/pyephem/issues/196
-                # Good data:
-                #    2010 LO33,e,17.8383,241.0811,80.8229,23.10129,0.0088767,0.31984018,339.3447,04/27.0/2019,2000,H 8.5,0.15
-                # Bad data:
-                #    2010 LG61,e,123.8859,317.3744,352.1688,7.366687,0.0492942,0.81371070,163.4277,04/27.0/2019,2000,H,0.15
-                firstComma = data[ i ].index( "," )
-                secondComma = data[ i ].index( ",", firstComma + 1 )
-                field2 = data[ i ][ firstComma + 1 : secondComma ]
-                if field2 == 'e':
-                    lastComma = data[ i ].rindex( "," )
-                    secondLastComma = data[ i ][ : lastComma ].rindex( "," )
-                    fieldSecondToLast = data[ i ][ secondLastComma + 1 : lastComma ]
-                    if len( fieldSecondToLast ) == 1 and fieldSecondToLast.isalpha(): # Missing magnitude component.
-                        continue
-
-                name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
-
-                oe = OE( name, data[ i ], dataType )
-                oeData[ oe.getName().upper() ] = oe
-
-        if not oeData and logging:
-            logging.error( "No OE data found at " + str( url ) )
-
-    except Exception as e:
-        oeData = { }
-        if logging:
-            logging.error( "Error retrieving OE data from " + str( url ) )
-            logging.exception( e )
-
-    return oeData
-
-
 def getName( line, dataType ):
     if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
         if dataType == OE.DataType.SKYFIELD_COMET:
@@ -272,3 +181,87 @@ def getName( line, dataType ):
         name = re.sub( "\s\s+", "", line[ 0 : line.find( "," ) ] ) # The name can have multiple whitespace, so remove.
 
     return name
+
+
+def toText( dictionary ):
+    text = ""
+    for oe in dictionary.values():
+        text += oe.getData() + '\n'
+
+    return text
+
+
+def toDictionary( text, isComet ):
+    if isComet: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+        dataType == OE.DataType.SKYFIELD_COMET
+        nameStart = 103 - 1
+        nameEnd = 158 - 1
+
+    else: # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+        dataType == OE.DataType.SKYFIELD_MINOR_PLANET
+        nameStart = 167 - 1
+        nameEnd = 194 - 1
+
+    oeData = { }
+    for line in text.splitlines():
+        name = line[ nameStart : nameEnd + 1 ].strip()
+        oe = OE( name, line, dataType )
+        oeData[ oe.getName().upper() ] = oe
+    
+    return oeData
+
+
+# Convert comet data in MPC format to XEphem format.
+#
+# Inspired by:
+#    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+#
+# MPC format: 
+#    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
+#
+# XEphem format:
+#    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+def convertCometFromMPCToXEphem( dictionaryOfOrbitalElements ):
+    print( "Converting comet from MPC to XEphem" )#TODO Testing
+    dictionaryOfConvertedOrbitalElements = { }
+    for oe in dictionaryOfOrbitalElements.values():
+        line = oe.getData()
+        name = line[ 103 - 1 : 158 ].replace( '(', '' ).replace( ')', '' ).strip()
+        absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
+        inclination = line[ 72 - 1 : 79 ].strip() # $i The Perl script uses 71 instead of 72. 
+        longitudeAscendingNode = line[ 62 - 1 : 69 ].strip() # $O The Perl script uses 61 instead of 62.
+        argumentPerihelion = line[ 52 - 1 : 59 ].strip() # $o The Perl script uses 51 instead of 52.
+        perihelionDistance = line[ 31 - 1 : 39 ].strip() # $q
+        orbitalEccentricity = line[ 42 - 1 : 49 ].strip() # $e The Perl script uses 41 instead of 42.
+        slopeParameter = line[ 97 - 1 : 100 ].strip() # $H
+        month = line[ 20 - 1 : 21 ].strip()
+        day = line[ 23 - 1 : 29 ].strip()
+        year = line[ 15 - 1 : 18 ].strip()
+        epochDate = month + '/' + day + '/' + year # $E
+
+        if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
+            meanAnomaly = str( 0.0 ) # $M
+            meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) ) # $a
+
+            components = [
+                name, 'e', inclination, longitudeAscendingNode, argumentPerihelion,
+                meanDistance, '0', orbitalEccentricity, meanAnomaly,
+                epochDate, "2000.0",
+                slopeParameter, absoluteMagnitude ]
+
+        elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
+            components = [
+                name, 'h', epochDate, inclination,
+                longitudeAscendingNode, argumentPerihelion, orbitalEccentricity, 
+                perihelionDistance, "2000.0",
+                slopeParameter, absoluteMagnitude ]
+
+        else: # Parabolic orbit.
+            components = [
+                name, 'p', epochDate, inclination,
+                argumentPerihelion, perihelionDistance, longitudeAscendingNode, 
+                "2000.0", slopeParameter, absoluteMagnitude ]
+
+        dictionaryOfConvertedOrbitalElements[ oe.getName().upper() ] = OE( name, ','.join( components ), OE.DataType.XEPHEM_COMET )
+
+    return dictionaryOfConvertedOrbitalElements
