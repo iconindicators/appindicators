@@ -56,7 +56,7 @@ def processAndWriteOneLine( line, outputFile ):
 
             slopeParameter = line[ 97 - 1 : 100 ].strip() # $H
 
-            if float( orbitalEccentricity ) < 0.99: # Elliptical orbit
+            if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
                 meanAnomaly = str( 0.0 ) # $M
                 meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) ) # $a
 
@@ -66,14 +66,14 @@ def processAndWriteOneLine( line, outputFile ):
                     epochDate, "2000.0",
                     slopeParameter, absoluteMagnitude ]
 
-            elif float( orbitalEccentricity ) > 1.0:
+            elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
                 components = [
                     name, 'h', epochDate, inclination,
                     longitudeAscendingNode, argumentPerihelion, orbitalEccentricity, 
                     perihelionDistance, "2000.0",
                     slopeParameter, absoluteMagnitude ]
 
-            else:
+            else: # Parabolic orbit.
                 components = [
                     name, 'p', epochDate, inclination,
                     argumentPerihelion, perihelionDistance, longitudeAscendingNode, 
@@ -84,9 +84,9 @@ def processAndWriteOneLine( line, outputFile ):
 
 if len( sys.argv ) != 2:
     message = \
-        "Usage: python3 MPCCometToXEphem.py fileToConvert" + \
+        "Usage: python3 mpcCometToXEphem.py fileToConvert" + \
         "\n\nFor example:" + \
-        "\n  python3 MPCCometToXEphem.py CometEls.txt"
+        "\n  python3 mpcCometToXEphem.py CometEls.txt"
 
     raise SystemExit( message )
 

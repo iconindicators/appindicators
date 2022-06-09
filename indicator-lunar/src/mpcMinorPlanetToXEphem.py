@@ -17,7 +17,9 @@
 
 
 # Convert minor planet data in MPC format to XEphem format.
-# Inspired by https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
+#
+# Inspired by:
+#    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
 #
 # MPC format: 
 #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
@@ -42,7 +44,7 @@ def getUnpackedDate( i ): return str( i ) if i.isdigit() else str( ord( i ) - or
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
         name = line[ 167 - 1 : 194 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = line[ 9 - 1 : 13 ].strip()
+        absoluteMagnitude = line[ 9 - 1 : 13 ].strip() # $H
 
         if len( name ) == 0:
             print( "Missing name:\n" + line )
@@ -51,19 +53,19 @@ def processAndWriteOneLine( line, outputFile ):
             print( "Missing absolute magnitude:\n" + line )
 
         else:
-            inclinationToEcliptic = line[ 60 - 1 : 68 ].strip()
-            longitudeAscendingNode = line[ 49 - 1 : 57 ].strip()
-            argumentPerihelion = line[ 38 - 1 : 46 ].strip()
-            semimajorAxix = line[ 93 - 1 : 103 ].strip()
-            orbitalEccentricity = line[ 71 - 1 : 79 ].strip()
-            meanAnomalyEpoch = line[ 27 - 1 : 35 ].strip()
-            slopeParamenter = line[ 15 - 1 : 19 ].strip()
-    
-            century = line[ 21 - 1 : 21 ].strip()
-            lastTwoDigitsOfYear = line[ 22 - 1 : 23 ].strip()
-            year = str( centuryMap[ century ] + int( lastTwoDigitsOfYear ) )
-            month = getUnpackedDate( line[ 24 - 1 : 24 ].strip() )
-            day = getUnpackedDate( line[ 25 - 1 : 25 ].strip() )
+            inclinationToEcliptic = line[ 60 - 1 : 68 ].strip() # $i
+            longitudeAscendingNode = line[ 49 - 1 : 57 ].strip() # $O
+            argumentPerihelion = line[ 38 - 1 : 46 ].strip() # $o
+            semimajorAxix = line[ 93 - 1 : 103 ].strip() # $a
+            orbitalEccentricity = line[ 71 - 1 : 79 ].strip() # $e
+            meanAnomalyEpoch = line[ 27 - 1 : 35 ].strip() # $M
+            slopeParamenter = line[ 15 - 1 : 19 ].strip() # $G
+
+            century = line[ 21 - 1 : 21 ].strip() # $cent
+            lastTwoDigitsOfYear = line[ 22 - 1 : 23 ].strip() # $TY
+            year = str( centuryMap[ century ] + int( lastTwoDigitsOfYear ) ) # $TY
+            month = getUnpackedDate( line[ 24 - 1 : 24 ].strip() ) # $TM
+            day = getUnpackedDate( line[ 25 - 1 : 25 ].strip() ) # $TD
             epochDate = month + '/' + day + '/' + year
 
             components = [
@@ -106,11 +108,11 @@ def convertMPCORB( inFile ):
 
 if len( sys.argv ) != 2:
     message = \
-        "Usage: python3 MPCMinorPlanetToXEphem.py fileToConvert" + \
+        "Usage: python3 mpcMinorPlanetToXEphem.py fileToConvert" + \
         "\n\nFor example:" + \
-        "\n  python3 MPCMinorPlanetToXEphem.py MPCORB.DAT" + \
-        "\n  python3 MPCMinorPlanetToXEphem.py MPCORB.DAT.gz" + \
-        "\n  python3 MPCMinorPlanetToXEphem.py mpcDataAsStraightTextWithoutHeader.txt"
+        "\n  python3 mpcMinorPlanetToXEphem.py MPCORB.DAT" + \
+        "\n  python3 mpcMinorPlanetToXEphem.py MPCORB.DAT.gz" + \
+        "\n  python3 mpcMinorPlanetToXEphem.py mpcDataAsStraightTextWithoutHeader.txt"
 
     raise SystemExit( message )
 
