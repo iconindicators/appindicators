@@ -64,20 +64,20 @@ def processAndWriteOneLine( line, outputFile ):
                     name, 'e', inclination, longitudeAscendingNode, argumentPerihelion,
                     meanDistance, '0', orbitalEccentricity, meanAnomaly,
                     epochDate, "2000.0",
-                    slopeParameter, absoluteMagnitude ]
+                    absoluteMagnitude, slopeParameter ]
 
             elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
                 components = [
                     name, 'h', epochDate, inclination,
                     longitudeAscendingNode, argumentPerihelion, orbitalEccentricity, 
                     perihelionDistance, "2000.0",
-                    slopeParameter, absoluteMagnitude ]
+                    absoluteMagnitude, slopeParameter ]
 
             else: # Parabolic orbit.
                 components = [
                     name, 'p', epochDate, inclination,
-                    argumentPerihelion, perihelionDistance, longitudeAscendingNode, 
-                    "2000.0", slopeParameter, absoluteMagnitude ]
+                    argumentPerihelion, perihelionDistance, longitudeAscendingNode, "2000.0",
+                    absoluteMagnitude, slopeParameter ]
 
             outputFile.write( ','.join( components ) + '\n' )
 
