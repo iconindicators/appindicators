@@ -1,5 +1,5 @@
 # Portable Object Template for indicatorbase.
-# Copyright (C) 2017-2020 Bernard Giannetti
+# Copyright (C) 2017-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicatorbase package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #

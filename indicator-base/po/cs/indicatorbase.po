@@ -1,7 +1,7 @@
 # Czech translation for indicatorbase.
-# Copyright (C) 2017-2020 Bernard Giannetti
+# Copyright (C) 2017-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicatorbase package.
-# Pavel Rehak <pavel-rehak@email.cz>, 2017-2020.
+# Pavel Rehak <pavel-rehak@email.cz>, 2017-2022.
 #
 msgid ""
 msgstr ""
