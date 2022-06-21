@@ -3,7 +3,7 @@ indicator-fortune (1.0.36-1) bionic; urgency=low
   * Added the ".txt" extension to the history file located in the user cache.
   * Update release to bionic as xenial is end of life.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 May 2022 23:12:37 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 21 Jun 2022 17:26:51 +1000
 
 
 indicator-fortune (1.0.35-1) xenial; urgency=low
