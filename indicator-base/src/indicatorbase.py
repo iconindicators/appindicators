@@ -667,15 +667,23 @@ class IndicatorBase( ABC ):
         return expiry
 
 
-#TODO Use these two headers to document new read/write text file functions below.
-    # Read the most recent binary object from the cache.
+    # Read the named text file from the cache.
+    #
+    # filename: The name of the file.
+    #
+    # Returns the contents of the text file; None on error and logs.
+    def readCacheText( self, filename ): return self.__readCacheText( self.__getCacheDirectory() + filename )
+
+
+    # Read the most recent text file from the cache.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
+    # extension: Added to the end of the baseName and date/time (will include the '.').
     #
     # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
     #    ~/.cache/fred/apple-20170629174950
@@ -683,25 +691,7 @@ class IndicatorBase( ABC ):
     #
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
-    # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-
-
-    # Writes an object as a binary file.
-    #
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    # binaryData: The object to write.
-    #
-    # The object will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # Returns True on success; False otherwise.
-
-
-    def readCacheText( self, filename ): return self.__readCacheText( self.__getCacheDirectory() + filename )
-
-
+    # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
     def readCacheTextWithTimestamp( self, baseName, extension = ".txt" ):
         cacheDirectory = self.__getCacheDirectory()
         cacheFile = ""
@@ -730,9 +720,27 @@ class IndicatorBase( ABC ):
         return text
 
 
+    # Writes text to a file in the cache.
+    #
+    # text: The text to write.
+    # filename: The name of the file.
+    #
+    # Returns True on success; False otherwise.
     def writeCacheText( self, text, filename ): return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
 
 
+    # Writes text to a file in the cache.
+    #
+    # text: The text to write.
+    # baseName: The text used to form the file name, typically the name of the calling application.
+    # extension: Added to the end of the baseName and date/time (will include the '.').
+    #
+    # The text will be written to the cache directory using the pattern
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    # or
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    #
+    # Returns True on success; False otherwise.
     def writeCacheTextWithTimestamp( self, text, baseName, extension = ".txt" ):
         cacheFile = \
             self.__getCacheDirectory() + \
