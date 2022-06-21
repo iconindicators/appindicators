@@ -4,7 +4,8 @@
 # Common code for the build-debian script for all indicators.
 #
 # Install the packages:
-#   sudo apt-get install devscripts dh-make build-essential lintian gpg
+#   sudo apt install devscripts dh-make build-essential lintian gpg
+#
 #
 # Import secret key into gpg.  In a terminal, change to the directory containing the files
 #
@@ -13,6 +14,14 @@
 # and run
 #
 #	gpg --import secring.skr 
+#
+#
+# When running a build, if the warning 'ancient-standards-version' arises,
+# edit the debian/control file and change the value for the field 'Standards-Version'
+# to be a value from the Debian policy which was just before the release of the
+# oldest supported version of Ubuntu.
+# For example, if Ubuntu 18.04 is the oldest supported version, choose the standards version 4.1.3
+#
 #
 # References for building a Debian package for PPA...
 #    http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
@@ -38,8 +47,8 @@
 #    https://developer.gnome.org/icon-theme-spec/
 
 
-# Python Utils contains Python/build scripts common to all indicators.
-PYTHON_UTILS=../PythonUtils
+# Common to all indicators.
+INDICATOR_BASE=../indicator-base
 
 
 # Supported themes and corresponding colours.
@@ -81,7 +90,7 @@ copyTopLevelAndSource()
     fi
     done
 
-  nonSource=( "$PYTHON_UTILS/src/indicatorbase.py" "packaging/debian/changelog" "packaging/debian/control" "packaging/debian/install" )
+  nonSource=( "$INDICATOR_BASE/src/indicatorbase.py" "packaging/debian/changelog" "packaging/debian/control" "packaging/debian/install" )
   for item in "${nonSource[@]}"; do
     if [ -n "$(grep -i TODO $item)" ]
     then
@@ -102,7 +111,7 @@ copyTopLevelAndSource()
   cp $NAME.py.desktop build/$NAME-$VERSION
 
   mkdir -p build/$NAME-$VERSION/src
-  cp $PYTHON_UTILS/src/indicatorbase.py build/$NAME-$VERSION/src
+  cp $INDICATOR_BASE/src/indicatorbase.py build/$NAME-$VERSION/src
 
   for item in "${_source[@]}"; do
     cp src/"$item" build/$NAME-$VERSION/src
@@ -145,11 +154,11 @@ copyPOCreateMO()
   # Copy entire po directory.
   rsync -ar --exclude=.svn po build/$NAME-$VERSION
 
-  # Copy README from pythonutils.
-  cp $PYTHON_UTILS/po/README build/$NAME-$VERSION/po
+  # Copy README from indicator-base.
+  cp $INDICATOR_BASE/po/README build/$NAME-$VERSION/po
 
   # Append translations from indicatorbase to POT.
-  msgcat --use-first build/$NAME-$VERSION/po/$NAME.pot $PYTHON_UTILS/po/indicatorbase.pot --output-file=build/$NAME-$VERSION/po/$NAME.pot
+  msgcat --use-first build/$NAME-$VERSION/po/$NAME.pot $INDICATOR_BASE/po/indicatorbase.pot --output-file=build/$NAME-$VERSION/po/$NAME.pot
 
   # Append translations from indicatorbase to PO files.
   for PO_FILE in $(find build/$NAME-$VERSION/po -type f -name '*.po') ; do
@@ -158,7 +167,7 @@ copyPOCreateMO()
     array=(`echo $PO_FILE | sed 's/\//\n/g'`)
     languageCode=${array[${#array[@]}-2]}
 
-    msgcat --use-first $PO_FILE $PYTHON_UTILS/po/$languageCode/indicatorbase.po --output-file=$PO_FILE
+    msgcat --use-first $PO_FILE $INDICATOR_BASE/po/$languageCode/indicatorbase.po --output-file=$PO_FILE
   done
 
   # Create .mo files.
