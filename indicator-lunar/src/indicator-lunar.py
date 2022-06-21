@@ -23,86 +23,25 @@
 #TODO Ensure all files written out (cached download data, images, etc) contain a file extension ( .txt, .svg, ...).
 
 
-# TODO
-# Have opened a ticket 
-# https://mpc-service.atlassian.net/servicedesk/customer/portal/15/DATAPR-110
-# which points out differences between the comet and minor planet values (for a given body)
-# between the MPC data format and the XEphem data format.
-# The response is that it is likely none of the files have been updated for some time.
-# Have also sent a follow up email...
-# Still waiting on a reply...but if the files are never to be updated, then there are two options.
-# 1) If possible take the files from the main data page (which are in MPC format) and convert to XEphem format.
-#    There are no files for bright/critical, so that's that.
-# 2a) Drop (or really hide) the comet and minor planet functionality.
-# 2b) If the comet and minor planet functionality is to be dropped, then may as well move to Skyfield.
-#     Skyfield still has the slowness issue of comet and minor planet...so there is no difference between
-#     that and PyEphem with no current data files.
+#TODO Given the MPC files for comets and minor planets cannot be used to determine apparent magnitude,
+# either drop comets and minor planets, or...
+# Find external sources (websites) which use better/reliable data to compute apparent magnitude
+# and list the currently visible comets / minor planets (along with the apparent magnitude).
+# From this list (should be at most twenty bodies of each type), can then interrogate the MPC
+# online ephemeris service to get the orbital elements for these bodies.
+# As the CometEls.txt is a small file, could just use that...but if going to the trouble
+# for minor planets, may as well do the same for comets...and may be able to get get both in one http transfer.
 #
-# Bottom line: consider switching to Skyfield with comet and minor planet functionality turned off
-# (until fixed in Skyfield).
-# This is all contingent upon the MPC responding to my issue/email. 
+# Do we still need to save orbital elements in different formats (one for PyEphem and one for Skyfield)?
 #
-# Stop the downloading from the MPC website.
-# Stop the calculation of comets and minor planets.
-# Stop the display of comets and minor planets.
-# Disable or hide the comets and minor planets in the preferences.
-# Notify the user somehow; notification when the indicator starts up or when preferences are opened.
+# Will need to save a list of the currently visible comets and minor planets (maybe keep in a single list).
 #
-# Have compared the RA and Dec of several comets and minor planets against online sources...seems to match closely.
-# So maybe the stale files are not too bad after all.
-# Delay this issue until it becomes a bigger issue.
+# Instead of getting the list of visible comets / minor planets from one website,
+# maybe get from multiple sites and then take subset/overlap to only show those bodies
+# which are deemed visible by several sites (majority rules).
 #
-# Another point...
-# Once the "correct" or "valid" minor planet and comet files are determined,
-# for both PyEphem and Skyfield, try to determine how often these files actually change.
-# If comets and minor planets are generally the same always, then only need to download 
-# once in a blue moon.
-# Does this allow then to somehow reduce the processing time to filter out bodies out of visible range?
-#
-# Look at https://web.archive.org/web/20100501000000*/https://www.minorplanetcenter.net/
-# compare the data files for comets/minorplanets over time for each of XEphem and MPC formats
-# to determine how things have changed (for existing bodies, do the numbers remain constant?).
-#
-# Gets MUCH worse!
-# In short, the minor planet files for XEphem are no longer officially provided via hyperlinks.
-# The files on the main MPC 'data' page for Distant/NEA/PHA/Unusual don't contain bodies such as Ceres, Vesta, etc.
-# Have to use the MPCORB.DAT to get latest bodies.
-# Looks like unless a source can be found to provide a stripped down version of MPCORB.DAT, then no more minor planets.
-# (stripped down by only containing bodies of apparent magnitude of 15 or less)
-# For comets, the comet data file on the main MPC 'data' page seems good (for now).
-# Long story: https://github.com/skyfielders/python-skyfield/discussions/747
-#
-# Skyfield/Comets:
-#    Download MPC format file once per week (updated a couple of times per month).
-#    Filter by apparent magnitude using download date and one week from download.
-#    Save filtered data out to cache in same text format as that downloaded.
-#
-# Skyfield/Minor Planets:
-#    MPC file is too large to download AND filter through the indicator.
-#    If an external source/mechanism can obtain the MPC file and filter by apparent magnitude,
-#    perhaps by the download date and once a week for a month, then make that file available for download
-#    in the same text format, then minor planets can be brought back in to the indicator.
-# 
-# PyEphem/Comets:
-#    Download MPC format file once per week (updated a couple of times per month).
-#    Filter by apparent magnitude using download date and one week from download.
-#    Save filtered data out to cache in same text format as that downloaded.
-#    Given the original file will be in MPC format, when magnitude filtering the format will have to change,
-#    so perhaps write out the filtered file in PyEphem format (saves changing the format each time the file is read in).
-#
-# Skyfield/Minor Planets:
-#    MPC file is too large to download AND filter through the indicator.
-#    If an external source/mechanism can obtain the MPC file and filter by apparent magnitude,
-#    perhaps by the download date and once a week for a month, then make that file available for download
-#    in the same text format, then minor planets can be brought back in to the indicator.
-#    When the filtered file is downloaded, best to save out in PyEphem format.
-# 
-# CHECK: Once a file is downloaded, filtered and saved to the cache,
-# the filtered file will only be read in when the indicator starts up (once per day).
-# So is there a speed difference between reading in a text file compared to reading in a binary file?
-#
-# Might need to check if the old cache files need to be removed for users upgrading.
-# https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
+# Probably need to update the visibility list weekly at least, maybe every second day.
+# Only need the orbital elements on a weekly or even monthly basis.
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
@@ -434,7 +373,6 @@ class IndicatorLunar( IndicatorBase ):
     # The 'process tags' function is passed the text along with optional arguments and
     # must then return the processed text.
     def processTags( self ):
-
         # Handle [ ].
         # There may still be tags left in as a result of say a satellite or comet dropping out.
         # Remaining tags are moped up at the end.
