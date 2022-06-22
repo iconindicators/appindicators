@@ -1,3 +1,11 @@
+indicator-fortune (1.0.37-1) bionic; urgency=low
+
+  * The debian/compat file had version 11 whereas should have been version 10
+    which caused build problems.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 Jun 2022 17:22:09 +1000
+
+
 indicator-fortune (1.0.36-1) bionic; urgency=low
 
   * Added the ".txt" extension to the history file located in the user cache.

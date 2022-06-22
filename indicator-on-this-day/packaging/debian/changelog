@@ -1,3 +1,11 @@
+indicator-on-this-day (1.0.11-1) bionic; urgency=low
+
+  * The debian/compat file had version 11 whereas should have been version 10
+    which caused build problems.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 Jun 2022 17:25:03 +1000
+
+
 indicator-on-this-day (1.0.10-1) bionic; urgency=low
 
   * Added the ".txt" extension to the calendars file located in the user cache.

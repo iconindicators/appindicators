@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-fortune 1.0.36\n"
+"Project-Id-Version: indicator-fortune 1.0.37\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2020-04-20 22:20+1000\n"
 "PO-Revision-Date: 2020-04-20 16:04+0300\n"
