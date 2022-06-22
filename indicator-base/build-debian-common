@@ -18,8 +18,9 @@
 #
 # When running a build, if the warning 'ancient-standards-version' arises,
 # edit the debian/control file and change the value for the field 'Standards-Version'
-# to be a value from the Debian policy which was just before the release of the
-# oldest supported version of Ubuntu.
+# to be a value from the Debian policy
+#	https://www.debian.org/doc/debian-policy/upgrading-checklist.html
+# which was just before the release of the oldest supported version of Ubuntu.
 # For example, if Ubuntu 18.04 is the oldest supported version, choose the standards version 4.1.3
 #
 #
@@ -27,6 +28,8 @@
 #    http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
 #    http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
 #    http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
+#	 https://stackoverflow.com/questions/65117979/problems-using-debuild-to-upload-a-python-gtk-program-to-launchpad
+#	 https://askubuntu.com/questions/399552/how-to-create-a-deb-package-for-a-python3-script
 #    http://blog.garethj.com/2009/06/02/building-deb-packages-for-python-applications
 #    http://developer.ubuntu.com/packaging/html/debian-dir-overview.html
 #    http://help.launchpad.net/Packaging/PPA/Uploading
