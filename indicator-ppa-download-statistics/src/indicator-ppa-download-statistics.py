@@ -74,7 +74,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.75",
+            version = "1.0.76",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 
