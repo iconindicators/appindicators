@@ -192,6 +192,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
+        self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + script.getCommand() ) #TODO Need a debug option/preference...either at the script level, or global.
         commandResult = self.processGet( script.getCommand(), logNonZeroErrorCode = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
         if commandResult:
             commandResult = commandResult.strip()
