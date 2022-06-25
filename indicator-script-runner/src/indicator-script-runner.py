@@ -35,6 +35,18 @@ from threading import Thread
 import concurrent.futures, copy, datetime, math
 
 
+#TODO
+# Edit the properties for "Internet Running Monthly Quota" to leave terminal open.  Run the script (click on it from icon menu)....no result and no terminal...why?
+#
+# This came about when I created a new "script" with command:
+#
+#     free | awk '/Mem/{printf("RAM Usage: %.2f%\n"), $3/$2*100}'
+#
+# and wanted the terminal open to see the result...but no terminal and no result.
+#
+# ...and no log file!
+
+
 class IndicatorScriptRunner( IndicatorBase ):
 
     CONFIG_HIDE_GROUPS = "hideGroups"
