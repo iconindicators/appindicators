@@ -42,6 +42,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     CONFIG_INDICATOR_TEXT_SEPARATOR = "indicatorTextSeparator"
     CONFIG_SCRIPTS_BACKGROUND = "scriptsBackground"
     CONFIG_SCRIPTS_NON_BACKGROUND = "scriptsNonBackground"
+    CONFIG_SEND_COMMAND_TO_LOG = "sendCommandToLog"
     CONFIG_SHOW_SCRIPTS_IN_SUBMENUS = "showScriptsInSubmenus"
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
@@ -83,7 +84,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.16",
+            version = "1.0.17",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
 
@@ -158,7 +159,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += "; ${SHELL}"
 
         command += "'"
-        self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command ) #TODO Need a debug option/preference...either at the script level, or global.
+        
+        if self.sendCommandToLog:
+            self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
+
         Thread( target = self.processCall, args = ( command, ) ).start()
 
 
@@ -192,7 +196,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def __updateBackgroundScript( self, script, now ):
-        self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + script.getCommand() ) #TODO Need a debug option/preference...either at the script level, or global.
+        if self.sendCommandToLog:
+            self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + script.getCommand() )
+
         commandResult = self.processGet( script.getCommand(), logNonZeroErrorCode = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
         if commandResult:
             commandResult = commandResult.strip()
@@ -360,6 +366,15 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 30, 1, 1 )
 
+        sendCommandToLogCheckbutton = Gtk.CheckButton.new_with_label( _( "Send command to log" ) )
+        sendCommandToLogCheckbutton.set_active( self.sendCommandToLog )
+        sendCommandToLogCheckbutton.set_tooltip_text( _(
+            "If checked, when a script is run,\n" + \
+            "the full command will be sent to the log\n" + \
+            "(located in your home directory)." ) )
+
+        grid.attach( sendCommandToLogCheckbutton, 0, 31, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "Scripts" ) ) )
 
         # Menu settings.
@@ -477,6 +492,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.scripts = copyOfScripts
+            self.sendCommandToLog = sendCommandToLogCheckbutton.get_active()
             self.showScriptsInSubmenus = radioShowScriptsSubmenu.get_active()
             self.hideGroups = hideGroupsCheckbutton.get_active()
             self.indicatorText = indicatorTextEntry.get_text()
@@ -1145,6 +1161,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" )
         self.indicatorTextSeparator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, " | " )
+        self.sendCommandToLog = config.get( IndicatorScriptRunner.CONFIG_SEND_COMMAND_TO_LOG, False )
         self.showScriptsInSubmenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
 
         self.scripts = [ ]
@@ -1237,6 +1254,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR: self.indicatorTextSeparator,
             IndicatorScriptRunner.CONFIG_SCRIPTS_BACKGROUND: scriptsBackground,
             IndicatorScriptRunner.CONFIG_SCRIPTS_NON_BACKGROUND: scriptsNonBackground,
+            IndicatorScriptRunner.CONFIG_SEND_COMMAND_TO_LOG: self.sendCommandToLog,
             IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS: self.showScriptsInSubmenus
         }
 

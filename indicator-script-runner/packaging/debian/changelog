@@ -1,3 +1,11 @@
+indicator-script-runner (1.0.17-1) bionic; urgency=low
+
+  * Added a preference to write out the full command to the log file when a
+    script is executed.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 30 Sep 2021 00:50:03 +1000  <-------- TODO Set date to be release date.
+
+
 indicator-script-runner (1.0.16-1) bionic; urgency=low
 
   * Background script functionality added.  Existing scripts are now referred
@@ -15,9 +23,9 @@ indicator-script-runner (1.0.16-1) bionic; urgency=low
 
     Example: If a background script checks for the presence of a log file (the
     log file representing an exception condition), the script will produce no
-    text output if the log file is absent, yet produce non-empty text output if
-    the log file is present.  Enabling the sound and notification options for
-    the script are of value.
+    text output if the log file is absent, yet produce non-empty text output
+    if the log file is present.  Enabling the sound and notification options
+    for the script are of value.
 
     Each background script is updated according to its respective interval and
     only if the background script has been added to the icon text.  The result
