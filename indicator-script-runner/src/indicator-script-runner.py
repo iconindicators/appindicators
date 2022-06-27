@@ -410,7 +410,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
-        #TODO Not sure where the issue is, but open preferences, select a script not already highlighted and switch to the icon tab.
+        #TODO Not sure where the issue is, but open preferences,
+        # select a script not already highlighted and switch to the icon tab.
         # The indicator text on the icon tab is highlighted...why?
         # https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
         # https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
