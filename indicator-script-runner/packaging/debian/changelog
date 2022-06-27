@@ -3,7 +3,7 @@ indicator-script-runner (1.0.17-1) bionic; urgency=low
   * Added a preference to write out the full command to the log file when a
     script is executed.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 30 Sep 2021 00:50:03 +1000  <-------- TODO Set date to be release date.
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 27 Jun 2022 19:06:20 +1000
 
 
 indicator-script-runner (1.0.16-1) bionic; urgency=low
