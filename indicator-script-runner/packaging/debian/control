@@ -14,3 +14,4 @@ Description: Run a terminal command or script from an indicator.
  the mouse (or keyboard shortcut where applicable) to execute the
  command/script rather than opening a terminal.
  Optionally the results can be displayed in the icon label.
+
