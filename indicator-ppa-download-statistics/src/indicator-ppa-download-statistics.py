@@ -98,7 +98,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if self.showSubmenu:
             indent = self.getMenuIndent( 1 )
             for ppa in ppas:
-                menuItem = Gtk.MenuItem( ppa.getDescriptor() )
+                menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 if ppa.getStatus() == PPA.Status.OK:
@@ -125,10 +125,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 else:
                     self.createMenuItemForStatusMessage( menu, indent, ppa )
-
-        # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
-        if len( ppas ) == 1:
-            self.secondaryActivateTarget = menuItem
+    
+            # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
+            if len( ppas ) == 1:
+                self.secondaryActivateTarget = menuItem
 
 
     def createMenuItemForPublishedBinary( self, menu, indent, ppa, publishedBinary ):
