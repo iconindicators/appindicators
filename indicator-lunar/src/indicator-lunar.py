@@ -42,6 +42,10 @@
 #
 # Probably need to update the visibility list weekly at least, maybe every second day.
 # Only need the orbital elements on a weekly or even monthly basis.
+#
+# For asteroids, look at using https://asteroid.lowell.edu/main/astorb/
+#
+# For comets, hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
@@ -140,6 +144,11 @@ class IndicatorLunar( IndicatorBase ):
 #    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt"
     COMET_DATA_URL = "file:///home/bernard/Programming/Indicators/indicator-lunar/data/CometEls.txt" #TODO For testing
 
+    COMET_CACHE_BASENAME = "comets-oe-"
+    COMET_CACHE_MAXIMUM_AGE_HOURS = 24 * 7 # Comet data is updated a few times a month, so a weekly download should be sufficient.
+#    COMET_DATA_URL = "https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt"
+    COMET_DATA_URL = "file:///home/bernard/Programming/Indicators/indicator-lunar/data/CometEls.txt" #TODO For testing
+
 #TODO Figure out if this (and the rest of minor planet stuff in the menu/preferences) should be commented out or nuked!
     MINOR_PLANET_CACHE_BASENAME = "minorplanets-oe-"
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 24 * 7 # MPC is updated daily, but a week shouldn't hopefully make much difference!
@@ -147,7 +156,8 @@ class IndicatorLunar( IndicatorBase ):
 
     SATELLITE_CACHE_BASENAME = "satellites-tle-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 24 * 2
-    SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
+    # SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt" #TODO Put back when no longer testing.
+    SATELLITE_DATA_URL = "file:///home/bernard/Programming/Indicators/indicator-lunar/data/visual.txt"
 
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
         _( "Rise Time: " ) + astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
@@ -309,23 +319,34 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateData( self, utcNow ):
+        # Update apparent magnitude data for comets and minor planets.
+        self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData( 
+            utcNow, self.satelliteData,
+            self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
+            self.downloadCountSatellite, self.nextDownloadTimeSatellite,
+            twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
+            None,
+            None, [ ],
+            twolineelement.toText, [ ],
+            twolineelement.toDictionary, [ ] )
+
         # Update comet data.
-        magnitudeFilterAdditionalArguments = [ ]
-        if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
-            magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
+        # magnitudeFilterAdditionalArguments = [ ]
+        # if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
+        #     magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
 
-        self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
-            utcNow, self.cometData,
-            self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
-            self.downloadCountComet, self.nextDownloadTimeComet,
-            orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, orbitalelement.OE.DataType.SKYFIELD_COMET, self.getLogging() ],
-            orbitalelement.convertCometFromMPCToXEphem,
-            IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments,
-            orbitalelement.toText, [ ],
-            orbitalelement.toDictionary, [ True ] )
-
-        if self.cometsAddNew:
-            self.addNewBodies( self.cometData, self.comets )
+        # self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
+        #     utcNow, self.cometData,
+        #     self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
+        #     self.downloadCountComet, self.nextDownloadTimeComet,
+        #     orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, orbitalelement.OE.DataType.SKYFIELD_COMET, self.getLogging() ],
+        #     orbitalelement.convertCometFromMPCToXEphem,
+        #     IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments,
+        #     orbitalelement.toText, [ ],
+        #     orbitalelement.toDictionary, [ True ] )
+        #
+        # if self.cometsAddNew:
+        #     self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
         # if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
@@ -442,11 +463,11 @@ class IndicatorLunar( IndicatorBase ):
                 downloadedData = downloadDataFunction( *downloadDataArguments )
                 downloadCount += 1
                 if downloadedData:
-                    if formatConversionFunction:
-                        downloadedData = formatConversionFunction( downloadedData )
-
-                    if magnitudeFilterFunction:
-                        downloadedData = magnitudeFilterFunction( utcNow, downloadedData, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
+                    # if formatConversionFunction:
+                    #     downloadedData = formatConversionFunction( downloadedData )
+                    #
+                    # if magnitudeFilterFunction:
+                    #     downloadedData = magnitudeFilterFunction( utcNow, downloadedData, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
                     self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName, cacheExtension )
                     downloadCount = 0
