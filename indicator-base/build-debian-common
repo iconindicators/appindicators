@@ -70,6 +70,7 @@ doStandardBuild()
   copyPOCreateMO
   createOrigTarGz
   copyDebian
+  setEndYearInCopyright
   addIconsToDebianInstall $2
   addMOToDebianInstall
   buildDeb
@@ -191,6 +192,12 @@ createOrigTarGz()
 copyDebian()
 {
   rsync -ar --exclude=.svn packaging/debian build/$NAME-$VERSION
+}
+
+
+setEndYearInCopyright()
+{
+  sed -i "s/ENDYEAR/$(date '+%Y')/" build/$NAME-$VERSION/debian/copyright
 }
 
 
