@@ -575,7 +575,6 @@ class AstroPyEphem( AstroBase ):
             _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
 
 
-#TODO Check and ensure the APPARENT magnitude is used to filter, not ABSOLUTE.
     @staticmethod
     def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ):
         results = { }

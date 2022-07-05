@@ -128,22 +128,3 @@ def download( url, logging = None ):
             logging.exception( e )
 
     return tleData
-
-
-def toText( dictionary ):
-    text = ""
-    for tle in dictionary.values():
-        text += tle.getTitle() + '\n' + tle.getLine1() + '\n' + tle.getLine2() + '\n'
-
-    return text
-
-
-def toDictionary( text ):
-    tleData = { }
-    i = 0
-    splitText = text.splitlines()
-    for i in range( 0, len( splitText ), 3 ):
-        tle = TLE( splitText[ i ].strip(), splitText[ i + 1 ].strip(), splitText[ i + 2 ].strip() )
-        tleData[ ( tle.getNumber() ) ] = tle
-
-    return tleData

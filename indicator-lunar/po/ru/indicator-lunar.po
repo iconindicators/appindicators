@@ -1,7 +1,7 @@
 # Russian translation for indicator-lunar.
-# Copyright (C) 2015-2021 Bernard Giannetti
+# Copyright (C) 2015-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-lunar package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2021.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2022.
 #
 msgid ""
 msgstr ""
@@ -130,6 +130,10 @@ msgstr "Уран"
 msgid "Neptune"
 msgstr "Нептун"
 
+#: astrobase.py:172
+msgid "Pluto"
+msgstr "Плутон"
+
 #: astrobase.py:176
 msgid "MERCURY"
 msgstr "МЕРКУРИЙ"
@@ -157,6 +161,10 @@ msgstr "УРАН"
 #: astrobase.py:182
 msgid "NEPTUNE"
 msgstr "НЕПТУН"
+
+#: astrobase.py:183
+msgid "PLUTO"
+msgstr "ПЛУТОН"
 
 #: astrobase.py:198
 msgid "Full Moon"
@@ -1668,11 +1676,11 @@ msgstr "Скрыть объекты со звёздной величиной б�
 
 #: indicator-lunar.py:1374
 msgid ""
-"Planets, stars, comets and minor planets\n"
-"exceeding the magnitude will be hidden."
+"Planets and stars exceeding the\n"
+"magnitude will be hidden."
 msgstr ""
-"Планеты, звёзды, кометы и малые планеты со звёздной\n"
-"величиной, превышающей заданную, будут скрыты."
+"Планеты и звёзды звёздной величиной,\n"
+"превышающей заданную, будут скрыты."
 
 #: indicator-lunar.py:1381
 msgid "Add new satellites"
@@ -1954,3 +1962,43 @@ msgstr "Высота должна быть числом от 0 до 10000 вкл
 #: indicator-lunar.py:1685
 msgid "The start hour for satellite passes must be lower than the end hour."
 msgstr "Начальный час для пролётов спутников должен быть меньше конечного."
+
+#: indicatorbase.py:79
+msgid "Initialising..."
+msgstr "Инициализация..."
+
+#: indicatorbase.py:110 indicatorbase.py:204
+msgid "Preferences"
+msgstr "Параметры"
+
+#: indicatorbase.py:114
+msgid "About"
+msgstr "О программе"
+
+#: indicatorbase.py:118
+msgid "Quit"
+msgstr "Выход"
+
+#: indicatorbase.py:156
+msgid "translator-credits"
+msgstr "Олег Мойсейчук"
+
+#: indicatorbase.py:162
+msgid "Credits"
+msgstr "Благодарность"
+
+#: indicatorbase.py:173 indicatorbase.py:174
+msgid "View the"
+msgstr "Просмотреть"
+
+#: indicatorbase.py:173 indicatorbase.py:174
+msgid "text file."
+msgstr "."
+
+#: indicatorbase.py:173
+msgid "changelog"
+msgstr "список изменений"
+
+#: indicatorbase.py:174
+msgid "error log"
+msgstr "журнал ошибок"

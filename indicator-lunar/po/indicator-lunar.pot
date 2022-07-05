@@ -1,5 +1,5 @@
 # Portable Object Template for indicator-lunar.
-# Copyright (C) 2015-2021 Bernard Giannetti
+# Copyright (C) 2015-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-lunar package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -129,6 +129,10 @@ msgstr ""
 msgid "Neptune"
 msgstr ""
 
+#: astrobase.py:172
+msgid "Pluto"
+msgstr ""
+
 #: astrobase.py:176
 msgid "MERCURY"
 msgstr ""
@@ -155,6 +159,10 @@ msgstr ""
 
 #: astrobase.py:182
 msgid "NEPTUNE"
+msgstr ""
+
+#: astrobase.py:183
+msgid "PLUTO"
 msgstr ""
 
 #: astrobase.py:198
@@ -1628,8 +1636,8 @@ msgstr ""
 
 #: indicator-lunar.py:1374
 msgid ""
-"Planets, stars, comets and minor planets\n"
-"exceeding the magnitude will be hidden."
+"Planets and stars exceeding the\n"
+"magnitude will be hidden."
 msgstr ""
 
 #: indicator-lunar.py:1381
@@ -1877,4 +1885,44 @@ msgstr ""
 
 #: indicator-lunar.py:1685
 msgid "The start hour for satellite passes must be lower than the end hour."
+msgstr ""
+
+#: indicatorbase.py:78
+msgid "Initialising..."
+msgstr ""
+
+#: indicatorbase.py:109 indicatorbase.py:221
+msgid "Preferences"
+msgstr ""
+
+#: indicatorbase.py:113
+msgid "About"
+msgstr ""
+
+#: indicatorbase.py:117
+msgid "Quit"
+msgstr ""
+
+#: indicatorbase.py:178
+msgid "translator-credits"
+msgstr ""
+
+#: indicatorbase.py:184
+msgid "Credits"
+msgstr ""
+
+#: indicatorbase.py:191 indicatorbase.py:195
+msgid "View the"
+msgstr ""
+
+#: indicatorbase.py:191
+msgid "changelog"
+msgstr ""
+
+#: indicatorbase.py:191 indicatorbase.py:195
+msgid "text file."
+msgstr ""
+
+#: indicatorbase.py:195
+msgid "error log"
 msgstr ""

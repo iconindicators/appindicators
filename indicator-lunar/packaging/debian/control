@@ -12,3 +12,4 @@ Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-
 Description: Application indicator for the home astronomer.
  Displays lunar, solar, planetary, star, comet, minor planet and
  satellite information.
+

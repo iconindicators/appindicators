@@ -1,11 +1,21 @@
-indicator-lunar (1.0.93-1) bionic; urgency=low
+indicator-lunar (1.0.94-1) bionic; urgency=low
 
   * Removed Pluto from list of planets; accessible from minor planets
-    (when its apparent magnitude is less than 15).
+    (when its apparent magnitude is less than 15)....TODO Will this stay or need a bigger announcement regarding comet and minor planet change of sources?
   * Increased URL timeout from 5 seconds to 20 seconds.
-  * Removed old eclipse information.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 13 Dec 2021 17:48:41 +1000   <--- TODO Set to day of release!!!!
+
+
+indicator-lunar (1.0.93-1) bionic; urgency=low
+
+  * Due to suspected stale data, computing the apparent magnitude for comets
+    and minor planets is no longer reliable.  As such, comet and minor planet
+    functionality has been disabled.
+  * Increased the minimal required version of PyEphem to 4.1.3.
+  * Removed old eclipse information.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Tue, 5 Jul 2022 13:23:11 +1000
 
 
 indicator-lunar (1.0.92-1) bionic; urgency=low
