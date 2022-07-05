@@ -30,9 +30,6 @@
 # Not sure if this still applies...difficult to tell when now re-examining.
 
 
-#TODO See if the current year can be inserted into the packaging/debian/copyright file.
-
-
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
