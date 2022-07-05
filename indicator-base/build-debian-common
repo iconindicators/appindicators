@@ -13,7 +13,7 @@
 #
 # and run
 #
-#	gpg --import secring.skr 
+#	gpg --import secring.skr
 #
 #
 # When running a build, if the warning 'ancient-standards-version' arises,
