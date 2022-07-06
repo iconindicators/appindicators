@@ -127,12 +127,11 @@ class IndicatorLunar( IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
-    EXTENSION_ICON = ".svg"
+    EXTENSION_SVG = ".svg" #TODO Put these into Indicator Base?  Where else are extensions used?
     EXTENSION_TEXT = ".txt"
 
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
-    ICON_EXTENSION = "svg" #TODO Find where this is used and change to EXTENSION_ICON (or maybe change to EXTENSION_SVG...and maybe put all into Indicator Base).
     ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
@@ -616,7 +615,7 @@ class IndicatorLunar( IndicatorBase ):
         svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
         iconFilename = self.writeCacheText( IndicatorLunar.ICON_CACHE_BASENAME, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
 #TODO Change line above to something like this:
-        # iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_ICON )
+        # iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -648,7 +647,7 @@ class IndicatorLunar( IndicatorBase ):
             False,
             IndicatorLunar.ICON_EXTENSION )
 #TODO Change line above to something like:
-        # return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_ICON )
+        # return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_SVG )
 
 
     def notificationSatellites( self ):
