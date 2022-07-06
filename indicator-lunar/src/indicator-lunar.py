@@ -65,6 +65,9 @@
 # Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
 
 
+#TODO If/when comets and minor planets are reinstated, add text back into packaging/debian/control.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
