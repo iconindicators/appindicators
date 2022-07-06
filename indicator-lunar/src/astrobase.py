@@ -180,7 +180,7 @@ class AstroBase( ABC ):
     PLANET_SATURN = "SATURN"
     PLANET_URANUS = "URANUS"
     PLANET_NEPTUNE = "NEPTUNE"
-    PLANET_PLUTO = "PLUTO"
+    PLANET_PLUTO = "PLUTO" #TODO Drop Pluto at some point...either when minor planets are added back in or just drop it outright.
 
     PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE, PLANET_PLUTO ]
 
