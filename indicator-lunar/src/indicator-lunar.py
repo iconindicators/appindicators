@@ -365,6 +365,17 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateData( self, utcNow ):
+#TODO Call to new version...still not sure how this is all going to work.
+        # Update apparent magnitude data for comets and minor planets.
+        # self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateDataNEW( 
+        #     utcNow, self.satelliteData,
+        #     self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
+        #     self.downloadCountSatellite, self.nextDownloadTimeSatellite,
+        #     twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
+        #     None,
+        #     None, [ ],
+        #     twolineelement.toText, [ ],
+        #     twolineelement.toDictionary, [ ] )
 
         # Update comet data.
         if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
