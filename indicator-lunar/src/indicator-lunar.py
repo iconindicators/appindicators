@@ -257,7 +257,7 @@ class IndicatorLunar( IndicatorBase ):
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
 
         self.__removeCacheFilesVersion89() # Cache data filenames changed in version 90, so remove old versions.
-        self.flushCache()
+        self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
 
 
@@ -270,8 +270,7 @@ class IndicatorLunar( IndicatorBase ):
         self.removeOldFilesFromCache( "minorplanet-oe-" + "unusual-", 0 )
 
 
-#TODO Rename to flushTheCache()
-    def flushCache( self ):
+    def flushTheCache( self ):
 #TODO Now use flushCache
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
