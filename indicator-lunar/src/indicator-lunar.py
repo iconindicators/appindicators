@@ -24,6 +24,47 @@
 # functionality has been disabled.
 
 
+#TODO Ensure all files written out (cached download data, images, etc) contain a file extension ( .txt, .svg, ...).
+
+
+#TODO Given the MPC files for comets and minor planets cannot be used to determine apparent magnitude,
+# either drop comets and minor planets, or...
+# Find external sources (websites) which use better/reliable data to compute apparent magnitude
+# and list the currently visible comets / minor planets (along with the apparent magnitude).
+# From this list (should be at most twenty bodies of each type), can then interrogate the MPC
+# online ephemeris service to get the orbital elements for these bodies.
+# As the CometEls.txt is a small file, could just use that...but if going to the trouble
+# for minor planets, may as well do the same for comets...and may be able to get get both in one http transfer.
+#
+# Do we still need to save orbital elements in different formats (one for PyEphem and one for Skyfield)?
+#
+# Will need to save a list of the currently visible comets and minor planets (maybe keep in a single list).
+#
+# Instead of getting the list of visible comets / minor planets from one website,
+# maybe get from multiple sites and then take subset/overlap to only show those bodies
+# which are deemed visible by several sites (majority rules).
+#
+# Probably need to update the visibility list weekly at least, maybe every second day.
+# Only need the orbital elements on a weekly or even monthly basis.
+#
+# For asteroids, look at using https://asteroid.lowell.edu/main/astorb/
+#
+# For comets, hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
+
+
+#TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
+# https://telescopenights.com/stars-in-the-daytime/
+# Excludes the sun and moon (maybe mercury?).
+# Could either use an hourly window similar to that in satellites, or
+# a check box that simply defaults to one hour before sunset and one hour after sunrise as the visible window.
+#
+# Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
+#
+# If this goes ahead, consider moving the start/end hour window functionality out of each backend and into the frontend.
+# So calculate the satellite passes and screen out those not within the desired window and calculate again moving the start date/time forward to the next window.
+# Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -79,9 +120,19 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
+    DATA_INDEX_BODY_TYPE = 0
+    DATA_INDEX_BODY_NAME = 1
+    DATA_INDEX_DATA_NAME = 2
+
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
+
+    EXTENSION_ICON = ".svg"
+    EXTENSION_TEXT = ".txt"
+
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
-    ICON_EXTENSION = "svg"
+    ICON_EXTENSION = "svg" #TODO Find where this is used and change to EXTENSION_ICON (or maybe change to EXTENSION_SVG...and maybe put all into Indicator Base).
     ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
@@ -97,6 +148,11 @@ class IndicatorLunar( IndicatorBase ):
         list( astroBackend.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+#TODO For comets, minor planets and satellites,
+# given the (eventual) change from binary to text files in the cache,
+# likely need to change the cache basename (satellite-tle changes to satellites-tle or similar for example)
+# so that old versions can be deleted or figure out how to distinguish a binary file from a text
+# and delete if binary.
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
 
@@ -166,10 +222,6 @@ class IndicatorLunar( IndicatorBase ):
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
 
-    DATA_INDEX_BODY_TYPE = 0
-    DATA_INDEX_BODY_NAME = 1
-    DATA_INDEX_DATA_NAME = 2
-
 
     def __init__( self ):
         super().__init__(
@@ -215,7 +267,9 @@ class IndicatorLunar( IndicatorBase ):
         self.removeOldFilesFromCache( "minorplanet-oe-" + "unusual-", 0 )
 
 
+#TODO Rename to flushTheCache()
     def flushCache( self ):
+#TODO Now use flushCache
         self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
