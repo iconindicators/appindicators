@@ -659,7 +659,7 @@ class IndicatorBase( ABC ):
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
-            expiry = datetime.datetime.strptime( theFile[ len( theFile ) - 14 : ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            expiry = datetime.datetime.strptime( theFile[ len( baseName ) : len( baseName ) + 14 ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
 
         if expiry is None:
             expiry = defaultExpiry
