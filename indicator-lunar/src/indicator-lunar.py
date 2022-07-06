@@ -1427,7 +1427,7 @@ class IndicatorLunar( IndicatorBase ):
         box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
-        # toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." )
+        # toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." ) #TODO May or may not be put back to this.
         toolTip = _( "Planets and stars exceeding the\n magnitude will be hidden." )
         spinnerMagnitude = self.createSpinButton(
             self.magnitude, int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ), int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
