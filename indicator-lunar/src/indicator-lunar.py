@@ -207,6 +207,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __removeCacheFilesVersion89( self ):
+#TODO Now use flushCache
         self.removeOldFilesFromCache( "comet-oe-", 0 )
         self.removeOldFilesFromCache( "minorplanet-oe-" + "bright-", 0 )
         self.removeOldFilesFromCache( "minorplanet-oe-" + "critical-", 0 )
@@ -456,6 +457,7 @@ class IndicatorLunar( IndicatorBase ):
             magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
+#TODO Change to readCacheTextWithTimestamp()
             data = self.readCacheBinary( cacheBaseName )
 
         else:
@@ -467,7 +469,7 @@ class IndicatorLunar( IndicatorBase ):
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( utcNow, data, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
-                    self.writeCacheBinary( cacheBaseName, data )
+                    self.writeCacheBinary( cacheBaseName, data ) #TODO Change to writeCacheTextWithTimestamp()
                     downloadCount = 0
                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
@@ -559,6 +561,8 @@ class IndicatorLunar( IndicatorBase ):
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
         iconFilename = self.writeCacheText( IndicatorLunar.ICON_CACHE_BASENAME, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
+#TODO Change line above to something like this:
+        # iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_ICON )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -581,12 +585,16 @@ class IndicatorLunar( IndicatorBase ):
             self.lastFullMoonNotfication = utcNow
 
 
+#TODO Test this by setting the date/time close to next full moon.
+#TODO Why give the full moon icon it's own name?  Can't the format of icon-YYYYMMDDHHMMSS.svg be used?
     def createFullMoonIcon( self ):
         return self.writeCacheText( 
             IndicatorLunar.ICON_FULL_MOON,
             self.createIconText( 100, None ),
             False,
             IndicatorLunar.ICON_EXTENSION )
+#TODO Change line above to something like:
+        # return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_ICON )
 
 
     def notificationSatellites( self ):
