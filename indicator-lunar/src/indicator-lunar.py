@@ -262,24 +262,22 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __removeCacheFilesVersion89( self ):
-#TODO Now use flushCache
-        self.removeOldFilesFromCache( "comet-oe-", 0 )
-        self.removeOldFilesFromCache( "minorplanet-oe-" + "bright-", 0 )
-        self.removeOldFilesFromCache( "minorplanet-oe-" + "critical-", 0 )
-        self.removeOldFilesFromCache( "minorplanet-oe-" + "distant-", 0 )
-        self.removeOldFilesFromCache( "minorplanet-oe-" + "unusual-", 0 )
+        self.flushCache( "comet-oe-", 0 )
+        self.flushCache( "minorplanet-oe-bright-", 0 )
+        self.flushCache( "minorplanet-oe-critical-", 0 )
+        self.flushCache( "minorplanet-oe-distant-", 0 )
+        self.flushCache( "minorplanet-oe-unusual-", 0 )
 
 
     def flushTheCache( self ):
-#TODO Now use flushCache
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
-        self.removeOldFilesFromCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
 
 
     def initialiseDownloadCountsAndCacheDateTimes( self ):
