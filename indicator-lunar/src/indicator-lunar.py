@@ -614,9 +614,7 @@ class IndicatorLunar( IndicatorBase ):
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
-        iconFilename = self.writeCacheText( IndicatorLunar.ICON_CACHE_BASENAME, svgIconText, False, IndicatorLunar.ICON_EXTENSION )
-#TODO Change line above to something like this:
-        # iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
+        iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -642,13 +640,7 @@ class IndicatorLunar( IndicatorBase ):
 #TODO Test this by setting the date/time close to next full moon.
 #TODO Why give the full moon icon it's own name?  Can't the format of icon-YYYYMMDDHHMMSS.svg be used?
     def createFullMoonIcon( self ):
-        return self.writeCacheText( 
-            IndicatorLunar.ICON_FULL_MOON,
-            self.createIconText( 100, None ),
-            False,
-            IndicatorLunar.ICON_EXTENSION )
-#TODO Change line above to something like:
-        # return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_SVG )
+        return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_SVG )
 
 
     def notificationSatellites( self ):
