@@ -631,12 +631,14 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # and is older than the cache maximum age is discarded.
-    def removeOldFilesFromCache( self, baseName, cacheMaximumAgeInHours ):
+    #
+    # Any file extension is ignored in determining if the file should be deleted or not.
+    def flushCache( self, baseName, cacheMaximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
         cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( baseName ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
-                dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYMMDDHHMMSS is 14 characters.
+                dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
                     fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
                     if fileDateTime < cacheMaximumAgeDateTime:
