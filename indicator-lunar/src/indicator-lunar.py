@@ -228,6 +228,8 @@ class IndicatorLunar( IndicatorBase ):
             version = "1.0.93",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
+#TODO Remove the eclipse credit if/when moving exclusively to Skyfield and Skyfield computes solar eclipses.
+#TODO Temporarily remove credit for comets and minor planets.
             # creditz =
             #     [ IndicatorLunar.astroBackend.getCredit(),
             #     _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
@@ -237,6 +239,8 @@ class IndicatorLunar( IndicatorBase ):
                 [ IndicatorLunar.astroBackend.getCredit(),
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
                 _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ) ] )
+
+        self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key is a combination of three tags: body type, body name and data name.
