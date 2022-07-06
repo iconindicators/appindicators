@@ -637,7 +637,7 @@ class IndicatorLunar( IndicatorBase ):
             self.lastFullMoonNotfication = utcNow
 
 
-#TODO Test this by setting the date/time close to next full moon.
+#TODO The full moon icon does appear in the notification (at least in the previous release).
 #TODO Why give the full moon icon it's own name?  Can't the format of icon-YYYYMMDDHHMMSS.svg be used?
     def createFullMoonIcon( self ):
         return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_SVG )
