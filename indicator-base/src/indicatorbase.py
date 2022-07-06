@@ -755,7 +755,7 @@ class IndicatorBase( ABC ):
     # or
     #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
-    # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
+    # For example, for an application 'apple', the first file will be caught, whilst the second is filtered out:
     #    ~/.cache/fred/apple-20170629174950
     #    ~/.cache/fred/orange-20170629174951
     #
