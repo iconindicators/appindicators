@@ -502,7 +502,15 @@ class IndicatorLunar( IndicatorBase ):
 
     # Get the data from the cache, or if stale, download from the source.
     #
-    # Returns a dictionary (may be empty).
+    # Returns a dictionary (may be empty). #TODO Update this!
+#TODO Maybe reverse the sense of this function...
+# Download first (if needed) then save to cache (run magnitude filtering if specified).
+# Read from cache (if needed)
+# Return data (assuming data was passed in and can be just returned if no download and no cache read is required).
+#
+#TODO Need to take into account when the indicator is running for some time (longer than a cache interval)...?
+# Need to always check the cache before just simply just sending back the passed in data (and may need to do a fresh download)?
+#If this logic is valid, implement first before any minor planet / comet changes. 
     def __updateData(
             self, utcNow,
             cacheDateTime, cacheMaximumAge, cacheBaseName,
@@ -531,6 +539,45 @@ class IndicatorLunar( IndicatorBase ):
                 else:
                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
  
+        return data, cacheDateTime, downloadCount, nextDownloadTime
+
+
+#TODO Not finished and likely very wrong...wait until comet and minor planet new sources are found and settled upon.
+    def __updateDataNEW(
+            self, utcNow, data,
+            cacheDateTime, cacheMaximumAge, cacheBaseName, cacheExtension,
+            downloadCount, nextDownloadTime,
+            downloadDataFunction, downloadDataArguments,
+            formatConversionFunction,
+            magnitudeFilterFunction, magnitudeFilterAdditionalArguments,
+            toTextFunction, toTextAdditionalArgunemts,
+            toObjectFunction, toObjectAdditionalArgunemts ):
+
+        if ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow: # Cache is stale.
+            downloadedData = { }
+            if nextDownloadTime < utcNow: # Download is overdue.
+                downloadedData = downloadDataFunction( *downloadDataArguments )
+                downloadCount += 1
+                if downloadedData:
+                    # if formatConversionFunction:
+                    #     downloadedData = formatConversionFunction( downloadedData )
+                    #
+                    # if magnitudeFilterFunction:
+                    #     downloadedData = magnitudeFilterFunction( utcNow, downloadedData, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
+
+                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName, cacheExtension )
+                    downloadCount = 0
+                    cacheDateTime = self.getCacheDateTime( cacheBaseName )
+                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+                    data = downloadedData
+
+                else:
+                    nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
+
+        else: # Cache is fresh.
+            if not data: # No data passed in, so read from cache.
+                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
+
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
