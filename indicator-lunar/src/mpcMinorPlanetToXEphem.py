@@ -83,6 +83,8 @@ def convertTXT( inFile ):
         for line in fIn:
             processAndWriteOneLine( line, fOut )
 
+    return fOut.name
+
 
 def convertMPCORB( inFile ):
     outFile = inFile.replace( "DAT", "edb" )
@@ -104,6 +106,7 @@ def convertMPCORB( inFile ):
 
     fIn.close()
     fOut.close()
+    return fOut.name
 
 
 if len( sys.argv ) != 2:
@@ -116,13 +119,11 @@ if len( sys.argv ) != 2:
 
     raise SystemExit( message )
 
-inFile = sys.argv[ 1 ]
-
-if inFile.endswith( ".txt" ):
+if sys.argv[ 1 ].endswith( ".txt" ):
     convertTXT( inFile )
 
-elif inFile.startswith( "MPCORB.DAT" ):
-    convertMPCORB( inFile )
+elif sys.argv[ 1 ].startswith( "MPCORB.DAT" ):
+    print( "Created", convertMPCORB( sys.argv[ 1 ] ) )
 
 else:
     raise SystemExit( "Unknown input file format." )

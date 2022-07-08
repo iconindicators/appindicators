@@ -50,13 +50,13 @@ def processAndWriteOneLine( line, outputFile ):
             orbitalEccentricity = line[ 159 - 1 : 169 ].strip() # $e
             meanAnomalyEpoch = line[ 116 - 1 : 126 ].strip() # $M
             epochDate = line[ 111 - 1 : 112 ] + '/' + line[ 113 - 1 : 114 ] + '/' + line[ 107 - 1 : 110 ]
-            slopeParamenter = line[ 50 - 1 : 54 ].strip() # $G
+            slopeParameter = line[ 50 - 1 : 54 ].strip() # $G
 
             components = [
                 name, 'e', inclinationToEcliptic, longitudeAscendingNode,
                 argumentPerihelion, semimajorAxix, '0', orbitalEccentricity, meanAnomalyEpoch,
                 epochDate, "2000.0",
-                absoluteMagnitude, slopeParamenter ]
+                absoluteMagnitude, slopeParameter ]
 
             outputFile.write( ','.join( components ) + '\n' )
 
@@ -76,6 +76,7 @@ def convert( inFile ):
 
     fIn.close()
     fOut.close()
+    return fOut.name
 
 
 if len( sys.argv ) != 2:
@@ -87,4 +88,4 @@ if len( sys.argv ) != 2:
 
     raise SystemExit( message )
 
-convert( sys.argv[ 1 ] )
+print( "Created", convert( sys.argv[ 1 ] ) )

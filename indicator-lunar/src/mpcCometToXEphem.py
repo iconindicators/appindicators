@@ -82,6 +82,18 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ','.join( components ) + '\n' )
 
 
+def convert( inFile ):
+    outFile = inFile[ 0 : -3 ] + "edb"
+    fIn = open( inFile, 'r' )
+    fOut = open( outFile, 'w' )
+    for line in fIn:
+        processAndWriteOneLine( line, fOut )
+
+    fIn.close()
+    fOut.close()
+    return fOut.name
+
+
 if len( sys.argv ) != 2:
     message = \
         "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
@@ -90,8 +102,4 @@ if len( sys.argv ) != 2:
 
     raise SystemExit( message )
 
-inFile = sys.argv[ 1 ]
-outFile = inFile[ 0 : -3 ] + "edb"
-with open( inFile, 'r' ) as fIn, open( outFile, 'w' ) as fOut:
-    for line in fIn:
-        processAndWriteOneLine( line, fOut )
+print( "Created", convert( sys.argv[ 1 ] ) )        
