@@ -66,7 +66,7 @@ def processAndWriteOneLine( line, outputFile ):
 def convert( inFile ):
     outFile = inFile.replace( "dat", "edb" )
     if inFile.endswith( ".gz" ):
-        fIn = gzip.open( inFile, 'r' )
+        fIn = gzip.open( inFile, 'rt' )
         outFile = outFile[ 0 : -3 ]
 
     else:

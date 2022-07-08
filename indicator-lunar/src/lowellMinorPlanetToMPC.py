@@ -99,7 +99,7 @@ def processAndWriteOneLine( line, outputFile ):
 def convert( inFile ):
     outFile = inFile.replace( "dat", "mpc.dat" )
     if inFile.endswith( ".gz" ):
-        fIn = gzip.open( inFile, 'r' )
+        fIn = gzip.open( inFile, 'rt' )
         outFile = outFile[ 0 : -3 ]
 
     else:

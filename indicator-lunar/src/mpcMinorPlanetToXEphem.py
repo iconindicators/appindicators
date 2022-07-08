@@ -89,7 +89,7 @@ def convertTXT( inFile ):
 def convertMPCORB( inFile ):
     outFile = inFile.replace( "DAT", "edb" )
     if inFile.endswith( ".gz" ):
-        fIn = gzip.open( inFile, 'r' )
+        fIn = gzip.open( inFile, 'rt' )
         fOut = gzip.open( outFile, 'w' )
 
     else:
