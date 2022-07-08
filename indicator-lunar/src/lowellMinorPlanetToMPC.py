@@ -114,13 +114,19 @@ def convert( inFile ):
     return fOut.name
 
 
-if len( sys.argv ) != 2:
-    message = \
-        "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
-        "\n\nFor example:" + \
-        "\n  python3  " + sys.argv[ 0 ] + " astorb.dat" + \
-        "\n  python3  " + sys.argv[ 0 ] + " astorb.dat.gz"
+#TODO Need to change to match that in loweellMinorPlanetToXEphem.py
+def main():
+    if len( sys.argv ) != 2:
+        message = \
+            "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
+            "\n\nFor example:" + \
+            "\n  python3  " + sys.argv[ 0 ] + " astorb.dat" + \
+            "\n  python3  " + sys.argv[ 0 ] + " astorb.dat.gz"
 
-    raise SystemExit( message )
+        raise SystemExit( message )
 
-print( "Created", convert( sys.argv[ 1 ] ) )
+    print( "Created", convert( sys.argv[ 1 ] ) )
+
+
+if __name__ == "__main__":
+    main()

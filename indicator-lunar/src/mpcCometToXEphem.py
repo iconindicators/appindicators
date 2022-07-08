@@ -94,6 +94,7 @@ def convert( inFile ):
     return fOut.name
 
 
+#TODO Need to change to match that in loweellMinorPlanetToXEphem.py
 if len( sys.argv ) != 2:
     message = \
         "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \

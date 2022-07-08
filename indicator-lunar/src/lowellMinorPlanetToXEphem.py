@@ -28,6 +28,8 @@
 #    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
 
 
+from pathlib import Path
+
 import gzip, sys
 
 
@@ -79,13 +81,19 @@ def convert( inFile ):
     return fOut.name
 
 
-if len( sys.argv ) != 2:
-    message = \
-        "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
-        "\n\nFor example:" + \
-        "\n  python3  " + sys.argv[ 0 ] + " astorb.dat" + \
-        "\n  python3  " + sys.argv[ 0 ] + " astorb.dat.gz"
+def main( fileToConvert ):
+    outputFilename = convert( fileToConvert )
+    return outputFilename
 
-    raise SystemExit( message )
 
-print( "Created", convert( sys.argv[ 1 ] ) )
+if __name__ == "__main__":
+    if len( sys.argv ) != 2:
+        message = \
+            "Usage: python3 " + Path(__file__).name + " fileToConvert" + \
+            "\n\nFor example:" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat.gz"
+
+        raise SystemExit( message )
+
+    print( "Created", main( sys.argv[ 1 ] ) )

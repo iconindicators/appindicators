@@ -119,6 +119,7 @@ if len( sys.argv ) != 2:
 
     raise SystemExit( message )
 
+#TODO Need to change to match that in loweellMinorPlanetToXEphem.py
 if sys.argv[ 1 ].endswith( ".txt" ):
     convertTXT( inFile )
 
