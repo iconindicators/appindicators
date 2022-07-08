@@ -84,9 +84,9 @@ def processAndWriteOneLine( line, outputFile ):
 
 if len( sys.argv ) != 2:
     message = \
-        "Usage: python3 mpcCometToXEphem.py fileToConvert" + \
+        "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
         "\n\nFor example:" + \
-        "\n  python3 mpcCometToXEphem.py CometEls.txt"
+        "\n  python3 " + sys.argv[ 0 ] + " CometEls.txt"
 
     raise SystemExit( message )
 

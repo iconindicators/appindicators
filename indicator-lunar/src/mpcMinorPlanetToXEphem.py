@@ -108,11 +108,11 @@ def convertMPCORB( inFile ):
 
 if len( sys.argv ) != 2:
     message = \
-        "Usage: python3 mpcMinorPlanetToXEphem.py fileToConvert" + \
+        "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
         "\n\nFor example:" + \
-        "\n  python3 mpcMinorPlanetToXEphem.py MPCORB.DAT" + \
-        "\n  python3 mpcMinorPlanetToXEphem.py MPCORB.DAT.gz" + \
-        "\n  python3 mpcMinorPlanetToXEphem.py mpcDataAsStraightTextWithoutHeader.txt"
+        "\n  python3 " + sys.argv[ 0 ] + " MPCORB.DAT" + \
+        "\n  python3 " + sys.argv[ 0 ] + " MPCORB.DAT.gz" + \
+        "\n  python3 " + sys.argv[ 0 ] + " mpcDataAsStraightTextWithoutHeader.txt"
 
     raise SystemExit( message )
 
