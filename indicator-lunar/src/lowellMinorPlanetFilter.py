@@ -50,7 +50,7 @@ def __getApparentMagnitudeOverPeriod( orbitalElement, startDate, endDate, city, 
     return body.mag
 
 
-def filterByName( inFile, names ):
+def __filterByName( inFile, names ):
     suffix = "-FILTERED" + ".dat"
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
@@ -72,7 +72,7 @@ def filterByName( inFile, names ):
     return fOut.name
 
 
-def filterByApparentMagnitudeUsingPyEphem(
+def __filterByApparentMagnitudeUsingPyEphem(
         inFile,
         apparentMagnitudeMaximum = 15.0, # Upper limit for apparent magnitude.
         durationInYears = 1, # Number of years over which to compute apparent magnitude.
@@ -91,7 +91,7 @@ def filterByApparentMagnitudeUsingPyEphem(
 
 
 #TODO Do some statistical analysis...is 100 too low or too high?
-def filterByObservationsAndSanityCheck( inFile, minimalNumberOfObservations = 100 ):
+def __filterByObservationsAndSanityCheck( inFile, minimalNumberOfObservations = 100 ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
@@ -133,10 +133,10 @@ def filterByObservationsAndSanityCheck( inFile, minimalNumberOfObservations = 10
 
 
 def main( fileToFilter ):
-    astorbFilteredByObservations = filterByObservationsAndSanityCheck( fileToFilter )
+    astorbFilteredByObservations = __filterByObservationsAndSanityCheck( fileToFilter )
     pyephemFilteredByObservations = lowellMinorPlanetToXEphem.main( astorbFilteredByObservations )
-    namesKept = filterByApparentMagnitudeUsingPyEphem( pyephemFilteredByObservations )
-    filteredFile = filterByName( fileToFilter, namesKept )
+    namesKept = __filterByApparentMagnitudeUsingPyEphem( pyephemFilteredByObservations )
+    filteredFile = __filterByName( fileToFilter, namesKept )
     return filteredFile
 
 
