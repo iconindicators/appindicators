@@ -96,11 +96,9 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ' '.join( components ) + '\n' )
 
 
-def convert( inFile ):
-    outFile = inFile.replace( "dat", "mpc.dat" )
+def convert( inFile, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
-        outFile = outFile[ 0 : -3 ]
 
     else:
         fIn = open( inFile, 'r' )
@@ -111,22 +109,16 @@ def convert( inFile ):
 
     fIn.close()
     fOut.close()
-    return fOut.name
-
-
-#TODO Need to change to match that in loweellMinorPlanetToXEphem.py
-def main():
-    if len( sys.argv ) != 2:
-        message = \
-            "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
-            "\n\nFor example:" + \
-            "\n  python3  " + sys.argv[ 0 ] + " astorb.dat" + \
-            "\n  python3  " + sys.argv[ 0 ] + " astorb.dat.gz"
-
-        raise SystemExit( message )
-
-    print( "Created", convert( sys.argv[ 1 ] ) )
 
 
 if __name__ == "__main__":
-    main()
+    if len( sys.argv ) != 3:
+        message = \
+            "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
+            "\n\nFor example:" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat astorb.txt" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat.gz astorb.txt"
+
+        raise SystemExit( message )
+
+    convert( sys.argv[ 1 ], sys.argv[ 2 ] )

@@ -78,9 +78,6 @@ def convert( inFile, outFile ):
     fOut.close()
 
 
-def main( inFile, outFile ): convert( inFile, outFile )
-
-
 if __name__ == "__main__":
     if len( sys.argv ) != 3:
         message = \
@@ -91,4 +88,4 @@ if __name__ == "__main__":
 
         raise SystemExit( message )
 
-    main( sys.argv[ 1 ], sys.argv[ 2 ] )
+    convert( sys.argv[ 1 ], sys.argv[ 2 ] )

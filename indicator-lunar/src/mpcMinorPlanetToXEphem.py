@@ -77,17 +77,13 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ','.join( components ) + '\n' )
 
 
-def convertTXT( inFile ):
-    outFile = inFile[ 0 : -3 ] + "edb"
+def convertTXT( inFile, outFile ):
     with open( inFile, 'r' ) as fIn, open( outFile, 'w' ) as fOut:
         for line in fIn:
             processAndWriteOneLine( line, fOut )
 
-    return fOut.name
 
-
-def convertMPCORB( inFile ):
-    outFile = inFile.replace( "DAT", "edb" )
+def convertMPCORB( inFile, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
         fOut = gzip.open( outFile, 'w' )
@@ -106,25 +102,29 @@ def convertMPCORB( inFile ):
 
     fIn.close()
     fOut.close()
-    return fOut.name
 
 
-if len( sys.argv ) != 2:
-    message = \
-        "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
-        "\n\nFor example:" + \
-        "\n  python3 " + sys.argv[ 0 ] + " MPCORB.DAT" + \
-        "\n  python3 " + sys.argv[ 0 ] + " MPCORB.DAT.gz" + \
-        "\n  python3 " + sys.argv[ 0 ] + " mpcDataAsStraightTextWithoutHeader.txt"
+def convert( inFile, outFile ):
+    if inFile == "MPCORB.DAT" or inFile == "MPCORB.DAT.gz":
+        convertMPCORB( inFile, outFile )
 
-    raise SystemExit( message )
+    else:
+        convertTXT( inFile, outFile )
 
-#TODO Need to change to match that in loweellMinorPlanetToXEphem.py
-if sys.argv[ 1 ].endswith( ".txt" ):
-    convertTXT( inFile )
 
-elif sys.argv[ 1 ].startswith( "MPCORB.DAT" ):
-    print( "Created", convertMPCORB( sys.argv[ 1 ] ) )
+if __name__ == "__main__":
+    if len( sys.argv ) != 3:
+        message = \
+            "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
+            "\n\nFor example:" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT MPC_MINOR_PLANET mpcorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz MPC_MINOR_PLANET mpcorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " NEA.txt MPC_MINOR_PLANET NEA.edb" + \
+            "\n  python3  " + Path(__file__).name + " PHA.txt MPC_MINOR_PLANET PHA.edb" + \
+            "\n  python3  " + Path(__file__).name + " DAILY.DAT MPC_MINOR_PLANET DAILY.edb" + \
+            "\n  python3  " + Path(__file__).name + " Distant.txt MPC_MINOR_PLANET Distant.edb" + \
+            "\n  python3  " + Path(__file__).name + " Unusual.txt MPC_MINOR_PLANET Unusual.edb"
 
-else:
-    raise SystemExit( "Unknown input file format." )
+        raise SystemExit( message )
+
+    convert( sys.argv[ 1 ], sys.argv[ 2 ] )

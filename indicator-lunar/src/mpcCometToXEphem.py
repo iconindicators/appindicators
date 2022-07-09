@@ -31,7 +31,7 @@
 import sys
 
 
-def processAndWriteOneLine( line, outputFile ):
+def processAndWriteOneLine( line, outFile ):
     if len( line.strip() ) > 0:
         name = line[ 103 - 1 : 158 ].replace( '(', '' ).replace( ')', '' ).strip()
         absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
@@ -79,11 +79,10 @@ def processAndWriteOneLine( line, outputFile ):
                     argumentPerihelion, perihelionDistance, longitudeAscendingNode, "2000.0",
                     absoluteMagnitude, slopeParameter ]
 
-            outputFile.write( ','.join( components ) + '\n' )
+            outFile.write( ','.join( components ) + '\n' )
 
 
-def convert( inFile ):
-    outFile = inFile[ 0 : -3 ] + "edb"
+def convert( inFile, outFile ):
     fIn = open( inFile, 'r' )
     fOut = open( outFile, 'w' )
     for line in fIn:
@@ -91,16 +90,15 @@ def convert( inFile ):
 
     fIn.close()
     fOut.close()
-    return fOut.name
 
 
-#TODO Need to change to match that in loweellMinorPlanetToXEphem.py
-if len( sys.argv ) != 2:
-    message = \
-        "Usage: python3 " + sys.argv[ 0 ] + " fileToConvert" + \
-        "\n\nFor example:" + \
-        "\n  python3 " + sys.argv[ 0 ] + " CometEls.txt"
+if __name__ == "__main__":
+    if len( sys.argv ) != 3:
+        message = \
+            "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
+            "\n\nFor example:" + \
+            "\n  python3  " + Path(__file__).name + " CometEls.txt CometEls.edb"
 
-    raise SystemExit( message )
+        raise SystemExit( message )
 
-print( "Created", convert( sys.argv[ 1 ] ) )        
+    convert( sys.argv[ 1 ], sys.argv[ 2 ] )
