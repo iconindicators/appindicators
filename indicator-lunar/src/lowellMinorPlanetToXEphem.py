@@ -63,11 +63,9 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ','.join( components ) + '\n' )
 
 
-def convert( inFile ):
-    outFile = inFile.replace( "dat", "edb" )
+def convert( inFile, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
-        outFile = outFile[ 0 : -3 ]
 
     else:
         fIn = open( inFile, 'r' )
@@ -78,22 +76,19 @@ def convert( inFile ):
 
     fIn.close()
     fOut.close()
-    return fOut.name
 
 
-def main( fileToConvert ):
-    outputFilename = convert( fileToConvert )
-    return outputFilename
+def main( inFile, outFile ): convert( inFile, outFile )
 
 
 if __name__ == "__main__":
-    if len( sys.argv ) != 2:
+    if len( sys.argv ) != 3:
         message = \
-            "Usage: python3 " + Path(__file__).name + " fileToConvert" + \
+            "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
             "\n\nFor example:" + \
-            "\n  python3  " + Path(__file__).name + " astorb.dat" + \
-            "\n  python3  " + Path(__file__).name + " astorb.dat.gz"
+            "\n  python3  " + Path(__file__).name + " astorb.dat astorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat.gz astorb.edb"
 
         raise SystemExit( message )
 
-    print( "Created", main( sys.argv[ 1 ] ) )
+    main( sys.argv[ 1 ], sys.argv[ 2 ] )
