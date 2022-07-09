@@ -16,16 +16,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Remove bodies from the Lowell Minor Planet Services asteroid orbital elements database:
-#    which have a low number of observations;
-#    with an apparent magnitude exceeding a limit,
-# creating a new database from the result.
+# Filter bodies from:
+#
+#    The Lowell Minor Planet Services or Minor Planet Center asteroids (minor planet) databases which have:
+#        A low number of observations;
+#        An apparent magnitude exceeding a limit;
+#    creating a new file from the result.
+#
+#    The Minor Planet Center comets file which have:
+#        An apparent magnitude exceeding a limit;
+#    creating a new file from the result.
 #
 # Requires PyEphem for the apparent magnitude calculations.
-#
-# The asteroid orbital elements database (and format) is available at
-#    https://asteroid.lowell.edu/main/astorb
-# (both the compressed and uncompressed versions are supported).
 
 
 from enum import Enum

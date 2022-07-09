@@ -86,12 +86,11 @@ def convertTXT( inFile, outFile ):
 def convertMPCORB( inFile, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
-        fOut = gzip.open( outFile, 'w' )
-
+ 
     else:
         fIn = open( inFile, 'r' )
-        fOut = open( outFile, 'w' )
 
+    fOut = open( outFile, 'w' )
     endOfHeader = False
     for line in fIn:
         if endOfHeader:
