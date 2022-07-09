@@ -23,7 +23,7 @@
 #
 # Requires PyEphem for the apparent magnitude calculations.
 #
-# The asteroid orbital elements database is available at
+# The asteroid orbital elements database (and format) is available at
 #    https://asteroid.lowell.edu/main/astorb
 # (both the compressed and uncompressed versions are supported).
 
