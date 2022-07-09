@@ -59,23 +59,6 @@ def getApparentMagnitudeOverPeriod( orbitalElement, startDate, endDate, city, ap
     return body.mag
 
 
-def filterByName( inFile, outFile, names, nameStart, nameEnd ):
-    if inFile.endswith( ".gz" ):
-        fIn = gzip.open( inFile, 'rt' )
-
-    else:
-        fIn = open( inFile, 'r' )
-
-    fOut = open( outFile, 'w' )
-    for line in fIn:
-        if len( line.strip() ) == 0:
-            continue
-
-        name = line[ nameStart - 1 : nameEnd ].strip()
-        if name in names:
-            fOut.write( line )
-
-
 def filterByApparentMagnitude(
         inFile,
         apparentMagnitudeMaximum = 15.0, # Upper limit for apparent magnitude.
@@ -93,6 +76,23 @@ def filterByApparentMagnitude(
                 namesKept.append( line[ : line.index( ',' ) ] )
 
     return namesKept
+
+
+def filterByName( inFile, outFile, names, nameStart, nameEnd ):
+    if inFile.endswith( ".gz" ):
+        fIn = gzip.open( inFile, 'rt' )
+
+    else:
+        fIn = open( inFile, 'r' )
+
+    fOut = open( outFile, 'w' )
+    for line in fIn:
+        if len( line.strip() ) == 0:
+            continue
+
+        name = line[ nameStart - 1 : nameEnd ].strip()
+        if name in names:
+            fOut.write( line )
 
 
 def removeHeaderFromMPCORB( inFile ):
@@ -115,9 +115,6 @@ def removeHeaderFromMPCORB( inFile ):
 
 
 #TODO Do some statistical analysis...is 100 too low or too high?
-#TODO Given that MPC comets do not have the observations field,
-# might need to split this function into name/magnitude/sanity and observations,
-# or just pass in a flag (or minimalNumberOfObservations = -1).
 def filterByObservationsAndSanityCheck(
         inFile,
         nameStart, nameEnd,
@@ -142,10 +139,11 @@ def filterByObservationsAndSanityCheck(
             print( "Missing name:\n" + line )
             continue
 
-        numberOfObservations = line[ observationsStart - 1 : observationsEnd ].strip()
-        if int( numberOfObservations ) < minimalNumberOfObservations:
-            droppedBodies += 1
-            continue
+        if observationsStart > -1:
+            numberOfObservations = line[ observationsStart - 1 : observationsEnd ].strip()
+            if int( numberOfObservations ) < minimalNumberOfObservations:
+                droppedBodies += 1
+                continue
 
         absoluteMagnitude = line[ magnitudeStart - 1 : magnitudeEnd ].strip()
         if len( absoluteMagnitude ) == 0:
@@ -162,16 +160,14 @@ def filterByObservationsAndSanityCheck(
 
 def filter( inFile, dataType, outFile ):
     if dataType == DataType.MPC_COMET.name:
-#TODO...
-        # filteredByObservations = filterByObservationsAndSanityCheck( inFile, 1, 26, 101, 106, 43, 49 ) #TODO Filter on sanity/name/magnitude but not observations.
-        # filteredByObservationsXEphem = tempfile.NamedTemporaryFile( delete = False )
-        # mpcCometToXEphem.convert( filteredByObservations, filteredByObservationsXEphem.name )
-        # names = filterByApparentMagnitude( filteredByObservationsXEphem.name )
-        # filterByName( inFile, outFile, names, 103, 158 )
-        # os.remove( filteredByObservations )
-        # os.remove( filteredByObservationsXEphem.name )
-        # print( "Created", outFile )
-        pass
+        filteredByObservations = filterByObservationsAndSanityCheck( inFile, 103, 158, -1, -1, 92, 95 )
+        filteredByObservationsXEphem = tempfile.NamedTemporaryFile( delete = False )
+        mpcCometToXEphem.convert( filteredByObservations, filteredByObservationsXEphem.name )
+        names = filterByApparentMagnitude( filteredByObservationsXEphem.name )
+        filterByName( inFile, outFile, names, 103, 158 )
+        os.remove( filteredByObservations )
+        os.remove( filteredByObservationsXEphem.name )
+        print( "Created", outFile )
 
     elif dataType == DataType.LOWELL_MINOR_PLANET.name:
         filteredByObservations = filterByObservationsAndSanityCheck( inFile, 1, 26, 101, 106, 43, 49 )
