@@ -45,7 +45,7 @@ def getUnpackedDate( i ): return str( i ) if i.isdigit() else str( ord( i ) - or
 
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
-        name = line[ 167 - 1 : 194 ].replace( '(', '' ).replace( ')', '' ).strip()
+        name = line[ 167 - 1 : 194 ].strip()
         absoluteMagnitude = line[ 9 - 1 : 13 ].strip() # $H
 
         if len( name ) == 0:

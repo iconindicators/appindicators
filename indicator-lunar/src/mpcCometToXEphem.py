@@ -35,7 +35,7 @@ import sys
 
 def processAndWriteOneLine( line, outFile ):
     if len( line.strip() ) > 0:
-        name = line[ 103 - 1 : 158 ].replace( '(', '' ).replace( ')', '' ).strip()
+        name = line[ 103 - 1 : 158 ].strip()
         absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
 
         if len( name ) == 0:

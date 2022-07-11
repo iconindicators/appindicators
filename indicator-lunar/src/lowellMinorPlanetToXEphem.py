@@ -35,7 +35,7 @@ import gzip, sys
 
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
-        name = line[ 1 - 1 : 26 ].replace( '(', '' ).replace( ')', '' ).strip()
+        name = line[ 1 - 1 : 26 ].strip()
         absoluteMagnitude = line[ 43 - 1 : 49 ].strip() # $H
 
         if len( name ) == 0:
