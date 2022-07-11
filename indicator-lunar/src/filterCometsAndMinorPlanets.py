@@ -28,30 +28,41 @@
 #    creating a new file from the result.
 #
 # Requires PyEphem for the apparent magnitude calculations.
+#
+# The default filtering removes bodies which:
+#    Have no name;
+#    Have no absolute magnitude;
+#    Have fewer than 250 observations (where applicable);
+#    Do not have an apparent magnitude less than 15 at some point, measured every 30 days over the course of 366 days.
 
 
 from enum import Enum
 from pathlib import Path
 
 
-import datetime, ephem, gzip, os, sys, tempfile
+import datetime, ephem, gzip, importlib, os, sys, tempfile
 import lowellMinorPlanetToXEphem, mpcCometToXEphem, mpcMinorPlanetToXEphem
 
 
 class DataType( Enum ):
     LOWELL_MINOR_PLANET = 0
-    MPC_MINOR_PLANET = 1
-    MPC_COMET = 2
+    MPC_MINOR_PLANET    = 1
+    MPC_COMET           = 2
 
 
-def getApparentMagnitudeOverPeriod( orbitalElement, startDate, endDate, city, apparentMagnitudeMaximum, intervalInDaysBetweenBodyCompute ):
+def getApparentMagnitudeOverPeriod(
+        orbitalElement,
+        startDate, endDate,
+        city,
+        magnitudeMaximum, intervalInDaysBetweenBodyCompute ):
+
     currentDate = startDate
     city = ephem.city( "London" ) # Use any city; makes no difference to obtain the apparent magnitude.
     body = ephem.readdb( orbitalElement )
     while currentDate < endDate:
         city.date = currentDate
         body.compute( city )
-        if body.mag <= apparentMagnitudeMaximum:
+        if body.mag <= magnitudeMaximum:
             break
 
         currentDate += datetime.timedelta( days = intervalInDaysBetweenBodyCompute )
@@ -65,6 +76,7 @@ def filterByApparentMagnitude(
         durationInYears = 1, # Number of years over which to compute apparent magnitude.
         intervalInDaysBetweenApparentMagnitudeCalculations = 30 ):
 
+    print( "Filter by apparent magnitude..." )
     namesKept = [ ]
     startDate = datetime.datetime.utcnow()
     endDate = startDate + datetime.timedelta( days = 366 * durationInYears )
@@ -79,6 +91,7 @@ def filterByApparentMagnitude(
 
 
 def filterByName( inFile, outFile, names, nameStart, nameEnd ):
+    print( "Filter by name..." )
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
@@ -96,6 +109,7 @@ def filterByName( inFile, outFile, names, nameStart, nameEnd ):
 
 
 def removeHeaderFromMPCORB( inFile ):
+    print( "Removing MPCORB header..." )
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
@@ -114,13 +128,41 @@ def removeHeaderFromMPCORB( inFile ):
     return fOut.name
 
 
-#TODO Do some statistical analysis...is 100 too low or too high?
-def filterByObservationsAndSanityCheck(
+def filterByObservations(
+        inFile,
+        observationsStart, observationsEnd,
+        minimalNumberOfObservations = 250 ):
+
+    print( "Filter by observations..." )
+    fIn = open( inFile, 'r' )
+    fOut = tempfile.NamedTemporaryFile( mode = 'w', delete = False )
+    totalBodies = 0
+    droppedBodies = 0
+    for line in fIn:
+        totalBodies += 1
+
+        numberOfObservations = line[ observationsStart - 1 : observationsEnd ].strip()
+        if int( numberOfObservations ) < minimalNumberOfObservations:
+            droppedBodies += 1
+            continue
+
+        fOut.write( line )
+
+    if droppedBodies > 0:
+        print( "Dropped", droppedBodies, "bodies out of", totalBodies, "due to fewer than", minimalNumberOfObservations, "observations." )
+
+    return fOut.name
+
+
+# To filter a data file which does not contain observations
+# such as CometEls.txt, set observationsStart = -1.
+def filterBySanityCheck(
         inFile,
         nameStart, nameEnd,
-        observationsStart, observationsEnd,
         magnitudeStart, magnitudeEnd,
-        minimalNumberOfObservations = 100 ):
+        observationsStart, observationsEnd ):
+
+    print( "Filter by sanity check..." )
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
@@ -128,76 +170,92 @@ def filterByObservationsAndSanityCheck(
         fIn = open( inFile, 'r' )
 
     fOut = tempfile.NamedTemporaryFile( mode = 'w', delete = False )
-    droppedBodies = 0
     for line in fIn:
         if len( line.strip() ) == 0:
             print( "Found empty line" )
             continue
 
-        name = line[ nameStart - 1 : nameEnd ].replace( '(', '' ).replace( ')', '' ).strip()
+        name = line[ nameStart - 1 : nameEnd ].strip()
         if len( name ) == 0:
             print( "Missing name:\n" + line )
             continue
-
-        if observationsStart > -1:
-            numberOfObservations = line[ observationsStart - 1 : observationsEnd ].strip()
-            if int( numberOfObservations ) < minimalNumberOfObservations:
-                droppedBodies += 1
-                continue
 
         absoluteMagnitude = line[ magnitudeStart - 1 : magnitudeEnd ].strip()
         if len( absoluteMagnitude ) == 0:
             print( "Missing absolute magnitude:\n" + line )
             continue
 
-        fOut.write( line )
+        if observationsStart > -1:
+            numberOfObservations = line[ observationsStart - 1 : observationsEnd ].strip()
+            if len( numberOfObservations ) == 0:
+                print( "Missing observations:\n" + line )
+                continue
 
-    if droppedBodies > 0:
-        print( "Number of bodies dropped due to fewer than", minimalNumberOfObservations, "observations:", droppedBodies )
+        fOut.write( line )
 
     return fOut.name
 
 
 def filter( inFile, dataType, outFile ):
+    fileToFilter = inFile
     if dataType == DataType.MPC_COMET.name:
-        filteredByObservations = filterByObservationsAndSanityCheck( inFile, 103, 158, -1, -1, 92, 95 )
-        filteredByObservationsXEphem = tempfile.NamedTemporaryFile( delete = False )
-        mpcCometToXEphem.convert( filteredByObservations, filteredByObservationsXEphem.name )
-        names = filterByApparentMagnitude( filteredByObservationsXEphem.name )
-        filterByName( inFile, outFile, names, 103, 158 )
-        os.remove( filteredByObservations )
-        os.remove( filteredByObservationsXEphem.name )
-        print( "Created", outFile )
+        nameStart = 103
+        nameEnd = 158
+        magnitudeStart = 92
+        magnitudeEnd = 95
+        observationsStart = -1
+        observationsEnd = -1
+        convertToXEphemFunction = getattr( importlib.import_module( "mpcCometToXEphem" ), "convert" )
 
     elif dataType == DataType.LOWELL_MINOR_PLANET.name:
-        filteredByObservations = filterByObservationsAndSanityCheck( inFile, 1, 26, 101, 106, 43, 49 )
-        filteredByObservationsXEphem = tempfile.NamedTemporaryFile( delete = False )
-        lowellMinorPlanetToXEphem.convert( filteredByObservations, filteredByObservationsXEphem.name )
-        names = filterByApparentMagnitude( filteredByObservationsXEphem.name )
-        filterByName( inFile, outFile, names, 1, 26 )
-        os.remove( filteredByObservations )
-        os.remove( filteredByObservationsXEphem.name )
-        print( "Created", outFile )
+        nameStart = 1
+        nameEnd = 26
+        magnitudeStart = 43
+        magnitudeEnd = 49
+        observationsStart = 101
+        observationsEnd = 106
+        convertToXEphemFunction = getattr( importlib.import_module( "lowellMinorPlanetToXEphem" ), "convert" )
 
     elif dataType == DataType.MPC_MINOR_PLANET.name:
-        fileToFilter = inFile
+        nameStart = 167
+        nameEnd = 194
+        magnitudeStart = 9
+        magnitudeEnd = 13
+        observationsStart = 118
+        observationsEnd = 122
+        convertToXEphemFunction = getattr( importlib.import_module( "mpcMinorPlanetToXEphem" ), "convert" )
+
         if inFile == "MPCORB.DAT" or inFile == "MPCORB.DAT.gz":
             fileToFilter = removeHeaderFromMPCORB( inFile )
 
-        filteredByObservations = filterByObservationsAndSanityCheck( fileToFilter, 167, 194, 118, 122, 9, 13 )
-        filteredByObservationsXEphem = tempfile.NamedTemporaryFile( delete = False )
-        mpcMinorPlanetToXEphem.convert( filteredByObservations, filteredByObservationsXEphem.name )
-        names = filterByApparentMagnitude( filteredByObservationsXEphem.name )
-        filterByName( fileToFilter, outFile, names, 1, 26 )
-        os.remove( filteredByObservations )
-        os.remove( filteredByObservationsXEphem.name )
+    else:
+        raise SystemExit( "Unknown data type: " + dataType )
+
+    filteredBySanityCheck = filterBySanityCheck( fileToFilter, nameStart, nameEnd, magnitudeStart, magnitudeEnd, observationsStart, observationsEnd )
+
+    if dataType == DataType.MPC_COMET.name:
+        filteredByObservations = filteredBySanityCheck
+
+    else: # DataType.LOWELL_MINOR_PLANET or DataType.MPC_MINOR_PLANET
+        filteredByObservations = filterByObservations( filteredBySanityCheck, observationsStart, observationsEnd )
+
+    filteredByObservationsConvertedToXEphem = tempfile.NamedTemporaryFile( delete = False ).name
+
+    print( "Converting to XEphem..." )
+    convertToXEphemFunction( filteredByObservations, filteredByObservationsConvertedToXEphem )
+
+    names = filterByApparentMagnitude( filteredByObservationsConvertedToXEphem )
+    filterByName( fileToFilter, outFile, names, nameStart, nameEnd )
+
+    if dataType == DataType.MPC_MINOR_PLANET.name:
         if inFile == "MPCORB.DAT" or inFile == "MPCORB.DAT.gz":
             os.remove( fileToFilter )
 
-        print( "Created", outFile )
+    os.remove( filteredBySanityCheck )
+    os.remove( filteredByObservations )
+    os.remove( filteredByObservationsConvertedToXEphem )
 
-    else:
-        print( "Unknown data type:", dataType )
+    print( "Created", outFile )
 
 
 if __name__ == "__main__":
@@ -213,15 +271,15 @@ if __name__ == "__main__":
             "\n  python3  " + Path(__file__).name + " astorb.dat LOWELL_MINOR_PLANET astorb-filtered.dat" + \
             "\n  python3  " + Path(__file__).name + " astorb.dat.gz LOWELL_MINOR_PLANET astorb-filtered.dat" + \
             "\n" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT MPC_MINOR_PLANET mpcorb-filtered.dat" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz MPC_MINOR_PLANET mpcorb-filtered.dat" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT MPC_MINOR_PLANET MPCORB-filtered.DAT" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz MPC_MINOR_PLANET MPCORB-filtered.DAT" + \
             "\n  python3  " + Path(__file__).name + " NEA.txt MPC_MINOR_PLANET NEA-filtered.txt" + \
             "\n  python3  " + Path(__file__).name + " PHA.txt MPC_MINOR_PLANET PHA-filtered.txt" + \
-            "\n  python3  " + Path(__file__).name + " DAILY.DAT MPC_MINOR_PLANET DAILY-filtered.dat" + \
+            "\n  python3  " + Path(__file__).name + " DAILY.DAT MPC_MINOR_PLANET DAILY-filtered.DAT" + \
             "\n  python3  " + Path(__file__).name + " Distant.txt MPC_MINOR_PLANET Distant-filtered.txt" + \
             "\n  python3  " + Path(__file__).name + " Unusual.txt MPC_MINOR_PLANET Unusual-filtered.txt" + \
             "\n" + \
-            "\n  python3  " + Path(__file__).name + " CometEls.txt MPC_COMET comets-filtered.dat"
+            "\n  python3  " + Path(__file__).name + " CometEls.txt MPC_COMET CometEls-filtered.txt"
 
         message = usage + dataTypes + examples
 
