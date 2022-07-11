@@ -589,7 +589,7 @@ class IndicatorLunar( IndicatorBase ):
                     nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
 
         else: # Cache is fresh.
-            if not data: # No data passed in, so read from cache.
+            if not data: # No data passed in, so read from cache. #TODO Either pass the data in or use a flag.
                 data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
 
         return data, cacheDateTime, downloadCount, nextDownloadTime
