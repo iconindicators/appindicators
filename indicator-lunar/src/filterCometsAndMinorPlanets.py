@@ -39,7 +39,6 @@
 from enum import Enum
 from pathlib import Path
 
-
 import datetime, ephem, gzip, importlib, os, sys, tempfile
 import lowellMinorPlanetToXEphem, mpcCometToXEphem, mpcMinorPlanetToXEphem
 
@@ -154,7 +153,7 @@ def filterByObservations(
     return fOut.name
 
 
-# To filter a data file which does not contain observations
+# To filter a data file which does not contain observations,
 # such as CometEls.txt, set observationsStart = -1.
 def filterBySanityCheck(
         inFile,
@@ -252,7 +251,10 @@ def filter( inFile, dataType, outFile ):
             os.remove( fileToFilter )
 
     os.remove( filteredBySanityCheck )
-    os.remove( filteredByObservations )
+
+    if dataType == DataType.LOWELL_MINOR_PLANET.name or dataType == DataType.MPC_MINOR_PLANET.name:
+        os.remove( filteredByObservations )
+
     os.remove( filteredByObservationsConvertedToXEphem )
 
     print( "Created", outFile )
