@@ -57,6 +57,8 @@ import datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( AstroBase ):
 
+#TODO See if there is some magic that can tell Python to load this once...
+# or does loading once happen automatically because these are defined in the class?
     __EPHEMERIS_PLANETS = "planets.bsp"
     __EPHEMERIS_STARS = "stars.dat" 
 
