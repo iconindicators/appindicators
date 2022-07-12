@@ -52,6 +52,10 @@
 # For comets, hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
 
 
+#TODO Contact the astorb.dat author, explain usage and ask how long before the data goes stale,
+# firstly for use in predicting rise/set and secondly for computing apparent magnitude.
+
+
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
 # https://telescopenights.com/stars-in-the-daytime/
 # Excludes the sun and moon (maybe mercury?).
