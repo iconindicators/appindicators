@@ -50,10 +50,17 @@
 # For asteroids, look at using https://asteroid.lowell.edu/main/astorb/
 #
 # For comets, hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
+# Other comet stuff:
+#    http://fg-kometen.vdsastro.de/fgk_hpe.htm
+#    https://people.ast.cam.ac.uk/~jds/
+#    https://people.ast.cam.ac.uk/~jds/magpars.htm
 
 
 #TODO Contact the astorb.dat author, explain usage and ask how long before the data goes stale,
 # firstly for use in predicting rise/set and secondly for computing apparent magnitude.
+# https://www.facebook.com/lowellobservatory
+# asteroid@lowell.edu
+# Also ask about giving them credit and suggest the text to use.
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
