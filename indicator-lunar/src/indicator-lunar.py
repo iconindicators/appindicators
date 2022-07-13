@@ -911,12 +911,7 @@ class IndicatorLunar( IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             for name, translatedName in planets:
-                if name == IndicatorLunar.astroBackend.PLANET_PLUTO:
-                    url = IndicatorLunar.SEARCH_URL_DWARF_PLANET + name.lower()
-
-                else:
-                    url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
-
+                url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
                 self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
@@ -2152,6 +2147,12 @@ class IndicatorLunar( IndicatorBase ):
             self.requestSaveConfig( delay = 5 )
 
 
+    def __dropPlutoVersion93( self ):
+        if "PLUTO" in self.planets:
+            self.planets.remove( "PLUTO" )
+            self.requestSaveConfig( delay = 5 )
+
+
     def loadConfig( self, config ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
         self.__useNewCityNameConfigVersion93( config )
@@ -2177,7 +2178,8 @@ class IndicatorLunar( IndicatorBase ):
 
         self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 3 ) # Although a value of 6 is visible with the naked eye, that gives too many minor planets initially.
 
-        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, IndicatorLunar.astroBackend.PLANETS[ : 6 ] ) # Drop Neptune and Pluto as not visible with naked eye.
+        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, IndicatorLunar.astroBackend.PLANETS[ : 6 ] ) # Drop Neptune as not visible with naked eye.
+        self.__dropPlutoVersion93()
 
         self.satelliteLimitStart = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 ) # 4pm
         self.satelliteLimitEnd = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 22 ) # 10pm
