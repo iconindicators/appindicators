@@ -123,7 +123,7 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
-    CONFIG_CITY_NAME = "city" #TODO Rename to cityName
+    CONFIG_CITY_NAME = "cityName"
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
     CONFIG_MAGNITUDE = "magnitude"
@@ -2146,8 +2146,15 @@ class IndicatorLunar( IndicatorBase ):
         return theCity
 
 
+    def __useNewCityNameConfigVersion93( self, config ):
+        if self.city is None:
+            self.city = config.get( "city" )
+            self.requestSaveConfig( delay = 5 )
+
+
     def loadConfig( self, config ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
+        self.__useNewCityNameConfigVersion93( config )
         if self.city is None:
             self.city = self.getDefaultCity()
             self.latitude, self.longitude, self.elevation = IndicatorLunar.astroBackend.getLatitudeLongitudeElevation( self.city )
