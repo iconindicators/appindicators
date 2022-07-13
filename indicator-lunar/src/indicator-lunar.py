@@ -158,7 +158,6 @@ class IndicatorLunar( IndicatorBase ):
 
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
-    ICON_FULL_MOON = ICON_CACHE_BASENAME + "fullmoon-" # Dynamically created in the user cache directory.
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
     INDICATOR_TEXT_DEFAULT = " [" + astroBackend.NAME_TAG_MOON + " " + astroBackend.DATA_TAG_PHASE + "]"
@@ -282,6 +281,7 @@ class IndicatorLunar( IndicatorBase ):
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
 
         self.__removeCacheFilesVersion89() # Cache data filenames changed in version 90, so remove old versions.
+        self.__removeCacheFilesVersion93() # Full moon icon now treated as a regular, time-stamped, icon, so remove old versions.
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
 
@@ -294,9 +294,13 @@ class IndicatorLunar( IndicatorBase ):
         self.flushCache( "minorplanet-oe-unusual-", 0 )
 
 
+    def __removeCacheFilesVersion93( self ):
+        self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
+        self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
+
+
     def flushTheCache( self ):
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.flushCache( IndicatorLunar.ICON_FULL_MOON, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS ) #TODO Hopefully moon will become a regular, timestamped icon/file and so can remove this.
         self.flushCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
@@ -715,24 +719,23 @@ class IndicatorLunar( IndicatorBase ):
             if self.werewolfWarningSummary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-            self.createFullMoonIcon()
-            Notify.Notification.new( summary, self.werewolfWarningMessage, IndicatorLunar.ICON_FULL_MOON ).show()
+            Notify.Notification.new( summary, self.werewolfWarningMessage, self.createFullMoonIcon() ).show()
             self.lastFullMoonNotfication = utcNow
 
 
-#TODO The full moon icon does appear in the notification (at least in the previous release).
-#TODO Why give the full moon icon it's own name?  Can't the format of icon-YYYYMMDDHHMMSS.svg be used?
     def createFullMoonIcon( self ):
-        return self.writeCacheText( self.createIconText( 100, None ), IndicatorLunar.ICON_FULL_MOON + IndicatorLunar.EXTENSION_SVG )
+        return self.writeCacheTextWithTimestamp(
+            self.createIconText( 100, None ),
+            IndicatorLunar.ICON_CACHE_BASENAME,
+            IndicatorLunar.EXTENSION_SVG )
 
 
     def notificationSatellites( self ):
-        utcNow = datetime.datetime.utcnow()
-
         INDEX_NUMBER = 0
         INDEX_RISE_TIME = 1
         satelliteCurrentNotifications = [ ]
 
+        utcNow = datetime.datetime.utcnow()
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if ( key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
@@ -2085,7 +2088,7 @@ class IndicatorLunar( IndicatorBase ):
         message = self.getTextViewText( messageTextView )
 
         if isMoonNotification:
-            svgFile = self.createFullMoonIcon()
+            Notify.Notification.new( summary, message, self.createFullMoonIcon() ).show()
 
         else:
             # Create mock data.
@@ -2110,9 +2113,7 @@ class IndicatorLunar( IndicatorBase ):
 
             summary = replaceTags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
             message = replaceTags( message )
-            svgFile = IndicatorLunar.ICON_SATELLITE
-
-        Notify.Notification.new( summary, message, svgFile ).show()
+            Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
