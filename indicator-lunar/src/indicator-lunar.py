@@ -969,7 +969,7 @@ class IndicatorLunar( IndicatorBase ):
 
             for name in sorted( orbitalElements ):
                 humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType )
-                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName )
+                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO Once comets/minor planets are sorted, check that this lookup still works.
                 self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url )
                 self.updateMenuCommon( subMenu, bodyType, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
