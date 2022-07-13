@@ -153,7 +153,7 @@ class IndicatorLunar( IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
-    EXTENSION_SVG = ".svg" #TODO Put these into Indicator Base?  Where else are extensions used?
+    EXTENSION_SVG = ".svg"
     EXTENSION_TEXT = ".txt"
 
     ICON_CACHE_BASENAME = "icon-"
