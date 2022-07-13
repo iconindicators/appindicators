@@ -850,6 +850,7 @@ class AstroSkyfield( AstroBase ):
 
 #TODO Once solar eclipses are implemented in Skyfield, replace the code below with similar functionality to lunar eclipses above.        
 # https://github.com/skyfielders/python-skyfield/issues/445
+#TODO Remove the eclipse credit from IndicatorLunar if/when moving EXCLUSIELY to Skyfield and Skyfield computes solar eclipses.
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( now.utc_datetime(), False )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType

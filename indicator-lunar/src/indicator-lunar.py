@@ -254,7 +254,6 @@ class IndicatorLunar( IndicatorBase ):
             version = "1.0.93",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
-#TODO Remove the eclipse credit if/when moving exclusively to Skyfield and Skyfield computes solar eclipses.
 #TODO Temporarily remove credit for comets and minor planets.
             # creditz =
             #     [ IndicatorLunar.astroBackend.getCredit(),
