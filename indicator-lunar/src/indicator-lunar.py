@@ -31,7 +31,7 @@
 # either drop comets and minor planets, or...
 # Find external sources (websites) which use better/reliable data to compute apparent magnitude
 # and list the currently visible comets / minor planets (along with the apparent magnitude).
-# From this list (should be at most twenty bodies of each type), can then interrogate the MPC
+# From this list (should be at most twent/y bodies of each type), can then interrogate the MPC
 # online ephemeris service to get the orbital elements for these bodies.
 # As the CometEls.txt is a small file, could just use that...but if going to the trouble
 # for minor planets, may as well do the same for comets...and may be able to get get both in one http transfer.
@@ -61,6 +61,18 @@
 # https://www.facebook.com/lowellobservatory
 # asteroid@lowell.edu
 # Also ask about giving them credit and suggest the text to use.
+#
+# Have sent an email, waiting for a reply...
+#
+# More thinking...
+# Can either create a filtered astorb.dat file released with the indicator,
+# and the frequency depends on the accuracy (or how quickly the data becomes stale)
+# and hopefully the Lowell email will address this.
+# An alternative is to have a script which downloads astorb.dat say weekly
+# (or whatever frequency works) and automatically filter, package into a debian source
+# and upload to Launchpad:
+#    https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+sourcefiles/indicator-fortune/1.0.37-1/indicator-fortune_1.0.37.orig.tar.gz
+# which the indicator can then download.  Can be easily scripted!
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
@@ -111,7 +123,7 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
-    CONFIG_CITY_NAME = "city"
+    CONFIG_CITY_NAME = "city" #TODO Rename to cityName
     CONFIG_COMETS = "comets"
     CONFIG_COMETS_ADD_NEW = "cometsAddNew"
     CONFIG_MAGNITUDE = "magnitude"
