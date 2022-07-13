@@ -483,11 +483,11 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def saveConfig( self ):
         return {
-            IndicatorOnThisDay.CONFIG_CALENDARS: self.calendars,
-            IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD: self.copyToClipboard,
-            IndicatorOnThisDay.CONFIG_LINES: self.lines,
-            IndicatorOnThisDay.CONFIG_NOTIFY: self.notify,
-            IndicatorOnThisDay.CONFIG_SEARCH_URL: self.searchURL,
+            IndicatorOnThisDay.CONFIG_CALENDARS : self.calendars,
+            IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD : self.copyToClipboard,
+            IndicatorOnThisDay.CONFIG_LINES : self.lines,
+            IndicatorOnThisDay.CONFIG_NOTIFY : self.notify,
+            IndicatorOnThisDay.CONFIG_SEARCH_URL : self.searchURL,
         }
 
 

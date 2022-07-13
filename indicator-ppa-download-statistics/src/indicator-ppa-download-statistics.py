@@ -1019,14 +1019,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             filters.append( [ user, name, series, architecture, filterText ] )
 
         return {
-            IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combinePPAs,
-            IndicatorPPADownloadStatistics.CONFIG_FILTERS: filters,
-            IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignoreVersionArchitectureSpecific,
-            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH: self.lowBandwidth,
-            IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
-            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.showSubmenu,
-            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD: self.sortByDownload,
-            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT: self.sortByDownloadAmount
+            IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS : self.combinePPAs,
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS : filters,
+            IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC : self.ignoreVersionArchitectureSpecific,
+            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH : self.lowBandwidth,
+            IndicatorPPADownloadStatistics.CONFIG_PPAS : ppas,
+            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU : self.showSubmenu,
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD : self.sortByDownload,
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT : self.sortByDownloadAmount
         }
 
 

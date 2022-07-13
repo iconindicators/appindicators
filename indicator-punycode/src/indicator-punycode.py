@@ -239,10 +239,10 @@ class IndicatorPunycode( IndicatorBase ):
 
     def saveConfig( self ):
         return {
-            IndicatorPunycode.CONFIG_DROP_PATH_QUERY: self.dropPathQuery,
-            IndicatorPunycode.CONFIG_INPUT_CLIPBOARD: self.inputClipboard,
-            IndicatorPunycode.CONFIG_OUTPUT_BOTH: self.outputBoth,
-            IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH: self.resultHistoryLength
+            IndicatorPunycode.CONFIG_DROP_PATH_QUERY : self.dropPathQuery,
+            IndicatorPunycode.CONFIG_INPUT_CLIPBOARD : self.inputClipboard,
+            IndicatorPunycode.CONFIG_OUTPUT_BOTH : self.outputBoth,
+            IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH : self.resultHistoryLength
         }
 
 

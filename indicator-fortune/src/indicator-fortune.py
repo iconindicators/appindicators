@@ -534,11 +534,11 @@ class IndicatorFortune( IndicatorBase ):
 
     def saveConfig( self ):
         return {
-            IndicatorFortune.CONFIG_FORTUNES: self.fortunes,
-            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON: self.middleMouseClickOnIcon,
-            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY: self.notificationSummary,
-            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
-            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT: self.skipFortuneCharacterCount
+            IndicatorFortune.CONFIG_FORTUNES : self.fortunes,
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON  : self.middleMouseClickOnIcon,
+            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY  : self.notificationSummary,
+            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES  : self.refreshIntervalInMinutes,
+            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT  : self.skipFortuneCharacterCount
         }
 
 

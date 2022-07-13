@@ -620,12 +620,12 @@ class IndicatorTide( IndicatorBase ):
 
     def saveConfig( self ):
         return {
-            IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT: self.menuItemDateFormat,
-            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT: self.menuItemTideFormat,
-            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME: self.menuItemTideFormatSansTime,
-            IndicatorTide.CONFIG_PORT_ID: self.portID,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS: self.showAsSubMenus,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY: self.showAsSubMenusExceptFirstDay
+            IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT : self.menuItemDateFormat,
+            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT : self.menuItemTideFormat,
+            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME : self.menuItemTideFormatSansTime,
+            IndicatorTide.CONFIG_PORT_ID : self.portID,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.showAsSubMenus,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.showAsSubMenusExceptFirstDay
         }
 
 

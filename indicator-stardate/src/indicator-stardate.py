@@ -166,9 +166,9 @@ class IndicatorStardate( IndicatorBase ):
         self.saveConfigTimerID = None # Reset the timer ID.
 
         return {
-            IndicatorStardate.CONFIG_PAD_INTEGER: self.padInteger,
-            IndicatorStardate.CONFIG_SHOW_CLASSIC: self.showClassic,
-            IndicatorStardate.CONFIG_SHOW_ISSUE: self.showIssue
+            IndicatorStardate.CONFIG_PAD_INTEGER : self.padInteger,
+            IndicatorStardate.CONFIG_SHOW_CLASSIC : self.showClassic,
+            IndicatorStardate.CONFIG_SHOW_ISSUE : self.showIssue
         }
 
 

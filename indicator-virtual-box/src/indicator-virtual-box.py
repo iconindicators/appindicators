@@ -545,11 +545,11 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def saveConfig( self ):
         return {
-            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS: self.delayBetweenAutoStartInSeconds,
-            IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES: self.refreshIntervalInMinutes,
-            IndicatorVirtualBox.CONFIG_SHOW_SUBMENU: self.showSubmenu,
-            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES: self.virtualMachinePreferences,
-            IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME: self.virtualboxManagerWindowName
+            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS : self.delayBetweenAutoStartInSeconds,
+            IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES : self.refreshIntervalInMinutes,
+            IndicatorVirtualBox.CONFIG_SHOW_SUBMENU : self.showSubmenu,
+            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES : self.virtualMachinePreferences,
+            IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME : self.virtualboxManagerWindowName
         }
 
 
