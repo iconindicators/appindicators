@@ -946,10 +946,6 @@ class AstroSkyfield( AstroBase ):
                 logging.exception( e )
 
 
-#TODO If there is at least one rise/set (if len( t ) >= 2) that means the object is always up.
-# Verify this is correct and then if so, see how to apply to satellites (if possible).
-# Where is the reference in the documentation for this...?
-# How also to determine if a satellite (or any object/body) is never up?
     @staticmethod
     def __calculateCommon( now, nowPlusThirtySixHours, data, key, locationAtNow, body ):
         neverUp = False
@@ -972,8 +968,16 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
-#TODO Verify from documentation the conditions for always up and never up.
-#Then test by setting high latitudes, north and south.
+            # There is one rise OR one set OR no rises/sets.
+            #
+            # If there are no rises/sets, the body is either 'always up' or 'never up'.
+            #
+            # If there is one rise or one set, this would occur say close to the poles.
+            # A body which has been below the horizon for weeks/months and is due to rise,
+            # will result in a single value (the rise) and there will be no set.
+            # Similarly for a body above the horizon.
+            # Treat these single rise/set events as 'always up' or 'never up' (as the case may be)
+            # until the body actually rises or sets.
             if almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target )( now ): # Body is up (and so always up).
                 alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
                 data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
@@ -1032,6 +1036,10 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
+#TODO How to determine if a satellite is 'always up' or 'never up'?
+# Can something be taken from the calculateCommon() above?
+# Be careful about using rise/set code which applies to planets: 
+# https://rhodesmill.org/skyfield/almanac.html#sunrise-and-sunset
     def __calculateSatellite( startDateTime, endDateTime, data, timeScale, location, satelliteNumber, earthSatellite, isTwilightFunction ): 
         key, riseTime = None, None
         culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
