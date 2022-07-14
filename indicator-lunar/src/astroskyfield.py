@@ -654,11 +654,12 @@ class AstroSkyfield( AstroBase ):
 
         timeScale = load.timescale( builtin = True )
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36, utcNow.minute, utcNow.second ) # Used to find moom rise/set which is slightly more than 24 hours.
+        nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36, utcNow.minute, utcNow.second ) # Used to find moon rise/set which is slightly more than 24 hours.
         nowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31, utcNow.hour, utcNow.minute, utcNow.second ) # Moon phases search window.
         nowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.hour, utcNow.minute, utcNow.second ) # Solstice/equinox search window.
         nowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.hour, utcNow.minute, utcNow.second ) # Lunar eclipse search window.
 
+#TODO Can these be done in a Java type static block?
         ephemerisPlanets = load( AstroSkyfield.__EPHEMERIS_PLANETS )
         with load.open( AstroSkyfield.__EPHEMERIS_STARS ) as f:
             ephemerisStars = hipparcos.load_dataframe( f )
@@ -788,10 +789,6 @@ class AstroSkyfield( AstroBase ):
         illumination = int( locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).fraction_illuminated( ephemerisPlanets[ AstroSkyfield.__SUN ] ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        moonAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().altaz()
-        sunAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAltAz, sunAltAz ).radians ) # Needed for icon.
-
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( ephemerisPlanets ) )
         moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
         moonPhaseDateTimes = t.utc_datetime()
@@ -799,6 +796,10 @@ class AstroSkyfield( AstroBase ):
         nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ]
         lunarPhase = AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
+
+        moonAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__MOON ] ).apparent().altaz()
+        sunAltAz = locationAtNow.observe( ephemerisPlanets[ AstroSkyfield.__SUN ] ).apparent().altaz()
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAltAz, sunAltAz ).radians ) # Needed for icon.
 
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusThirtySixHours,
