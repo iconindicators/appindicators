@@ -50,9 +50,10 @@ except ImportError:
     available = False
 
 from astrobase import AstroBase
+from dateutil.relativedelta import relativedelta
 from distutils.version import LooseVersion
 
-import datetime, eclipse, importlib, io, locale, math
+import datetime, eclipse, importlib, io, locale, math, os, subprocess
 
 
 class AstroSkyfield( AstroBase ):
@@ -1081,7 +1082,11 @@ class AstroSkyfield( AstroBase ):
 
 
     # Create a planet ephemeris from an original BSP file.
-    # The resultant ephemeris will commence from today's date and end at the specified number of years from today.
+    # The resultant ephemeris will commence from today's date and
+    # end at the specified number of years from today.
+    #
+    # Requires jplephem:
+    #    https://pypi.org/project/jplephem
     #
     # Source for BSP files:
     #    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
@@ -1096,9 +1101,6 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     @staticmethod
     def createEphemerisPlanets( ephemerisBSPFile, yearsToKeepFromToday = 5 ):
-        from dateutil.relativedelta import relativedelta
-        import os, subprocess
-
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS_FILE ):
             os.remove( AstroSkyfield.__EPHEMERIS_PLANETS_FILE )
 
@@ -1120,21 +1122,16 @@ class AstroSkyfield( AstroBase ):
         print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS_FILE )
 
 
-    # Create a star ephemeris from hip_main.dat (must be present in the file system),
-    # containing only the stars listed at:
-    #
+    # Create a star ephemeris from hip_main.dat, containing only the stars listed at:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
     # The file hip_main.dat can be downloaded from:
-    #
     #    https://cdsarc.u-strasbg.fr/ftp/cats/I/239/hip_main.dat
     #
     # Format of Hipparcos catalogue:
     #    ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
     @staticmethod
     def createEphemerisStars( hip_mainDOTdat  ):
-        import os
-
         if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS_FILE ):
             os.remove( AstroSkyfield.__EPHEMERIS_STARS_FILE )
 
