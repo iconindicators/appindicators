@@ -761,7 +761,7 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def getStatusMessage():
-        minimalRequiredVersion = "1.42"
+        minimalRequiredVersion = "1.43.1"
         installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade pandas pip skyfield"
         message = None
         if not available:
