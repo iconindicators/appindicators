@@ -787,11 +787,12 @@ class AstroSkyfield( AstroBase ):
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
-        moonPhases = [ almanac.MOON_PHASES[ yi ] for yi in y ]
-        moonPhaseDateTimes = t.utc_datetime()
-        nextNewMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ]
-        nextFullMoonDateTime = moonPhaseDateTimes[ moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ]
-        lunarPhase = AstroBase.getLunarPhase( int( float ( illumination ) ), nextFullMoonDateTime, nextNewMoonDateTime )
+        moonPhases = list( y )
+        moonPhasesDateTimes = t.utc_datetime()
+        lunarPhase = AstroBase.getLunarPhase(
+            illumination,
+            moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_FULL ) ],
+            moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         moonAltAz = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] ).apparent().altaz()
@@ -806,16 +807,16 @@ class AstroSkyfield( AstroBase ):
 
         if not neverUp:
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
-                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ] ) ) ] )
+                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ) ] )
 
             data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = \
-                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_FULL ] ) ) ] )
+                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_FULL ) ] )
 
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
-                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_LAST_QUARTER ] ) ) ] )
+                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_LAST_QUARTER ) ] )
 
             data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = \
-                AstroBase.toDateTimeString( moonPhaseDateTimes[ ( moonPhases.index( almanac.MOON_PHASES[ AstroSkyfield.__MOON_PHASE_NEW ] ) ) ] )
+                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
 
             t, y, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS ) # Zeroth result in t and y is the first result, so use that.
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
