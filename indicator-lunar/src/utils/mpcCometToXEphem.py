@@ -115,57 +115,6 @@ def processAndWriteOneLine( line, outFile ):
             outFile.write( ','.join( components ) + '\n' )
 
 
-def processAndWriteOneLineORIGINAL( line, outFile ):
-    if len( line.strip() ) > 0:
-        name = line[ 103 - 1 : 158 ].strip()
-        absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
-
-        if len( name ) == 0:
-            print( "Missing name:\n" + line )
-
-        elif len( absoluteMagnitude ) == 0:
-            print( "Missing absolute magnitude:\n" + line )
-
-        else:
-            inclination = line[ 72 - 1 : 79 ].strip() # $i The Perl script uses 71 instead of 72. 
-            longitudeAscendingNode = line[ 62 - 1 : 69 ].strip() # $O The Perl script uses 61 instead of 62.
-            argumentPerihelion = line[ 52 - 1 : 59 ].strip() # $o The Perl script uses 51 instead of 52.
-            perihelionDistance = line[ 31 - 1 : 39 ].strip() # $q
-            orbitalEccentricity = line[ 42 - 1 : 49 ].strip() # $e The Perl script uses 41 instead of 42.
-
-            month = line[ 20 - 1 : 21 ].strip()
-            day = line[ 23 - 1 : 29 ].strip()
-            year = line[ 15 - 1 : 18 ].strip()
-            epochDate = month + '/' + day + '/' + year # $E
-
-            slopeParameter = line[ 97 - 1 : 100 ].strip() # $H
-
-            if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
-                meanAnomaly = str( 0.0 ) # $M
-                meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) ) # $a
-
-                components = [
-                    name, 'e', inclination, longitudeAscendingNode, argumentPerihelion,
-                    meanDistance, '0', orbitalEccentricity, meanAnomaly,
-                    epochDate, "2000.0",
-                    absoluteMagnitude, slopeParameter ]
-
-            elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
-                components = [
-                    name, 'h', epochDate, inclination,
-                    longitudeAscendingNode, argumentPerihelion, orbitalEccentricity, 
-                    perihelionDistance, "2000.0",
-                    absoluteMagnitude, slopeParameter ]
-
-            else: # Parabolic orbit.
-                components = [
-                    name, 'p', epochDate, inclination,
-                    argumentPerihelion, perihelionDistance, longitudeAscendingNode, "2000.0",
-                    absoluteMagnitude, slopeParameter ]
-
-            outFile.write( ','.join( components ) + '\n' )
-
-
 def convert( inFile, outFile ):
     fIn = open( inFile, 'r' )
     fOut = open( outFile, 'w' )
