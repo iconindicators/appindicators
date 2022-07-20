@@ -37,11 +37,12 @@ def processAndWriteOneLine( line, indices, outputFile ):
     if len( line.strip() ) > 0:
         parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
 
-        numberAndName = parts[ 1 ].strip() + " " + parts[ 2 ].strip()
+        number = parts[ 1 ].strip()
+        name = parts[ 2 ].strip()
         absoluteMagnitude = parts[ 4 ].strip()
 
-        if len( numberAndName ) == 0:
-            print( "Missing numberAndName:\n" + line )
+        if len( name ) == 0:
+            print( "Missing name:\n" + line )
 
         elif len( absoluteMagnitude ) == 0:
             print( "Missing absolute magnitude:\n" + line )
@@ -49,7 +50,6 @@ def processAndWriteOneLine( line, indices, outputFile ):
         else:
             slopeParameter = parts[ 5 ].strip()
             epochDate = parts[ 12 ].strip()
-            epochDate = epochDate[ 4 : 6 ] + '/' + epochDate[ 6 : ] + '/' + epochDate[ 0 : 4 ]
             meanAnomalyEpoch = parts[ 13 ].strip()
             argumentPerihelion = parts[ 14 ].strip()
             longitudeAscendingNode = parts[ 15 ].strip()
@@ -58,10 +58,19 @@ def processAndWriteOneLine( line, indices, outputFile ):
             semimajorAxix = parts[ 18 ].strip()
 
             components = [
-                numberAndName, 'e', inclinationToEcliptic, longitudeAscendingNode,
-                argumentPerihelion, semimajorAxix, '0', orbitalEccentricity, meanAnomalyEpoch,
-                epochDate, "2000.0",
-                absoluteMagnitude, slopeParameter ]
+                number + " " + name,
+                'e',
+                inclinationToEcliptic,
+                longitudeAscendingNode,
+                argumentPerihelion,
+                semimajorAxix,
+                '0',
+                orbitalEccentricity,
+                meanAnomalyEpoch,
+                epochDate[ 4 : 6 ] + '/' + epochDate[ 6 : ] + '/' + epochDate[ 0 : 4 ],
+                "2000.0",
+                absoluteMagnitude,
+                slopeParameter ]
 
             outputFile.write( ','.join( components ) + '\n' )
 
