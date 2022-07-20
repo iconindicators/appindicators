@@ -58,7 +58,117 @@ def getPackedDate( year, month, day ):
     return packedYear + packedMonth + packedDay
 
 
-def processAndWriteOneLine( line, outputFile ):
+def justify( stringToJustify, start, end, rightAdjust = True ):
+    if rightAdjust:
+        stringJustified = stringToJustify.rjust( end - start + 1 )
+
+    else:  
+        stringJustified = stringToJustify.ljust( end - start + 1 )
+
+    return stringJustified
+
+
+def pad( start, end ): return ' ' * ( end - start + 1 )
+
+
+def processAndWriteOneLine( line, indices, outputFile ):
+    if len( line.strip() ) > 0:
+        parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+
+        number = parts[ 1 ].strip()
+        name = parts[ 2 ].strip()
+        absoluteMagnitude = parts[ 4 ].strip()
+
+        if len( name ) == 0:
+            print( "Missing name:\n" + line )
+
+        elif len( absoluteMagnitude ) == 0:
+            print( "Missing absolute magnitude:\n" + line )
+
+        else:
+            slopeParameter = parts[ 5 ].strip()
+            numberObservations = parts[ 11 ].strip()
+            epochDate = parts[ 12 ].strip()
+            meanAnomalyEpoch = parts[ 13 ].strip()
+            argumentPerihelion = parts[ 14 ].strip()
+            longitudeAscendingNode = parts[ 15 ].strip()
+            inclinationToEcliptic = parts[ 16 ].strip()
+            orbitalEccentricity = parts[ 17 ].strip()
+            semimajorAxix = parts[ 18 ].strip()
+
+            components = [
+                pad( 1, 7 ), # number or designation packed
+                ' ',
+                justify( str( round( float( absoluteMagnitude ), 2 ) ), 9, 13 ),
+                ' ',
+                justify( str( round( float( slopeParameter ), 2 ) ), 15, 19 ),
+                ' ',
+                justify( getPackedDate( epochDate[ 0 : 4 ], epochDate[ 4 : 6 ], epochDate[ 6 : 8 ] ), 21, 25 ),
+                ' ',
+                justify( str( round( float( meanAnomalyEpoch ), 5 ) ), 27, 35 ),
+                ' ',
+                ' ',
+                justify( str( round( float( argumentPerihelion ), 5 ) ), 38, 46 ),
+                ' ',
+                ' ',
+                justify( str( round( float( longitudeAscendingNode ), 5 ) ), 49, 57 ),
+                ' ',
+                ' ',
+                justify( str( round( float( inclinationToEcliptic ), 5 ) ), 60, 68 ),
+                ' ',
+                ' ',
+                justify( str( round( float( orbitalEccentricity ), 7 ) ), 71, 79 ),
+                ' ',
+                pad( 81, 91 ), # mean daily motion
+                ' ',
+                justify( str( round( float( semimajorAxix ), 7 ) ), 93, 103 ),
+                ' ',
+                ' ',
+                pad( 106, 106 ), # uncertainty parameter
+                ' ',
+                pad( 108, 116 ), # reference
+                ' ',
+                justify( numberObservations, 118, 122 ),
+                ' ',
+                pad( 124, 126 ), # oppositions
+                ' ',
+                pad( 128, 136 ), # oppositions
+                ' ',
+                pad( 138, 141 ), # rms residual
+                ' ',
+                pad( 143, 145 ), # coarse indicator of perturbers
+                ' ',
+                pad( 147, 149 ), # precise indicator of perturbers
+                ' ',
+                pad( 151, 160 ), # computer name
+                ' ',
+                pad( 162, 165 ), # hexdigit flags
+                ' ',
+                justify( number + ' ' + name, 167, 194, False ),
+                pad( 195, 202 ) ] # date last observation
+
+            outputFile.write( ''.join( components ) + '\n' )
+
+
+def convert( inFile, outFile ):
+    indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
+    indices = [ x - 1 for x in indices ] # Offset back to zero to match each line read into a string.
+
+    if inFile.endswith( ".gz" ):
+        fIn = gzip.open( inFile, 'rt' )
+
+    else:
+        fIn = open( inFile, 'r' )
+
+    fOut = open( outFile, 'w' )
+    for line in fIn:
+        processAndWriteOneLine( line, indices, fOut )
+
+    fIn.close()
+    fOut.close()
+
+
+def processAndWriteOneLineORIGINAL( line, outputFile ):
     if len( line.strip() ) > 0:
         name = line[ 1 - 1 : 26 ].replace( '(', '' ).replace( ')', '' ).strip()
         absoluteMagnitude = line[ 43 - 1 : 49 ].strip()
@@ -98,7 +208,7 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ' '.join( components ) + '\n' )
 
 
-def convert( inFile, outFile ):
+def convertORIGINAL( inFile, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
