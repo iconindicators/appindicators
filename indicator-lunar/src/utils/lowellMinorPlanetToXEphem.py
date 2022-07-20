@@ -33,9 +33,13 @@ from pathlib import Path
 import gzip, sys
 
 
-def processAndWriteOneLine( line, indices, outputFile ):
+def processAndWriteOneLine( line, outputFile ):
+    indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
+    indices = [ x - 1 for x in indices ] # Offset back to zero to match each line read into a string.
+
     if len( line.strip() ) > 0:
-        parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        parts = [ "OFFSET TO ALIGN WITH FIELD NUMBERING" ] + \
+                [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
 
         number = parts[ 1 ].strip()
         name = parts[ 2 ].strip()
@@ -76,9 +80,6 @@ def processAndWriteOneLine( line, indices, outputFile ):
 
 
 def convert( inFile, outFile ):
-    indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
-    indices = [ x - 1 for x in indices ] # Offset back to zero to match each line read into a string.
-
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
@@ -87,7 +88,7 @@ def convert( inFile, outFile ):
 
     fOut = open( outFile, 'w' )
     for line in fIn:
-        processAndWriteOneLine( line, indices, fOut )
+        processAndWriteOneLine( line, fOut )
 
     fIn.close()
     fOut.close()
