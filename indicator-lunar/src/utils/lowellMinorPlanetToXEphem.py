@@ -33,7 +33,71 @@ from pathlib import Path
 import gzip, sys
 
 
-def processAndWriteOneLine( line, outputFile ):
+def test():
+    s = 'long string that I want to split up'
+    indices = [ 0, 5, 12, 17 ]
+
+    s = "     1 Ceres              L.H. Wasserman   3.33  0.15 0.72 848.4 G?      0   0   0   0   0   0 80714 6778 20220809 334.327376  73.531308  80.266493 10.586785 0.07863562   2.76661907 20220428 1.1E-02  2.4E-07 20220703 2.4E-02 20230320 2.5E-02 20270108 2.7E-02 20320223"
+    indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
+    indices = [ x - 1 for x in indices ]    
+
+    parts = [ s[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ]
+    parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ s[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ]
+    print( parts )
+
+
+def processAndWriteOneLine( line, indices, outputFile ):
+    if len( line.strip() ) > 0:
+        parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ]
+
+        numberAndName = parts[ 1 ].strip() + " " + parts[ 2 ].strip()
+        absoluteMagnitude = parts[ 4 ].strip()
+
+        if len( numberAndName ) == 0:
+            print( "Missing numberAndName:\n" + line )
+
+        elif len( absoluteMagnitude ) == 0:
+            print( "Missing absolute magnitude:\n" + line )
+
+        else:
+            slopeParameter = parts[ 5 ].strip()
+            epochDate = parts[ 12 ].strip()
+            epochDate = epochDate[ 4 : 6 ] + '/' + epochDate[ 6 : ] + '/' + epochDate[ 0 : 4 ]
+            meanAnomalyEpoch = parts[ 13 ].strip()
+            argumentPerihelion = parts[ 14 ].strip()
+            longitudeAscendingNode = parts[ 15 ].strip()
+            inclinationToEcliptic = parts[ 16 ].strip()
+            orbitalEccentricity = parts[ 17 ].strip()
+            semimajorAxix = parts[ 18 ].strip()
+
+            components = [
+                numberAndName, 'e', inclinationToEcliptic, longitudeAscendingNode,
+                argumentPerihelion, semimajorAxix, '0', orbitalEccentricity, meanAnomalyEpoch,
+                epochDate, "2000.0",
+                absoluteMagnitude, slopeParameter ]
+
+            outputFile.write( ','.join( components ) + '\n' )
+
+
+def convert( inFile, outFile ):
+    indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
+    indices = [ x - 1 for x in indices ]    
+
+    if inFile.endswith( ".gz" ):
+        fIn = gzip.open( inFile, 'rt' )
+
+    else:
+        fIn = open( inFile, 'r' )
+
+    fOut = open( outFile, 'w' )
+    for line in fIn:
+        processAndWriteOneLine( line, indices, fOut )
+
+    fIn.close()
+    fOut.close()
+
+
+def processAndWriteOneLineORIGINAL( line, outputFile ):
     if len( line.strip() ) > 0:
         name = line[ 1 - 1 : 26 ].strip()
         absoluteMagnitude = line[ 43 - 1 : 49 ].strip() # $H
@@ -63,7 +127,7 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ','.join( components ) + '\n' )
 
 
-def convert( inFile, outFile ):
+def convertORIGINAL( inFile, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
@@ -85,7 +149,9 @@ if __name__ == "__main__":
             "\n\nFor example:" + \
             "\n  python3  " + Path(__file__).name + " astorb.dat astorb.edb" + \
             "\n  python3  " + Path(__file__).name + " astorb.dat.gz astorb.edb"
-
+    
         raise SystemExit( message )
-
+    
     convert( sys.argv[ 1 ], sys.argv[ 2 ] )
+    
+    # test()
