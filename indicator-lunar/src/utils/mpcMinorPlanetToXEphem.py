@@ -45,6 +45,62 @@ def getUnpackedDate( i ): return str( i ) if i.isdigit() else str( ord( i ) - or
 
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
+        # Field numbers: 0   1   2   3   4   5   6   7   8   9   10   11   12   13   14   15   16   17   18   19   20   21   22
+        startIndices = [ 1,  9, 15, 21, 27, 38, 49, 60, 71, 81,  93, 106, 108, 118, 124, 128, 138, 143, 147, 151, 162, 167, 195 ]
+        endIndices =   [ 7, 13, 19, 25, 35, 46, 57, 68, 79, 91, 103, 106, 116, 122, 126, 136, 141, 145, 149, 160, 165, 194, 202 ]
+
+        # Offset back to zero to match lines read into a string.
+        startIndices = [ x - 1 for x in startIndices ]
+        endIndices = [ x - 1 for x in endIndices ]
+
+        parts = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        name = parts[ 21 ].replace( '(', '' ).replace( ')', '' ).strip()
+        absoluteMagnitude = parts[ 1 ].strip()
+
+        if len( name ) == 0:
+            print( "Missing name:\n" + line )
+
+        elif len( absoluteMagnitude ) == 0:
+            print( "Missing absolute magnitude:\n" + line )
+
+        else:
+            slopeParamenter = parts[ 2 ].strip()
+
+            epochPacked = parts[ 3 ].strip()
+            century = epochPacked[ 0 ]
+            lastTwoDigitsOfYear = epochPacked[ 1 : 3 ]
+            year = str( centuryMap[ century ] + int( lastTwoDigitsOfYear ) )
+            month = getUnpackedDate( epochPacked[ 3 ] )
+            day = getUnpackedDate( epochPacked[ 4 ] )
+            epochDate = month + '/' + day + '/' + year
+
+            meanAnomalyEpoch = parts[ 4 ].strip()
+            argumentPerihelion = parts[ 5 ].strip()
+            longitudeAscendingNode = parts[ 6 ].strip()
+            inclinationToEcliptic = parts[ 7 ].strip()
+            orbitalEccentricity = parts[ 8 ].strip()
+            semimajorAxix = parts[ 10 ].strip()
+
+            components = [
+                name,
+                'e',
+                inclinationToEcliptic,
+                longitudeAscendingNode,
+                argumentPerihelion,
+                semimajorAxix,
+                '0',
+                orbitalEccentricity,
+                meanAnomalyEpoch,
+                epochDate,
+                "2000.0",
+                absoluteMagnitude,
+                slopeParamenter ]
+
+            outputFile.write( ','.join( components ) + '\n' )
+
+
+def processAndWriteOneLineORIGINAL( line, outputFile ):
+    if len( line.strip() ) > 0:
         name = line[ 167 - 1 : 194 ].strip()
         absoluteMagnitude = line[ 9 - 1 : 13 ].strip() # $H
 
@@ -118,13 +174,13 @@ if __name__ == "__main__":
         message = \
             "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
             "\n\nFor example:" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT MPC_MINOR_PLANET mpcorb.edb" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz MPC_MINOR_PLANET mpcorb.edb" + \
-            "\n  python3  " + Path(__file__).name + " NEA.txt MPC_MINOR_PLANET NEA.edb" + \
-            "\n  python3  " + Path(__file__).name + " PHA.txt MPC_MINOR_PLANET PHA.edb" + \
-            "\n  python3  " + Path(__file__).name + " DAILY.DAT MPC_MINOR_PLANET DAILY.edb" + \
-            "\n  python3  " + Path(__file__).name + " Distant.txt MPC_MINOR_PLANET Distant.edb" + \
-            "\n  python3  " + Path(__file__).name + " Unusual.txt MPC_MINOR_PLANET Unusual.edb"
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT mpcorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz mpcorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " NEA.txt NEA.edb" + \
+            "\n  python3  " + Path(__file__).name + " PHA.txt PHA.edb" + \
+            "\n  python3  " + Path(__file__).name + " DAILY.DAT DAILY.edb" + \
+            "\n  python3  " + Path(__file__).name + " Distant.txt Distant.edb" + \
+            "\n  python3  " + Path(__file__).name + " Unusual.txt Unusual.edb"
 
         raise SystemExit( message )
 
