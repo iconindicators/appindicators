@@ -224,7 +224,7 @@ def filter( inFile, dataType, outFile ):
         observationsEnd = 122
         convertToXEphemFunction = getattr( importlib.import_module( "mpcMinorPlanetToXEphem" ), "convert" )
 
-        if inFile == "MPCORB.DAT" or inFile == "MPCORB.DAT.gz":
+        if inFile.endswith( "MPCORB.DAT" ) or inFile.endswith( "MPCORB.DAT.gz" ):
             fileToFilter = removeHeaderFromMPCORB( inFile )
 
     else:
@@ -247,7 +247,7 @@ def filter( inFile, dataType, outFile ):
     filterByName( fileToFilter, outFile, names, nameStart, nameEnd )
 
     if dataType == DataType.MPC_MINOR_PLANET.name:
-        if inFile == "MPCORB.DAT" or inFile == "MPCORB.DAT.gz":
+        if inFile.endswith( "MPCORB.DAT" ) or inFile.endswith( "MPCORB.DAT.gz" ):
             os.remove( fileToFilter )
 
     os.remove( filteredBySanityCheck )
@@ -270,18 +270,18 @@ if __name__ == "__main__":
 
         examples = \
             "\n\nFor example:" + \
-            "\n  python3  " + Path(__file__).name + " astorb.dat LOWELL_MINOR_PLANET astorb-filtered.dat" + \
-            "\n  python3  " + Path(__file__).name + " astorb.dat.gz LOWELL_MINOR_PLANET astorb-filtered.dat" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat " + DataType.LOWELL_MINOR_PLANET.name + " astorb-filtered.dat" + \
+            "\n  python3  " + Path(__file__).name + " astorb.dat.gz " + DataType. LOWELL_MINOR_PLANET.name + " astorb-filtered.dat" + \
             "\n" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT MPC_MINOR_PLANET MPCORB-filtered.DAT" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz MPC_MINOR_PLANET MPCORB-filtered.DAT" + \
-            "\n  python3  " + Path(__file__).name + " NEA.txt MPC_MINOR_PLANET NEA-filtered.txt" + \
-            "\n  python3  " + Path(__file__).name + " PHA.txt MPC_MINOR_PLANET PHA-filtered.txt" + \
-            "\n  python3  " + Path(__file__).name + " DAILY.DAT MPC_MINOR_PLANET DAILY-filtered.DAT" + \
-            "\n  python3  " + Path(__file__).name + " Distant.txt MPC_MINOR_PLANET Distant-filtered.txt" + \
-            "\n  python3  " + Path(__file__).name + " Unusual.txt MPC_MINOR_PLANET Unusual-filtered.txt" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT " + DataType. MPC_MINOR_PLANET.name + " MPCORB-filtered.DAT" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz " + DataType. MPC_MINOR_PLANET.name + " MPCORB-filtered.DAT" + \
+            "\n  python3  " + Path(__file__).name + " NEA.txt " + DataType. MPC_MINOR_PLANET.name + " NEA-filtered.txt" + \
+            "\n  python3  " + Path(__file__).name + " PHA.txt " + DataType. MPC_MINOR_PLANET.name + " PHA-filtered.txt" + \
+            "\n  python3  " + Path(__file__).name + " DAILY.DAT " + DataType. MPC_MINOR_PLANET.name + " DAILY-filtered.DAT" + \
+            "\n  python3  " + Path(__file__).name + " Distant.txt " + DataType. MPC_MINOR_PLANET.name + " Distant-filtered.txt" + \
+            "\n  python3  " + Path(__file__).name + " Unusual.txt " + DataType. MPC_MINOR_PLANET.name + " Unusual-filtered.txt" + \
             "\n" + \
-            "\n  python3  " + Path(__file__).name + " CometEls.txt MPC_COMET CometEls-filtered.txt"
+            "\n  python3  " + Path(__file__).name + " CometEls.txt " + DataType. MPC_COMET.name + " CometEls-filtered.txt"
 
         message = usage + dataTypes + examples
 

@@ -64,7 +64,7 @@ def processAndWriteOneLine( line, outputFile ):
             print( "Missing absolute magnitude:\n" + line )
 
         else:
-            slopeParamenter = parts[ 2 ].strip()
+            slopeParameter = parts[ 2 ].strip()
 
             epochPacked = parts[ 3 ].strip()
             century = epochPacked[ 0 ]
@@ -94,43 +94,7 @@ def processAndWriteOneLine( line, outputFile ):
                 epochDate,
                 "2000.0",
                 absoluteMagnitude,
-                slopeParamenter ]
-
-            outputFile.write( ','.join( components ) + '\n' )
-
-
-def processAndWriteOneLineORIGINAL( line, outputFile ):
-    if len( line.strip() ) > 0:
-        name = line[ 167 - 1 : 194 ].strip()
-        absoluteMagnitude = line[ 9 - 1 : 13 ].strip() # $H
-
-        if len( name ) == 0:
-            print( "Missing name:\n" + line )
-
-        elif len( absoluteMagnitude ) == 0:
-            print( "Missing absolute magnitude:\n" + line )
-
-        else:
-            inclinationToEcliptic = line[ 60 - 1 : 68 ].strip() # $i
-            longitudeAscendingNode = line[ 49 - 1 : 57 ].strip() # $O
-            argumentPerihelion = line[ 38 - 1 : 46 ].strip() # $o
-            semimajorAxix = line[ 93 - 1 : 103 ].strip() # $a
-            orbitalEccentricity = line[ 71 - 1 : 79 ].strip() # $e
-            meanAnomalyEpoch = line[ 27 - 1 : 35 ].strip() # $M
-            slopeParamenter = line[ 15 - 1 : 19 ].strip() # $G
-
-            century = line[ 21 - 1 : 21 ].strip() # $cent
-            lastTwoDigitsOfYear = line[ 22 - 1 : 23 ].strip() # $TY
-            year = str( centuryMap[ century ] + int( lastTwoDigitsOfYear ) ) # $TY
-            month = getUnpackedDate( line[ 24 - 1 : 24 ].strip() ) # $TM
-            day = getUnpackedDate( line[ 25 - 1 : 25 ].strip() ) # $TD
-            epochDate = month + '/' + day + '/' + year
-
-            components = [
-                name, 'e', inclinationToEcliptic, longitudeAscendingNode,
-                argumentPerihelion, semimajorAxix, '0', orbitalEccentricity, meanAnomalyEpoch,
-                epochDate, "2000.0",
-                absoluteMagnitude, slopeParamenter ]
+                slopeParameter ]
 
             outputFile.write( ','.join( components ) + '\n' )
 
@@ -162,7 +126,7 @@ def convertMPCORB( inFile, outFile ):
 
 
 def convert( inFile, outFile ):
-    if inFile == "MPCORB.DAT" or inFile == "MPCORB.DAT.gz":
+    if inFile.endswith( "MPCORB.DAT" ) or inFile.endswith( "MPCORB.DAT.gz" ):
         convertMPCORB( inFile, outFile )
 
     else:

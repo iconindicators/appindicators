@@ -35,6 +35,88 @@ import sys
 
 def processAndWriteOneLine( line, outFile ):
     if len( line.strip() ) > 0:
+        # Field numbers: 0  1   2   3   4   5   6   7   8   9  10  11  12  13  14   15   16   17
+        startIndices = [ 1, 5,  6, 15, 20, 23, 31, 42, 52, 62, 72, 82, 86, 88, 92,  97, 103, 160 ]
+        endIndices =   [ 4, 5, 12, 18, 21, 29, 39, 49, 59, 69, 79, 85, 87, 89, 95, 100, 158, 168 ]
+
+        # Offset back to zero to match lines read into a string.
+        startIndices = [ x - 1 for x in startIndices ]
+        endIndices = [ x - 1 for x in endIndices ]
+
+        parts = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        name = parts[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
+        absoluteMagnitude = parts[ 14 ].strip()
+
+        if len( name ) == 0:
+            print( "Missing name:\n" + line )
+
+        elif len( absoluteMagnitude ) == 0:
+            print( "Missing absolute magnitude:\n" + line )
+
+        else:
+            year = parts[ 3 ].strip()
+            month = parts[ 4 ].strip()
+            day = parts[ 5 ].strip()
+            epochDate = month + '/' + day + '/' + year
+
+            perihelionDistance = parts[ 6 ].strip()
+            orbitalEccentricity = parts[ 7 ].strip()
+            argumentPerihelion = parts[ 8 ].strip()
+            longitudeAscendingNode = parts[ 9 ].strip()
+            inclination = parts[ 10 ].strip()
+            slopeParameter = parts[ 15 ].strip()
+
+            if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
+                meanAnomaly = str( 0.0 )
+                meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) )
+
+                components = [
+                    name,
+                    'e',
+                    inclination,
+                    longitudeAscendingNode,
+                    argumentPerihelion,
+                    meanDistance,
+                    '0',
+                    orbitalEccentricity,
+                    meanAnomaly,
+                    epochDate,
+                    "2000.0",
+                    absoluteMagnitude,
+                    slopeParameter ]
+
+            elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
+                components = [
+                    name,
+                    'h',
+                    epochDate,
+                    inclination,
+                    longitudeAscendingNode,
+                    argumentPerihelion,
+                    orbitalEccentricity, 
+                    perihelionDistance,
+                    "2000.0",
+                    absoluteMagnitude,
+                    slopeParameter ]
+
+            else: # Parabolic orbit.
+                components = [
+                    name,
+                    'p',
+                    epochDate,
+                    inclination,
+                    argumentPerihelion,
+                    perihelionDistance,
+                    longitudeAscendingNode,
+                    "2000.0",
+                    absoluteMagnitude,
+                    slopeParameter ]
+
+            outFile.write( ','.join( components ) + '\n' )
+
+
+def processAndWriteOneLineORIGINAL( line, outFile ):
+    if len( line.strip() ) > 0:
         name = line[ 103 - 1 : 158 ].strip()
         absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
 
