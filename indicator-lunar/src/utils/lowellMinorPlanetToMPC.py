@@ -73,11 +73,11 @@ def pad( start, end ): return ' ' * ( end - start + 1 )
 
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
-        indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
-        indices = [ x - 1 for x in indices ] # Offset back to zero to match each line read into a string.
+        startIndices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
+        startIndices = [ x - 1 for x in startIndices ] # Offset back to zero to match each line read into a string.
 
         parts = [ "OFFSET TO ALIGN WITH FIELD NUMBERING" ] + \
-                [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+                [ line[ i : j ] for i, j in zip( startIndices, startIndices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
 
         number = parts[ 1 ].strip()
         name = parts[ 2 ].strip()
