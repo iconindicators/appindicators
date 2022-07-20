@@ -35,7 +35,7 @@ import gzip, sys
 
 def processAndWriteOneLine( line, indices, outputFile ):
     if len( line.strip() ) > 0:
-        parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ]
+        parts = [ "OFFSET FOR ZEROTH FIELD" ] + [ line[ i : j ] for i, j in zip( indices, indices[ 1 : ] + [ None ] ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
 
         numberAndName = parts[ 1 ].strip() + " " + parts[ 2 ].strip()
         absoluteMagnitude = parts[ 4 ].strip()
