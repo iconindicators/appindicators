@@ -99,53 +99,47 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ','.join( components ) + '\n' )
 
 
-def convertTXT( inFile, outFile ):
-    with open( inFile, 'r' ) as fIn, open( outFile, 'w' ) as fOut:
-        for line in fIn:
-            processAndWriteOneLine( line, fOut )
-
-
-def convertMPCORB( inFile, outFile ):
+def convert( inFile, hasHeader, outFile ):
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
- 
+
     else:
         fIn = open( inFile, 'r' )
 
     fOut = open( outFile, 'w' )
-    endOfHeader = False
-    for line in fIn:
-        if endOfHeader:
-            processAndWriteOneLine( line, fOut )
 
-        elif line.startswith( "----------" ):
-            endOfHeader = True
+    if hasHeader:
+        endOfHeader = False
+        for line in fIn:
+            if endOfHeader:
+                processAndWriteOneLine( line, fOut )
+    
+            elif line.startswith( "----------" ):
+                endOfHeader = True
+
+    else:
+        for line in fIn:
+            processAndWriteOneLine( line, fOut )
 
     fIn.close()
     fOut.close()
 
 
-def convert( inFile, outFile ):
-    if inFile.endswith( "MPCORB.DAT" ) or inFile.endswith( "MPCORB.DAT.gz" ):
-        convertMPCORB( inFile, outFile )
-
-    else:
-        convertTXT( inFile, outFile )
-
-
 if __name__ == "__main__":
-    if len( sys.argv ) != 3:
+    if len( sys.argv ) != 4:
         message = \
-            "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
+            "Usage:" + \
+            "\n python3 " + Path(__file__).name + " fileToConvert hasHeader=TRUE outputFile" + \
+            "\n python3 " + Path(__file__).name + " fileToConvert hasHeader=FALSE outputFile" + \
             "\n\nFor example:" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT mpcorb.edb" + \
-            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz mpcorb.edb" + \
-            "\n  python3  " + Path(__file__).name + " NEA.txt NEA.edb" + \
-            "\n  python3  " + Path(__file__).name + " PHA.txt PHA.edb" + \
-            "\n  python3  " + Path(__file__).name + " DAILY.DAT DAILY.edb" + \
-            "\n  python3  " + Path(__file__).name + " Distant.txt Distant.edb" + \
-            "\n  python3  " + Path(__file__).name + " Unusual.txt Unusual.edb"
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT hasHeader=TRUE mpcorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz hasHeader=TRUE mpcorb.edb" + \
+            "\n  python3  " + Path(__file__).name + " NEA.txt hasHeader=FALSE NEA.edb" + \
+            "\n  python3  " + Path(__file__).name + " PHA.txt hasHeader=FALSE PHA.edb" + \
+            "\n  python3  " + Path(__file__).name + " DAILY.DAT hasHeader=FALSE DAILY.edb" + \
+            "\n  python3  " + Path(__file__).name + " Distant.txt hasHeader=FALSE Distant.edb" + \
+            "\n  python3  " + Path(__file__).name + " Unusual.txt hasHeader=FALSE Unusual.edb"
 
         raise SystemExit( message )
 
-    convert( sys.argv[ 1 ], sys.argv[ 2 ] )
+    convert( sys.argv[ 1 ], True if sys.argv[ 2 ].endswith( "TRUE" ) else False, sys.argv[ 3 ] )
