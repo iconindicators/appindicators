@@ -130,7 +130,7 @@ def processAndWriteOneLine( line, outputFile ):
                 ' ', # 161
                 ' ' * 4, # hexdigit flags
                 ' ', # 166
-                ( number + ' ' + name ).ljust( 194 - 167 + 1 ),
+                ( number + ' ' + name ).strip().ljust( 194 - 167 + 1 ),
                 ' ' * 8 ] # date last observation
 
             outputFile.write( ''.join( components ) + '\n' )

@@ -62,7 +62,7 @@ def processAndWriteOneLine( line, outputFile ):
             semimajorAxix = parts[ 18 ].strip()
 
             components = [
-                number + " " + name,
+                ( number + ' ' + name ).strip(),
                 'e',
                 inclinationToEcliptic,
                 longitudeAscendingNode,
