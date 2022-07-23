@@ -377,3 +377,8 @@ if __name__ == "__main__":
         raise SystemExit( message )
 
     filter( sys.argv[ 1 ], sys.argv[ 2 ], sys.argv[ 3 ] )
+    
+# TODO Test ALL vaiants again...I'm getting empty out put files.
+
+# TODO Make the app mag and obs as paramenters...maybe as just globasl.     
+    
