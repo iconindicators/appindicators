@@ -58,19 +58,6 @@ def getPackedDate( year, month, day ):
     return packedYear + packedMonth + packedDay
 
 
-def justify( stringToJustify, start, end, rightAdjust = True ):
-    if rightAdjust:
-        stringJustified = stringToJustify.rjust( end - start + 1 )
-
-    else:  
-        stringJustified = stringToJustify.ljust( end - start + 1 )
-
-    return stringJustified
-
-
-def pad( start, end ): return ' ' * ( end - start + 1 )
-
-
 def processAndWriteOneLine( line, outputFile ):
     if len( line.strip() ) > 0:
         startIndices = [ 1, 8, 27, 43, 49, 55, 60, 66, 71, 96, 101, 107, 116, 127, 138, 148, 159, 169, 183, 192, 200, 209, 218, 235, 252 ]
@@ -101,55 +88,50 @@ def processAndWriteOneLine( line, outputFile ):
             semimajorAxix = parts[ 18 ].strip()
 
             components = [
-                pad( 1, 7 ), # number or designation packed
-                ' ',
-                justify( str( round( float( absoluteMagnitude ), 2 ) ), 9, 13 ),
-                ' ',
-                justify( str( round( float( slopeParameter ), 2 ) ), 15, 19 ),
-                ' ',
-                justify( getPackedDate( epochDate[ 0 : 4 ], epochDate[ 4 : 6 ], epochDate[ 6 : 8 ] ), 21, 25 ),
-                ' ',
-                justify( str( round( float( meanAnomalyEpoch ), 5 ) ), 27, 35 ),
-                ' ',
-                ' ',
-                justify( str( round( float( argumentPerihelion ), 5 ) ), 38, 46 ),
-                ' ',
-                ' ',
-                justify( str( round( float( longitudeAscendingNode ), 5 ) ), 49, 57 ),
-                ' ',
-                ' ',
-                justify( str( round( float( inclinationToEcliptic ), 5 ) ), 60, 68 ),
-                ' ',
-                ' ',
-                justify( str( round( float( orbitalEccentricity ), 7 ) ), 71, 79 ),
-                ' ',
-                pad( 81, 91 ), # mean daily motion
-                ' ',
-                justify( str( round( float( semimajorAxix ), 7 ) ), 93, 103 ),
-                ' ',
-                ' ',
-                pad( 106, 106 ), # uncertainty parameter
-                ' ',
-                pad( 108, 116 ), # reference
-                ' ',
-                justify( numberObservations, 118, 122 ),
-                ' ',
-                pad( 124, 126 ), # oppositions
-                ' ',
-                pad( 128, 136 ), # oppositions
-                ' ',
-                pad( 138, 141 ), # rms residual
-                ' ',
-                pad( 143, 145 ), # coarse indicator of perturbers
-                ' ',
-                pad( 147, 149 ), # precise indicator of perturbers
-                ' ',
-                pad( 151, 160 ), # computer name
-                ' ',
-                pad( 162, 165 ), # hexdigit flags
-                ' ',
-                justify( number + ' ' + name, 167, 194, False ),
-                pad( 195, 202 ) ] # date last observation
+                ' ' * 7, # number or designation packed
+                ' ', # 8
+                str( round( float( absoluteMagnitude ), 2 ) ).rjust( 5 ),
+                ' ', # 14
+                str( round( float( slopeParameter ), 2 ) ).rjust( 5 ),
+                ' ', # 20
+                getPackedDate( epochDate[ 0 : 4 ], epochDate[ 4 : 6 ], epochDate[ 6 : 8 ] ).rjust( 5 ),
+                ' ', # 26
+                str( round( float( meanAnomalyEpoch ), 5 ) ).rjust( 9 ),
+                ' ' * 2, # 36, 37 
+                str( round( float( argumentPerihelion ), 5 ) ).rjust( 9 ),
+                ' ' * 2, # 47, 48
+                str( round( float( longitudeAscendingNode ), 5 ) ).rjust( 9 ),
+                ' ' * 2, # 58, 59
+                str( round( float( inclinationToEcliptic ), 5 ) ).rjust( 9 ),
+                ' ' * 2, # 69, 70
+                str( round( float( orbitalEccentricity ), 7 ) ).rjust( 9 ),
+                ' ', # 80
+                ' ' * 11, # mean daily motion
+                ' ', # 92
+                str( round( float( semimajorAxix ), 7 ) ).rjust( 11 ),
+                ' ' * 2, # 104, 105
+                ' ', # uncertainty parameter
+                ' ', # 107
+                ' ' * 9, # reference
+                ' ', # 117
+                numberObservations.rjust( 5 ),
+                ' ', # 123
+                ' ' * 3, # oppositions
+                ' ', # 127
+                ' ' * ( 4 + 1 + 4 ), # multiple/single oppositions
+                ' ', # 137
+                ' ' * 4, # rms residual
+                ' ', # 142
+                ' ' * 3, # coarse indicator of perturbers
+                ' ', # 146
+                ' ' * 3, # precise indicator of perturbers
+                ' ', # 150
+                ' ' * 10, # computer name
+                ' ', # 161
+                ' ' * 4, # hexdigit flags
+                ' ', # 166
+                ( number + ' ' + name ).ljust( 194 - 167 + 1 ),
+                ' ' * 8 ] # date last observation
 
             outputFile.write( ''.join( components ) + '\n' )
 
