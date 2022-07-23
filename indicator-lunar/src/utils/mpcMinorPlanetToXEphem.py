@@ -53,9 +53,9 @@ def processAndWriteOneLine( line, outputFile ):
         startIndices = [ x - 1 for x in startIndices ]
         endIndices = [ x - 1 for x in endIndices ]
 
-        parts = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
-        name = parts[ 21 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = parts[ 1 ].strip()
+        fields = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        name = fields[ 21 ].replace( '(', '' ).replace( ')', '' ).strip()
+        absoluteMagnitude = fields[ 1 ].strip()
 
         if len( name ) == 0:
             print( "Missing name:\n" + line )
@@ -64,9 +64,9 @@ def processAndWriteOneLine( line, outputFile ):
             print( "Missing absolute magnitude:\n" + line )
 
         else:
-            slopeParameter = parts[ 2 ].strip()
+            slopeParameter = fields[ 2 ].strip()
 
-            epochPacked = parts[ 3 ].strip()
+            epochPacked = fields[ 3 ].strip()
             century = epochPacked[ 0 ]
             lastTwoDigitsOfYear = epochPacked[ 1 : 3 ]
             year = str( centuryMap[ century ] + int( lastTwoDigitsOfYear ) )
@@ -74,12 +74,12 @@ def processAndWriteOneLine( line, outputFile ):
             day = getUnpackedDate( epochPacked[ 4 ] )
             epochDate = month + '/' + day + '/' + year
 
-            meanAnomalyEpoch = parts[ 4 ].strip()
-            argumentPerihelion = parts[ 5 ].strip()
-            longitudeAscendingNode = parts[ 6 ].strip()
-            inclinationToEcliptic = parts[ 7 ].strip()
-            orbitalEccentricity = parts[ 8 ].strip()
-            semimajorAxix = parts[ 10 ].strip()
+            meanAnomalyEpoch = fields[ 4 ].strip()
+            argumentPerihelion = fields[ 5 ].strip()
+            longitudeAscendingNode = fields[ 6 ].strip()
+            inclinationToEcliptic = fields[ 7 ].strip()
+            orbitalEccentricity = fields[ 8 ].strip()
+            semimajorAxix = fields[ 10 ].strip()
 
             components = [
                 name,

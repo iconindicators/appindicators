@@ -43,9 +43,9 @@ def processAndWriteOneLine( line, outFile ):
         startIndices = [ x - 1 for x in startIndices ]
         endIndices = [ x - 1 for x in endIndices ]
 
-        parts = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
-        name = parts[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = parts[ 14 ].strip()
+        fields = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        name = fields[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
+        absoluteMagnitude = fields[ 14 ].strip()
 
         if len( name ) == 0:
             print( "Missing name:\n" + line )
@@ -54,17 +54,17 @@ def processAndWriteOneLine( line, outFile ):
             print( "Missing absolute magnitude:\n" + line )
 
         else:
-            year = parts[ 3 ].strip()
-            month = parts[ 4 ].strip()
-            day = parts[ 5 ].strip()
+            year = fields[ 3 ].strip()
+            month = fields[ 4 ].strip()
+            day = fields[ 5 ].strip()
             epochDate = month + '/' + day + '/' + year
 
-            perihelionDistance = parts[ 6 ].strip()
-            orbitalEccentricity = parts[ 7 ].strip()
-            argumentPerihelion = parts[ 8 ].strip()
-            longitudeAscendingNode = parts[ 9 ].strip()
-            inclination = parts[ 10 ].strip()
-            slopeParameter = parts[ 15 ].strip()
+            perihelionDistance = fields[ 6 ].strip()
+            orbitalEccentricity = fields[ 7 ].strip()
+            argumentPerihelion = fields[ 8 ].strip()
+            longitudeAscendingNode = fields[ 9 ].strip()
+            inclination = fields[ 10 ].strip()
+            slopeParameter = fields[ 15 ].strip()
 
             if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
                 meanAnomaly = str( 0.0 )
