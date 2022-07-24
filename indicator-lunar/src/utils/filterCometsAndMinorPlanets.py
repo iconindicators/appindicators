@@ -33,7 +33,7 @@
 #    Have no name;
 #    Have no absolute magnitude;
 #    Have fewer than 250 observations (where applicable);
-#    Do not have an apparent magnitude less than 15 at some point, measured every 30 days over the course of 366 days.
+#    Have no apparent magnitude less than 15, measured every 30 days over the course of 366 days.
 
 
 from enum import Enum
@@ -52,10 +52,10 @@ class DataType( Enum ):
 
 def toDataType( dataTypeAsString ):
     dataTypeStringToEnum = {
-        DataType.LOWELL_MINOR_PLANET.name : DataType.LOWELL_MINOR_PLANET,
+        DataType.LOWELL_MINOR_PLANET.name          : DataType.LOWELL_MINOR_PLANET,
         DataType.MPC_MINOR_PLANET_WITH_HEADER.name : DataType.MPC_MINOR_PLANET_WITH_HEADER,
-        DataType.MPC_MINOR_PLANET_NO_HEADER.name : DataType.MPC_MINOR_PLANET_NO_HEADER,
-        DataType.MPC_COMET.name : DataType.MPC_COMET }
+        DataType.MPC_MINOR_PLANET_NO_HEADER.name   : DataType.MPC_MINOR_PLANET_NO_HEADER,
+        DataType.MPC_COMET.name                    : DataType.MPC_COMET }
 
     return dataTypeStringToEnum[ dataTypeAsString ]
 
@@ -64,7 +64,7 @@ def getApparentMagnitudeOverPeriod(
         orbitalElement,
         startDate, endDate,
         city,
-        magnitudeMaximum, intervalInDaysBetweenBodyCompute ):
+        apparentMagnitudeMaximum, daysBetweenBodyCompute ):
 
     currentDate = startDate
     city = ephem.city( "London" ) # Use any city; makes no difference to obtain the apparent magnitude.
@@ -72,19 +72,19 @@ def getApparentMagnitudeOverPeriod(
     while currentDate < endDate:
         city.date = currentDate
         body.compute( city )
-        if body.mag <= magnitudeMaximum:
+        if body.mag <= apparentMagnitudeMaximum:
             break
 
-        currentDate += datetime.timedelta( days = intervalInDaysBetweenBodyCompute )
+        currentDate += datetime.timedelta( days = daysBetweenBodyCompute )
 
     return body.mag
 
 
 def filterByApparentMagnitude(
         inFile,
-        apparentMagnitudeMaximum = 15.0, # Upper limit for apparent magnitude.
-        durationInYears = 1, # Number of years over which to compute apparent magnitude.
-        intervalInDaysBetweenApparentMagnitudeCalculations = 30 ):
+        apparentMagnitudeMaximum, # Upper limit for apparent magnitude.
+        durationInYears, # Number of years over which to compute apparent magnitude.
+        daysBetweenApparentMagnitudeCalculations ):
 
     print( "Filter by apparent magnitude..." )
     namesKept = [ ]
@@ -93,7 +93,7 @@ def filterByApparentMagnitude(
     with open( inFile, 'r' ) as fIn:
         city = ephem.city( "London" ) # Use any city; makes no difference to obtain the apparent magnitude.
         for line in fIn:
-            apparentMagnitude = getApparentMagnitudeOverPeriod( line, startDate, endDate, city, apparentMagnitudeMaximum, intervalInDaysBetweenApparentMagnitudeCalculations )
+            apparentMagnitude = getApparentMagnitudeOverPeriod( line, startDate, endDate, city, apparentMagnitudeMaximum, daysBetweenApparentMagnitudeCalculations )
             if apparentMagnitude < apparentMagnitudeMaximum:
                 namesKept.append( line[ : line.index( ',' ) ] )
 
@@ -113,7 +113,7 @@ def filterByName( inFile, outFile, names, nameStart, nameEnd ):
         if len( line.strip() ) == 0:
             continue
 
-        name = line[ nameStart - 1 : nameEnd ].strip()
+        name = line[ nameStart - 1 : nameEnd ].replace( '(', '' ).replace( ')', '' ).strip() # Only MPC has '(' and ')'.
         if name in names:
             fOut.write( line )
 
@@ -141,7 +141,7 @@ def removeHeaderFromMPCORB( inFile ):
 def filterByObservations(
         inFile,
         observationsStart, observationsEnd,
-        minimalNumberOfObservations = 250 ):
+        minimalNumberOfObservations ):
 
     print( "Filter by observations..." )
     fIn = open( inFile, 'r' )
@@ -164,13 +164,12 @@ def filterByObservations(
     return fOut.name
 
 
-# To filter a data file which does not contain observations,
-# such as CometEls.txt, set observationsStart = -1.
+# When a data file does not contain observations, such as CometEls.txt, set observationsStart = -1.
 def filterBySanityCheck(
         inFile,
         nameStart, nameEnd,
         magnitudeStart, magnitudeEnd,
-        observationsStart, observationsEnd ):
+        observationsStart = -1, observationsEnd = -1 ):
 
     print( "Filter by sanity check..." )
     if inFile.endswith( ".gz" ):
@@ -180,33 +179,48 @@ def filterBySanityCheck(
         fIn = open( inFile, 'r' )
 
     fOut = tempfile.NamedTemporaryFile( mode = 'w', delete = False )
+    totalBodies = 0
+    droppedBodies = 0
     for line in fIn:
+        totalBodies += 1
+
         if len( line.strip() ) == 0:
+            droppedBodies += 1
             print( "Found empty line" )
             continue
 
-        name = line[ nameStart - 1 : nameEnd ].strip()
+        name = line[ nameStart - 1 : nameEnd ].replace( '(', '' ).replace( ')', '' ).strip() # Only MPC has '(' and ')'.
         if len( name ) == 0:
+            droppedBodies += 1
             print( "Missing name:\n" + line )
             continue
 
         absoluteMagnitude = line[ magnitudeStart - 1 : magnitudeEnd ].strip()
         if len( absoluteMagnitude ) == 0:
+            droppedBodies += 1
             print( "Missing absolute magnitude:\n" + line )
             continue
 
         if observationsStart > -1:
             numberOfObservations = line[ observationsStart - 1 : observationsEnd ].strip()
             if len( numberOfObservations ) == 0:
+                droppedBodies += 1
                 print( "Missing observations:\n" + line )
                 continue
 
         fOut.write( line )
 
+    if droppedBodies > 0:
+        print( "Dropped", droppedBodies, "bodies out of", totalBodies, "due to missing/bad data." )
+
     return fOut.name
 
 
-def filter( inFile, dataType, outFile ):
+def filter(
+        inFile, dataType, outFile,
+        apparentMagnitudeMaximum = 15.0, durationInYears = 1, daysBetweenApparentMagnitudeCalculations = 30,
+        minimalNumberOfObservations = 250 ):
+
     dataType = toDataType( dataType )
     fileToFilter = inFile
     if dataType == DataType.MPC_COMET:
@@ -248,24 +262,20 @@ def filter( inFile, dataType, outFile ):
     if dataType == DataType.MPC_COMET:
         filteredByObservations = filteredBySanityCheck
 
-    else: # DataType.LOWELL_MINOR_PLANET or DataType.MPC_MINOR_PLANET_NO_HEADER or DataType.MPC_MINOR_PLANET_WITH_HEADER
-        filteredByObservations = filterByObservations( filteredBySanityCheck, observationsStart, observationsEnd )
+    else:
+        filteredByObservations = filterByObservations( filteredBySanityCheck, observationsStart, observationsEnd, minimalNumberOfObservations )
 
-    filteredByObservationsConvertedToXEphem = tempfile.NamedTemporaryFile( delete = False ).name
-
-    # Converting
+    # Convert to XEphem
     print( "Converting to XEphem..." )
-    if dataType == DataType.MPC_MINOR_PLANET_NO_HEADER:
+    filteredByObservationsConvertedToXEphem = tempfile.NamedTemporaryFile( delete = False ).name
+    if dataType == DataType.MPC_MINOR_PLANET_NO_HEADER or dataType == DataType.MPC_MINOR_PLANET_WITH_HEADER:
         convertToXEphemFunction( filteredByObservations, False, filteredByObservationsConvertedToXEphem )
-
-    elif dataType == DataType.MPC_MINOR_PLANET_WITH_HEADER:
-        convertToXEphemFunction( filteredByObservations, True, filteredByObservationsConvertedToXEphem )
 
     else:
         convertToXEphemFunction( filteredByObservations, filteredByObservationsConvertedToXEphem )
 
     # Final filtering
-    names = filterByApparentMagnitude( filteredByObservationsConvertedToXEphem )
+    names = filterByApparentMagnitude( filteredByObservationsConvertedToXEphem, apparentMagnitudeMaximum, durationInYears, daysBetweenApparentMagnitudeCalculations )
     filterByName( fileToFilter, outFile, names, nameStart, nameEnd )
 
     # Clean up
@@ -275,73 +285,6 @@ def filter( inFile, dataType, outFile ):
     os.remove( filteredBySanityCheck )
 
     if not( dataType == DataType.MPC_COMET ):
-        os.remove( filteredByObservations )
-
-    os.remove( filteredByObservationsConvertedToXEphem )
-
-    print( "Created", outFile )
-
-
-def filterORIGINAL( inFile, dataType, outFile ):
-    fileToFilter = inFile
-    if dataType == DataType.MPC_COMET.name:
-        nameStart = 103
-        nameEnd = 158
-        magnitudeStart = 92
-        magnitudeEnd = 95
-        observationsStart = -1
-        observationsEnd = -1
-        convertToXEphemFunction = getattr( importlib.import_module( "mpcCometToXEphem" ), "convert" )
-
-    elif dataType == DataType.LOWELL_MINOR_PLANET.name:
-        nameStart = 1
-        nameEnd = 25
-        magnitudeStart = 43
-        magnitudeEnd = 47
-        observationsStart = 101
-        observationsEnd = 105
-        convertToXEphemFunction = getattr( importlib.import_module( "lowellMinorPlanetToXEphem" ), "convert" )
-
-    elif dataType == DataType.MPC_MINOR_PLANET.name:
-        nameStart = 167
-        nameEnd = 194
-        magnitudeStart = 9
-        magnitudeEnd = 13
-        observationsStart = 118
-        observationsEnd = 122
-        convertToXEphemFunction = getattr( importlib.import_module( "mpcMinorPlanetToXEphem" ), "convert" )
-
-        if inFile.endswith( "MPCORB.DAT" ) or inFile.endswith( "MPCORB.DAT.gz" ):
-            fileToFilter = removeHeaderFromMPCORB( inFile )
-
-    else:
-        raise SystemExit( "Unknown data type: " + dataType )
-
-    # Filtering, converting...
-    filteredBySanityCheck = filterBySanityCheck( fileToFilter, nameStart, nameEnd, magnitudeStart, magnitudeEnd, observationsStart, observationsEnd )
-
-    if dataType == DataType.MPC_COMET.name:
-        filteredByObservations = filteredBySanityCheck
-
-    else: # DataType.LOWELL_MINOR_PLANET or DataType.MPC_MINOR_PLANET
-        filteredByObservations = filterByObservations( filteredBySanityCheck, observationsStart, observationsEnd )
-
-    filteredByObservationsConvertedToXEphem = tempfile.NamedTemporaryFile( delete = False ).name
-
-    print( "Converting to XEphem..." )
-    convertToXEphemFunction( filteredByObservations, filteredByObservationsConvertedToXEphem )
-
-    names = filterByApparentMagnitude( filteredByObservationsConvertedToXEphem )
-    filterByName( fileToFilter, outFile, names, nameStart, nameEnd )
-
-    # Clean up
-    if dataType == DataType.MPC_MINOR_PLANET.name:
-        if inFile.endswith( "MPCORB.DAT" ) or inFile.endswith( "MPCORB.DAT.gz" ):
-            os.remove( fileToFilter )
-
-    os.remove( filteredBySanityCheck )
-
-    if dataType == DataType.LOWELL_MINOR_PLANET.name or dataType == DataType.MPC_MINOR_PLANET.name:
         os.remove( filteredByObservations )
 
     os.remove( filteredByObservationsConvertedToXEphem )
@@ -376,9 +319,13 @@ if __name__ == "__main__":
 
         raise SystemExit( message )
 
-    filter( sys.argv[ 1 ], sys.argv[ 2 ], sys.argv[ 3 ] )
-    
-# TODO Test ALL vaiants again...I'm getting empty out put files.
+    # Set as appropriate
+    apparentMagnitudeMaximum = 15.0
+    durationInYears = 1
+    daysBetweenApparentMagnitudeCalculations = 30
+    minimalNumberOfObservations = 250
 
-# TODO Make the app mag and obs as paramenters...maybe as just globasl.     
-    
+    filter(
+        sys.argv[ 1 ], sys.argv[ 2 ], sys.argv[ 3 ],
+        apparentMagnitudeMaximum, durationInYears, daysBetweenApparentMagnitudeCalculations,
+        minimalNumberOfObservations )    
