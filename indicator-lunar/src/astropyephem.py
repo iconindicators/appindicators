@@ -677,7 +677,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateOrbitalElements( observer, data, bodyType, orbitalElements, orbitalElementData, magnitudeMaximum ):
+    def __calculateOrbitalElements( observer, data, bodyType, orbitalElements, orbitalElementData, apparentMagnitudeMaximum ):
         for key in orbitalElements:
             if key in orbitalElementData:
                 body = ephem.readdb( orbitalElementData[ key ].getData() )
@@ -688,7 +688,7 @@ class AstroPyEphem( AstroBase ):
                     math.isnan( body.size ) or \
                     math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
 
-                if not bad and body.mag <= magnitudeMaximum:
+                if not bad and body.mag <= apparentMagnitudeMaximum:
                     AstroPyEphem.__calculateCommon( data, observer, body, bodyType, key )
 
 

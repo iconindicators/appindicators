@@ -891,7 +891,7 @@ class AstroSkyfield( AstroBase ):
     def __calculateOrbitalElements(
             now, nowPlusThirtySixHours, 
             data, timeScale, locationAtNow,
-            bodyType, orbitalElements, orbitalElementData, magnitudeMaximum,
+            bodyType, orbitalElements, orbitalElementData, apparentMagnitudeMaximum,
             logging ):
 
         # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
@@ -932,7 +932,7 @@ class AstroSkyfield( AstroBase ):
                         row[ "magnitude_H" ], row[ "magnitude_G" ],
                         earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
-                if apparentMagnitude and apparentMagnitude <= magnitudeMaximum: # Minimum magnitudes have already been screened out in the filtering.
+                if apparentMagnitude and apparentMagnitude <= apparentMagnitudeMaximum: # Minimum magnitudes have already been screened out in the filtering.
                     AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, ( bodyType, name ), locationAtNow, body )
 
             except Exception as e:
