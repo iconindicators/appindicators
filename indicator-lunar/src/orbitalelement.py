@@ -22,7 +22,7 @@
 from enum import Enum
 from urllib.request import urlopen
 
-import indicatorbase, re
+import re
 
 
 class OE( object ):
@@ -73,7 +73,7 @@ class OE( object ):
 def download( url, dataType, logging = None ):
     oeData = { }
     try:
-        data = urlopen( url, timeout = indicatorbase.IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+        data = urlopen( url, timeout = 20 ).read().decode( "utf8" ).splitlines() # TODO If AstroBase will be used for something else, then add the timeout back here.
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
