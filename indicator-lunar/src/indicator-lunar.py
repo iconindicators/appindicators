@@ -262,7 +262,8 @@ class IndicatorLunar( IndicatorBase ):
             creditz =
                 [ IndicatorLunar.astroBackend.getCredit(),
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
-                _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ) ] )
+                _( "Satellite TLE data by Dr T S Kelso. https://www.celestrak.com" ),
+                _( "Minor Planet OE data by Lowell Minor Planet Services. https://asteroid.lowell.edu" ) ] )
 
         self.debug = True #TODO Testing
 
