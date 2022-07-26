@@ -834,6 +834,26 @@ class IndicatorBase( ABC ):
         return cacheFile
 
 
+    # Writes text to a file in the cache.
+    #
+    # text: The text to write.
+    # baseName: The text used to form the file name, typically the name of the calling application.
+    # extension: Added to the end of the baseName and date/time (will include the '.').
+    #
+    # The text will be written to the cache directory using the pattern
+    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    # or
+    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    #
+    # Returns True on success; False otherwise.
+#TODO If this stays, fix the header comment and call this from within writeCacheTextWithTimestamp() above.
+    def getCacheFilenameWithTimestamp( self, baseName, extension = ".txt" ):
+        return self.__getCacheDirectory() + \
+               baseName + \
+               datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+               extension
+
+
     # Return the full directory path to the user cache directory for the current indicator.
     def getCacheDirectory( self ): return self.__getCacheDirectory()
 

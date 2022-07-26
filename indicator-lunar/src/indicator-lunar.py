@@ -622,6 +622,44 @@ class IndicatorLunar( IndicatorBase ):
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
+    def __updateDataNEWNEW(
+            self, utcNow, data,
+            cacheBaseName, cacheMaximumAge, cacheExtension,
+            downloadCount, nextDownloadTime,
+            downloadDataFunction, downloadDataArguments,
+            toTextFunction, toTextAdditionalArgunemts,
+            toObjectFunction, toObjectAdditionalArgunemts ):
+
+        data = { }
+        cacheAge = self.getCacheDateTime( cacheBaseName, utcNow - datetime.timedelta( hours = ( cacheMaximumAge * 2 ) ) )
+        if cacheAge < utcNow: # Cache is stale
+            if nextDownloadTime < utcNow: # Download is allowed (will not annoy data supplier).
+                # getCacheFilenameWithTimestamp( self, baseName, extension = ".txt" ):
+                data = downloadDataFunction( *downloadDataArguments )
+                if downloadedData:
+                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName, cacheExtension )
+                    downloadCount = 0
+                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+
+                else:
+                    downloadCount += 1
+                    nextDownloadTime = self.getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
+
+        else: # Cache is fresh.
+            if not data: # No data passed in, so read from cache. #TODO Either pass the data in or use a flag.
+                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
+
+#TODO See if downloadcount and nextdownloadtime can be simplified..
+# can we only make it such that one of them is passed/kept around and compute the other on the fly?
+        return data, cacheDateTime, downloadCount, nextDownloadTime
+
+
+#TODO Put into IndicatorBase?  Who else could use this...IndicatorTide?
+    def cacheIsStale( self, utcNow, cacheBaseName, cacheDefaultExpiry, cacheMaximumAge  ):
+        cacheDateTime = self.getCacheDateTime( cacheBaseName )
+        return ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow
+
+
     def getNextDownloadTime( self, utcNow, downloadCount ):
         nextDownloadTime = utcNow + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
         timeIntervalInMinutes = {
