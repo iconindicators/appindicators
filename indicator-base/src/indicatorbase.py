@@ -648,6 +648,7 @@ class IndicatorBase( ABC ):
     # Find the date/time of the newest file in the cache matching the basename.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
+#TODO Document defaultExpiry and the update the return statement.
     #
     # Returns the datetime of the newest file in the cache.  None if no file can be found.
     def getCacheDateTime( self, baseName, defaultExpiry = None ):
