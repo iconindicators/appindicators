@@ -59,7 +59,7 @@ def processAndWriteOneLine( line, outputFile ):
             longitudeAscendingNode = parts[ 15 ].strip()
             inclinationToEcliptic = parts[ 16 ].strip()
             orbitalEccentricity = parts[ 17 ].strip()
-            semimajorAxix = parts[ 18 ].strip()
+            semimajorAxis = parts[ 18 ].strip()
 
             components = [
                 ( number + ' ' + name ).strip(),
@@ -67,7 +67,7 @@ def processAndWriteOneLine( line, outputFile ):
                 inclinationToEcliptic,
                 longitudeAscendingNode,
                 argumentPerihelion,
-                semimajorAxix,
+                semimajorAxis,
                 '0',
                 orbitalEccentricity,
                 meanAnomalyEpoch,

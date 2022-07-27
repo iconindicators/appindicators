@@ -85,7 +85,7 @@ def processAndWriteOneLine( line, outputFile ):
             longitudeAscendingNode = parts[ 15 ].strip()
             inclinationToEcliptic = parts[ 16 ].strip()
             orbitalEccentricity = parts[ 17 ].strip()
-            semimajorAxix = parts[ 18 ].strip()
+            semimajorAxis = parts[ 18 ].strip()
 
             components = [
                 ' ' * 7, # number or designation packed
@@ -108,7 +108,7 @@ def processAndWriteOneLine( line, outputFile ):
                 ' ', # 80
                 ' ' * 11, # mean daily motion
                 ' ', # 92
-                str( round( float( semimajorAxix ), 7 ) ).rjust( 11 ),
+                str( round( float( semimajorAxis ), 7 ) ).rjust( 11 ),
                 ' ' * 2, # 104, 105
                 ' ', # uncertainty parameter
                 ' ', # 107
