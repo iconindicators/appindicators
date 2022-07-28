@@ -173,6 +173,17 @@ class IndicatorLunar( IndicatorBase ):
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
 #TODO Waiting on COBS.
+#
+# From Domenic Ford:
+# For comets, I use the MPC orbital elements,
+# but I download absolute magnitudes from the British Astronomical Association's Comet Section:
+# https://people.ast.cam.ac.uk/~jds/magpars.htm.
+# If a comet isn't listed on the BAA list,
+# I'm willing to use an MPC absolute magnitude,
+# but only if it predicts the comet's brightness to be fainter than mag 10.
+# If the MPC predicts a bright comet, but the BAA doesn't list it, 
+# then that seems rather suspicious and my website automatically suppresses any brightness estimates for it. 
+# Thankfully, the BAA seems extremely efficient about removing absolute magnitudes for comets that are much fainter than expected.
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-" #TODO Make sure putting in this number helps in the future!!!  
 #Put the number as a variable?
 #What happens if say comets has to change.  Does the number change for ALL of the other file types?    
@@ -568,8 +579,6 @@ class IndicatorLunar( IndicatorBase ):
             if not data:
                 data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
 
-#TODO See if downloadcount and nextdownloadtime can be simplified..
-# can we only make it such that one of them is passed/kept around and compute the other on the fly?
         return data, downloadCount, nextDownloadTime
 
 
