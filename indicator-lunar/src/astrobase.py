@@ -328,9 +328,9 @@ class AstroBase( ABC ):
     # in which the key is the body name and value is the orbital element data.
     #
     # Returns a dictionary in which each item has an APPARENT magnitude less than or equal to the specified maximum.
-    @staticmethod
-    @abstractmethod
-    def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, apparentMagnitudeMaximum ): return { }
+    # @staticmethod
+    # @abstractmethod
+    # def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, apparentMagnitudeMaximum ): return { }
 
 
     # If the minimum version of the third party library is met and available, returns None.

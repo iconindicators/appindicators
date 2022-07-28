@@ -111,7 +111,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
@@ -259,7 +259,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __removeCacheFilesVersion89( self ):
-        # Cache data filenames changed in format in version 90.
+        # In version 90, cache data filenames changed format.
         self.flushCache( "comet-oe-", 0 )
         self.flushCache( "minorplanet-oe-bright-", 0 )
         self.flushCache( "minorplanet-oe-critical-", 0 )
@@ -268,11 +268,11 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __removeCacheFilesVersion93( self ):
-        # From version 94, the full moon icon is now treated as a regular, time-stamped icon.
+        # In version 94, the full moon icon is now treated as a regular, time-stamped icon.
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
         self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
 
-        # Cache data filenames changed in format in version 94.
+        # In version 94, cache data filenames changed format.
         self.flushCache( "comet-oe-astropyephem-", 0 )
         self.flushCache( "minorplanet-oe-bright-astropyephem-", 0 )
         self.flushCache( "minorplanet-oe-critical-astropyephem-", 0 )
@@ -300,31 +300,6 @@ class IndicatorLunar( IndicatorBase ):
         # self.nextDownloadTimeComet = utcNow
         self.nextDownloadTimeMinorPlanet = utcNow
         self.nextDownloadTimeSatellite = utcNow
-
-#TODO Should go eventually.
-        # self.cacheDateTimeComet = self.getCacheDateTime( 
-        #     IndicatorLunar.COMET_CACHE_BASENAME, 
-        #     utcNow - datetime.timedelta( hours = ( IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
-        #
-        # self.cacheDateTimeMinorPlanetBright = self.getCacheDateTime( 
-        #     IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_BRIGHT, 
-        #     utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
-        #
-        # self.cacheDateTimeMinorPlanetCritical = self.getCacheDateTime( 
-        #     IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_CRITICAL, 
-        #     utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
-        #
-        # self.cacheDateTimeMinorPlanetDistant = self.getCacheDateTime( 
-        #     IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_DISTANT, 
-        #     utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
-        #
-        # self.cacheDateTimeMinorPlanetUnusual = self.getCacheDateTime( 
-        #     IndicatorLunar.MINOR_PLANET_CACHE_BASENAME_UNUSUAL, 
-        #     utcNow - datetime.timedelta( hours = ( IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
-        #
-        # self.cacheDateTimeSatellite = self.getCacheDateTime( 
-        #     IndicatorLunar.SATELLITE_CACHE_BASENAME, 
-        #     utcNow - datetime.timedelta( hours = ( IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS * 2 ) ) )
 
 
     def update( self, menu ):
