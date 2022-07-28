@@ -10,4 +10,6 @@ Package: indicator-lunar
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2, python3-pip
 Description: Application indicator for the home astronomer.
- Displays lunar, solar, planetary, star and satellite information.
+ Displays lunar, solar, planetary, star, minor planet and
+ satellite information.
+
