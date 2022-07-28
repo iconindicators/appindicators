@@ -22,7 +22,7 @@
 from enum import Enum
 from urllib.request import urlopen
 
-import re
+import datetime, re, requests
 
 
 class OE( object ):
@@ -63,14 +63,210 @@ class OE( object ):
             self.getDataType() == other.getDataType()
 
 
+def download( dataType, apparentMagnitudeMaximum = None, logging = None ):
+    logging.getLogger( "urllib3" ).propagate = False
+    oeData = { }
+    if dataType == OE.DataType.SKYFIELD_MINOR_PLANET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
+        oeData = __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum, logging )
+
+    if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.XEPHEM_COMET:
+        pass #TODO Get data from COBS
+
+    else:
+        pass #TODO Log error or something?
+
+    return oeData
+
+
+#TODO Update header comment
 # Download OE data; drop bad/missing data.
 #
 # Returns a dictionary:
-#    Key: object name (upper cased)
+#    Key: object name
 #    Value: OE object
 #
 # Otherwise, returns an empty dictionary and may write to the log.
-def download( url, dataType, logging = None ):
+def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum, logging = None ):
+    orbitalElementData = { }
+    try:
+        variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum } #TODO Check if today or utctoday...ask Brian.
+
+        query = """
+            query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
+            {
+                query_closest_orbelements
+                (
+                    args: { query_date: $date },
+                    where:
+                    {
+                        minorplanet:
+                        {
+                            ephemeris:
+                            {
+                                _and:
+                                {
+                                    eph_date: { _eq: $date },
+                                    v_mag: { _lte: $apparentMagnitude }
+                                }
+                            }
+                        }
+                    }
+                )
+                {
+                    minorplanet
+                    {
+                        ast_number
+                        designameByIdDesignationPrimary { str_designame }
+                        h # Absolute magnitude
+                        ephemeris( where: { eph_date: { _eq: $date } } ) { v_mag }
+                    }    
+                    epoch # Epoch date
+                    m # Mean anomaly epoch
+                    peri # Argument of perhilion
+                    node # Longitude of ascending node
+                    i # Inclination to ecliptic
+                    e # Orbital eccentricity
+                    a # Semi-major axis
+                }
+            }
+            """
+
+        url = "https://astorbdb.lowell.edu/v1/graphql"
+        json = { "query": query, "variables": variables }
+        response = requests.post( url, None, json )
+        data = response.json()
+        minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
+
+        for minorPlanet in minorPlanets:
+            number = str( minorPlanet[ "minorplanet" ][ "ast_number" ] )
+            name = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ]
+            id = ( number + ' ' + name ).strip()
+
+            absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
+            slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
+            epochDate = minorPlanet[ "epoch" ][ 5 : 7 ] + '/' + minorPlanet[ "epoch" ][ 8 : 10 ] + '/' + minorPlanet[ "epoch" ][ 0 : 4 ]
+            meanAnomalyEpoch = str( minorPlanet[ 'm' ] )
+            argumentPerihelion = str( minorPlanet[ "peri" ] )
+            longitudeAscendingNode = str( minorPlanet[ "node" ] )
+            inclinationToEcliptic = str( minorPlanet[ 'i' ] )
+            orbitalEccentricity = str( minorPlanet[ 'e' ] )
+            semimajorAxis = str( minorPlanet[ 'a' ] )
+
+            if dataType == OE.DataType.XEPHEM_MINOR_PLANET:
+                components = [
+                    id,
+                    'e',
+                    inclinationToEcliptic,
+                    longitudeAscendingNode,
+                    argumentPerihelion,
+                    semimajorAxis,
+                    '0',
+                    orbitalEccentricity,
+                    meanAnomalyEpoch,
+                    minorPlanet[ "epoch" ][ 5 : 7 ] + '/' + minorPlanet[ "epoch" ][ 8 : 10 ] + '/' + minorPlanet[ "epoch" ][ 0 : 4 ],
+                    "2000.0",
+                    absoluteMagnitude,
+                    slopeParameter ]
+
+                oe = OE( id, ','.join( components ), dataType )
+                orbitalElementData[ oe.getName() ] = oe
+
+            else: #OE.DataType.SKYFIELD_MINOR_PLANET
+                components = [
+                    ' ' * 7, # number or designation packed
+                    ' ', # 8
+                    str( round( float( absoluteMagnitude ), 2 ) ).rjust( 5 ),
+                    ' ', # 14
+                    str( round( float( slopeParameter ), 2 ) ).rjust( 5 ),
+                    ' ', # 20
+                    getPackedDate( minorPlanet[ "epoch" ][ 0 : 4 ], minorPlanet[ "epoch" ][ 5 : 7 ], minorPlanet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
+                    ' ', # 26
+                    str( round( float( meanAnomalyEpoch ), 5 ) ).rjust( 9 ),
+                    ' ' * 2, # 36, 37 
+                    str( round( float( argumentPerihelion ), 5 ) ).rjust( 9 ),
+                    ' ' * 2, # 47, 48
+                    str( round( float( longitudeAscendingNode ), 5 ) ).rjust( 9 ),
+                    ' ' * 2, # 58, 59
+                    str( round( float( inclinationToEcliptic ), 5 ) ).rjust( 9 ),
+                    ' ' * 2, # 69, 70
+                    str( round( float( orbitalEccentricity ), 7 ) ).rjust( 9 ),
+                    ' ', # 80
+                    ' ' * 11, # mean daily motion
+                    ' ', # 92
+                    str( round( float( semimajorAxis ), 7 ) ).rjust( 11 ),
+                    ' ' * 2, # 104, 105
+                    ' ', # uncertainty parameter
+                    ' ', # 107
+                    ' ' * 9, # reference
+                    ' ', # 117
+                    ' ' * 5, # observations
+                    ' ', # 123
+                    ' ' * 3, # oppositions
+                    ' ', # 127
+                    ' ' * ( 4 + 1 + 4 ), # multiple/single oppositions
+                    ' ', # 137
+                    ' ' * 4, # rms residual
+                    ' ', # 142
+                    ' ' * 3, # coarse indicator of perturbers
+                    ' ', # 146
+                    ' ' * 3, # precise indicator of perturbers
+                    ' ', # 150
+                    ' ' * 10, # computer name
+                    ' ', # 161
+                    ' ' * 4, # hexdigit flags
+                    ' ', # 166
+                    ( number + ' ' + name ).strip().ljust( 194 - 167 + 1 ),
+                    ' ' * 8 ] # date last observation
+
+                oe = OE( id, ''.join( components ), dataType )
+                orbitalElementData[ oe.getName() ] = oe
+
+    except Exception as e:
+        orbitalElementData = { }
+        if logging:
+            logging.error( "Error retrieving orbital element data from " + str( url ) )
+            logging.exception( e )
+
+    return orbitalElementData
+
+
+# https://www.minorplanetcenter.net/iau/info/PackedDates.html
+def getPackedDate( year, month, day ):
+    packedYear = year[ 2 : ]
+    if int( year ) < 1900:
+        packedYear = 'I' + packedYear
+
+    elif int( year ) < 2000:
+        packedYear = 'J' + packedYear
+
+    else:
+        packedYear = 'K' + packedYear
+
+
+    def getPackedDayMonth( dayOrMonth ):
+        if int( dayOrMonth ) < 10:
+            packedDayMonth = str( int( dayOrMonth ) )
+
+        else:
+            packedDayMonth = chr( int( dayOrMonth ) - 10 + ord( 'A' ) )
+
+        return packedDayMonth
+
+    packedMonth = getPackedDayMonth( month )
+    packedDay = getPackedDayMonth( day )
+
+    return packedYear + packedMonth + packedDay
+
+
+# Need a comment explaining why this is no longer in use.
+# Download OE data; drop bad/missing data.
+#
+# Returns a dictionary:
+#    Key: object name
+#    Value: OE object
+#
+# Otherwise, returns an empty dictionary and may write to the log.
+def __downloadFromMinorPlanetCenter( url, dataType, logging = None ):
     oeData = { }
     try:
         data = urlopen( url, timeout = 20 ).read().decode( "utf8" ).splitlines() # TODO If AstroBase will be used for something else, then add the timeout back here.
@@ -115,7 +311,7 @@ def download( url, dataType, logging = None ):
                 name = data[ i ][ nameStart : nameEnd + 1 ].strip()
 
                 oe = OE( name, data[ i ], dataType )
-                oeData[ oe.getName().upper() ] = oe
+                oeData[ oe.getName() ] = oe
 
         else: # OE.DataType.XEPHEM_COMET or OE.DataType.XEPHEM_MINOR_PLANET
             # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
@@ -147,20 +343,21 @@ def download( url, dataType, logging = None ):
                 name = re.sub( "\s\s+", "", data[ i ][ 0 : data[ i ].index( "," ) ] ) # The name can have multiple whitespace, so remove.
 
                 oe = OE( name, data[ i ], dataType )
-                oeData[ oe.getName().upper() ] = oe
+                oeData[ oe.getName() ] = oe
 
         if not oeData and logging:
-            logging.error( "No OE data found at " + str( url ) )
+            logging.error( "No orbital element data found at " + str( url ) )
 
     except Exception as e:
         oeData = { }
         if logging:
-            logging.error( "Error retrieving OE data from " + str( url ) )
+            logging.error( "Error retrieving orbital element data from " + str( url ) )
             logging.exception( e )
 
     return oeData
 
 
+# TODO Is this valid now...I don't think so.  Is it even needed?
 def getName( line, dataType ):
     if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
         if dataType == OE.DataType.SKYFIELD_COMET:
@@ -181,3 +378,95 @@ def getName( line, dataType ):
         name = re.sub( "\s\s+", "", line[ 0 : line.find( "," ) ] ) # The name can have multiple whitespace, so remove.
 
     return name
+
+
+def toText( dictionary ):
+    text = ""
+    for oe in dictionary.values():
+        text += oe.getData() + '\n'
+
+    return text
+
+
+def toDictionary( text, dataType ):
+    oeData = { }
+    if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
+        if dataType == OE.DataType.SKYFIELD_COMET: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+            nameStart = 103 - 1
+            nameEnd = 158 - 1
+    
+        elif dataType == OE.DataType.SKYFIELD_MINOR_PLANET: # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+            nameStart = 167 - 1
+            nameEnd = 194 - 1
+
+        for line in text.splitlines():
+            name = line[ nameStart : nameEnd + 1 ].strip()
+            oe = OE( name, line, dataType )
+            oeData[ oe.getName() ] = oe
+
+    elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
+        for line in text.splitlines():
+            name = line[ : line.find( ',' ) ].strip()
+            oe = OE( name, line, dataType )
+            oeData[ oe.getName() ] = oe
+
+    else:
+        pass # TODO Barf or ignore?
+
+    return oeData
+
+
+# Convert comet data in MPC format to XEphem format.
+#
+# Inspired by:
+#    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+#
+# MPC format: 
+#    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
+#
+# XEphem format:
+#    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+def convertCometFromMPCToXEphem( dictionaryOfOrbitalElements ):
+    print( "Converting comet from MPC to XEphem" )#TODO Testing
+    dictionaryOfConvertedOrbitalElements = { }
+    for oe in dictionaryOfOrbitalElements.values():
+        line = oe.getData()
+        name = line[ 103 - 1 : 158 ].replace( '(', '' ).replace( ')', '' ).strip()
+        absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
+        inclination = line[ 72 - 1 : 79 ].strip() # $i The Perl script uses 71 instead of 72. 
+        longitudeAscendingNode = line[ 62 - 1 : 69 ].strip() # $O The Perl script uses 61 instead of 62.
+        argumentPerihelion = line[ 52 - 1 : 59 ].strip() # $o The Perl script uses 51 instead of 52.
+        perihelionDistance = line[ 31 - 1 : 39 ].strip() # $q
+        orbitalEccentricity = line[ 42 - 1 : 49 ].strip() # $e The Perl script uses 41 instead of 42.
+        slopeParameter = line[ 97 - 1 : 100 ].strip() # $H
+        month = line[ 20 - 1 : 21 ].strip()
+        day = line[ 23 - 1 : 29 ].strip()
+        year = line[ 15 - 1 : 18 ].strip()
+        epochDate = month + '/' + day + '/' + year # $E
+
+        if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
+            meanAnomaly = str( 0.0 ) # $M
+            meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) ) # $a
+
+            components = [
+                name, 'e', inclination, longitudeAscendingNode, argumentPerihelion,
+                meanDistance, '0', orbitalEccentricity, meanAnomaly,
+                epochDate, "2000.0",
+                slopeParameter, absoluteMagnitude ]
+
+        elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
+            components = [
+                name, 'h', epochDate, inclination,
+                longitudeAscendingNode, argumentPerihelion, orbitalEccentricity, 
+                perihelionDistance, "2000.0",
+                slopeParameter, absoluteMagnitude ]
+
+        else: # Parabolic orbit.
+            components = [
+                name, 'p', epochDate, inclination,
+                argumentPerihelion, perihelionDistance, longitudeAscendingNode, 
+                "2000.0", slopeParameter, absoluteMagnitude ]
+
+        dictionaryOfConvertedOrbitalElements[ oe.getName() ] = OE( name, ','.join( components ), OE.DataType.XEPHEM_COMET )
+
+    return dictionaryOfConvertedOrbitalElements

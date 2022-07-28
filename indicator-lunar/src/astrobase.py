@@ -298,7 +298,8 @@ class AstroBase( ABC ):
             satellites, satelliteData, startHour, endHour,
             comets, cometData,
             minorPlanets, minorPlanetData,
-            magnitudeMaximum,
+            apparentMagnitudeData,
+            apparentMagnitudeMaximum,
             logging = None ):
         return { }
 
@@ -322,13 +323,14 @@ class AstroBase( ABC ):
     def getLatitudeLongitudeElevation( city ): return 0.0, 0.0, 0.0
 
 
+#TODO Remove as no longer used?
     # Takes a dictionary of orbital element data (for comets or minor planets),
     # in which the key is the body name and value is the orbital element data.
     #
     # Returns a dictionary in which each item has an APPARENT magnitude less than or equal to the specified maximum.
     @staticmethod
     @abstractmethod
-    def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, magnitudeMaximum ): return { }
+    def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, apparentMagnitudeMaximum ): return { }
 
 
     # If the minimum version of the third party library is met and available, returns None.
