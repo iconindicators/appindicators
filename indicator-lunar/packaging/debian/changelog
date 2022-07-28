@@ -1,10 +1,10 @@
 indicator-lunar (1.0.94-1) bionic; urgency=low
 
   * Bug fix: Full moon icon was not appearing in the werewolf notification.
+  * Minor planets are back!  Many thanks to Lowell Minor Planet Services.
+  * Removed Pluto from planets and is now accessible as a minor planet
+    (only when its apparent magnitude is 15 or less).
   * Increased URL timeout from 5 seconds to 20 seconds.
-  * Removed Pluto from list of planets.
-TODO If/when minor planets are added back in, mention Pluto is available there....
-...and only when it's apparent magnitude is 15 or less.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 13 Dec 2021 17:48:41 +1000   <--- TODO Set to day of release!!!!
 
