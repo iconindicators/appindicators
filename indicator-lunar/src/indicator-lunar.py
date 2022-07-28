@@ -1438,13 +1438,13 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
-        # grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 )
+        # grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 ) #TODO Reinstate
 
         minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
         minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
         minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "If checked, all minor planets are added." ) )
-        # grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
+        grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 5 )
@@ -1539,7 +1539,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 ) #TODO Reinstate
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
