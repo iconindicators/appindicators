@@ -138,8 +138,8 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
         minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
 
         for minorPlanet in minorPlanets:
-            number = str( minorPlanet[ "minorplanet" ][ "ast_number" ] )
-            primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ]
+            number = str( minorPlanet[ "minorplanet" ][ "ast_number" ] or '' ).strip() # The asteroid number CAN be empty so need to avoid a None result.
+            primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
             id = ( number + ' ' + primaryDesignation ).strip()
 
             absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
@@ -151,10 +151,6 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
             inclinationToEcliptic = str( minorPlanet[ 'i' ] )
             orbitalEccentricity = str( minorPlanet[ 'e' ] )
             semimajorAxis = str( minorPlanet[ 'a' ] )
-
-#TODO Waiting on Brian to determine if we only use primary designation or still combine number and primary designation.
-            if "RH9" in id:
-                print( id )
 
             if dataType == OE.DataType.XEPHEM_MINOR_PLANET:
                 components = [
@@ -362,7 +358,9 @@ def __downloadFromMinorPlanetCenter( url, dataType, logging = None ):
 
 
 # TODO Is this valid now...I don't think so.  Is it even needed?
+# I think it is used in the Preferences...figure out what is going on.
 def getName( line, dataType ):
+    print( "getName in orbitalelement")
     if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
         if dataType == OE.DataType.SKYFIELD_COMET:
             # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
@@ -418,59 +416,3 @@ def toDictionary( text, dataType ):
         pass # TODO Barf or ignore?
 
     return oeData
-
-
-# Convert comet data in MPC format to XEphem format.
-#
-# Inspired by:
-#    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
-#
-# MPC format: 
-#    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
-#
-# XEphem format:
-#    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
-def convertCometFromMPCToXEphem( dictionaryOfOrbitalElements ):
-    print( "Converting comet from MPC to XEphem" )#TODO Testing
-    dictionaryOfConvertedOrbitalElements = { }
-    for oe in dictionaryOfOrbitalElements.values():
-        line = oe.getData()
-        name = line[ 103 - 1 : 158 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = line[ 92 - 1 : 95 ].strip() # $G The Perl script uses 91 instead of 92.
-        inclination = line[ 72 - 1 : 79 ].strip() # $i The Perl script uses 71 instead of 72. 
-        longitudeAscendingNode = line[ 62 - 1 : 69 ].strip() # $O The Perl script uses 61 instead of 62.
-        argumentPerihelion = line[ 52 - 1 : 59 ].strip() # $o The Perl script uses 51 instead of 52.
-        perihelionDistance = line[ 31 - 1 : 39 ].strip() # $q
-        orbitalEccentricity = line[ 42 - 1 : 49 ].strip() # $e The Perl script uses 41 instead of 42.
-        slopeParameter = line[ 97 - 1 : 100 ].strip() # $H
-        month = line[ 20 - 1 : 21 ].strip()
-        day = line[ 23 - 1 : 29 ].strip()
-        year = line[ 15 - 1 : 18 ].strip()
-        epochDate = month + '/' + day + '/' + year # $E
-
-        if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
-            meanAnomaly = str( 0.0 ) # $M
-            meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) ) # $a
-
-            components = [
-                name, 'e', inclination, longitudeAscendingNode, argumentPerihelion,
-                meanDistance, '0', orbitalEccentricity, meanAnomaly,
-                epochDate, "2000.0",
-                slopeParameter, absoluteMagnitude ]
-
-        elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
-            components = [
-                name, 'h', epochDate, inclination,
-                longitudeAscendingNode, argumentPerihelion, orbitalEccentricity, 
-                perihelionDistance, "2000.0",
-                slopeParameter, absoluteMagnitude ]
-
-        else: # Parabolic orbit.
-            components = [
-                name, 'p', epochDate, inclination,
-                argumentPerihelion, perihelionDistance, longitudeAscendingNode, 
-                "2000.0", slopeParameter, absoluteMagnitude ]
-
-        dictionaryOfConvertedOrbitalElements[ oe.getName() ] = OE( name, ','.join( components ), OE.DataType.XEPHEM_COMET )
-
-    return dictionaryOfConvertedOrbitalElements
