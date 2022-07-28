@@ -24,9 +24,6 @@
 # functionality has been disabled.
 
 
-#TODO Ensure all files written out (cached download data, images, etc) contain a file extension ( .txt, .svg, ...).
-
-
 #TODO Given the MPC files for comets and minor planets cannot be used to determine apparent magnitude,
 # either drop comets and minor planets, or...
 # Find external sources (websites) which use better/reliable data to compute apparent magnitude
@@ -88,7 +85,7 @@
 # Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
 
 
-#TODO If/when comets and minor planets are reinstated, add text back into packaging/debian/control.
+#TODO If/when comets are reinstated, add text back into packaging/debian/control.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -176,7 +173,9 @@ class IndicatorLunar( IndicatorBase ):
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
 #TODO Waiting on COBS.
-    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-"
+    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-" #TODO Make sure putting in this number helps in the future!!!  
+#Put the number as a variable?
+#What happens if say comets has to change.  Does the number change for ALL of the other file types?    
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
 
@@ -186,8 +185,7 @@ class IndicatorLunar( IndicatorBase ):
 
     SATELLITE_CACHE_BASENAME = "satellite-tle-94-"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
-    SATELLITE_DATA_URL = "file:///home/bernard/Downloads/visual.txt" #TODO Testing
-    # SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
+    SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
         _( "Rise Time: " ) + astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
         _( "Rise Azimuth: " ) + astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
@@ -268,7 +266,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __removeCacheFilesVersion93( self ):
-        # In version 94, the full moon icon is now treated as a regular, time-stamped icon.
+        # In version 94, the full moon icon is now a regular, time-stamped icon.
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
         self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
 
@@ -284,27 +282,25 @@ class IndicatorLunar( IndicatorBase ):
     def flushTheCache( self ):
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS )
-        # self.flushCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS ) #TODO Put back eventually
+        self.flushCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
 
 
     def initialiseDownloadCountsAndCacheDateTimes( self ):
         self.downloadCountApparentMagnitude = 0
-        # self.downloadCountComet = 0
+        self.downloadCountComet = 0
         self.downloadCountMinorPlanet = 0
         self.downloadCountSatellite = 0
 
         utcNow = datetime.datetime.utcnow() 
         self.nextDownloadTimeApparentMagnitude = utcNow
-        # self.nextDownloadTimeComet = utcNow
+        self.nextDownloadTimeComet = utcNow
         self.nextDownloadTimeMinorPlanet = utcNow
         self.nextDownloadTimeSatellite = utcNow
 
 
     def update( self, menu ):
-        self.minorPlanetsAddNew = True#TODO Testing
-
         utcNow = datetime.datetime.utcnow()
 
         # Update comet minor planet and satellite cached data.
@@ -1543,7 +1539,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
@@ -1568,7 +1564,7 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
-        # notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
+        notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
 
         # Satellites.
         box = Gtk.Box()

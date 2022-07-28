@@ -139,8 +139,8 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
 
         for minorPlanet in minorPlanets:
             number = str( minorPlanet[ "minorplanet" ][ "ast_number" ] )
-            name = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ]
-            id = ( number + ' ' + name ).strip()
+            primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ]
+            id = ( number + ' ' + primaryDesignation ).strip()
 
             absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
             slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
@@ -151,6 +151,10 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
             inclinationToEcliptic = str( minorPlanet[ 'i' ] )
             orbitalEccentricity = str( minorPlanet[ 'e' ] )
             semimajorAxis = str( minorPlanet[ 'a' ] )
+
+#TODO Waiting on Brian to determine if we only use primary designation or still combine number and primary designation.
+            if "RH9" in id:
+                print( id )
 
             if dataType == OE.DataType.XEPHEM_MINOR_PLANET:
                 components = [
@@ -215,7 +219,7 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
                     ' ', # 161
                     ' ' * 4, # hexdigit flags
                     ' ', # 166
-                    ( number + ' ' + name ).strip().ljust( 194 - 167 + 1 ),
+                    id.ljust( 194 - 167 + 1 ),
                     ' ' * 8 ] # date last observation
 
                 oe = OE( id, ''.join( components ), dataType )
