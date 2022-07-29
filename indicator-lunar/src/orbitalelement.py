@@ -138,10 +138,7 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
         minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
 
         for minorPlanet in minorPlanets:
-            number = str( minorPlanet[ "minorplanet" ][ "ast_number" ] or '' ).strip() # The asteroid number CAN be empty so need to avoid a None result.
             primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
-            id = ( number + ' ' + primaryDesignation ).strip()
-
             absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
             slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
             epochDate = minorPlanet[ "epoch" ][ 5 : 7 ] + '/' + minorPlanet[ "epoch" ][ 8 : 10 ] + '/' + minorPlanet[ "epoch" ][ 0 : 4 ]
@@ -154,7 +151,7 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
 
             if dataType == OE.DataType.XEPHEM_MINOR_PLANET:
                 components = [
-                    id,
+                    primaryDesignation,
                     'e',
                     inclinationToEcliptic,
                     longitudeAscendingNode,
@@ -168,7 +165,7 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
                     absoluteMagnitude,
                     slopeParameter ]
 
-                oe = OE( id, ','.join( components ), dataType )
+                oe = OE( primaryDesignation, ','.join( components ), dataType )
                 orbitalElementData[ oe.getName() ] = oe
 
             else: #OE.DataType.SKYFIELD_MINOR_PLANET
@@ -215,10 +212,10 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
                     ' ', # 161
                     ' ' * 4, # hexdigit flags
                     ' ', # 166
-                    id.ljust( 194 - 167 + 1 ),
+                    primaryDesignation.ljust( 194 - 167 + 1 ),
                     ' ' * 8 ] # date last observation
 
-                oe = OE( id, ''.join( components ), dataType )
+                oe = OE( primaryDesignation, ''.join( components ), dataType )
                 orbitalElementData[ oe.getName() ] = oe
 
     except Exception as e:

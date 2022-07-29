@@ -114,13 +114,10 @@ def __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging =
         minorPlanets = data[ "data" ][ "minorplanet" ]
 
         for minorPlanet in minorPlanets:
-            number = str( minorPlanet[ "ast_number" ] )
-            name = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ]
-            id = ( number + ' ' + name ).strip()
-
+            primaryDesignation = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
             apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
 
-            am = AM( id, apparentMagnitude )
+            am = AM( primaryDesignation, apparentMagnitude )
             apparentMagnitudeData[ am.getName() ] = am
 
     except Exception as e:

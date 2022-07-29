@@ -221,7 +221,8 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_ALTITUDE = 3
 
     SEARCH_URL_DWARF_PLANET = "https://solarsystem.nasa.gov/planets/dwarf-planets/"
-    SEARCH_URL_COMET_AND_MINOR_PLANET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    # SEARCH_URL_COMET_AND_MINOR_PLANET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    SEARCH_URL_COMET_AND_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/" #TODO Will only work for minor planets...so need a new one for comets.  Plus for Minor planets don't want the number but the designation only.
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
     SEARCH_URL_SATELLITE = "https://www.n2yo.com/satellite/?s="
@@ -237,7 +238,7 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.94",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ),
+            comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ), #TODO Remove comets if they will not be available.
             creditz =
                 [ IndicatorLunar.astroBackend.getCredit(),
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
@@ -253,9 +254,9 @@ class IndicatorLunar( IndicatorBase ):
         self.data = None
         self.dataPrevious = None
 
+        self.apparentMagnitudeData = {} #TODO Document and mention hopefully comets and minor planets don't clash.  If comets are not stored here (but in the comet OE data) mention that too.
         self.cometData = { } # Key: comet name; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name; Value: orbitalelement.OE object.  Can be empty but never None.
-        self.apparentMagnitudeData = {} #TODO Document and mention hopefully comets and minor planets don't clash.  If comets are not stored here (but in the comet OE data) mention that too.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
@@ -925,21 +926,24 @@ class IndicatorLunar( IndicatorBase ):
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-                data = self.cometData
+                # data = self.cometData
                 designationFunction = IndicatorLunar.astroBackend.getDesignationComet
-                dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
-                    if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+                # dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
+                #     if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
 
             else: # MINOR_PLANET
-                data = self.minorPlanetData
+                # data = self.minorPlanetData
                 designationFunction = IndicatorLunar.astroBackend.getDesignationMinorPlanet
-                dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
-                    if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+                # dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
+                #     if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
 
             for name in sorted( orbitalElements ):
-                humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType )
-                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO Once comets/minor planets are sorted, check that this lookup still works.
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url )
+                # humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType )
+                # print( name, humanReadableName )#TODO Testing to see if orbitalelement.getName can now be dropped.
+                # url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO Once comets/minor planets are sorted, check that this lookup still works.
+                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + name
+                # self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url )
+                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + name, url )
                 self.updateMenuCommon( subMenu, bodyType, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
@@ -1522,6 +1526,8 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
+#TODO Consider putthing planets/stars/comets/minor planets on same tab.  Get Oleg to check.
+#TODO Try to centre the satellite contents.
         notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
 
         # Comets and minor planets.
@@ -1533,6 +1539,7 @@ class IndicatorLunar( IndicatorBase ):
         cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
         dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+
         for comet in sorted( self.cometData.keys() ):
             cometStore.append( [ comet in self.comets, comet, orbitalelement.getName( self.cometData[ comet ].getData(), dataType ) ] )
 
@@ -1556,6 +1563,8 @@ class IndicatorLunar( IndicatorBase ):
         minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
         dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+
+#TODO Need to do a case-insensitive sort of the minor planet names (ditto for comets...what about stars and satellites?).
         for minorPlanet in sorted( self.minorPlanetData.keys() ):
             minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, orbitalelement.getName( self.minorPlanetData[ minorPlanet ].getData(), dataType ) ] )
 
