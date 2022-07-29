@@ -1410,11 +1410,11 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
-#TODO Consider putthing planets/stars/comets/minor planets on same tab.  Get Oleg to check.
-        notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
+#TODO Consider combining planets/stars/comets/minor planets on same tab.  Get Oleg to check.
+        # notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
 
         # Comets and minor planets.
-        box = Gtk.Box( spacing = 20 )
+        # box = Gtk.Box( spacing = 20 ) #TODO Reinstate
 
         COMET_STORE_INDEX_HIDE_SHOW = 0
         COMET_STORE_INDEX_NAME = 1
@@ -1434,7 +1434,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_NAME ), True, True, 0 ) #TODO Reinstate
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_NAME ), True, True, 0 )
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
@@ -1456,7 +1456,9 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
+        # notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
+        # notebook.append_page( box, Gtk.Label.new( _( "Planets / Minor Planets / Comets / Stars" ) ) ) #TODO If this stays, reorder the columns.
+        notebook.append_page( box, Gtk.Label.new( _( "Natural Bodies" ) ) ) #TODO If this stays, reorder the columns.  
 
         # Satellites.
         box = Gtk.Box()
@@ -1515,7 +1517,8 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label.new( _( "Satellites" ) ) )
+        # notebook.append_page( box, Gtk.Label.new( _( "Satellites" ) ) )
+        notebook.append_page( box, Gtk.Label.new( _( "Artificial bodies" ) ) ) #TODO Keep this?  What about other text (to the user) with the word 'satellite" for use with the ISS?
 
         # Notifications (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
@@ -1825,12 +1828,17 @@ class IndicatorLunar( IndicatorBase ):
     def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
 
         COLUMN_INDEX_TOGGLE = 0
+        COLUMN_INDEX_DATA = 1
 
-        def toggleCheckbox( cellRendererToggle, row, listStore ): listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
+        def toggleCheckbox( cellRendererToggle, row, listStore ):
+            listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
+
 
         tree = Gtk.TreeView.new_with_model( listStore )
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         tree.set_tooltip_text( toolTipText )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect( "toggled", toggleCheckbox, listStore )
@@ -1840,6 +1848,7 @@ class IndicatorLunar( IndicatorBase ):
         tree.append_column( treeViewColumn )
 
         tree.append_column( Gtk.TreeViewColumn( columnHeaderText, Gtk.CellRendererText(), text = columnIndex ) )
+        tree.get_column( COLUMN_INDEX_DATA ).set_expand( True )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
