@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Orbital Element - holds parameters to compute orbits for comets and minor planets.
+# Orbital Element - holds orbital elements for comets and minor planets.
 
 
 from enum import Enum
@@ -73,13 +73,12 @@ def download( dataType, apparentMagnitudeMaximum = None, logging = None ):
         pass #TODO Get data from COBS
 
     else:
-        pass #TODO Log error or something?
+        logging.error( "Unknown data type: " + str( dataType ) )
 
     return oeData
 
 
-#TODO Update header comment
-# Download OE data; drop bad/missing data.
+# Download OE data.
 #
 # Returns a dictionary:
 #    Key: object name
@@ -89,7 +88,7 @@ def download( dataType, apparentMagnitudeMaximum = None, logging = None ):
 def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum, logging = None ):
     orbitalElementData = { }
     try:
-        variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum } #TODO Check if today or utctoday...ask Brian.
+        variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
 
         query = """
             query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
@@ -255,7 +254,8 @@ def getPackedDate( year, month, day ):
     return packedYear + packedMonth + packedDay
 
 
-# Need a comment explaining why this is no longer in use.
+# No longer in use as MPC data is stale and unreliable; kept for posterity.
+#
 # Download OE data; drop bad/missing data.
 #
 # Returns a dictionary:
@@ -354,31 +354,6 @@ def __downloadFromMinorPlanetCenter( url, dataType, logging = None ):
     return oeData
 
 
-# TODO Is this valid now...I don't think so.  Is it even needed?
-# I think it is used in the Preferences...figure out what is going on.
-def getName( line, dataType ):
-    print( "getName in orbitalelement")
-    if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-        if dataType == OE.DataType.SKYFIELD_COMET:
-            # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-            # The format starts from 1, whereas the data is in a list/string which starts from 0, therefore, for all indices, subtract 1.
-            nameStart = 103 - 1
-            nameEnd = 158 - 1
-
-        else:
-            # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-            nameStart = 167 - 1
-            nameEnd = 194 - 1
-
-        name = line[ nameStart : nameEnd + 1 ].strip()
-
-    else: # OE.DataType.XEPHEM_COMET or OE.DataType.XEPHEM_MINOR_PLANET
-        # Format: http://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId215848
-        name = re.sub( "\s\s+", "", line[ 0 : line.find( "," ) ] ) # The name can have multiple whitespace, so remove.
-
-    return name
-
-
 def toText( dictionary ):
     text = ""
     for oe in dictionary.values():
@@ -410,6 +385,6 @@ def toDictionary( text, dataType ):
             oeData[ oe.getName() ] = oe
 
     else:
-        pass # TODO Barf or ignore?
+        logging.error( "Unknown data type: " + str( dataType ) )
 
     return oeData
