@@ -259,13 +259,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
         treeViewColumn.set_expand( True )
-        treeViewColumn.set_alignment( 0.5 )
         treeView.append_column( treeViewColumn )
 
         rendererText = Gtk.CellRendererText()
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME, weight_set = True )
         treeViewColumn.set_expand( True )
-        treeViewColumn.set_alignment( 0.5 )
         treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionNameColumn, copyOfScripts )
         treeView.append_column( treeViewColumn )
 
@@ -447,12 +445,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
         treeViewColumn.set_expand( True )
-        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_NAME )
         treeViewColumn.set_expand( True )
-        treeViewColumn.set_alignment( 0.5 )
         backgroundScriptsTreeView.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_SOUND )
