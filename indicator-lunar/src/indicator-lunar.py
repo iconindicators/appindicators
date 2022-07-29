@@ -220,9 +220,8 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_AZIMUTH = 2 
     SATELLITE_MENU_ALTITUDE = 3
 
-    SEARCH_URL_DWARF_PLANET = "https://solarsystem.nasa.gov/planets/dwarf-planets/"
-    # SEARCH_URL_COMET_AND_MINOR_PLANET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
-    SEARCH_URL_COMET_AND_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/" #TODO Will only work for minor planets...so need a new one for comets.  Plus for Minor planets don't want the number but the designation only.
+    # SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Need a comet only version once comet ephemerides source is finalised.
+    SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
     SEARCH_URL_SATELLITE = "https://www.n2yo.com/satellite/?s="
@@ -916,35 +915,32 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateMenuCometsMinorPlanets( self, menu, bodyType ):
-        orbitalElements = [ ]
+        cometsOrMinorPlanets = [ ]
         for body in ( self.comets if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else self.minorPlanets ):
             if self.display( bodyType, body ):
-                orbitalElements.append( body )
+                cometsOrMinorPlanets.append( body )
 
-        if orbitalElements:
+        if cometsOrMinorPlanets:
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
+                # TODO This hopefully can go once the comets are sorted.
                 # data = self.cometData
-                designationFunction = IndicatorLunar.astroBackend.getDesignationComet
+                # designationFunction = IndicatorLunar.astroBackend.getDesignationComet
                 # dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
                 #     if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+                pass
 
             else: # MINOR_PLANET
-                # data = self.minorPlanetData
-                designationFunction = IndicatorLunar.astroBackend.getDesignationMinorPlanet
-                # dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
-                #     if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+                url = IndicatorLunar.SEARCH_URL_MINOR_PLANET
 
-            for name in sorted( orbitalElements ):
-                # humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType )
-                # print( name, humanReadableName )#TODO Testing to see if orbitalelement.getName can now be dropped.
-                # url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO Once comets/minor planets are sorted, check that this lookup still works.
-                url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + name
-                # self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url )
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + name, url )
-                self.updateMenuCommon( subMenu, bodyType, name, 2, url )
+            for name in sorted( cometsOrMinorPlanets, key = str.casefold ):
+                # humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType ) #TODO Needed for comets?  If not, remove completely from orbitalelemt.py
+                # url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO  #TODO Needed for comets?
+                # self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url ) #TODO May still be needed for comets.
+                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + name, url + name )
+                self.updateMenuCommon( subMenu, bodyType, name, 2, url + name )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
@@ -1535,13 +1531,9 @@ class IndicatorLunar( IndicatorBase ):
 
         COMET_STORE_INDEX_HIDE_SHOW = 0
         COMET_STORE_INDEX_NAME = 1
-        COMET_STORE_INDEX_HUMAN_READABLE_NAME = 2
-        cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
-        dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
-            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
-
-        for comet in sorted( self.cometData.keys() ):
-            cometStore.append( [ comet in self.comets, comet, orbitalelement.getName( self.cometData[ comet ].getData(), dataType ) ] )
+        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
+        for comet in sorted( self.cometData.keys(), key = str.casefold ):
+            cometStore.append( [ comet in self.comets, comet ] )
 
         if self.cometData:
             toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
@@ -1555,18 +1547,13 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 ) #TODO Reinstate
+        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_NAME ), True, True, 0 ) #TODO Reinstate
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
-        MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME = 2
-        minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-        dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
-            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
-
-#TODO Need to do a case-insensitive sort of the minor planet names (ditto for comets...what about stars and satellites?).
-        for minorPlanet in sorted( self.minorPlanetData.keys() ):
-            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, orbitalelement.getName( self.minorPlanetData[ minorPlanet ].getData(), dataType ) ] )
+        minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
+        for minorPlanet in sorted( self.minorPlanetData.keys(), key = str.casefold ):
+            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet ] )
 
         if self.minorPlanetData:
             toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
@@ -1580,7 +1567,7 @@ class IndicatorLunar( IndicatorBase ):
                 "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
 
         notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
 
@@ -1811,13 +1798,13 @@ class IndicatorLunar( IndicatorBase ):
             if not self.cometsAddNew:
                 for comet in cometStore:
                     if comet[ COMET_STORE_INDEX_HIDE_SHOW ]:
-                        self.comets.append( comet[ COMET_STORE_INDEX_NAME ].upper() ) #TODO Need upper()?
+                        self.comets.append( comet[ COMET_STORE_INDEX_NAME ] )
 
             self.minorPlanets = [ ]
             if not self.minorPlanetsAddNew:
                 for minorPlanet in minorPlanetStore:
                     if minorPlanet[ MINOR_PLANET_STORE_INDEX_HIDE_SHOW ]:
-                        self.minorPlanets.append( minorPlanet[ MINOR_PLANET_STORE_INDEX_NAME ].upper() ) #TODO Need upper()?
+                        self.minorPlanets.append( minorPlanet[ MINOR_PLANET_STORE_INDEX_NAME ] )
 
             self.satellites = [ ]
             if not self.satellitesAddNew:
