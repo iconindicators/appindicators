@@ -212,7 +212,7 @@ class IndicatorLunar( IndicatorBase ):
         self.data = None
         self.dataPrevious = None
 
-        self.apparentMagnitudeData = {} #TODO Document and mention hopefully comets and minor planets don't clash.  If comets are not stored here (but in the comet OE data) mention that too.
+        self.apparentMagnitudeData = {} # Key: minor planet designation; Value apparentmagnitude.AM object.  Can be empty but never None.
         self.cometData = { } # Key: comet name; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
@@ -236,10 +236,6 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __removeCacheFilesVersion93( self ):
-        # In version 94, the full moon icon is now a regular, time-stamped icon.
-        self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
-        self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
-
         # In version 94, cache data filenames changed format.
         self.flushCache( "comet-oe-astropyephem-", 0 )
         self.flushCache( "minorplanet-oe-bright-astropyephem-", 0 )
@@ -247,6 +243,10 @@ class IndicatorLunar( IndicatorBase ):
         self.flushCache( "minorplanet-oe-distant-astropyephem-", 0 )
         self.flushCache( "minorplanet-oe-unusual-astropyephem-", 0 )
         self.flushCache( "satellite-tle-", 0 )
+
+        # In version 94, the full moon icon is now a regular, time-stamped icon.
+        self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
+        self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
 
 
     def flushTheCache( self ):
@@ -311,18 +311,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateData( self, utcNow ):
-#TODO Call to new version...still not sure how this is all going to work.
-        # Update apparent magnitude data for comets and minor planets.
-        # self.satelliteData, self.cacheDateTimeSatellite, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateDataNEW( 
-        #     utcNow, self.satelliteData,
-        #     self.cacheDateTimeSatellite, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.EXTENSION_TEXT,
-        #     self.downloadCountSatellite, self.nextDownloadTimeSatellite,
-        #     twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
-        #     None,
-        #     None, [ ],
-        #     twolineelement.toText, [ ],
-        #     twolineelement.toDictionary, [ ] )
-
+#TODO Sort out comets.
         # Update comet data.
         # if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
         #     dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
@@ -331,19 +320,19 @@ class IndicatorLunar( IndicatorBase ):
         # else:
         #     dataType = orbitalelement.OE.DataType.XEPHEM_COMET
         #     magnitudeFilterAdditionalArguments = [ ]
-
+        #
         # self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
         #     utcNow,
         #     self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
         #     orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ],
         #     self.downloadCountComet, self.nextDownloadTimeComet,
         #     IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
-
+        #
         # if self.cometsAddNew:
         #     self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
-        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateDataNEWNEW( 
+        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
             utcNow, self.minorPlanetData,
             IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
@@ -355,7 +344,7 @@ class IndicatorLunar( IndicatorBase ):
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
-        self.apparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateDataNEWNEW( 
+        self.apparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
             utcNow, self.apparentMagnitudeData,
             IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
@@ -364,7 +353,7 @@ class IndicatorLunar( IndicatorBase ):
             apparentmagnitude.toDictionary, [ ] )
 
         # Update satellite data.
-        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateDataNEWNEW( 
+        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData( 
             utcNow, self.satelliteData,
             IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
@@ -431,18 +420,8 @@ class IndicatorLunar( IndicatorBase ):
         return processedText
 
 
-    # Get the data from the cache, or if stale, download from the source.
-    #
-    # Returns a dictionary (may be empty). #TODO Update this!
-#TODO Maybe reverse the sense of this function...
-# Download first (if needed) then save to cache (run magnitude filtering if specified).
-# Read from cache (if needed)
-# Return data (assuming data was passed in and can be just returned if no download and no cache read is required).
-#
-#TODO Need to take into account when the indicator is running for some time (longer than a cache interval)...?
-# Need to always check the cache before just simply just sending back the passed in data (and may need to do a fresh download)?
-#If this logic is valid, implement first before any minor planet / comet changes. 
-    def __updateData(
+#TODO Original function...keep until comets are sorted.
+    def __updateDataORIGINAL(
             self, utcNow,
             cacheDateTime, cacheMaximumAge, cacheBaseName,
             downloadDataFunction, downloadDataArguments,
@@ -450,7 +429,6 @@ class IndicatorLunar( IndicatorBase ):
             magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
 
         if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-#TODO Change to readCacheTextWithTimestamp()
             data = self.readCacheBinary( cacheBaseName )
 
         else:
@@ -462,7 +440,7 @@ class IndicatorLunar( IndicatorBase ):
                     if magnitudeFilterFunction:
                         data = magnitudeFilterFunction( utcNow, data, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
 
-                    self.writeCacheBinary( cacheBaseName, data ) #TODO Change to writeCacheTextWithTimestamp()
+                    self.writeCacheBinary( cacheBaseName, data ) 
                     downloadCount = 0
                     cacheDateTime = self.getCacheDateTime( cacheBaseName )
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
@@ -473,46 +451,8 @@ class IndicatorLunar( IndicatorBase ):
         return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
-#TODO Not finished and likely very wrong...wait until comet and minor planet new sources are found and settled upon.
-    def __updateDataNEW(
-            self, utcNow, data,
-            cacheDateTime, cacheMaximumAge, cacheBaseName, cacheExtension,
-            downloadCount, nextDownloadTime,
-            downloadDataFunction, downloadDataArguments,
-            formatConversionFunction,
-            magnitudeFilterFunction, magnitudeFilterAdditionalArguments,
-            toTextFunction, toTextAdditionalArgunemts,
-            toObjectFunction, toObjectAdditionalArgunemts ):
-
-        if ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow: # Cache is stale.
-            downloadedData = { }
-            if nextDownloadTime < utcNow: # Download is overdue.
-                downloadedData = downloadDataFunction( *downloadDataArguments )
-                downloadCount += 1
-                if downloadedData:
-                    # if formatConversionFunction:
-                    #     downloadedData = formatConversionFunction( downloadedData )
-                    #
-                    # if magnitudeFilterFunction:
-                    #     downloadedData = magnitudeFilterFunction( utcNow, downloadedData, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
-
-                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName, cacheExtension )
-                    downloadCount = 0
-                    cacheDateTime = self.getCacheDateTime( cacheBaseName )
-                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-                    data = downloadedData
-
-                else:
-                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
-
-        else: # Cache is fresh.
-            if not data: # No data passed in, so read from cache. #TODO Either pass the data in or use a flag.
-                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
-
-        return data, cacheDateTime, downloadCount, nextDownloadTime
-
-
-    def __updateDataNEWNEW(
+    # Get the data from the cache, or if stale, download from the source.
+    def __updateData(
             self, utcNow, data,
             cacheBaseName, cacheMaximumAge, cacheExtension,
             downloadCount, nextDownloadTime,
@@ -520,7 +460,7 @@ class IndicatorLunar( IndicatorBase ):
             toTextFunction, toTextAdditionalArgunemts,
             toObjectFunction, toObjectAdditionalArgunemts ):
 
-        if self.cacheIsStale( utcNow, cacheBaseName, cacheMaximumAge ):
+        if self.isCacheStale( utcNow, cacheBaseName, cacheMaximumAge ):
             downloadedData = { }
             if nextDownloadTime < utcNow: # Download is allowed (will not annoy data supplier).
                 downloadedData = downloadDataFunction( *downloadDataArguments )
@@ -539,19 +479,6 @@ class IndicatorLunar( IndicatorBase ):
                 data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
 
         return data, downloadCount, nextDownloadTime
-
-
-#TODO Put into IndicatorBase?  Who else could use this...IndicatorTide?
-# If not, make is __ private.
-    def cacheIsStale( self, utcNow, cacheBaseName, cacheMaximumAge ):
-        cacheDateTime = self.getCacheDateTime( cacheBaseName )
-        if cacheDateTime is None:
-            stale = True
-
-        else:
-            stale = ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow
-
-        return stale
 
 
     def __getNextDownloadTime( self, utcNow, downloadCount ):
