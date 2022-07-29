@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Apparent Magnitude - holds the apparent magnitude for comets or minor planets.
+# Apparent Magnitude - holds the apparent magnitude for comets and minor planets.
 
 
 import datetime, requests
@@ -60,18 +60,17 @@ def download( isComet, apparentMagnitudeMaximum = None, logging = None ):
     return apparentMagnitudeData
 
 
-#TODO Update header comment
-# Download OE data; drop bad/missing data.
+# Download AM data.
 #
 # Returns a dictionary:
 #    Key: object name
-#    Value: OE object
+#    Value: AM object
 #
 # Otherwise, returns an empty dictionary and may write to the log.
 def __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging = None ):
     apparentMagnitudeData = { }
     try:
-        variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum } #TODO Check if today or utctoday...ask Brian.
+        variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
 
         query = """
             query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
