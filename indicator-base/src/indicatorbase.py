@@ -659,27 +659,21 @@ class IndicatorBase( ABC ):
     # Find the date/time of the newest file in the cache matching the basename.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
-#TODO Document defaultExpiry and the update the return statement.
     #
     # Returns the datetime of the newest file in the cache.  None if no file can be found.
-    def getCacheDateTime( self, baseName, defaultExpiry = None ):
-        cacheDirectory = self.__getCacheDirectory()
+    def getCacheDateTime( self, baseName ):
         expiry = None
         theFile = ""
-        for file in os.listdir( cacheDirectory ):
+        for file in os.listdir( self.__getCacheDirectory() ):
             if file.startswith( baseName ) and file > theFile:
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
             expiry = datetime.datetime.strptime( theFile[ len( baseName ) : len( baseName ) + 14 ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
 
-        if expiry is None:
-            expiry = defaultExpiry
-
         return expiry
 
 
-#TODO Deprecated
     # Read the most recent binary object from the cache.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
@@ -697,15 +691,14 @@ class IndicatorBase( ABC ):
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
     def readCacheBinary( self, baseName ):
-        cacheDirectory = self.__getCacheDirectory()
         data = None
         theFile = ""
-        for file in os.listdir( cacheDirectory ):
+        for file in os.listdir( self.__getCacheDirectory() ):
             if file.startswith( baseName ) and file > theFile:
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
-            filename = cacheDirectory + theFile
+            filename = self.__getCacheDirectory() + theFile
             try:
                 with open( filename, 'rb' ) as f:
                     data = pickle.load( f )
@@ -718,7 +711,6 @@ class IndicatorBase( ABC ):
         return data
 
 
-#TODO Deprecated
     # Writes an object as a binary file.
     #
     # baseName: The text used to form the file name, typically the name of the calling application.
@@ -844,26 +836,6 @@ class IndicatorBase( ABC ):
             cacheFile = None
 
         return cacheFile
-
-
-    # Writes text to a file in the cache.
-    #
-    # text: The text to write.
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    # extension: Added to the end of the baseName and date/time (will include the '.').
-    #
-    # The text will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
-    # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
-    #
-    # Returns True on success; False otherwise.
-#TODO If this stays, fix the header comment and call this from within writeCacheTextWithTimestamp() above.
-    def getCacheFilenameWithTimestamp( self, baseName, extension = ".txt" ):
-        return self.__getCacheDirectory() + \
-               baseName + \
-               datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
-               extension
 
 
     # Return the full directory path to the user cache directory for the current indicator.
