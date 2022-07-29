@@ -603,6 +603,17 @@ class IndicatorBase( ABC ):
     def __getConfigDirectory( self ): return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
 
 
+    def isCacheStale( self, utcNow, cacheBaseName, cacheMaximumAge ):
+        cacheDateTime = self.getCacheDateTime( cacheBaseName )
+        if cacheDateTime is None:
+            stale = True
+
+        else:
+            stale = ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow
+
+        return stale
+
+
     # Remove a file from the cache.
     #
     # fileName: The file to remove.
