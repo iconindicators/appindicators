@@ -1289,10 +1289,12 @@ class IndicatorLunar( IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Tag" ), Gtk.CellRendererText(), text = COLUMN_TRANSLATED_TAG )
         treeViewColumn.set_sort_column_id( COLUMN_TRANSLATED_TAG )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Value" ), Gtk.CellRendererText(), text = COLUMN_VALUE )
         treeViewColumn.set_sort_column_id( COLUMN_VALUE )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         tree.set_tooltip_text( _( "Double click to add a tag to the icon text." ) )
@@ -1409,7 +1411,6 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
 #TODO Consider putthing planets/stars/comets/minor planets on same tab.  Get Oleg to check.
-#TODO Try to centre the satellite contents.
         notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
 
         # Comets and minor planets.
@@ -1474,6 +1475,8 @@ class IndicatorLunar( IndicatorBase ):
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView.new_with_model( satelliteStoreSort )
+        tree.set_hexpand( True )
+        tree.set_vexpand( True )
         if self.satelliteData:
             tree.set_tooltip_text( _( "Check a satellite to display in the menu." ) + "\n\n" + \
                                    _( "Clicking the header of the first column\n" + \
@@ -1494,14 +1497,17 @@ class IndicatorLunar( IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_NAME )
         treeViewColumn.set_sort_column_id( 1 )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_NUMBER )
         treeViewColumn.set_sort_column_id( 2 )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR )
         treeViewColumn.set_sort_column_id( 3 )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         scrolledWindow = Gtk.ScrolledWindow()
