@@ -1323,8 +1323,7 @@ class IndicatorLunar( IndicatorBase ):
         box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
-        # toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." ) #TODO May or may not be put back to this.
-        toolTip = _( "Planets and stars exceeding the\n magnitude will be hidden." )
+        toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." ) #TODO Keep comets in?
         spinnerMagnitude = self.createSpinButton(
             self.magnitude, int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ), int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
 
@@ -1377,7 +1376,7 @@ class IndicatorLunar( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
-        # Planets/Stars.
+        # Planets / minor planets / comets / stars.
         box = Gtk.Box( spacing = 20 )
 
         PLANET_STORE_INDEX_HIDE_SHOW = 0
@@ -1391,50 +1390,7 @@ class IndicatorLunar( IndicatorBase ):
                       _( "Clicking the header of the first column\n" + \
                          "will toggle all checkboxes." )
 
-        box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planet" ), PLANET_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
-
-        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
-        for starName in IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS.keys():
-            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS[ starName ] ] )
-
-        STAR_STORE_INDEX_HIDE_SHOW = 0
-        STAR_STORE_INDEX_NAME = 1
-        STAR_STORE_INDEX_TRANSLATED_NAME = 2
-        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
-        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
-            starStore.append( star )
-
-        toolTipText = _( "Check a star to display in the menu." ) + "\n\n" + \
-                      _( "Clicking the header of the first column\n" + \
-                         "will toggle all checkboxes." )
-
-        box.pack_start( self.createTreeView( starStore, toolTipText, _( "Star" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
-
-#TODO Consider combining planets/stars/comets/minor planets on same tab.  Get Oleg to check.
-        # notebook.append_page( box, Gtk.Label.new( _( "Planets / Stars" ) ) )
-
-        # Comets and minor planets.
-        # box = Gtk.Box( spacing = 20 ) #TODO Reinstate
-
-        COMET_STORE_INDEX_HIDE_SHOW = 0
-        COMET_STORE_INDEX_NAME = 1
-        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
-        for comet in sorted( self.cometData.keys(), key = str.casefold ):
-            cometStore.append( [ comet in self.comets, comet ] )
-
-        if self.cometData:
-            toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
-                          _( "Clicking the header of the first column\n" + \
-                             "will toggle all checkboxes." )
-
-        else:
-            toolTipText = _(
-                "Comet data is unavailable; the source\n" + \
-                "could not be reached, or no data was\n" + \
-                "available from the source, or the data\n" + \
-                "was completely filtered by magnitude." )
-
-        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comet" ), COMET_STORE_INDEX_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planets" ), PLANET_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
@@ -1454,10 +1410,45 @@ class IndicatorLunar( IndicatorBase ):
                 "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planet" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planets" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
 
-        # notebook.append_page( box, Gtk.Label.new( _( "Comets / Minor Planets" ) ) )
-        # notebook.append_page( box, Gtk.Label.new( _( "Planets / Minor Planets / Comets / Stars" ) ) ) #TODO If this stays, reorder the columns.
+        COMET_STORE_INDEX_HIDE_SHOW = 0
+        COMET_STORE_INDEX_NAME = 1
+        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
+        for comet in sorted( self.cometData.keys(), key = str.casefold ):
+            cometStore.append( [ comet in self.comets, comet ] )
+
+        if self.cometData:
+            toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
+                          _( "Clicking the header of the first column\n" + \
+                             "will toggle all checkboxes." )
+
+        else:
+            toolTipText = _(
+                "Comet data is unavailable; the source\n" + \
+                "could not be reached, or no data was\n" + \
+                "available from the source, or the data\n" + \
+                "was completely filtered by magnitude." )
+
+        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_NAME ), True, True, 0 )
+
+        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
+        for starName in IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS.keys():
+            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+
+        STAR_STORE_INDEX_HIDE_SHOW = 0
+        STAR_STORE_INDEX_NAME = 1
+        STAR_STORE_INDEX_TRANSLATED_NAME = 2
+        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
+        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
+            starStore.append( star )
+
+        toolTipText = _( "Check a star to display in the menu." ) + "\n\n" + \
+                      _( "Clicking the header of the first column\n" + \
+                         "will toggle all checkboxes." )
+
+        box.pack_start( self.createTreeView( starStore, toolTipText, _( "Stars" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
+
         notebook.append_page( box, Gtk.Label.new( _( "Natural Bodies" ) ) ) #TODO If this stays, reorder the columns.  
 
         # Satellites.
@@ -1517,8 +1508,10 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         box.pack_start( scrolledWindow, True, True, 0 )
 
+#TODO Keep this?
+# What about other text (to the user) like in notifications with the word 'satellite"?
         # notebook.append_page( box, Gtk.Label.new( _( "Satellites" ) ) )
-        notebook.append_page( box, Gtk.Label.new( _( "Artificial bodies" ) ) ) #TODO Keep this?  What about other text (to the user) with the word 'satellite" for use with the ISS?
+        notebook.append_page( box, Gtk.Label.new( _( "Artificial Bodies" ) ) )
 
         # Notifications (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
