@@ -211,10 +211,13 @@ class IndicatorFortune( IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Fortune File/Directory" ), Gtk.CellRendererText(), text = IndicatorFortune.COLUMN_FILE_OR_DIRECTORY )
         treeViewColumn.set_sort_column_id( 0 )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorFortune.COLUMN_ENABLED )
         treeViewColumn.set_sort_column_id( 1 )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         tree.append_column( treeViewColumn )
 
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )

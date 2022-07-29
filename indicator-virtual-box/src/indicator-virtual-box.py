@@ -362,11 +362,15 @@ class IndicatorVirtualBox( IndicatorBase ):
         treeView.set_hexpand( True )
         treeView.set_vexpand( True )
         treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ) )
-        treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorVirtualBox.COLUMN_AUTOSTART ) )
+        treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorVirtualBox.COLUMN_AUTOSTART ) ) # Column 1
         treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_START_COMMAND ) )
         treeView.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
         treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeView.connect( "row-activated", self.onVirtualMachineDoubleClick )
+        for column in treeView.get_columns():
+            column.set_expand( True )
+
+        treeView.get_column( 1 ).set_alignment( 0.5 ) # Autostart.
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( treeView )

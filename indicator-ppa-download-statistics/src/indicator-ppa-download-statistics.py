@@ -487,6 +487,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         ppaTree.set_tooltip_text( _( "Double click to edit a PPA." ) )
         ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         ppaTree.connect( "row-activated", self.onPPADoubleClick )
+        for column in ppaTree.get_columns():
+            column.set_expand( True )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -530,6 +532,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         filterTree.set_tooltip_text( _( "Double click to edit a filter." ) )
         filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
         filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
+        for column in filterTree.get_columns():
+            column.set_expand( True )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )

@@ -198,10 +198,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Calendar" ), Gtk.CellRendererText(), text = IndicatorOnThisDay.COLUMN_CALENDAR_FILE )
         treeViewColumn.set_sort_column_id( 0 )
+        treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
 
         treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
         treeViewColumn.set_sort_column_id( 1 )
+        treeViewColumn.set_expand( True )
+        treeViewColumn.set_alignment( 0.5 )
         tree.append_column( treeViewColumn )
 
         tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
