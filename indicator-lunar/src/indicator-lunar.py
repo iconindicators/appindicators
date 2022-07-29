@@ -18,58 +18,27 @@
 
 # Application indicator which displays lunar, solar, planetary, star,
 # comet, minor planet and satellite information.
-#
-# Due to suspected stale data, computing the apparent magnitude for comets and
-# minor planets is no longer reliable.  As such, comet and minor planet
-# functionality has been disabled.
 
 
-#TODO Given the MPC files for comets and minor planets cannot be used to determine apparent magnitude,
-# either drop comets and minor planets, or...
-# Find external sources (websites) which use better/reliable data to compute apparent magnitude
-# and list the currently visible comets / minor planets (along with the apparent magnitude).
-# From this list (should be at most twent/y bodies of each type), can then interrogate the MPC
-# online ephemeris service to get the orbital elements for these bodies.
-# As the CometEls.txt is a small file, could just use that...but if going to the trouble
-# for minor planets, may as well do the same for comets...and may be able to get get both in one http transfer.
+#TODO Given the MPC comet data is stale and so cannot be used to determine apparent magnitude,
+# either drop comets or find a new data source.
+# Hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
 #
-# Do we still need to save orbital elements in different formats (one for PyEphem and one for Skyfield)?
+# From Domenic Ford:
+# For comets, I use the MPC orbital elements,
+# but I download absolute magnitudes from the British Astronomical Association's Comet Section:
+# https://people.ast.cam.ac.uk/~jds/magpars.htm.
+# If a comet isn't listed on the BAA list,
+# I'm willing to use an MPC absolute magnitude,
+# but only if it predicts the comet's brightness to be fainter than mag 10.
+# If the MPC predicts a bright comet, but the BAA doesn't list it, 
+# then that seems rather suspicious and my website automatically suppresses any brightness estimates for it. 
+# Thankfully, the BAA seems extremely efficient about removing absolute magnitudes for comets that are much fainter than expected.
 #
-# Will need to save a list of the currently visible comets and minor planets (maybe keep in a single list).
-#
-# Instead of getting the list of visible comets / minor planets from one website,
-# maybe get from multiple sites and then take subset/overlap to only show those bodies
-# which are deemed visible by several sites (majority rules).
-#
-# Probably need to update the visibility list weekly at least, maybe every second day.
-# Only need the orbital elements on a weekly or even monthly basis.
-#
-# For asteroids, look at using https://asteroid.lowell.edu/main/astorb/
-#
-# For comets, hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
 # Other comet stuff:
 #    http://fg-kometen.vdsastro.de/fgk_hpe.htm
 #    https://people.ast.cam.ac.uk/~jds/
 #    https://people.ast.cam.ac.uk/~jds/magpars.htm
-
-
-#TODO Contact the astorb.dat author, explain usage and ask how long before the data goes stale,
-# firstly for use in predicting rise/set and secondly for computing apparent magnitude.
-# https://www.facebook.com/lowellobservatory
-# asteroid@lowell.edu
-# Also ask about giving them credit and suggest the text to use.
-#
-# Have sent an email, waiting for a reply...
-#
-# More thinking...
-# Can either create a filtered astorb.dat file released with the indicator,
-# and the frequency depends on the accuracy (or how quickly the data becomes stale)
-# and hopefully the Lowell email will address this.
-# An alternative is to have a script which downloads astorb.dat say weekly
-# (or whatever frequency works) and automatically filter, package into a debian source
-# and upload to Launchpad:
-#    https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa/+sourcefiles/indicator-fortune/1.0.37-1/indicator-fortune_1.0.37.orig.tar.gz
-# which the indicator can then download.  Can be easily scripted!
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
@@ -173,20 +142,10 @@ class IndicatorLunar( IndicatorBase ):
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
 #TODO Waiting on COBS.
-#
-# From Domenic Ford:
-# For comets, I use the MPC orbital elements,
-# but I download absolute magnitudes from the British Astronomical Association's Comet Section:
-# https://people.ast.cam.ac.uk/~jds/magpars.htm.
-# If a comet isn't listed on the BAA list,
-# I'm willing to use an MPC absolute magnitude,
-# but only if it predicts the comet's brightness to be fainter than mag 10.
-# If the MPC predicts a bright comet, but the BAA doesn't list it, 
-# then that seems rather suspicious and my website automatically suppresses any brightness estimates for it. 
-# Thankfully, the BAA seems extremely efficient about removing absolute magnitudes for comets that are much fainter than expected.
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-" #TODO Make sure putting in this number helps in the future!!!  
-#Put the number as a variable?
-#What happens if say comets has to change.  Does the number change for ALL of the other file types?    
+                                                                           # Put the number as a variable?
+                                                                           # What happens if say comets has to change.  
+                                                                           # Does the number change for ALL of the other file types?    
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
 
