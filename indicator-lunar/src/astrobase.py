@@ -610,6 +610,8 @@ class AstroBase( ABC ):
         return startDateTime, endDateTime
 
 
+#TODO Check if this is still correct/valid/useful.
+# There was a minor planet with no number, but the designation contained a number which may end up confusing this function.
     # Retrieve the comet's designation from the full name
     # which uniquely identifies a comet at the Minor Planet Center.
     #
@@ -657,6 +659,8 @@ class AstroBase( ABC ):
         return designation
 
 
+#TODO Check if this is still correct/valid/useful.
+# There was a minor planet with no number, but the designation contained a number which may end up confusing this function.
     # Retrieve the minor planet's designation from the full name
     # which uniquely identifies a minor planet at the Minor Planet Center.
     #
