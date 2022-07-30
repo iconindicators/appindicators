@@ -545,9 +545,9 @@ class IndicatorLunar( IndicatorBase ):
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
         self.updateMenuPlanets( menu )
-        self.updateMenuStars( menu )
-        self.updateMenuCometsMinorPlanets( menu, IndicatorLunar.astroBackend.BodyType.COMET )
         self.updateMenuCometsMinorPlanets( menu, IndicatorLunar.astroBackend.BodyType.MINOR_PLANET)
+        self.updateMenuCometsMinorPlanets( menu, IndicatorLunar.astroBackend.BodyType.COMET )
+        self.updateMenuStars( menu )
         self.updateMenuSatellites( menu, utcNow )
 
 
@@ -801,17 +801,27 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateMenuCometsMinorPlanets( self, menu, bodyType ):
-        cometsOrMinorPlanets = [ ]
-        for body in ( self.comets if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else self.minorPlanets ):
-            if self.display( bodyType, body ):
-                cometsOrMinorPlanets.append( body )
 
-        if cometsOrMinorPlanets:
+        def getBodyNamesToDisplay( bodies, bodiesData, bodyType ):
+            bodiesToDisplay = [ ]
+            for body in bodies:
+                if self.display( bodyType, body ):
+                    bodiesToDisplay.append( [ body, bodiesData[ body].getName() ] )
+
+            return bodiesToDisplay
+
+        if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
+            bodiesToDisplay = getBodyNamesToDisplay( self.comets, self.cometData, IndicatorLunar.astroBackend.BodyType.COMET )
+
+        else:
+            bodiesToDisplay = getBodyNamesToDisplay( self.minorPlanets, self.minorPlanetData, IndicatorLunar.astroBackend.BodyType.MINOR_PLANET )
+
+        if bodiesToDisplay:
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
             if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-                # TODO This hopefully can go once the comets are sorted.
+                # TODO Hopefully can replace all of this with a single URL.
                 # data = self.cometData
                 # designationFunction = IndicatorLunar.astroBackend.getDesignationComet
                 # dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
@@ -821,12 +831,12 @@ class IndicatorLunar( IndicatorBase ):
             else: # MINOR_PLANET
                 url = IndicatorLunar.SEARCH_URL_MINOR_PLANET
 
-            for name in sorted( cometsOrMinorPlanets, key = str.casefold ):
+            for internalName, displayName in sorted( bodiesToDisplay, key = lambda x: x[ 1 ].casefold() ):
                 # humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType ) #TODO Needed for comets?  If not, remove completely from orbitalelemt.py
                 # url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO  #TODO Needed for comets?
                 # self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url ) #TODO May still be needed for comets.
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + name, url + name )
-                self.updateMenuCommon( subMenu, bodyType, name, 2, url + name )
+                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + displayName, url + internalName )
+                self.updateMenuCommon( subMenu, bodyType, internalName, 2, url + internalName )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
@@ -1394,9 +1404,12 @@ class IndicatorLunar( IndicatorBase ):
 
         MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
         MINOR_PLANET_STORE_INDEX_NAME = 1
-        minorPlanetStore = Gtk.ListStore( bool, str ) # Show/hide, minor planet name.
-        for minorPlanet in sorted( self.minorPlanetData.keys(), key = str.casefold ):
-            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet ] )
+        MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME = 2
+        minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
+        dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+        for minorPlanet in sorted( self.minorPlanetData.keys() ):
+            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetData[ minorPlanet ].getName() ] )
 
         if self.minorPlanetData:
             toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
@@ -1410,13 +1423,16 @@ class IndicatorLunar( IndicatorBase ):
                 "or no data was available, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planets" ), MINOR_PLANET_STORE_INDEX_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planets" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         COMET_STORE_INDEX_HIDE_SHOW = 0
         COMET_STORE_INDEX_NAME = 1
-        cometStore = Gtk.ListStore( bool, str ) # Show/hide, comet name.
-        for comet in sorted( self.cometData.keys(), key = str.casefold ):
-            cometStore.append( [ comet in self.comets, comet ] )
+        COMET_STORE_INDEX_HUMAN_READABLE_NAME = 2
+        cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
+        dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+        for comet in sorted( self.cometData.keys() ):
+            cometStore.append( [ comet in self.comets, comet, self.cometData[ comet ].getName() ] )
 
         if self.cometData:
             toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
@@ -1430,7 +1446,8 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_NAME ), True, True, 0 )
+#TODO Hide/show
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS.keys():
@@ -1449,7 +1466,7 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( self.createTreeView( starStore, toolTipText, _( "Stars" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
-        notebook.append_page( box, Gtk.Label.new( _( "Natural Bodies" ) ) ) #TODO If this stays, reorder the columns.  
+        notebook.append_page( box, Gtk.Label.new( _( "Natural Bodies" ) ) )
 
         # Satellites.
         box = Gtk.Box()
@@ -1508,10 +1525,7 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         box.pack_start( scrolledWindow, True, True, 0 )
 
-#TODO Keep this?
-# What about other text (to the user) like in notifications with the word 'satellite"?
-        # notebook.append_page( box, Gtk.Label.new( _( "Satellites" ) ) )
-        notebook.append_page( box, Gtk.Label.new( _( "Artificial Bodies" ) ) )
+        notebook.append_page( box, Gtk.Label.new( _( "Satellites" ) ) )
 
         # Notifications (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
