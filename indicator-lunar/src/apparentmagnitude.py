@@ -117,7 +117,7 @@ def __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging =
             apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
 
             am = AM( primaryDesignation, apparentMagnitude )
-            apparentMagnitudeData[ am.getName() ] = am
+            apparentMagnitudeData[ am.getName().upper() ] = am
 
     except Exception as e:
         apparentMagnitudeData = { }
@@ -143,6 +143,6 @@ def toDictionary( text ):
         name = line[ 0 : lastComma ]
         apparentMagnitude = line[ lastComma + 1 : ]
         am = AM( name, apparentMagnitude )
-        amData[ am.getName() ] = am
+        amData[ am.getName().upper() ] = am
 
     return amData

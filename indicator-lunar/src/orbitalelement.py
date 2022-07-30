@@ -165,7 +165,7 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
                     slopeParameter ]
 
                 oe = OE( primaryDesignation, ','.join( components ), dataType )
-                orbitalElementData[ oe.getName() ] = oe
+                orbitalElementData[ oe.getName().upper() ] = oe
 
             else: #OE.DataType.SKYFIELD_MINOR_PLANET
                 components = [
@@ -215,7 +215,7 @@ def __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum,
                     ' ' * 8 ] # date last observation
 
                 oe = OE( primaryDesignation, ''.join( components ), dataType )
-                orbitalElementData[ oe.getName() ] = oe
+                orbitalElementData[ oe.getName().upper() ] = oe
 
     except Exception as e:
         orbitalElementData = { }
@@ -376,13 +376,13 @@ def toDictionary( text, dataType ):
         for line in text.splitlines():
             name = line[ nameStart : nameEnd + 1 ].strip()
             oe = OE( name, line, dataType )
-            oeData[ oe.getName() ] = oe
+            oeData[ oe.getName().upper() ] = oe
 
     elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
         for line in text.splitlines():
             name = line[ : line.find( ',' ) ].strip()
             oe = OE( name, line, dataType )
-            oeData[ oe.getName() ] = oe
+            oeData[ oe.getName().upper() ] = oe
 
     else:
         logging.error( "Unknown data type: " + str( dataType ) )
