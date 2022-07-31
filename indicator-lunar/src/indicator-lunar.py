@@ -16,29 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays lunar, solar, planetary, star,
-# comet, minor planet and satellite information.
+# Application indicator which displays lunar, solar, planetary, minor planet,
+# comet, star and satellite information.
 
 
-#TODO Given the MPC comet data is stale and so cannot be used to determine apparent magnitude,
-# either drop comets or find a new data source.
-# Hopefully will use https://cobs.si/help/cobs_api/elements_api/ with a new API on the way.
-#
-# From Domenic Ford:
-# For comets, I use the MPC orbital elements,
-# but I download absolute magnitudes from the British Astronomical Association's Comet Section:
-# https://people.ast.cam.ac.uk/~jds/magpars.htm.
-# If a comet isn't listed on the BAA list,
-# I'm willing to use an MPC absolute magnitude,
-# but only if it predicts the comet's brightness to be fainter than mag 10.
-# If the MPC predicts a bright comet, but the BAA doesn't list it, 
-# then that seems rather suspicious and my website automatically suppresses any brightness estimates for it. 
-# Thankfully, the BAA seems extremely efficient about removing absolute magnitudes for comets that are much fainter than expected.
-#
-# Other comet stuff:
-#    http://fg-kometen.vdsastro.de/fgk_hpe.htm
-#    https://people.ast.cam.ac.uk/~jds/
-#    https://people.ast.cam.ac.uk/~jds/magpars.htm
+#TODO Make sure putting the new version number into cache files helps in the future!!!  
+# Put the number as a variable?
+# What happens if say comets has to change.  
+# Does the number change for ALL of the other file types?    
 
 
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
@@ -52,9 +37,6 @@
 # If this goes ahead, consider moving the start/end hour window functionality out of each backend and into the frontend.
 # So calculate the satellite passes and screen out those not within the desired window and calculate again moving the start date/time forward to the next window.
 # Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
-
-
-#TODO If/when comets are reinstated, add text back into packaging/debian/control.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -141,11 +123,7 @@ class IndicatorLunar( IndicatorBase ):
     APPARENT_MAGNITUDE_CACHE_BASENAME = "apparentmagnitude-94-"
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
-#TODO Waiting on COBS.
-    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-" #TODO Make sure putting in this number helps in the future!!!  
-                                                                           # Put the number as a variable?
-                                                                           # What happens if say comets has to change.  
-                                                                           # Does the number change for ALL of the other file types?    
+    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-" 
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
 
@@ -179,7 +157,8 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_AZIMUTH = 2 
     SATELLITE_MENU_ALTITUDE = 3
 
-    SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Need a comet only version once comet ephemerides source is finalised.
+#TODO Ask Jure if his site can take a url with the comet designation as part of the url (like MPC), instead of only the internal id.
+    SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
     SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
@@ -196,12 +175,13 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.94",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, comet, minor planet, star and satellite information." ), #TODO Remove comets if they will not be available.
+            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
             creditz =
                 [ IndicatorLunar.astroBackend.getCredit(),
                 _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
-                _( "Satellite data by Dr T S Kelso. https://www.celestrak.com" ),
-                _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" ) ] )
+                _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" ), 
+                _( "Comet data by Comet Observation Database. https://cobs.si" ),
+                _( "Satellite data by Dr T S Kelso. https://www.celestrak.com" ) ] )
 
         self.debug = True #TODO Testing
 
