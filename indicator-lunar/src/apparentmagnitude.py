@@ -52,7 +52,7 @@ def download( isComet, apparentMagnitudeMaximum = None, logging = None ):
     logging.getLogger( "urllib3" ).propagate = False
     apparentMagnitudeData = { }
     if isComet:
-        pass #TODO Waiting on COBS.
+        pass # Nothing to do as comet data from COBS contains updated/corrected absolute magnitude data in the ephemerides.
 
     else:
         apparentMagnitudeData = __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging )

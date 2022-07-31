@@ -25,6 +25,9 @@ from urllib.request import urlopen
 import datetime, re, requests
 
 
+URL_TIMEOUT_IN_SECONDS = 20
+
+
 class OE( object ):
 
     class DataType( Enum ):
@@ -70,7 +73,7 @@ def download( dataType, apparentMagnitudeMaximum = None, logging = None ):
         oeData = __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum, logging )
 
     if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.XEPHEM_COMET:
-        pass #TODO Get data from COBS
+        oeData = __downloadFromCometObservationDatabase( dataType, apparentMagnitudeMaximum, logging )
 
     else:
         logging.error( "Unknown data type: " + str( dataType ) )
@@ -254,6 +257,43 @@ def getPackedDate( year, month, day ):
     return packedYear + packedMonth + packedDay
 
 
+# Download OE data.
+#
+# Returns a dictionary:
+#    Key: object name
+#    Value: OE object
+#
+# Otherwise, returns an empty dictionary and may write to the log.
+def __downloadFromCometObservationDatabase( dataType, apparentMagnitudeMaximum, logging = None ):
+    orbitalElementData = { }
+#TODO Wait on Jure to figure out what other params should be passed in.
+# is-observed    boolean    false    include only comets that have observations stored in COBS database
+# is-active    boolean    true    include only comets that are active in the COBS database
+
+    url = "https://cobs.si/api/elements.api?format=mpc" if dataType == OE.DataType.SKYFIELD_COMET else "https://cobs.si/api/elements.api?format=ephem"
+    try:
+        data = urlopen( url, timeout = URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
+        for i in range( 0, len( data ) ):
+            if dataType == OE.DataType.SKYFIELD_COMET:
+                nameStart = 103 - 1
+                nameEnd = 158 - 1
+                name = data[ i ][ nameStart : nameEnd + 1 ].strip()
+
+            else:
+                name = data[ i ][ : data[ i ].find( ',' ) ].strip()
+
+            oe = OE( name, data[ i ], dataType )
+            orbitalElementData[ oe.getName().upper() ] = oe
+
+    except Exception as e:
+        orbitalElementData = { }
+        if logging:
+            logging.error( "Error retrieving orbital element data from " + str( url ) )
+            logging.exception( e )
+
+    return orbitalElementData
+
+
 # No longer in use as MPC data is stale and unreliable; kept for posterity.
 #
 # Download OE data; drop bad/missing data.
@@ -266,7 +306,7 @@ def getPackedDate( year, month, day ):
 def __downloadFromMinorPlanetCenter( url, dataType, logging = None ):
     oeData = { }
     try:
-        data = urlopen( url, timeout = 20 ).read().decode( "utf8" ).splitlines() # TODO If AstroBase will be used for something else, then add the timeout back here.
+        data = urlopen( url, timeout = URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if dataType == OE.DataType.SKYFIELD_COMET:
                 # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html

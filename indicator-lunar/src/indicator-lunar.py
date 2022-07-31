@@ -179,7 +179,7 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_AZIMUTH = 2 
     SATELLITE_MENU_ALTITUDE = 3
 
-    # SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Need a comet only version once comet ephemerides source is finalised.
+    SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id=" #TODO Need a comet only version once comet ephemerides source is finalised.
     SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
@@ -286,8 +286,8 @@ class IndicatorLunar( IndicatorBase ):
             self.satellites, self.satelliteData, self.convertLocalHourToUTC( self.satelliteLimitStart ), self.convertLocalHourToUTC( self.satelliteLimitEnd ),
             self.comets, self.cometData,
             self.minorPlanets, self.minorPlanetData,
-            self.apparentMagnitudeData,
             self.magnitude,
+            self.apparentMagnitudeData,
             self.getLogging() )
 
         if self.dataPrevious is None: # Happens only on first run.
@@ -311,25 +311,17 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateData( self, utcNow ):
-#TODO Sort out comets.
         # Update comet data.
-        # if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendSkyfield:
-        #     dataType = orbitalelement.OE.DataType.SKYFIELD_COMET
-        #     magnitudeFilterAdditionalArguments = [ IndicatorLunar.astroBackend.BodyType.COMET, self.latitude, self.longitude, self.elevation, self.getLogging() ]
-        #
-        # else:
-        #     dataType = orbitalelement.OE.DataType.XEPHEM_COMET
-        #     magnitudeFilterAdditionalArguments = [ ]
-        #
-        # self.cometData, self.cacheDateTimeComet, self.downloadCountComet, self.nextDownloadTimeComet = self.__updateData( 
-        #     utcNow,
-        #     self.cacheDateTimeComet, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.COMET_CACHE_BASENAME,
-        #     orbitalelement.download, [ IndicatorLunar.COMET_DATA_URL, dataType, self.getLogging() ],
-        #     self.downloadCountComet, self.nextDownloadTimeComet,
-        #     IndicatorLunar.astroBackend.getOrbitalElementsLessThanMagnitude, magnitudeFilterAdditionalArguments )
-        #
-        # if self.cometsAddNew:
-        #     self.addNewBodies( self.cometData, self.comets )
+        self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData( 
+            utcNow, self.cometData,
+            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
+            self.downloadCountComet, self.nextDownloadTimeComet,
+            orbitalelement.download, [ IndicatorLunar.COMET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
+            orbitalelement.toText, [ ],
+            orbitalelement.toDictionary, [ IndicatorLunar.COMET_DATA_TYPE ] )
+
+        if self.cometsAddNew:
+            self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
         self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
@@ -418,37 +410,6 @@ class IndicatorLunar( IndicatorBase ):
 
         processedText = re.sub( tagRegularExpression, "", processedText ) # Remove remaining tags (not removed because they were not contained within { }).
         return processedText
-
-
-#TODO Original function...keep until comets are sorted.
-    def __updateDataORIGINAL(
-            self, utcNow,
-            cacheDateTime, cacheMaximumAge, cacheBaseName,
-            downloadDataFunction, downloadDataArguments,
-            downloadCount, nextDownloadTime,
-            magnitudeFilterFunction, magnitudeFilterAdditionalArguments ):
-
-        if utcNow < ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ):
-            data = self.readCacheBinary( cacheBaseName )
-
-        else:
-            data = { }
-            if nextDownloadTime < utcNow:
-                data = downloadDataFunction( *downloadDataArguments )
-                downloadCount += 1
-                if data:
-                    if magnitudeFilterFunction:
-                        data = magnitudeFilterFunction( utcNow, data, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, *magnitudeFilterAdditionalArguments )
-
-                    self.writeCacheBinary( cacheBaseName, data ) 
-                    downloadCount = 0
-                    cacheDateTime = self.getCacheDateTime( cacheBaseName )
-                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
- 
-                else:
-                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
- 
-        return data, cacheDateTime, downloadCount, nextDownloadTime
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -820,23 +781,15 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-                # TODO Hopefully can replace all of this with a single URL.
-                # data = self.cometData
-                # designationFunction = IndicatorLunar.astroBackend.getDesignationComet
-                # dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
-                #     if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
-                pass
-
-            else: # MINOR_PLANET
-                url = IndicatorLunar.SEARCH_URL_MINOR_PLANET
-
             for internalName, displayName in sorted( bodiesToDisplay, key = lambda x: x[ 1 ].casefold() ):
-                # humanReadableName = orbitalelement.getName( data[ name ].getData(), dataType ) #TODO Needed for comets?  If not, remove completely from orbitalelemt.py
-                # url = IndicatorLunar.SEARCH_URL_COMET_AND_MINOR_PLANET + designationFunction( humanReadableName ) #TODO  #TODO Needed for comets?
-                # self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + humanReadableName, url ) #TODO May still be needed for comets.
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + displayName, url + internalName )
-                self.updateMenuCommon( subMenu, bodyType, internalName, 2, url + internalName )
+                if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
+                    url = IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( internalName )
+
+                else:
+                    url = IndicatorLunar.SEARCH_URL_MINOR_PLANET + internalName # Designation comes directory from Lowell data so no need to .
+
+                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + displayName, url )
+                self.updateMenuCommon( subMenu, bodyType, internalName, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
 
@@ -1333,7 +1286,7 @@ class IndicatorLunar( IndicatorBase ):
         box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies greater than magnitude" ) ), False, False, 0 )
-        toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." ) #TODO Keep comets in?
+        toolTip = _( "Planets, stars, comets and minor planets\nexceeding the magnitude will be hidden." )
         spinnerMagnitude = self.createSpinButton(
             self.magnitude, int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ), int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
 
@@ -1344,7 +1297,7 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
-        # grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 ) #TODO Reinstate
+        grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 )
 
         minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
@@ -1446,7 +1399,6 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-#TODO Hide/show
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.

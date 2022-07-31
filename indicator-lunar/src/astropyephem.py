@@ -535,8 +535,8 @@ class AstroPyEphem( AstroBase ):
             satellites, satelliteData, startHour, endHour,
             comets, cometData,
             minorPlanets, minorPlanetData,
-            apparentMagnitudeData,
             apparentMagnitudeMaximum,
+            cometMinorPlanetApparentMagnitudeData,
             logging ):
 
         data = { }
@@ -553,8 +553,8 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
         AstroPyEphem.__calculatePlanets( observer, data, planets, apparentMagnitudeMaximum )
         AstroPyEphem.__calculateStars( observer, data, stars, apparentMagnitudeMaximum )
-        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.COMET, comets, cometData, apparentMagnitudeData, apparentMagnitudeMaximum )
-        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, apparentMagnitudeData, apparentMagnitudeMaximum )
+        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.COMET, comets, cometData, apparentMagnitudeMaximum, None )
+        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, apparentMagnitudeMaximum, cometMinorPlanetApparentMagnitudeData )
         AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
 
         return data
@@ -574,24 +574,6 @@ class AstroPyEphem( AstroBase ):
             float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
             float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
             _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
-
-
-#TODO Keep?
-    # @staticmethod
-    # def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, apparentMagnitudeMaximum ):
-    #     results = { }
-    #     city = ephem.city( "London" ) # Use any city; makes no difference to obtain the magnitude.
-    #     city.date = utcNow
-    #     for key in orbitalElementData:
-    #         body = ephem.readdb( orbitalElementData[ key ].getData() )
-    #         body.compute( city )
-    #
-    #         # Have found the data file may contain ***** in lieu of actual data!
-    #         bad = math.isnan( body.earth_distance ) or math.isnan( body.phase ) or math.isnan( body.size ) or math.isnan( body.sun_distance )
-    #         if not bad and body.mag >= AstroBase.MAGNITUDE_MINIMUM and body.mag <= apparentMagnitudeMaximum:
-    #             results[ key ] = orbitalElementData[ key ]
-    #
-    #     return results
 
 
     @staticmethod
@@ -679,19 +661,43 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateCometsMinorPlanets( observer, data, bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData, apparentMagnitudeMaximum ):
-        for key in cometsMinorPlanets:
-            if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
-                body = ephem.readdb( orbitalElementData[ key ].getData() )
-                body.compute( observer )
+    def __calculateCometsMinorPlanets( observer, data, bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeMaximum, apparentMagnitudeData ):
+
+        def computeBody( observer, orbitalElementData ):
+            body = ephem.readdb( orbitalElementData )
+            body.compute( observer )
+            return body
+
+
+        def isBad( body ):
+            try:
                 bad = \
                     math.isnan( body.earth_distance ) or \
                     math.isnan( body.phase ) or \
                     math.isnan( body.size ) or \
-                    math.isnan( body.sun_distance ) # Have found that data (from the MPC) may contain ***** in lieu of actual data!
+                    math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
 
-                if not bad:
-                    AstroPyEphem.__calculateCommon( data, observer, body, bodyType, key )
+            except Exception as e:
+                # Some comets with a near-parabolic orbit will trigger an error...
+                # https://github.com/brandon-rhodes/pyephem/issues/239
+                bad = True
+
+            return bad
+
+
+        if apparentMagnitudeData is None:
+            for key in cometsMinorPlanets:
+                if key in orbitalElementData:
+                    body = computeBody( observer, orbitalElementData[ key ].getData() )
+                    if not isBad( body ) and body.mag <= apparentMagnitudeMaximum:
+                        AstroPyEphem.__calculateCommon( data, observer, body, bodyType, key )
+
+        else:
+            for key in cometsMinorPlanets:
+                if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
+                    body = computeBody( observer, orbitalElementData[ key ].getData() )
+                    if not isBad( body ):
+                        AstroPyEphem.__calculateCommon( data, observer, body, bodyType, key )
 
 
     # Calculates common attributes such as rise/set date/time, azimuth/altitude.

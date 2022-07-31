@@ -298,8 +298,8 @@ class AstroBase( ABC ):
             satellites, satelliteData, startHour, endHour,
             comets, cometData,
             minorPlanets, minorPlanetData,
-            apparentMagnitudeData,
             apparentMagnitudeMaximum,
+            cometMinorPlanetApparentMagnitudeData = None,
             logging = None ):
         return { }
 
@@ -321,16 +321,6 @@ class AstroBase( ABC ):
     @staticmethod
     @abstractmethod
     def getLatitudeLongitudeElevation( city ): return 0.0, 0.0, 0.0
-
-
-#TODO Remove as no longer used?
-    # Takes a dictionary of orbital element data (for comets or minor planets),
-    # in which the key is the body name and value is the orbital element data.
-    #
-    # Returns a dictionary in which each item has an APPARENT magnitude less than or equal to the specified maximum.
-    # @staticmethod
-    # @abstractmethod
-    # def getOrbitalElementsLessThanMagnitude( utcNow, orbitalElementData, apparentMagnitudeMaximum ): return { }
 
 
     # If the minimum version of the third party library is met and available, returns None.
@@ -610,8 +600,6 @@ class AstroBase( ABC ):
         return startDateTime, endDateTime
 
 
-#TODO Check if this is still correct/valid/useful.
-# There was a minor planet with no number, but the designation contained a number which may end up confusing this function.
     # Retrieve the comet's designation from the full name
     # which uniquely identifies a comet at the Minor Planet Center.
     #
@@ -659,8 +647,6 @@ class AstroBase( ABC ):
         return designation
 
 
-#TODO Check if this is still correct/valid/useful.
-# There was a minor planet with no number, but the designation contained a number which may end up confusing this function.
     # Retrieve the minor planet's designation from the full name
     # which uniquely identifies a minor planet at the Minor Planet Center.
     #
@@ -700,4 +686,4 @@ class AstroBase( ABC ):
         else:
             designation = components[ 0 ]
 
-        return designation    
+        return designation

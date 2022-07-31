@@ -25,6 +25,9 @@
 from urllib.request import urlopen
 
 
+URL_TIMEOUT_IN_SECONDS = 20
+
+
 class TLE( object ):
     def __init__( self, title, line1, line2 ):
         self.title = title
@@ -103,7 +106,7 @@ class TLE( object ):
 def download( url, logging = None ):
     tleData = { }
     try:
-        data = urlopen( url, timeout = 20 ).read().decode( "utf8" ).splitlines()
+        data = urlopen( url, timeout = URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             if tle._isValid():
