@@ -157,7 +157,6 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_AZIMUTH = 2 
     SATELLITE_MENU_ALTITUDE = 3
 
-#TODO Ask Jure if his site can take a url with the comet designation as part of the url (like MPC), instead of only the internal id.
     SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
     SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
