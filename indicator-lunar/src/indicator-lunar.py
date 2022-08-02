@@ -1272,17 +1272,17 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
-        cometsAddNewCheckbutton.set_margin_top( 5 )
-        cometsAddNewCheckbutton.set_active( self.cometsAddNew )
-        cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
-        grid.attach( cometsAddNewCheckbutton, 0, 2, 1, 1 )
-
         minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
         minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
         minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "If checked, all minor planets are added." ) )
-        grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
+        grid.attach( minorPlanetsAddNewCheckbutton, 0, 2, 1, 1 )
+
+        cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
+        cometsAddNewCheckbutton.set_margin_top( 5 )
+        cometsAddNewCheckbutton.set_active( self.cometsAddNew )
+        cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
+        grid.attach( cometsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 5 )
@@ -1560,7 +1560,7 @@ class IndicatorLunar( IndicatorBase ):
         longitude.set_text( str( self.longitude ) )
         elevation.set_text( str( self.elevation ) )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Location" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
