@@ -24,7 +24,7 @@ def isExpired(): return getExpiry() < time.strftime( "%Y-%m-%d" )
 
 
 # Obtain the non-UK port expiration date in YYYY-MM-DD.
-def getExpiry(): return "2021-09-09"
+def getExpiry(): return "3021-09-09" #TODO Have set far in the future to get the indicator to at least run.
 
 
 def isValidPortID( portID ):

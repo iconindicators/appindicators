@@ -111,7 +111,7 @@ class IndicatorTide( IndicatorBase ):
                 menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
                 summary = _( "Error" )
                 message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
-                self.getLogging().error( message )
+                # self.getLogging().error( message ) #TODO Comment out for now...
                 Notify.Notification.new( summary, message, self.icon ).show()
 
             return self.getNextUpdateTimeInSeconds( tidalReadings )
