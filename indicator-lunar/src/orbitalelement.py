@@ -266,10 +266,9 @@ def getPackedDate( year, month, day ):
 # Otherwise, returns an empty dictionary and may write to the log.
 def __downloadFromCometObservationDatabase( dataType, apparentMagnitudeMaximum, logging = None ):
     orbitalElementData = { }
-#TODO Wait on Jure to figure out what other params should be passed in.
-# is-observed    boolean    false    include only comets that have observations stored in COBS database
-# is-active    boolean    true    include only comets that are active in the COBS database
-
+#TODO Wait on Jure to figure final API...
+# https://cobs.si/help/cobs_api/elements_api/
+# Is apparentMagnitudeMaximum needed or will I be able to filter by apparent magnitude when making the download?
     url = "https://cobs.si/api/elements.api?format=mpc" if dataType == OE.DataType.SKYFIELD_COMET else "https://cobs.si/api/elements.api?format=ephem"
     try:
         data = urlopen( url, timeout = URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
