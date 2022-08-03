@@ -72,7 +72,7 @@ def download( dataType, apparentMagnitudeMaximum = None, logging = None ):
     if dataType == OE.DataType.SKYFIELD_MINOR_PLANET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
         oeData = __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum, logging )
 
-    if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.XEPHEM_COMET:
+    elif dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.XEPHEM_COMET:
         oeData = __downloadFromCometObservationDatabase( dataType, apparentMagnitudeMaximum, logging )
 
     else:
