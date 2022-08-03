@@ -17,6 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+##############################################################################
+# NO LONGER IN USE AS UKHO IN 2021 CEASED PROVIDING DATA FOR ALL NON-UK PORTS.
+##############################################################################
+
+
 import time
 
 
@@ -24,7 +29,7 @@ def isExpired(): return getExpiry() < time.strftime( "%Y-%m-%d" )
 
 
 # Obtain the non-UK port expiration date in YYYY-MM-DD.
-def getExpiry(): return "3021-09-09" #TODO Have set far in the future to get the indicator to at least run.
+def getExpiry(): return "2021-09-09"
 
 
 def isValidPortID( portID ):
