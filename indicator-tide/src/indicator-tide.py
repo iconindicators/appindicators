@@ -44,33 +44,14 @@ class IndicatorTide( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.26",
+            version = "1.0.25",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information." ) )
 
 
     def update( self, menu ):
-        # import importlib
-        # import sys
-        
-        # from getTideDataFromBOM import GetTideDataFromBOM
-        # GetTideDataFromBOM.getTideData()
-
-
-        # module = importlib.import_module( "getTideDataFromBOM" )
-        # x = userGetTideDataFunction.getTideData()
-        # print( x )
-
-
-        # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "/home/bernard/Downloads/getTideDataFromBOM.py" )
-        
-        
-        self.userScriptPathAndFilename = "getTideDataFromBOM.py"
-        self.userScriptClassName = "lGetTideDataFromBOM"
-
         tidalReadings = [ ]
         try:
-            # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "getTideDataFromBOM.py" )
             spec = importlib.util.spec_from_file_location( self.userScriptClassName, self.userScriptPathAndFilename )
             module = importlib.util.module_from_spec( spec )
             sys.modules[ self.userScriptClassName ] = module
@@ -90,43 +71,13 @@ class IndicatorTide( IndicatorBase ):
             self.getLogging().error( "Error running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
             self.getLogging().exception( e )
 
-        # try:
-        #     dyn.mymethod() # How to check whether this exists or not
-        #     # Method exists and was used.  
-        # except AttributeError:
-        #     # Method does not exist; What now?
-
-        # spec = importlib.util.spec_from_loader( "GetTideDataFromBOM", importlib.machinery.SourceFileLoader( "GetTideDataFromBOM", "getTideDataFromBOM.py" ) )
-        # module = importlib.util.module_from_spec(spec)
-        # spec.loader.exec_module(module)
-        # sys.modules["GetTideDataFromBOM"] = module
-        # module.getTideData
-
-        # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "getTideDataFromBOM.py" )
-        # module = importlib.util.module_from_spec( spec )
-        # sys.modules[ "GetTideDataFromBOM" ] = module            
-        # spec.loader.exec_module( module )
-        # module.getTideData
-        
-        # loadedModule = spec.loader.load_module( module )
-        # klass = getattr(module, "getTideData")
-        # x = module.getTideData()
-
-        
-        # import types
-        # import importlib.machinery
-        # loader = importlib.machinery.SourceFileLoader( "getTideDataFromBOM", "getTideDataFromBOM.py" )
-        # mod = types.ModuleType( loader.name )
-        # loader.exec_module( mod )            
-        
-        
         if tidalReadings:
             self.buildMenu( menu, tidalReadings )
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available!" ) ) )
-            summary = _( "Error" )
-            message = _( "No tidal data available!" )
+            summary = _( "No tidal data available!" )
+            message = _( "Check the log in your home directory." )
             Notify.Notification.new( summary, message, self.icon ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
@@ -219,41 +170,20 @@ class IndicatorTide( IndicatorBase ):
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
-        showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
-        showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
-        showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
-
-        grid.attach( showAsSubmenusCheckbutton, 0, 0, 1, 1 )
-
-        showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
-        showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
-        showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
-        showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
-        showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
-
-        grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 1, 1, 1 )
-
-        showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
-
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label.new( _( "User script" ) ), False, False, 0 )
 
         userScriptPathAndFilename = Gtk.Entry()
         userScriptPathAndFilename.set_text( self.userScriptPathAndFilename )
         userScriptPathAndFilename.set_hexpand( True )
-        userScriptPathAndFilename.set_tooltip_text( _(
-            "Formatting options for the date:\n\n" + \
-            "    https://docs.python.org/3/library/datetime.html\n\n" + \
-            "Leave empty to reset back to default." ) ) #TODO Fix
+        userScriptPathAndFilename.set_tooltip_text( _( "Full path and filename of user's Python3 script." ) )
 
         box.pack_start( userScriptPathAndFilename, True, True, 0 )
 
-        grid.attach( box, 0, 2, 1, 1 )
+        grid.attach( box, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label.new( _( "User class" ) ), False, False, 0 )
 
@@ -261,13 +191,33 @@ class IndicatorTide( IndicatorBase ):
         userScriptClassName.set_text( self.userScriptClassName )
         userScriptClassName.set_hexpand( True )
         userScriptClassName.set_tooltip_text( _(
-            "Formatting options for the date:\n\n" + \
-            "    https://docs.python.org/3/library/datetime.html\n\n" + \
-            "Leave empty to reset back to default." ) ) #TODO Fix
+            "Class name within the user script,\n" + \
+            "which must contain the function\n\n" + \
+            "    getTideData()\n\n" + \
+            "implemented by the user to obtain\n" + \
+            "the tidal data." ) )
 
         box.pack_start( userScriptClassName, True, True, 0 )
 
-        grid.attach( box, 0, 3, 1, 1 )
+        box.set_margin_bottom( 10 )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
+        showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
+        showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
+
+        grid.attach( showAsSubmenusCheckbutton, 0, 2, 1, 1 )
+
+        showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
+        showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
+        showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
+        showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
+
+        grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 3, 1, 1 )
+
+        showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()

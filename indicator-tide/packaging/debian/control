@@ -10,5 +10,4 @@ Package: indicator-tide
 Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, python3-notify2
 Description: Application indicator which displays tidal information.
- A user can select from a list of ports from around the globe and obtain tidal
- information for up to one week in advance.
+ The end user must write a Python3 script to obtain the tidal data.

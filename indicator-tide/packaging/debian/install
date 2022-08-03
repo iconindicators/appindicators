@@ -1,8 +1,8 @@
 indicator-tide.py.desktop usr/share/applications
 src/indicatorbase.py usr/share/indicator-tide
 src/indicator-tide.py usr/share/indicator-tide
-src/ports.py usr/share/indicator-tide
 src/tide.py usr/share/indicator-tide
+src/tidedatagetterbase.py usr/share/indicator-tide
 icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/scalable/apps
 icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/apps/16
 icons/hicolor/indicator-tide.svg usr/share/icons/hicolor/apps/22
