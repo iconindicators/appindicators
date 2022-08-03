@@ -19,93 +19,50 @@
 import datetime
 
 
-class Type: H, L = range( 2 )
-
-
 class Reading( object ):
-    # portID: ID of the port/location (string).
-    # year, month, day: numerical date components for when the tide occurs (integer).
-    # hour, minute: numerical time components for when the tide occurs (integer), or optionally both None.
-    # timezone: String format +HHMM or -HHMM, only applicable when hour/minute are valid, otherwise None.
-    # levelInMetres: the (positive or negative) level of the tide in metres (float).
-    # tideType: the type of the tide.
+    # date: Date of reading, as a string.
+    # time: Time of reading, as a string.
+    # locatoin: Name of port or place.
+    # level: The tide level, as a string.
+    # isHigh: True if the tide is high; false otherwise.
     # url: The URL used to source the tide information.
-    def __init__( self, portID, year, month, day, hour, minute, timezone, levelInMetres, tideType, url ):
-        self.portID = portID
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hour
-        self.minute = minute
-        self.timezone = timezone
-        self.levelInMetres = levelInMetres
-        self.tideType = tideType
+    def __init__( self, date, time, location, isHigh, level, url ):
+        self.date = date
+        self.time = time
+        self.location = location
+        self._isHigh = isHigh
+        self.level = level
         self.url = url
 
 
-    def getPortID( self ): return self.portID
+    def getDate( self ): return self.date
 
 
-    def getYear( self ): return self.year
+    def getTime( self ): return self.time
 
 
-    def getMonth( self ): return self.month
+    def getLocation( self ): return self.location
 
 
-    def getDay( self ): return self.day
+    # Returns true if tide is high; false otherwise.
+    def isHigh( self ): return self._isHigh
 
 
-    def getHour( self ): return self.hour
-
-
-    def getMinute( self ): return self.minute
-
-
-    def getTimezone( self ): return self.timezone
-
-
-    # Returns the tide.Type for this tide.
-    def getType( self ): return self.tideType
-
-
-    # Returns the level of this tide in metres as a float.
-    def getLevelInMetres( self ): return self.levelInMetres
+    # Returns the level of this tide.
+    def getLevel( self ): return self.level
 
 
     def getURL( self ): return self.url
 
 
-    # Returns the date/time or date if time is unavailable in the port local timezone.
-    def getDateTime( self ):
-        dateTime = None
-        if self.hour is None and self.minute is None and self.timezone is None:
-            dateTime = datetime.date( self.year, self.month, self.day )
-
-        else:
-            dateString = \
-                str( self.year ) + " " + \
-                str( self.month ) +  " " + \
-                str( self.day ) +  " " + \
-                str( self.hour ) + " " + \
-                str( self.minute ) + " " + \
-                str( self.timezone )
-
-            dateTime = datetime.datetime.strptime( dateString, "%Y %m %d %H %M %z" )
-
-        return dateTime
-
-
     def __str__( self ):
         return \
-            self.portID + " | " + \
-            str( self.year ) + "-" + \
-            str( self.month ) + "-" + \
-            str( self.day ) + "-" + \
-            str( self.hour ) + "-" + \
-            str( self.minute ) + "-" + \
-            str( self.timezone ) + " | " + \
-            str( self.levelInMetres ) + " | " + \
-            ( "H" if self.tideType == Type.H else "L" )
+            self.date + " | " + \
+            self.time + " | " + \
+            self.location + " | " + \
+            str( self._isHigh ) + " | " + \
+            str( self.level ) + " | " + \
+            self.url
 
 
     def __repr__( self ): return self.__str__()
@@ -114,13 +71,9 @@ class Reading( object ):
     def __eq__( self, other ): 
         return \
             self.__class__ == other.__class__ and \
-            self.getPortID() == other.getPortID() and \
-            self.getYear() == other.getYear() and \
-            self.getMonth() == other.getMonth() and \
-            self.getDay() == other.getDay() and \
-            self.getHour() == other.getHour() and \
-            self.getMinute() == other.getMinute() and \
-            self.getTimezone() == other.getTimezone() and \
-            self.getType() == other.getType() and \
-            self.getLevelInMetres() == other.getLevelInMetres() and \
+            self.getDate() == other.getDate() and \
+            self.getTime() == other.getTime() and \
+            self.getLocation() == other.getLocation() and \
+            self.isHigh() == other.isHigh() and \
+            self.getLevel() == other.getLevel() and \
             self.getURL() == other.getURL()

@@ -58,66 +58,180 @@ import datetime, locale, ports, re, tide, time, webbrowser
 
 class IndicatorTide( IndicatorBase ):
 
-    CONFIG_MENU_ITEM_DATE_FORMAT = "menuItemDateFormat"
-    CONFIG_MENU_ITEM_TIDE_FORMAT = "menuItemTideFormat"
-    CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME = "menuItemTideFormatSansTime"
-    CONFIG_PORT_ID = "portID"
+    CONFIG_PORT_NAME = "portName"
     CONFIG_SHOW_AS_SUBMENUS = "showAsSubmenus"
     CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"
-
-    MENU_ITEM_DATE_DEFAULT_FORMAT = "%A, %d %B"
-    MENU_ITEM_TIME_DEFAULT_FORMAT = "%I:%M %p"
-    MENU_ITEM_TIDE_LEVEL_TAG = "[LEVEL]" # The level of the tide in metres.
-    MENU_ITEM_TIDE_TYPE_TAG = "[TYPE]" # The tide type, either high or low.
-    MENU_ITEM_TIDE_DEFAULT_FORMAT = MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIME_DEFAULT_FORMAT + "    " + MENU_ITEM_TIDE_LEVEL_TAG
-    MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME = MENU_ITEM_TIDE_TYPE_TAG + "    " + MENU_ITEM_TIDE_LEVEL_TAG
-
-    CACHE_BASENAME = "tidal-" #TODO If tidal data is ever found and this indicator rises from the ashes, add a ".txt" to the and of the cache files.
-    CACHE_MAXIMUM_AGE_HOURS = 24
-
-    COMMENTS_LINE_FIRST = _( "Displays tidal information." )
-    COMMENTS_LINE_LAST = _( "Port data is licensed and will expire after {0}." ).format( ports.getExpiry() )
+    CONFIG_USER_SCRIPT_PATH_AND_FILENAME = "userScriptPathAndFilename"
+    CONFIG_USER_SCRIPT_CLASSNAME = "userScriptClassname"
 
 
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.25",
+            version = "1.0.26",
             copyrightStartYear = "2015",
-            comments = IndicatorTide.COMMENTS_LINE_FIRST + '\n' + IndicatorTide.COMMENTS_LINE_LAST,
-            creditz = [
-                _( "© Crown Copyright and/or database rights.\nReproduced by permission of the\nController of Her Majesty’s Stationery Office and the\nUK Hydrographic Office. https://www.GOV.uk/UKHO" ),
-                _( "Click on any menu item to display the ‘Admiralty EasyTide’\nport page to verify the results produced." ) ] )
+            comments = _( "Displays tidal information." ) )
 
 
     def update( self, menu ):
-        if ports.isExpired():
-            message = _( "The license for tidal port data has expired; please upgrade to the latest version of the indicator." )
-            Notify.Notification.new( _( "License has expired" ), message, self.icon ).show()
-            self.getLogging().warning( message )
-            Gtk.main_quit()
+        # import importlib
+        # import sys
+        
+        # from getTideDataFromBOM import GetTideDataFromBOM
+        # GetTideDataFromBOM.getTideData()
+
+
+        # module = importlib.import_module( "getTideDataFromBOM" )
+        # x = userGetTideDataFunction.getTideData()
+        # print( x )
+
+
+        import importlib.util, sys
+        spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "getTideDataFromBOM.py" )
+        module = importlib.util.module_from_spec( spec )
+        sys.modules[ "GetTideDataFromBOM" ] = module
+        spec.loader.exec_module( module )
+        klazz = getattr( module, "GetTideDataFromBOM" )
+        tidalReadings = klazz.getTideData( self.getLogging() )
+
+        # try:
+        #     dyn.mymethod() # How to check whether this exists or not
+        #     # Method exists and was used.  
+        # except AttributeError:
+        #     # Method does not exist; What now?
+
+        # spec = importlib.util.spec_from_loader( "GetTideDataFromBOM", importlib.machinery.SourceFileLoader( "GetTideDataFromBOM", "getTideDataFromBOM.py" ) )
+        # module = importlib.util.module_from_spec(spec)
+        # spec.loader.exec_module(module)
+        # sys.modules["GetTideDataFromBOM"] = module
+        # module.getTideData
+
+        # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "getTideDataFromBOM.py" )
+        # module = importlib.util.module_from_spec( spec )
+        # sys.modules[ "GetTideDataFromBOM" ] = module            
+        # spec.loader.exec_module( module )
+        # module.getTideData
+        
+        # loadedModule = spec.loader.load_module( module )
+        # klass = getattr(module, "getTideData")
+        # x = module.getTideData()
+
+        
+        # import types
+        # import importlib.machinery
+        # loader = importlib.machinery.SourceFileLoader( "getTideDataFromBOM", "getTideDataFromBOM.py" )
+        # mod = types.ModuleType( loader.name )
+        # loader.exec_module( mod )            
+        
+        
+        if tidalReadings:
+            self.buildMenu( menu, tidalReadings )
 
         else:
-            tidalReadings = self.getTidalData( self.portID )
-            if tidalReadings:
-                self.buildMenu( menu, tidalReadings )
-                message = _( "Tidal data is presented in the time zone of the port." )
-                if not self.tidalReadingsAreAllDateTimes( tidalReadings ):
-                    message = _( "Tidal data is presented in your local time zone." )
+            menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available!" ) ) )
+            summary = _( "Error" )
+            message = _( "No tidal data available!" )
+            self.getLogging().error( message )
+            Notify.Notification.new( summary, message, self.icon ).show()
 
-                self.setAboutComments( IndicatorTide.COMMENTS_LINE_FIRST + '\n' + message + '\n' + IndicatorTide.COMMENTS_LINE_LAST )
+        # return self.getNextUpdateTimeInSeconds( tidalReadings )
 
-            else:
-                menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) ) ) )
-                summary = _( "Error" )
-                message = _( "No tidal data available for {0}!" ).format( ports.getPortName( self.portID ) )
-                # self.getLogging().error( message ) #TODO Comment out for now...
-                Notify.Notification.new( summary, message, self.icon ).show()
 
-            return self.getNextUpdateTimeInSeconds( tidalReadings )
-
+# Tue 2 Aug | 5:13 am | False | 0.14 m | file:///home/bernard/Downloads/tide.html, 
+# Tue 2 Aug | 11:25 am | True | 1.27 m | file:///home/bernard/Downloads/tide.html, 
+# Tue 2 Aug | 5:09 pm | False | 0.31 m | file:///home/bernard/Downloads/tide.html, 
+# Tue 2 Aug | 11:23 pm | True | 1.48 m | file:///home/bernard/Downloads/tide.html, 
+# Wed 3 Aug | 5:51 am | False | 0.15 m | file:///home/bernard/Downloads/tide.html, 
+# Wed 3 Aug | 12:09 pm | True | 1.31 m | file:///home/bernard/Downloads/tide.html, 
+# Wed 3 Aug | 6:00 pm | False | 0.34 m | file:///home/bernard/Downloads/tide.html, 
+# Thu 4 Aug | 12:10 am | True | 1.39 m | file:///home/bernard/Downloads/tide.html, 
+# Thu 4 Aug | 6:33 am | False | 0.18 m | file:///home/bernard/Downloads/tide.html, 
+# Thu 4 Aug | 12:58 pm | True | 1.36 m | file:///home/bernard/Downloads/tide.html, 
+# Thu 4 Aug | 7:00 pm | False | 0.37 m | file:///home/bernard/Downloads/tide.html, Fri 5 Aug | 1:03 am | True | 1.29 m | file:///home/bernard/Downloads/tide.html, Fri 5 Aug | 7:20 am | False | 0.24 m | file:///home/bernard/Downloads/tide.html, Fri 5 Aug | 1:52 pm | True | 1.43 m | file:///home/bernard/Downloads/tide.html, Fri 5 Aug | 8:06 pm | False | 0.40 m | file:///home/bernard/Downloads/tide.html, Sat 6 Aug | 2:07 am | True | 1.22 m | file:///home/bernard/Downloads/tide.html, Sat 6 Aug | 8:12 am | False | 0.30 m | file:///home/bernard/Downloads/tide.html, Sat 6 Aug | 2:52 pm | True | 1.51 m | file:///home/bernard/Downloads/tide.html, Sat 6 Aug | 9:22 pm | False | 0.40 m | file:///home/bernard/Downloads/tide.html, Sun 7 Aug | 3:20 am | True | 1.18 m | file:///home/bernard/Downloads/tide.html, Sun 7 Aug | 9:11 am | False | 0.36 m | file:///home/bernard/Downloads/tide.html, Sun 7 Aug | 3:55 pm | True | 1.61 m | file:///home/bernard/Downloads/tide.html, Sun 7 Aug | 10:38 pm | False | 0.36 m | file:///home/bernard/Downloads/tide.html, Mon 8 Aug | 4:33 am | True | 1.20 m | file:///home/bernard/Downloads/tide.html, Mon 8 Aug | 10:15 am | False | 0.39 m | file:///home/bernard/Downloads/tide.html, Mon 8 Aug | 4:57 pm | True | 1.73 m | file:///home/bernard/Downloads/tide.html, Mon 8 Aug | 11:45 pm | False | 0.29 m | file:///home/bernard/Downloads/tide.html]
 
     def buildMenu( self, menu, tidalReadings ):
+        indent = "" 
+        self.portName = tidalReadings[ 0 ].getLocation()
+        self.portName = ""
+        if self.portName:
+            self.__createAndAppendMenuItemNEW( menu, self.portName, tidalReadings[ 0 ].getURL() )
+            indent = self.getMenuIndent( 1 )
+
+        url = tidalReadings[ 0 ].getURL()
+        if not self.showAsSubMenus:
+            if self.showAsSubMenusExceptFirstDay:
+                firstDateTidalReadings, afterFirstDateTidalReadings = self.splitTidalReadingsAfterFirstDate( tidalReadings )
+                self.__createMenuFlat( firstDateTidalReadings, menu, indent )
+                self.__createMenuSub( afterFirstDateTidalReadings, menu, indent )
+
+            else:
+                self.__createMenuSub( tidalReadings, menu, indent )
+
+        else:
+            self.__createMenuFlat( tidalReadings, menu, indent )
+
+
+    def __createMenuFlat( self, tidalReadings, menu, indent ):
+        todayDate = ""
+        shownToday = False
+        for tidalReading in tidalReadings:
+            if todayDate != tidalReading.getDate():
+                shownToday = False
+        
+            menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime()
+            if shownToday:
+                self.__createAndAppendMenuItemNEW( menu, menuText, tidalReading.getURL() )
+        
+            else:
+                self.__createAndAppendMenuItemNEW( menu, indent + tidalReading.getDate(), tidalReading.getURL() )
+                self.__createAndAppendMenuItemNEW( menu, menuText, tidalReading.getURL() )
+                todayDate = tidalReading.getDate()
+                shownToday = True
+
+
+    def __createMenuSub( self, tidalReadings, menu, indent ):
+        todayDate = ""
+        shownToday = False
+        for tidalReading in tidalReadings:
+            if todayDate != tidalReading.getDate():
+                shownToday = False
+
+            menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime()
+            if shownToday:
+                self.__createAndAppendMenuItemNEW( subMenu, menuText, tidalReading.getURL() )
+
+            else:
+                subMenu = Gtk.Menu()
+                self.__createAndAppendMenuItemNEW( menu, indent + tidalReading.getDate(), None ).set_submenu( subMenu )
+                self.__createAndAppendMenuItemNEW( subMenu, menuText, tidalReading.getURL() )
+                todayDate = tidalReading.getDate()
+                shownToday = True
+
+
+    def __createAndAppendMenuItemNEW( self, menu, menuItemText, url ):
+        menuItem = Gtk.MenuItem.new_with_label( menuItemText )
+        menu.append( menuItem )
+        if url is not None:
+            menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
+            menuItem.set_name( url )
+
+        return menuItem
+
+
+    def splitTidalReadingsAfterFirstDate( self, tidalReadings ):
+        firstDateReadings = [ ]
+        afterFirstDateReadings = [ ]
+        for tidalReading in tidalReadings:
+            if tidalReading.getDate() == tidalReadings[ 0 ].getDate():
+                firstDateReadings.append( tidalReading )
+
+            else:
+                afterFirstDateReadings.append( tidalReading )
+
+        return firstDateReadings, afterFirstDateReadings
+
+
+    def buildMenuORIGINAL( self, menu, tidalReadings ):
         menuItemText = _( "{0}, {1}" ).format( ports.getPortName( self.portID ), ports.getCountry( self.portID ) )
         self.__createAndAppendMenuItem( menu, menuItemText, tidalReadings[ 0 ].getURL() )
 
@@ -413,219 +527,20 @@ class IndicatorTide( IndicatorBase ):
         portsTree.scroll_to_cell( Gtk.TreePath.new_from_string( portIndex ) )
 
 
-    def getTidalData( self, portID ):
-        self.flushCache( IndicatorTide.CACHE_BASENAME, IndicatorTide.CACHE_MAXIMUM_AGE_HOURS )
-#TODO readCacheBinary no longer exists...change to a text based file.
-        tidalReadings = self.readCacheBinary( IndicatorTide.CACHE_BASENAME ) # Either valid or None; empty data is never cached.
-        if tidalReadings:
-            tidalReadings = self.removeTidalReadingsPriorToToday( tidalReadings )
-            if not tidalReadings:
-                tidalReadings = None
-
-        # Ensure the port ID is the same as that in the cached data.
-        if tidalReadings:
-            for tidalReading in list( tidalReadings ):
-                if portID != tidalReading.getPortID():
-                    tidalReadings.remove( tidalReading )
-
-            if not tidalReadings:
-                tidalReadings = None
-
-        if tidalReadings is None: # There was no cached version or the cached version was stale; either way, need to do a download.
-            tidalReadings = self.removeTidalReadingsPriorToToday( self.__getTidalDataFromUnitedKingdomHydrographicOffice( portID ) ) # Either empty or non-empty.
-            if tidalReadings:
-#TODO writeCacheBinary no longer exists...change to a text based file.
-                self.writeCacheBinary( IndicatorTide.CACHE_BASENAME, tidalReadings )
-
-        return tidalReadings
-
-
-    def __getTidalDataFromUnitedKingdomHydrographicOffice( self, portID ):
-        if portID[ -1 ].isalpha():
-            portIDForURL = portID[ 0 : -1 ].rjust( 4, "0" ) + portID[ -1 ]
-
-        else:
-            portIDForURL = portID.rjust( 4, "0" )
-
-        # Port IDs for testing...
-        #    LW time missing: 1800, 1894A, 3983
-        #    HW/LW time missing: 2168, 5088
-        #    HW/LW reading is missing: 0839
-        #    LW time/reading is missing: 4000, 3578
-        #    HW/LW reading is missing; LW time is missing: 4273
-        #    LW reading is negative: 1411
-        #    UTC offset negative: 2168
-        #    UTC offset positive: 4000
-
-        url = \
-            "http://www.ukho.gov.uk/easytide/EasyTide/ShowPrediction.aspx?PortID=" + portIDForURL + \
-            "&PredictionLength=7&DaylightSavingOffset=0&PrinterFriendly=True&HeightUnits=0&GraphSize=7"
-
-        defaultLocale = locale.getlocale( locale.LC_TIME )
-        locale.setlocale( locale.LC_TIME, "POSIX" ) # Used to convert the date in English to a DateTime object when in a non-English locale.
-
-        try:
-            tidalReadings = [ ]
-            levelPositivePattern = re.compile( "^[0-9]\.[0-9]" )
-            levelNegativePattern = re.compile( "^-?[0-9]\.[0-9]" )
-            hourMinutePattern = re.compile( "^[0-9][0-9]:[0-9][0-9]" )
-            lines = urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
-            for index, line in enumerate( lines ): # The tidal data is presented in date/time order.
-
-                if "Port predictions" in line: # Tidal dateTimes are in the standard local time of the port - need to obtain the UTC offset for the port in the format +HHMM or -HHMM.
-                    if "equal to UTC" in line: # Example: "Port predictions (Standard Local Time) are equal to UTC"
-                        utcOffset = "+0000"
-
-                    elif "hour from UTC" in line or "hours from UTC" in line:
-                        utcOffset = line[ line.index( "are" ) + 4 : line.index( "hour" ) - 1 ]
-                        if len( utcOffset ) == 3: # Example: "Port predictions (Standard Local Time) are +10 hours from UTC"
-                            utcOffset += "00"
-
-                        else:
-                            utcOffset = utcOffset[ 0 ] + "0" + utcOffset[ 1 ] + "00" # Example: "Port predictions (Standard Local Time) are -3 hours from UTC"
-
-                    elif "mins from UTC" in line:
-                        hours = line[ line.index( "are" ) + 4 : line.index( "hours" ) - 1 ]
-                        if len( hours ) == 2:
-                            hours = hours[ 0 ] + "0" + hours[ 1 ]
-
-                        minutes = line[ line.index( "hours" ) + 6 : line.index( "mins" ) - 1 ]
-                        utcOffset = hours + minutes
-
-                    else:
-                        raise ValueError( "Unable to obtain UTC from '" + line + "' in " + url )
-
-                if "PredictionSummary1_lblPredictionStart" in line:
-                    startDate = line[ line.index( "Today" ) + len( "Today - " ) : line.index( "<small>" ) ].strip().split() # Monday 17th July 2017 (standard local time of the port)
-                    year = startDate[ 3 ] # 2017
-                    startMonth = str( datetime.datetime.strptime( startDate[ 2 ], "%B" ).month ) # 7
-
-                if "HWLWTableHeaderCell" in line:
-                    date = line[ line.find( ">" ) + 1 : line.find( "</th>" ) ] # Mon 17 Jul (standard local time)
-                    dayOfMonth = date[ 4 : 6 ] # 17
-                    month = str( datetime.datetime.strptime( date[ -3 : ], "%b" ).month ) # 7
-                    if month == "1" and startMonth == "12": # Account for the year change when rolling from December to January.
-                        year = str( int( year ) + 1 )
-                        startMonth = 1 # Set to January to stop the year from incrementing on each subsequent iteration.
-
-                    types = [ ]
-                    line = lines[ index + 2 ]
-                    for item in line.split( "<th class=\"HWLWTableHWLWCellPrintFriendly\">" ):
-                        if len( item.strip() ) > 0:
-                            if item[ 0 ] == "H":
-                                types.append( tide.Type.H )
-
-                            elif item[ 0 ] == "L":
-                                types.append( tide.Type.L )
-
-                            else:
-                                raise ValueError( "Unknown type '" + item[ 0 ] + "' in " + url )
-
-                    dateTimes = [ ]
-                    line = lines[ index + 4 ]
-                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
-                        if len( item.strip() ) > 0:
-                            hourMinute = item.strip()[ 0 : 5 ]
-                            if hourMinutePattern.match( hourMinute ):
-                                dateTimes.append( datetime.datetime.strptime( year + " " + month +  " " + dayOfMonth +  " " + hourMinute + " " + utcOffset, "%Y %m %d %H:%M %z" ) )
-
-                            else:
-                                dateTimes.append( datetime.date( int( year ), int( month ), int( dayOfMonth ) ) ) # When no time is present, just add the date.
-
-                    levels = [ ]
-                    line = lines[ index + 6 ]
-                    for item in line.split( "<td class=\"HWLWTableCellPrintFriendly\">" ):
-                        if len( item.strip() ) > 0:
-                            if levelPositivePattern.match( item ):
-                                levels.append( float( item[ 0 : 3 ] ) )
-
-                            elif levelNegativePattern.match( item ):
-                                levels.append( float( item[ 0 : 4 ] ) )
-
-                            else:
-                                levels.append( None )
-
-                    for index, tideType in enumerate( types ):
-                        if levels[ index ] is None and isinstance( dateTimes[ index ], datetime.date ):
-                            continue # Drop a tidal reading if missing both the time and level.
-
-                        # As some ports only have the date component (no time is specified),
-                        # can only store date/time in the port local timezone (rather than say, UTC).
-                        if isinstance( dateTimes[ index ], datetime.datetime ):
-                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, dateTimes[ index ].hour, dateTimes[ index ].minute, dateTimes[ index ].tzname()[ 3 : 6 ] + dateTimes[ index ].tzname()[ 7 : ], levels[ index ], tideType, url ) )
-
-                        else:
-                            tidalReadings.append( tide.Reading( portID, dateTimes[ index ].year, dateTimes[ index ].month, dateTimes[ index ].day, None, None, None, levels[ index ], tideType, url ) )
-
-        except Exception as e:
-            self.getLogging().exception( e )
-            self.getLogging().error( "Error retrieving/parsing tidal data from " + str( url ) )
-            tidalReadings = [ ]
-
-        locale.setlocale( locale.LC_TIME, defaultLocale )
-
-        return tidalReadings
-
-
-    # If all tidal readings comprise both a date and time, convert each reading to user local date and time,
-    # then remove a reading if prior to user local today.
-    #
-    # Otherwise, tidal readings contain a mix of date and date/time or are date only.
-    # Compare each reading to UTC midnight date only and remove if older.
-    def removeTidalReadingsPriorToToday( self, tidalReadings ):
-        if self.tidalReadingsAreAllDateTimes( tidalReadings ):
-            todayLocalMidnight = datetime.datetime.now( datetime.timezone.utc ).astimezone().replace( hour = 0, minute = 0, second = 0 )
-            for tidalReading in list( tidalReadings ):
-                if tidalReading.getDateTime().astimezone() < todayLocalMidnight:
-                    tidalReadings.remove( tidalReading )
-
-        else:
-            utcMidnightDate = datetime.datetime.utcnow().replace( hour = 0, minute = 0, second = 0 ).date()
-            for tidalReading in list( tidalReadings ):
-                if isinstance( tidalReading.getDateTime(), datetime.datetime ):
-                    theDate = tidalReading.getDateTime().date()
-
-                else:
-                    theDate = tidalReading.getDateTime()
-
-                if theDate < utcMidnightDate:
-                    tidalReadings.remove( tidalReading )
-
-        return tidalReadings
-
-
     def loadConfig( self, config ):
-        self.menuItemDateFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT, IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT )
-        self.menuItemTideFormat = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT )
-        self.menuItemTideFormatSansTime = config.get( IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME, IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT_SANS_TIME )
-        self.portID = config.get( IndicatorTide.CONFIG_PORT_ID, None )
+        self.portName = config.get( IndicatorTide.CONFIG_PORT_NAME, "" ) #TODO Is "" okay for default?
         self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
         self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
-
-        # Validate the port...
-        if not ports.isValidPortID( self.portID ):
-            try: # Set a geographically sensible default...
-                timezone = self.processGet( "cat /etc/timezone" )
-                country = timezone[ 0 : timezone.find( "/" ) ]
-
-            except Exception as e:
-                self.getLogging().exception( e )
-                self.getLogging().error( "Error getting country/city from timezone." )
-                country = ""
-
-            self.portID = ports.getPortIDForCountry( country )
-            if self.portID is None:
-                self.portID = ports.getFirstPortID()
 
 
     def saveConfig( self ):
         return {
-            IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT : self.menuItemDateFormat,
-            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT : self.menuItemTideFormat,
-            IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME : self.menuItemTideFormatSansTime,
-            IndicatorTide.CONFIG_PORT_ID : self.portID,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.showAsSubMenus,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.showAsSubMenusExceptFirstDay
+            # IndicatorTide.CONFIG_MENU_ITEM_DATE_FORMAT : self.menuItemDateFormat,
+            # IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT : self.menuItemTideFormat,
+            # IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME : self.menuItemTideFormatSansTime,
+            # IndicatorTide.CONFIG_PORT_ID : self.portID,
+            # IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.showAsSubMenus,
+            # IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.showAsSubMenusExceptFirstDay
         }
 
 
