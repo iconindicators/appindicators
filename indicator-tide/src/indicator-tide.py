@@ -65,21 +65,29 @@ class IndicatorTide( IndicatorBase ):
         # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "/home/bernard/Downloads/getTideDataFromBOM.py" )
         
         
-        self.userScriptPathAndFilename = "agetTideDataFromBOM.py"
-        self.userScriptClassName = "GetTideDataFromBOM"
+        self.userScriptPathAndFilename = "getTideDataFromBOM.py"
+        self.userScriptClassName = "lGetTideDataFromBOM"
 
         tidalReadings = [ ]
         try:
-            # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "agetTideDataFromBOM.py" )
+            # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "getTideDataFromBOM.py" )
             spec = importlib.util.spec_from_file_location( self.userScriptClassName, self.userScriptPathAndFilename )
             module = importlib.util.module_from_spec( spec )
-            sys.modules[ "GetTideDataFromBOM" ] = module
+            sys.modules[ self.userScriptClassName ] = module
             spec.loader.exec_module( module )
-            klazz = getattr( module, "GetTideDataFromBOM" )
+            klazz = getattr( module, self.userScriptClassName )
             tidalReadings = klazz.getTideData( self.getLogging() )
 
+        except FileNotFoundError as e:
+            self.getLogging().error( "Could not find user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
+            self.getLogging().exception( e )
+
+        except AttributeError as e:
+            self.getLogging().error( "Could not find class in user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
+            self.getLogging().exception( e )
+
         except Exception as e:
-            self.getLogging().error( "Error loading/running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
+            self.getLogging().error( "Error running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
             self.getLogging().exception( e )
 
         # try:
