@@ -30,14 +30,14 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 
-import datetime, importlib.util, sys, webbrowser
+import datetime, importlib.util, os, sys, webbrowser
 
 
 class IndicatorTide( IndicatorBase ):
 
     CONFIG_SHOW_AS_SUBMENUS = "showAsSubmenus"
     CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"
-    CONFIG_USER_SCRIPT_MODLUE_NAME = "userScriptModuleName"
+    CONFIG_USER_SCRIPT_CLASS_NAME = "userScriptClassName"
     CONFIG_USER_SCRIPT_PATH_AND_FILENAME = "userScriptPathAndFilename"
 
 
@@ -62,12 +62,25 @@ class IndicatorTide( IndicatorBase ):
         # print( x )
 
 
-        spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "/home/bernard/Downloads/getTideDataFromBOM.py" )
-        module = importlib.util.module_from_spec( spec )
-        sys.modules[ "GetTideDataFromBOM" ] = module
-        spec.loader.exec_module( module )
-        klazz = getattr( module, "GetTideDataFromBOM" )
-        tidalReadings = klazz.getTideData( self.getLogging() )
+        # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "/home/bernard/Downloads/getTideDataFromBOM.py" )
+        
+        
+        self.userScriptPathAndFilename = "agetTideDataFromBOM.py"
+        self.userScriptClassName = "GetTideDataFromBOM"
+
+        tidalReadings = [ ]
+        try:
+            # spec = importlib.util.spec_from_file_location( "GetTideDataFromBOM", "agetTideDataFromBOM.py" )
+            spec = importlib.util.spec_from_file_location( self.userScriptClassName, self.userScriptPathAndFilename )
+            module = importlib.util.module_from_spec( spec )
+            sys.modules[ "GetTideDataFromBOM" ] = module
+            spec.loader.exec_module( module )
+            klazz = getattr( module, "GetTideDataFromBOM" )
+            tidalReadings = klazz.getTideData( self.getLogging() )
+
+        except Exception as e:
+            self.getLogging().error( "Error loading/running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
+            self.getLogging().exception( e )
 
         # try:
         #     dyn.mymethod() # How to check whether this exists or not
@@ -106,10 +119,12 @@ class IndicatorTide( IndicatorBase ):
             menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available!" ) ) )
             summary = _( "Error" )
             message = _( "No tidal data available!" )
-            self.getLogging().error( message )
             Notify.Notification.new( summary, message, self.icon ).show()
 
-        return self.getNextUpdateTimeInSeconds( tidalReadings )
+        # Update a little after midnight...best guess as to when the user's data source will update.
+        now = datetime.datetime.now()
+        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+        return ( fiveMinutesAfterMidnight - now ).total_seconds()
 
 
     def buildMenu( self, menu, tidalReadings ):
@@ -122,7 +137,7 @@ class IndicatorTide( IndicatorBase ):
         url = tidalReadings[ 0 ].getURL()
         if self.showAsSubMenus:
             if self.showAsSubMenusExceptFirstDay:
-                firstDateTidalReadings, afterFirstDateTidalReadings = self.splitTidalReadingsAfterFirstDate( tidalReadings )
+                firstDateTidalReadings, afterFirstDateTidalReadings = self.__splitTidalReadingsAfterFirstDate( tidalReadings )
                 self.__createMenuFlat( firstDateTidalReadings, menu, indent )
                 self.__createMenuSub( afterFirstDateTidalReadings, menu, indent )
 
@@ -180,7 +195,7 @@ class IndicatorTide( IndicatorBase ):
         return menuItem
 
 
-    def splitTidalReadingsAfterFirstDate( self, tidalReadings ):
+    def __splitTidalReadingsAfterFirstDate( self, tidalReadings ):
         firstDateReadings = [ ]
         afterFirstDateReadings = [ ]
         for tidalReading in tidalReadings:
@@ -191,13 +206,6 @@ class IndicatorTide( IndicatorBase ):
                 afterFirstDateReadings.append( tidalReading )
 
         return firstDateReadings, afterFirstDateReadings
-
-
-    def getNextUpdateTimeInSeconds( self, tidalReadings ):
-        # Update a little after midnight...best guess as to when the user's data source will update.
-        now = datetime.datetime.now()
-        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
-        return ( fiveMinutesAfterMidnight - now ).total_seconds()
 
 
     def onPreferences( self, dialog ):
@@ -221,112 +229,68 @@ class IndicatorTide( IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
-        
+
         box.pack_start( Gtk.Label.new( _( "User script" ) ), False, False, 0 )
-        
-        userScript = Gtk.Entry()
-        # userScript.set_text( self.menuItemDateFormat )
-        userScript.set_hexpand( True )
-        userScript.set_tooltip_text( _(
+
+        userScriptPathAndFilename = Gtk.Entry()
+        userScriptPathAndFilename.set_text( self.userScriptPathAndFilename )
+        userScriptPathAndFilename.set_hexpand( True )
+        userScriptPathAndFilename.set_tooltip_text( _(
             "Formatting options for the date:\n\n" + \
             "    https://docs.python.org/3/library/datetime.html\n\n" + \
             "Leave empty to reset back to default." ) ) #TODO Fix
 
-        box.pack_start( userScript, True, True, 0 )
+        box.pack_start( userScriptPathAndFilename, True, True, 0 )
 
         grid.attach( box, 0, 2, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
-        
+
         box.pack_start( Gtk.Label.new( _( "User class" ) ), False, False, 0 )
-        
-        userClass = Gtk.Entry()
-        # userClass.set_text( self.menuItemDateFormat )
-        userClass.set_hexpand( True )
-        userClass.set_tooltip_text( _(
+
+        userScriptClassName = Gtk.Entry()
+        userScriptClassName.set_text( self.userScriptClassName )
+        userScriptClassName.set_hexpand( True )
+        userScriptClassName.set_tooltip_text( _(
             "Formatting options for the date:\n\n" + \
             "    https://docs.python.org/3/library/datetime.html\n\n" + \
             "Leave empty to reset back to default." ) ) #TODO Fix
 
-        box.pack_start( userClass, True, True, 0 )
+        box.pack_start( userScriptClassName, True, True, 0 )
 
         grid.attach( box, 0, 3, 1, 1 )
-
-        # label = Gtk.Label.new( _( "Tide format" ) )
-        # label.set_margin_top( 10 )
-        # label.set_halign( Gtk.Align.START )
-        #
-        # grid.attach( label, 0, 3, 1, 1 )
-        #
-        # box = Gtk.Box( spacing = 6 )
-        # box.set_margin_left( self.INDENT_WIDGET_LEFT )
-        #
-        # box.pack_start( Gtk.Label.new( _( "Default" ) ), False, False, 0 )
-        #
-        # tideFormat = Gtk.Entry()
-        # tideFormat.set_text( self.menuItemTideFormat )
-        # tideFormat.set_hexpand( True )
-        # tideFormat.set_tooltip_text( _(
-        #     "Tide information is specified using:\n\n" + \
-        #     "    {0} - the tide is high or low.\n" + \
-        #     "    {1} - the tide level, measured in metres.\n\n" + \
-        #     "Formatting options for the time:\n\n" + \
-        #     "    https://docs.python.org/3/library/datetime.html\n\n" + \
-        #     "Leave empty to reset back to default." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
-        # box.pack_start( tideFormat, True, True, 0 )
-        #
-        # grid.attach( box, 0, 4, 1, 1 )
-        #
-        # box = Gtk.Box( spacing = 6 )
-        # box.set_margin_left( self.INDENT_WIDGET_LEFT )
-        #
-        # box.pack_start( Gtk.Label.new( _( "Missing time" ) ), False, False, 0 )
-        #
-        # tideFormatSansTime = Gtk.Entry()
-        # tideFormatSansTime.set_text( self.menuItemTideFormatSansTime )
-        # tideFormatSansTime.set_hexpand( True )
-        # tideFormatSansTime.set_tooltip_text( _(
-        #     "Tide information is specified using:\n\n" + \
-        #     "    {0} - the tide is high or low.\n" + \
-        #     "    {1} - the tide level, measured in metres.\n\n" + \
-        #     "This format is used when there is no time\n" + \
-        #     "component in a tide reading.\n\n" + \
-        #     "Leave empty to reset back to default." ).format( IndicatorTide.MENU_ITEM_TIDE_TYPE_TAG, IndicatorTide.MENU_ITEM_TIDE_LEVEL_TAG ) )
-        # box.pack_start( tideFormatSansTime, True, True, 0 )
-        #
-        # grid.attach( box, 0, 5, 1, 1 )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
-        responseType = dialog.run()
-        if responseType == Gtk.ResponseType.OK:
-            country = countriesComboBox.get_active_text()
-            model, treeiter = portsTree.get_selection().get_selected()
-            port = model[ treeiter ][ COLUMN_PORT ]
-            self.portID = ports.getPortIDForCountryAndPortName( country, port )
-            self.showAsSubMenus = showAsSubmenusCheckbutton.get_active()
-            self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbutton.get_active()
+        while True:
+            responseType = dialog.run()
+            if responseType == Gtk.ResponseType.OK:
+                self.showAsSubMenus = showAsSubmenusCheckbutton.get_active()
+                self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbutton.get_active()
 
-            if userScript.get_text():
-                self.menuItemDateFormat = userScript.get_text()
+                if userScriptPathAndFilename.get_text() and userScriptClassName.get_text():
+                    if not os.path.isfile( userScriptPathAndFilename.get_text().strip() ):
+                        self.showMessage( dialog, _( "The user script path/filename cannot be found." ) )
+                        userScriptPathAndFilename.grab_focus()
+                        continue
 
-            else:
-                self.menuItemDateFormat = IndicatorTide.MENU_ITEM_DATE_DEFAULT_FORMAT
+                elif userScriptPathAndFilename.get_text() or userScriptClassName.get_text(): # Cannot have one empty and the other not.
+                    if not userScriptPathAndFilename.get_text():
+                        self.showMessage( dialog, _( "The user script path/filename cannot be empty." ) )
+                        userScriptPathAndFilename.grab_focus()
+                        continue
 
+                    else:
+                        self.showMessage( dialog, _( "The user script class name cannot be empty." ) )
+                        userScriptClassName.grab_focus()
+                        continue
 
-            if tideFormat.get_text():
-                self.menuItemTideFormat = tideFormat.get_text()
+                self.userScriptPathAndFilename = userScriptPathAndFilename.get_text().strip()
+                self.userScriptClassName = userScriptClassName.get_text().strip()
 
-            else:
-                self.menuItemTideFormat = IndicatorTide.MENU_ITEM_TIDE_DEFAULT_FORMAT
-
-            if tideFormatSansTime.get_text():
-                self.menuItemTideFormatSansTime = tideFormatSansTime.get_text()
-
-            else:
-                self.menuItemTideFormatSansTime = IndicatorTide.CONFIG_MENU_ITEM_TIDE_FORMAT_SANS_TIME
+            break
 
         return responseType
 
@@ -335,14 +299,14 @@ class IndicatorTide( IndicatorBase ):
         self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
         self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
         self.userScriptPathAndFilename = config.get( IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME, "" )
-        self.userScriptModuleName = config.get( IndicatorTide.CONFIG_USER_SCRIPT_MODLUE_NAME, "" )
+        self.userScriptClassName = config.get( IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME, "" )
 
 
     def saveConfig( self ):
         return {
             IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.showAsSubMenus,
             IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.showAsSubMenusExceptFirstDay,
-            IndicatorTide.CONFIG_USER_SCRIPT_MODLUE_NAME : self.userScriptModuleName,
+            IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME : self.userScriptClassName,
             IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME : self.userScriptPathAndFilename
         }
 
