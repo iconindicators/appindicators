@@ -114,7 +114,7 @@ class IndicatorTide( IndicatorBase ):
             if todayDate != tidalReading.getDate():
                 shownToday = False
         
-            menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime()
+            menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime() + "  " + tidalReading.getLevel()
             if shownToday:
                 self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )
         
@@ -132,7 +132,7 @@ class IndicatorTide( IndicatorBase ):
             if todayDate != tidalReading.getDate():
                 shownToday = False
 
-            menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime()
+            menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime() + "  " + tidalReading.getLevel()
             if shownToday:
                 self.__createAndAppendMenuItem( subMenu, menuText, tidalReading.getURL() )
 
