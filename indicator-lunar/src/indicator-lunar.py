@@ -102,7 +102,6 @@ class IndicatorLunar( IndicatorBase ):
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
     EXTENSION_SVG = ".svg"
-    EXTENSION_TEXT = ".txt"
 
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
@@ -293,7 +292,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update comet data.
         self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData( 
             utcNow, self.cometData,
-            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
+            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountComet, self.nextDownloadTimeComet,
             orbitalelement.download, [ IndicatorLunar.COMET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
             orbitalelement.toText, [ ],
@@ -305,7 +304,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update minor planet data.
         self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
             utcNow, self.minorPlanetData,
-            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
+            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
             orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
             orbitalelement.toText, [ ],
@@ -317,7 +316,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update minor planet apparent magnitudes.
         self.apparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
             utcNow, self.apparentMagnitudeData,
-            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
+            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
             apparentmagnitude.download, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
             apparentmagnitude.toText, [ ],
@@ -326,7 +325,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update satellite data.
         self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData( 
             utcNow, self.satelliteData,
-            IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS, IndicatorLunar.EXTENSION_TEXT,
+            IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
             twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
             twolineelement.toText, [ ],
@@ -394,7 +393,7 @@ class IndicatorLunar( IndicatorBase ):
     # Get the data from the cache, or if stale, download from the source.
     def __updateData(
             self, utcNow, data,
-            cacheBaseName, cacheMaximumAge, cacheExtension,
+            cacheBaseName, cacheMaximumAge,
             downloadCount, nextDownloadTime,
             downloadDataFunction, downloadDataArguments,
             toTextFunction, toTextAdditionalArgunemts,
@@ -405,7 +404,7 @@ class IndicatorLunar( IndicatorBase ):
             if nextDownloadTime < utcNow: # Download is allowed (will not annoy data supplier).
                 downloadedData = downloadDataFunction( *downloadDataArguments )
                 if downloadedData:
-                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName, cacheExtension )
+                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName )
                     downloadCount = 0
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
                     data = downloadedData
@@ -416,7 +415,7 @@ class IndicatorLunar( IndicatorBase ):
 
         else:
             if not data:
-                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName, cacheExtension ), *toObjectAdditionalArgunemts )
+                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName ), *toObjectAdditionalArgunemts )
 
         return data, downloadCount, nextDownloadTime
 
@@ -500,7 +499,7 @@ class IndicatorLunar( IndicatorBase ):
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
-        svgIconText = self.createIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
+        svgIconText = self.getSVGIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
         iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
@@ -525,7 +524,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def createFullMoonIcon( self ):
         return self.writeCacheTextWithTimestamp(
-            self.createIconText( 100, None ),
+            self.getSVGIconText( 100, None ),
             IndicatorLunar.ICON_CACHE_BASENAME,
             IndicatorLunar.EXTENSION_SVG )
 
@@ -1132,7 +1131,7 @@ class IndicatorLunar( IndicatorBase ):
     #
     #    brightLimbAngleInDegrees The angle of the bright limb, relative to zenith, ranging from 0 to 360 inclusive.
     #                             Ignored if illuminationPercentage is 0 or 100.
-    def createIconText( self, illuminationPercentage, brightLimbAngleInDegrees ):
+    def getSVGIconText( self, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # Ensure the icon takes up most of the viewing area with a small boundary.
