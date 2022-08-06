@@ -151,6 +151,9 @@ def convert( inFile, outFile ):
     fOut.close()
 
 
+#TODO Look for argparse in https://rhodesmill.org/skyfield/kepler-orbits.html and see if it's worth switching.
+
+
 if __name__ == "__main__":
     if len( sys.argv ) != 3:
         message = \
