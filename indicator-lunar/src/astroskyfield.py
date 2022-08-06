@@ -680,7 +680,7 @@ class AstroSkyfield( AstroBase ):
         AstroSkyfield.__calculateCometsMinorPlanets(
             now, nowPlusThirtySixHours, data, timeScale, locationAtNow,
             AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData,
-            apparentMagnitudeMaximum, apparentMagnitudeData,
+            apparentMagnitudeMaximum, cometMinorPlanetApparentMagnitudeData,
             logging )
 
         AstroSkyfield.__calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHour, endHour )
@@ -728,7 +728,9 @@ class AstroSkyfield( AstroBase ):
     def __calculateMoon( now, nowPlusThirtySixHours, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
 
-        illumination = int( locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] ).fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
+        moonAtNow = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] )
+
+        illumination = int( moonAtNow.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
@@ -740,9 +742,8 @@ class AstroSkyfield( AstroBase ):
             moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
-        moonAltAz = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] ).apparent().altaz()
         sunAltAz = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAltAz, sunAltAz ).radians ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAtNow.apparent().altaz(), sunAltAz ).radians ) # Needed for icon.
 
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusThirtySixHours,
@@ -840,9 +841,12 @@ class AstroSkyfield( AstroBase ):
             apparentMagnitudeMaximum, apparentMagnitudeData,
             logging ):
 
-#TODO Need to handle for comets when apparentMagnitudeData = None
+#TODO Need to figure out what to pass in to determine whether apparent magnitude is supplied
+# and if not, which magnitude model to use.
 
-        # Skyfield loads orbital element data into a dataframe from a file; write the orbital element data to a memory file object.
+        # Skyfield loads orbital element data into a dataframe from a file; 
+        # as the orbital element data is already in memory,
+        # write the orbital element data to a memory file object.
         with io.BytesIO() as f:
             if apparentMagnitudeData is None:
                 for key in cometsMinorPlanets:
@@ -859,7 +863,7 @@ class AstroSkyfield( AstroBase ):
             if bodyType == AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
-                message = "Error computing apparent magnitude for comet: "
+                message = "Error computing apparent magnitude for comet: " #TODO Try and move this into the exception clause.
 
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f )
@@ -867,11 +871,18 @@ class AstroSkyfield( AstroBase ):
                 message = "Error computing apparent magnitude for minor planet: "
 
         dataframe = dataframe.set_index( "designation", drop = False )
-
         alt, az, earthSunDistance = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
         sunAtNow = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ].at( now )
         for name, row in dataframe.iterrows():
-            body = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            try:
+                if "1P/Halley" not in name:
+                    continue
+                body = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            except Exception as e:
+                print( e )
+                continue
+                
+                
             if apparentMagnitudeData is None:
                 ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
                 ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
@@ -882,6 +893,8 @@ class AstroSkyfield( AstroBase ):
 # when the comet data is converted from MPC to XEphem, 
 # the magnitude and slope parameters is HG.
 # But according to XEphem doc, for 'e', HG is used by default unless there is a 'g' or 'H', for 'p' and 'h', always use g,k.
+# Maybe not a good idea to assume the source of the data...
+# ...so instead if no apparent magnitude is passed in, perhaps pass in a flag as to the magnitude model to use?
                     if bodyType == AstroBase.BodyType.COMET:
                         apparentMagnitude = AstroBase.getApparentMagnitude_gk(
                             row[ "magnitude_g" ], row[ "magnitude_k" ],
