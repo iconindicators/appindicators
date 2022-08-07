@@ -552,8 +552,17 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
         AstroPyEphem.__calculatePlanets( observer, data, planets, apparentMagnitudeMaximum )
         AstroPyEphem.__calculateStars( observer, data, stars, apparentMagnitudeMaximum )
-        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData, apparentMagnitudeMaximum )
-        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData, apparentMagnitudeMaximum )
+
+        AstroPyEphem.__calculateCometsMinorPlanets(
+            observer, data,
+            AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
+            apparentMagnitudeMaximum )
+
+        AstroPyEphem.__calculateCometsMinorPlanets(
+            observer, data,
+            AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
+            apparentMagnitudeMaximum )
+
         AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
 
         return data
