@@ -190,7 +190,7 @@ class IndicatorLunar( IndicatorBase ):
         self.data = None
         self.dataPrevious = None
 
-        self.apparentMagnitudeData = {} # Key: minor planet designation; Value apparentmagnitude.AM object.  Can be empty but never None.
+        self.minorPlanetApparentMagnitudeData = { } # Key: minor planet designation; Value apparentmagnitude.AM object.  Can be empty but never None.
         self.cometData = { } # Key: comet name; Value: orbitalelement.OE object.  Can be empty but never None.
         self.minorPlanetData = { } # Key: minor planet name; Value: orbitalelement.OE object.  Can be empty but never None.
         self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
@@ -262,10 +262,9 @@ class IndicatorLunar( IndicatorBase ):
             self.planets,
             self.stars,
             self.satellites, self.satelliteData, self.convertLocalHourToUTC( self.satelliteLimitStart ), self.convertLocalHourToUTC( self.satelliteLimitEnd ),
-            self.comets, self.cometData,
-            self.minorPlanets, self.minorPlanetData,
+            self.comets, self.cometData, None,
+            self.minorPlanets, self.minorPlanetData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
-            self.apparentMagnitudeData,
             self.getLogging() )
 
         if self.dataPrevious is None: # Happens only on first run.
@@ -314,8 +313,8 @@ class IndicatorLunar( IndicatorBase ):
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
-        self.apparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
-            utcNow, self.apparentMagnitudeData,
+        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
+            utcNow, self.minorPlanetApparentMagnitudeData,
             IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
             apparentmagnitude.download, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],

@@ -533,10 +533,9 @@ class AstroPyEphem( AstroBase ):
             planets,
             stars,
             satellites, satelliteData, startHour, endHour,
-            comets, cometData,
-            minorPlanets, minorPlanetData,
+            comets, cometData, cometApparentMagnitudeData,
+            minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
-            cometMinorPlanetApparentMagnitudeData,
             logging ):
 
         data = { }
@@ -553,8 +552,8 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateSun( ephemNow, observer, data )
         AstroPyEphem.__calculatePlanets( observer, data, planets, apparentMagnitudeMaximum )
         AstroPyEphem.__calculateStars( observer, data, stars, apparentMagnitudeMaximum )
-        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.COMET, comets, cometData, apparentMagnitudeMaximum, None )
-        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, apparentMagnitudeMaximum, cometMinorPlanetApparentMagnitudeData )
+        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData, apparentMagnitudeMaximum )
+        AstroPyEphem.__calculateCometsMinorPlanets( observer, data, AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData, apparentMagnitudeMaximum )
         AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
 
         return data
@@ -661,7 +660,7 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateCometsMinorPlanets( observer, data, bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeMaximum, apparentMagnitudeData ):
+    def __calculateCometsMinorPlanets( observer, data, bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData, apparentMagnitudeMaximum ):
 
         def computeBody( observer, orbitalElementData ):
             body = ephem.readdb( orbitalElementData )

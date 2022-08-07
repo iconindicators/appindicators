@@ -296,10 +296,9 @@ class AstroBase( ABC ):
             planets,
             stars,
             satellites, satelliteData, startHour, endHour,
-            comets, cometData,
-            minorPlanets, minorPlanetData,
+            comets, cometData, cometApparentMagnitudeData,
+            minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
-            cometMinorPlanetApparentMagnitudeData = None,
             logging = None ):
         return { }
 

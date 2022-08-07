@@ -648,10 +648,9 @@ class AstroSkyfield( AstroBase ):
             planets,
             stars,
             satellites, satelliteData, startHour, endHour,
-            comets, cometData,
-            minorPlanets, minorPlanetData,
+            comets, cometData, cometApparentMagnitudeData,
+            minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
-            cometMinorPlanetApparentMagnitudeData,
             logging ):
 
         data = { }
@@ -673,14 +672,14 @@ class AstroSkyfield( AstroBase ):
 
         AstroSkyfield.__calculateCometsMinorPlanets(
             now, nowPlusThirtySixHours, data, timeScale, locationAtNow,
-            AstroBase.BodyType.COMET, comets, cometData,
-            apparentMagnitudeMaximum, None,
+            AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
+            apparentMagnitudeMaximum,
             logging )
 
         AstroSkyfield.__calculateCometsMinorPlanets(
             now, nowPlusThirtySixHours, data, timeScale, locationAtNow,
-            AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData,
-            apparentMagnitudeMaximum, cometMinorPlanetApparentMagnitudeData,
+            AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
+            apparentMagnitudeMaximum,
             logging )
 
         AstroSkyfield.__calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHour, endHour )
@@ -837,12 +836,9 @@ class AstroSkyfield( AstroBase ):
     def __calculateCometsMinorPlanets(
             now, nowPlusThirtySixHours, 
             data, timeScale, locationAtNow,
-            bodyType, cometsMinorPlanets, orbitalElementData,
-            apparentMagnitudeMaximum, apparentMagnitudeData,
+            bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData,
+            apparentMagnitudeMaximum,
             logging ):
-
-#TODO Need to figure out what to pass in to determine whether apparent magnitude is supplied
-# and if not, which magnitude model to use.
 
         # Skyfield loads orbital element data into a dataframe from a file; 
         # as the orbital element data is already in memory,
@@ -874,15 +870,8 @@ class AstroSkyfield( AstroBase ):
         alt, az, earthSunDistance = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
         sunAtNow = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ].at( now )
         for name, row in dataframe.iterrows():
-            try:
-                if "1P/Halley" not in name:
-                    continue
-                body = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            except Exception as e:
-                print( e )
-                continue
-                
-                
+            body = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+
             if apparentMagnitudeData is None:
                 ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
                 ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
@@ -895,6 +884,19 @@ class AstroSkyfield( AstroBase ):
 # But according to XEphem doc, for 'e', HG is used by default unless there is a 'g' or 'H', for 'p' and 'h', always use g,k.
 # Maybe not a good idea to assume the source of the data...
 # ...so instead if no apparent magnitude is passed in, perhaps pass in a flag as to the magnitude model to use?
+#
+# Comparing
+    # https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt
+# or
+    # https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
+# with
+    # https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+# it is clear the values for absolute magnitudes are the same for a given comet.
+# Given that the XEphem values have a g preceeding,
+# that implies the MPC format for comets should use the gk apparent magnitude model.
+#
+# Given that minor planet data is now sourced from Lowell
+# would still be nice to determine if the HG or gk model should be used (when no apparent magnitude data is passed in).
                     if bodyType == AstroBase.BodyType.COMET:
                         apparentMagnitude = AstroBase.getApparentMagnitude_gk(
                             row[ "magnitude_g" ], row[ "magnitude_k" ],
