@@ -356,15 +356,19 @@ class AstroBase( ABC ):
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
-        # Have seen the division resolve to a number greater than 1 in the fifth or sixth decimal place which throws
+        # The division may result in a number greater than 1 in the fifth or sixth decimal place
+        # and when the arccos is executed, throws:
+        #
         #    'ValueError: math domain error'
-        # when arccos is executed.  A solution posted in
+        #
+        # A solution posted in
         #
         #    https://math.stackexchange.com/questions/4060964/floating-point-division-resulting-in-a-value-exceeding-1-but-should-be-equal-to
         #
         # suggests setting an upper bound to the division with a value +/- 1.0.
         # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero and the immediate logarithm is undefined!
-        # Not really sure what can be done, or should be done; leave things as they are and catch the error/exception.
+        # Not really sure what can be done, or should be done;
+        # leave things as they are and the caller can catch the error/exception.
         numerator = \
             bodySunDistanceAU * bodySunDistanceAU + \
             bodyEarthDistanceAU * bodyEarthDistanceAU - \
