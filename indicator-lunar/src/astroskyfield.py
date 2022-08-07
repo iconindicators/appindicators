@@ -876,41 +876,32 @@ class AstroSkyfield( AstroBase ):
                 ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
                 ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
                 try:
-#TODO Need to check this logic now...will comet always use gk and minor planet always use HG?  Ask Jure about comets.
-# According to
-# https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
-# when the comet data is converted from MPC to XEphem, 
-# the magnitude and slope parameters is HG.
-# But according to XEphem doc, for 'e', HG is used by default unless there is a 'g' or 'H', for 'p' and 'h', always use g,k.
-# Maybe not a good idea to assume the source of the data...
-# ...so instead if no apparent magnitude is passed in, perhaps pass in a flag as to the magnitude model to use?
-#
-# Comparing
-    # https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt
-# or
-    # https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
-# with
-    # https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
-# it is clear the values for absolute magnitudes are the same for a given comet.
-# Given that the XEphem values have a g preceeding,
-# that implies the MPC format for comets should use the gk apparent magnitude model.
-#
-# Given that minor planet data is now sourced from Lowell
-# would still be nice to determine if the HG or gk model should be used (when no apparent magnitude data is passed in).
                     if bodyType == AstroBase.BodyType.COMET:
+                        # Comparing
+                        #    https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt
+                        # and
+                        #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
+                        # with
+                        #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+                        # it is clear the values for absolute magnitudes are the same for a given comet.
+                        # Given that the XEphem values are preceded by a 'g',
+                        # the MPC format for comets should use the gk apparent magnitude model.
                         apparentMagnitude = AstroBase.getApparentMagnitude_gk(
                             row[ "magnitude_g" ], row[ "magnitude_k" ],
                             earthBodyDistance.au, sunBodyDistance.au )
 
                     else:
+                        # According to the format, use the HG apparent magnitude model:
+                        #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
                         apparentMagnitude = AstroBase.getApparentMagnitude_HG(
                             row[ "magnitude_H" ], row[ "magnitude_G" ],
                             earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
-                    if apparentMagnitude and apparentMagnitude <= magnitudeMaximum:
+                    if apparentMagnitude <= magnitudeMaximum:
                         AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, ( bodyType, name ), locationAtNow, ephemerisPlanets, body )
 
                 except Exception as e:
+                    message = "Error computing apparent magnitude for " + ( "comet: " if bodyType == AstroBase.BodyType.COMET else "minor planet: " )
                     logging.error( message + name )
                     logging.exception( e )
 
