@@ -1,16 +1,16 @@
 indicator-tide (1.0.25-1) bionic; urgency=low
 
-  * Around the middle of 2021, the UKHO reduced their coverage to only
-    provide tidal data for UK ports.  As no other source for global tidal
-    readings could be found, the indicator has been radically overhauled.
-    The end user must now write their own Python3 script which downloads or
-    otherwise acquires tidal data and passes that data back to the indicator.
-    Please see the file 'tidedatagetterbase.py' typically located in your
-    installation directory /usr/share/indicator-tide as an example.  Your
-    Python3 script must extend the base class 'TideDataGetterBase' and then
-    implement the function 'getTideData' which will obtain your tidal data and
-    return a list of 'tide.Reading' objects.  Specify the script path/name and
-    the class name in the Preferences.
+  * Around the middle of 2021, the UKHO reduced their coverage of tidal data
+    from globally to only UK ports.  As no other source for global tidal
+    data has been found, the indicator has been radically overhauled.
+    The end user must now write a Python3 script which downloads/obtains tidal
+    data and pass that data back to the indicator.
+    See the file 'tidedatagetterbase.py' located in the installation directory
+    (typically /usr/share/indicator-tide) as an example.
+    Your script must extend the base class 'TideDataGetterBase' and implement
+    the function 'getTideData' to obtain your tidal data, returning a list of
+    'tide.Reading' objects.
+    Specify the script path/name and the class name in the Preferences.
   * Update release to bionic as xenial is end of life.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 4 Aug 2022 13:36:11 +1000
