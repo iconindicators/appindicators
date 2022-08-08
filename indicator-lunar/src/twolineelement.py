@@ -110,7 +110,7 @@ def download( url, logging = None ):
         for i in range( 0, len( data ), 3 ):
             tle = TLE( data[ i ].strip(), data[ i + 1 ].strip(), data[ i + 2 ].strip() )
             if tle._isValid():
-                tleData[ ( tle.getNumber() ) ] = tle
+                tleData[ tle.getNumber() ] = tle
 
             else:
                 if logging:
