@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-from tide import Reading, Type
+from tide import Reading
 
 import unittest
 
@@ -10,53 +10,38 @@ import unittest
 class Test( unittest.TestCase ):
 
     def testReading( self ):
-        portID = "1234"
-        year = 2021
-        month = 11
-        day = 22
-        hour = 10
-        minute = 30
-        timezone = "+1030"
-        levelInMetres = 1.23
-        tideType = Type.H
+        date = "Tuesday August 9"
+        time = "5:40 am"
+        location = "Fort Denison, Sydney, Australia"
+        level = "1.25 m"
+        isHigh = True
         url = "http://www.url.com"
 
-        myReading = Reading( portID, year, month, day, hour, minute, timezone, levelInMetres, tideType, url )
+        myReading = Reading( date, time, location, isHigh, level, url )
 
-        self.assertAlmostEqual( myReading.getPortID(), portID )
-        self.assertAlmostEqual( myReading.getYear(), year )
-        self.assertAlmostEqual( myReading.getMonth(), month )
-        self.assertAlmostEqual( myReading.getDay(), day  )
-        self.assertAlmostEqual( myReading.getHour(), hour )
-        self.assertAlmostEqual( myReading.getMinute(), minute )
-        self.assertAlmostEqual( myReading.getTimezone(), timezone )
-        self.assertAlmostEqual( myReading.getLevelInMetres(), levelInMetres )
-        self.assertAlmostEqual( myReading.getType(), tideType )
+        self.assertAlmostEqual( myReading.getDate(), date )
+        self.assertAlmostEqual( myReading.getTime(), time )
+        self.assertAlmostEqual( myReading.getLocation(), location )
+        self.assertAlmostEqual( myReading.isHigh(), isHigh )
+        self.assertAlmostEqual( myReading.getLevel(), level )
         self.assertAlmostEqual( myReading.getURL(), url )
 
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour, minute, timezone, levelInMetres, tideType, url ) ), True )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date, time, location,isHigh, level, url ) ), True )
 
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID + " ", year, month, day, hour, minute, timezone, levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year + 1, month, day, hour, minute, timezone, levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month + 1, day, hour, minute, timezone, levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day + 1, hour, minute, timezone, levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour + 1, minute, timezone, levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour, minute + 1, timezone, levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour, minute, timezone + " ", levelInMetres, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour, minute, timezone, levelInMetres + 1.0, tideType, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour, minute, timezone, levelInMetres, Type.L, url ) ), False )
-        self.assertAlmostEqual( myReading.__eq__( Reading( portID, year, month, day, hour, minute, timezone, levelInMetres, tideType, url + " " ) ), False )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date + " ", time, location, isHigh, level, url ) ), False )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date, time + " ", location, isHigh, level, url ) ), False )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date, time, location + " ", isHigh, level, url ) ), False )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date, time, location, not isHigh, level, url ) ), False )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date, time, location, isHigh, level + " ", url ) ), False )
+        self.assertAlmostEqual( myReading.__eq__( Reading( date, time, location, isHigh, level, url + " " ) ), False )
 
         readingString = \
-            portID + " | " + \
-            str( year ) + "-" + \
-            str( month ) + "-" + \
-            str( day ) + "-" + \
-            str( hour ) + "-" + \
-            str( minute ) + "-" + \
-            str( timezone ) + " | " + \
-            str( levelInMetres ) + " | " + \
-            "H"
+            date + " | " + \
+            time + " | " + \
+            location + " | " + \
+            str( isHigh ) + " | " + \
+            level + " | " + \
+            url
 
         self.assertAlmostEqual( myReading.__str__(), readingString )
 

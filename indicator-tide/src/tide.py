@@ -22,7 +22,7 @@ import datetime
 class Reading( object ):
     # date: Date of reading, as a string.
     # time: Time of reading, as a string.
-    # locatoin: Name of port or place.
+    # location: Name of port or place.
     # level: The tide level, as a string.
     # isHigh: True if the tide is high; false otherwise.
     # url: The URL used to source the tide information.
