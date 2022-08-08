@@ -859,12 +859,10 @@ class AstroSkyfield( AstroBase ):
             if bodyType == AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
-                message = "Error computing apparent magnitude for comet: " #TODO Try and move this into the exception clause.
 
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f )
                 orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
-                message = "Error computing apparent magnitude for minor planet: "
 
         dataframe = dataframe.set_index( "designation", drop = False )
         alt, az, earthSunDistance = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
@@ -878,11 +876,14 @@ class AstroSkyfield( AstroBase ):
                 try:
                     if bodyType == AstroBase.BodyType.COMET:
                         # Comparing
+                        #
                         #    https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt
-                        # and
                         #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
+                        #
                         # with
+                        #
                         #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
+                        #
                         # it is clear the values for absolute magnitudes are the same for a given comet.
                         # Given that the XEphem values are preceded by a 'g',
                         # the MPC format for comets should use the gk apparent magnitude model.
@@ -891,8 +892,11 @@ class AstroSkyfield( AstroBase ):
                             earthBodyDistance.au, sunBodyDistance.au )
 
                     else:
-                        # According to the format, use the HG apparent magnitude model:
+                        # According to the format,
+                        #
                         #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
+                        #
+                        # use the HG apparent magnitude model:
                         apparentMagnitude = AstroBase.getApparentMagnitude_HG(
                             row[ "magnitude_H" ], row[ "magnitude_G" ],
                             earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
@@ -901,8 +905,8 @@ class AstroSkyfield( AstroBase ):
                         AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, ( bodyType, name ), locationAtNow, ephemerisPlanets, body )
 
                 except Exception as e:
-                    message = "Error computing apparent magnitude for " + ( "comet: " if bodyType == AstroBase.BodyType.COMET else "minor planet: " )
-                    logging.error( message + name )
+                    message = "Error computing apparent magnitude for " + ( "comet: " if bodyType == AstroBase.BodyType.COMET else "minor planet: " ) + name
+                    logging.error( message )
                     logging.exception( e )
 
             else:
