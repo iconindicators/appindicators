@@ -97,8 +97,8 @@ def processAndWriteOneLine( line, outputFile ):
             outputFile.write( ','.join( components ) + '\n' )
 
 
-def convert( inFile, hasHeader, outFile ):
-    print( inFile, hasHeader, outFile )
+def convert( inFile, header, outFile ):
+    print( inFile, header, outFile )
     if True: return
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
@@ -108,7 +108,7 @@ def convert( inFile, hasHeader, outFile ):
 
     fOut = open( outFile, 'w' )
 
-    if hasHeader:
+    if header:
         endOfHeader = False
         for line in fIn:
             if endOfHeader:
@@ -126,32 +126,14 @@ def convert( inFile, hasHeader, outFile ):
 
 
 if __name__ == "__main__":
-    # if len( sys.argv ) != 4:
-    #     message = \
-    #         "Usage:" + \
-    #         "\n python3 " + Path(__file__).name + " fileToConvert header=TRUE outputFile" + \
-    #         "\n python3 " + Path(__file__).name + " fileToConvert header=FALSE outputFile" + \
-    #         "\n\nFor example:" + \
-    #         "\n  python3  " + Path(__file__).name + " MPCORB.DAT header=TRUE mpcorb.edb" + \
-    #         "\n  python3  " + Path(__file__).name + " MPCORB.DAT.gz header=TRUE mpcorb.edb" + \
-    #         "\n  python3  " + Path(__file__).name + " NEA.txt header=FALSE NEA.edb" + \
-    #         "\n  python3  " + Path(__file__).name + " PHA.txt header=FALSE PHA.edb" + \
-    #         "\n  python3  " + Path(__file__).name + " DAILY.DAT header=FALSE DAILY.edb" + \
-    #         "\n  python3  " + Path(__file__).name + " Distant.txt header=FALSE Distant.edb" + \
-    #         "\n  python3  " + Path(__file__).name + " Unusual.txt header=FALSE Unusual.edb"
-    #
-    #     raise SystemExit( message )
-    # convert( sys.argv[ 1 ], True if sys.argv[ 2 ].casefold() == "header=TRUE".casefold() else False, sys.argv[ 3 ] )
-    
-
     parser = argparse.ArgumentParser(
         description = "Convert a minor planet text file such as MPCORB.DAT or MPCORB.DAT.gz from MPC to XEphem format. " + \
         "If the file ends in '.gz' the file will be treated as a gzip file; otherwise the file is assumed to be text." )
     parser.add_argument( "inFile", help = "File to convert" )
     parser.add_argument(
-        "--hasHeader",
+        "--header",
         action = "store_true",
         help = "Only specify this option if the file to convert contains a header, such as MPCORB.DAT or MPCORB.DAT.gz." )
     parser.add_argument( "outFile", help = "Output file to be created" )
     args = parser.parse_args()
-    convert( args.inFile, args.hasHeader, args.outFile )
+    convert( args.inFile, args.header, args.outFile )

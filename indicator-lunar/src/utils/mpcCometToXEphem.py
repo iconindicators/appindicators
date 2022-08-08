@@ -124,15 +124,6 @@ def convert( inFile, outFile ):
 
 
 if __name__ == "__main__":
-    # if len( sys.argv ) != 3:
-    #     message = \
-    #         "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
-    #         "\n\nFor example:" + \
-    #         "\n  python3  " + Path(__file__).name + " CometEls.txt CometEls.edb"
-    #
-    #     raise SystemExit( message )
-    #
-    # convert( sys.argv[ 1 ], sys.argv[ 2 ] )
     parser = argparse.ArgumentParser( description = "Convert a comet text file such as CometEls.txt from MPC to XEphem format." )
     parser.add_argument( "inFile", help = "File to convert" )
     parser.add_argument( "outFile", help = "Output file to be created" )
