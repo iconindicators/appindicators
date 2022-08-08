@@ -25,9 +25,7 @@
 #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 
 
-from pathlib import Path
-
-import gzip, sys
+import argparse, gzip
 
 
 # https://www.minorplanetcenter.net/iau/info/PackedDates.html
@@ -151,17 +149,23 @@ def convert( inFile, outFile ):
     fOut.close()
 
 
-#TODO Look for argparse in https://rhodesmill.org/skyfield/kepler-orbits.html and see if it's worth switching.
-
-
 if __name__ == "__main__":
-    if len( sys.argv ) != 3:
-        message = \
-            "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
-            "\n\nFor example:" + \
-            "\n  python3  " + Path(__file__).name + " astorb.dat astorb.txt" + \
-            "\n  python3  " + Path(__file__).name + " astorb.dat.gz astorb.txt"
+#     if len( sys.argv ) != 3:
+#         message = \
+#             "Usage: python3 " + Path(__file__).name + " fileToConvert outputFile" + \
+#             "\n\nFor example:" + \
+#             "\n  python3  " + Path(__file__).name + " astorb.dat astorb.txt" + \
+#             "\n  python3  " + Path(__file__).name + " astorb.dat.gz astorb.txt"
+#
+#         raise SystemExit( message )
+#
+#     convert( sys.argv[ 1 ], sys.argv[ 2 ] )
 
-        raise SystemExit( message )
 
-    convert( sys.argv[ 1 ], sys.argv[ 2 ] )
+    parser = argparse.ArgumentParser(
+        description = "Convert a minor planet text file such as astorb.dat or astorb.dat.gz from Lowell to MPC format. " + \
+                      "If the file ends in '.gz' the file will be treated as a gzip file; otherwise the file is assumed to be text." )
+    parser.add_argument( "inFile", help = "File to convert" )
+    parser.add_argument( "outFile", help = "Output file to be created" )
+    args = parser.parse_args()
+    convert( args.inFile, args.outFile )
