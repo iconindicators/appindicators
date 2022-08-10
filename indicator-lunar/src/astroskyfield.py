@@ -35,8 +35,6 @@
 # Will also need to include the latest versions of planets.bsp and stars.dat (might need add to packaging/debian/install).
 
 
-# import gettext ; gettext.install( "astroskyfield" ) # Uncomment to create/update the stars/planets ephemerides (see end of the file).
-
 try:
     from skyfield import almanac, constants, eclipselib
     from skyfield.api import EarthSatellite, load, Star, wgs84
