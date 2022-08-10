@@ -50,10 +50,9 @@ except ImportError:
     available = False
 
 from astrobase import AstroBase
-from dateutil.relativedelta import relativedelta
 from distutils.version import LooseVersion
 
-import datetime, eclipse, importlib, io, locale, math, os, subprocess
+import datetime, eclipse, importlib, io, locale, math
 
 
 class AstroSkyfield( AstroBase ):
@@ -1076,73 +1075,3 @@ class AstroSkyfield( AstroBase ):
                 culminateTimes = [ ]
 
         return key
-
-
-    # Create a planet ephemeris from an original BSP file.
-    # The resultant ephemeris will commence from today's date and
-    # end at the specified number of years from today.
-    #
-    # Requires jplephem:
-    #    https://pypi.org/project/jplephem
-    #
-    # Source for BSP files:
-    #    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-    #
-    # References:
-    #    https://github.com/skyfielders/python-skyfield/issues/123
-    #    ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
-    #    ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
-    #
-    # Alternate method: Download a .bsp and use spkmerge to create a smaller subset:
-    #    https://github.com/skyfielders/python-skyfield/issues/123
-    #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
-    @staticmethod
-    def createEphemerisPlanets( ephemerisBSPFile, yearsToKeepFromToday = 5 ):
-        if os.path.isfile( AstroSkyfield.__EPHEMERIS_PLANETS_FILE ):
-            os.remove( AstroSkyfield.__EPHEMERIS_PLANETS_FILE )
-
-        # Set the start date a little earlier to avoid sticky situations...
-        # For example, the lunar eclipse code starts searching prior to the search date.
-        # https://github.com/skyfielders/python-skyfield/issues/531
-        today = datetime.date.today()
-        startDate = today - relativedelta( months = 1 )
-        endDate = today.replace( year = today.year + yearsToKeepFromToday )
-        dateFormat = "%Y/%m/%d"
-        command = \
-            "python3 -m jplephem excerpt " + \
-            startDate.strftime( dateFormat ) + " " + \
-            endDate.strftime( dateFormat ) + " " + \
-            ephemerisBSPFile + " " + AstroSkyfield.__EPHEMERIS_PLANETS_FILE
-
-        print( "Creating planets ephemeris...\n\t", command )
-        subprocess.call( command, shell = True )
-        print( "Created", AstroSkyfield.__EPHEMERIS_PLANETS_FILE )
-
-
-    # Create a star ephemeris from hip_main.dat, containing only the stars listed at:
-    #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
-    #
-    # The file hip_main.dat can be downloaded from:
-    #    https://cdsarc.u-strasbg.fr/ftp/cats/I/239/hip_main.dat
-    #
-    # Format of Hipparcos catalogue:
-    #    ftp://cdsarc.u-strasbg.fr/cats/I/239/ReadMe
-    @staticmethod
-    def createEphemerisStars( hip_mainDOTdat  ):
-        if os.path.isfile( AstroSkyfield.__EPHEMERIS_STARS_FILE ):
-            os.remove( AstroSkyfield.__EPHEMERIS_STARS_FILE )
-
-        hipparcosIdentifiers = list( AstroSkyfield.STARS_TO_HIP.values() )
-        print( "Creating stars ephemeris..." )
-        with load.open( hip_mainDOTdat, "rb" ) as inFile, open( AstroSkyfield.__EPHEMERIS_STARS_FILE, "wb" ) as outFile:
-            for line in inFile:
-                hip = int( line.decode()[ 8 : 14 ].strip() ) # FYI Absolute magnitude can be found at indices [ 42 : 46 ].
-                if hip in hipparcosIdentifiers:
-                    outFile.write( line )
-
-        print( "Created", AstroSkyfield.__EPHEMERIS_STARS_FILE )
-
-
-# Create/update the stars/planets ephemerides; uncomment the gettext import at the top of the file!
-# AstroSkyfield.createEphemerisPlanets( "de440s.bsp" )
-# AstroSkyfield.createEphemerisStars( "hip_main.dat" )
