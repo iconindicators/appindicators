@@ -660,9 +660,8 @@ class AstroSkyfield( AstroBase ):
     __SATELLITE_EVENT_SET = 2
 
 
- #TODO Compare the passes with n2y and heavens above...maybe a value of 20 or 25 is better to match against what they calculate?
-    __SATELLITE_ALTITUDE = 30.0 # Degrees
-    __SATELLITE_TRANSIT_INTERVAL = 5.0 
+    __SATELLITE_ALTITUDE = 30.0 # Degrees #TODO Compare the passes with n2y and heavens above...maybe a value of 20 or 25 is better to match against what they calculate?
+    __SATELLITE_TRANSIT_INTERVAL = 5.0 # TODO Does changing to 10 make a noticeable change to speed and/or number of results?
 
 
     # Skyfield seasons.
