@@ -646,6 +646,7 @@ class AstroBase( ABC ):
         return startDateTime, endDateTime
 
 
+#TODO Check this still works with COBS data.
     # Retrieve the comet's designation from the full name
     # which uniquely identifies a comet at the Minor Planet Center.
     #
@@ -693,6 +694,7 @@ class AstroBase( ABC ):
         return designation
 
 
+#TODO Check this still works with Lowell data.
     # Retrieve the minor planet's designation from the full name
     # which uniquely identifies a minor planet at the Minor Planet Center.
     #
