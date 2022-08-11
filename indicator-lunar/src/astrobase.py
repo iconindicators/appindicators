@@ -527,11 +527,11 @@ class AstroBase( ABC ):
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
 
-    # Satellite passes typically occur before dawn and after sunset, unless the
-    # observer is at very high latitudes. An observer may only be interested in
-    # the after sunset passes for example and so would want to limit the passes
-    # returned.
-    # 
+    # Satellite passes typically occur before dawn and after sunset,
+    # unless the observer is at very high latitudes.
+    # If, for example, an observer is only interested in passes after sunset,
+    # need to limit the passes returned.
+    #
     # Given a date/time to search for passes, limit the passes to a start/end
     # hour (to say before dawn or after sunset or no limit) and search up to the
     # final date/time.
