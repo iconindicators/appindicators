@@ -570,10 +570,6 @@ class AstroPyEphem( AstroBase ):
             apparentMagnitudeMaximum )
 
         AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
-#TODO The date is changed a lot in the observer during satellite stuff...
-# When coming out of calculateSatellites(), check the observer date and that it should be ephenNow.
-# In fact, check when leaving all functions.
-# Might need to reset the date at various points, just to be safe.
 
         return data
 
@@ -763,6 +759,10 @@ class AstroPyEphem( AstroBase ):
                 for startDateTime, endDateTime in windows:
                     if AstroPyEphem.__calculateSatellite( ephem.Date( startDateTime ), ephem.Date( endDateTime ), data, key, earthSatellite, observer, observerVisiblePasses ):
                         break
+
+        # The observer's date was constantly changed in the calculate satellite method,
+        # so clean up before returning in case the observer is used later.
+        observer.date = currentDateTime
 
 
     @staticmethod
