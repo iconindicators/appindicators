@@ -527,6 +527,48 @@ class AstroBase( ABC ):
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
 
+# TODO
+# Condition: ( endDateTime - startDateTime ).hours > ( endHour - startHour )
+# What to do if not true?
+# Surely can determine if there is some overlap and return a single pair of start/end?
+#
+#TODO Need a header comment...get it from below?
+    @staticmethod
+    def getStartEndWindows( startDateTime, endDateTime, startHour, endHour ):
+        #   SH            EH
+        #                 SH            EH
+        #                               SH            EH
+        #                                             SH            EH
+        #                                                           SH            EH
+        #                        X------------------------X
+        #                 StartDateTime                   EndDateTime
+        windows = [ ]
+        current = startDateTime - datetime.timedelta( days = 1 )
+        end = endDateTime + datetime.timedelta( days = 1 )
+        while current < end:
+            startHourAsDateTime = datetime.datetime( current.year, current.month, current.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
+            endHourAsDateTime = datetime.datetime( current.year, current.month, current.day, endHour, 0, 0, tzinfo = datetime.timezone.utc )
+
+            if startHourAsDateTime < startDateTime:
+                if endHourAsDateTime < startDateTime:
+                    pass
+
+                else:
+                    windows.append( [ startDateTime, endHourAsDateTime ] )
+
+            else:
+                if startHourAsDateTime < endDateTime:
+                    if endHourAsDateTime < endDateTime:
+                        windows.append( [ startHourAsDateTime, endHourAsDateTime ] )
+
+                    else:
+                        windows.append( [ startHourAsDateTime, endDateTime ] )
+
+            current = current + datetime.timedelta( days = 1 )
+
+        return windows
+
+
     # Satellite passes typically occur before dawn and after sunset,
     # unless the observer is at very high latitudes.
     # If, for example, an observer is only interested in passes after sunset,
@@ -563,6 +605,7 @@ class AstroBase( ABC ):
     # 4pm - 9pm
     # 23 - 4 UTC                                                                  S---------E
     @staticmethod
+#TODO Hopefully can be removed!    
     def getAdjustedDateTime( currentDateTime, finalDateTime, startHour, endHour ):
         startDateTime, endDateTime = None, None
 
