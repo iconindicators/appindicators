@@ -564,6 +564,10 @@ class AstroPyEphem( AstroBase ):
             apparentMagnitudeMaximum )
 
         AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
+#TODO The date is changed a lot in the observer during satellite stuff...
+# When coming out of calculateSatellites(), check the observer date and that it should be ephenNow.
+# In fact, check when leaving all functions.
+# Might need to reset the date at various points, just to be safe.
 
         return data
 
@@ -752,76 +756,43 @@ class AstroPyEphem( AstroBase ):
                     startDateTime, endDateTime, finalDateTime, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite )
 
 
+#TODO When this is sorted, make sure that if the start = 0 and end = 23 that they work too;
+# not just a window for the evening, morning.
+# Might have to NOT use the adjusted start/end for the case of 0 and 23. 
     @staticmethod
     def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour ):
+        now = ephemNow.datetime().replace( tzinfo = datetime.timezone.utc )
+        end = now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
+        windows = AstroPyEphem.getWindows( now, end, startHour, endHour )
+
         observerVisiblePasses = observer.copy()
         observerVisiblePasses.pressure = 0
         observerVisiblePasses.horizon = "-0:34"
 
-        ephemEnd = ephemNow + ephem.hour * 48 # AstroBase.SATELLITE_SEARCH_DURATION_HOURS
-
-        # windows = AstroPyEphem.getStartEndWindows(
-        #     ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ),
-        #     ephem.Date( ephemNow + ephem.hour * 48 ).datetime().replace( tzinfo = datetime.timezone.utc ),
-        #     startHour,
-        #     endHour )
-
-        now = ephemNow.datetime().replace( tzinfo = datetime.timezone.utc )
-        for _ in range( 24 ):
-            print()
-            windows = AstroPyEphem.getWindows(
-                now,
-                now + datetime.timedelta( hours = 48 ),
-                startHour,
-                endHour )
-            now = now + datetime.timedelta( hours = 1 )
-            print()
-
-        if True: return
-
-
-# Search from datetime now until datetime end, dropping any transit outside of start hour and end hour. 
-
-
-#TODO When this is sorted, make sure that if the start = 0 and end = 23 that they work too;
-# not just a window for the evening, morning.
-# Might have to NOT use the adjusted start/end for the case of 0 and 23. 
-
-
-        finalDateTime = ephem.Date( ephemNow + ephem.hour * AstroBase.SATELLITE_SEARCH_DURATION_HOURS ).datetime().replace( tzinfo = datetime.timezone.utc )
         for satellite in satellites:
             if satellite in satelliteData:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
                 earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() )
-                startDateTime, endDateTime = AstroBase.getAdjustedDateTime(
-                    ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ), finalDateTime, startHour, endHour )
-
-                AstroPyEphem.__calculateSatellite(
-                    startDateTime, endDateTime, finalDateTime, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite )
+                for startDateTime, endDateTime in windows:
+                    if AstroPyEphem.__calculateSatellite( ephem.Date( startDateTime ), ephem.Date( endDateTime ), observer, observerVisiblePasses, data, key, earthSatellite ):
+                        break
 
 
     @staticmethod
-    def __calculateSatellite( startDateTime, endDateTime, finalDateTime, startHour, endHour, observer, observerVisiblePasses, data, key, earthSatellite ):
-        # Typically to search for a visible satellite pass,
-        # start from 'now' until 'now' plus search duration,
-        # checking each pass as it is calculated for visibility.
-        # However, when filtering passes through a start/end window,
-        # searching is further bound within each star/end hour pair.
-        while startDateTime is not None and startDateTime < endDateTime:
-            observer.date = ephem.Date( startDateTime )
+    def __calculateSatellite( startDateTime, endDateTime, observer, observerVisiblePasses, data, key, earthSatellite ):
+        foundPass = False
+        currentDateTime = startDateTime
+        while currentDateTime < endDateTime:
+            observer.date = currentDateTime
             earthSatellite.compute( observer )
             try:
                 # Must set 'singlepass = False' as it is possible a pass is too quick/low and an exception is thrown.
                 # https://github.com/brandon-rhodes/pyephem/issues/164
                 # https://github.com/brandon-rhodes/pyephem/pull/85/files
                 nextPass = observer.next_pass( earthSatellite, singlepass = False )
-                passIsValid = AstroPyEphem.__isSatellitePassValid( nextPass )
-                if passIsValid:
-                    passBeforeEndDateTime = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) < endDateTime
-
-                    passIsVisible = AstroPyEphem.__isSatellitePassVisible(
-                        observerVisiblePasses, earthSatellite, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] )
-
+                if AstroPyEphem.__isSatellitePassValid( nextPass ):
+                    passBeforeEndDateTime = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] < endDateTime
+                    passIsVisible = AstroPyEphem.__isSatellitePassVisible( observerVisiblePasses, earthSatellite, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] )
                     if passBeforeEndDateTime and passIsVisible:
                         data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
                             AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ].datetime() )
@@ -832,33 +803,28 @@ class AstroPyEphem( AstroBase ):
                             AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime() )
 
                         data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_ANGLE ] )
+                        foundPass = True
                         break
 
                     # Look for the next pass starting shortly after current set.
-                    startDateTime = ephem.Date(
-                        nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc )
+                    currentDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
 
                 else:
-                    # Bad pass data, so look shortly after the current time.
-                    startDateTime = ephem.Date( ephem.Date( startDateTime ) + ephem.minute * 15 ).datetime().replace( tzinfo = datetime.timezone.utc )
-
-                startDateTime, endDateTime = AstroBase.getAdjustedDateTime( startDateTime, finalDateTime, startHour, endHour )
+                    currentDateTime = ephem.Date( currentDateTime + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
 
             except ValueError:
                 if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
                     data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
                     data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
+                    foundPass = True
 
                 break
+
+        return foundPass
 
 
     @staticmethod
     def getWindows( startDateTime, endDateTime, startHour, endHour ):
-        print()
-        print( "start", startDateTime )
-        print( "end", endDateTime )
-        print( startHour, endHour )
-
         #   SH            EH
         #                 SH            EH
         #                               SH            EH
@@ -879,19 +845,18 @@ class AstroPyEphem( AstroBase ):
 
                 else:
                     windows.append( [ startDateTime, endHourAsDateTime ] )
-                    print( windows[ -1 ] )
 
             else:
                 if startHourAsDateTime < endDateTime:
                     if endHourAsDateTime < endDateTime:
                         windows.append( [ startHourAsDateTime, endHourAsDateTime ] )
-                        print( windows[ -1 ] )
 
                     else:
                         windows.append( [ startHourAsDateTime, endDateTime ] )
-                        print( windows[ -1 ] )
 
             current = current + datetime.timedelta( days = 1 )
+
+        return windows
 
 
 # TODO
