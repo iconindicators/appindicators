@@ -762,7 +762,7 @@ class AstroPyEphem( AstroBase ):
 
         # The observer's date was constantly changed in the calculate satellite method,
         # so clean up before returning in case the observer is used later.
-        observer.date = currentDateTime
+        observer.date = ephemNow
 
 
     @staticmethod
