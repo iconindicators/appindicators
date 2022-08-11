@@ -761,12 +761,12 @@ class AstroPyEphem( AstroBase ):
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
                 earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), satelliteData[ satellite ].getLine1(), satelliteData[ satellite ].getLine2() )
                 for startDateTime, endDateTime in windows:
-                    if AstroPyEphem.__calculateSatellite( ephem.Date( startDateTime ), ephem.Date( endDateTime ), observer, observerVisiblePasses, data, key, earthSatellite ):
+                    if AstroPyEphem.__calculateSatellite( ephem.Date( startDateTime ), ephem.Date( endDateTime ), data, key, earthSatellite, observer, observerVisiblePasses ):
                         break
 
 
     @staticmethod
-    def __calculateSatellite( startDateTime, endDateTime, observer, observerVisiblePasses, data, key, earthSatellite ):
+    def __calculateSatellite( startDateTime, endDateTime, data, key, earthSatellite, observer, observerVisiblePasses ):
         foundPass = False
         currentDateTime = startDateTime
         while currentDateTime < endDateTime:
