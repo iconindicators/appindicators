@@ -239,7 +239,7 @@ class AstroBase( ABC ):
 
 
     # Satellites.
-    SATELLITE_SEARCH_DURATION_HOURS = 50 # Number of hours to search from 'now' for visible satellite passes.
+    SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
