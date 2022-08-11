@@ -531,8 +531,10 @@ class AstroBase( ABC ):
 # Condition: ( endDateTime - startDateTime ).hours > ( endHour - startHour )
 # What to do if not true?
 # Surely can determine if there is some overlap and return a single pair of start/end?
-#
-#TODO Need a header comment...get it from below?
+    # Take a start/end date/time used to search for a satellite transit
+    # and determine where a given start/end hour will overlap.
+    # 
+    # Used to limit satellite passes from say dawn and dusk to just dusk.
     @staticmethod
     def getStartEndWindows( startDateTime, endDateTime, startHour, endHour ):
         #   SH            EH
@@ -545,7 +547,22 @@ class AstroBase( ABC ):
         windows = [ ]
         current = startDateTime - datetime.timedelta( days = 1 )
         end = endDateTime + datetime.timedelta( days = 1 )
-        while current < end:
+
+        # Need to ensure that
+        #
+        #    ( endDateTime - startDateTime ).hours > ( endHour - startHour )
+        #
+        # which will be the case because the satellite search window should/will be always greater than 24 hours.
+#TODO Figure out if this check is needed and how to do it.
+        a =  endDateTime - startDateTime
+        b = a.seconds
+        c = b / 60 / 60
+        d = ( endHour - startHour )
+        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
+        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
+        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
+        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
+        while ( current < end ) and safetyCheck:
             startHourAsDateTime = datetime.datetime( current.year, current.month, current.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
             endHourAsDateTime = datetime.datetime( current.year, current.month, current.day, endHour, 0, 0, tzinfo = datetime.timezone.utc )
 
@@ -567,83 +584,6 @@ class AstroBase( ABC ):
             current = current + datetime.timedelta( days = 1 )
 
         return windows
-
-
-    # Satellite passes typically occur before dawn and after sunset,
-    # unless the observer is at very high latitudes.
-    # If, for example, an observer is only interested in passes after sunset,
-    # need to limit the passes returned.
-    #
-    # Given a date/time to search for passes, limit the passes to a start/end
-    # hour (to say before dawn or after sunset or no limit) and search up to the
-    # final date/time.
-    #
-    # A start date/time and end date/time will be the returned representing the
-    # current date/time snapped to fall within the start/end hour.
-    #
-    # If the start/end date/time fall after the final date/time, each will be None.
-    #
-    # All date/time are UTC aware.
-    #
-    # Satellite pass scenarios:
-    #
-    #                       0/24                        12                        0/24
-    #                       UTC                         UTC                       UTC 
-    # Sydney
-    # 4pm - 9pm
-    # 6 - 11 UTC                            S---------E
-    #
-    # Sydney
-    # 3am - 6am
-    # 17 - 20 UTC                                                S---------E
-    #
-    # India
-    # 3am - 7am
-    # 21 - 1 UTC                                                               S---------E
-    #
-    # Los Angeles
-    # 4pm - 9pm
-    # 23 - 4 UTC                                                                  S---------E
-    @staticmethod
-#TODO Hopefully can be removed!    
-    def getAdjustedDateTime( currentDateTime, finalDateTime, startHour, endHour ):
-        startDateTime, endDateTime = None, None
-
-        # Adjust the current date/time so that it fits within the start/end.
-        if startHour <= endHour:
-            if currentDateTime.hour < startHour:
-                startDateTime = datetime.datetime( 
-                    currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
-                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
-
-            elif currentDateTime.hour > endHour:
-                startDateTime = datetime.datetime(
-                    currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 )
-                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
-
-            else:
-                startDateTime = currentDateTime
-                endDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
-
-        else:
-            if currentDateTime.hour < startHour and currentDateTime.hour > endHour:
-                startDateTime = datetime.datetime( currentDateTime.year, currentDateTime.month, currentDateTime.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
-                endDateTime = datetime.datetime( startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc )
-
-            else:
-                startDateTime = currentDateTime
-                endDateTime = datetime.datetime(
-                    startDateTime.year, startDateTime.month, startDateTime.day, endHour, 59, 59, tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 )
-
-        # Ensure the start/end date/time does not exceed the final date/time.
-        if startDateTime > finalDateTime:
-            startDateTime = None
-            endDateTime = None
-
-        elif endDateTime > finalDateTime:
-            endDateTime = finalDateTime
-
-        return startDateTime, endDateTime
 
 
 #TODO Check this still works with COBS data.
