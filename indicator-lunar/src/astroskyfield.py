@@ -661,6 +661,11 @@ class AstroSkyfield( AstroBase ):
     __SEASON_WINTER_SOLSTICE = 3
 
 
+    __SKYFIELD_SATELLITE_EVENT_RISE = 0
+    __SKYFIELD_SATELLITE_EVENT_CULMINATE = 1
+    __SKYFIELD_SATELLITE_EVENT_SET = 2
+
+
     @staticmethod
     def calculate(
             utcNow,
@@ -980,7 +985,7 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/327
     #    https://github.com/skyfielders/python-skyfield/issues/558
     @staticmethod
-    def __calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellitesORIGINAL( now, data, timeScale, location, satellites, satelliteData, startHour, endHour ):
         nowPlusSatelliteSearchDuration = timeScale.utc(
             now.utc.year,
             now.utc.month,
@@ -1022,12 +1027,103 @@ class AstroSkyfield( AstroBase ):
                     break
 
 
+    # References:
+    #    https://github.com/skyfielders/python-skyfield/issues/327
+    #    https://github.com/skyfielders/python-skyfield/issues/558
+    @staticmethod
+    def __calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHour, endHour ):
+        end = timeScale.utc( now.utc.year, now.utc.month, now.utc.day, now.utc.hour + AstroBase.SATELLITE_SEARCH_DURATION_HOURS, now.utc.minute, now.utc.second )
+        windows = AstroBase.getStartEndWindows( now.utc, end, startHour, endHour )
+        isTwilightFunction = almanac.dark_twilight_day( AstroSkyfield.__EPHEMERIS_PLANETS, location )
+
+        for satellite in satellites:
+            if satellite in satelliteData:
+                key = ( AstroBase.BodyType.SATELLITE, satellite )
+                earthSatellite = EarthSatellite(
+                    satelliteData[ satellite ].getLine1(),
+                    satelliteData[ satellite ].getLine2(),
+                    satelliteData[ satellite ].getName(),
+                    timeScale )
+
+                for startDateTime, endDateTime in windows:
+                    foundPass = AstroSkyfield.__calculateSatellite(
+                        timeScale.from_datetime( startDateTime ),
+                        timeScale.from_datetime( endDateTime ),
+                        data,
+                        timeScale,
+                        location,
+                        satellite,
+                        earthSatellite,
+                        isTwilightFunction )
+                    
+                    if foundPass:
+                        break
+
+
     @staticmethod
 #TODO How to determine if a satellite is 'always up' or 'never up'?
 # Can something be taken from the calculateCommon() above?
 # Be careful about using rise/set code which applies to planets: 
 # https://rhodesmill.org/skyfield/almanac.html#sunrise-and-sunset
     def __calculateSatellite( startDateTime, endDateTime, data, timeScale, location, satelliteNumber, earthSatellite, isTwilightFunction ): 
+        key, riseTime = None, None
+        culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
+        t, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = 30.0 ) #TODO Compare the passes with n2y and heavens above...maybe a value of 20 or 25 is better to match against what they calculate?
+        for ti, event in zip( t, events ):
+            if event == AstroSkyfield.__SKYFIELD_SATELLITE_EVENT_RISE:
+                riseTime = ti
+
+            elif event == AstroSkyfield.__SKYFIELD_SATELLITE_EVENT_CULMINATE:
+                culminateTimes.append( ti )
+
+            else: # AstroSkyfield.__SKYFIELD_SATELLITE_EVENT_SET
+                if riseTime is not None and culminateTimes:
+                    totalSecondsFromRiseToSet = ( ti.utc_datetime() - riseTime.utc_datetime() ).total_seconds()
+                    step = 1.0 if ( totalSecondsFromRiseToSet / 10.0 ) < 1.0 else ( totalSecondsFromRiseToSet / 10.0 )
+                    timeRange = timeScale.utc( 
+                        riseTime.utc.year, 
+                        riseTime.utc.month, 
+                        riseTime.utc.day, 
+                        riseTime.utc.hour, 
+                        riseTime.utc.minute, 
+                        range( math.ceil( riseTime.utc.second ), math.ceil( totalSecondsFromRiseToSet + riseTime.utc.second ), math.ceil( step ) ) )
+
+                    isTwilightAstronomical = isTwilightFunction( timeRange ) == 1
+                    isTwilightNautical = isTwilightFunction( timeRange ) == 2
+                    sunlit = earthSatellite.at( timeRange ).is_sunlit( AstroSkyfield.__EPHEMERIS_PLANETS )
+                    for twilightAstronomical, twilightNautical, isSunlit in zip( isTwilightAstronomical, isTwilightNautical, sunlit ):
+                        if isSunlit and ( twilightAstronomical or twilightNautical ):
+                            key = ( AstroBase.BodyType.SATELLITE, satelliteNumber )
+
+                            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseTime.utc_datetime() )
+                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
+                            data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
+
+                            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( ti.utc_datetime() )
+                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
+                            data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                            break
+
+                if key is not None:
+                    break
+
+                riseTime = None
+                culminateTimes = [ ]
+
+        return key
+
+
+    @staticmethod
+    def __isSatellitePassVisible( observerVisiblePasses, satellite, passDateTime ):
+        pass
+
+
+    @staticmethod
+#TODO How to determine if a satellite is 'always up' or 'never up'?
+# Can something be taken from the calculateCommon() above?
+# Be careful about using rise/set code which applies to planets: 
+# https://rhodesmill.org/skyfield/almanac.html#sunrise-and-sunset
+    def __calculateSatelliteORIGINAL( startDateTime, endDateTime, data, timeScale, location, satelliteNumber, earthSatellite, isTwilightFunction ): 
         key, riseTime = None, None
         culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
         t, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = 30.0 ) #TODO Compare the passes with n2y and heavens above...maybe a value of 20 or 25 is better to match against what they calculate?
