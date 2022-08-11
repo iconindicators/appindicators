@@ -1121,7 +1121,13 @@ class IndicatorLunar( IndicatorBase ):
     # https://stackoverflow.com/a/64097432/2156453
     # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
     def convertLocalHourToUTC( self, localHour ):
-        return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour
+#TODO Handle Ubuntu 16.04
+        import sys
+        if sys.version.startswith( "3.5" ):
+            return datetime.datetime.now().replace( hour = localHour ).replace( tzinfo = datetime.timezone.utc ).astimezone( datetime.timezone.utc ).hour
+
+        else:
+            return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour
 
 
     # Creates the SVG icon text representing the moon given the illumination and bright limb angle.
