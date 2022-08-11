@@ -1029,11 +1029,6 @@ class AstroSkyfield( AstroBase ):
                         break
 
 
-#TODO How to determine if a satellite is 'always up'?
-# Can something be taken from the calculateCommon() above?
-# Be careful about using rise/set code which applies to planets: 
-# https://rhodesmill.org/skyfield/almanac.html#sunrise-and-sunset
-# Also search under issues for alwaysup.
     @staticmethod
     def __calculateSatellite( startDateTime, endDateTime, data, key, earthSatellite, timeScale, location, isTwilightFunction ): 
         foundPass = False
