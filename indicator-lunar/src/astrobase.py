@@ -239,7 +239,8 @@ class AstroBase( ABC ):
 
 
     # Satellites.
-    SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
+    # SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
+    SATELLITE_SEARCH_DURATION_HOURS = 4 # TODO Testing
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -527,10 +528,6 @@ class AstroBase( ABC ):
     def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
 
-# TODO
-# Condition: ( endDateTime - startDateTime ).hours > ( endHour - startHour )
-# What to do if not true?
-# Surely can determine if there is some overlap and return a single pair of start/end?
     # Take a start/end date/time used to search for a satellite transit
     # and determine where a given start/end hour will overlap.
     # 
@@ -548,21 +545,7 @@ class AstroBase( ABC ):
         current = startDateTime - datetime.timedelta( days = 1 )
         end = endDateTime + datetime.timedelta( days = 1 )
 
-        # Need to ensure that
-        #
-        #    ( endDateTime - startDateTime ).hours > ( endHour - startHour )
-        #
-        # which will be the case because the satellite search window should/will be always greater than 24 hours.
-#TODO Figure out if this check is needed and how to do it.
-        a =  endDateTime - startDateTime
-        b = a.seconds
-        c = b / 60 / 60
-        d = ( endHour - startHour )
-        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
-        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
-        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
-        safetyCheck = ( endDateTime - startDateTime ).hours > ( endHour - startHour )
-        while ( current < end ) and safetyCheck:
+        while current < end:
             startHourAsDateTime = datetime.datetime( current.year, current.month, current.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
             endHourAsDateTime = datetime.datetime( current.year, current.month, current.day, endHour, 0, 0, tzinfo = datetime.timezone.utc )
 

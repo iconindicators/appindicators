@@ -876,6 +876,10 @@ class IndicatorLunar( IndicatorBase ):
         satellitesPolar = [ ]
         now = IndicatorLunar.astroBackend.toDateTimeString( utcNow )
         nowPlusFiveMinutes = IndicatorLunar.astroBackend.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
+
+#TODO Figure out what this did, why and what is the alternative.
+# Only used when the user changes the visible satellite window and so the previous data will not match the current data.
+# So can we detect the change in window and if so, set previous data to None? 
         visibleStartHour, visibleEndHour = IndicatorLunar.astroBackend.getAdjustedDateTime(
             utcNow.replace( tzinfo = datetime.timezone.utc ),
             utcNow.replace( tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 ),
