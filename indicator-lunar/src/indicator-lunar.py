@@ -888,6 +888,96 @@ class IndicatorLunar( IndicatorBase ):
 
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
+            if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets.
+                if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes.
+                    satellites.append( [
+                        number,
+                        self.satelliteData[ number ].getName(),
+                        self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
+                        self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
+                        self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
+                        self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, ) ] ] )
+
+                else: # Satellite will rise more than five minutes from now; look at previous transit.
+                    if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
+                        inTransit = \
+                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
+                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] > now
+
+                        # If the user changed the hourly start/end between previous calculation and now, the previous pass may now be invalid, so cannot use it.
+#This is a valid point...
+# So either write a new function to determine if a (previous) rise/set is within the current start/end hour, OR
+# set the previous data to None in the Preferences if the start/end hour is changed.
+                        withinLimit = \
+                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] >= IndicatorLunar.astroBackend.toDateTimeString( visibleStartHour ) and \
+                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] <= IndicatorLunar.astroBackend.toDateTimeString( visibleEndHour )
+
+                        if inTransit and withinLimit:
+                            satellites.append( [
+                                number,
+                                self.satelliteData[ number ].getName(), 
+                                self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
+                                self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
+                                self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
+                                self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, ) ] ] )
+
+                        else: # Previous transit is complete or invalid, so show next pass...
+                            satellites.append( [
+                                number,
+                                self.satelliteData[ number ].getName(),
+                                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+
+                    else: # No previous transit, show next pass.
+                        satellites.append( [
+                            number,
+                            self.satelliteData[ number ].getName(),
+                            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
+
+            elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is polar (always up).
+                satellitesPolar.append( [
+                    number,
+                    self.satelliteData[ number ].getName(),
+                    self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ],
+                    self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ] )
+
+        if satellites:
+            if self.satellitesSortByDateTime:
+                satellites = sorted(
+                    satellites,
+                    key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
+
+            else: # Sort by name/number.
+                satellites = sorted(
+                    satellites,
+                    key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+
+            self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
+
+        if satellitesPolar:
+            satellitesPolar = sorted(
+                satellitesPolar,
+                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+
+            self.__updateMenuSatellites( menu, _( "Satellites (Polar)" ), satellitesPolar )
+
+
+    def updateMenuSatellitesORIGINAL( self, menu, utcNow ):
+        satellites = [ ]
+        satellitesPolar = [ ]
+        now = IndicatorLunar.astroBackend.toDateTimeString( utcNow )
+        nowPlusFiveMinutes = IndicatorLunar.astroBackend.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
+
+#TODO Figure out what this did, why and what is the alternative.
+# Only used when the user changes the visible satellite window and so the previous data will not match the current data.
+# So can we detect the change in window and if so, set previous data to None? 
+        visibleStartHour, visibleEndHour = IndicatorLunar.astroBackend.getAdjustedDateTime(
+            utcNow.replace( tzinfo = datetime.timezone.utc ),
+            utcNow.replace( tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 ),
+            self.satelliteLimitStart,
+            self.satelliteLimitEnd )
+
+        for number in self.satellites:
+            key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets...
                 if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes...
                     satellites.append( [
