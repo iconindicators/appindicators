@@ -845,32 +845,32 @@ class IndicatorLunar( IndicatorBase ):
 
     # Display the rise/set information for each satellite.
     #
-    # If a satellite is in transit OR will rise within the next five minutes, show the rise and set information.
-    # Otherwise, just show the next rise. 
+    # If a satellite is in transit OR will rise within the next five minutes,
+    # show next rise/set.  Otherwise, show next rise. 
     #
-    # Next rise/set relative to UTC now:
+    # Next rise/set:
     #
-    #                            R       S                           Satellite will rise within the five minute window; display rise/set information.
-    #                            R               S                   Satellite will rise within the five minute window; display rise/set information.
-    #                                            R       S           Satellite will rise after five minute window; display rise information.  Check for a previous transit.
+    #                            R       S                           Satellite will rise within the five minute window; display next rise/set.
+    #                            R               S                   Satellite will rise within the five minute window; display next rise/set.
+    #                                            R       S           Satellite will rise after five minute window; display next rise; check if in previous transit.
     #                   ^                    ^
     #                utcNow             utcNow + 5
     #
-    # When ( R < utcNow + 5 ) display rise/set information.
-    # Otherwise, display rise information.
+    # When ( R < utcNow + 5 ) display next rise/set.
+    # Otherwise, display next rise and check previous transit in case still underway.
     #
-    # Previous rise/set relative to UTC now:
+    # Previous rise/set:
     #
-    #    R       S                                                   Satellite has set; look to next transit.
-    #    R                       S                                   Satellite in transit; display rise/set information.
-    #    R                                           S               Satellite in transit; display rise/set information.
-    #                            R       S                           Satellite will rise within the five minute window; display rise/set information.
-    #                            R                   S               Satellite will rise within the five minute window; display rise/set information.
-    #                                                R       S       Satellite will rise after five minute window; display rise information.
+    #    R       S                                                   Satellite has set; display next rise/set.
+    #    R                       S                                   Satellite in transit; display previous rise/set.
+    #    R                                           S               Satellite in transit; display previous rise/set.
+    #                            R       S                           Satellite will rise within the five minute window; display previous rise/set.
+    #                            R                   S               Satellite will rise within the five minute window; display previous rise/set.
+    #                                                R       S       Satellite will rise after five minute window; display next rise.
     #                   ^                    ^
     #                utcNow             utcNow + 5
     #
-    # When ( R < utcNow + 5 ) AND ( S > utcNow ) display rise/set information.
+    # When ( R < utcNow + 5 ) AND ( S > utcNow ) display previous rise/set.
     def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
