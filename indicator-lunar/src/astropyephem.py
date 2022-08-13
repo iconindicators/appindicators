@@ -739,9 +739,6 @@ class AstroPyEphem( AstroBase ):
         return neverUp
 
 
-#TODO When this is sorted, make sure that if the start = 0 and end = 23 that they work too;
-# not just a window for the evening, morning.
-# Might have to NOT use the adjusted start/end for the case of 0 and 23. 
     @staticmethod
     def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC ):
         now = ephemNow.datetime().replace( tzinfo = datetime.timezone.utc )
