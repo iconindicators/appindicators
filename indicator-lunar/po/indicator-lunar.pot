@@ -1402,7 +1402,7 @@ msgid "Comet data by Comet Observation Database. https://cobs.si"
 msgstr ""
 
 #: indicator-lunar.py:183
-msgid "Satellite data by Dr T S Kelso. https://www.celestrak.com"
+msgid "Satellite data by Celestrak. https://www.celestrak.com"
 msgstr ""
 
 #: indicator-lunar.py:608

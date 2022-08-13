@@ -1419,9 +1419,9 @@ msgstr ""
 "Данные о кометах предоставлены Comet Observation Database. https://cobs.si"
 
 #: indicator-lunar.py:183
-msgid "Satellite data by Dr T S Kelso. https://www.celestrak.com"
+msgid "Satellite data by Celestrak. https://www.celestrak.com"
 msgstr ""
-"Данные о спутниках предоставил д-р Т.С. Келсо. https://www.celestrak.com"
+"Данные о спутниках предоставил Celestrak. https://www.celestrak.com"
 
 #: indicator-lunar.py:608
 msgid "Moon"
@@ -1938,4 +1938,3 @@ msgstr "Высота должна быть числом от 0 до 10000 вкл
 #: indicator-lunar.py:1603
 msgid "The start hour for satellite passes must be lower than the end hour."
 msgstr "Начальный час для пролётов спутников должен быть меньше конечного."
-
