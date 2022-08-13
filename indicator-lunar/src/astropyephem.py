@@ -538,12 +538,6 @@ class AstroPyEphem( AstroBase ):
             apparentMagnitudeMaximum,
             logging ):
 
-        #TODO Hard code when on Ubuntu 16.04
-        import sys
-        if sys.version.startswith( "3.5" ):
-            startHour = 6 # 16
-            endHour = 12 # 22
-
         data = { }
 
         ephemNow = ephem.Date( utcNow )
