@@ -65,7 +65,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
@@ -770,7 +770,7 @@ class IndicatorLunar( IndicatorBase ):
                     url = IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( internalName )
 
                 else:
-                    url = IndicatorLunar.SEARCH_URL_MINOR_PLANET + internalName # Designation comes directory from Lowell data so no need to .
+                    url = IndicatorLunar.SEARCH_URL_MINOR_PLANET + internalName
 
                 self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + displayName, url )
                 self.updateMenuCommon( subMenu, bodyType, internalName, 2, url )

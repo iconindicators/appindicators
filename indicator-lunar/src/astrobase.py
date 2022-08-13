@@ -617,11 +617,8 @@ class AstroBase( ABC ):
         return designation
 
 
-#TODO Check this still works with Lowell data.
-    # Retrieve the minor planet's designation from the full name
-    # which uniquely identifies a minor planet at the Minor Planet Center.
-    #
-    # Supports the MPC and XEphem data file formats from which the full name is obtained.
+    # Retrieve a minor planet's designation from the full name,
+    # from both MPC and XEphem data file formats from the Minor Planet Center.
     #
     # https://www.iau.org/public/themes/naming/
     # https://minorplanetcenter.net/iau/info/DesDoc.html
