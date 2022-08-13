@@ -532,7 +532,7 @@ class AstroPyEphem( AstroBase ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData, startHour, endHour,
+            satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC,
             comets, cometData, cometApparentMagnitudeData,
             minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
@@ -569,7 +569,7 @@ class AstroPyEphem( AstroBase ):
             AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum )
 
-        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour )
+        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
 
         return data
 
@@ -743,10 +743,10 @@ class AstroPyEphem( AstroBase ):
 # not just a window for the evening, morning.
 # Might have to NOT use the adjusted start/end for the case of 0 and 23. 
     @staticmethod
-    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC ):
         now = ephemNow.datetime().replace( tzinfo = datetime.timezone.utc )
         end = now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
-        windows = AstroBase.getStartEndWindows( now, end, startHour, endHour )
+        windows = AstroBase.getStartEndWindows( now, end, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
 
         observerVisiblePasses = observer.copy()
         observerVisiblePasses.pressure = 0

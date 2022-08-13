@@ -685,7 +685,7 @@ class AstroSkyfield( AstroBase ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData, startHour, endHour,
+            satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC,
             comets, cometData, cometApparentMagnitudeData,
             minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
@@ -720,7 +720,7 @@ class AstroSkyfield( AstroBase ):
             apparentMagnitudeMaximum,
             logging )
 
-        AstroSkyfield.__calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHour, endHour )
+        AstroSkyfield.__calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
 
         return data
 
@@ -1000,9 +1000,9 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/327
     #    https://github.com/skyfielders/python-skyfield/issues/558
     @staticmethod
-    def __calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHour, endHour ):
+    def __calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC ):
         end = timeScale.utc( now.utc.year, now.utc.month, now.utc.day, now.utc.hour + AstroBase.SATELLITE_SEARCH_DURATION_HOURS, now.utc.minute, now.utc.second ).utc_datetime()
-        windows = AstroBase.getStartEndWindows( now.utc_datetime(), end, startHour, endHour )
+        windows = AstroBase.getStartEndWindows( now.utc_datetime(), end, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
         isTwilightFunction = almanac.dark_twilight_day( AstroSkyfield.__EPHEMERIS_PLANETS, location )
 
         for satellite in satellites:

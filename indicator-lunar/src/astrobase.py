@@ -238,9 +238,7 @@ class AstroBase( ABC ):
     STAR_TAGS_TRANSLATIONS = { }
 
 
-    # Satellites.
-    # SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
-    SATELLITE_SEARCH_DURATION_HOURS = 4 # TODO Testing
+    SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -296,7 +294,7 @@ class AstroBase( ABC ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData, startHour, endHour,
+            satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC,
             comets, cometData, cometApparentMagnitudeData,
             minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
@@ -532,8 +530,9 @@ class AstroBase( ABC ):
     # and determine where a given start/end hour will overlap.
     # 
     # Used to limit satellite passes from say dawn and dusk to just dusk.
+#TODO Make a comment about how end hour > start hour
     @staticmethod
-    def getStartEndWindows( startDateTime, endDateTime, startHour, endHour ):
+    def getStartEndWindows( startDateTime, endDateTime, startHourAsDateTime, endHourAsDateTime ):
         #   SH            EH
         #                 SH            EH
         #                               SH            EH
@@ -542,13 +541,15 @@ class AstroBase( ABC ):
         #                        X------------------------X
         #                 StartDateTime                   EndDateTime
         windows = [ ]
+
         current = startDateTime - datetime.timedelta( days = 1 )
         end = endDateTime + datetime.timedelta( days = 1 )
 
-        while current < end:
-            startHourAsDateTime = datetime.datetime( current.year, current.month, current.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
-            endHourAsDateTime = datetime.datetime( current.year, current.month, current.day, endHour, 0, 0, tzinfo = datetime.timezone.utc )
+        # startHourAsDateTime = datetime.datetime( current.year, current.month, current.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
+        # endHourAsDateTime = startHourAsDateTime + datetime.timedelta( hours = ( endHour - startHour + 1 ) )
+        # endHourAsDateTime = datetime.datetime( current.year, current.month, current.day, endHour, 0, 0, tzinfo = datetime.timezone.utc )
 
+        while current < end:
             if startHourAsDateTime < startDateTime:
                 if endHourAsDateTime < startDateTime:
                     pass
@@ -565,8 +566,36 @@ class AstroBase( ABC ):
                         windows.append( [ startHourAsDateTime, endDateTime ] )
 
             current = current + datetime.timedelta( days = 1 )
+            startHourAsDateTime = startHourAsDateTime + datetime.timedelta( days = 1 )
+            endHourAsDateTime = endHourAsDateTime + datetime.timedelta( days = 1 )
 
         return windows
+        # windows = [ ]
+        # current = startDateTime - datetime.timedelta( days = 1 )
+        # end = endDateTime + datetime.timedelta( days = 1 )
+        #
+        # while current < end:
+        #     startHourAsDateTime = datetime.datetime( current.year, current.month, current.day, startHour, 0, 0, tzinfo = datetime.timezone.utc )
+        #     endHourAsDateTime = datetime.datetime( current.year, current.month, current.day, endHour, 0, 0, tzinfo = datetime.timezone.utc )
+        #
+        #     if startHourAsDateTime < startDateTime:
+        #         if endHourAsDateTime < startDateTime:
+        #             pass
+        #
+        #         else:
+        #             windows.append( [ startDateTime, endHourAsDateTime ] )
+        #
+        #     else:
+        #         if startHourAsDateTime < endDateTime:
+        #             if endHourAsDateTime < endDateTime:
+        #                 windows.append( [ startHourAsDateTime, endHourAsDateTime ] )
+        #
+        #             else:
+        #                 windows.append( [ startHourAsDateTime, endDateTime ] )
+        #
+        #     current = current + datetime.timedelta( days = 1 )
+        #
+        # return windows
 
 
 #TODO Check this still works with COBS data.

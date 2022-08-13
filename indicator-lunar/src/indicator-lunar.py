@@ -261,13 +261,14 @@ class IndicatorLunar( IndicatorBase ):
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
-            self.satellites, self.satelliteData, self.convertLocalHourToUTC( self.satelliteLimitStart ), self.convertLocalHourToUTC( self.satelliteLimitEnd ),
+            self.satellites, self.satelliteData, 
+            *self.convertStartHourAndEndHourToDateTimeInUTC( self.satelliteLimitStart, self.satelliteLimitEnd ),
             self.comets, self.cometData, None,
             self.minorPlanets, self.minorPlanetData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
             self.getLogging() )
 
-        if self.dataPrevious is None: # Happens only on first run.
+        if self.dataPrevious is None: # Happens only on first run or when the user alters the satellite visibility window.
             self.dataPrevious = self.data
 
         # Update frontend.
@@ -410,7 +411,7 @@ class IndicatorLunar( IndicatorBase ):
 
                 else:
                     downloadCount += 1
-                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time...
+                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
 
         else:
             if not data:
@@ -880,11 +881,11 @@ class IndicatorLunar( IndicatorBase ):
 #TODO Figure out what this did, why and what is the alternative.
 # Only used when the user changes the visible satellite window and so the previous data will not match the current data.
 # So can we detect the change in window and if so, set previous data to None? 
-        visibleStartHour, visibleEndHour = IndicatorLunar.astroBackend.getAdjustedDateTime(
-            utcNow.replace( tzinfo = datetime.timezone.utc ),
-            utcNow.replace( tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 ),
-            self.satelliteLimitStart,
-            self.satelliteLimitEnd )
+        # visibleStartHour, visibleEndHour = IndicatorLunar.astroBackend.getAdjustedDateTime(
+        #     utcNow.replace( tzinfo = datetime.timezone.utc ),
+        #     utcNow.replace( tzinfo = datetime.timezone.utc ) + datetime.timedelta( days = 1 ),
+        #     self.satelliteLimitStart,
+        #     self.satelliteLimitEnd )
 
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
@@ -908,11 +909,11 @@ class IndicatorLunar( IndicatorBase ):
 #This is a valid point...
 # So either write a new function to determine if a (previous) rise/set is within the current start/end hour, OR
 # set the previous data to None in the Preferences if the start/end hour is changed.
-                        withinLimit = \
-                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] >= IndicatorLunar.astroBackend.toDateTimeString( visibleStartHour ) and \
-                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] <= IndicatorLunar.astroBackend.toDateTimeString( visibleEndHour )
+                        # withinLimit = \
+                        #     self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] >= IndicatorLunar.astroBackend.toDateTimeString( visibleStartHour ) and \
+                        #     self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] <= IndicatorLunar.astroBackend.toDateTimeString( visibleEndHour )
 
-                        if inTransit and withinLimit:
+                        if inTransit:
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(), 
@@ -921,7 +922,7 @@ class IndicatorLunar( IndicatorBase ):
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, ) ] ] )
 
-                        else: # Previous transit is complete or invalid, so show next pass...
+                        else: # Previous transit is complete (and too far back in the past to be applicable), so show next pass.
                             satellites.append( [
                                 number,
                                 self.satelliteData[ number ].getName(),
@@ -1214,14 +1215,20 @@ class IndicatorLunar( IndicatorBase ):
 
     # https://stackoverflow.com/a/64097432/2156453
     # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
-    def convertLocalHourToUTC( self, localHour ):
+    def convertStartHourAndEndHourToDateTimeInUTC( self, startHour, endHour ):
 #TODO Handle Ubuntu 16.04
         import sys
         if sys.version.startswith( "3.5" ):
+#TOD Fix for 16.04
             return datetime.datetime.now().replace( hour = localHour ).replace( tzinfo = datetime.timezone.utc ).astimezone( datetime.timezone.utc ).hour
 
         else:
-            return datetime.datetime.now().replace( hour = localHour ).astimezone( datetime.timezone.utc ).hour
+            startHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = startHour ).astimezone( datetime.timezone.utc )
+            endHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = endHour ).astimezone( datetime.timezone.utc )
+            if endHourAsDateTimeInUTC < startHourAsDateTimeInUTC:
+                endHourAsDateTimeInUTC = endHourAsDateTimeInUTC + datetime.timedelta( days = 1 )
+
+        return startHourAsDateTimeInUTC, endHourAsDateTimeInUTC
 
 
     # Creates the SVG icon text representing the moon given the illumination and bright limb angle.
@@ -1710,6 +1717,15 @@ class IndicatorLunar( IndicatorBase ):
             self.minorPlanetsAddNew = minorPlanetsAddNewCheckbutton.get_active() # The update will add in new minor planets.
             self.satellitesSortByDateTime = sortSatellitesByDateTimeCheckbutton.get_active()
             self.satellitesAddNew = satellitesAddNewCheckbox.get_active() # The update will add in new satellites.
+
+            # If the user changes the visibility window for satellites,
+            # the previous set of transits may no longer match the new window.
+            # One solution is to attempt to filter out those transits which do not match.
+            # A simpler solution is to erase the previous transits.
+            if self.satelliteLimitStart != spinnerSatelliteLimitStart.get_value_as_int() or \
+               self.satelliteLimitEnd != spinnerSatelliteLimitEnd.get_value_as_int():
+                self.dataPrevious = None
+
             self.satelliteLimitStart = spinnerSatelliteLimitStart.get_value_as_int()
             self.satelliteLimitEnd = spinnerSatelliteLimitEnd.get_value_as_int()
 
