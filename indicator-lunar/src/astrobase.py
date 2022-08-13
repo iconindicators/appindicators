@@ -569,11 +569,9 @@ class AstroBase( ABC ):
         return windows
 
 
-#TODO Check this still works with COBS data.
-    # Retrieve the comet's designation from the full name
-    # which uniquely identifies a comet at the Minor Planet Center.
-    #
-    # Supports the MPC and XEphem data file formats from which the full name is obtained.
+    # Retrieve a comet's designation from the full name,
+    # from both MPC and XEphem formatted data files from
+    # the Minor Planet Center or Comet Observation Database.
     #
     # https://minorplanetcenter.net//iau/lists/CometResolution.html
     # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
@@ -618,7 +616,7 @@ class AstroBase( ABC ):
 
 
     # Retrieve a minor planet's designation from the full name,
-    # from both MPC and XEphem data file formats from the Minor Planet Center.
+    # from both MPC and XEphem formatted data files from the Minor Planet Center.
     #
     # https://www.iau.org/public/themes/naming/
     # https://minorplanetcenter.net/iau/info/DesDoc.html
