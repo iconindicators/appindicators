@@ -660,8 +660,8 @@ class AstroSkyfield( AstroBase ):
     __SATELLITE_EVENT_SET = 2
 
 
-    __SATELLITE_ALTITUDE = 30.0 # Degrees #TODO Compare the passes with n2y and heavens above...maybe a value of 20 or 25 is better to match against what they calculate?
-    __SATELLITE_TRANSIT_INTERVAL = 5.0 # TODO Does changing to 10 make a noticeable change to speed and/or number of results?
+    __SATELLITE_ALTITUDE = 20.0
+    __SATELLITE_TRANSIT_INTERVAL = 5.0
 
 
     # Skyfield seasons.
@@ -1047,10 +1047,9 @@ class AstroSkyfield( AstroBase ):
                     transitRange = AstroSkyfield.__getSatelliteTransitRange( timeScale, riseTime, ti )
                     isTwilightAstronomical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_ASTRONOMICAL
                     isTwilightNautical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_NAUTICAL
-                    isTwilightCivil = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_CIVIL
                     isSunlit = earthSatellite.at( transitRange ).is_sunlit( AstroSkyfield.__EPHEMERIS_PLANETS )
-                    for twilightAstronomical, twilightNautical, twilightCivil, sunlit in zip( isTwilightAstronomical, isTwilightNautical, isTwilightCivil, isSunlit ):
-                        if sunlit and ( twilightAstronomical or twilightNautical or twilightCivil ):
+                    for twilightAstronomical, twilightNautical, sunlit in zip( isTwilightAstronomical, isTwilightNautical, isSunlit ):
+                        if sunlit and ( twilightAstronomical or twilightNautical ):
                             data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseTime.utc_datetime() )
                             alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
                             data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )

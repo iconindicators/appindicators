@@ -23,7 +23,7 @@
 #TODO Test satellites...
 # Compare skyfield against pyephem for an evening window, morning window and full window and middle of day window.
 # Compare against n2y and heavens above.
-
+# For Skyfield, see if __SATELLITE_TRANSIT_INTERVAL = 5.0 is a "good" value in terms of speed/accuracy...maybe try 10?
 
 
 #TODO Make sure putting the new version number into cache files helps in the future!!!  
@@ -65,7 +65,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
