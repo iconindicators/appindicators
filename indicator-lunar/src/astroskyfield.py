@@ -820,6 +820,8 @@ class AstroSkyfield( AstroBase ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             t, y = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
             t = t.utc_datetime()
+
+#TODO Explain the indices....also see end of calculate moon and explain that (better).            
             if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or \
                almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
                 data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( t[ 0 ] )
@@ -959,7 +961,7 @@ class AstroSkyfield( AstroBase ):
         t, y = almanac.find_discrete( now, nowPlusThirtySixHours, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
         if len( t ) >= 2: # Ensure there is at least one rise and one set.
             t = t.utc_datetime()
-            if y[ 0 ]:
+            if y[ 0 ]: #TODO Need to explain this logic...
                 riseDateTime = t[ 0 ]
                 setDateTime = t[ 1 ]
 
