@@ -641,6 +641,11 @@ class AstroSkyfield( AstroBase ):
         "Zurich"            :   ( 47.3833333, 8.5333333, 405.500916 ) }
 
 
+    # Skyfield body rise/set events.
+    __BODY_EVENT_RISE = 1
+    __BODY_EVENT_SET = 0
+
+
     # City components of latitude, longitude and elevation.
     __CITY_LATITUDE = 0
     __CITY_LONGITUDE = 1
@@ -705,7 +710,7 @@ class AstroSkyfield( AstroBase ):
 
         AstroSkyfield.__calculateMoon( now, nowPlusThirtySixHours, nowPlusThirtyOneDays, nowPlusOneYear, data, locationAtNow )
         AstroSkyfield.__calculateSun( now, nowPlusThirtySixHours, nowPlusSevenMonths, data, locationAtNow )
-        AstroSkyfield.__calculatePlanets( now, nowPlusThirtySixHours, data, locationAtNow, planets, apparentMagnitudeMaximum, logging )
+        AstroSkyfield.__calculatePlanets( now, nowPlusThirtySixHours, data, locationAtNow, planets, apparentMagnitudeMaximum )
         AstroSkyfield.__calculateStars( now, nowPlusThirtySixHours, data, locationAtNow, stars, apparentMagnitudeMaximum )
 
         AstroSkyfield.__calculateCometsMinorPlanets(
@@ -844,7 +849,7 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def __calculatePlanets( now, nowPlusThirtySixHours, data, locationAtNow, planets, apparentMagnitudeMaximum, logging ):
+    def __calculatePlanets( now, nowPlusThirtySixHours, data, locationAtNow, planets, apparentMagnitudeMaximum ):
         earthAtNow = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ].at( now )
         for planet in planets:
             apparentMagnitude = planetary_magnitude( earthAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ) )
@@ -960,23 +965,28 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateCommon( now, nowPlusThirtySixHours, data, key, locationAtNow, body ):
         neverUp = False
-        t, y = almanac.find_discrete( now, nowPlusThirtySixHours, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
-        if len( t ) >= 2: # Ensure there is at least one rise and one set.
+        t, events = almanac.find_discrete( now, nowPlusThirtySixHours, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
+        if len( events ) >= 2:
             t = t.utc_datetime()
-            if y[ 0 ]: #TODO Need to explain this logic...
+            foundRiseSet = True
+            if events[ 0 ] == AstroSkyfield.__BODY_EVENT_RISE and events[ 1 ] == AstroSkyfield.__BODY_EVENT_SET: 
                 riseDateTime = t[ 0 ]
                 setDateTime = t[ 1 ]
 
-            else:
+            elif events[ 0 ] == AstroSkyfield.__BODY_EVENT_SET and events[ 1 ] == AstroSkyfield.__BODY_EVENT_RISE: 
                 riseDateTime = t[ 1 ]
                 setDateTime = t[ 0 ]
 
-            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime )
-            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( setDateTime )
+            else:
+                foundRiseSet = False
 
-            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+            if foundRiseSet:
+                data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime )
+                data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( setDateTime )
+
+                alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
+                data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+                data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else:
             # There is one rise OR one set OR no rises/sets.
@@ -987,7 +997,7 @@ class AstroSkyfield( AstroBase ):
             # A body which has been below the horizon for weeks/months and is due to rise,
             # will result in a single value (the rise) and there will be no set.
             # Similarly for a body above the horizon.
-            # Treat these single rise/set events as 'always up' or 'never up' (as the case may be)
+            # Treat these single rise/set events as 'always up' or 'never up'
             # until the body actually rises or sets.
             if almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target )( now ): # Body is up (and so always up).
                 alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
