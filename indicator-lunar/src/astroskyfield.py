@@ -801,6 +801,7 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = \
                 AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
 
+#TODO Explain the indices below.
             t, y, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS ) # Zeroth result in t and y is the first result, so use that.
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
                 t[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
@@ -831,9 +832,10 @@ class AstroSkyfield( AstroBase ):
                 data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( t[ 0 ] )
                 data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( t[ 1 ] )
 
-#TODO Once solar eclipses are implemented in Skyfield, replace the code below with similar functionality to lunar eclipses above.        
+#TODO When solar eclipses are implemented,
+# replace the code below similarly to lunar eclipses above
+# and update the eclipse credit in the indicator.
 # https://github.com/skyfielders/python-skyfield/issues/445
-#TODO Remove the eclipse credit from IndicatorLunar if/when moving EXCLUSIELY to Skyfield and Skyfield computes solar eclipses.
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( now.utc_datetime(), False )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType

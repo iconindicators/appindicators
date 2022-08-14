@@ -100,6 +100,17 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
+    CREDIT_COMETS = _( "Comet data by Comet Observation Database. https://cobs.si" )
+    CREDIT_ECLIPSES = _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" )
+    CREDIT_ECLIPSE_SOLAR_ONLY = _( "Solar eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" )
+    CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
+    CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://www.celestrak.com" )
+    if astroBackendName == astroBackendPyEphem:
+        CREDIT = [ CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
+
+    else:
+        CREDIT = [ CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
+
     DATA_INDEX_BODY_TYPE = 0
     DATA_INDEX_BODY_NAME = 1
     DATA_INDEX_DATA_NAME = 2
@@ -179,13 +190,8 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.94",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
-            creditz =
-                [ IndicatorLunar.astroBackend.getCredit(),
-                _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" ),
-                _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" ), 
-                _( "Comet data by Comet Observation Database. https://cobs.si" ),
-                _( "Satellite data by Dr T S Kelso. https://www.celestrak.com" ) ] )
+            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
+            creditz = IndicatorLunar.CREDIT )
 
         self.debug = True #TODO Testing
 
