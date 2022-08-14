@@ -775,13 +775,13 @@ class AstroSkyfield( AstroBase ):
         illumination = int( moonAtNow.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-        t, y = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
-        moonPhases = list( y )
-        moonPhasesDateTimes = t.utc_datetime()
+        dateTimes, events = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
+        phases = list( events )
+        phasesDateTimes = dateTimes.utc_datetime()
         lunarPhase = AstroBase.getLunarPhase(
             illumination,
-            moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_FULL ) ],
-            moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
+            phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_FULL ) ],
+            phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         sunAltAz = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
@@ -794,24 +794,14 @@ class AstroSkyfield( AstroBase ):
             AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] )
 
         if not neverUp:
-            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
-                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_FULL ) ] )
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_LAST_QUARTER ) ] )
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
 
-            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = \
-                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_FULL ) ] )
-
-            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
-                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_LAST_QUARTER ) ] )
-
-            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = \
-                AstroBase.toDateTimeString( moonPhasesDateTimes[ moonPhases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
-
-#TODO Explain the indices below.
-            t, y, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS ) # Zeroth result in t and y is the first result, so use that.
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = \
-                t[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ y[ 0 ] ]
+            dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ events[ 0 ] ]
 
 
     @staticmethod
@@ -824,18 +814,16 @@ class AstroSkyfield( AstroBase ):
 
         if not neverUp:
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
-            t, y = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
-            t = t.utc_datetime()
+            dateTimes, events = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
+            dateTimes = dateTimes.utc_datetime()
 
-#TODO Explain the indices....also see end of calculate moon and explain that (better).            
-            if almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_VERNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ] or \
-               almanac.SEASON_EVENTS[ AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX ] in almanac.SEASON_EVENTS[ y[ 0 ] ]:
-                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( t[ 0 ] )
-                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( t[ 1 ] )
+            if events[ 0 ] == AstroSkyfield.__SEASON_VERNAL_EQUINOX or events[ 0 ] == AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX:
+                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( dateTimes[ 0 ] )
+                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( dateTimes[ 1 ] )
 
             else:
-                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( t[ 0 ] )
-                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( t[ 1 ] )
+                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( dateTimes[ 1 ] )
+                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( dateTimes[ 0 ] )
 
 #TODO When solar eclipses are implemented,
 # replace the code below similarly to lunar eclipses above
@@ -965,17 +953,17 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateCommon( now, nowPlusThirtySixHours, data, key, locationAtNow, body ):
         neverUp = False
-        t, events = almanac.find_discrete( now, nowPlusThirtySixHours, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
+        dateTimes, events = almanac.find_discrete( now, nowPlusThirtySixHours, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
         if len( events ) >= 2:
-            t = t.utc_datetime()
+            dateTimes = dateTimes.utc_datetime()
             foundRiseSet = True
             if events[ 0 ] == AstroSkyfield.__BODY_EVENT_RISE and events[ 1 ] == AstroSkyfield.__BODY_EVENT_SET: 
-                riseDateTime = t[ 0 ]
-                setDateTime = t[ 1 ]
+                riseDateTime = dateTimes[ 0 ]
+                setDateTime = dateTimes[ 1 ]
 
             elif events[ 0 ] == AstroSkyfield.__BODY_EVENT_SET and events[ 1 ] == AstroSkyfield.__BODY_EVENT_RISE: 
-                riseDateTime = t[ 1 ]
-                setDateTime = t[ 0 ]
+                riseDateTime = dateTimes[ 1 ]
+                setDateTime = dateTimes[ 0 ]
 
             else:
                 foundRiseSet = False
@@ -1048,8 +1036,8 @@ class AstroSkyfield( AstroBase ):
         foundPass = False
         riseTime = None
         culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        t, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_ALTITUDE )
-        for ti, event in zip( t, events ):
+        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_ALTITUDE )
+        for ti, event in zip( dateTimes, events ):
             if event == AstroSkyfield.__SATELLITE_EVENT_RISE:
                 riseTime = ti
 
