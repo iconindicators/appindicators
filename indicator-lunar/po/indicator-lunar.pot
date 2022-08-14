@@ -1385,9 +1385,15 @@ msgid ""
 "information."
 msgstr ""
 
-#: indicator-lunar.py:180
+#: indicator-lunar.py:179
 msgid ""
 "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc."
+"nasa.gov"
+msgstr ""
+
+#: indicator-lunar.py:180
+msgid ""
+"Solar eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc."
 "nasa.gov"
 msgstr ""
 

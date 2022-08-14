@@ -1398,19 +1398,26 @@ msgstr ""
 "Показывает сведения о Луне, Солнце, планетах, малых планетах, кометах, "
 "звёздах и спутниках Земли."
 
-#: indicator-lunar.py:180
+#: indicator-lunar.py:179
 msgid ""
 "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc."
 "nasa.gov"
 msgstr ""
-"Сведения о затмениях: Фред Эспенак и Жан Меёс. https://eclipse.gsfc.nasa.gov"
+"Сведения о затмениях: Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov"
+
+#: indicator-lunar.py:180
+msgid ""
+"Solar eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc."
+"nasa.gov"
+msgstr ""
+"Сведения о солнечное затмениях: Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov"
 
 #: indicator-lunar.py:181
 msgid ""
 "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell."
 "edu"
 msgstr ""
-"Данные о малых планетах предоставлены Центром малых планет. https://www."
+"Данные о малых планетах предоставлены Lowell Minor Planet Services. https://www."
 "minorplanetcenter.net"
 
 #: indicator-lunar.py:182
