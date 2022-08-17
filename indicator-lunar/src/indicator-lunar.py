@@ -715,9 +715,10 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
+            indent = self.getMenuIndent( 1 )
             for name, translatedName in planets:
                 url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + translatedName, url )
+                self.createMenuItem( subMenu, indent + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
@@ -735,9 +736,10 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Stars" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
+            indent = self.getMenuIndent( 1 ) 
             for name, translatedName in stars:
                 url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.STARS_TO_HIP[ name ] )
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + translatedName, url )
+                self.createMenuItem( subMenu, indent + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
@@ -765,6 +767,7 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
+            indent = self.getMenuIndent( 1 ) 
             for internalName, displayName in sorted( bodiesToDisplay, key = lambda x: x[ 1 ].casefold() ):
                 if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
                     url = IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( internalName )
@@ -772,7 +775,7 @@ class IndicatorLunar( IndicatorBase ):
                 else:
                     url = IndicatorLunar.SEARCH_URL_MINOR_PLANET + internalName
 
-                self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + displayName, url )
+                self.createMenuItem( subMenu, indent + displayName, url )
                 self.updateMenuCommon( subMenu, bodyType, internalName, 2, url )
                 separator = Gtk.SeparatorMenuItem()
                 subMenu.append( separator )
@@ -955,67 +958,42 @@ class IndicatorLunar( IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
+        indent = self.getMenuIndent( 1 ) 
+        indentDouble = self.getMenuIndent( 2 ) 
+        indentTriple = self.getMenuIndent( 3 ) 
         for info in satellites:
             number = info[ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + number
-            menuItem = self.createMenuItem( subMenu, self.getMenuIndent( 1 ) + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
             if len( info ) == 3: # Satellite yet to rise.
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 2 ) + \
-                    _( "Rise Date/Time: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] ),
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
+                self.createMenuItem( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
 
             elif len( info ) == 4: # Circumpolar (always up).
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 2 ) + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_AZIMUTH ] ) ,
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_AZIMUTH ] )
+                self.createMenuItem( subMenu, indentDouble + _( "Azimuth: " ) + data, url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 2 ) + \
-                    _( "Altitude: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, info[ IndicatorLunar.SATELLITE_MENU_ALTITUDE ] ),
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, info[ IndicatorLunar.SATELLITE_MENU_ALTITUDE ] )
+                self.createMenuItem( subMenu, indentDouble + _( "Altitude: " ) + data, url )
 
             else: # Satellite is in transit.
-                self.createMenuItem( subMenu, self.getMenuIndent( 2 ) + _( "Rise" ), url )
+                self.createMenuItem( subMenu, indentDouble + _( "Rise" ), url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 3 ) + \
-                    _( "Date/Time: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] ),
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
+                self.createMenuItem( subMenu, indentTriple + _( "Date/Time: " ) + data, url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 3 ) + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_RISE_AZIMUTH ] ),
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_RISE_AZIMUTH ] )
+                self.createMenuItem( subMenu, indentTriple + _( "Azimuth: " ) + data, url )
 
-                self.createMenuItem( subMenu, self.getMenuIndent( 2 ) + _( "Set" ), url )
+                self.createMenuItem( subMenu, indentDouble + _( "Set" ), url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 3 ) + \
-                     _( "Date/Time: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_SET_DATE_TIME ] ),
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_SET_DATE_TIME ] )
+                self.createMenuItem( subMenu, indentTriple + _( "Date/Time: " ) + data, url )
 
-                self.createMenuItem(
-                    subMenu,
-                    self.getMenuIndent( 3 ) + \
-                    _( "Azimuth: " ) + \
-                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_SET_AZIMUTH ] ),
-                    url )
+                data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_SET_AZIMUTH ] )
+                self.createMenuItem( subMenu, indentTriple + _( "Azimuth: " ) + data, url )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
