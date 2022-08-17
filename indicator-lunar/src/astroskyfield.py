@@ -1088,3 +1088,66 @@ class AstroSkyfield( AstroBase ):
             startDateTime.utc.hour,
             startDateTime.utc.minute,
             range( rangeStart, rangeEnd, rangeStep ) )
+
+
+    @staticmethod
+    def __calculateSatelliteNEW( startDateTime, endDateTime, data, key, earthSatellite, timeScale, location, isTwilightFunction ): 
+        foundPass = False
+        riseDateTime = None
+        culminationDateTimes = [ ] # Culminate may occur more than once, so collect them all.
+        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_ALTITUDE )
+        for ti, event in zip( dateTimes, events ):
+            if event == AstroSkyfield.__SATELLITE_EVENT_RISE:
+                riseDateTime = ti
+
+            elif event == AstroSkyfield.__SATELLITE_EVENT_CULMINATE:
+                culminationDateTimes.append( ti )
+
+            else: # AstroSkyfield.__SATELLITE_EVENT_SET
+                if riseDateTime is not None and \
+                   culminationDateTimes and \
+                   AstroSkyfield.__isSatellitePassVisible( timeScale, riseDateTime, ti, isTwilightFunction, earthSatellite ):
+                    data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime.utc_datetime() )
+                    alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseDateTime ).altaz()
+                    data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
+                    
+                    data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( ti.utc_datetime() )
+                    alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
+                    data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
+                    
+                    foundPass = True
+                    break
+
+                riseDateTime = None
+                culminationDateTimes = [ ]
+
+        return foundPass
+
+
+    @staticmethod
+    def __isSatellitePassVisible( timeScale, startDateTime, endDateTime, isTwilightFunction, earthSatellite ):
+        secondsFromRiseToSet = ( endDateTime.utc_datetime() - startDateTime.utc_datetime() ).total_seconds()
+        rangeStart = math.ceil( startDateTime.utc.second )
+        rangeEnd = math.ceil( startDateTime.utc.second + secondsFromRiseToSet )
+        rangeStep = math.ceil( secondsFromRiseToSet / AstroSkyfield.__SATELLITE_TRANSIT_INTERVAL )
+        if rangeStep < 1.0:
+            rangeStep = 1.0
+
+        transitRange = timeScale.utc(
+            startDateTime.utc.year,
+            startDateTime.utc.month,
+            startDateTime.utc.day,
+            startDateTime.utc.hour,
+            startDateTime.utc.minute,
+            range( rangeStart, rangeEnd, rangeStep ) )
+
+        isTwilightAstronomical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_ASTRONOMICAL
+        isTwilightNautical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_NAUTICAL
+        isSunlit = earthSatellite.at( transitRange ).is_sunlit( AstroSkyfield.__EPHEMERIS_PLANETS )
+        isVisible = False
+        for twilightAstronomical, twilightNautical, sunlit in zip( isTwilightAstronomical, isTwilightNautical, isSunlit ):
+            if sunlit and ( twilightAstronomical or twilightNautical ):
+                isVisible = True
+                break
+
+        return isVisible
