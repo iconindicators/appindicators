@@ -665,8 +665,8 @@ class AstroSkyfield( AstroBase ):
     __SATELLITE_EVENT_SET = 2
 
 
-    __SATELLITE_ALTITUDE = 20.0
-    __SATELLITE_TRANSIT_INTERVAL = 5.0
+    __SATELLITE_DEGREES_ABOVE_HORIZON = 20.0
+    __SATELLITE_TRANSIT_INTERVAL_IN_SECONDS = 5.0
 
 
     # Skyfield seasons.
@@ -1034,85 +1034,26 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateSatellite( startDateTime, endDateTime, data, key, earthSatellite, timeScale, location, isTwilightFunction ): 
         foundPass = False
-        riseTime = None
-        culminateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_ALTITUDE )
-        for ti, event in zip( dateTimes, events ):
-            if event == AstroSkyfield.__SATELLITE_EVENT_RISE:
-                riseTime = ti
-
-            elif event == AstroSkyfield.__SATELLITE_EVENT_CULMINATE:
-                culminateTimes.append( ti )
-
-            else: # AstroSkyfield.__SATELLITE_EVENT_SET
-                if riseTime is not None and culminateTimes:
-                    transitRange = AstroSkyfield.__getSatelliteTransitRange( timeScale, riseTime, ti )
-                    isTwilightAstronomical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_ASTRONOMICAL
-                    isTwilightNautical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_NAUTICAL
-                    isSunlit = earthSatellite.at( transitRange ).is_sunlit( AstroSkyfield.__EPHEMERIS_PLANETS )
-                    for twilightAstronomical, twilightNautical, sunlit in zip( isTwilightAstronomical, isTwilightNautical, isSunlit ):
-                        if sunlit and ( twilightAstronomical or twilightNautical ):
-                            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseTime.utc_datetime() )
-                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseTime ).altaz()
-                            data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
-
-                            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( ti.utc_datetime() )
-                            alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
-                            data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
-
-                            foundPass = True
-                            break
-
-                riseTime = None
-                culminateTimes = [ ]
-
-            if foundPass:
-                break
-
-        return foundPass
-
-
-    @staticmethod
-    def __getSatelliteTransitRange( timeScale, startDateTime, endDateTime ):
-        secondsFromRiseToSet = ( endDateTime.utc_datetime() - startDateTime.utc_datetime() ).total_seconds()
-        rangeStart = math.ceil( startDateTime.utc.second )
-        rangeEnd = math.ceil( startDateTime.utc.second + secondsFromRiseToSet )
-        rangeStep = math.ceil( secondsFromRiseToSet / AstroSkyfield.__SATELLITE_TRANSIT_INTERVAL )
-        if rangeStep < 1.0:
-            rangeStep = 1.0
-
-        return timeScale.utc(
-            startDateTime.utc.year,
-            startDateTime.utc.month,
-            startDateTime.utc.day,
-            startDateTime.utc.hour,
-            startDateTime.utc.minute,
-            range( rangeStart, rangeEnd, rangeStep ) )
-
-
-    @staticmethod
-    def __calculateSatelliteNEW( startDateTime, endDateTime, data, key, earthSatellite, timeScale, location, isTwilightFunction ): 
-        foundPass = False
         riseDateTime = None
         culminationDateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_ALTITUDE )
-        for ti, event in zip( dateTimes, events ):
+        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_DEGREES_ABOVE_HORIZON )
+        for dateTime, event in zip( dateTimes, events ):
             if event == AstroSkyfield.__SATELLITE_EVENT_RISE:
-                riseDateTime = ti
+                riseDateTime = dateTime
 
             elif event == AstroSkyfield.__SATELLITE_EVENT_CULMINATE:
-                culminationDateTimes.append( ti )
+                culminationDateTimes.append( dateTime )
 
             else: # AstroSkyfield.__SATELLITE_EVENT_SET
                 if riseDateTime is not None and \
                    culminationDateTimes and \
-                   AstroSkyfield.__isSatellitePassVisible( timeScale, riseDateTime, ti, isTwilightFunction, earthSatellite ):
+                   AstroSkyfield.__isSatellitePassVisible( timeScale, riseDateTime, dateTime, isTwilightFunction, earthSatellite ):
                     data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime.utc_datetime() )
                     alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseDateTime ).altaz()
                     data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
                     
-                    data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( ti.utc_datetime() )
-                    alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( ti ).altaz()
+                    data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( dateTime.utc_datetime() )
+                    alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( dateTime ).altaz()
                     data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
                     
                     foundPass = True
@@ -1129,7 +1070,7 @@ class AstroSkyfield( AstroBase ):
         secondsFromRiseToSet = ( endDateTime.utc_datetime() - startDateTime.utc_datetime() ).total_seconds()
         rangeStart = math.ceil( startDateTime.utc.second )
         rangeEnd = math.ceil( startDateTime.utc.second + secondsFromRiseToSet )
-        rangeStep = math.ceil( secondsFromRiseToSet / AstroSkyfield.__SATELLITE_TRANSIT_INTERVAL )
+        rangeStep = math.ceil( secondsFromRiseToSet / AstroSkyfield.__SATELLITE_TRANSIT_INTERVAL_IN_SECONDS )
         if rangeStep < 1.0:
             rangeStep = 1.0
 
