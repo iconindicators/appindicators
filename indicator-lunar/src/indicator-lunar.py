@@ -20,12 +20,6 @@
 # comet, star and satellite information.
 
 
-#TODO Test satellites...
-# Compare skyfield against pyephem for an evening window, morning window and full window and middle of day window.
-# Compare against n2y and heavens above.
-# For Skyfield, see if __SATELLITE_TRANSIT_INTERVAL = 5.0 is a "good" value in terms of speed/accuracy...maybe try 10?
-
-
 #TODO Make sure putting the new version number into cache files helps in the future!!!  
 # Put the number as a variable?
 # What happens if say comets has to change.  
