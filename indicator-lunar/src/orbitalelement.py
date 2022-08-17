@@ -72,9 +72,6 @@ def download( dataType, apparentMagnitudeMaximum = None, logging = None ):
     if dataType == OE.DataType.SKYFIELD_MINOR_PLANET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
         oeData = __downloadFromLowellMinorPlanetServices( dataType, apparentMagnitudeMaximum, logging )
 
-    elif dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.XEPHEM_COMET:
-        oeData = __downloadFromCometObservationDatabase( dataType, apparentMagnitudeMaximum, logging )
-
     else:
         logging.error( "Unknown data type: " + str( dataType ) )
 
@@ -266,9 +263,6 @@ def getPackedDate( year, month, day ):
 # Otherwise, returns an empty dictionary and may write to the log.
 def __downloadFromCometObservationDatabase( dataType, apparentMagnitudeMaximum, logging = None ):
     orbitalElementData = { }
-#TODO Wait on Jure to figure final API...
-# https://cobs.si/help/cobs_api/elements_api/
-# Is apparentMagnitudeMaximum needed or will I be able to filter by apparent magnitude when making the download?
     url = "https://cobs.si/api/elements.api?format=mpc" if dataType == OE.DataType.SKYFIELD_COMET else "https://cobs.si/api/elements.api?format=ephem"
     try:
         data = urlopen( url, timeout = URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ).splitlines()
