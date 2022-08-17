@@ -20,12 +20,6 @@
 # comet, star and satellite information.
 
 
-#TODO Make sure putting the new version number into cache files helps in the future!!!  
-# Put the number as a variable?
-# What happens if say comets has to change.  
-# Does the number change for ALL of the other file types?    
-
-
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
 # https://telescopenights.com/stars-in-the-daytime/
 # Excludes the sun and moon (maybe mercury?).
@@ -133,15 +127,17 @@ class IndicatorLunar( IndicatorBase ):
     APPARENT_MAGNITUDE_CACHE_BASENAME = "apparentmagnitude-94-"
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
-    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + "-94-" 
+    CACHE_VERSION = "-94-" 
+
+    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION 
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
 
-    MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-" + astroBackendName.lower() + "-94-"
+    MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-" + astroBackendName.lower() + CACHE_VERSION
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
 
-    SATELLITE_CACHE_BASENAME = "satellite-tle-94-"
+    SATELLITE_CACHE_BASENAME = "satellite-tle" + CACHE_VERSION
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
     SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
