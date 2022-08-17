@@ -666,7 +666,7 @@ class AstroSkyfield( AstroBase ):
 
 
     __SATELLITE_DEGREES_ABOVE_HORIZON = 20.0
-    __SATELLITE_TRANSIT_INTERVAL_IN_SECONDS = 5.0
+    __SATELLITE_TRANSIT_INTERVAL_IN_SECONDS = 30.0
 
 
     # Skyfield seasons.
@@ -1071,6 +1071,7 @@ class AstroSkyfield( AstroBase ):
         rangeStart = math.ceil( startDateTime.utc.second )
         rangeEnd = math.ceil( startDateTime.utc.second + secondsFromRiseToSet )
         rangeStep = math.ceil( secondsFromRiseToSet / AstroSkyfield.__SATELLITE_TRANSIT_INTERVAL_IN_SECONDS )
+        print( rangeStep)
         if rangeStep < 1.0:
             rangeStep = 1.0
 
