@@ -25,6 +25,11 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
+#TODO Why do the icons appear to change shade/colour depending on the window touching the top panel or not?
+# https://askubuntu.com/questions/1114601/icons-change-colour-on-ubuntu-18-04-depending-on-window-state
+# Not sure if this still applies...difficult to tell when now re-examining.
+
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
