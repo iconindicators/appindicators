@@ -642,12 +642,8 @@ class IndicatorLunar( IndicatorBase ):
 
             indent = self.getMenuIndent( 2 )
             for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ INDEX_KEY ] ):
-                self.createMenuItem(
-                    subMenu,
-                    indent + \
-                    displayText + \
-                    self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ),
-                    IndicatorLunar.SEARCH_URL_MOON )
+                label = indent + displayText + self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
+                self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_MOON )
 
             self.updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
