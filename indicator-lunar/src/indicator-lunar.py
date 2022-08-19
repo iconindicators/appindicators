@@ -557,50 +557,54 @@ class IndicatorLunar( IndicatorBase ):
                     self.satellitePreviousNotifications.remove( number )
 
         for number, riseTime in sorted( satelliteCurrentNotifications, key = lambda x: ( x[ INDEX_RISE_TIME ], x[ INDEX_NUMBER ] ) ):
-            key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
+            self.__notificationSatellite( number, riseTime )
 
-            riseTime = self.formatData(
-                IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME,
-                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
-                IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            riseAzimuth = self.formatData(
-                IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, 
-                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ], 
-                IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+    def __notificationSatellite( self, number, riseTime ):
+        key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
 
-            setTime = self.formatData(
-                IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, 
-                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ], 
-                IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+        riseTime = self.formatData(
+            IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME,
+            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
+            IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            setAzimuth = self.formatData(
-                IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH,
-                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, ) ],
-                IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+        riseAzimuth = self.formatData(
+            IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, 
+            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ], 
+            IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            summary = \
-                self.satelliteNotificationSummary. \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME, setTime ) + \
-                " " # The notification summary text must not be empty (at least on Unity).
+        setTime = self.formatData(
+            IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, 
+            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ], 
+            IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            message = \
-                self.satelliteNotificationMessage. \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
-                replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME, setTime )
+        setAzimuth = self.formatData(
+            IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH,
+            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, ) ],
+            IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
+        summary = \
+            self.satelliteNotificationSummary. \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME, setTime ) + \
+            " " # The notification summary text must not be empty (at least on Unity).
+
+        message = \
+            self.satelliteNotificationMessage. \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME, setTime )
+
+        Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
 
     def updateMenuMoon( self, menu ):
