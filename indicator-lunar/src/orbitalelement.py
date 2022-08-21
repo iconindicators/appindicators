@@ -26,9 +26,6 @@ from urllib.request import urlopen
 import datetime, re, requests
 
 
-URL_TIMEOUT_IN_SECONDS = 20
-
-
 class OE( object ):
 
     class DataType( Enum ):
@@ -163,9 +160,6 @@ def __downloadFromLowellMinorPlanetServices( filename, dataType, apparentMagnitu
                         absoluteMagnitude,
                         slopeParameter ]
 
-                    #TODO Remove
-                    # oe = OE( primaryDesignation, ','.join( components ), dataType )
-                    # orbitalElementData[ oe.getName().upper() ] = oe
                     f.write( ','.join( components )  + '\n' )
 
                 else: #OE.DataType.SKYFIELD_MINOR_PLANET
@@ -217,9 +211,6 @@ def __downloadFromLowellMinorPlanetServices( filename, dataType, apparentMagnitu
 
                     f.write( ''.join( components )  + '\n' )
 
-                    #TODO Remove
-                # oe = OE( primaryDesignation, ''.join( components ), dataType )
-                # orbitalElementData[ oe.getName().upper() ] = oe
         downloaded = True
 
     except Exception as e:
