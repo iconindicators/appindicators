@@ -48,18 +48,19 @@ class AM( object ):
             self.getApparentMagnitude() == other.getApparentMagnitude()
 
 
-def download( isComet, apparentMagnitudeMaximum = None, logging = None ):
+def download( filename, isComet, apparentMagnitudeMaximum = None, logging = None ):
     logging.getLogger( "urllib3" ).propagate = False
-    apparentMagnitudeData = { }
+    downloaded = False
     if isComet:
         pass # Nothing to do as comet data from COBS contains updated/corrected absolute magnitude data in the ephemerides.
 
     else:
-        apparentMagnitudeData = __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging )
+        downloaded = __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum, logging )
 
-    return apparentMagnitudeData
+    return downloaded
 
 
+#TODO Fix all headers
 # Download AM data.
 #
 # Returns a dictionary:
@@ -67,8 +68,7 @@ def download( isComet, apparentMagnitudeMaximum = None, logging = None ):
 #    Value: AM object
 #
 # Otherwise, returns an empty dictionary and may write to the log.
-def __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging = None ):
-    apparentMagnitudeData = { }
+def __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum, logging = None ):
     try:
         variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
 
@@ -112,37 +112,58 @@ def __downloadFromLowellMinorPlanetServices( apparentMagnitudeMaximum, logging =
         data = response.json()
         minorPlanets = data[ "data" ][ "minorplanet" ]
 
-        for minorPlanet in minorPlanets:
-            primaryDesignation = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
-            apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
+        with open( filename, 'w' ) as f:
+            for minorPlanet in minorPlanets:
+                primaryDesignation = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
+                apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
+                f.write( primaryDesignation + ',' + apparentMagnitude  + '\n' )
 
-            am = AM( primaryDesignation, apparentMagnitude )
-            apparentMagnitudeData[ am.getName().upper() ] = am
+        downloaded = True
 
     except Exception as e:
-        apparentMagnitudeData = { }
+        downloaded = False
         if logging:
             logging.error( "Error retrieving apparent magnitude data from " + str( url ) )
             logging.exception( e )
 
-    return apparentMagnitudeData
+    return downloaded
 
 
-def toText( dictionary ):
-    text = ""
-    for am in dictionary.values():
-        text += str( am ) + '\n'
-
-    return text
-
-
-def toDictionary( text ):
+def load( filename, logging ):
     amData = { }
-    for line in text.splitlines():
-        lastComma = line.rfind( ',' )
-        name = line[ 0 : lastComma ]
-        apparentMagnitude = line[ lastComma + 1 : ]
-        am = AM( name, apparentMagnitude )
-        amData[ am.getName().upper() ] = am
+    try:
+        with open( filename, 'r' ) as f:
+            for line in f.read().splitlines():
+                lastComma = line.rfind( ',' )
+                name = line[ 0 : lastComma ]
+                apparentMagnitude = line[ lastComma + 1 : ]
+                am = AM( name, apparentMagnitude )
+                amData[ am.getName().upper() ] = am
+
+    except Exception as e:
+        amData = { }
+        logging.exception( e )
+        logging.error( "Error reading apparent magnitude data from: " + filename )
 
     return amData
+
+
+#TODO remove
+# def toText( dictionary ):
+#     text = ""
+#     for am in dictionary.values():
+#         text += str( am ) + '\n'
+#
+#     return text
+#
+#
+# def toDictionary( text ):
+#     amData = { }
+#     for line in text.splitlines():
+#         lastComma = line.rfind( ',' )
+#         name = line[ 0 : lastComma ]
+#         apparentMagnitude = line[ lastComma + 1 : ]
+#         am = AM( name, apparentMagnitude )
+#         amData[ am.getName().upper() ] = am
+#
+#     return amData

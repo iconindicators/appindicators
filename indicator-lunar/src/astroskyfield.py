@@ -1010,12 +1010,7 @@ class AstroSkyfield( AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
-                earthSatellite = EarthSatellite(
-                    satelliteData[ satellite ].getLine1(),
-                    satelliteData[ satellite ].getLine2(),
-                    satelliteData[ satellite ].getName(),
-                    timeScale )
-
+                earthSatellite = EarthSatellite.from_satrec( satelliteData[ satellite ].getSatelliteRecord(), timeScale )
                 for startDateTime, endDateTime in windows:
                     foundPass = AstroSkyfield.__calculateSatellite(
                         timeScale.from_datetime( startDateTime ),

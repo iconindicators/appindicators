@@ -20,6 +20,11 @@
 # comet, star and satellite information.
 
 
+#TODO
+# Need to include in the install/doc:
+# sudo pip3 install --upgrade sgp4
+
+
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
 # https://telescopenights.com/stars-in-the-daytime/
 # Excludes the sun and moon (maybe mercury?).
@@ -45,7 +50,7 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 
-import apparentmagnitude, datetime, eclipse, locale, math, orbitalelement, re, sys, twolineelement, webbrowser
+import apparentmagnitude, datetime, eclipse, generalperturbation, locale, math, orbitalelement, re, sys, webbrowser
 
 
 class IndicatorLunar( IndicatorBase ):
@@ -139,7 +144,7 @@ class IndicatorLunar( IndicatorBase ):
 
     SATELLITE_CACHE_BASENAME = "satellite-tle" + CACHE_VERSION
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
-    SATELLITE_DATA_URL = "https://celestrak.com/NORAD/elements/visual.txt"
+
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
         _( "Rise Time: " ) + astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n" + \
         _( "Rise Azimuth: " ) + astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
@@ -292,46 +297,43 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-        self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData( 
+        self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateDataNEW( 
             utcNow, self.cometData,
             IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountComet, self.nextDownloadTimeComet,
-            orbitalelement.download, [ IndicatorLunar.COMET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
-            orbitalelement.toText, [ ],
-            orbitalelement.toDictionary, [ IndicatorLunar.COMET_DATA_TYPE ] )
-
+            orbitalelement.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.COMET_CACHE_BASENAME ), IndicatorLunar.COMET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
+            orbitalelement.load, [ self.getCacheNewestFilename( IndicatorLunar.COMET_CACHE_BASENAME ), IndicatorLunar.COMET_DATA_TYPE, self.getLogging() ] )
+        
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
-        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
+        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateDataNEW( 
             utcNow, self.minorPlanetData,
             IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
-            orbitalelement.download, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
-            orbitalelement.toText, [ ],
-            orbitalelement.toDictionary, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] )
-
+            orbitalelement.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME ), IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
+            orbitalelement.load, [ self.getCacheNewestFilename( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME ), IndicatorLunar.MINOR_PLANET_DATA_TYPE, self.getLogging() ] )
+        
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
-        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
+        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateDataNEW( 
             utcNow, self.minorPlanetApparentMagnitudeData,
             IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
-            apparentmagnitude.download, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
-            apparentmagnitude.toText, [ ],
-            apparentmagnitude.toDictionary, [ ] )
+            apparentmagnitude.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME ), False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
+            apparentmagnitude.load, [ self.getCacheNewestFilename( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME ), self.getLogging() ] )
 
         # Update satellite data.
-        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData( 
+        limitSatelliteNumber = True if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else False
+        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateDataNEW( 
             utcNow, self.satelliteData,
             IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
-            twolineelement.download, [ IndicatorLunar.SATELLITE_DATA_URL, self.getLogging() ],
-            twolineelement.toText, [ ],
-            twolineelement.toDictionary, [ ] )
+            generalperturbation.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.SATELLITE_CACHE_BASENAME, ".xml" ), self.getLogging() ],
+            generalperturbation.load, [ self.getCacheNewestFilename( IndicatorLunar.SATELLITE_CACHE_BASENAME, ".xml" ), limitSatelliteNumber ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -393,6 +395,37 @@ class IndicatorLunar( IndicatorBase ):
 
 
     # Get the data from the cache, or if stale, download from the source.
+    def __updateDataNEW(
+            self, utcNow, currentData,
+            cacheBaseName, cacheMaximumAge,
+            downloadCount, nextDownloadTime,
+            downloadDataFunction, downloadDataArguments,
+            loadDataFunction, loadDataArguments ):
+
+        if self.isCacheStale( utcNow, cacheBaseName, cacheMaximumAge ):
+            freshData = { }
+            if nextDownloadTime < utcNow: # Download is allowed (will not annoy currentData supplier).
+                if downloadDataFunction( *downloadDataArguments ):
+                    downloadCount = 0
+                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+                    freshData = loadDataFunction( *loadDataArguments )
+
+                else:
+                    downloadCount += 1
+                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
+
+        else:
+            # Cache is not stale; only load off disk as necessary.
+            if currentData:
+                freshData = currentData
+
+            else:
+                freshData = loadDataFunction( *loadDataArguments )
+
+        return freshData, downloadCount, nextDownloadTime
+
+
+    # Get the currentData from the cache, or if stale, download from the source.
     def __updateData(
             self, utcNow, data,
             cacheBaseName, cacheMaximumAge,
@@ -961,8 +994,10 @@ class IndicatorLunar( IndicatorBase ):
             number = info[ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
-            url = IndicatorLunar.SEARCH_URL_SATELLITE + number
-            menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            # url = IndicatorLunar.SEARCH_URL_SATELLITE + number
+            # menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            url = IndicatorLunar.SEARCH_URL_SATELLITE + str( number ) #TODO Test  and work out why number is an int and not a string
+            menuItem = self.createMenuItem( subMenu, indent + name + " : " + str( number ) + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
             if len( info ) == 3: # Satellite yet to rise.
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
                 self.createMenuItem( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
