@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Apparent Magnitude - holds the apparent magnitude for comets and minor planets.
+# Holds holds the apparent magnitude for comets and minor planets.
 
 
 import datetime, requests
@@ -48,6 +48,7 @@ class AM( object ):
             self.getApparentMagnitude() == other.getApparentMagnitude()
 
 
+# Downloads apparent magnitude data for comets and minor planets and saves to the given filename.
 def download( filename, isComet, apparentMagnitudeMaximum = None, logging = None ):
     logging.getLogger( "urllib3" ).propagate = False
     downloaded = False
@@ -60,14 +61,7 @@ def download( filename, isComet, apparentMagnitudeMaximum = None, logging = None
     return downloaded
 
 
-#TODO Fix all headers
-# Download AM data.
-#
-# Returns a dictionary:
-#    Key: object name
-#    Value: AM object
-#
-# Otherwise, returns an empty dictionary and may write to the log.
+# Downloads apparent magnitude data for minor planets from Lowell Minor Planet Services and saves to the given filename.
 def __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum, logging = None ):
     try:
         variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
@@ -129,6 +123,13 @@ def __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum,
     return downloaded
 
 
+# Loads apparent magnitude data from the given filename.
+#
+# Returns a dictionary:
+#    Key: Object/body name
+#    Value: AM object
+#
+# Otherwise, returns an empty dictionary and may write to the log.
 def load( filename, logging ):
     amData = { }
     try:
@@ -146,24 +147,3 @@ def load( filename, logging ):
         logging.error( "Error reading apparent magnitude data from: " + filename )
 
     return amData
-
-
-#TODO remove
-# def toText( dictionary ):
-#     text = ""
-#     for am in dictionary.values():
-#         text += str( am ) + '\n'
-#
-#     return text
-#
-#
-# def toDictionary( text ):
-#     amData = { }
-#     for line in text.splitlines():
-#         lastComma = line.rfind( ',' )
-#         name = line[ 0 : lastComma ]
-#         apparentMagnitude = line[ lastComma + 1 : ]
-#         am = AM( name, apparentMagnitude )
-#         amData[ am.getName().upper() ] = am
-#
-#     return amData

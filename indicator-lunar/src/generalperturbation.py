@@ -16,14 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Update this comment...
-# https://celestrak.org/NORAD/documentation/gp-data-formats.php
-#
-#
-# Two Line Element - holds parameters to compute orbit for satellites.
-#
-# https://www.celestrak.com/NORAD/documentation/tle-fmt.php
-# https://en.wikipedia.org/wiki/Two-line_element_set
+# Holds general perturbations for satellites.
 
 
 from indicatorbase import IndicatorBase
@@ -69,25 +62,20 @@ class GP( object ):
             self.getSatelliteRecord() == other.getSatelliteRecord()
 
 
-#TODO Fix
-# Downloads TLE data from the URL.
-#
-# Returns a dictionary:
-#    Key: Satellite number
-#    Value: TLE object
-#
-# Otherwise, returns an empty dictionary and may write to the log.
+# Downloads general perturbation data from Celestrak and saves to the given filename.
 def download( filename, logging = None ):
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
     return IndicatorBase.download( url, filename, logging )
 
 
-#TODO Fix
-# Downloads TLE data from the URL.
+# Loads general perturbation data from the given filename.
+#
+# If instructed, will drop any satellite with a satellite number (Norad number)
+# greater than five digits, as this is incompatible with the TLE format.
 #
 # Returns a dictionary:
-#    Key: Satellite number
-#    Value: TLE object
+#    Key: Satellite number (Norad number)
+#    Value: GP object
 #
 # Otherwise, returns an empty dictionary and may write to the log.
 def load( filename, dropSatelliteNumberGreaterThanLengthFive ):
@@ -95,7 +83,7 @@ def load( filename, dropSatelliteNumberGreaterThanLengthFive ):
     for fields in omm.parse_xml( filename ):
         satelliteRecord = Satrec()
         omm.initialize( satelliteRecord, fields )
-        if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5: #TODO Add comment and ask if this is valid on the PyEphem discussion board.
+        if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5:
             continue
 
         data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord ) 

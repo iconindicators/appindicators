@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Orbital Element - holds orbital elements for comets and minor planets.
+# Holds orbital elements for comets and minor planets.
 
 
 from enum import Enum
@@ -67,6 +67,7 @@ class OE( object ):
             self.getDataType() == other.getDataType()
 
 
+# Downloads orbital element data and saves to the given filename.
 def download( filename, dataType, apparentMagnitudeMaximum = None, logging = None ):
     logging.getLogger( "urllib3" ).propagate = False
     downloaded = False
@@ -82,13 +83,7 @@ def download( filename, dataType, apparentMagnitudeMaximum = None, logging = Non
     return downloaded
 
 
-# Download OE data.
-#
-# Returns a dictionary:
-#    Key: object name
-#    Value: OE object
-#
-# Otherwise, returns an empty dictionary and may write to the log.
+# Downloads orbital element data for minor planets from Lowell Minor Planet Services and saves to the given filename.
 def __downloadFromLowellMinorPlanetServices( filename, dataType, apparentMagnitudeMaximum, logging = None ):
     try:
         variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
@@ -264,14 +259,7 @@ def getPackedDate( year, month, day ):
     return packedYear + packedMonth + packedDay
 
 
-#TODO Fix all headers.
-# Download OE data.
-#
-# Returns a dictionary:
-#    Key: object name
-#    Value: OE object
-#
-# Otherwise, returns an empty dictionary and may write to the log.
+# Downloads orbital element data for comets from Comet Observation Database and saves to the given filename.
 def __downloadFromCometObservationDatabase( filename, dataType, apparentMagnitudeMaximum, logging = None ):
 #TODO Wait on Jure to figure final API...
 # https://cobs.si/help/cobs_api/elements_api/
@@ -286,6 +274,7 @@ def __downloadFromCometObservationDatabase( filename, dataType, apparentMagnitud
     return IndicatorBase.download( url, filename, logging )
 
 
+#TODO Remove
 # No longer in use as MPC data is stale and unreliable; kept for posterity.
 #
 # Download OE data; drop bad/missing data.
@@ -386,44 +375,14 @@ def __downloadFromMinorPlanetCenter( url, dataType, logging = None ):
     return oeData
 
 
-def toText( dictionary ):
-    text = ""
-    for oe in dictionary.values():
-        text += oe.getData() + '\n'
-
-    return text
-
-
-def toDictionary( text, dataType ):
-    oeData = { }
-    if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-        if dataType == OE.DataType.SKYFIELD_COMET: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-            nameStart = 103 - 1
-            nameEnd = 158 - 1
-    
-        elif dataType == OE.DataType.SKYFIELD_MINOR_PLANET: # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-            nameStart = 167 - 1
-            nameEnd = 194 - 1
-
-        for line in text.splitlines():
-            name = line[ nameStart : nameEnd + 1 ].strip()
-            oe = OE( name, line, dataType )
-            oeData[ oe.getName().upper() ] = oe
-
-    elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
-        for line in text.splitlines():
-            name = line[ : line.find( ',' ) ].strip()
-            oe = OE( name, line, dataType )
-            oeData[ oe.getName().upper() ] = oe
-
-    else:
-        logging.error( "Unknown data type: " + str( dataType ) )
-
-    return oeData
-
-
+# Loads orbital element data from the given filename.
+#
+# Returns a dictionary:
+#    Key: Object/body name
+#    Value: OE object
+#
+# Otherwise, returns an empty dictionary and may write to the log.
 def load( filename, dataType, logging ):
-    print( "Unknown data type encountered when loading orbital elements from file: '" + str( dataType ) + "', '" + filename + "'" ) #TODO Test
     oeData = { }
     if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
         if dataType == OE.DataType.SKYFIELD_COMET: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
