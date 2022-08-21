@@ -28,48 +28,6 @@ from urllib.request import urlopen
 URL_TIMEOUT_IN_SECONDS = 20
 
 
-#TODO Might have to rename this file/class to generalperturbations:
-# https://celestrak.org/NORAD/documentation/gp-data-formats.php
-#
-# See how to allow downloading TLEs for PyEphem
-# and the OMM XML for Skyfield (using sgp4).
-#
-# If sgp4 is needed, maybe need to include in the install/doc:
-# sudo pip3 install --upgrade sgp4
-#
-# Check if the visual.txt from Celestrak will ever include satellites with number
-# greater than 99999 and if so, what then?  The TLE format cannot handle anything larger.
-#
-# https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml
-# https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=tle
-#
-# https://rhodesmill.org/pyephem/quick.html
-# https://rhodesmill.org/pyephem/tutorial.html
-#
-# https://github.com/skyfielders/python-skyfield/issues/763
-# https://pypi.org/project/sgp4/
-# https://rhodesmill.org/skyfield/earth-satellites.html
-#
-# from sgp4 import omm
-# from sgp4.api import Satrec
-# with open( "/home/bernard/Downloads/visual.xml" ) as f:
-#     fields = next( omm.parse_xml( f ) )
-#
-# sat = Satrec()
-# omm.initialize( sat, fields )
-# print( sat )
-#
-# from skyfield.api import EarthSatellite, load, Star, wgs84
-#
-# ts = load.timescale( builtin = True )
-#
-# sat = EarthSatellite.from_satrec( sat, ts )
-# print('Satellite number:', sat.model.satnum )
-# print('Satellite name:', sat.name )
-# print('Epoch:', sat.epoch.utc_jpl() )
-
-
-
 class TLE( object ):
     def __init__( self, title, line1, line2 ):
         self.title = title
