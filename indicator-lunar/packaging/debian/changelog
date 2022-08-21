@@ -1,3 +1,10 @@
+indicator-lunar (1.0.95-1) bionic; urgency=low
+
+  * Satellite data format changed to use OMM rather than TLE.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Aug 2022 21:30:57 +1000  TODO Make this date of release.
+
+
 indicator-lunar (1.0.94-1) bionic; urgency=low
 
   * Bug fix: Full moon icon was not appearing in the werewolf notification.
