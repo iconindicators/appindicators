@@ -1126,19 +1126,10 @@ class IndicatorLunar( IndicatorBase ):
     # https://stackoverflow.com/a/64097432/2156453
     # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
     def convertStartHourAndEndHourToDateTimeInUTC( self, startHour, endHour ):
-#TODO Handle Ubuntu 16.04
-        import sys
-        if sys.version.startswith( "3.5" ):
-            startHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = startHour ).replace( tzinfo = datetime.timezone.utc ).astimezone( datetime.timezone.utc )
-            endHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = endHour ).replace( tzinfo = datetime.timezone.utc ).astimezone( datetime.timezone.utc )
-            if endHourAsDateTimeInUTC < startHourAsDateTimeInUTC:
-                endHourAsDateTimeInUTC = endHourAsDateTimeInUTC + datetime.timedelta( days = 1 )
-
-        else:
-            startHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = startHour ).astimezone( datetime.timezone.utc )
-            endHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = endHour ).astimezone( datetime.timezone.utc )
-            if endHourAsDateTimeInUTC < startHourAsDateTimeInUTC:
-                endHourAsDateTimeInUTC = endHourAsDateTimeInUTC + datetime.timedelta( days = 1 )
+        startHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = startHour ).astimezone( datetime.timezone.utc )
+        endHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = endHour ).astimezone( datetime.timezone.utc )
+        if endHourAsDateTimeInUTC < startHourAsDateTimeInUTC:
+            endHourAsDateTimeInUTC = endHourAsDateTimeInUTC + datetime.timedelta( days = 1 )
 
         return startHourAsDateTimeInUTC, endHourAsDateTimeInUTC
 
