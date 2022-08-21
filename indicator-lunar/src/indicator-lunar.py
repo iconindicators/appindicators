@@ -167,7 +167,7 @@ class IndicatorLunar( IndicatorBase ):
     SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
-    SEARCH_URL_SATELLITE = "https://www.n2yo.com/satellite/?s="
+    SEARCH_URL_SATELLITE = "https://www.heavens-above.com/PassSummary.aspx?"
     SEARCH_URL_STAR = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+"
     SEARCH_URL_SUN = "https://solarsystem.nasa.gov/solar-system/sun"
 
@@ -988,17 +988,15 @@ class IndicatorLunar( IndicatorBase ):
         menuItem = self.createMenuItem( menu, label )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        indent = self.getMenuIndent( 1 ) 
-        indentDouble = self.getMenuIndent( 2 ) 
-        indentTriple = self.getMenuIndent( 3 ) 
+        indent = self.getMenuIndent( 1 )
+        indentDouble = self.getMenuIndent( 2 )
+        indentTriple = self.getMenuIndent( 3 )
         for info in satellites:
             number = info[ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
-            # url = IndicatorLunar.SEARCH_URL_SATELLITE + number
-            # menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
-            url = IndicatorLunar.SEARCH_URL_SATELLITE + str( number ) #TODO Test  and work out why number is an int and not a string
-            menuItem = self.createMenuItem( subMenu, indent + name + " : " + str( number ) + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
+            menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
             if len( info ) == 3: # Satellite yet to rise.
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
                 self.createMenuItem( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
