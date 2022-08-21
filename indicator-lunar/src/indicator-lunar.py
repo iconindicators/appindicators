@@ -20,11 +20,6 @@
 # comet, star and satellite information.
 
 
-#TODO
-# Need to include in the install/doc:
-# sudo pip3 install --upgrade sgp4
-
-
 #TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
 # https://telescopenights.com/stars-in-the-daytime/
 # Excludes the sun and moon (maybe mercury?).
