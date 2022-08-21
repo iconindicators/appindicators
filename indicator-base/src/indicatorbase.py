@@ -39,6 +39,7 @@ gi.require_version( "Notify", "0.7" )
 from abc import ABC
 from bisect import bisect_right
 from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from urllib.request import urlopen
 
 import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
@@ -779,6 +780,47 @@ class IndicatorBase( ABC ):
         return self.__readCacheText( cacheFile )
 
 
+#TODO Need comment
+#TODO Maybe move out of cache stuff.
+    def download( url, filename, logging = None ):
+        downloaded = False
+        try:
+            response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
+            with open( filename, 'w' ) as f:
+                f.write( response )
+
+            downloaded = True
+
+        except Exception as e:
+            if logging:
+                logging.error( "Error downloading from " + str( url ) )
+                logging.exception( e )
+
+        return downloaded
+
+
+#TODO Keep?
+#TODO Need a better function name...not to confuse with the same function name further below.
+    def getCacheNewestFilename( self, baseName, extension = ".txt" ): #TODO Maybe ditch the extension part...
+        cacheDirectory = self.__getCacheDirectory()
+        cacheFile = ""
+        for file in os.listdir( cacheDirectory ):
+            if file.startswith( baseName ) and file.endswith( extension ) and file > cacheFile:
+                cacheFile = file
+
+        if cacheFile:
+            cacheFile = cacheDirectory + cacheFile
+
+        else:
+            cacheFile = \
+                self.__getCacheDirectory() + \
+                baseName + \
+                datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+                extension
+
+        return cacheFile
+
+
     def __readCacheText( self, cacheFile ):
         text = ""
         if os.path.isfile( cacheFile ):
@@ -823,6 +865,14 @@ class IndicatorBase( ABC ):
             extension
 
         return self.__writeCacheText( text, cacheFile )
+
+
+#TODO Keep?
+    def getCacheFilenameWithTimestamp( self, baseName, extension = ".txt" ):
+        return self.__getCacheDirectory() + \
+                baseName + \
+                datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+                extension
 
 
     def __writeCacheText( self, text, cacheFile ):
