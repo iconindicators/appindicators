@@ -137,7 +137,7 @@ class IndicatorLunar( IndicatorBase ):
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
 
-    SATELLITE_CACHE_BASENAME = "satellite-tle" + CACHE_VERSION
+    SATELLITE_CACHE_BASENAME = "satellite-omm" + CACHE_VERSION
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
 
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
@@ -178,7 +178,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.94",
+            version = "1.0.95",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
             creditz = IndicatorLunar.CREDIT )
@@ -202,6 +202,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.__removeCacheFilesVersion89()
         self.__removeCacheFilesVersion93()
+        self.__removeCacheFilesVersion94()
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
 
@@ -227,6 +228,11 @@ class IndicatorLunar( IndicatorBase ):
         # In version 94, the full moon icon is now a regular, time-stamped icon.
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
         self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
+
+
+    def __removeCacheFilesVersion94( self ):
+        # In version 95, satellite cache data changed from TLE to OMM.
+        self.flushCache( "satellite-tle-94-", 0 )
 
 
     def flushTheCache( self ):
