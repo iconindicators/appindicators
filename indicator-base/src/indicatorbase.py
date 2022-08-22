@@ -328,7 +328,11 @@ class IndicatorBase( ABC ):
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     #    title: If None, will default to the indicator name.
     def showMessage( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__showMessageInternal( self.__getParent( parentWidget ), message, messageType, self.indicatorName if title is None else title )
+        IndicatorBase.__showMessageInternal(
+            self.__getParent( parentWidget ),
+            message,
+            messageType,
+            self.indicatorName if title is None else title )
 
 
     # Show a message dialog.
@@ -336,7 +340,11 @@ class IndicatorBase( ABC ):
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     @staticmethod
     def showMessageStatic( message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__showMessageInternal( Gtk.Dialog(), message, messageType, "" if title is None else title )
+        IndicatorBase.__showMessageInternal(
+            Gtk.Dialog(),
+            message,
+            messageType,
+            "" if title is None else title )
 
 
     # Show a message dialog.
@@ -344,7 +352,12 @@ class IndicatorBase( ABC ):
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
     @staticmethod
     def __showMessageInternal( parentWidget, message, messageType, title ):
-        dialog = Gtk.MessageDialog( parentWidget, Gtk.DialogFlags.MODAL, messageType, Gtk.ButtonsType.OK, message )
+        dialog = Gtk.MessageDialog(
+            parentWidget,
+            Gtk.DialogFlags.MODAL,
+            messageType,
+            Gtk.ButtonsType.OK, message )
+
         dialog.set_title( title )
         messageArea = dialog.get_message_area()
         for child in messageArea.get_children():
@@ -556,7 +569,8 @@ class IndicatorBase( ABC ):
         return listStore
 
 
-    def requestSaveConfig( self, delay = 0 ):  GLib.timeout_add_seconds( delay, self.__saveConfig, False )
+    def requestSaveConfig( self, delay = 0 ):
+        GLib.timeout_add_seconds( delay, self.__saveConfig, False )
 
 
     # Read a dictionary of configuration from a JSON text file.
@@ -601,88 +615,111 @@ class IndicatorBase( ABC ):
 
 
     # Return the full directory path to the user config directory for the current indicator.
-    def __getConfigDirectory( self ): return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
+    def __getConfigDirectory( self ):
+        return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
 
 
-    def isCacheStale( self, utcNow, cacheBaseName, cacheMaximumAge ):
-        cacheDateTime = self.getCacheDateTime( cacheBaseName )
+    # Download the contents of the given URL and save to file.
+    def download( url, filename, logging = None ):
+        downloaded = False
+        try:
+            response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
+            with open( filename, 'w' ) as f:
+                f.write( response )
+
+            downloaded = True
+
+        except Exception as e:
+            if logging:
+                logging.error( "Error downloading from " + str( url ) )
+                logging.exception( e )
+
+        return downloaded
+
+
+    # Finds the most recent file in the cache with the given basename
+    # and if the timestamp is older than the current date/time
+    # plus the maximum age, returns True, otherwise False.
+    # If no file can be found, returns True.
+    def isCacheStale( self, utcNow, basename, maximumAgeInHours ):
+        cacheDateTime = self.getCacheDateTime( basename )
         if cacheDateTime is None:
             stale = True
 
         else:
-            stale = ( cacheDateTime + datetime.timedelta( hours = cacheMaximumAge ) ) < utcNow
+            stale = ( cacheDateTime + datetime.timedelta( hours = maximumAgeInHours ) ) < utcNow
 
         return stale
 
 
+    # Find the date/time of the newest file in the cache matching the basename.
+    #
+    # basename: The text used to form the file name, typically the name of the calling application.
+    #
+    # Returns the datetime of the newest file in the cache.  None if no file can be found.
+    def getCacheDateTime( self, basename ):
+        expiry = None
+        theFile = ""
+        for file in os.listdir( self.__getCacheDirectory() ):
+            if file.startswith( basename ) and file > theFile:
+                theFile = file
+
+        if theFile: # A value of "" evaluates to False.
+            expiry = datetime.datetime.strptime( theFile[ len( basename ) : len( basename ) + 14 ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
+
+        return expiry
+
+
     # Remove a file from the cache.
     #
-    # fileName: The file to remove.
+    # filename: The file to remove.
     #
     # The file removed will be either
     #     ${XDGKey}/applicationBaseDirectory/fileName
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
-    def removeFileFromCache( self, fileName ):
+    def removeFileFromCache( self, filename ):
         cacheDirectory = self.__getCacheDirectory()
         for file in os.listdir( cacheDirectory ):
-            if file == fileName:
+            if file == filename:
                 os.remove( cacheDirectory + file )
                 break
 
 
-    # Removes out of date cache files of a given base filename.
+    # Removes out of date cache files for a given basename.
     #
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    # cacheMaximumAgeInHours: Anything older than the maximum age (hours) is deleted.
+    # basename: The text used to form the file name, typically the name of the calling application.
+    # maximumAgeInHours: Anything older than the maximum age (hours) is deleted.
     #
     # Any file in the cache directory matching the pattern
     #
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # and is older than the cache maximum age is discarded.
     #
     # Any file extension is ignored in determining if the file should be deleted or not.
-    def flushCache( self, baseName, cacheMaximumAgeInHours ):
+    def flushCache( self, basename, maximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
-        cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = cacheMaximumAgeInHours )
+        cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = maximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
-            if file.startswith( baseName ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
-                dateTime = file[ len( baseName ) : len( baseName ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
+            if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
+                dateTime = file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
                     fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
                     if fileDateTime < cacheMaximumAgeDateTime:
                         os.remove( cacheDirectory + file )
 
 
-    # Find the date/time of the newest file in the cache matching the basename.
-    #
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    #
-    # Returns the datetime of the newest file in the cache.  None if no file can be found.
-    def getCacheDateTime( self, baseName ):
-        expiry = None
-        theFile = ""
-        for file in os.listdir( self.__getCacheDirectory() ):
-            if file.startswith( baseName ) and file > theFile:
-                theFile = file
-
-        if theFile: # A value of "" evaluates to False.
-            expiry = datetime.datetime.strptime( theFile[ len( baseName ) : len( baseName ) + 14 ], IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
-
-        return expiry
-
-
     # Read the most recent binary object from the cache.
     #
-    # baseName: The text used to form the file name, typically the name of the calling application.
+    # basename: The text used to form the file name, typically the name of the calling application.
     #
     # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
     #    ~/.cache/fred/apple-20170629174950
@@ -691,11 +728,11 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-    def readCacheBinary( self, baseName ):
+    def readCacheBinary( self, basename ):
         data = None
         theFile = ""
         for file in os.listdir( self.__getCacheDirectory() ):
-            if file.startswith( baseName ) and file > theFile:
+            if file.startswith( basename ) and file > theFile:
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
@@ -714,20 +751,20 @@ class IndicatorBase( ABC ):
 
     # Writes an object as a binary file.
     #
-    # baseName: The text used to form the file name, typically the name of the calling application.
+    # basename: The text used to form the file name, typically the name of the calling application.
     # binaryData: The object to write.
     #
     # The object will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # Returns True on success; False otherwise.
-    def writeCacheBinary( self, baseName, binaryData ):
+    def writeCacheBinary( self, basename, binaryData ):
         success = True
         cacheFile = \
             self.__getCacheDirectory() + \
-            baseName + \
+            basename + \
             datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
         try:
@@ -742,23 +779,27 @@ class IndicatorBase( ABC ):
         return success
 
 
+#TODO Who uses this?
    # Read the named text file from the cache.
     #
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
-    def readCacheText( self, filename ): return self.__readCacheText( self.__getCacheDirectory() + filename )
+    def readCacheText( self, filename ):
+        return self.__readCacheText( self.__getCacheDirectory() + filename )
 
 
+#TODO If the above function goes (or is renamed) rename this to be like the binary functions above...
+# So maybe readCacheText
     # Read the most recent text file from the cache.
     #
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    # extension: Added to the end of the baseName and date/time (will include the '.').
+    # basename: The text used to form the file name, typically the name of the calling application.
+    # extension: Added to the end of the basename and date/time (will include the '.').
     #
     # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # For example, for an application 'apple', the first file will be caught, whilst the second is filtered out:
     #    ~/.cache/fred/apple-20170629174950
@@ -767,11 +808,11 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
-    def readCacheTextWithTimestamp( self, baseName, extension = ".txt" ):
+    def readCacheTextWithTimestamp( self, basename, extension = ".txt" ):
         cacheDirectory = self.__getCacheDirectory()
         cacheFile = ""
         for file in os.listdir( cacheDirectory ):
-            if file.startswith( baseName ) and file.endswith( extension ) and file > cacheFile:
+            if file.startswith( basename ) and file.endswith( extension ) and file > cacheFile:
                 cacheFile = file
 
         if cacheFile:
@@ -780,32 +821,13 @@ class IndicatorBase( ABC ):
         return self.__readCacheText( cacheFile )
 
 
-#TODO Need comment
-#TODO Maybe move out of cache stuff.
-    def download( url, filename, logging = None ):
-        downloaded = False
-        try:
-            response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w' ) as f:
-                f.write( response )
-
-            downloaded = True
-
-        except Exception as e:
-            if logging:
-                logging.error( "Error downloading from " + str( url ) )
-                logging.exception( e )
-
-        return downloaded
-
-
 #TODO Keep?
 #TODO Need a better function name...not to confuse with the same function name further below.
-    def getCacheNewestFilename( self, baseName, extension = ".txt" ): #TODO Maybe ditch the extension part...
+    def getCacheNewestFilename( self, basename, extension = ".txt" ): #TODO Maybe ditch the extension part...
         cacheDirectory = self.__getCacheDirectory()
         cacheFile = ""
         for file in os.listdir( cacheDirectory ):
-            if file.startswith( baseName ) and file.endswith( extension ) and file > cacheFile:
+            if file.startswith( basename ) and file.endswith( extension ) and file > cacheFile:
                 cacheFile = file
 
         if cacheFile:
@@ -814,7 +836,7 @@ class IndicatorBase( ABC ):
         else:
             cacheFile = \
                 self.__getCacheDirectory() + \
-                baseName + \
+                basename + \
                 datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
                 extension
 
@@ -836,6 +858,7 @@ class IndicatorBase( ABC ):
         return text
 
 
+#TODO If this is not used, maybe delete (like in the read above) and rename the one below to writeCacheText.
     # Writes text to a file in the cache.
     #
     # text: The text to write.
@@ -848,19 +871,19 @@ class IndicatorBase( ABC ):
     # Writes text to a file in the cache.
     #
     # text: The text to write.
-    # baseName: The text used to form the file name, typically the name of the calling application.
-    # extension: Added to the end of the baseName and date/time (will include the '.').
+    # basename: The text used to form the file name, typically the name of the calling application.
+    # extension: Added to the end of the basename and date/time (will include the '.').
     #
     # The text will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     # or
-    #     ~/.cache/applicationBaseDirectory/baseNameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns True on success; False otherwise.
-    def writeCacheTextWithTimestamp( self, text, baseName, extension = ".txt" ):
+    def writeCacheTextWithTimestamp( self, text, basename, extension = ".txt" ):
         cacheFile = \
             self.__getCacheDirectory() + \
-            baseName + \
+            basename + \
             datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
@@ -868,9 +891,9 @@ class IndicatorBase( ABC ):
 
 
 #TODO Keep?
-    def getCacheFilenameWithTimestamp( self, baseName, extension = ".txt" ):
+    def getCacheFilenameWithTimestamp( self, basename, extension = ".txt" ):
         return self.__getCacheDirectory() + \
-                baseName + \
+                basename + \
                 datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
                 extension
 
