@@ -569,6 +569,23 @@ class IndicatorBase( ABC ):
         return listStore
 
 
+    # Download the contents of the given URL and save to file.
+    def download( url, filename, logging ):
+        downloaded = False
+        try:
+            response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
+            with open( filename, 'w' ) as f:
+                f.write( response )
+
+            downloaded = True
+
+        except Exception as e:
+            logging.error( "Error downloading from " + str( url ) )
+            logging.exception( e )
+
+        return downloaded
+
+
     def requestSaveConfig( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__saveConfig, False )
 

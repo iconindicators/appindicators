@@ -39,21 +39,3 @@ class DataProvider( ABC ):
     @staticmethod
     @abstractmethod
     def load( filename, logging, *args ): return { }
-
-
-    # Download the contents of the given URL and save to file.
-    @staticmethod
-    def download( url, filename, logging ):
-        downloaded = False
-        try:
-            response = urlopen( url, timeout = DataProvider.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w' ) as f:
-                f.write( response )
-
-            downloaded = True
-
-        except Exception as e:
-            logging.error( "Error downloading from " + str( url ) )
-            logging.exception( e )
-
-        return downloaded

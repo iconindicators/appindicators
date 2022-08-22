@@ -22,6 +22,7 @@
 
 from abc import ABC, abstractmethod
 from dataprovider import DataProvider
+from indicatorbase import IndicatorBase
 from sgp4 import exporter, omm
 from sgp4.api import Satrec
 
@@ -32,7 +33,7 @@ class DataProviderGeneralPerturbation( DataProvider ):
     @staticmethod
     def download( filename, logging ):
         url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
-        return DataProvider.download( url, filename, logging )
+        return IndicatorBase.download( url, filename, logging )
 
 
     # Load general perturbation data from the given filename.

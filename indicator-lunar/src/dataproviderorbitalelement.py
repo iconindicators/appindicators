@@ -23,6 +23,7 @@
 from abc import ABC, abstractmethod
 from dataprovider import DataProvider
 from enum import Enum
+from indicatorbase import IndicatorBase
 
 import datetime, requests
 
@@ -234,7 +235,7 @@ class DataProviderOrbitalElement( DataProvider ):
         else:
             url += "?format=ephem"
 
-        return DataProvider.download( url, filename, logging )
+        return IndicatorBase.download( url, filename, logging )
 
 
     # Load orbital element data from the given filename.
