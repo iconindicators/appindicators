@@ -62,7 +62,7 @@ def download( filename, isComet, apparentMagnitudeMaximum = None, logging = None
 
 
 # Downloads apparent magnitude data for minor planets from Lowell Minor Planet Services and saves to the given filename.
-def __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum, logging = None ):
+def __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum, logging ):
     try:
         variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
 
@@ -116,9 +116,8 @@ def __downloadFromLowellMinorPlanetServices( filename, apparentMagnitudeMaximum,
 
     except Exception as e:
         downloaded = False
-        if logging:
-            logging.error( "Error retrieving apparent magnitude data from " + str( url ) )
-            logging.exception( e )
+        logging.error( "Error retrieving apparent magnitude data from " + str( url ) )
+        logging.exception( e )
 
     return downloaded
 

@@ -16,14 +16,50 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Holds general perturbations for satellites.
+#TODO
+# Calculate astronomical information using Skyfield.
 
 
-from indicatorbase import IndicatorBase
+from abc import ABC, abstractmethod
+from dataprovider import DataProvider
 from sgp4 import exporter, omm
 from sgp4.api import Satrec
 
 
+class DataProviderGeneralPerturbation( DataProvider ):
+
+    # Download general perturbation data from Celestrak and save to the given filename.
+    @staticmethod
+    def download( filename, logging ):
+        url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
+        return DataProvider.download( url, filename, logging )
+
+
+    # Load general perturbation data from the given filename.
+    #
+    # If instructed, will drop any satellite with a satellite number (Norad number)
+    # greater than five digits, as this is incompatible with the TLE format.
+    #
+    # Returns a dictionary:
+    #    Key: Satellite number (Norad number)
+    #    Value: GP object
+    #
+    # Otherwise, returns an empty dictionary and may write to the log.
+    @staticmethod
+    def load( filename, logging, dropSatelliteNumberGreaterThanLengthFive ):
+        data = { }
+        for fields in omm.parse_xml( filename ):
+            satelliteRecord = Satrec()
+            omm.initialize( satelliteRecord, fields )
+            if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5:
+                continue
+
+            data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord ) 
+
+        return data
+
+
+# Holds general perturbations for satellites.
 class GP( object ):
     def __init__( self, name, satelliteRecord ):
         self.name = name
@@ -60,33 +96,3 @@ class GP( object ):
             self.__class__ == other.__class__ and \
             self.getName() == other.getName() and \
             self.getSatelliteRecord() == other.getSatelliteRecord()
-
-
-# Downloads general perturbation data from Celestrak and saves to the given filename.
-def download( filename, logging = None ):
-    url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
-    url = "file:///home/bernard/Downloads/visual.txt"#TODO Remove
-    return IndicatorBase.download( url, filename, logging )
-
-
-# Loads general perturbation data from the given filename.
-#
-# If instructed, will drop any satellite with a satellite number (Norad number)
-# greater than five digits, as this is incompatible with the TLE format.
-#
-# Returns a dictionary:
-#    Key: Satellite number (Norad number)
-#    Value: GP object
-#
-# Otherwise, returns an empty dictionary and may write to the log.
-def load( filename, dropSatelliteNumberGreaterThanLengthFive ):
-    data = { }
-    for fields in omm.parse_xml( filename ):
-        satelliteRecord = Satrec()
-        omm.initialize( satelliteRecord, fields )
-        if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5:
-            continue
-
-        data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord ) 
-
-    return data

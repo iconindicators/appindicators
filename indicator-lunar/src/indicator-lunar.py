@@ -42,10 +42,13 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 
+from dataproviderapparentmagnitude import AM, DataProviderApparentMagnitude
+from dataprovidergeneralperturbation import DataProviderGeneralPerturbation, GP
+from dataproviderorbitalelement import DataProviderOrbitalElement, OE
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 
-import apparentmagnitude, datetime, eclipse, generalperturbation, locale, math, orbitalelement, re, sys, webbrowser
+import datetime, eclipse, locale, math, re, sys, webbrowser
 
 
 class IndicatorLunar( IndicatorBase ):
@@ -124,20 +127,25 @@ class IndicatorLunar( IndicatorBase ):
         list( astroBackend.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+#TODO Need to rename the data files?  Name them after the data they store (generalperturbation) or customer (satellite)?
     APPARENT_MAGNITUDE_CACHE_BASENAME = "apparentmagnitude-94-"
+    APPARENT_MAGNITUDE_CACHE_EXTENSION = ".txt"
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
     CACHE_VERSION = "-94-" 
 
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION 
+    COMET_CACHE_EXTENSION = ".txt"
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
-    COMET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+    COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
     MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-" + astroBackendName.lower() + CACHE_VERSION
+    MINOR_PLANET_CACHE_EXTENSION = ".txt"
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
-    MINOR_PLANET_DATA_TYPE = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+    MINOR_PLANET_DATA_TYPE = OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
 
     SATELLITE_CACHE_BASENAME = "satellite-omm" + CACHE_VERSION
+    SATELLITE_CACHE_EXTENSION = ".xml"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
 
     SATELLITE_NOTIFICATION_MESSAGE_DEFAULT = \
@@ -230,6 +238,7 @@ class IndicatorLunar( IndicatorBase ):
         self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
 
 
+#TODO Probably need to remove other files too if we rename.
     def __removeCacheFilesVersion94( self ):
         # In version 95, satellite cache data changed from TLE to OMM.
         self.flushCache( "satellite-tle-94-", 0 )
@@ -297,47 +306,102 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateData( self, utcNow ):
+
         # Update comet data.
-        self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateDataNEW( 
+        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.COMET_CACHE_BASENAME )
+        self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
             utcNow, self.cometData,
-            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_EXTENSION, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountComet, self.nextDownloadTimeComet,
-            orbitalelement.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.COMET_CACHE_BASENAME ), IndicatorLunar.COMET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
-            orbitalelement.load, [ self.getCacheNewestFilename( IndicatorLunar.COMET_CACHE_BASENAME ), IndicatorLunar.COMET_DATA_TYPE, self.getLogging() ] )
-        
+            DataProviderOrbitalElement.download, downloadDataFilename, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
-        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateDataNEW( 
+        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME )
+        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
             utcNow, self.minorPlanetData,
-            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_EXTENSION, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
-            orbitalelement.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME ), IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
-            orbitalelement.load, [ self.getCacheNewestFilename( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME ), IndicatorLunar.MINOR_PLANET_DATA_TYPE, self.getLogging() ] )
-        
+            DataProviderOrbitalElement.download, downloadDataFilename, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
+            DataProviderOrbitalElement.load, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] )
+
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
-        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateDataNEW( 
+        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME )
+        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
             utcNow, self.minorPlanetApparentMagnitudeData,
-            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_EXTENSION, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
-            apparentmagnitude.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME ), False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM, self.getLogging() ],
-            apparentmagnitude.load, [ self.getCacheNewestFilename( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME ), self.getLogging() ] )
+            DataProviderApparentMagnitude.download, downloadDataFilename, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
+            DataProviderApparentMagnitude.load, [ ] )
 
         # Update satellite data.
+        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_EXTENSION )
         limitSatelliteNumber = True if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else False
-        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateDataNEW( 
+        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData(
             utcNow, self.satelliteData,
-            IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_EXTENSION, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
-            generalperturbation.download, [ self.getCacheFilenameWithTimestamp( IndicatorLunar.SATELLITE_CACHE_BASENAME, ".xml" ), self.getLogging() ],
-            generalperturbation.load, [ self.getCacheNewestFilename( IndicatorLunar.SATELLITE_CACHE_BASENAME, ".xml" ), limitSatelliteNumber ] )
+            DataProviderGeneralPerturbation.download, downloadDataFilename, [ ],
+            DataProviderGeneralPerturbation.load, [ limitSatelliteNumber ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
+
+
+    # Get the data from the cache, or if stale, download from the source.
+    def __updateData(
+            self, utcNow, currentData,
+            cacheBasename, cacheExtension, cacheMaximumAge,
+            downloadCount, nextDownloadTime,
+            downloadDataFunction, downloadDataFilename, downloadDataAdditionalArguments,
+            loadDataFunction, loadDataAdditionalArguments ):
+
+        if self.isCacheStale( utcNow, cacheBasename, cacheMaximumAge ):
+            freshData = { }
+            if nextDownloadTime < utcNow: # Download is allowed (do not want to annoy third-party data provider).
+                if downloadDataFunction( downloadDataFilename, self.getLogging(), *downloadDataAdditionalArguments ):
+                    downloadCount = 0
+                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
+                    freshData = loadDataFunction( self.getCacheNewestFilename( cacheBasename, cacheExtension ), self.getLogging(), *loadDataAdditionalArguments )
+
+                else:
+                    downloadCount += 1
+                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
+
+        else:
+            # Cache is not stale; only load off disk as necessary.
+            if currentData:
+                freshData = currentData
+
+            else:
+                freshData = loadDataFunction( self.getCacheNewestFilename( cacheBasename, cacheExtension ), self.getLogging(), *loadDataAdditionalArguments )
+
+        return freshData, downloadCount, nextDownloadTime
+
+
+    def __getNextDownloadTime( self, utcNow, downloadCount ):
+        nextDownloadTime = utcNow + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
+        timeIntervalInMinutes = {
+            1 : 5,
+            2 : 15,
+            3 : 60 }
+
+        if downloadCount in timeIntervalInMinutes:
+            nextDownloadTime = utcNow + datetime.timedelta( minutes = timeIntervalInMinutes[ downloadCount ] )
+
+        return nextDownloadTime
+
+
+    def addNewBodies( self, data, bodies ):
+        for body in data:
+            if body not in bodies:
+                bodies.append( body )
 
 
     # Process text containing pairs of [ ], optionally surrounded by { }, typically used for display in the indicator's label.
@@ -393,86 +457,6 @@ class IndicatorLunar( IndicatorBase ):
 
         processedText = re.sub( tagRegularExpression, "", processedText ) # Remove remaining tags (not removed because they were not contained within { }).
         return processedText
-
-
-    # Get the data from the cache, or if stale, download from the source.
-    def __updateDataNEW(
-            self, utcNow, currentData,
-            cacheBaseName, cacheMaximumAge,
-            downloadCount, nextDownloadTime,
-            downloadDataFunction, downloadDataArguments,
-            loadDataFunction, loadDataArguments ):
-
-        if self.isCacheStale( utcNow, cacheBaseName, cacheMaximumAge ):
-            freshData = { }
-            if nextDownloadTime < utcNow: # Download is allowed (will not annoy currentData supplier).
-                if downloadDataFunction( *downloadDataArguments ):
-                    downloadCount = 0
-                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-                    freshData = loadDataFunction( *loadDataArguments )
-
-                else:
-                    downloadCount += 1
-                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
-
-        else:
-            # Cache is not stale; only load off disk as necessary.
-            if currentData:
-                freshData = currentData
-
-            else:
-                freshData = loadDataFunction( *loadDataArguments )
-
-        return freshData, downloadCount, nextDownloadTime
-
-
-    # Get the currentData from the cache, or if stale, download from the source.
-    def __updateData(
-            self, utcNow, data,
-            cacheBaseName, cacheMaximumAge,
-            downloadCount, nextDownloadTime,
-            downloadDataFunction, downloadDataArguments,
-            toTextFunction, toTextAdditionalArgunemts,
-            toObjectFunction, toObjectAdditionalArgunemts ):
-
-        if self.isCacheStale( utcNow, cacheBaseName, cacheMaximumAge ):
-            downloadedData = { }
-            if nextDownloadTime < utcNow: # Download is allowed (will not annoy data supplier).
-                downloadedData = downloadDataFunction( *downloadDataArguments )
-                if downloadedData:
-                    self.writeCacheTextWithTimestamp( toTextFunction( downloadedData, *toTextAdditionalArgunemts ), cacheBaseName )
-                    downloadCount = 0
-                    nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-                    data = downloadedData
-
-                else:
-                    downloadCount += 1
-                    nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
-
-        else:
-            if not data:
-                data = toObjectFunction( self.readCacheTextWithTimestamp( cacheBaseName ), *toObjectAdditionalArgunemts )
-
-        return data, downloadCount, nextDownloadTime
-
-
-    def __getNextDownloadTime( self, utcNow, downloadCount ):
-        nextDownloadTime = utcNow + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
-        timeIntervalInMinutes = {
-            1 : 5,
-            2 : 15,
-            3 : 60 }
-
-        if downloadCount in timeIntervalInMinutes:
-            nextDownloadTime = utcNow + datetime.timedelta( minutes = timeIntervalInMinutes[ downloadCount ] )
-
-        return nextDownloadTime
-
-
-    def addNewBodies( self, data, bodies ):
-        for body in data:
-            if body not in bodies:
-                bodies.append( body )
 
 
     def getNextUpdateTimeInSeconds( self ):
@@ -536,7 +520,7 @@ class IndicatorLunar( IndicatorBase ):
         lunarIlluminationPercentage = int( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.getSVGIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
-        iconFilename = self.writeCacheTextWithTimestamp( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
+        iconFilename = self.writeCacheText( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -559,7 +543,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def createFullMoonIcon( self ):
-        return self.writeCacheTextWithTimestamp(
+        return self.writeCacheText(
             self.getSVGIconText( 100, None ),
             IndicatorLunar.ICON_CACHE_BASENAME,
             IndicatorLunar.EXTENSION_SVG )
