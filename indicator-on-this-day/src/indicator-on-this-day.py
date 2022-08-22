@@ -124,7 +124,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             if os.path.isfile( calendar ):
                 content += "#include <" +calendar + ">\n"
 
-        self.writeCacheText( content, IndicatorOnThisDay.CALENDARS_FILENAME )
+        self.writeCacheTextWithoutTimestamp( content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]

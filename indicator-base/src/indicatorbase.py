@@ -779,13 +779,12 @@ class IndicatorBase( ABC ):
         return success
 
 
-#TODO Who uses this?
    # Read the named text file from the cache.
     #
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
-    def readCacheText( self, filename ):
+    def readCacheTextWithoutTimestamp( self, filename ):
         return self.__readCacheText( self.__getCacheDirectory() + filename )
 
 
@@ -865,7 +864,7 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns True on success; False otherwise.
-    def writeCacheText( self, text, filename ): return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
+    def writeCacheTextWithoutTimestamp( self, text, filename ): return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
 
 
     # Writes text to a file in the cache.

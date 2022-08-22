@@ -106,7 +106,7 @@ class IndicatorFortune( IndicatorBase ):
     def showHistory( self, widget ):
         textView = Gtk.TextView()
         textView.set_editable( False )
-        textView.get_buffer().set_text( self.readCacheText( IndicatorFortune.HISTORY_FILE ) )
+        textView.get_buffer().set_text( self.readCacheTextWithoutTimestamp( IndicatorFortune.HISTORY_FILE ) )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.set_hexpand( True )
@@ -148,7 +148,7 @@ class IndicatorFortune( IndicatorBase ):
                     break
 
                 elif len( self.fortune ) <= self.skipFortuneCharacterCount: # If the fortune is within the character limit keep it...
-                    history = self.readCacheText( IndicatorFortune.HISTORY_FILE )
+                    history = self.readCacheTextWithoutTimestamp( IndicatorFortune.HISTORY_FILE )
                     if history is None:
                         history = ""
 
@@ -166,7 +166,7 @@ class IndicatorFortune( IndicatorBase ):
                         output += c                   
 
                     self.fortune = output
-                    self.writeCacheText( history + self.fortune + "\n\n", IndicatorFortune.HISTORY_FILE )
+                    self.writeCacheTextWithoutTimestamp( history + self.fortune + "\n\n", IndicatorFortune.HISTORY_FILE )
                     break
 
 
