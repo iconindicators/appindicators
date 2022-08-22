@@ -1,6 +1,6 @@
 indicator-lunar (1.0.95-1) bionic; urgency=low
 
-  * Satellite data format changed to use OMM rather than TLE.
+  * Satellite data now uses OMM format rather than TLE.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Aug 2022 21:30:57 +1000  TODO Make this date of release.
 
