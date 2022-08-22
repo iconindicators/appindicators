@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO
-# Calculate astronomical information using Skyfield.
+# Download from URL, load from file and hold in memory
+# general perturbations for satellites.
 
 
 from abc import ABC, abstractmethod
@@ -60,7 +60,7 @@ class DataProviderGeneralPerturbation( DataProvider ):
         return data
 
 
-# Holds general perturbations for satellites.
+# Hold general perturbations for satellites.
 class GP( object ):
     def __init__( self, name, satelliteRecord ):
         self.name = name

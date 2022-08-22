@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO
-# Calculate astronomical information using Skyfield.
+# Download from URL, load from file and hold in memory
+# apparent magnitude for comets and minor planets.
 
 
 from abc import ABC, abstractmethod
@@ -121,7 +121,7 @@ class DataProviderApparentMagnitude( DataProvider ):
                     apparentMagnitude = line[ lastComma + 1 : ]
                     am = AM( name, apparentMagnitude )
                     amData[ am.getName().upper() ] = am
-    
+
         except Exception as e:
             amData = { }
             logging.exception( e )
@@ -130,7 +130,7 @@ class DataProviderApparentMagnitude( DataProvider ):
         return amData
 
 
-# Holds holds the apparent magnitude for comets and minor planets.
+# Hold apparent magnitude for comets and minor planets.
 class AM( object ):
 
     def __init__( self, name, apparentMagnitude ):

@@ -16,26 +16,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Update
-# Base class for calculating astronomical information for use with Indicator Lunar.
+# Base class for downloading from a URL and loading from file,
+# data for comets, minor planets and satellites.
 
 
 from abc import ABC, abstractmethod
-from urllib.request import urlopen
 
 
 class DataProvider( ABC ):
 
-    URL_TIMEOUT_IN_SECONDS = 20
-
-
-#TODO Need comment
+    # Download data and save to file.
+    #
+    # Return True on success; false otherwise and may log.
     @staticmethod
     @abstractmethod
     def download( filename, logging, *args ): return True
 
 
-#TODO Need comment
+    # Load data from file and return in a dictionary.
+    #
+    # Return dictionary which may be empty and may log.
     @staticmethod
     @abstractmethod
     def load( filename, logging, *args ): return { }

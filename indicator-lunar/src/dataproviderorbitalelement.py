@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO
-# Calculate astronomical information using Skyfield.
+# Download from URL, load from file and hold in memory
+# orbital elements for comets and minor planets.
 
 
 from abc import ABC, abstractmethod
@@ -30,32 +30,27 @@ import datetime, requests
 
 class DataProviderOrbitalElement( DataProvider ):
 
-#TODO All references to dataType might be better renamed to include the classname into the datatype, so
-# orbitalElementDataType
-# Maybe just include the underlying data class (orbitalelement.OE) in here too.
-
-
     # Download orbital element data and save to the given filename.
     # If the maximum apparent magnitude does not apply for the given data type, set to None.
     @staticmethod
-    def download( filename, logging, dataType, apparentMagnitudeMaximum ):
+    def download( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         logging.getLogger( "urllib3" ).propagate = False
         downloaded = False
-        if dataType == OE.DataType.SKYFIELD_MINOR_PLANET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
-            downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices( filename, logging, dataType, apparentMagnitudeMaximum )
+        if orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET or orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
+            downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
 
-        elif dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.XEPHEM_COMET:
-            downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase( filename, logging, dataType )
+        elif orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.XEPHEM_COMET:
+            downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType )
 
         else:
-            logging.error( "Unknown data type: " + str( dataType ) )
+            logging.error( "Unknown data type: " + str( orbitalElementDataType ) )
 
         return downloaded
 
 
     # Download orbital element data for minor planets from Lowell Minor Planet Services and save to the given filename.
     @staticmethod
-    def __downloadFromLowellMinorPlanetServices( filename, logging, dataType, apparentMagnitudeMaximum ):
+    def __downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         try:
             variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
 
@@ -118,7 +113,7 @@ class DataProviderOrbitalElement( DataProvider ):
                     orbitalEccentricity = str( minorPlanet[ 'e' ] )
                     semimajorAxis = str( minorPlanet[ 'a' ] )
 
-                    if dataType == OE.DataType.XEPHEM_MINOR_PLANET:
+                    if orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
                         components = [
                             primaryDesignation,
                             'e',
@@ -225,14 +220,14 @@ class DataProviderOrbitalElement( DataProvider ):
 
     # Download orbital element data for comets from Comet Observation Database and save to the given filename.
     @staticmethod
-    def __downloadFromCometObservationDatabase( filename, logging, dataType ):
-    #TODO Wait on Jure to figure final API...
-    # https://cobs.si/help/cobs_api/elements_api/
+    def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType ):
+#TODO Wait on Jure to figure final API...
+# https://cobs.si/help/cobs_api/elements_api/
         url = "https://cobs.si/api/elements.api"
-        if dataType == OE.DataType.SKYFIELD_COMET:
+        if orbitalElementDataType == OE.DataType.SKYFIELD_COMET:
             url += "?format=mpc"
 
-        else:
+        else: # Assume to be OE.DataType.PYEPHEM_COMET
             url += "?format=ephem"
 
         return IndicatorBase.download( url, filename, logging )
@@ -245,14 +240,14 @@ class DataProviderOrbitalElement( DataProvider ):
     #    Value: OE object
     #
     # Otherwise, returns an empty dictionary and may write to the log.
-    def load( filename, logging, dataType ):
+    def load( filename, logging, orbitalElementDataType ):
         oeData = { }
-        if dataType == OE.DataType.SKYFIELD_COMET or dataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-            if dataType == OE.DataType.SKYFIELD_COMET: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+        if orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET:
+            if orbitalElementDataType == OE.DataType.SKYFIELD_COMET: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 nameStart = 103 - 1
                 nameEnd = 158 - 1
 
-            elif dataType == OE.DataType.SKYFIELD_MINOR_PLANET: # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+            elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET: # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
                 nameStart = 167 - 1
                 nameEnd = 194 - 1
 
@@ -260,7 +255,7 @@ class DataProviderOrbitalElement( DataProvider ):
                 with open( filename, 'r' ) as f:
                     for line in f.read().splitlines():
                         name = line[ nameStart : nameEnd + 1 ].strip()
-                        oe = OE( name, line, dataType )
+                        oe = OE( name, line, orbitalElementDataType )
                         oeData[ oe.getName().upper() ] = oe
 
             except Exception as e:
@@ -268,12 +263,12 @@ class DataProviderOrbitalElement( DataProvider ):
                 logging.exception( e )
                 logging.error( "Error reading orbital element data from: " + filename )
 
-        elif dataType == OE.DataType.XEPHEM_COMET or dataType == OE.DataType.XEPHEM_MINOR_PLANET:
+        elif orbitalElementDataType == OE.DataType.XEPHEM_COMET or orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
             try:
                 with open( filename, 'r' ) as f:
                     for line in f.read().splitlines():
                         name = line[ : line.find( ',' ) ].strip()
-                        oe = OE( name, line, dataType )
+                        oe = OE( name, line, orbitalElementDataType )
                         oeData[ oe.getName().upper() ] = oe
 
             except Exception as e:
@@ -283,12 +278,12 @@ class DataProviderOrbitalElement( DataProvider ):
 
         else:
             oeData = { }
-            logging.error( "Unknown data type encountered when loading orbital elements from file: '" + str( dataType ) + "', '" + filename + "'" )
+            logging.error( "Unknown data type encountered when loading orbital elements from file: '" + str( orbitalElementDataType ) + "', '" + filename + "'" )
 
         return oeData
 
 
-# Holds orbital elements for comets and minor planets.
+# Hold orbital elements for comets and minor planets.
 class OE( object ):
 
     class DataType( Enum ):
