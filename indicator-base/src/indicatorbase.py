@@ -60,7 +60,7 @@ class IndicatorBase( ABC ):
     CONFIG_VERSION = "version"
     INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
-    URL_TIMEOUT_IN_SECONDS = 20 #TODO Still needed?
+    URL_TIMEOUT_IN_SECONDS = 20
 
 
     def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None, debug = False ):

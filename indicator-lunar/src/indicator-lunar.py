@@ -135,7 +135,7 @@ class IndicatorLunar( IndicatorBase ):
     CACHE_VERSION = "-94-" 
 
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION 
-    COMET_CACHE_EXTENSION = ".txt"
+    COMET_CACHE_EXTENSION = ".txt" #TODO MOve this as generic CACHE_EXTENSION = ".txt" to IndicatorBase?
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
