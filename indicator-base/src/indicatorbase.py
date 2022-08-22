@@ -156,7 +156,8 @@ class IndicatorBase( ABC ):
             self.nextUpdateTime = None
 
 
-    def requestUpdate( self, delay = 0 ): GLib.timeout_add_seconds( delay, self.__update )
+    def requestUpdate( self, delay = 0 ):
+        GLib.timeout_add_seconds( delay, self.__update )
 
 
     def setLabel( self, text ):
@@ -164,7 +165,8 @@ class IndicatorBase( ABC ):
         self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.
 
 
-    def requestMouseWheelScrollEvents( self ): self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
+    def requestMouseWheelScrollEvents( self ):
+        self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
 
 
     def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
@@ -175,7 +177,8 @@ class IndicatorBase( ABC ):
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
-    def setAboutComments( self, comments ): self.comments = comments
+    def setAboutComments( self, comments ):
+        self.comments = comments
 
 
     def __onAbout( self, widget ):
@@ -477,10 +480,12 @@ class IndicatorBase( ABC ):
 
 
     # Standardised amount of indent spacing used in menus.
-    def getMenuIndent( self, indent ): return "      " * indent
+    def getMenuIndent( self, indent ):
+        return "      " * indent
 
 
-    def getThemeName( self ): return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+    def getThemeName( self ):
+        return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
     # Get the colour (in hexadecimal) for the current theme.
@@ -502,7 +507,8 @@ class IndicatorBase( ABC ):
         return themeColour
 
 
-    def getLogging( self ): return logging
+    def getLogging( self ):
+        return logging
 
 
     # Returns True if a number; False otherwise.
@@ -872,7 +878,8 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns True on success; False otherwise.
-    def writeCacheTextWithoutTimestamp( self, text, filename ): return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
+    def writeCacheTextWithoutTimestamp( self, text, filename ):
+        return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
 
 
     # Writes text to a file in the cache.
@@ -911,11 +918,13 @@ class IndicatorBase( ABC ):
 
 
     # Return the full directory path to the user cache directory for the current indicator.
-    def getCacheDirectory( self ): return self.__getCacheDirectory()
+    def getCacheDirectory( self ):
+        return self.__getCacheDirectory()
 
 
     # Return the full directory path to the user cache directory for the current indicator.
-    def __getCacheDirectory( self ): return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
+    def __getCacheDirectory( self ):
+        return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
