@@ -64,7 +64,15 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
 
-    def __init__( self, indicatorName, version, copyrightStartYear, comments, artwork = None, creditz = None, debug = False ):
+    def __init__( self,
+                  indicatorName,
+                  version,
+                  copyrightStartYear,
+                  comments,
+                  artwork = None,
+                  creditz = None,
+                  debug = False ):
+
         self.indicatorName = indicatorName
         self.version = version
         self.copyrightStartYear = copyrightStartYear
@@ -125,7 +133,8 @@ class IndicatorBase( ABC ):
 
         if self.debug:
             nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
-            menu.prepend( Gtk.MenuItem.new_with_label( "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] ) ) # Remove fractional seconds.
+            label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] # Remove fractional seconds.
+            menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
@@ -678,7 +687,7 @@ class IndicatorBase( ABC ):
 
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
-    def getCacheFilenameWithTimestamp( self, basename, extension = IndicatorBase.EXTENSION_TEXT ):
+    def getCacheFilenameWithTimestamp( self, basename, extension = EXTENSION_TEXT ):
         return self.__getCacheDirectory() + \
                basename + \
                datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -890,7 +899,7 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns True on success; False otherwise.
-    def writeCacheText( self, text, basename, extension = IndicatorBase.EXTENSION_TEXT ):
+    def writeCacheText( self, text, basename, extension = EXTENSION_TEXT ):
         cacheFile = \
             self.__getCacheDirectory() + \
             basename + \
@@ -968,7 +977,13 @@ class IndicatorBase( ABC ):
     def processGet( self, command, logNonZeroErrorCode = False ):
         result = None
         try:
-            result = subprocess.run( command, stdout = subprocess.PIPE, stderr = subprocess.PIPE, shell = True, check = logNonZeroErrorCode ).stdout.decode()
+            result = subprocess.run(
+                        command,
+                        stdout = subprocess.PIPE,
+                        stderr = subprocess.PIPE,
+                        shell = True,
+                        check = logNonZeroErrorCode ).stdout.decode()
+
             if not result:
                 result = None
 
