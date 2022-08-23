@@ -1,6 +1,7 @@
 indicator-lunar (1.0.95-1) bionic; urgency=low
 
   * Satellite data now uses OMM format rather than TLE.
+    As a result, the international designator will look slightly different.
     Requires PIP3 package 'sgp4' which should be automatically installed.
     If not:
 
