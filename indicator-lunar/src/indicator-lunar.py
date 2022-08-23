@@ -306,7 +306,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update comet data.
         self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
             utcNow, self.cometData,
-            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorBase.CACHE_EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountComet, self.nextDownloadTimeComet,
             DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
             DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
@@ -317,7 +317,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update minor planet data.
         self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
             utcNow, self.minorPlanetData,
-            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorBase.CACHE_EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
             DataProviderOrbitalElement.download, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
             DataProviderOrbitalElement.load, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] )
@@ -328,7 +328,7 @@ class IndicatorLunar( IndicatorBase ):
         # Update minor planet apparent magnitudes.
         self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
             utcNow, self.minorPlanetApparentMagnitudeData,
-            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorBase.CACHE_EXTENSION_TEXT, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
             DataProviderApparentMagnitude.download, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
             DataProviderApparentMagnitude.load, [ ] )

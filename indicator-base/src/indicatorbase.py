@@ -57,8 +57,8 @@ class IndicatorBase( ABC ):
     __TERMINAL_XFCE = "xfce4-terminal"
 
     # Public
-    CACHE_EXTENSION_TEXT = ".txt"
     CONFIG_VERSION = "version"
+    EXTENSION_TEXT = ".txt"
     INDENT_TEXT_LEFT = 25
     INDENT_WIDGET_LEFT = 20
     URL_TIMEOUT_IN_SECONDS = 20
@@ -678,7 +678,7 @@ class IndicatorBase( ABC ):
 
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
-    def getCacheFilenameWithTimestamp( self, basename, extension = IndicatorBase.CACHE_EXTENSION_TEXT ):
+    def getCacheFilenameWithTimestamp( self, basename, extension = IndicatorBase.EXTENSION_TEXT ):
         return self.__getCacheDirectory() + \
                basename + \
                datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -890,7 +890,7 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns True on success; False otherwise.
-    def writeCacheText( self, text, basename, extension = IndicatorBase.CACHE_EXTENSION_TEXT ):
+    def writeCacheText( self, text, basename, extension = IndicatorBase.EXTENSION_TEXT ):
         cacheFile = \
             self.__getCacheDirectory() + \
             basename + \
