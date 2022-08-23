@@ -127,13 +127,13 @@ class IndicatorLunar( IndicatorBase ):
         list( astroBackend.STAR_TAGS_TRANSLATIONS.items() ) +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
+    CACHE_VERSION = "-95-" 
+
 #TODO Need to rename the data files?  Name them after the data they store (generalperturbation) or customer (satellite)?
     APPARENT_MAGNITUDE_CACHE_BASENAME = "apparentmagnitude-94-"
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
-    CACHE_VERSION = "-94-" 
-
-    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION 
+    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
@@ -236,9 +236,11 @@ class IndicatorLunar( IndicatorBase ):
         self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
 
 
-#TODO Probably need to remove other files too if we rename.
+#TODO Test
     def __removeCacheFilesVersion94( self ):
-        # In version 95, satellite cache data changed from TLE to OMM.
+        # In version 95, cache data filenames changed format.
+        self.flushCache( "apparentmagnitude-94-", 0 )
+        self.flushCache( "minorplanet-oe-astropyephem-94-", 0 )
         self.flushCache( "satellite-tle-94-", 0 )
 
 
@@ -305,6 +307,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
+#TODO COmmet out before release
         self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
             utcNow, self.cometData,
             IndicatorLunar.COMET_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
