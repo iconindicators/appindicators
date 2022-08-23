@@ -139,7 +139,7 @@ class DataProviderOrbitalElement( DataProvider ):
                             ' ', # 14
                             str( round( float( slopeParameter ), 2 ) ).rjust( 5 ),
                             ' ', # 20
-                            getPackedDate( minorPlanet[ "epoch" ][ 0 : 4 ], minorPlanet[ "epoch" ][ 5 : 7 ], minorPlanet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
+                            DataProviderOrbitalElement.getPackedDate( minorPlanet[ "epoch" ][ 0 : 4 ], minorPlanet[ "epoch" ][ 5 : 7 ], minorPlanet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
                             ' ', # 26
                             str( round( float( meanAnomalyEpoch ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 36, 37 
@@ -191,6 +191,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
 
     # https://www.minorplanetcenter.net/iau/info/PackedDates.html
+    @staticmethod
     def getPackedDate( year, month, day ):
         packedYear = year[ 2 : ]
         if int( year ) < 1900:
