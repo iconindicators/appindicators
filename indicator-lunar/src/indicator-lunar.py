@@ -150,6 +150,7 @@ class IndicatorLunar( IndicatorBase ):
         _( "Rise Azimuth: " ) + astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\n" + \
         _( "Set Time: " ) + astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n" + \
         _( "Set Azimuth: " ) + astroBackend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION
+
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = \
         astroBackend.SATELLITE_TAG_NAME + " : " + \
         astroBackend.SATELLITE_TAG_NUMBER + " : " + \
