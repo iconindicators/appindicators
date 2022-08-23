@@ -129,18 +129,15 @@ class IndicatorLunar( IndicatorBase ):
 
 #TODO Need to rename the data files?  Name them after the data they store (generalperturbation) or customer (satellite)?
     APPARENT_MAGNITUDE_CACHE_BASENAME = "apparentmagnitude-94-"
-    APPARENT_MAGNITUDE_CACHE_EXTENSION = ".txt"
     APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
 
     CACHE_VERSION = "-94-" 
 
     COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION 
-    COMET_CACHE_EXTENSION = ".txt" #TODO MOve this as generic CACHE_EXTENSION = ".txt" to IndicatorBase?
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
     MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-" + astroBackendName.lower() + CACHE_VERSION
-    MINOR_PLANET_CACHE_EXTENSION = ".txt"
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
 
@@ -200,10 +197,10 @@ class IndicatorLunar( IndicatorBase ):
         self.data = None
         self.dataPrevious = None
 
-        self.minorPlanetApparentMagnitudeData = { } # Key: minor planet designation; Value apparentmagnitude.AM object.  Can be empty but never None.
-        self.cometData = { } # Key: comet name; Value: orbitalelement.OE object.  Can be empty but never None.
-        self.minorPlanetData = { } # Key: minor planet name; Value: orbitalelement.OE object.  Can be empty but never None.
-        self.satelliteData = { } # Key: satellite number; Value: twolineelement.TLE object.  Can be empty but never None.
+        self.minorPlanetApparentMagnitudeData = { } # Key: minor planet designation; Value AM object.  Can be empty but never None.
+        self.cometData = { } # Key: comet name; Value: OE object.  Can be empty but never None.
+        self.minorPlanetData = { } # Key: minor planet name; Value: OE object.  Can be empty but never None.
+        self.satelliteData = { } # Key: satellite number; Value: GP object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
@@ -306,49 +303,43 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateData( self, utcNow ):
-
         # Update comet data.
-        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.COMET_CACHE_BASENAME )
         self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
             utcNow, self.cometData,
-            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_EXTENSION, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorBase.CACHE_EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountComet, self.nextDownloadTimeComet,
-            DataProviderOrbitalElement.download, downloadDataFilename, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
             DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometData, self.comets )
 
         # Update minor planet data.
-        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME )
         self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
             utcNow, self.minorPlanetData,
-            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_EXTENSION, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorBase.CACHE_EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
-            DataProviderOrbitalElement.download, downloadDataFilename, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
+            DataProviderOrbitalElement.download, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
             DataProviderOrbitalElement.load, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] )
 
         if self.minorPlanetsAddNew:
             self.addNewBodies( self.minorPlanetData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
-        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME )
         self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
             utcNow, self.minorPlanetApparentMagnitudeData,
-            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_EXTENSION, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorBase.CACHE_EXTENSION_TEXT, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
-            DataProviderApparentMagnitude.download, downloadDataFilename, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
+            DataProviderApparentMagnitude.download, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
             DataProviderApparentMagnitude.load, [ ] )
 
         # Update satellite data.
-        downloadDataFilename = self.getCacheFilenameWithTimestamp( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_EXTENSION )
-        limitSatelliteNumber = True if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else False
         self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData(
             utcNow, self.satelliteData,
             IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_EXTENSION, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
-            DataProviderGeneralPerturbation.download, downloadDataFilename, [ ],
-            DataProviderGeneralPerturbation.load, [ limitSatelliteNumber ] )
+            DataProviderGeneralPerturbation.download, [ ],
+            DataProviderGeneralPerturbation.load, [ True if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else False ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteData, self.satellites )
@@ -359,16 +350,17 @@ class IndicatorLunar( IndicatorBase ):
             self, utcNow, currentData,
             cacheBasename, cacheExtension, cacheMaximumAge,
             downloadCount, nextDownloadTime,
-            downloadDataFunction, downloadDataFilename, downloadDataAdditionalArguments,
+            downloadDataFunction, downloadDataAdditionalArguments,
             loadDataFunction, loadDataAdditionalArguments ):
 
         if self.isCacheStale( utcNow, cacheBasename, cacheMaximumAge ):
             freshData = { }
             if nextDownloadTime < utcNow: # Download is allowed (do not want to annoy third-party data provider).
+                downloadDataFilename = self.getCacheFilenameWithTimestamp( cacheBasename, cacheExtension )
                 if downloadDataFunction( downloadDataFilename, self.getLogging(), *downloadDataAdditionalArguments ):
                     downloadCount = 0
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-                    freshData = loadDataFunction( self.getCacheNewestFilename( cacheBasename, cacheExtension ), self.getLogging(), *loadDataAdditionalArguments )
+                    freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
 
                 else:
                     downloadCount += 1
@@ -380,7 +372,8 @@ class IndicatorLunar( IndicatorBase ):
                 freshData = currentData
 
             else:
-                freshData = loadDataFunction( self.getCacheNewestFilename( cacheBasename, cacheExtension ), self.getLogging(), *loadDataAdditionalArguments )
+                downloadDataFilename = self.getCacheNewestFilename( cacheBasename ) # Should NOT return None as the cache was checked for staleness above.
+                freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
 
         return freshData, downloadCount, nextDownloadTime
 
@@ -1330,8 +1323,8 @@ class IndicatorLunar( IndicatorBase ):
         MINOR_PLANET_STORE_INDEX_NAME = 1
         MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME = 2
         minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-        dataType = orbitalelement.OE.DataType.XEPHEM_MINOR_PLANET \
-            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_MINOR_PLANET
+        dataType = OE.DataType.XEPHEM_MINOR_PLANET \
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
         for minorPlanet in sorted( self.minorPlanetData.keys() ):
             minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetData[ minorPlanet ].getName() ] )
 
@@ -1353,8 +1346,8 @@ class IndicatorLunar( IndicatorBase ):
         COMET_STORE_INDEX_NAME = 1
         COMET_STORE_INDEX_HUMAN_READABLE_NAME = 2
         cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
-        dataType = orbitalelement.OE.DataType.XEPHEM_COMET \
-            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else orbitalelement.OE.DataType.SKYFIELD_COMET
+        dataType = OE.DataType.XEPHEM_COMET \
+            if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
         for comet in sorted( self.cometData.keys() ):
             cometStore.append( [ comet in self.comets, comet, self.cometData[ comet ].getName() ] )
 
