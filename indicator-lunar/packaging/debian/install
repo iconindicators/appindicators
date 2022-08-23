@@ -1,12 +1,13 @@
 indicator-lunar.py.desktop usr/share/applications
-src/apparentmagnitude.py usr/share/indicator-lunar
 src/astrobase.py usr/share/indicator-lunar
 src/astropyephem.py usr/share/indicator-lunar
+src/dataprovider.py usr/share/indicator-lunar
+src/dataproviderapparentmagnitude.py usr/share/indicator-lunar
+src/dataprovidergeneralperturbation.py usr/share/indicator-lunar
+src/dataproviderorbitalelement.py usr/share/indicator-lunar
 src/eclipse.py usr/share/indicator-lunar
-src/generalperturbation.py usr/share/indicator-lunar
 src/indicatorbase.py usr/share/indicator-lunar
 src/indicator-lunar.py usr/share/indicator-lunar
-src/orbitalelement.py usr/share/indicator-lunar
 icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/scalable/apps
 icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/16
 icons/hicolor/indicator-lunar.svg usr/share/icons/hicolor/apps/22
