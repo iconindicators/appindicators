@@ -20,6 +20,19 @@
 # comet, star and satellite information.
 
 
+#TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
+# https://telescopenights.com/stars-in-the-daytime/
+# Excludes the sun and moon (maybe mercury?).
+# Could either use an hourly window similar to that in satellites, or
+# a check box that simply defaults to one hour before sunset and one hour after sunrise as the visible window.
+#
+# Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
+#
+# If this goes ahead, consider moving the start/end hour window functionality out of each backend and into the frontend.
+# So calculate the satellite passes and screen out those not within the desired window and calculate again moving the start date/time forward to the next window.
+# Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -84,10 +97,10 @@ class IndicatorLunar( IndicatorBase ):
     CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
     CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://www.celestrak.com" )
     if astroBackendName == astroBackendPyEphem:
-        CREDIT = [ CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
+        CREDIT = [ CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
 
     else:
-        CREDIT = [ CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
+        CREDIT = [ CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
 
     DATA_INDEX_BODY_TYPE = 0
     DATA_INDEX_BODY_NAME = 1
@@ -171,8 +184,10 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.95",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, minor planet, star and satellite information." ),
+            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.  Also in the debian/control file.
             creditz = IndicatorLunar.CREDIT )
+
+        self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key: combination of three tags: body type, body name and data name.
@@ -291,12 +306,13 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-        # self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-        #     utcNow, self.cometOrbitalElementData,
-        #     IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-        #     self.downloadCountComet, self.nextDownloadTimeComet,
-        #     DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
-        #     DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+#TODO Comment out before release
+        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+            utcNow, self.cometOrbitalElementData,
+            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+            self.downloadCountComet, self.nextDownloadTimeComet,
+            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometOrbitalElementData, self.comets )
@@ -1254,7 +1270,8 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
-        # grid.attach( cometsAddNewCheckbutton, 0, 3, 1, 1 )
+#TODO Comment out before release
+        grid.attach( cometsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 5 )
@@ -1350,7 +1367,8 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+#TODO Comment out before release
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS.keys():
