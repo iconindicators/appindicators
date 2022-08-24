@@ -7,8 +7,7 @@ indicator-lunar (1.0.95-1) bionic; urgency=low
 
         sudo pip3 install --upgrade sgp4
 
-
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 22 Aug 2022 21:30:57 +1000                  TODO Make this date of release.
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 24 Aug 2022 10:51:24 +1000
 
 
 indicator-lunar (1.0.94-1) bionic; urgency=low
