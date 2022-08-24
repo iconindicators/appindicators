@@ -129,12 +129,12 @@ class IndicatorLunar( IndicatorBase ):
 
     CACHE_VERSION = "-95-" 
 
-    COMET_CACHE_APPARENT_MAGNITUDE_BASENAME = "comet-apparentmagnitude-" + astroBackendName.lower() + CACHE_VERSION
+    COMET_CACHE_APPARENT_MAGNITUDE_BASENAME = "comet-apparentmagnitude-" + CACHE_VERSION
     COMET_CACHE_ORBITAL_ELEMENT_BASENAME = "comet-orbitalelement-" + astroBackendName.lower() + CACHE_VERSION
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
-    MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME = "minorplanet-apparentmagnitude-" + astroBackendName.lower() + CACHE_VERSION
+    MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME = "minorplanet-apparentmagnitude-" + CACHE_VERSION
     MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME = "minorplanet-orbitalelement-" + astroBackendName.lower() + CACHE_VERSION
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
