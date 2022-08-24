@@ -129,19 +129,17 @@ class IndicatorLunar( IndicatorBase ):
 
     CACHE_VERSION = "-95-" 
 
-#TODO Need to rename the data files?  Name them after the data they store (generalperturbation) or customer (satellite)?
-    APPARENT_MAGNITUDE_CACHE_BASENAME = "apparentmagnitude-94-"
-    APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS = 96
-
-    COMET_CACHE_BASENAME = "comet-oe-" + astroBackendName.lower() + CACHE_VERSION
+    COMET_CACHE_APPARENT_MAGNITUDE_BASENAME = "comet-apparentmagnitude-" + astroBackendName.lower() + CACHE_VERSION
+    COMET_CACHE_ORBITAL_ELEMENT_BASENAME = "comet-orbitalelement-" + astroBackendName.lower() + CACHE_VERSION
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
-    MINOR_PLANET_CACHE_BASENAME = "minorplanet-oe-" + astroBackendName.lower() + CACHE_VERSION
+    MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME = "minorplanet-apparentmagnitude-" + astroBackendName.lower() + CACHE_VERSION
+    MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME = "minorplanet-orbitalelement-" + astroBackendName.lower() + CACHE_VERSION
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
 
-    SATELLITE_CACHE_BASENAME = "satellite-omm" + CACHE_VERSION
+    SATELLITE_CACHE_BASENAME = "satellite-generalperturbation-" + CACHE_VERSION
     SATELLITE_CACHE_EXTENSION = ".xml"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
 
@@ -186,22 +184,22 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.95",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
+            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.  Also in the debian/control file.
             creditz = IndicatorLunar.CREDIT )
 
         self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
-        # Key is a combination of three tags: body type, body name and data name.
-        # Value is a string, regardless being numerical or not.
+        # Key: combination of three tags: body type, body name and data name.
+        # Value: a string, regardless being numerical or not.
         # Previous data is used for satellite transits.
         self.data = None
         self.dataPrevious = None
 
+        self.cometOrbitalElementData = { } # Key: comet designation; Value: OE object.  Can be empty but never None.
         self.minorPlanetApparentMagnitudeData = { } # Key: minor planet designation; Value AM object.  Can be empty but never None.
-        self.cometData = { } # Key: comet name; Value: OE object.  Can be empty but never None.
-        self.minorPlanetData = { } # Key: minor planet name; Value: OE object.  Can be empty but never None.
-        self.satelliteData = { } # Key: satellite number; Value: GP object.  Can be empty but never None.
+        self.minorPlanetOrbitalElementData = { } # Key: minor planet designation; Value: OE object.  Can be empty but never None.
+        self.satelliteGeneralPerturbationData = { } # Key: satellite number; Value: GP object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
@@ -230,25 +228,26 @@ class IndicatorLunar( IndicatorBase ):
         self.flushCache( "minorplanet-oe-distant-astropyephem-", 0 )
         self.flushCache( "minorplanet-oe-unusual-astropyephem-", 0 )
         self.flushCache( "satellite-tle-", 0 )
+        self.flushCache( "satellites-tle-", 0 )
 
         # In version 94, the full moon icon is now a regular, time-stamped icon.
-        self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-", 0 )
-        self.removeFileFromCache( IndicatorLunar.ICON_CACHE_BASENAME + "fullmoon-" + IndicatorLunar.EXTENSION_SVG )
+        self.flushCache( "icon-" + "fullmoon-", 0 )
+        self.removeFileFromCache( "icon-" + "fullmoon-" + ".svg" )
 
 
-#TODO Test
     def __removeCacheFilesVersion94( self ):
         # In version 95, cache data filenames changed format.
         self.flushCache( "apparentmagnitude-94-", 0 )
+        self.flushCache( "comet-oe-astropyephem-94-", 0 )
         self.flushCache( "minorplanet-oe-astropyephem-94-", 0 )
         self.flushCache( "satellite-tle-94-", 0 )
 
 
     def flushTheCache( self ):
+        self.flushCache( IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
-        self.flushCache( IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS )
-        self.flushCache( IndicatorLunar.COMET_CACHE_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
-        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
+        self.flushCache( IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
 
 
@@ -278,10 +277,10 @@ class IndicatorLunar( IndicatorBase ):
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
-            self.satellites, self.satelliteData, 
+            self.satellites, self.satelliteGeneralPerturbationData, 
             *self.convertStartHourAndEndHourToDateTimeInUTC( self.satelliteLimitStart, self.satelliteLimitEnd ),
-            self.comets, self.cometData, None,
-            self.minorPlanets, self.minorPlanetData, self.minorPlanetApparentMagnitudeData,
+            self.comets, self.cometOrbitalElementData, None,
+            self.minorPlanets, self.minorPlanetOrbitalElementData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
             self.getLogging() )
 
@@ -307,46 +306,46 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-#TODO COmmet out before release
-        self.cometData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-            utcNow, self.cometData,
-            IndicatorLunar.COMET_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+#TODO Comment out before release
+        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+            utcNow, self.cometOrbitalElementData,
+            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountComet, self.nextDownloadTimeComet,
             DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
             DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
-            self.addNewBodies( self.cometData, self.comets )
+            self.addNewBodies( self.cometOrbitalElementData, self.comets )
 
         # Update minor planet data.
-        self.minorPlanetData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
-            utcNow, self.minorPlanetData,
-            IndicatorLunar.MINOR_PLANET_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
+        self.minorPlanetOrbitalElementData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
+            utcNow, self.minorPlanetOrbitalElementData,
+            IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
             DataProviderOrbitalElement.download, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
             DataProviderOrbitalElement.load, [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] )
 
         if self.minorPlanetsAddNew:
-            self.addNewBodies( self.minorPlanetData, self.minorPlanets )
+            self.addNewBodies( self.minorPlanetOrbitalElementData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
         self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
             utcNow, self.minorPlanetApparentMagnitudeData,
-            IndicatorLunar.APPARENT_MAGNITUDE_CACHE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.APPARENT_MAGNITUDE_CACHE_MAXIMUM_AGE_HOURS,
+            IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
             DataProviderApparentMagnitude.download, [ False, IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ],
             DataProviderApparentMagnitude.load, [ ] )
 
         # Update satellite data.
-        self.satelliteData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData(
-            utcNow, self.satelliteData,
+        self.satelliteGeneralPerturbationData, self.downloadCountSatellite, self.nextDownloadTimeSatellite = self.__updateData(
+            utcNow, self.satelliteGeneralPerturbationData,
             IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_EXTENSION, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
             DataProviderGeneralPerturbation.download, [ ],
             DataProviderGeneralPerturbation.load, [ True if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else False ] )
 
         if self.satellitesAddNew:
-            self.addNewBodies( self.satelliteData, self.satellites )
+            self.addNewBodies( self.satelliteGeneralPerturbationData, self.satellites )
 
 
     # Get the data from the cache, or if stale, download from the source.
@@ -600,9 +599,9 @@ class IndicatorLunar( IndicatorBase ):
 
         summary = \
             self.satelliteNotificationSummary. \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteGeneralPerturbationData[ number ].getName() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteGeneralPerturbationData[ number ].getNumber() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator() ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
@@ -611,9 +610,9 @@ class IndicatorLunar( IndicatorBase ):
 
         message = \
             self.satelliteNotificationMessage. \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteData[ number ].getName() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteData[ number ].getNumber() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteData[ number ].getInternationalDesignator() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteGeneralPerturbationData[ number ].getName() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteGeneralPerturbationData[ number ].getNumber() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator() ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
@@ -769,10 +768,10 @@ class IndicatorLunar( IndicatorBase ):
             return bodiesToDisplay
 
         if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-            bodiesToDisplay = getBodyNamesToDisplay( self.comets, self.cometData, IndicatorLunar.astroBackend.BodyType.COMET )
+            bodiesToDisplay = getBodyNamesToDisplay( self.comets, self.cometOrbitalElementData, IndicatorLunar.astroBackend.BodyType.COMET )
 
         else:
-            bodiesToDisplay = getBodyNamesToDisplay( self.minorPlanets, self.minorPlanetData, IndicatorLunar.astroBackend.BodyType.MINOR_PLANET )
+            bodiesToDisplay = getBodyNamesToDisplay( self.minorPlanets, self.minorPlanetOrbitalElementData, IndicatorLunar.astroBackend.BodyType.MINOR_PLANET )
 
         if bodiesToDisplay:
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" ) )
@@ -904,7 +903,7 @@ class IndicatorLunar( IndicatorBase ):
                 if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes.
                     satellites.append( [
                         number,
-                        self.satelliteData[ number ].getName(),
+                        self.satelliteGeneralPerturbationData[ number ].getName(),
                         self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
                         self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
                         self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
@@ -919,7 +918,7 @@ class IndicatorLunar( IndicatorBase ):
                         if inTransit:
                             satellites.append( [
                                 number,
-                                self.satelliteData[ number ].getName(), 
+                                self.satelliteGeneralPerturbationData[ number ].getName(), 
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
@@ -928,19 +927,19 @@ class IndicatorLunar( IndicatorBase ):
                         else: # Previous transit is complete (and too far back in the past to be applicable), so show next pass.
                             satellites.append( [
                                 number,
-                                self.satelliteData[ number ].getName(),
+                                self.satelliteGeneralPerturbationData[ number ].getName(),
                                 self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                     else: # No previous transit, show next pass.
                         satellites.append( [
                             number,
-                            self.satelliteData[ number ].getName(),
+                            self.satelliteGeneralPerturbationData[ number ].getName(),
                             self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
             elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is polar (always up).
                 satellitesPolar.append( [
                     number,
-                    self.satelliteData[ number ].getName(),
+                    self.satelliteGeneralPerturbationData[ number ].getName(),
                     self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ],
                     self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ] )
 
@@ -977,7 +976,7 @@ class IndicatorLunar( IndicatorBase ):
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
-            menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteData[ number ].getInternationalDesignator(), url )
+            menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator(), url )
             if len( info ) == 3: # Satellite yet to rise.
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
                 self.createMenuItem( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
@@ -1271,6 +1270,7 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
+#TODO Comment out before release
         grid.attach( cometsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
@@ -1329,10 +1329,10 @@ class IndicatorLunar( IndicatorBase ):
         minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
         dataType = OE.DataType.XEPHEM_MINOR_PLANET \
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
-        for minorPlanet in sorted( self.minorPlanetData.keys() ):
-            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetData[ minorPlanet ].getName() ] )
+        for minorPlanet in sorted( self.minorPlanetOrbitalElementData.keys() ):
+            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetOrbitalElementData[ minorPlanet ].getName() ] )
 
-        if self.minorPlanetData:
+        if self.minorPlanetOrbitalElementData:
             toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
                           _( "Clicking the header of the first column\n" + \
                              "will toggle all checkboxes." )
@@ -1352,10 +1352,10 @@ class IndicatorLunar( IndicatorBase ):
         cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
         dataType = OE.DataType.XEPHEM_COMET \
             if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
-        for comet in sorted( self.cometData.keys() ):
-            cometStore.append( [ comet in self.comets, comet, self.cometData[ comet ].getName() ] )
+        for comet in sorted( self.cometOrbitalElementData.keys() ):
+            cometStore.append( [ comet in self.comets, comet, self.cometOrbitalElementData[ comet ].getName() ] )
 
-        if self.cometData:
+        if self.cometOrbitalElementData:
             toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
                           _( "Clicking the header of the first column\n" + \
                              "will toggle all checkboxes." )
@@ -1367,6 +1367,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
+#TODO Comment out before release
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
@@ -1396,10 +1397,10 @@ class IndicatorLunar( IndicatorBase ):
         SATELLITE_STORE_INDEX_NUMBER = 2
         SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR = 3
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
-        for satellite in self.satelliteData:
+        for satellite in self.satelliteGeneralPerturbationData:
             satelliteStore.append( [ satellite in self.satellites,
-                                     self.satelliteData[ satellite ].getName(),
-                                     satellite, self.satelliteData[ satellite ].getInternationalDesignator() ] )
+                                     self.satelliteGeneralPerturbationData[ satellite ].getName(),
+                                     satellite, self.satelliteGeneralPerturbationData[ satellite ].getInternationalDesignator() ] )
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -1407,7 +1408,7 @@ class IndicatorLunar( IndicatorBase ):
         tree = Gtk.TreeView.new_with_model( satelliteStoreSort )
         tree.set_hexpand( True )
         tree.set_vexpand( True )
-        if self.satelliteData:
+        if self.satelliteGeneralPerturbationData:
             tree.set_tooltip_text( _( "Check a satellite to display in the menu." ) + "\n\n" + \
                                    _( "Clicking the header of the first column\n" + \
                                       "will toggle all checkboxes." ) )
@@ -1696,8 +1697,8 @@ class IndicatorLunar( IndicatorBase ):
                             value = self.formatData( dataTag, self.data[ key ] )
                             displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
-        items = [ [ IndicatorLunar.astroBackend.BodyType.COMET, self.cometData, IndicatorLunar.astroBackend.DATA_TAGS_COMET ],
-                  [ IndicatorLunar.astroBackend.BodyType.MINOR_PLANET, self.minorPlanetData, IndicatorLunar.astroBackend.DATA_TAGS_MINOR_PLANET ] ]
+        items = [ [ IndicatorLunar.astroBackend.BodyType.COMET, self.cometOrbitalElementData, IndicatorLunar.astroBackend.DATA_TAGS_COMET ],
+                  [ IndicatorLunar.astroBackend.BodyType.MINOR_PLANET, self.minorPlanetOrbitalElementData, IndicatorLunar.astroBackend.DATA_TAGS_MINOR_PLANET ] ]
 
         for item in items:
             bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
@@ -1714,12 +1715,12 @@ class IndicatorLunar( IndicatorBase ):
                             displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         bodyType = IndicatorLunar.astroBackend.BodyType.SATELLITE
-        for bodyTag in self.satelliteData:
+        for bodyTag in self.satelliteGeneralPerturbationData:
             if ( bodyType, bodyTag, IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH ) in self.data or ( bodyType, bodyTag, IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                 for dataTag in IndicatorLunar.astroBackend.DATA_TAGS_SATELLITE:
                     value = ""
-                    name = self.satelliteData[ bodyTag ].getName()
-                    internationalDesignator = self.satelliteData[ bodyTag ].getInternationalDesignator()
+                    name = self.satelliteGeneralPerturbationData[ bodyTag ].getName()
+                    internationalDesignator = self.satelliteGeneralPerturbationData[ bodyTag ].getInternationalDesignator()
                     translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + IndicatorLunar.astroBackend.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, bodyTag, dataTag )
                     if key in self.data:
