@@ -55,19 +55,19 @@ import datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( AstroBase ):
 
-    # Planet epehemeris has been created with a reduced date range:
+    # Planets epehemeris is created with a reduced date range:
     #
-    #    python3 -m jplephem excerpt startDate_YYYY/MM/DD endDate_YYYY/MM/DD inFile.bsp outFile.bsp
+    #    python3 -m jplephem excerpt startDate endDate inFile.bsp outFile.bsp
     #
-    #    python3 -m jplephem excerpt 2022/07/10 2027/08/10 de440s.bsp planets.bsp
+    #    python3 -m jplephem excerpt 2022/07/20 2027/08/20 de440s.bsp planets.bsp
     #
-    # Set the start date one month earlier than today to avoid problems:
+    # Set the start date one month earlier than date of creation to avoid problems:
     #     https://github.com/skyfielders/python-skyfield/issues/531
     #
     # Requires jplephem:
     #    https://pypi.org/project/jplephem
     #
-    # Source for input BSP files:
+    # BSP files:
     #    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
     #
     # References:
@@ -78,11 +78,10 @@ class AstroSkyfield( AstroBase ):
     # Alternate method: Download a .bsp and use spkmerge to create a smaller subset:
     #    https://github.com/skyfielders/python-skyfield/issues/123
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
-    __EPHEMERIS_PLANETS_FILE = "planets.bsp"
-    __EPHEMERIS_PLANETS = load( __EPHEMERIS_PLANETS_FILE )
+    __EPHEMERIS_PLANETS = load( "planets.bsp" )
 
-    __EPHEMERIS_STARS_FILE = "stars.dat" # Created using createEphemerisStars.py to contain only commonly named stars.
-    with load.open( __EPHEMERIS_STARS_FILE ) as f:
+    # Stars ephemeris is created to contain only commonly named stars using 'createEphemerisStars.py'.
+    with load.open( "stars.dat" ) as f:
         __EPHEMERIS_STARS = hipparcos.load_dataframe( f )
 
 
