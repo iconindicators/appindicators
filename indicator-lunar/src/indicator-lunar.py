@@ -20,19 +20,6 @@
 # comet, star and satellite information.
 
 
-#TODO Consider add an option to show rise/set/az/alt for natural bodies only during night time.
-# https://telescopenights.com/stars-in-the-daytime/
-# Excludes the sun and moon (maybe mercury?).
-# Could either use an hourly window similar to that in satellites, or
-# a check box that simply defaults to one hour before sunset and one hour after sunrise as the visible window.
-#
-# Unsure how, if at all, this interacts with the preference "hide bodies below the horizon".
-#
-# If this goes ahead, consider moving the start/end hour window functionality out of each backend and into the frontend.
-# So calculate the satellite passes and screen out those not within the desired window and calculate again moving the start date/time forward to the next window.
-# Continue until the start date/time exceeds a few days (no more than three days or whatever we use in the backend).
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
