@@ -706,7 +706,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.remove( treeiter )
 
 
-    def onPPAAdd( self, button, tree ): self.onPPADoubleClick( tree, None, None )
+    def onPPAAdd( self, button, tree ):
+        self.onPPADoubleClick( tree, None, None )
 
 
     def onPPADoubleClick( self, tree, rowNumber, treeViewColumn ):

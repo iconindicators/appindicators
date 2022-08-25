@@ -40,19 +40,24 @@ class Info( ABC ):
         self.showNotification = showNotification
 
 
-    def getGroup( self ): return self.group
+    def getGroup( self ):
+        return self.group
 
 
-    def getName( self ): return self.name
+    def getName( self ):
+        return self.name
 
 
-    def getCommand( self ): return self.command
+    def getCommand( self ):
+        return self.command
 
 
-    def getPlaySound( self ): return self.playSound
+    def getPlaySound( self ):
+        return self.playSound
 
 
-    def getShowNotification( self ): return self.showNotification
+    def getShowNotification( self ):
+        return self.showNotification
 
 
     def __eq__( self, other ): 
@@ -74,7 +79,8 @@ class Info( ABC ):
             str( self.showNotification )
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
 class Background( Info ):
@@ -92,10 +98,12 @@ class Background( Info ):
         self.forceUpdate = forceUpdate
 
 
-    def getIntervalInMinutes( self ): return int( self.intervalInMinutes )
+    def getIntervalInMinutes( self ):
+        return int( self.intervalInMinutes )
 
 
-    def getForceUpdate( self ): return self.forceUpdate
+    def getForceUpdate( self ):
+        return self.forceUpdate
 
 
     def __eq__( self, other ): 
@@ -113,7 +121,8 @@ class Background( Info ):
             str( self.forceUpdate )
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
 class NonBackground( Info ):
@@ -131,10 +140,12 @@ class NonBackground( Info ):
         self.default = default
 
 
-    def getTerminalOpen( self ): return self.terminalOpen
+    def getTerminalOpen( self ):
+        return self.terminalOpen
 
 
-    def getDefault( self ): return self.default
+    def getDefault( self ):
+        return self.default
 
 
     def __eq__( self, other ): 
@@ -152,4 +163,5 @@ class NonBackground( Info ):
             str( self.default )
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()

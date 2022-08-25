@@ -26,16 +26,20 @@ class VirtualMachine( object ):
         self.uuid = uuid
 
 
-    def getName( self ): return self.name
+    def getName( self ):
+        return self.name
 
 
-    def getUUID( self ): return self.uuid
+    def getUUID( self ):
+        return self.uuid
 
 
-    def __str__( self ): return self.getName() + " | " + self.getUUID()
+    def __str__( self ):
+        return self.getName() + " | " + self.getUUID()
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ):
@@ -52,19 +56,24 @@ class Group( object ):
         self.items = [ ] # List of virtual machines and/or groups pertaining to this group.
 
 
-    def getName( self ): return self.name
+    def getName( self ):
+        return self.name
 
 
-    def addItem( self, virtualMachineOrGroup ): self.items.append( virtualMachineOrGroup )
+    def addItem( self, virtualMachineOrGroup ):
+        self.items.append( virtualMachineOrGroup )
 
 
-    def getItems( self ): return self.items
+    def getItems( self ):
+        return self.items
 
 
-    def __str__( self ): return self.getName() + ": " + ' | '.join( [ str( x.getName() ) for x in self.getItems() ] )
+    def __str__( self ):
+        return self.getName() + ": " + ' | '.join( [ str( x.getName() ) for x in self.getItems() ] )
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ):

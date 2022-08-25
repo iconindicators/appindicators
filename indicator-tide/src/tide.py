@@ -35,24 +35,30 @@ class Reading( object ):
         self.url = url
 
 
-    def getDate( self ): return self.date
+    def getDate( self ):
+        return self.date
 
 
-    def getTime( self ): return self.time
+    def getTime( self ):
+        return self.time
 
 
-    def getLocation( self ): return self.location
+    def getLocation( self ):
+        return self.location
 
 
     # Returns true if tide is high; false otherwise.
-    def isHigh( self ): return self._isHigh
+    def isHigh( self ):
+        return self._isHigh
 
 
     # Returns the level of this tide.
-    def getLevel( self ): return self.level
+    def getLevel( self ):
+        return self.level
 
 
-    def getURL( self ): return self.url
+    def getURL( self ):
+        return self.url
 
 
     def __str__( self ):
@@ -65,7 +71,8 @@ class Reading( object ):
             self.url
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ): 

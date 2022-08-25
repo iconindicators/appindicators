@@ -114,7 +114,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                 break
 
 
-    def removeLeadingZeroFromDate( self, date ): return date[ 0 : -3 ] + ' ' + date[ -1 ] if date[ -2 ] == '0' else date[ 0 : -3 ] + ' ' + date[ -2 : ]
+    def removeLeadingZeroFromDate( self, date ):
+        return date[ 0 : -3 ] + ' ' + date[ -1 ] if date[ -2 ] == '0' else date[ 0 : -3 ] + ' ' + date[ -2 : ]
 
 
     def getEvents( self ):
@@ -368,7 +369,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onCalendarAdd( self, button, treeView ): self.onCalendarDoubleClick( treeView, None, None )
+    def onCalendarAdd( self, button, treeView ):
+        self.onCalendarDoubleClick( treeView, None, None )
 
 
     def onCalendarDoubleClick( self, treeView, rowNumber, treeViewColumn ):

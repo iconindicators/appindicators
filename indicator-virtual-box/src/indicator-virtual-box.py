@@ -272,7 +272,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         return names, uuids
 
 
-    def isVirtualMachineRunning( self, uuid ): return self.processGet( "VBoxManage list runningvms | grep " + uuid ) is not None
+    def isVirtualMachineRunning( self, uuid ):
+        return self.processGet( "VBoxManage list runningvms | grep " + uuid ) is not None
 
 
     def getVirtualMachines( self ):

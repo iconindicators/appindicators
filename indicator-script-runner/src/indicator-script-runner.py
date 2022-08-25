@@ -1078,10 +1078,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
 
 
-    def __createKey( self, group, name ): return group + "::" + name
+    def __createKey( self, group, name ):
+        return group + "::" + name
 
 
-    def isBackgroundScriptInIndicatorText( self, script ): return '[' + self.__createKey( script.getGroup(), script.getName() ) + ']' in self.indicatorText
+    def isBackgroundScriptInIndicatorText( self, script ):
+        return '[' + self.__createKey( script.getGroup(), script.getName() ) + ']' in self.indicatorText
 
 
     # In version 14 the 'directory' attribute was removed.

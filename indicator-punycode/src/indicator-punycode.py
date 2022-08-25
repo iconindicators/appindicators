@@ -78,7 +78,8 @@ class IndicatorPunycode( IndicatorBase ):
             menu.append( menuItem )
 
 
-    def onConvert( self, menuItem ): Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
+    def onConvert( self, menuItem ):
+        Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
 
 
     def doConversion( self, clipboard, text, data ):

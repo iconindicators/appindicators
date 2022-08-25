@@ -25,11 +25,13 @@
 import time
 
 
-def isExpired(): return getExpiry() < time.strftime( "%Y-%m-%d" )
+def isExpired(): 
+    eturn getExpiry() < time.strftime( "%Y-%m-%d" )
 
 
 # Obtain the non-UK port expiration date in YYYY-MM-DD.
-def getExpiry(): return "2021-09-09"
+def getExpiry():
+    return "2021-09-09"
 
 
 def isValidPortID( portID ):
@@ -101,7 +103,8 @@ def getCountries():
     return countries
 
 
-def getFirstPortID(): return _ports[ 0 ][ _INDEX_PORT_ID ]
+def getFirstPortID():
+    return _ports[ 0 ][ _INDEX_PORT_ID ]
 
 
 # Indices for each port's data.

@@ -388,7 +388,8 @@ class IndicatorFortune( IndicatorBase ):
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onFortuneAdd( self, button, treeView ): self.onFortuneDoubleClick( treeView, None, None )
+    def onFortuneAdd( self, button, treeView ):
+        self.onFortuneDoubleClick( treeView, None, None )
 
 
     def onFortuneDoubleClick( self, treeView, rowNumber, treeViewColumn ):

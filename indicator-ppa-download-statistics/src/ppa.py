@@ -79,16 +79,20 @@ class PublishedBinary( object ):
         self.architectureSpecific = architectureSpecific
 
 
-    def getPackageName( self ): return self.packageName
+    def getPackageName( self ):
+        return self.packageName
 
 
-    def getPackageVersion( self ): return self.packageVersion
+    def getPackageVersion( self ):
+        return self.packageVersion
 
 
-    def getDownloadCount( self ): return self.downloadCount
+    def getDownloadCount( self ):
+        return self.downloadCount
 
 
-    def isArchitectureSpecific( self ): return self.architectureSpecific
+    def isArchitectureSpecific( self ):
+        return self.architectureSpecific
 
 
     def __str__( self ):
@@ -99,7 +103,8 @@ class PublishedBinary( object ):
             str( self.isArchitectureSpecific() ) # Must wrap str() around getPackageVersion() as it will return None when published binaries are combined.
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ): 
@@ -132,7 +137,8 @@ class PPA( object ):
         self.architecture = architecture
 
 
-    def getStatus( self ): return self.status
+    def getStatus( self ):
+        return self.status
 
 
     def setStatus( self, status ):
@@ -141,16 +147,20 @@ class PPA( object ):
             self.publishedBinaries = [ ]
 
 
-    def getUser( self ): return self.user
+    def getUser( self ):
+        return self.user
 
 
-    def getName( self ): return self.name
+    def getName( self ):
+        return self.name
 
 
-    def getSeries( self ): return self.series
+    def getSeries( self ):
+        return self.series
 
 
-    def getArchitecture( self ): return self.architecture
+    def getArchitecture( self ):
+        return self.architecture
 
 
     # Returns a string description of the PPA of the form 'user | name | series | architecture'
@@ -187,7 +197,8 @@ class PPA( object ):
 
 
     @staticmethod
-    def sort( listOfPPAs ): listOfPPAs.sort( key = operator.methodcaller( "getDescriptor" ) )
+    def sort( listOfPPAs ):
+        listOfPPAs.sort( key = operator.methodcaller( "getDescriptor" ) )
 
 
     def __str__( self ):
@@ -199,7 +210,8 @@ class PPA( object ):
             self.publishedBinaries
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ): 

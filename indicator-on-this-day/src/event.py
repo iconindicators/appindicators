@@ -28,16 +28,20 @@ class Event( object ):
         self.description = description
 
 
-    def getDate( self ): return self.date
+    def getDate( self ):
+        return self.date
 
 
-    def getDescription( self ): return self.description
+    def getDescription( self ):
+        return self.description
 
 
-    def __str__( self ): return self.date + " | " + self.description
+    def __str__( self ):
+        return self.date + " | " + self.description
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ):
