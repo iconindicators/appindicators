@@ -730,11 +730,13 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def getCities(): return sorted( AstroSkyfield._city_data.keys(), key = locale.strxfrm )
+    def getCities():
+        return sorted( AstroSkyfield._city_data.keys(), key = locale.strxfrm )
 
 
     @staticmethod
-    def getCredit(): return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
+    def getCredit():
+        return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
 
 
     @staticmethod
@@ -762,7 +764,8 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def getVersion(): return skyfield.__version__
+    def getVersion():
+        return skyfield.__version__
 
 
     @staticmethod

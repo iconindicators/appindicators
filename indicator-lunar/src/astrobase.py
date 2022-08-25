@@ -305,33 +305,38 @@ class AstroBase( ABC ):
     # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
     @abstractmethod
-    def getCities(): return [ ]
+    def getCities():
+        return [ ]
 
 
     # Returns a string specifying third party credit; otherwise an empty string.
     # Format is a credit string followed by an optional URL.
     @staticmethod
     @abstractmethod
-    def getCredit(): return ""
+    def getCredit():
+        return ""
 
 
     # Returns a tuple of floats of the latitude, longitude and elevation for the city.
     @staticmethod
     @abstractmethod
-    def getLatitudeLongitudeElevation( city ): return 0.0, 0.0, 0.0
+    def getLatitudeLongitudeElevation( city ):
+        return 0.0, 0.0, 0.0
 
 
     # If the minimum version of the third party library is met and available, returns None.
     # Otherwise returns an error message.
     @staticmethod
     @abstractmethod
-    def getStatusMessage(): return None
+    def getStatusMessage():
+        return None
 
 
     # Returns the version of the underlying astronomical library.
     @staticmethod
     @abstractmethod
-    def getVersion(): return None
+    def getVersion():
+        return None
 
 
     # Calculate apparent magnitude.
@@ -523,7 +528,8 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def toDateTimeString( dateTime ): return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+    def toDateTimeString( dateTime ):
+        return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
 
 
     # Take a start/end date/time used to search for a satellite transit

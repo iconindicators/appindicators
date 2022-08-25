@@ -569,11 +569,13 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def getCities(): return sorted( _city_data.keys(), key = locale.strxfrm )
+    def getCities():
+        return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
     @staticmethod
-    def getCredit(): return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
+    def getCredit():
+        return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
 
 
     @staticmethod
@@ -601,7 +603,8 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def getVersion(): return ephem.__version__
+    def getVersion():
+        return ephem.__version__
 
 
     @staticmethod
