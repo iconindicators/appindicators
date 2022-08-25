@@ -19,7 +19,7 @@
 # Create a star ephemeris containing stars with a common name.
 
 
-import gettext # astroskyfield contains translatable text, so gettext is required.
+import gettext
 gettext.install( "astroskyfield" )
 
 from skyfield.api import load
