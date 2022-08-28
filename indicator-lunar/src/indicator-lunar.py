@@ -169,7 +169,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.95",
+            version = "1.0.96",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.  Also in the debian/control file.
             creditz = IndicatorLunar.CREDIT )
@@ -1948,6 +1948,17 @@ class IndicatorLunar( IndicatorBase ):
             self.requestSaveConfig( delay = 5 )
 
 
+    def __dropOldStarsVersion96( self ):
+        stars = [ ]
+        for star in self.stars:
+            if star in IndicatorLunar.astroBackend.STARS:
+                stars.append( star )
+
+        if len( self.stars ) > len( stars ):
+            self.stars = stars
+            # self.requestSaveConfig( delay = 5 ) #TODO Uncomment when happy
+
+
     def loadConfig( self, config ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
         self.__useNewCityNameConfigVersion93( config )
@@ -1988,6 +1999,7 @@ class IndicatorLunar( IndicatorBase ):
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
 
         self.stars = config.get( IndicatorLunar.CONFIG_STARS, [ ] )
+        self.__dropOldStarsVersion96()
 
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT )
