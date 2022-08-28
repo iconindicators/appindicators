@@ -238,7 +238,7 @@ class AstroBase( ABC ):
     #
     # To create the star data, refer to 'createEphemerisStars.py'.
     #
-    # Note that the star "3C 273" has been omitted from this list.
+    # Note that the star "3C 273" with HIP 60936 has been omitted from this list.
     # In creating the star data for PyEphem, the spectral type is missing for this star
     # implying the data cannot be created for PyEphem.
     #
@@ -249,6 +249,7 @@ class AstroBase( ABC ):
 #TODO Do a build and make sure the translations come through.
 #TODO Can the translations dynamically refer to the first element?
     STARS = [
+        [ "3C 273",           60936,  _( "3C 273" ),           _( "3C 273" ) ], #TODO Waiting on https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
         [ "ACAMAR",           13847,  _( "Acamar" ),           _( "ACAMAR" ) ],
         [ "ACHERNAR",         7588,   _( "Achernar" ),         _( "ACHERNAR" ) ],
         [ "ACRUX",            60718,  _( "Acrux" ),            _( "ACRUX" ) ],
