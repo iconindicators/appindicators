@@ -35,6 +35,7 @@ import datetime, eclipse, locale, math
 
 class AstroPyEphem( AstroBase ):
 
+#TODO Add comment about how to create this.
     STAR_DATA = [
         "ACAMAR,f|S|A4,2.97102074|-53.53,-40.30467239|25.71,2.88",
         "ACHERNAR,f|S|B3,1.62856849|88.02,-57.23675744|-40.08,0.45",
