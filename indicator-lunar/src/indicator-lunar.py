@@ -51,7 +51,6 @@ class IndicatorLunar( IndicatorBase ):
         IndicatorBase.showMessageStatic( message, Gtk.MessageType.ERROR, INDICATOR_NAME )
         sys.exit()
 
-
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
     CONFIG_CITY_LONGITUDE = "cityLongitude"
@@ -108,10 +107,14 @@ class IndicatorLunar( IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
+    a = astroBackend.PLANET_TAGS_TRANSLATIONS.items()
+    b = list( a )
+    c = astroBackend.getStarTagTranslations()
+
     BODY_TAGS_TRANSLATIONS = dict(
         list( astroBackend.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astroBackend.PLANET_TAGS_TRANSLATIONS.items() ) +
-        list( astroBackend.STAR_TAGS_TRANSLATIONS.items() ) +
+        astroBackend.getStarTagTranslations() +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     CACHE_VERSION = "-95-" 
@@ -727,7 +730,7 @@ class IndicatorLunar( IndicatorBase ):
         stars = [ ]
         for star in self.stars:
             if self.display( IndicatorLunar.astroBackend.BodyType.STAR, star ):
-                stars.append( [ star, IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS[ star ] ] )
+                stars.append( [ star, IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS[ star ] ] ) #TODO Need to switch to new function
 
         if stars:
             menuItem = self.createMenuItem( menu, _( "Stars" ) )
@@ -735,7 +738,7 @@ class IndicatorLunar( IndicatorBase ):
             menuItem.set_submenu( subMenu )
             indent = self.getMenuIndent( 1 ) 
             for name, translatedName in stars:
-                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.STARS_TO_HIP[ name ] )
+                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.STARS_TO_HIP[ name ] ) #TODO Need to switch to getHIP
                 self.createMenuItem( subMenu, indent + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
@@ -1358,8 +1361,8 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
-        for starName in IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS.keys():
-            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS[ starName ] ] )
+        for starName in IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS.keys(): #TODO Need to switch to new function
+            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.STAR_NAMES_TRANSLATIONS[ starName ] ] ) #TODO Need to switch to new function
 
         STAR_STORE_INDEX_HIDE_SHOW = 0
         STAR_STORE_INDEX_NAME = 1
@@ -1668,7 +1671,7 @@ class IndicatorLunar( IndicatorBase ):
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ IndicatorLunar.astroBackend.BodyType.PLANET, IndicatorLunar.astroBackend.PLANETS, IndicatorLunar.astroBackend.DATA_TAGS_PLANET ],
-                  [ IndicatorLunar.astroBackend.BodyType.STAR, IndicatorLunar.astroBackend.STARS, IndicatorLunar.astroBackend.DATA_TAGS_STAR ] ]
+                  [ IndicatorLunar.astroBackend.BodyType.STAR, IndicatorLunar.astroBackend.STARS, IndicatorLunar.astroBackend.DATA_TAGS_STAR ] ]  #TODO Need to switch to new function
 
         for item in items:
             bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
@@ -1951,7 +1954,7 @@ class IndicatorLunar( IndicatorBase ):
     def __dropOldStarsVersion96( self ):
         stars = [ ]
         for star in self.stars:
-            if star in IndicatorLunar.astroBackend.STARS:
+            if star in IndicatorLunar.astroBackend.STARS:   #TODO Need to switch to new function
                 stars.append( star )
 
         if len( self.stars ) > len( stars ):

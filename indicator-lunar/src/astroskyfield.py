@@ -447,7 +447,7 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateStars( now, nowPlusThirtySixHours, data, locationAtNow, stars, apparentMagnitudeMaximum ):
         for star in stars:
-            theStar = AstroSkyfield.__EPHEMERIS_STARS.loc[ AstroBase.STARS_TO_HIP[ star ] ]
+            theStar = AstroSkyfield.__EPHEMERIS_STARS.loc[ AstroBase.STARS_TO_HIP[ star ] ]#TODO Need to switch to getHIP
             if theStar.magnitude <= apparentMagnitudeMaximum:
                 AstroSkyfield.__calculateCommon(
                     now, nowPlusThirtySixHours,
