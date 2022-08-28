@@ -231,7 +231,7 @@ class AstroBase( ABC ):
     # Therefore, unify the stars from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #
-    # To create the star data, refer to createEphemerisStars.py
+    # To create the star data, refer to 'createEphemerisStars.py'.
     #
     # Note that the star "3C 273" has been omitted from this list.
     # In creating the star data for PyEphem, the spectral type is missing for this star
