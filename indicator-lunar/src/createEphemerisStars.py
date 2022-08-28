@@ -20,12 +20,13 @@
 
 
 import gettext
-gettext.install( "astroskyfield" )
+gettext.install( "astrobase" )
 
+from astrobase import AstroBase
 from skyfield.api import load
 from skyfield.data import hipparcos
 
-import argparse, astroskyfield
+import argparse
 
 
 if __name__ == "__main__":
