@@ -726,7 +726,7 @@ class IndicatorLunar( IndicatorBase ):
         stars = [ ]
         for star in self.stars:
             if self.display( IndicatorLunar.astroBackend.BodyType.STAR, star ):
-                stars.append( [ star, IndicatorLunar.astroBackend.getStarNameTranslation( star ) ] ) #TODO Make sure this works
+                stars.append( [ star, IndicatorLunar.astroBackend.getStarNameTranslation( star ) ] )
 
         if stars:
             menuItem = self.createMenuItem( menu, _( "Stars" ) )
@@ -734,7 +734,7 @@ class IndicatorLunar( IndicatorBase ):
             menuItem.set_submenu( subMenu )
             indent = self.getMenuIndent( 1 ) 
             for name, translatedName in stars:
-                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( star ) ) #TODO Make sure this works
+                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( star ) )
                 self.createMenuItem( subMenu, indent + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
@@ -1357,8 +1357,8 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
-        for starName in IndicatorLunar.astroBackend.getStars(): #TODO Make sure this works
-            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.getStarNameTranslation( starName ) ] ) #TODO Make sure this works
+        for starName in IndicatorLunar.astroBackend.getStars():
+            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.getStarNameTranslation( starName ) ] )
 
         STAR_STORE_INDEX_HIDE_SHOW = 0
         STAR_STORE_INDEX_NAME = 1
@@ -1950,7 +1950,7 @@ class IndicatorLunar( IndicatorBase ):
     def __dropOldStarsVersion96( self ):
         stars = [ ]
         for star in self.stars:
-            if star in IndicatorLunar.astroBackend.getStars():   #TODO Make sure this works
+            if star in IndicatorLunar.astroBackend.getStars():
                 stars.append( star )
 
         if len( self.stars ) > len( stars ):
