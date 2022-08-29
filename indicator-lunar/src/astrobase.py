@@ -235,7 +235,6 @@ class AstroBase( ABC ):
     #
     # Therefore, unify and simplify by using the stars from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
-#TODO Do a build and make sure the translations come through.
 #TODO Can the translations dynamically refer to the first element?
     STARS = [
         [ "3C 273",           60936,  _( "3C 273" ),           _( "3C 273" ) ], #TODO Waiting on https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
