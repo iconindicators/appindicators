@@ -447,27 +447,27 @@ class AstroBase( ABC ):
         return None
 
 
-    # @staticmethod
+    @staticmethod
     def getStars():
         return [ i[ AstroBase.STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
-    # @staticmethod
-    def getStarHIPs():
-        return [ i[ AstroBase.STARS_INDEX_HIP ] for i in AstroBase.STARS ]
-
-
-    # @staticmethod
+    @staticmethod
     def getStarHIP( star ):
         return next( i for i in AstroBase.STARS if i[ AstroBase.STARS_INDEX_NAME ] == star )[ AstroBase.STARS_INDEX_HIP ]
 
 
-    # @staticmethod
+    @staticmethod
+    def getStarHIPs():
+        return [ i[ AstroBase.STARS_INDEX_HIP ] for i in AstroBase.STARS ]
+
+
+    @staticmethod
     def getStarNameTranslation( star ):
         return next( i for i in AstroBase.STARS if i[ AstroBase.STARS_INDEX_NAME ] == star )[ AstroBase.STARS_INDEX_NAME_TRANSLATION ]
 
 
-    # @staticmethod
+    @staticmethod
     def getStarTagTranslation( star ):
         return next( i for i in AstroBase.STARS if i[ AstroBase.STARS_INDEX_NAME ] == star )[ AstroBase.STARS_INDEX_TAG_TRANSLATION ]
 
