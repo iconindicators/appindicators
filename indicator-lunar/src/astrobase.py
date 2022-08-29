@@ -453,6 +453,11 @@ class AstroBase( ABC ):
 
 
     # @staticmethod
+    def getStarHIPs():
+        return [ i[ AstroBase.STARS_INDEX_HIP ] for i in AstroBase.STARS ]
+
+
+    # @staticmethod
     def getStarHIP( star ):
         return next( i for i in AstroBase.STARS if i[ AstroBase.STARS_INDEX_NAME ] == star )[ AstroBase.STARS_INDEX_HIP ]
 
