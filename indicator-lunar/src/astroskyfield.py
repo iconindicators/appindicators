@@ -80,7 +80,7 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     __EPHEMERIS_PLANETS = load( "planets.bsp" )
 
-    # Stars ephemeris is created to contain only commonly named stars using 'createEphemerisStars.py'.
+    # Created to contain only commonly named stars using 'createEphemerisStars.py'.
     with load.open( "stars.dat" ) as f:
         __EPHEMERIS_STARS = hipparcos.load_dataframe( f )
 
@@ -447,7 +447,7 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateStars( now, nowPlusThirtySixHours, data, locationAtNow, stars, apparentMagnitudeMaximum ):
         for star in stars:
-            theStar = AstroSkyfield.__EPHEMERIS_STARS.loc[ AstroBase.getStarHIP( star ) ]#TODO Make sure this works.
+            theStar = AstroSkyfield.__EPHEMERIS_STARS.loc[ AstroBase.getStarHIP( star ) ]
             if theStar.magnitude <= apparentMagnitudeMaximum:
                 AstroSkyfield.__calculateCommon(
                     now, nowPlusThirtySixHours,

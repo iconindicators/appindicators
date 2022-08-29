@@ -35,7 +35,7 @@ import datetime, eclipse, locale, math
 
 class AstroPyEphem( AstroBase ):
 
-#TODO Add comment about how to create this.
+    # Created to contain only commonly named stars using 'createEphemerisStars.py'.
     STAR_DATA = [
         "3C 273,f|S|  ,12.48519276|-11.01,2.05239846|4.38,12.88", #TODO Waiting on https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
         "ACAMAR,f|S|A4,2.97102074|-53.53,-40.30467239|25.71,2.88",

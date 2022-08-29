@@ -233,19 +233,8 @@ class AstroBase( ABC ):
     # PyEphem provides a list of stars and data, whereas Skyfield does not.
     # Over the years, the PyEphem stars have contained duplicates and misspellings.
     #
-    # Therefore, unify the stars from the ESA Hipparcos catalogue:
+    # Therefore, unify and simplify by using the stars from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
-    #
-    # To create the star data, refer to 'createEphemerisStars.py'.
-    #
-    # Note that the star "3C 273" with HIP 60936 has been omitted from this list.
-    # In creating the star data for PyEphem, the spectral type is missing for this star
-    # implying the data cannot be created for PyEphem.
-    #
-    # Capitalised names of stars and associated HIP numbers.
-    # Names of stars (from STARS) and associated English string encapsulated as _( "" ).
-    # Names of stars (from STARS) and associated capitalised English string encapsulated as _( "" ).
-#TODO Tidy up above comments.
 #TODO Do a build and make sure the translations come through.
 #TODO Can the translations dynamically refer to the first element?
     STARS = [
