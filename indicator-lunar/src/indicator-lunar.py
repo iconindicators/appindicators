@@ -734,7 +734,7 @@ class IndicatorLunar( IndicatorBase ):
             menuItem.set_submenu( subMenu )
             indent = self.getMenuIndent( 1 ) 
             for name, translatedName in stars:
-                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( star ) )
+                url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
                 self.createMenuItem( subMenu, indent + translatedName, url )
                 self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, 2, url )
                 separator = Gtk.SeparatorMenuItem()
