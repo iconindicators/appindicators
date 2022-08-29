@@ -1,3 +1,13 @@
+indicator-lunar (1.0.96-1) bionic; urgency=low
+
+  * Due to duplications, misspellings and the requirement for historical
+    support, the list of stars is now obtained from commonly named stars:
+
+    	https://www.cosmos.esa.int/web/hipparcos/common-star-names
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 29 Aug 2022 19:55:07 +1000
+
+
 indicator-lunar (1.0.95-1) bionic; urgency=low
 
   * Satellite data now uses OMM format rather than TLE.

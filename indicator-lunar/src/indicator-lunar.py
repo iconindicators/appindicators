@@ -104,9 +104,6 @@ class IndicatorLunar( IndicatorBase ):
     INDICATOR_TEXT_DEFAULT = " [" + astroBackend.NAME_TAG_MOON + " " + astroBackend.DATA_TAG_PHASE + "]"
     INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
 
-    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
-
     BODY_TAGS_TRANSLATIONS = dict(
         list( astroBackend.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astroBackend.PLANET_TAGS_TRANSLATIONS.items() ) +

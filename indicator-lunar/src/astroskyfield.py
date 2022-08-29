@@ -80,7 +80,7 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     __EPHEMERIS_PLANETS = load( "planets.bsp" )
 
-    # Created to contain only commonly named stars using 'createEphemerisStars.py'.
+    # Created to contain only commonly named stars using 'createephemerisstars.py'.
     with load.open( "stars.dat" ) as f:
         __EPHEMERIS_STARS = hipparcos.load_dataframe( f )
 
