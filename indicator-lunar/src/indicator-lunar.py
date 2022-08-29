@@ -1955,7 +1955,7 @@ class IndicatorLunar( IndicatorBase ):
 
         if len( self.stars ) > len( stars ):
             self.stars = stars
-            # self.requestSaveConfig( delay = 5 ) #TODO Uncomment when happy
+            self.requestSaveConfig( delay = 5 )
 
 
     def loadConfig( self, config ):
