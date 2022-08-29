@@ -1617,13 +1617,13 @@ msgid ""
 msgstr ""
 
 #: indicator-lunar.py:1267
-msgid "Hide bodies greater than magnitude"
+msgid "Hide bodies fainter than magnitude"
 msgstr ""
 
 #: indicator-lunar.py:1268
 msgid ""
 "Planets, stars, comets and minor planets\n"
-"exceeding the magnitude will be hidden."
+"with a fainter magnitude will be hidden."
 msgstr ""
 
 #: indicator-lunar.py:1275

@@ -1658,16 +1658,16 @@ msgstr ""
 "будут скрыты (исключая спутники)."
 
 #: indicator-lunar.py:1267
-msgid "Hide bodies greater than magnitude"
-msgstr "Скрыть объекты со звёздной величиной более"
+msgid "Hide bodies fainter than magnitude"
+msgstr "Скрыть объекты с величиной, меньшей, чем"
 
 #: indicator-lunar.py:1268
 msgid ""
 "Planets, stars, comets and minor planets\n"
-"exceeding the magnitude will be hidden."
+"with a fainter magnitude will be hidden."
 msgstr ""
-"Планеты, звёзды, кометы и малые планеты со звёздной\n"
-"величиной, превышающей заданную, будут скрыты."
+"Планеты, звезды, кометы и малые планеты с меньшей\n"
+"звездной величиной будут скрыты.
 
 #: indicator-lunar.py:1275
 msgid "Add new minor planets"
