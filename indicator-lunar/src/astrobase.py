@@ -233,9 +233,8 @@ class AstroBase( ABC ):
     # PyEphem provides a list of stars and data, whereas Skyfield does not.
     # Over the years, the PyEphem stars have contained duplicates and misspellings.
     #
-    # Therefore, unify and simplify by using the stars from the ESA Hipparcos catalogue:
+    # Consequently, unify and simplify by using the stars from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
-#TODO Can the translations dynamically refer to the first element?
     STARS = [
         [ "3C 273",           60936,  _( "3C 273" ),           _( "3C 273" ) ], #TODO Waiting on https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
         [ "ACAMAR",           13847,  _( "Acamar" ),           _( "ACAMAR" ) ],
