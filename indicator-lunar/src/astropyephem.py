@@ -317,6 +317,7 @@ class AstroPyEphem( AstroBase ):
                     math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
 
             except Exception as e:
+#TODO Cannot release comets stuff until PyEphem 4.1.4 is released.
                 # Some comets with a near-parabolic orbit will trigger an error...
                 # https://github.com/brandon-rhodes/pyephem/issues/239
                 bad = True
