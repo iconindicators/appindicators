@@ -693,8 +693,14 @@ class IndicatorLunar( IndicatorBase ):
             url )
 
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
-            latitude = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
-            longitude = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
+            latitude = self.formatData(
+                IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE,
+                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE, ) ] )
+
+            longitude = self.formatData(
+                IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE,
+                self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
+
             self.createMenuItem( menu, self.getMenuIndent( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url )
 
 
@@ -930,12 +936,17 @@ class IndicatorLunar( IndicatorBase ):
             if self.satellitesSortByDateTime:
                 satellites = sorted(
                     satellites,
-                    key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ], x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
+                    key = lambda x: (
+                        x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ],
+                        x[ IndicatorLunar.SATELLITE_MENU_NAME ],
+                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
-            else: # Sort by name/number.
+            else: # Sort by name then number.
                 satellites = sorted(
                     satellites,
-                    key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+                    key = lambda x: (
+                        x[ IndicatorLunar.SATELLITE_MENU_NAME ],
+                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
             self.__updateMenuSatellites( menu, _( "Satellites" ), satellites )
 
@@ -959,7 +970,8 @@ class IndicatorLunar( IndicatorBase ):
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
-            menuItem = self.createMenuItem( subMenu, indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator(), url )
+            label = indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator()
+            menuItem = self.createMenuItem( subMenu, label, url )
             if len( info ) == 3: # Satellite yet to rise.
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
                 self.createMenuItem( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
@@ -1123,11 +1135,16 @@ class IndicatorLunar( IndicatorBase ):
             if illuminationPercentage == 50: # Quarter
                 body += ' Z"'
 
-            elif illuminationPercentage < 50: # Crescent
-                body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+            else: # Crescent or Gibbous
+                body += ' A ' + str( radius ) + ' '
 
-            else: # Gibbous
-                body += ' A ' + str( radius ) + ' ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+                if illuminationPercentage < 50: # Crescent
+                    body += str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 '
+
+                else: # Gibbous
+                    body += str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 '
+
+                body += ' ' + str( height / 2 ) + '"'
 
             body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
@@ -1699,7 +1716,12 @@ class IndicatorLunar( IndicatorBase ):
 
         bodyType = IndicatorLunar.astroBackend.BodyType.SATELLITE
         for bodyTag in self.satelliteGeneralPerturbationData:
-            if ( bodyType, bodyTag, IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH ) in self.data or ( bodyType, bodyTag, IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
+            # Add this body's attributes ONLY if data is present.
+            riseIsPresent = \
+                ( bodyType, bodyTag, IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH ) in self.data or \
+                ( bodyType, bodyTag, IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH ) in self.data
+
+            if riseIsPresent:
                 for dataTag in IndicatorLunar.astroBackend.DATA_TAGS_SATELLITE:
                     value = ""
                     name = self.satelliteGeneralPerturbationData[ bodyTag ].getName()
