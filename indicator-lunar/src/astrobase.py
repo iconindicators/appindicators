@@ -235,8 +235,15 @@ class AstroBase( ABC ):
     #
     # Consequently, unify and simplify by using the stars from the ESA Hipparcos catalogue:
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
+    #
+    # Although the quasar "3C 273" is listed in the common star names, it has been dropped from this list.
+    # For PyEphem, a star object requires spectral line data from the underlying star catalogue
+    # and there is no such information for "3C 273".
+    # Despite substituting an empty string for the value and confirming there is no difference
+    # between PyEphem and Skyfield calcuations, safer to simply drop.
+    # An issue has been raised at
+    #    https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
     STARS = [
-        [ "3C 273",           60936,  _( "3C 273" ),           _( "3C 273" ) ], #TODO Waiting on https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
         [ "ACAMAR",           13847,  _( "Acamar" ),           _( "ACAMAR" ) ],
         [ "ACHERNAR",         7588,   _( "Achernar" ),         _( "ACHERNAR" ) ],
         [ "ACRUX",            60718,  _( "Acrux" ),            _( "ACRUX" ) ],

@@ -37,7 +37,6 @@ class AstroPyEphem( AstroBase ):
 
     # Created to contain only commonly named stars using 'createephemerisstars.py'.
     STAR_DATA = [
-        "3C 273,f|S|  ,12.48519276|-11.01,2.05239846|4.38,12.88", #TODO Waiting on https://github.com/brandon-rhodes/pyephem/issues/244 to see if we keep this.
         "ACAMAR,f|S|A4,2.97102074|-53.53,-40.30467239|25.71,2.88",
         "ACAMAR,f|S|A4,2.97102074|-53.53,-40.30467239|25.71,2.88",
         "ACHERNAR,f|S|B3,1.62856849|88.02,-57.23675744|-40.08,0.45",
