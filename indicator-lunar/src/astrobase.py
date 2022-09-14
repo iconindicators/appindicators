@@ -473,10 +473,7 @@ class AstroBase( ABC ):
     #
     # May throw a value error or similar if bad numbers/calculations occur.
     #
-    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
-#TODO Updated to 
-#https://www.clearskyinstitute.com/ephem/Man.txt
-# but find a better link.    
+    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
     @staticmethod
     def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
         return \
@@ -489,10 +486,7 @@ class AstroBase( ABC ):
     #
     # May throw a value error or similar if bad numbers/calculations occur.
     #
-#TODO Updated to 
-#https://www.clearskyinstitute.com/ephem/Man.txt
-# but find a better link.    
-    # https://www.clearskyinstitute.com/xephem/help/xephem.html#mozTocId564354
+    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
