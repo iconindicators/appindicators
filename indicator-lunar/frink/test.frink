@@ -1,6 +1,6 @@
 // To run, open a terminal:
 //
-//	 java -classpath frink.jar frink.parser.Frink -f TestMoonBrightLimb.frink
+//	 java -classpath frink.jar frink.parser.Frink -f test.frink
 //
 // Both
 //
