@@ -1131,22 +1131,22 @@ class IndicatorLunar( IndicatorBase ):
 
         else:
             body = '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
-                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + str( width / 2 + radius ) + ' ' + str( height / 2 )
+                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
+                   str( width / 2 + radius ) + ' ' + str( height / 2 )
+
             if illuminationPercentage == 50: # Quarter
                 body += ' Z"'
 
-            else: # Crescent or Gibbous
-                body += ' A ' + str( radius ) + ' '
+            elif illuminationPercentage < 50: # Crescent
+                body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 ' + \
+                        str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
-                if illuminationPercentage < 50: # Crescent
-                    body += str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 '
+            else: # Gibbous
+                body += ' A ' + str( radius ) + ' ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 ' + \
+                        str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
-                else: # Gibbous
-                    body += str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 '
-
-                body += ' ' + str( height / 2 ) + '"'
-
-            body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
+            body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + \
+                    str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
