@@ -40,6 +40,7 @@ class DataProviderGeneralPerturbation( DataProvider ):
     #
     # If instructed, will drop any satellite with a satellite number (Norad number)
     # greater than five digits, as this is incompatible with the TLE format.
+    # https://github.com/brandon-rhodes/pyephem/discussions/243
     #
     # Returns a dictionary:
     #    Key: Satellite number (Norad number)
