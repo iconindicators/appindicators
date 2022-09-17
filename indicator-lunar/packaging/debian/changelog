@@ -5,6 +5,9 @@ indicator-lunar (1.0.96-1) bionic; urgency=low
 
     	https://www.cosmos.esa.int/web/hipparcos/common-star-names
 
+  * Replaced '--' with '-' in cache filenames for minor planet apparent
+    magnitude and satellite general perturbations.
+
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 29 Aug 2022 19:55:07 +1000
 
 

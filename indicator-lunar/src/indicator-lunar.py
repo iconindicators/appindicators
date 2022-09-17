@@ -110,19 +110,19 @@ class IndicatorLunar( IndicatorBase ):
         astroBackend.getStarTagTranslations() +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
-    CACHE_VERSION = "-95-" 
+    CACHE_VERSION = "-96-"
 
-    COMET_CACHE_APPARENT_MAGNITUDE_BASENAME = "comet-apparentmagnitude-" + CACHE_VERSION
-    COMET_CACHE_ORBITAL_ELEMENT_BASENAME = "comet-orbitalelement-" + astroBackendName.lower() + CACHE_VERSION
+    COMET_CACHE_APPARENT_MAGNITUDE_BASENAME = "comet-apparentmagnitude" + CACHE_VERSION
+    COMET_CACHE_ORBITAL_ELEMENT_BASENAME = "comet-orbitalelement" + '-' + astroBackendName.lower() + CACHE_VERSION
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = OE.DataType.XEPHEM_COMET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_COMET
 
-    MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME = "minorplanet-apparentmagnitude-" + CACHE_VERSION
-    MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME = "minorplanet-orbitalelement-" + astroBackendName.lower() + CACHE_VERSION
+    MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME = "minorplanet-apparentmagnitude" + CACHE_VERSION
+    MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME = "minorplanet-orbitalelement" + '-' + astroBackendName.lower() + CACHE_VERSION
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = OE.DataType.XEPHEM_MINOR_PLANET if astroBackendName == astroBackendPyEphem else OE.DataType.SKYFIELD_MINOR_PLANET
 
-    SATELLITE_CACHE_BASENAME = "satellite-generalperturbation-" + CACHE_VERSION
+    SATELLITE_CACHE_BASENAME = "satellite-generalperturbation" + CACHE_VERSION
     SATELLITE_CACHE_EXTENSION = ".xml"
     SATELLITE_CACHE_MAXIMUM_AGE_HOURS = 48
 
@@ -190,6 +190,7 @@ class IndicatorLunar( IndicatorBase ):
         self.__removeCacheFilesVersion89()
         self.__removeCacheFilesVersion93()
         self.__removeCacheFilesVersion94()
+        self.__removeCacheFilesVersion95()
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
 
@@ -226,6 +227,14 @@ class IndicatorLunar( IndicatorBase ):
         self.flushCache( "satellite-tle-94-", 0 )
 
 
+    def __removeCacheFilesVersion95( self ):
+        # In version 95, some cache basenames incorrectly had '--'.
+        self.flushCache( "comet-orbitalelement-astropyephem-95-", 0 )
+        self.flushCache( "minorplanet-apparentmagnitude--95-", 0 )
+        self.flushCache( "minorplanet-orbitalelement-astropyephem-95-", 0 )
+        self.flushCache( "satellite-generalperturbation--95-", 0 )
+
+
     def flushTheCache( self ):
         self.flushCache( IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
         self.flushCache( IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.ICON_CACHE_MAXIMUM_AGE_HOURS )
@@ -249,6 +258,8 @@ class IndicatorLunar( IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
+        # utcNow = datetime.datetime.utcnow() + datetime.timedelta( hours = 100 ) #TODO Testing
+        # print( utcNow )
 
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -340,6 +351,7 @@ class IndicatorLunar( IndicatorBase ):
             loadDataFunction, loadDataAdditionalArguments ):
 
         if self.isCacheStale( utcNow, cacheBasename, cacheMaximumAge ):
+            print( "STALE CACHE:", cacheBasename )#TODO Testing
             freshData = { }
             if nextDownloadTime < utcNow: # Download is allowed (do not want to annoy third-party data provider).
                 downloadDataFilename = self.getCacheFilenameWithTimestamp( cacheBasename, cacheExtension )
@@ -347,17 +359,22 @@ class IndicatorLunar( IndicatorBase ):
                     downloadCount = 0
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
                     freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
+                    print( "\tDOWNLOADED" )#TODO Testing
 
                 else:
+                    print( "\tDOWNLOAD FAILURE" )#TODO Testing
                     downloadCount += 1
                     nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
 
         else:
+            print( "VALID CACHE:", cacheBasename )
             # Cache is not stale; only load off disk as necessary.
             if currentData:
                 freshData = currentData
+                print( "\tUSE IN MEMORY" )#TODO Testing
 
             else:
+                print( "\tLOAD FROM DISK" )#TODO Testing
                 downloadDataFilename = self.getCacheNewestFilename( cacheBasename ) # Should NOT return None as the cache was checked for staleness above.
                 freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
 
