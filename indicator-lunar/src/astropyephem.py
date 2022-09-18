@@ -377,14 +377,7 @@ class AstroPyEphem( AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
-                
-                record = satelliteData[ satellite ].getSatelliteRecord()
-                lineOne, lineTwo = satelliteData[ satellite ].getLineOneLineTwo()
-                if int( lineOne[ 2 : 7 ] ) != int( satelliteData[ satellite ].getNumber() ):
-                    print( lineOne[ 2 : 7 ], satelliteData[ satellite ].getNumber())
-#TODO In progress: swap in a dummy/short satellite number if the number is longer than 5 digits.                
-                earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), lineOne, lineTwo )
-                # earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), *satelliteData[ satellite ].getLineOneLineTwo() )
+                earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), *satelliteData[ satellite ].getLineOneLineTwo() )
                 for startDateTime, endDateTime in windows:
                     if AstroPyEphem.__calculateSatellite( ephem.Date( startDateTime ), ephem.Date( endDateTime ), data, key, earthSatellite, observer, observerVisiblePasses ):
                         break
