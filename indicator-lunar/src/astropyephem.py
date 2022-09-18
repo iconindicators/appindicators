@@ -377,7 +377,7 @@ class AstroPyEphem( AstroBase ):
         for satellite in satellites:
             if satellite in satelliteData:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
-                earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), *satelliteData[ satellite ].getLineOneLineTwo() )
+                earthSatellite = ephem.readtle( satelliteData[ satellite ].getName(), *satelliteData[ satellite ].getTLELineOneLineTwo() )
                 for startDateTime, endDateTime in windows:
                     if AstroPyEphem.__calculateSatellite( ephem.Date( startDateTime ), ephem.Date( endDateTime ), data, key, earthSatellite, observer, observerVisiblePasses ):
                         break

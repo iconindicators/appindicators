@@ -496,7 +496,7 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getThemeColour( self, defaultColour ):
-        themeNames = { 
+        themeNames = {
             "Adwaita"                : "bebebe",
             "elementary-xfce-darker" : "f3f3f3",
             "Lubuntu"                : "4c4c4c",

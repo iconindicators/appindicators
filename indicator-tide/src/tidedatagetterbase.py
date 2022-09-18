@@ -31,12 +31,11 @@ class TideDataGetterBase( ABC ):
     #
     # This function is abstract and must be implemented by the end user.
     # In the users's implementation, remove the @abstractmethod from the function header.
-    # 
     @staticmethod
     @abstractmethod
     def getTideData( logging = None, urlTimeoutInSeconds = 20 ):
         # Example data returned by this function, to be implemented by the end user in the own script and class.
-        return [ 
+        return [
             tide.Reading( "Tuesday August 3rd", "4:07 AM", "The port", True, 1.6, "http://url-used-to-obtain-tidal-information" ),
             tide.Reading( "Tuesday August 3rd", "10:31 AM", "The port", False, 0.3, "http://url-used-to-obtain-tidal-information" ),
             tide.Reading( "Wednesday August 4th", "5:26 AM", "The port", True, 1.5, "http://url-used-to-obtain-tidal-information" ) ]

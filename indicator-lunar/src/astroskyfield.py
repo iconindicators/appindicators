@@ -308,11 +308,13 @@ class AstroSkyfield( AstroBase ):
             apparentMagnitudeMaximum,
             logging )
 
+        # start = datetime.datetime.utcnow() #TODO Testing
         AstroSkyfield.__calculateCometsMinorPlanets(
             now, nowPlusThirtySixHours, data, timeScale, locationAtNow,
             AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
             logging )
+        # print( ( datetime.datetime.utcnow() - start ).total_seconds() ) #TODO Testing
 
         AstroSkyfield.__calculateSatellites( now, data, timeScale, location, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
 
@@ -460,7 +462,7 @@ class AstroSkyfield( AstroBase ):
 # https://github.com/skyfielders/python-skyfield/issues/490
     @staticmethod
     def __calculateCometsMinorPlanets(
-            now, nowPlusThirtySixHours, 
+            now, nowPlusThirtySixHours,
             data, timeScale, locationAtNow,
             bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData,
             apparentMagnitudeMaximum,
@@ -468,7 +470,7 @@ class AstroSkyfield( AstroBase ):
 
         if bodyType == AstroBase.BodyType.COMET: return #TODO Comets data file currently breaks this code...waiting on Jure from COBS to fix.
 
-        # Skyfield loads orbital element data into a dataframe from a file; 
+        # Skyfield loads orbital element data into a dataframe from a file;
         # as the orbital element data is already in memory,
         # write the orbital element data to a memory file object.
         with io.BytesIO() as f:
@@ -548,11 +550,11 @@ class AstroSkyfield( AstroBase ):
         if len( events ) >= 2:
             dateTimes = dateTimes.utc_datetime()
             foundRiseSet = True
-            if events[ 0 ] == AstroSkyfield.__BODY_EVENT_RISE and events[ 1 ] == AstroSkyfield.__BODY_EVENT_SET: 
+            if events[ 0 ] == AstroSkyfield.__BODY_EVENT_RISE and events[ 1 ] == AstroSkyfield.__BODY_EVENT_SET:
                 riseDateTime = dateTimes[ 0 ]
                 setDateTime = dateTimes[ 1 ]
 
-            elif events[ 0 ] == AstroSkyfield.__BODY_EVENT_SET and events[ 1 ] == AstroSkyfield.__BODY_EVENT_RISE: 
+            elif events[ 0 ] == AstroSkyfield.__BODY_EVENT_SET and events[ 1 ] == AstroSkyfield.__BODY_EVENT_RISE:
                 riseDateTime = dateTimes[ 1 ]
                 setDateTime = dateTimes[ 0 ]
 
@@ -618,7 +620,7 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellite( startDateTime, endDateTime, data, key, earthSatellite, timeScale, location, isTwilightFunction ): 
+    def __calculateSatellite( startDateTime, endDateTime, data, key, earthSatellite, timeScale, location, isTwilightFunction ):
         foundPass = False
         riseDateTime = None
         culminationDateTimes = [ ] # Culminate may occur more than once, so collect them all.
@@ -637,11 +639,11 @@ class AstroSkyfield( AstroBase ):
                     data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime.utc_datetime() )
                     alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseDateTime ).altaz()
                     data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
-                    
+
                     data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( dateTime.utc_datetime() )
                     alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( dateTime ).altaz()
                     data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
-                    
+
                     foundPass = True
                     break
 

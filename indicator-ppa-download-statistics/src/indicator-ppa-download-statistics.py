@@ -154,7 +154,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 else:
                     self.createMenuItemForStatusMessage( menu, indent, ppa )
-    
+
             # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
             if len( ppas ) == 1:
                 self.secondaryActivateTarget = menuItem
@@ -242,7 +242,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                     temp[ key ].getPackageVersion(),
                                     temp[ key ].getDownloadCount() + publishedBinary.getDownloadCount(),
                                     temp[ key ].isArchitectureSpecific )
-                            
+
                             temp[ key ] = newPublishedBinary
 
                         else:
@@ -254,7 +254,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                         None,
                                         temp[ key ].getDownloadCount(),
                                         temp[ key ].isArchitectureSpecific )
-                                
+
                                 temp[ key ] = newPublishedBinary
 
                     else:
@@ -1004,18 +1004,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.ppas = [ ]
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
-                user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ] 
+                user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                 name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                 series = ppa[ IndicatorPPADownloadStatistics.COLUMN_SERIES ]
                 architecture = ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
                 self.ppas.append( PPA( user, name, series, architecture ) )
-            
+
             PPA.sort( self.ppas )
 
             self.filters = Filters()
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
             for theFilter in filters:
-                user = theFilter[ IndicatorPPADownloadStatistics.COLUMN_USER ] 
+                user = theFilter[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                 name = theFilter[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                 series = theFilter[ IndicatorPPADownloadStatistics.COLUMN_SERIES ]
                 architecture = theFilter[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]

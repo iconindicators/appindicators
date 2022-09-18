@@ -161,9 +161,9 @@ class IndicatorFortune( IndicatorBase ):
                     output = ""
                     for c in self.fortune:
                         if codecs.encode( str.encode( c ), "hex" ) == b'07':
-                            continue 
+                            continue
 
-                        output += c                   
+                        output += c
 
                     self.fortune = output
                     self.writeCacheTextWithoutTimestamp( history + self.fortune + "\n\n", IndicatorFortune.HISTORY_FILE )
@@ -267,13 +267,13 @@ class IndicatorFortune( IndicatorBase ):
         box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
         spinnerRefreshInterval = self.createSpinButton(
-            self.refreshIntervalInMinutes, 
-            1, 
-            60 * 24, 
+            self.refreshIntervalInMinutes,
+            1,
+            60 * 24,
             1,
             10,
             _( "How often a fortune is displayed." ) )
-        
+
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )
@@ -435,7 +435,7 @@ class IndicatorFortune( IndicatorBase ):
                 "system and cannot be modified." ) )
 
         else:
-            browseFileButton.set_tooltip_text( _( 
+            browseFileButton.set_tooltip_text( _(
                 "Choose a fortune .dat file.\n\n" + \
                 "Ensure the corresponding text\n" + \
                 "file is present." ) )

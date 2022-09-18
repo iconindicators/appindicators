@@ -62,9 +62,9 @@ def getEclipse( dateTimeUTC, isLunar ):
     eclipseInfo = None
     for eclipse in eclipseData:
         dateTime = datetime.datetime.strptime(
-            eclipse[ __ECLIPSE_YEAR ] + ", " + 
-            eclipse[ __ECLIPSE_MONTH ] + ", " + 
-            eclipse[ __ECLIPSE_DAY ] + ", " + 
+            eclipse[ __ECLIPSE_YEAR ] + ", " +
+            eclipse[ __ECLIPSE_MONTH ] + ", " +
+            eclipse[ __ECLIPSE_DAY ] + ", " +
             eclipse[ __ECLIPSE_HOUR_MINUTE_SECOND ], "%Y, %m, %d, %H:%M:%S" )
         dateTime = dateTime - datetime.timedelta( seconds = int( eclipse[ __ECLIPSE_DELTA_T ] ) ) # Need to subtract delta T (https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html).
         if dateTimeUTC.timestamp() <= dateTime.timestamp():

@@ -81,7 +81,7 @@ class DataProviderOrbitalElement( DataProvider ):
                             designameByIdDesignationPrimary { str_designame }
                             h # Absolute magnitude
                             ephemeris( where: { eph_date: { _eq: $date } } ) { v_mag }
-                        }    
+                        }
                         epoch # Epoch date
                         m # Mean anomaly epoch
                         peri # Argument of perhilion
@@ -141,7 +141,7 @@ class DataProviderOrbitalElement( DataProvider ):
                             DataProviderOrbitalElement.getPackedDate( minorPlanet[ "epoch" ][ 0 : 4 ], minorPlanet[ "epoch" ][ 5 : 7 ], minorPlanet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
                             ' ', # 26
                             str( round( float( meanAnomalyEpoch ), 5 ) ).rjust( 9 ),
-                            ' ' * 2, # 36, 37 
+                            ' ' * 2, # 36, 37
                             str( round( float( argumentPerihelion ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 47, 48
                             str( round( float( longitudeAscendingNode ), 5 ) ).rjust( 9 ),
@@ -319,7 +319,7 @@ class OE( object ):
         return self.__str__()
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
             self.getName() == other.getName() and \

@@ -48,7 +48,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
     COLUMN_CALENDAR_ENABLED = 1 # tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
 
-    CALENDARS_FILENAME = "calendars.txt" 
+    CALENDARS_FILENAME = "calendars.txt"
 
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
     TAG_EVENT = "["+ _( "EVENT" )+ "]"

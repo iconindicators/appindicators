@@ -159,7 +159,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += "; ${SHELL}"
 
         command += "'"
-        
+
         if self.sendCommandToLog:
             self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
 
@@ -584,12 +584,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
                 row = [
                     group,
-                    None, 
-                    script.getName(), 
-                    Gtk.STOCK_APPLY if script.getPlaySound() else None, 
-                    Gtk.STOCK_APPLY if script.getShowNotification() else None, 
-                    None, 
-                    None, 
+                    None,
+                    script.getName(),
+                    Gtk.STOCK_APPLY if script.getPlaySound() else None,
+                    Gtk.STOCK_APPLY if script.getShowNotification() else None,
+                    None,
+                    None,
                     str( script.getIntervalInMinutes() ),
                     Gtk.STOCK_APPLY if script.getForceUpdate() else None ]
 
@@ -719,9 +719,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
                     self.populateBackgroundScriptsTreeStore(
-                        scripts, 
-                        backgroundScriptsTreeView, 
-                        newScript.getGroup() if type( newScript ) == Background else "", 
+                        scripts,
+                        backgroundScriptsTreeView,
+                        newScript.getGroup() if type( newScript ) == Background else "",
                         newScript.getName() if type( newScript ) == Background else "" )
 
                 break
@@ -1228,23 +1228,23 @@ class IndicatorScriptRunner( IndicatorBase ):
         scriptsNonBackground = [ ]
         for script in self.scripts:
             if type( script ) == Background:
-                scriptsBackground.append( [ 
-                    script.getGroup(), 
-                    script.getName(), 
-                    script.getCommand(), 
-                    script.getPlaySound(), 
+                scriptsBackground.append( [
+                    script.getGroup(),
+                    script.getName(),
+                    script.getCommand(),
+                    script.getPlaySound(),
                     script.getShowNotification(),
                     script.getIntervalInMinutes(),
                     script.getForceUpdate() ] )
 
             else:
-                scriptsNonBackground.append( [ 
-                    script.getGroup(), 
-                    script.getName(), 
-                    script.getCommand(), 
-                    script.getPlaySound(), 
+                scriptsNonBackground.append( [
+                    script.getGroup(),
+                    script.getName(),
+                    script.getCommand(),
+                    script.getPlaySound(),
                     script.getShowNotification(),
-                    script.getTerminalOpen(), 
+                    script.getTerminalOpen(),
                     script.getDefault() ] )
 
         return {

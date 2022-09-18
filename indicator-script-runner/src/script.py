@@ -106,7 +106,7 @@ class Background( Info ):
         return self.forceUpdate
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         return \
             super().__eq__( other ) and \
             self.__class__ == other.__class__ and \
@@ -148,7 +148,7 @@ class NonBackground( Info ):
         return self.default
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         return \
             super().__eq__( other ) and \
             self.__class__ == other.__class__ and \

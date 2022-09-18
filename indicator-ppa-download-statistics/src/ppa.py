@@ -107,7 +107,7 @@ class PublishedBinary( object ):
         return self.__str__()
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
             self.getPackageName() == other.getPackageName() and \
@@ -214,7 +214,7 @@ class PPA( object ):
         return self.__str__()
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         equal = \
             self.__class__ == other.__class__ and \
             self.getUser() == other.getUser() and \

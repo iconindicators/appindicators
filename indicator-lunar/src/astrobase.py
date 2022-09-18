@@ -268,7 +268,7 @@ class AstroBase( ABC ):
         [ "ALPHARD",          46390,  _( "Alphard" ),          _( "ALPHARD" ) ],
         [ "ALPHEKKA",         76267,  _( "Alphekka" ),         _( "ALPHEKKA" ) ],
         [ "ALPHERATZ",        677,    _( "Alpheratz" ),        _( "ALPHERATZ" ) ],
-        [ "ALSHAIN",          98036,  _( "Alshain" ),          _( "ALSHAIN" ) ],  
+        [ "ALSHAIN",          98036,  _( "Alshain" ),          _( "ALSHAIN" ) ],
         [ "ALTAIR",           97649,  _( "Altair" ),           _( "ALTAIR" ) ],
         [ "ANKAA",            2081,   _( "Ankaa" ),            _( "ANKAA" ) ],
         [ "ANTARES",          80763,  _( "Antares" ),          _( "ANTARES" ) ],
@@ -514,7 +514,7 @@ class AstroBase( ABC ):
             bodySunDistanceAU * bodySunDistanceAU + \
             bodyEarthDistanceAU * bodyEarthDistanceAU - \
             earthSunDistanceAU * earthSunDistanceAU
-        
+
         denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
         beta = math.acos( numerator / denominator )
 
@@ -671,7 +671,7 @@ class AstroBase( ABC ):
 
     # Take a start/end date/time used to search for a satellite transit
     # and determine where a given start/end hour will overlap.
-    # 
+    #
     # Used to limit satellite passes from say dawn and dusk to just dusk.
     #
     # The start hour (as date/time) < end hour (as date/time).
@@ -735,7 +735,7 @@ class AstroBase( ABC ):
                 # Special case for '282P' which is MPC format, whereas the XEphem format is '282P/'.
                 designation = name
 
-            else:            
+            else:
                 dash = name[ 0 : slash ].find( '-' )
                 if dash == -1:
                     designation = name[ 0 : slash ]
@@ -749,7 +749,7 @@ class AstroBase( ABC ):
                 # P/1998 VS24 (LINEAR)
                 # P/2011 UA134 (Spacewatch-PANSTARRS)
                 # A/2018 V3
-                # C/2019 Y4-D (ATLAS)       
+                # C/2019 Y4-D (ATLAS)
             designation = ' '.join( name.split()[ 0 : 2 ] )
 
         else:

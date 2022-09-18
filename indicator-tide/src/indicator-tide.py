@@ -88,7 +88,7 @@ class IndicatorTide( IndicatorBase ):
 
 
     def buildMenu( self, menu, tidalReadings ):
-        indent = "" 
+        indent = ""
         self.portName = tidalReadings[ 0 ].getLocation()
         if self.portName:
             self.__createAndAppendMenuItem( menu, self.portName, tidalReadings[ 0 ].getURL() )
@@ -114,11 +114,11 @@ class IndicatorTide( IndicatorBase ):
         for tidalReading in tidalReadings:
             if todayDate != tidalReading.getDate():
                 shownToday = False
-        
+
             menuText = indent + self.getMenuIndent( 1 ) + ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + tidalReading.getTime() + "  " + tidalReading.getLevel()
             if shownToday:
                 self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )
-        
+
             else:
                 self.__createAndAppendMenuItem( menu, indent + tidalReading.getDate(), tidalReading.getURL() )
                 self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )
