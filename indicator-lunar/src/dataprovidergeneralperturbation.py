@@ -16,11 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory
-# general perturbations for satellites.
+# Download from URL, load from file and hold in memory general perturbations for satellites.
 
 
-from abc import ABC, abstractmethod
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase
 from sgp4 import exporter, omm
@@ -45,45 +43,48 @@ class DataProviderGeneralPerturbation( DataProvider ):
     # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
     def load( filename, logging ):
-        # names = { }
-        # numbers = { }
         data = { }
         for fields in omm.parse_xml( filename ):
-            satelliteRecord = Satrec()
-            omm.initialize( satelliteRecord, fields )
-            data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord )
+            gp = GP( fields )
+            data[ gp.getNumber() ] = gp
 
         return data
 
 
-# Hold general perturbations for satellites.
+# Hold general perturbation for a satellite.
 class GP( object ):
-    def __init__( self, name, satelliteRecord, satelliteRecordWithSatelliteNumberSetToZero = None ):
-        self.name = name
-        self.satelliteRecord = satelliteRecord
-        self.satelliteRecordWithSatelliteNumberSetToZero = satelliteRecordWithSatelliteNumberSetToZero
+
+    def __init__( self, xmlFieldsFromOMM ):
+        self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ]
+
+        self.satelliteRecord = Satrec()
+        omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
+
+        # The TLE format does not support a satellite catalog number (NORAD number) greater than 99,999.
+        # Therefore, when the satellite information is requested as a TLE,
+        # substitute '0' for the satellite catalog number when in excess of 99,999.
+        #
+        # Unfortunately, cannot alter the satellite catalog number once it is set as it is protected.
+        # Instead, keep a second record around as required.
+        self.satelliteRecordTLESafe = self.satelliteRecord
+        if int( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > 99999:
+            self.satelliteRecordTLESafe = Satrec()
+            xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = str( 0 )
+            omm.initialize( self.satelliteRecordTLESafe, xmlFieldsFromOMM )
+
+        self.tleLineOne = None
+        self.tleLineTwo = None
 
 
     def getInternationalDesignator( self ):
         return self.satelliteRecord.intldesg
 
 
-#TODO I think here the satellite record should be modified BEFORE passed to the exporter
-# to change the satellite number to say 00000 if the satellite number is longer than five digits.
-# FIRST check if 00000 is already taken.
-    def getLineOneLineTwo( self ):
-        lineOneLineTwo = None
-        if self.satelliteRecord.satnum > 99999:
-            print( "Swapping", self.satelliteRecord.satnum )
-            satNum = self.satelliteRecord.satnum
-            self.satelliteRecord.satnum = 0
-            lineOneLineTwo = exporter.export_tle( self.satelliteRecord )
-            self.satelliteRecord.satnum = satNum
+    def getTLELineOneLineTwo( self ):
+        if self.tleLineOne is None:
+            self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecordTLESafe )
 
-        else:
-            lineOneLineTwo = exporter.export_tle( self.satelliteRecord )
-
-        return lineOneLineTwo
+        return self.tleLineOne, self.tleLineTwo
 
 
     def getName( self ):
@@ -98,11 +99,6 @@ class GP( object ):
         return self.satelliteRecord
 
 
-#TODO NOt sure if this should be exposed.
-    # def satelliteRecordWithSatelliteNumberSetToZero( self ):
-    #     return self.satelliteRecordWithSatelliteNumberSetToZero
-
-
     def __str__( self ):
         return \
             self.name + " | " + \
@@ -114,7 +110,7 @@ class GP( object ):
         return self.__str__()
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
             self.getName() == other.getName() and \

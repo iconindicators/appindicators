@@ -19,7 +19,6 @@
 # Download from URL, load from file and hold in memory apparent magnitude for comets and minor planets.
 
 
-from abc import ABC, abstractmethod
 from dataprovider import DataProvider
 
 import datetime, requests
