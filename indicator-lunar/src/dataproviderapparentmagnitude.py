@@ -130,7 +130,7 @@ class DataProviderApparentMagnitude( DataProvider ):
         return amData
 
 
-# Hold apparent magnitude for comets and minor planets.
+# Hold apparent magnitude for a comet or minor planet.
 class AM( object ):
 
     def __init__( self, name, apparentMagnitude ):

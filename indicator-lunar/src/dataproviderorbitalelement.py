@@ -284,7 +284,7 @@ class DataProviderOrbitalElement( DataProvider ):
         return oeData
 
 
-# Hold orbital elements for comets and minor planets.
+# Hold orbital element for a comet or minor planet.
 class OE( object ):
 
     class DataType( Enum ):
