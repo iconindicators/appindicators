@@ -48,15 +48,58 @@ class DataProviderGeneralPerturbation( DataProvider ):
     #
     # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
+#TODO 
+# As per the discussion at
+#    https://github.com/brandon-rhodes/pyephem/discussions/243
+# maybe drop the paramater for dropping satellites.
+# Instead, in PyEphem, when requesting the TLE,
+# first check the length of the satellite catalog number (satnum)
+# and if that number is of lenght greater than 5,
+# swap in a dummy number of say 12345 and then ask for the TLE.     
     def load( filename, logging, dropSatelliteNumberGreaterThanLengthFive ):
+        names = { }
+        numbers = { }
         data = { }
         for fields in omm.parse_xml( filename ):
             satelliteRecord = Satrec()
             omm.initialize( satelliteRecord, fields )
-            if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5:
-                continue
 
-            data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord ) 
+            print( fields )
+            print( satelliteRecord )
+            
+            # if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5:
+            #     continue
+
+#TODO Should the name be used as the key as it is not necessarily unique?
+# Maybe use the unique satnum instead.
+# Find an example of two satellites with same name.
+            # data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord ) 
+            data[ str( satelliteRecord.satnum ) ] = GP( fields[ "NORAD_CAT_ID" ], satelliteRecord )
+
+            if fields[ "OBJECT_NAME" ] not in names:
+                names[ fields[ "OBJECT_NAME" ] ] = 0
+                
+            names[ fields[ "OBJECT_NAME" ] ] = names[ fields[ "OBJECT_NAME" ] ] + 1
+
+            if fields[ "NORAD_CAT_ID" ] not in numbers:
+                numbers[ fields[ "NORAD_CAT_ID" ] ] = 0
+                
+            numbers[ fields[ "NORAD_CAT_ID" ] ] = numbers[ fields[ "NORAD_CAT_ID" ] ] + 1
+
+        # print(names)
+        # print( numbers)
+        print( "names")
+        for key, value in names.items():
+            if value > 1:
+                print( key, value )
+
+        print( "numbers")
+        for key, value in numbers.items():
+            if value > 1:
+                print( key, value )
+        
+
+        print( len(names), len(numbers))
 
         return data
 
@@ -68,7 +111,7 @@ class GP( object ):
         self.satelliteRecord = satelliteRecord
 
 
-    def getInternationalDesignator( self ):  return self.satelliteRecord.intldesg
+    def getInternationalDesignator( self ): return self.satelliteRecord.intldesg
 
 
     def getLineOneLineTwo( self ): return exporter.export_tle( self.satelliteRecord )
