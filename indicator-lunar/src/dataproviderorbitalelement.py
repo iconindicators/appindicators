@@ -16,8 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory
-# orbital elements for comets and minor planets.
+# Download from URL, load from file and hold in memory orbital elements for comets and minor planets.
 
 
 from abc import ABC, abstractmethod
