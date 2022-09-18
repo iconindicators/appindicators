@@ -300,19 +300,24 @@ class OE( object ):
         self.dataType = dataType
 
 
-    def getName( self ): return self.name
+    def getName( self ):
+        return self.name
 
 
-    def getData( self ): return self.data
+    def getData( self ):
+        return self.data
 
 
-    def getDataType( self ): return self.dataType
+    def getDataType( self ):
+        return self.dataType
 
 
-    def __str__( self ): return self.data
+    def __str__( self ):
+        return self.data
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ): 
