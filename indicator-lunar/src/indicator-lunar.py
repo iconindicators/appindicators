@@ -258,8 +258,6 @@ class IndicatorLunar( IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
-        # utcNow = datetime.datetime.utcnow() + datetime.timedelta( hours = 100 ) #TODO Testing
-        # print( utcNow )
 
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -271,7 +269,7 @@ class IndicatorLunar( IndicatorBase ):
             self.latitude, self.longitude, self.elevation,
             self.planets,
             self.stars,
-            self.satellites, self.satelliteGeneralPerturbationData, 
+            self.satellites, self.satelliteGeneralPerturbationData,
             *self.convertStartHourAndEndHourToDateTimeInUTC( self.satelliteLimitStart, self.satelliteLimitEnd ),
             self.comets, self.cometOrbitalElementData, None,
             self.minorPlanets, self.minorPlanetOrbitalElementData, self.minorPlanetApparentMagnitudeData,
@@ -312,7 +310,7 @@ class IndicatorLunar( IndicatorBase ):
             self.addNewBodies( self.cometOrbitalElementData, self.comets )
 
         # Update minor planet data.
-        self.minorPlanetOrbitalElementData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData( 
+        self.minorPlanetOrbitalElementData, self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet = self.__updateData(
             utcNow, self.minorPlanetOrbitalElementData,
             IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountMinorPlanet, self.nextDownloadTimeMinorPlanet,
@@ -323,7 +321,7 @@ class IndicatorLunar( IndicatorBase ):
             self.addNewBodies( self.minorPlanetOrbitalElementData, self.minorPlanets )
 
         # Update minor planet apparent magnitudes.
-        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData( 
+        self.minorPlanetApparentMagnitudeData, self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude = self.__updateData(
             utcNow, self.minorPlanetApparentMagnitudeData,
             IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountApparentMagnitude, self.nextDownloadTimeApparentMagnitude,
@@ -336,7 +334,7 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.SATELLITE_CACHE_BASENAME, IndicatorLunar.SATELLITE_CACHE_EXTENSION, IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.downloadCountSatellite, self.nextDownloadTimeSatellite,
             DataProviderGeneralPerturbation.download, [ ],
-            DataProviderGeneralPerturbation.load, [ True if IndicatorLunar.astroBackendName == IndicatorLunar.astroBackendPyEphem else False ] )
+            DataProviderGeneralPerturbation.load, [ ] )
 
         if self.satellitesAddNew:
             self.addNewBodies( self.satelliteGeneralPerturbationData, self.satellites )
@@ -588,8 +586,8 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
         setTime = self.formatData(
-            IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, 
-            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ], 
+            IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME,
+            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
             IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
         setAzimuth = self.formatData(
@@ -642,20 +640,20 @@ class IndicatorLunar( IndicatorBase ):
             # The phase (illumination) rounds numbers and so a given phase is entered earlier than what is correct.
             INDEX_KEY = 0
             nextPhases = [ ]
-            nextPhases.append( 
-                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER, ) ], 
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER, ) ],
                  _( "First Quarter: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER, ) ] )
 
-            nextPhases.append( 
-                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_FULL, ) ], 
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_FULL, ) ],
                 _( "Full: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_FULL, ) ] )
 
-            nextPhases.append( 
-                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_NEW, ) ], 
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_NEW, ) ],
                 _( "New: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_NEW, ) ] )
 
-            nextPhases.append( 
-                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER, ) ], 
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER, ) ],
                 _( "Third Quarter: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER, ) ] )
 
             indent = self.getMenuIndent( 2 )
@@ -752,7 +750,7 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Stars" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            indent = self.getMenuIndent( 1 ) 
+            indent = self.getMenuIndent( 1 )
             for name, translatedName in stars:
                 url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
                 self.createMenuItem( subMenu, indent + translatedName, url )
@@ -783,7 +781,7 @@ class IndicatorLunar( IndicatorBase ):
             menuItem = self.createMenuItem( menu, _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" ) )
             subMenu = Gtk.Menu()
             menuItem.set_submenu( subMenu )
-            indent = self.getMenuIndent( 1 ) 
+            indent = self.getMenuIndent( 1 )
             for internalName, displayName in sorted( bodiesToDisplay, key = lambda x: x[ 1 ].casefold() ):
                 if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
                     url = IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( internalName )
@@ -838,21 +836,21 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Azimuth: " ) + \
                     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
                     onClickURL )
-        
+
                 self.createMenuItem(
                     menu,
                     indent + \
                     _( "Altitude: " ) + \
                     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
                     onClickURL )
-        
+
                 self.createMenuItem(
                     menu,
                     indent + \
                     _( "Set: " ) + \
                     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] ),
                     onClickURL )
-        
+
         else: # Body is always up.
             self.createMenuItem(
                 menu,
@@ -860,7 +858,7 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Azimuth: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
                 onClickURL )
-        
+
             self.createMenuItem(
                 menu,
                 indent + \
@@ -872,7 +870,7 @@ class IndicatorLunar( IndicatorBase ):
     # Display the rise/set information for each satellite.
     #
     # If a satellite is in transit OR will rise within the next five minutes,
-    # show next rise/set.  Otherwise, show next rise. 
+    # show next rise/set.  Otherwise, show next rise.
     #
     # Next rise/set:
     #
@@ -924,7 +922,7 @@ class IndicatorLunar( IndicatorBase ):
                         if inTransit:
                             satellites.append( [
                                 number,
-                                self.satelliteGeneralPerturbationData[ number ].getName(), 
+                                self.satelliteGeneralPerturbationData[ number ].getName(),
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
@@ -1925,7 +1923,7 @@ class IndicatorLunar( IndicatorBase ):
             if utcNowPlusTenMinutes.index( '.' ) > -1:
                 utcNowPlusTenMinutes = utcNowPlusTenMinutes.split( '.' )[ 0 ] # Remove fractional seconds.
 
-            def replaceTags( text ): 
+            def replaceTags( text ):
                 return \
                     text. \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME_TRANSLATION, "ISS (ZARYA)" ). \
