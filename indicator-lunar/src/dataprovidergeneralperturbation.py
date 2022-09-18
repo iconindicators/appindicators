@@ -38,92 +38,69 @@ class DataProviderGeneralPerturbation( DataProvider ):
 
     # Load general perturbation data from the given filename.
     #
-    # If instructed, will drop any satellite with a satellite number (Norad number)
-    # greater than five digits, as this is incompatible with the TLE format.
-    # https://github.com/brandon-rhodes/pyephem/discussions/243
-    #
     # Returns a dictionary:
-    #    Key: Satellite number (Norad number)
+    #    Key: Satellite catalog number (NORAD number)
     #    Value: GP object
     #
     # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
-#TODO 
-# As per the discussion at
-#    https://github.com/brandon-rhodes/pyephem/discussions/243
-# maybe drop the paramater for dropping satellites.
-# Instead, in PyEphem, when requesting the TLE,
-# first check the length of the satellite catalog number (satnum)
-# and if that number is of lenght greater than 5,
-# swap in a dummy number of say 12345 and then ask for the TLE.     
-    def load( filename, logging, dropSatelliteNumberGreaterThanLengthFive ):
-        names = { }
-        numbers = { }
+    def load( filename, logging ):
+        # names = { }
+        # numbers = { }
         data = { }
         for fields in omm.parse_xml( filename ):
             satelliteRecord = Satrec()
             omm.initialize( satelliteRecord, fields )
-
-            print( fields )
-            print( satelliteRecord )
-            
-            # if dropSatelliteNumberGreaterThanLengthFive and len( str( satelliteRecord.satnum ) ) > 5:
-            #     continue
-
-#TODO Should the name be used as the key as it is not necessarily unique?
-# Maybe use the unique satnum instead.
-# Find an example of two satellites with same name.
-            # data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord ) 
-            data[ str( satelliteRecord.satnum ) ] = GP( fields[ "NORAD_CAT_ID" ], satelliteRecord )
-
-            if fields[ "OBJECT_NAME" ] not in names:
-                names[ fields[ "OBJECT_NAME" ] ] = 0
-                
-            names[ fields[ "OBJECT_NAME" ] ] = names[ fields[ "OBJECT_NAME" ] ] + 1
-
-            if fields[ "NORAD_CAT_ID" ] not in numbers:
-                numbers[ fields[ "NORAD_CAT_ID" ] ] = 0
-                
-            numbers[ fields[ "NORAD_CAT_ID" ] ] = numbers[ fields[ "NORAD_CAT_ID" ] ] + 1
-
-        # print(names)
-        # print( numbers)
-        print( "names")
-        for key, value in names.items():
-            if value > 1:
-                print( key, value )
-
-        print( "numbers")
-        for key, value in numbers.items():
-            if value > 1:
-                print( key, value )
-        
-
-        print( len(names), len(numbers))
+            data[ str( satelliteRecord.satnum ) ] = GP( fields[ "OBJECT_NAME" ], satelliteRecord )
 
         return data
 
 
 # Hold general perturbations for satellites.
 class GP( object ):
-    def __init__( self, name, satelliteRecord ):
+    def __init__( self, name, satelliteRecord, satelliteRecordWithSatelliteNumberSetToZero = None ):
         self.name = name
         self.satelliteRecord = satelliteRecord
+        self.satelliteRecordWithSatelliteNumberSetToZero = satelliteRecordWithSatelliteNumberSetToZero
 
 
-    def getInternationalDesignator( self ): return self.satelliteRecord.intldesg
+    def getInternationalDesignator( self ):
+        return self.satelliteRecord.intldesg
 
 
-    def getLineOneLineTwo( self ): return exporter.export_tle( self.satelliteRecord )
+#TODO I think here the satellite record should be modified BEFORE passed to the exporter
+# to change the satellite number to say 00000 if the satellite number is longer than five digits.
+# FIRST check if 00000 is already taken.
+    def getLineOneLineTwo( self ):
+        lineOneLineTwo = None
+        if self.satelliteRecord.satnum > 99999:
+            print( "Swapping", self.satelliteRecord.satnum )
+            satNum = self.satelliteRecord.satnum
+            self.satelliteRecord.satnum = 0
+            lineOneLineTwo = exporter.export_tle( self.satelliteRecord )
+            self.satelliteRecord.satnum = satNum
+
+        else:
+            lineOneLineTwo = exporter.export_tle( self.satelliteRecord )
+
+        return lineOneLineTwo
 
 
-    def getName( self ): return self.name
+    def getName( self ):
+        return self.name
 
 
-    def getNumber( self ): return str( self.satelliteRecord.satnum )
-    
-    
-    def getSatelliteRecord( self ): return self.satelliteRecord
+    def getNumber( self ):
+        return str( self.satelliteRecord.satnum )
+
+
+    def getSatelliteRecord( self ):
+        return self.satelliteRecord
+
+
+#TODO NOt sure if this should be exposed.
+    # def satelliteRecordWithSatelliteNumberSetToZero( self ):
+    #     return self.satelliteRecordWithSatelliteNumberSetToZero
 
 
     def __str__( self ):
@@ -133,7 +110,8 @@ class GP( object ):
             self.getInternationalDesignator()
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
     def __eq__( self, other ): 
