@@ -51,7 +51,10 @@ class Filters( object ):
     def getUserNameSeriesArchitecture( self ):
         for key in sorted( self.filters.keys() ):
             keyComponents = key.split( " | " )
-            yield keyComponents[ Filters.INDEX_USER ], keyComponents[ Filters.INDEX_NAME ], keyComponents[ Filters.INDEX_SERIES ], keyComponents[ Filters.INDEX_ARCHITECTURE ]
+            yield keyComponents[ Filters.INDEX_USER ], \
+                  keyComponents[ Filters.INDEX_NAME ], \
+                  keyComponents[ Filters.INDEX_SERIES ], \
+                  keyComponents[ Filters.INDEX_ARCHITECTURE ]
 
 
     def __getKey( self, user, name, series, architecture ):

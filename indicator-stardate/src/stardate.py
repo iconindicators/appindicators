@@ -81,7 +81,8 @@ __gregorianDates = [
 __stardateRates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
-def getVersion(): return "Version 5.0 (2019-10-07)"
+def getVersion():
+    return "Version 5.0 (2019-10-07)"
 
 
 # Convert a Gregorian datetime.datetime in UTC to a 'classic' stardate.
