@@ -98,8 +98,6 @@ def processAndWriteOneLine( line, outputFile ):
 
 
 def convert( inFile, header, outFile ):
-    print( inFile, header, outFile )
-    if True: return
     if inFile.endswith( ".gz" ):
         fIn = gzip.open( inFile, 'rt' )
 
