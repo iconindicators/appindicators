@@ -44,15 +44,12 @@ def getStarsAndHIPs( starFile, maximumAbsoluteMagnitude ):
         if line.startswith( '#' ) or line.startswith( '$' ):
             continue
 
-#TODO See if the UTF8 version works first, if not, go back to ASCII.
-        # nameASCII = line[ 1 - 1 : 18 - 1 + 1 ].strip()
-        nameUTF8 = line[ nameStart - 1 : nameEnd - 1 + 1 ].strip()
-
         try:
             absoluteMagnitude = float( line[ absoluteMagnitudeStart - 1 : absoluteMagnitudeEnd - 1 + 1 ] )
             if absoluteMagnitude > maximumAbsoluteMagnitude:
                 continue 
 
+            nameUTF8 = line[ nameStart - 1 : nameEnd - 1 + 1 ].strip()
             hip = int( line[ hipStart - 1 : hipEnd - 1 + 1 ] )
             starsAndHIPs.append( [ nameUTF8, hip ] )
 
