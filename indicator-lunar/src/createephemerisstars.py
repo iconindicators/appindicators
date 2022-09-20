@@ -131,14 +131,14 @@ def createEphemerisPyEphem( bspFile , starEphemeris, starsAndHIPs ):
         ]
 
         line = ','.join( str( item ) for item in components )
-        print( '        "' + line + '",' )  
+        print( "        \"" + name.upper() + "\"" + ( ' ' * ( nameEnd - nameStart - len( name ) + 1 ) ) + ": \"" + line + "\"," )
 
     print()
 
 
+# Sample arguments:
+#     IAU-CSN.txt hip_main.dat 15.0 de421.bsp stars.dat
 if __name__ == "__main__":
-    # Sample arguments:
-    #     IAU-CSN.txt hip_main.dat 15.0 de421.bsp stars.dat
     parser = argparse.ArgumentParser( 
         description = "Using a list of stars, create " + \
                       "1) a star ephemeris for Skyfield, " + \
