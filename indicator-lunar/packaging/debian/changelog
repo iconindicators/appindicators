@@ -1,9 +1,9 @@
 indicator-lunar (1.0.96-1) bionic; urgency=low
 
   * Due to duplications, misspellings and the requirement for historical
-    support, the list of stars is now obtained from commonly named stars:
+    support, the list of stars is now obtained from named stars:
 
-    	https://www.cosmos.esa.int/web/hipparcos/common-star-names
+		http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt
 
   * Replaced '--' with '-' in cache filenames for minor planet apparent
     magnitude and satellite general perturbations.
