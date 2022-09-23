@@ -506,12 +506,10 @@ class AstroSkyfield( AstroBase ):
                 try:
                     if bodyType == AstroBase.BodyType.COMET:
                         # Comparing
-                        #
                         #    https://www.minorplanetcenter.net/iau/MPCORB/CometEls.txt
                         #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft00Cmt.txt
                         #
                         # with
-                        #
                         #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
                         #
                         # it is clear the values for absolute magnitudes are the same for a given comet.
@@ -522,17 +520,14 @@ class AstroSkyfield( AstroBase ):
                             earthBodyDistance.au, sunBodyDistance.au )
 
                     else:
-                        # According to the format,
-                        #
+                        # Use the HG apparent magnitude model, according to the format:
                         #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                        #
-                        # use the HG apparent magnitude model:
                         apparentMagnitude = AstroBase.getApparentMagnitude_HG(
                             row[ "magnitude_H" ], row[ "magnitude_G" ],
                             earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
                     if apparentMagnitude <= magnitudeMaximum:
-                        AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, ( bodyType, name ), locationAtNow, ephemerisPlanets, body )
+                        AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, ( bodyType, name.upper() ), locationAtNow, ephemerisPlanets, body )
 
                 except Exception as e:
                     message = "Error computing apparent magnitude for " + ( "comet: " if bodyType == AstroBase.BodyType.COMET else "minor planet: " ) + name
@@ -540,7 +535,7 @@ class AstroSkyfield( AstroBase ):
                     logging.exception( e )
 
             else:
-                AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, ( bodyType, name ), locationAtNow, body )
+                AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, ( bodyType, name.upper() ), locationAtNow, body )
 
 
     @staticmethod
