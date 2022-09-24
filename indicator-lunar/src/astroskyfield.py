@@ -383,7 +383,7 @@ class AstroSkyfield( AstroBase ):
 
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusThirtySixHours,
-            data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ),
+            data, key,
             locationAtNow,
             AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] )
 
@@ -400,14 +400,14 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def __calculateSun( now, nowPlusThirtySixHours, nowPlusSevenMonths, data, locationAtNow ):
+        key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusThirtySixHours,
-            data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ),
+            data, key,
             locationAtNow,
             AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] )
 
         if not neverUp:
-            key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             dateTimes, events = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
             dateTimes = dateTimes.utc_datetime()
 
@@ -498,8 +498,8 @@ class AstroSkyfield( AstroBase ):
         alt, az, earthSunDistance = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
         sunAtNow = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ].at( now )
         for name, row in dataframe.iterrows():
+            key = ( bodyType, name.upper() )
             body = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-
             if apparentMagnitudeData is None:
                 ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
                 ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
@@ -527,7 +527,7 @@ class AstroSkyfield( AstroBase ):
                             earthBodyDistance.au, sunBodyDistance.au, earthSunDistance.au )
 
                     if apparentMagnitude <= magnitudeMaximum:
-                        AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, ( bodyType, name.upper() ), locationAtNow, ephemerisPlanets, body )
+                        AstroSkyfield.__calculateCommon( now, nowPlusOneDay, data, key, locationAtNow, ephemerisPlanets, body )
 
                 except Exception as e:
                     message = "Error computing apparent magnitude for " + ( "comet: " if bodyType == AstroBase.BodyType.COMET else "minor planet: " ) + name
@@ -535,7 +535,7 @@ class AstroSkyfield( AstroBase ):
                     logging.exception( e )
 
             else:
-                AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, ( bodyType, name.upper() ), locationAtNow, body )
+                AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, key, locationAtNow, body )
 
 
     @staticmethod
