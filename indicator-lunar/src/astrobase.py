@@ -757,7 +757,7 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def getStars():
+    def getStarNames():
         return [ i[ AstroBase.STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
@@ -782,7 +782,7 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def getStarTagTranslations():
+    def getStarTagTranslationPairs():
         return [ ( i[ AstroBase.STARS_INDEX_NAME ], i[ AstroBase.STARS_INDEX_TAG_TRANSLATION ] ) for i in AstroBase.STARS ]
 
 

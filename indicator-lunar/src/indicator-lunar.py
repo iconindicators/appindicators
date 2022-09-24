@@ -112,7 +112,7 @@ class IndicatorLunar( IndicatorBase ):
     BODY_TAGS_TRANSLATIONS = dict(
         list( astroBackend.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astroBackend.PLANET_TAGS_TRANSLATIONS.items() ) +
-        astroBackend.getStarTagTranslations() +
+        astroBackend.getStarTagTranslationPairs() +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     CACHE_VERSION = "-96-"
@@ -1398,7 +1398,7 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
-        for starName in IndicatorLunar.astroBackend.getStars():
+        for starName in IndicatorLunar.astroBackend.getStarNames():
             stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.getStarNameTranslation( starName ) ] )
 
         STAR_STORE_INDEX_HIDE_SHOW = 0
@@ -1708,7 +1708,7 @@ class IndicatorLunar( IndicatorBase ):
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ IndicatorLunar.astroBackend.BodyType.PLANET, IndicatorLunar.astroBackend.PLANETS, IndicatorLunar.astroBackend.DATA_TAGS_PLANET ],
-                  [ IndicatorLunar.astroBackend.BodyType.STAR, IndicatorLunar.astroBackend.getStars(), IndicatorLunar.astroBackend.DATA_TAGS_STAR ] ]
+                  [ IndicatorLunar.astroBackend.BodyType.STAR, IndicatorLunar.astroBackend.getStarNames(), IndicatorLunar.astroBackend.DATA_TAGS_STAR ] ]
 
         for item in items:
             bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
@@ -1996,7 +1996,7 @@ class IndicatorLunar( IndicatorBase ):
     def __dropOldStarsVersion96( self ):
         stars = [ ]
         for star in self.stars:
-            if star in IndicatorLunar.astroBackend.getStars():
+            if star in IndicatorLunar.astroBackend.getStarNames():
                 stars.append( star )
 
         if len( self.stars ) > len( stars ):
