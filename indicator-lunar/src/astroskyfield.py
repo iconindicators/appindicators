@@ -468,8 +468,6 @@ class AstroSkyfield( AstroBase ):
             apparentMagnitudeMaximum,
             logging ):
 
-        if bodyType == AstroBase.BodyType.COMET: return #TODO Comets data file currently breaks this code...waiting on Jure from COBS to fix.
-
         # Skyfield loads orbital element data into a dataframe from a file;
         # as the orbital element data is already in memory,
         # write the orbital element data to a memory file object.

@@ -16,8 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays lunar, solar, planetary, minor planet,
-# comet, star and satellite information.
+# Application indicator which displays lunar, solar, planetary, comet,
+# minor planet, star and satellite information.
+
+
+#TODO
+# The comets data from COBS currently does not contain updated absolute magnitude data.
+# Also, the data contains spurious data (easier to see in the MPC format).
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -262,6 +267,11 @@ class IndicatorLunar( IndicatorBase ):
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
+#TODO Temporarily stop comets from being processed due to data issues and inability to compute apparent magnitude.
+        comets = self.comets
+        self.comets = [ ]
+#TODO End        
+
         # Update backend.
         self.dataPrevious = self.data
         self.data = IndicatorLunar.astroBackend.calculate(
@@ -275,6 +285,8 @@ class IndicatorLunar( IndicatorBase ):
             self.minorPlanets, self.minorPlanetOrbitalElementData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
             self.getLogging() )
+
+        self.comets = comets #TODO Remove when comets are back in.
 
         if self.dataPrevious is None: # Happens only on first run or when the user alters the satellite visibility window.
             self.dataPrevious = self.data
