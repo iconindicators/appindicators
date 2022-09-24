@@ -629,7 +629,7 @@ class AstroPyEphem( AstroBase ):
                     math.isnan( body.earth_distance ) or \
                     math.isnan( body.phase ) or \
                     math.isnan( body.size ) or \
-                    math.isnan( body.sun_distance ) # Have found the data file may contain ***** in lieu of actual data!
+                    math.isnan( body.sun_distance ) # Have found MPC data may contain ***** in lieu of actual data!
 
             except Exception as e:
 #TODO Cannot release comets stuff until PyEphem 4.1.4 is released.
