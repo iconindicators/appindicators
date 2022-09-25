@@ -608,6 +608,10 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def __calculateStars( observer, data, stars, apparentMagnitudeMaximum ):
         for star in stars:
+            # Did test obtaining the absolute magnitude directly from the ephemeris
+            # before reading in and computing the body.
+            # After timing tests, this makes no difference, so follow "traditional" route of
+            # read, compute and obtain the absolute magnitude.
             body = ephem.readdb( AstroPyEphem.__EPHEMERIS_STARS[ star.upper() ] )
             body.compute( observer )
             if body.mag <= apparentMagnitudeMaximum:
