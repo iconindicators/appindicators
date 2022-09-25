@@ -441,7 +441,6 @@ class AstroSkyfield( AstroBase ):
 
             if apparentMagnitude <= apparentMagnitudeMaximum:
                 planetAtNow = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ).apparent()
-                print( planet, planetAtNow.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
 
                 AstroSkyfield.__calculateCommon(
                     now, nowPlusThirtySixHours,
