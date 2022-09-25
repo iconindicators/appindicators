@@ -782,8 +782,8 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def getStarTagTranslationPairs():
-        return [ ( i[ AstroBase.STARS_INDEX_NAME ], i[ AstroBase.STARS_INDEX_TAG_TRANSLATION ] ) for i in AstroBase.STARS ]
+    def getStarTagTranslations():
+        return [ i[ AstroBase.STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
 
 
     # Calculate apparent magnitude.

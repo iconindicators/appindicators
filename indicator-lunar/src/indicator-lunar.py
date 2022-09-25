@@ -48,7 +48,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
@@ -112,7 +112,7 @@ class IndicatorLunar( IndicatorBase ):
     BODY_TAGS_TRANSLATIONS = dict(
         list( astroBackend.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astroBackend.PLANET_TAGS_TRANSLATIONS.items() ) +
-        astroBackend.getStarTagTranslationPairs() +
+        [ x for x in zip( astroBackend.getStarNames(), astroBackend.getStarTagTranslations() ) ] +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     CACHE_VERSION = "-96-"
