@@ -365,8 +365,9 @@ class AstroSkyfield( AstroBase ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
 
         moonAtNow = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] )
+        moonAtNowApparent = moonAtNow.apparent()
 
-        illumination = int( moonAtNow.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
+        illumination = int( moonAtNowApparent.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         dateTimes, events = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
@@ -379,7 +380,7 @@ class AstroSkyfield( AstroBase ):
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         sunAltAz = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAtNow.apparent().altaz(), sunAltAz ).radians ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAtNowApparent.altaz(), sunAltAz ).radians ) # Needed for icon.
 
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusThirtySixHours,
@@ -439,6 +440,9 @@ class AstroSkyfield( AstroBase ):
                 apparentMagnitude = 0.46 # Set the mean apparent magnitude (as per Wikipedia).
 
             if apparentMagnitude <= apparentMagnitudeMaximum:
+                planetAtNow = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_MAPPINGS[ planet ] ] ).apparent()
+                print( planet, planetAtNow.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100 )
+
                 AstroSkyfield.__calculateCommon(
                     now, nowPlusThirtySixHours,
                     data, ( AstroBase.BodyType.PLANET, planet ),
