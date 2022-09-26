@@ -1,3 +1,16 @@
+indicator-script-runner (1.0.18-1) bionic; urgency=low
+
+  * Workaround for odd focus behaviour; in the Preferences dialog, when
+    switching tabs, the TextEntry on the third tab would have the focus and
+    highlight the text.  If the user hits the space bar (or any regular key),
+    the text would be overwritten.
+    Refer to:
+      https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
+      https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 26 Sep 2022 15:21:56 +1000
+
+
 indicator-script-runner (1.0.17-1) bionic; urgency=low
 
   * Added a preference to write out the full command to the log file when a

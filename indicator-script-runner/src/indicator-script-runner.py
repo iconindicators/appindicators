@@ -27,7 +27,7 @@ gettext.install( INDICATOR_NAME )
 import gi
 gi.require_version( "Gtk", "3.0" )
 
-from gi.repository import Gtk, Pango
+from gi.repository import GLib, Gtk, Pango
 from indicatorbase import IndicatorBase
 from script import Background, NonBackground
 from threading import Thread
@@ -84,7 +84,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.17",
+            version = "1.0.18",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
 
@@ -408,11 +408,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
-        #TODO Not sure where the issue is, but open preferences,
-        # select a script not already highlighted and switch to the icon tab.
-        # The indicator text on the icon tab is highlighted...why?
-        # https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
-        # https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
         indicatorTextEntry.set_text( self.indicatorText )
         indicatorTextEntry.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
@@ -483,6 +478,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
+        notebook.connect( "switch-page", self.onSwitchPage )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
@@ -497,6 +493,22 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.initialiseBackgroundScripts()
 
         return responseType
+
+
+    def __setFocusOnTab( self, notebook, pageNumber ):
+        notebook.get_tab_label( notebook.get_nth_page( pageNumber ) ).get_parent().grab_focus()
+        return False
+
+
+    # Workaround for odd focus behaviour; in the Preferences dialog, when
+    # switching tabs, the TextEntry on the third tab would have the focus and
+    # highlight the text.  If the user hits the space bar (or any regular key),
+    # the text would be overwritten.
+    # Refer to:
+    #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
+    #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
+    def onSwitchPage( self, notebook, page, pageNumber ):
+        GLib.idle_add( self.__setFocusOnTab, notebook, pageNumber )
 
 
     # Renders the script name bold when the (non-background) script is default.
