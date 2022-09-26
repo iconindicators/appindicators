@@ -495,8 +495,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         return responseType
 
 
-    def __setFocusOnTab( self, notebook, pageNumber ):
-        notebook.get_tab_label( notebook.get_nth_page( pageNumber ) ).get_parent().grab_focus()
+    def __setFocusOnTab( self, notebook ):
+        notebook.grab_focus()
         return False
 
 
@@ -508,7 +508,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
     #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
     def onSwitchPage( self, notebook, page, pageNumber ):
-        GLib.idle_add( self.__setFocusOnTab, notebook, pageNumber )
+        GLib.idle_add( self.__setFocusOnTab, notebook )
 
 
     # Renders the script name bold when the (non-background) script is default.
