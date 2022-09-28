@@ -476,32 +476,6 @@ class AstroSkyfield( AstroBase ):
             apparentMagnitudeMaximum,
             logging ):
 
-        # # Skyfield loads orbital element data into a dataframe from a file;
-        # # as the orbital element data is already in memory,
-        # # write the orbital element data to a memory file object.
-        # with io.BytesIO() as f:
-        #     if apparentMagnitudeData is None:
-        #         for key in cometsMinorPlanets:
-        #             if key in orbitalElementData:
-        #                 f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
-        #
-        #     else:
-        #         for key in cometsMinorPlanets:
-        #             if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
-        #                 f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
-        #
-        #     f.seek( 0 )
-        #
-        #     if bodyType == AstroBase.BodyType.COMET:
-        #         dataframe = mpc.load_comets_dataframe( f )
-        #         orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
-        #
-        #     else:
-        #         dataframe = mpc.load_mpcorb_dataframe( f )
-        #         orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
-        #
-        # dataframe = dataframe.set_index( "designation", drop = False )
-        
         if bodyType == AstroBase.BodyType.COMET:
             orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
 
@@ -573,11 +547,9 @@ class AstroSkyfield( AstroBase ):
 
             if bodyType == AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f )
-                # orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
 
             else:
                 dataframe = mpc.load_mpcorb_dataframe( f )
-                # orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
 
         dataframe = dataframe.set_index( "designation", drop = False )
         return dataframe
