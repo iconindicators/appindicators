@@ -476,36 +476,45 @@ class AstroSkyfield( AstroBase ):
             apparentMagnitudeMaximum,
             logging ):
 
-        # Skyfield loads orbital element data into a dataframe from a file;
-        # as the orbital element data is already in memory,
-        # write the orbital element data to a memory file object.
-        with io.BytesIO() as f:
-            if apparentMagnitudeData is None:
-                for key in cometsMinorPlanets:
-                    if key in orbitalElementData:
-                        f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+        # # Skyfield loads orbital element data into a dataframe from a file;
+        # # as the orbital element data is already in memory,
+        # # write the orbital element data to a memory file object.
+        # with io.BytesIO() as f:
+        #     if apparentMagnitudeData is None:
+        #         for key in cometsMinorPlanets:
+        #             if key in orbitalElementData:
+        #                 f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+        #
+        #     else:
+        #         for key in cometsMinorPlanets:
+        #             if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
+        #                 f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+        #
+        #     f.seek( 0 )
+        #
+        #     if bodyType == AstroBase.BodyType.COMET:
+        #         dataframe = mpc.load_comets_dataframe( f )
+        #         orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
+        #
+        #     else:
+        #         dataframe = mpc.load_mpcorb_dataframe( f )
+        #         orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
+        #
+        # dataframe = dataframe.set_index( "designation", drop = False )
+        
+        if bodyType == AstroBase.BodyType.COMET:
+            orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
 
-            else:
-                for key in cometsMinorPlanets:
-                    if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
-                        f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+        else:
+            orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
 
-            f.seek( 0 )
-
-            if bodyType == AstroBase.BodyType.COMET:
-                dataframe = mpc.load_comets_dataframe( f )
-                orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
-
-            else:
-                dataframe = mpc.load_mpcorb_dataframe( f )
-                orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
-
-        dataframe = dataframe.set_index( "designation", drop = False )
-        alt, az, earthSunDistance = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
-        sunAtNow = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ].at( now )
+        dataframe = AstroSkyfield.__convertOrbitalElementsToDataframe( bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData, apparentMagnitudeMaximum )
+        sun = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ]
+        sunAtNow = sun.at( now )
+        alt, az, earthSunDistance = locationAtNow.observe( sun ).apparent().altaz()
         for name, row in dataframe.iterrows():
             key = ( bodyType, name.upper() )
-            body = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            body = sun + orbitCalculationFunction( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
             if apparentMagnitudeData is None:
                 ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
                 ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
@@ -542,6 +551,36 @@ class AstroSkyfield( AstroBase ):
 
             else:
                 AstroSkyfield.__calculateCommon( now, nowPlusTwentyFiveHours, data, key, locationAtNow, body )
+
+
+    @staticmethod
+    def __convertOrbitalElementsToDataframe( bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData, apparentMagnitudeMaximum ):
+        # Skyfield loads orbital element data into a dataframe from a file;
+        # as the orbital element data is already in memory,
+        # write the orbital element data to a memory file object.
+        with io.BytesIO() as f:
+            if apparentMagnitudeData is None:
+                for key in cometsMinorPlanets:
+                    if key in orbitalElementData:
+                        f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+
+            else:
+                for key in cometsMinorPlanets:
+                    if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
+                        f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+
+            f.seek( 0 )
+
+            if bodyType == AstroBase.BodyType.COMET:
+                dataframe = mpc.load_comets_dataframe( f )
+                # orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "comet_orbit" )
+
+            else:
+                dataframe = mpc.load_mpcorb_dataframe( f )
+                # orbitCalculationFunction = getattr( importlib.import_module( "skyfield.data.mpc" ), "mpcorb_orbit" )
+
+        dataframe = dataframe.set_index( "designation", drop = False )
+        return dataframe
 
 
     @staticmethod
