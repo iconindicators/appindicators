@@ -673,7 +673,7 @@ class IndicatorLunar( IndicatorBase ):
                 label = indent + displayText + self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
                 self.createMenuItem( subMenu, label, IndicatorLunar.SEARCH_URL_MOON )
 
-            self.updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
+            self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
 
     def updateMenuSun( self, menu ):
@@ -684,26 +684,28 @@ class IndicatorLunar( IndicatorBase ):
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, 1, IndicatorLunar.SEARCH_URL_SUN )
 
-#TODO Should not the equinox and solstice be displayed according to earliest date?
-# This must have changed somewhere...?
-            self.createMenuItem(
-                subMenu,
+            equinoxLabel = \
                 self.getMenuIndent( 1 ) + \
                 _( "Equinox: " ) + \
-                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] ),
-                IndicatorLunar.SEARCH_URL_SUN )
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] )
 
-            self.createMenuItem(
-                subMenu,
+            solsticeLabel = \
                 self.getMenuIndent( 1 ) + \
                 _( "Solstice: " ) + \
-                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ] ),
-                IndicatorLunar.SEARCH_URL_SUN )
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ] )
 
-            self.updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
+            if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ]:
+                self.createMenuItem( subMenu, equinoxLabel, IndicatorLunar.SEARCH_URL_SUN )
+                self.createMenuItem( subMenu, solsticeLabel, IndicatorLunar.SEARCH_URL_SUN )
+
+            else:
+                self.createMenuItem( subMenu, solsticeLabel, IndicatorLunar.SEARCH_URL_SUN )
+                self.createMenuItem( subMenu, equinoxLabel, IndicatorLunar.SEARCH_URL_SUN )
+
+            self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
 
-    def updateMenuEclipse( self, menu, bodyType, nameTag, url ):
+    def __updateMenuEclipse( self, menu, bodyType, nameTag, url ):
         key = ( bodyType, nameTag )
         self.createMenuItem( menu, self.getMenuIndent( 1 ) + _( "Eclipse" ), url )
 
