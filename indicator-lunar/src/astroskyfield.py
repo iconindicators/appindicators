@@ -242,14 +242,6 @@ class AstroSkyfield( AstroBase ):
     __CITY_ELEVATION = 2
 
 
-    # Skyfield moon phases.
-#TODO Can a Skyfield label/tag be used instead of these?
-    __MOON_PHASE_NEW = 0
-    __MOON_PHASE_FIRST_QUARTER = 1
-    __MOON_PHASE_FULL = 2
-    __MOON_PHASE_LAST_QUARTER = 3
-
-
     # Skyfield satellite rise/set/culmination events.
 #TODO Can a Skyfield label/tag be used instead of these?
     __SATELLITE_EVENT_RISE = 0
@@ -260,14 +252,6 @@ class AstroSkyfield( AstroBase ):
     # Satellite parameters.
     __SATELLITE_DEGREES_ABOVE_HORIZON = 20.0
     __SATELLITE_TRANSIT_INTERVAL_IN_SECONDS = 60.0
-
-
-    # Skyfield seasons.
-#TODO Can a Skyfield label/tag be used instead of these?
-    __SEASON_VERNAL_EQUINOX = 0
-    __SEASON_SUMMER_SOLSTICE = 1
-    __SEASON_AUTUMNAL_EQUINOX = 2
-    __SEASON_WINTER_SOLSTICE = 3
 
 
     # Skyfield twilight.
@@ -295,11 +279,11 @@ class AstroSkyfield( AstroBase ):
 
         timeScale = load.timescale( builtin = True )
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        nowPlusTwentyFiveHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 24, utcNow.minute, utcNow.second ) # Typical rise/set window (make slightly more than 24 hours).
-        nowPlusThirtySixHours = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour + 36, utcNow.minute, utcNow.second ) # Rise/set window for the moon rise/set which is more than 24 hours.
-        nowPlusThirtyOneDays = timeScale.utc( utcNow.year, utcNow.month, utcNow.day + 31, utcNow.hour, utcNow.minute, utcNow.second ) # Moon phases search window.
-        nowPlusSevenMonths = timeScale.utc( utcNow.year, utcNow.month + 7, utcNow.hour, utcNow.minute, utcNow.second ) # Solstice/equinox search window.
-        nowPlusOneYear = timeScale.utc( utcNow.year + 1, utcNow.month, utcNow.hour, utcNow.minute, utcNow.second ) # Lunar eclipse search window.
+        nowPlusTwentyFiveHours = now + datetime.timedelta( hours = 25 ) # Typical rise/set window for bodies is 24 hours, but set slightly more.
+        nowPlusThirtySixHours = now + datetime.timedelta( hours = 36 ) # Rise/set window for the moon.
+        nowPlusThirtyOneDays = now + datetime.timedelta( days = 31 ) # Moon phases search window.
+        nowPlusSevenMonths = now + datetime.timedelta( days = 366 / 2 ) # Solstice/equinox search window.
+        nowPlusOneYear = now + datetime.timedelta( days = 366 ) # Lunar eclipse search window.
 
         location = wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = ( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )
@@ -377,16 +361,13 @@ class AstroSkyfield( AstroBase ):
         illumination = int( moonAtNowApparent.fraction_illuminated( sun ) * 100 )
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
-#TODO See if using
-# https://rhodesmill.org/skyfield/almanac.html#phases-of-the-moon
-# instead of using __MOON_PHASE_FULL (that is use Skyfiel's own labels/tags).
         dateTimes, events = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
-        phases = list( events )
-        phasesDateTimes = dateTimes.utc_datetime()
+        eventsToDateTimes = dict( zip( events, dateTimes.utc_datetime() ) )
+
         lunarPhase = AstroBase.getLunarPhase(
             illumination,
-            phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_FULL ) ],
-            phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
+            eventsToDateTimes[ almanac.MOON_PHASES.index( "Full Moon" ) ],
+            eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ] )
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         sunAltAz = locationAtNow.observe( sun ).apparent().altaz()
@@ -395,10 +376,10 @@ class AstroSkyfield( AstroBase ):
         neverUp = AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, key, locationAtNow, moon )
 
         if not neverUp:
-            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_FIRST_QUARTER ) ] )
-            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_FULL ) ] )
-            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_LAST_QUARTER ) ] )
-            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( phasesDateTimes[ phases.index( AstroSkyfield.__MOON_PHASE_NEW ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "First Quarter" ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "Full Moon" ) ] )
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "Last Quarter" ) ] )
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ] )
 
             dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
@@ -417,11 +398,7 @@ class AstroSkyfield( AstroBase ):
         if not neverUp:
             dateTimes, events = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
             dateTimes = dateTimes.utc_datetime()
-
-#TODO See if using
-# https://rhodesmill.org/skyfield/almanac.html#the-seasons
-# instead of using __SEASON_VERNAL_EQUINOX(that is use Skyfiel's own labels/tags).
-            if events[ 0 ] == AstroSkyfield.__SEASON_VERNAL_EQUINOX or events[ 0 ] == AstroSkyfield.__SEASON_AUTUMNAL_EQUINOX:
+            if events[ 0 ] == almanac.SEASON_EVENTS_NEUTRAL.index( "March Equinox" ) or events[ 0 ] == almanac.SEASON_EVENTS_NEUTRAL.index( "September Equinox" ): 
                 data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( dateTimes[ 0 ] )
                 data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( dateTimes[ 1 ] )
 
@@ -502,8 +479,8 @@ class AstroSkyfield( AstroBase ):
                         #    https://www.minorplanetcenter.net/iau/Ephemerides/Comets/Soft03Cmt.txt
                         #
                         # it is clear the values for absolute magnitudes are the same for a given comet.
-                        # Given that the XEphem values are preceded by a 'g',
-                        # the MPC format for comets should use the gk apparent magnitude model.
+                        # Given that the XEphem values are preceded by a 'g', the MPC format for comets
+                        # should use the gk apparent magnitude model.
                         apparentMagnitude = AstroBase.getApparentMagnitude_gk(
                             row[ "magnitude_g" ], row[ "magnitude_k" ],
                             earthBodyDistance.au, sunBodyDistance.au )
@@ -540,7 +517,9 @@ class AstroSkyfield( AstroBase ):
 
             else:
                 for key in cometsMinorPlanets:
-                    if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
+                    if key in orbitalElementData and \
+                       key in apparentMagnitudeData and \
+                       float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
                         f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
 
             f.seek( 0 )
