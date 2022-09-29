@@ -400,7 +400,6 @@ class AstroSkyfield( AstroBase ):
                 apparentMagnitude = 0.46 # Set the mean apparent magnitude (as per Wikipedia).
 
             if apparentMagnitude <= apparentMagnitudeMaximum:
-                # planetAtNow = locationAtNow.observe( planet ).apparent()#TODO Is this needed?
                 AstroSkyfield.__calculateCommon( now, nowPlusTwentyFiveHours, data, ( AstroBase.BodyType.PLANET, planetName ), locationAtNow, planet )
 
 
