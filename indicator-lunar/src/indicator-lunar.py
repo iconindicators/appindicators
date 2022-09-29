@@ -684,6 +684,8 @@ class IndicatorLunar( IndicatorBase ):
             menuItem.set_submenu( subMenu )
             self.updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, 1, IndicatorLunar.SEARCH_URL_SUN )
 
+#TODO Should not the equinox and solstice be displayed according to earliest date?
+# This must have changed somewhere...?
             self.createMenuItem(
                 subMenu,
                 self.getMenuIndent( 1 ) + \
