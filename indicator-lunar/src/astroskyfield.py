@@ -101,6 +101,12 @@ class AstroSkyfield( AstroBase ):
         AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER" }
 
 
+    # City components of latitude, longitude and elevation.
+    __CITY_LATITUDE = 0
+    __CITY_LONGITUDE = 1
+    __CITY_ELEVATION = 2
+
+
     # Skyfield does not provide a list of cities.
     #
     # However ephem/cities.py does provide such a list:
@@ -228,39 +234,6 @@ class AstroSkyfield( AstroBase ):
         "Washington"        :   ( 38.8951118, -77.0363658, 7.119641 ),
         "Wellington"        :   ( -41.2924945, 174.7732353, 17.000000 ),
         "Zurich"            :   ( 47.3833333, 8.5333333, 405.500916 ) }
-
-
-    # Skyfield body rise/set events.
-#TODO Can a Skyfield label/tag be used instead of these?
-    __BODY_EVENT_RISE = 1
-    __BODY_EVENT_SET = 0
-
-
-    # City components of latitude, longitude and elevation.
-    __CITY_LATITUDE = 0
-    __CITY_LONGITUDE = 1
-    __CITY_ELEVATION = 2
-
-
-    # Skyfield satellite rise/set/culmination events.
-#TODO Can a Skyfield label/tag be used instead of these?
-    __SATELLITE_EVENT_RISE = 0
-    __SATELLITE_EVENT_CULMINATE = 1
-    __SATELLITE_EVENT_SET = 2
-
-
-    # Satellite parameters.
-    __SATELLITE_DEGREES_ABOVE_HORIZON = 20.0
-    __SATELLITE_TRANSIT_INTERVAL_IN_SECONDS = 60.0
-
-
-    # Skyfield twilight.
-#TODO Can a Skyfield label/tag be used instead of these?
-    __TWILIGHT_NIGHT = 0
-    __TWILIGHT_ASTRONOMICAL = 1
-    __TWILIGHT_NAUTICAL = 2
-    __TWILIGHT_CIVIL = 3
-    __TWILIGHT_DAY = 4
 
 
     @staticmethod
@@ -541,11 +514,11 @@ class AstroSkyfield( AstroBase ):
         if len( events ) >= 2:
             dateTimes = dateTimes.utc_datetime()
             foundRiseSet = True
-            if events[ 0 ] == AstroSkyfield.__BODY_EVENT_RISE and events[ 1 ] == AstroSkyfield.__BODY_EVENT_SET:
+            if events[ 0 ] == 1 and events[ 1 ] == 0: # Rise = 1, set = 0.  #TODO Find a reference in the skyfield almanac or searchlib for these numbers.
                 riseDateTime = dateTimes[ 0 ]
                 setDateTime = dateTimes[ 1 ]
 
-            elif events[ 0 ] == AstroSkyfield.__BODY_EVENT_SET and events[ 1 ] == AstroSkyfield.__BODY_EVENT_RISE:
+            elif events[ 0 ] == 0 and events[ 1 ] == 1: # Rise = 1, set = 0.
                 riseDateTime = dateTimes[ 1 ]
                 setDateTime = dateTimes[ 0 ]
 
@@ -614,15 +587,15 @@ class AstroSkyfield( AstroBase ):
         foundPass = False
         riseDateTime = None
         culminationDateTimes = [ ] # Culminate may occur more than once, so collect them all.
-        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = AstroSkyfield.__SATELLITE_DEGREES_ABOVE_HORIZON )
+        dateTimes, events = earthSatellite.find_events( location, startDateTime, endDateTime, altitude_degrees = 20.0 )
         for dateTime, event in zip( dateTimes, events ):
-            if event == AstroSkyfield.__SATELLITE_EVENT_RISE:
+            if event == 0:  #TODO Find a reference in the skyfield code for these numbers.
                 riseDateTime = dateTime
 
-            elif event == AstroSkyfield.__SATELLITE_EVENT_CULMINATE:
+            elif event == 1:  #TODO Find a reference in the skyfield code for these numbers.
                 culminationDateTimes.append( dateTime )
 
-            else: # AstroSkyfield.__SATELLITE_EVENT_SET
+            else: # 2 Set
                 if riseDateTime is not None and \
                    culminationDateTimes and \
                    AstroSkyfield.__isSatellitePassVisible( timeScale, riseDateTime, dateTime, isTwilightFunction, earthSatellite ):
@@ -648,7 +621,7 @@ class AstroSkyfield( AstroBase ):
         secondsFromRiseToSet = ( endDateTime.utc_datetime() - startDateTime.utc_datetime() ).total_seconds()
         rangeStart = math.ceil( startDateTime.utc.second )
         rangeEnd = math.ceil( startDateTime.utc.second + secondsFromRiseToSet )
-        rangeStep = math.ceil( secondsFromRiseToSet / AstroSkyfield.__SATELLITE_TRANSIT_INTERVAL_IN_SECONDS )
+        rangeStep = math.ceil( secondsFromRiseToSet / 60.0 ) # Set the transit interval to 60 seconds.
         if rangeStep < 1.0:
             rangeStep = 1.0
 
@@ -660,8 +633,8 @@ class AstroSkyfield( AstroBase ):
             startDateTime.utc.minute,
             range( rangeStart, rangeEnd, rangeStep ) )
 
-        isTwilightAstronomical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_ASTRONOMICAL
-        isTwilightNautical = isTwilightFunction( transitRange ) == AstroSkyfield.__TWILIGHT_NAUTICAL
+        isTwilightAstronomical = isTwilightFunction( transitRange ) == 1 # almanac.TWILIGHTS[ 1 ], Astronomical twilight
+        isTwilightNautical = isTwilightFunction( transitRange ) == 2 # almanac.TWILIGHTS[ 2 ], Nautical twilight
         isSunlit = earthSatellite.at( transitRange ).is_sunlit( AstroSkyfield.__EPHEMERIS_PLANETS )
         isVisible = False
         for twilightAstronomical, twilightNautical, sunlit in zip( isTwilightAstronomical, isTwilightNautical, isSunlit ):
