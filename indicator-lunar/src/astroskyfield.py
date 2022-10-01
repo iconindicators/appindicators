@@ -624,7 +624,7 @@ class AstroSkyfield( AstroBase ):
         secondsFromRiseToSet = ( endDateTime.utc_datetime() - startDateTime.utc_datetime() ).total_seconds()
         rangeStart = math.ceil( startDateTime.utc.second )
         rangeEnd = math.ceil( startDateTime.utc.second + secondsFromRiseToSet )
-        rangeStep = math.ceil( secondsFromRiseToSet / 60.0 ) # Set the transit interval to 60 seconds.
+        rangeStep = math.ceil( secondsFromRiseToSet / 60.0 ) # Set a step interval of 60 seconds.
         if rangeStep < 1.0:
             rangeStep = 1.0
 
