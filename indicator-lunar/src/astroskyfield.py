@@ -335,7 +335,7 @@ class AstroSkyfield( AstroBase ):
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         dateTimes, events = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )
-        eventsToDateTimes = dict( zip( events, dateTimes.utc_datetime() ) )
+        eventsToDateTimes = dict( zip( events[ : 4 ], dateTimes[ : 4 ].utc_datetime() ) ) # Take first four events to avoid an unforeseen edge case!
 
         lunarPhase = AstroBase.getLunarPhase(
             illumination,
@@ -370,14 +370,18 @@ class AstroSkyfield( AstroBase ):
 
         if not neverUp:
             dateTimes, events = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
-            dateTimes = dateTimes.utc_datetime()
-            if events[ 0 ] == almanac.SEASON_EVENTS_NEUTRAL.index( "March Equinox" ) or events[ 0 ] == almanac.SEASON_EVENTS_NEUTRAL.index( "September Equinox" ): 
-                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( dateTimes[ 0 ] )
-                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( dateTimes[ 1 ] )
+            eventsToDateTimes = dict( zip( events[ : 2 ], dateTimes[ : 2 ].utc_datetime() ) ) # Take first two events to avoid an unforeseen edge case!
 
-            else:
-                data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( dateTimes[ 1 ] )
-                data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( dateTimes[ 0 ] )
+            keyEquinox = almanac.SEASON_EVENTS_NEUTRAL.index( "March Equinox" ) \
+                if almanac.SEASON_EVENTS_NEUTRAL.index( "March Equinox" ) in eventsToDateTimes \
+                else almanac.SEASON_EVENTS_NEUTRAL.index( "September Equinox" )
+
+            keySolstice = almanac.SEASON_EVENTS_NEUTRAL.index( "June Solstice" ) \
+                if almanac.SEASON_EVENTS_NEUTRAL.index( "June Solstice" ) in eventsToDateTimes \
+                else almanac.SEASON_EVENTS_NEUTRAL.index( "December Solstice" )
+
+            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ keyEquinox ] )
+            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ keySolstice ] )
 
 #TODO When solar eclipses are implemented,
 # replace the code below similarly to lunar eclipses above
