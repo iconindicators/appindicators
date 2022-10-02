@@ -233,7 +233,7 @@ class AstroBase( ABC ):
     # PyEphem provides a list of stars and data, whereas Skyfield does not.
     # Over the years, the PyEphem stars have contained duplicates and misspellings.
     #
-    # Therefore use the list of named stars at
+    # Therefore use the list of named stars (last updated 2022-04-04) at
     #    http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt
     #
     # DO NOT EDIT: Content must be created using 'createephemerisstars.py'.
