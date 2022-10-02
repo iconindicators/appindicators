@@ -20,9 +20,13 @@
 # comet, star and satellite information.
 
 
-#TODO
-# The comets data from COBS currently does not contain updated absolute magnitude data.
+#TODO The comets data from COBS does not contain updated absolute magnitude data.
 # Also, the data contains spurious data (easier to see in the MPC format).
+# Waiting on Jure @ COBS to resolve.
+
+
+#TODO If comets are unresolved for next release,
+# remove 'comet' from the description in debian/control.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -48,7 +52,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
@@ -172,7 +176,7 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.96",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.  Also in the debian/control file.
+            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
             creditz = IndicatorLunar.CREDIT )
 
         self.debug = True #TODO Testing
@@ -267,11 +271,6 @@ class IndicatorLunar( IndicatorBase ):
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
-#TODO Temporarily stop comets from being processed due to data issues and inability to compute apparent magnitude.
-        comets = self.comets
-        self.comets = [ ]
-#TODO End        
-
         # Update backend.
         self.dataPrevious = self.data
         self.data = IndicatorLunar.astroBackend.calculate(
@@ -285,8 +284,6 @@ class IndicatorLunar( IndicatorBase ):
             self.minorPlanets, self.minorPlanetOrbitalElementData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
             self.getLogging() )
-
-        self.comets = comets #TODO Remove when comets are back in.
 
         if self.dataPrevious is None: # Happens only on first run or when the user alters the satellite visibility window.
             self.dataPrevious = self.data
@@ -310,13 +307,13 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-#TODO Comment out before release
-        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-            utcNow, self.cometOrbitalElementData,
-            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-            self.downloadCountComet, self.nextDownloadTimeComet,
-            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
-            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+#TODO Commented out until comets are resolved.
+        # self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+        #     utcNow, self.cometOrbitalElementData,
+        #     IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+        #     self.downloadCountComet, self.nextDownloadTimeComet,
+        #     DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+        #     DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometOrbitalElementData, self.comets )
@@ -361,7 +358,6 @@ class IndicatorLunar( IndicatorBase ):
             loadDataFunction, loadDataAdditionalArguments ):
 
         if self.isCacheStale( utcNow, cacheBasename, cacheMaximumAge ):
-            print( "STALE CACHE:", cacheBasename )#TODO Testing
             freshData = { }
             if nextDownloadTime < utcNow: # Download is allowed (do not want to annoy third-party data provider).
                 downloadDataFilename = self.getCacheFilenameWithTimestamp( cacheBasename, cacheExtension )
@@ -369,22 +365,17 @@ class IndicatorLunar( IndicatorBase ):
                     downloadCount = 0
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
                     freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
-                    print( "\tDOWNLOADED" )#TODO Testing
 
                 else:
-                    print( "\tDOWNLOAD FAILURE" )#TODO Testing
                     downloadCount += 1
                     nextDownloadTime = self.__getNextDownloadTime( utcNow, downloadCount ) # Download failed for some reason; retry at a later time.
 
         else:
-            print( "VALID CACHE:", cacheBasename )
             # Cache is not stale; only load off disk as necessary.
             if currentData:
                 freshData = currentData
-                print( "\tUSE IN MEMORY" )#TODO Testing
 
             else:
-                print( "\tLOAD FROM DISK" )#TODO Testing
                 downloadDataFilename = self.getCacheNewestFilename( cacheBasename ) # Should NOT return None as the cache was checked for staleness above.
                 freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
 
@@ -1301,7 +1292,7 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
-#TODO Comment out before release
+#TODO Comment out before release if comets unresolved.
         grid.attach( cometsAddNewCheckbutton, 0, 3, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
@@ -1398,7 +1389,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-#TODO Comment out before release
+#TODO Comment out before release if comets unresolved.
         box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
