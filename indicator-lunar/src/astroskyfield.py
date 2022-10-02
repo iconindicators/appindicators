@@ -101,16 +101,12 @@ class AstroSkyfield( AstroBase ):
         AstroBase.PLANET_NEPTUNE : "NEPTUNE BARYCENTER" }
 
 
-    # City components of latitude, longitude and elevation.
-    __CITY_LATITUDE = 0
-    __CITY_LONGITUDE = 1
-    __CITY_ELEVATION = 2
-
-
     # Skyfield does not provide a list of cities.
-    #
     # However ephem/cities.py does provide such a list:
     #    https://github.com/skyfielders/python-skyfield/issues/316
+    #
+    # Format:
+    #    Name: latitude (dec degrees), longitude (dec degrees), elevation (m).
     _city_data = {
         "Abu Dhabi"         :   ( 24.4666667, 54.3666667, 6.296038 ),
         "Adelaide"          :   ( -34.9305556, 138.6205556, 49.098354 ),
@@ -295,10 +291,13 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def getLatitudeLongitudeElevation( city ):
+        # Latitude = 0
+        # Longitude = 1
+        # Elevation = 2
         return \
-            AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LATITUDE ], \
-            AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_LONGITUDE ], \
-            AstroSkyfield._city_data.get( city )[ AstroSkyfield.__CITY_ELEVATION ]
+            AstroSkyfield._city_data.get( city )[ 0 ], \
+            AstroSkyfield._city_data.get( city )[ 1 ], \
+            AstroSkyfield._city_data.get( city )[ 2 ]
 
 
     @staticmethod
@@ -357,7 +356,9 @@ class AstroSkyfield( AstroBase ):
             dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ events[ 0 ] ]
-#TODO Submit a request for lat/long if possible.
+#TODO Submitted a discussion to see if possible to get the lat/long.
+# If feasible, add here and remove check in indicator front-end.
+# https://github.com/skyfielders/python-skyfield/discussions/801
 
 
     @staticmethod
