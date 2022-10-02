@@ -3,6 +3,7 @@ Type=Application
 Name=Lunar Indicator
 Name[ru]=Лунный индикатор
 Icon=indicator-lunar
+Path=/usr/share/indicator-lunar
 Exec=/usr/share/indicator-lunar/indicator-lunar.py
 Categories=Utility;
 X-GNOME-Autostart-enabled=true

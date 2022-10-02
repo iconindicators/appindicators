@@ -156,7 +156,7 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_SET_DATE_TIME = 4
     SATELLITE_MENU_SET_AZIMUTH = 5
 
-    SATELLITE_MENU_AZIMUTH = 2 
+    SATELLITE_MENU_AZIMUTH = 2
     SATELLITE_MENU_ALTITUDE = 3
 
     SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
@@ -258,7 +258,7 @@ class IndicatorLunar( IndicatorBase ):
         self.downloadCountMinorPlanet = 0
         self.downloadCountSatellite = 0
 
-        utcNow = datetime.datetime.utcnow() 
+        utcNow = datetime.datetime.utcnow()
         self.nextDownloadTimeApparentMagnitude = utcNow
         self.nextDownloadTimeComet = utcNow
         self.nextDownloadTimeMinorPlanet = utcNow
