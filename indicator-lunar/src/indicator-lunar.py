@@ -29,6 +29,29 @@
 # remove 'comet' from the description in debian/control.
 
 
+#TODO Thinking for when a body will set before sunset...and is clearly not visible.
+# Why show the body's set date/time and instead show the next rise (assuming before sunrise)?
+# 
+#             Sun rise                       Sun set                          Sun rise
+# 
+# If current time is between rise and set (day) AND body sets before sunset, drop body and get next transit.
+
+
+#TODO Is it possible/feasible to list meteor showers?
+# Daniel Franklin
+# git@danielfranklin.id.au
+# https://github.com/dfranklinau/astronote/blob/master/astronote/celestial.py
+#
+# https://www.ta3.sk/IAUC22DB/MDC2022/
+# https://www.ta3.sk/IAUC22DB/MDC2022/Roje/roje_lista.php?corobic_roje=1&sort_roje=0
+#
+# https://www.imo.net/
+#
+#
+# On a quick look, the data from ta3 above could be an ephemeris and be used to compute rise/set/az/alt.
+# Issue is visibility..without a magnitude, how to determine if the shower is within range to be visible?
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -52,7 +75,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendSkyfield
+    astroBackendName = astroBackendPyEphem
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
@@ -822,6 +845,30 @@ class IndicatorLunar( IndicatorBase ):
                     displayBody = not self.hideBodiesBelowHorizon
 
         return displayBody
+
+
+#TODO Possible place for adding in the idea to "drop" or replace a body's set with the next rise if will set before sunset...
+        # # If current time is between rise and set (day) AND body sets before sunset, drop body and get next transit.
+        # keySun = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
+        # sunRise = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
+        # sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
+        # if sunSet < sunRise: # Daylight
+        #     # utcNowAsString = IndicatorLunar.astroBackend.toDateTimeString( utcNow )
+        #     for key in self.data:
+        #         targetBodyType = \
+        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.COMET or \
+        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
+        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.PLANET or \
+        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.STAR
+        #
+        #         if targetBodyType and \
+        #            key[ 2 ] == IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME and \
+        #            self.data[ key ] < sunSet:
+        #                 print( key[ 1 ] + ": " + self.data[ key ] )
+        #                 firstCharacter = self.data[ key ]
+        #                 value[ 0 ] = 
+        #                 self.data[ key ] = self.data[ key ]
+        #                 print( key[ 1 ] + ": " + self.data[ key ] )
 
 
     def updateMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
