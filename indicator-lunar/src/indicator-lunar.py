@@ -847,31 +847,88 @@ class IndicatorLunar( IndicatorBase ):
         return displayBody
 
 
-#TODO Possible place for adding in the idea to "drop" or replace a body's set with the next rise if will set before sunset...
-        # # If current time is between rise and set (day) AND body sets before sunset, drop body and get next transit.
-        # keySun = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
-        # sunRise = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
-        # sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
-        # if sunSet < sunRise: # Daylight
-        #     # utcNowAsString = IndicatorLunar.astroBackend.toDateTimeString( utcNow )
-        #     for key in self.data:
-        #         targetBodyType = \
-        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.COMET or \
-        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
-        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.PLANET or \
-        #             key[ 0 ] == IndicatorLunar.astroBackend.BodyType.STAR
-        #
-        #         if targetBodyType and \
-        #            key[ 2 ] == IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME and \
-        #            self.data[ key ] < sunSet:
-        #                 print( key[ 1 ] + ": " + self.data[ key ] )
-        #                 firstCharacter = self.data[ key ]
-        #                 value[ 0 ] = 
-        #                 self.data[ key ] = self.data[ key ]
-        #                 print( key[ 1 ] + ": " + self.data[ key ] )
-
-
     def updateMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
+        key = ( bodyType, nameTag )
+        indent = self.getMenuIndent( indent )
+        if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
+            if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]:
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Rise: " ) + \
+                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                    onClickURL )
+
+            else:
+                option = True#TODO Make this an option
+                if option:
+                    # If current time is between rise and set (day) AND body sets before sunset, drop body and get next transit.
+                    targetBodyType = \
+                        bodyType == IndicatorLunar.astroBackend.BodyType.COMET or \
+                        bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
+                        bodyType == IndicatorLunar.astroBackend.BodyType.PLANET or \
+                        bodyType == IndicatorLunar.astroBackend.BodyType.STAR
+                    keySun = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
+#TODO Test at high latitudes...sun may never be up or always up....so may need to check for sun present in data.                    
+                    sunRise = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
+                    sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
+                    if targetBodyType and sunSet < sunRise and self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] < sunSet:
+                        self.createMenuItem(
+                            menu,
+                            indent + \
+                            _( "Rise: " ) + \
+                            self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                            onClickURL )
+                        print( str( bodyType ) + " : " + str( nameTag ) )
+
+                    else:
+                        self.__createMenuAzimuthAltitudeSetDateTime( menu, key, indent, onClickURL )
+
+                else:
+                    self.__createMenuAzimuthAltitudeSetDateTime( menu, key, indent, onClickURL )
+
+        else: # Body is always up.
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Azimuth: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
+                onClickURL )
+
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Altitude: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
+                onClickURL )
+
+
+#TODO Only stays if above function stays
+    def __createMenuAzimuthAltitudeSetDateTime( self, menu, key, indent, onClickURL ):
+        self.createMenuItem(
+            menu,
+            indent + \
+            _( "Azimuth: " ) + \
+            self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
+            onClickURL )
+
+        self.createMenuItem(
+            menu,
+            indent + \
+            _( "Altitude: " ) + \
+            self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
+            onClickURL )
+
+        self.createMenuItem(
+            menu,
+            indent + \
+            _( "Set: " ) + \
+            self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] ),
+            onClickURL )
+
+
+#TODO Delete if/when the above stays.
+    def updateMenuCommonORIGINAL( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
         key = ( bodyType, nameTag )
         indent = self.getMenuIndent( indent )
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
