@@ -869,7 +869,7 @@ class IndicatorLunar( IndicatorBase ):
                         bodyType == IndicatorLunar.astroBackend.BodyType.PLANET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.STAR
                     keySun = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
-#TODO Test at high latitudes...sun may never be up or always up....so may need to check for sun present in data.                    
+#TODO Test at high latitudes...sun may never be up or always up....so may need to check for sun present in data.
                     sunRise = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
                     sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
                     if targetBodyType and sunSet < sunRise and self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] < sunSet:
