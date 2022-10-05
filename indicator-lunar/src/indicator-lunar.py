@@ -290,7 +290,8 @@ class IndicatorLunar( IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
-
+        utcNow = utcNow - datetime.timedelta( hours = 6 )#TODO Testing
+        
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
@@ -851,12 +852,12 @@ class IndicatorLunar( IndicatorBase ):
         displayBody = False
         key = ( bodyType, bodyName )
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Body will rise or set or is 'always up'.
-            # displayBody = True
+            displayBody = True
             if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Body rises/sets.
 
                 option = True#TODO Make this an option
-                if option:
 #TODO Test at high latitudes...sun may never be up or always up....so may need to check for sun present in data.
+                if option:
                     targetBodyType = \
                         bodyType == IndicatorLunar.astroBackend.BodyType.COMET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
@@ -872,18 +873,9 @@ class IndicatorLunar( IndicatorBase ):
                         if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]:
                             displayBody = not self.hideBodiesBelowHorizon # Body is below the horizon; display according to user preference.
 
-                        else: # Body is above the horizon.
-                            displayBody = True
-
-                else:
-                    if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]:
-                        displayBody = not self.hideBodiesBelowHorizon # Body is below the horizon; display according to user preference.
-
-                    else: # Body is above the horizon.
-                        displayBody = True
-
-            else: # Body is always up.
-                displayBody = True
+                elif self.hideBodiesBelowHorizon and \
+                     self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]:
+                    displayBody = False
 
         return displayBody
 
@@ -903,14 +895,12 @@ class IndicatorLunar( IndicatorBase ):
             else:
                 option = True#TODO Make this an option
                 if option:
-                    # If current time is between rise and set (day) AND body sets before sunset, drop body and get next transit.  #TODO Fix/update wording.
                     targetBodyType = \
                         bodyType == IndicatorLunar.astroBackend.BodyType.COMET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.PLANET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.STAR
                     keySun = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
-#TODO Test at high latitudes...sun may never be up or always up....so may need to check for sun present in data.
                     sunRise = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
                     sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
                     if targetBodyType and sunSet < sunRise and self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] < sunSet:
