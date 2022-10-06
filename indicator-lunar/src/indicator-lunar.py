@@ -994,8 +994,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def __updateMenuSatellites( self, menu, label, satellites ):
-#TODO Can this function be made to function similarly to planets/stars?
-        menuItem = self.createMenuItemToBeReplaced( menu, label )
+        menuItem = self.createMenuItemAndAppend( menu, label, "" )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
         indent = self.getMenuIndent( 1 )
@@ -1007,49 +1006,39 @@ class IndicatorLunar( IndicatorBase ):
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
             label = indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator()
-            menuItem = self.createMenuItemToBeReplaced( subMenu, label, url )
+            menuItem = self.createMenuItemAndAppend( subMenu, label, url )
             if len( info ) == 3: # Satellite yet to rise.
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
-                self.createMenuItemToBeReplaced( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentDouble + _( "Rise Date/Time: " ) + data, url )
 
             elif len( info ) == 4: # Circumpolar (always up).
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_AZIMUTH ] )
-                self.createMenuItemToBeReplaced( subMenu, indentDouble + _( "Azimuth: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentDouble + _( "Azimuth: " ) + data, url )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, info[ IndicatorLunar.SATELLITE_MENU_ALTITUDE ] )
-                self.createMenuItemToBeReplaced( subMenu, indentDouble + _( "Altitude: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentDouble + _( "Altitude: " ) + data, url )
 
             else: # Satellite is in transit.
-                self.createMenuItemToBeReplaced( subMenu, indentDouble + _( "Rise" ), url )
+                self.createMenuItemAndAppend( subMenu, indentDouble + _( "Rise" ), url )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
-                self.createMenuItemToBeReplaced( subMenu, indentTriple + _( "Date/Time: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentTriple + _( "Date/Time: " ) + data, url )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_RISE_AZIMUTH ] )
-                self.createMenuItemToBeReplaced( subMenu, indentTriple + _( "Azimuth: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentTriple + _( "Azimuth: " ) + data, url )
 
-                self.createMenuItemToBeReplaced( subMenu, indentDouble + _( "Set" ), url )
+                self.createMenuItemAndAppend( subMenu, indentDouble + _( "Set" ), url )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_SET_DATE_TIME ] )
-                self.createMenuItemToBeReplaced( subMenu, indentTriple + _( "Date/Time: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentTriple + _( "Date/Time: " ) + data, url )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_SET_AZIMUTH ] )
-                self.createMenuItemToBeReplaced( subMenu, indentTriple + _( "Azimuth: " ) + data, url )
+                self.createMenuItemAndAppend( subMenu, indentTriple + _( "Azimuth: " ) + data, url )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
 
-        subMenu.remove( separator )
-
-
-    def createMenuItemToBeReplaced( self, menu, label, onClickURL = "" ):
-        menuItem = Gtk.MenuItem.new_with_label( label )
-        menu.append( menuItem )
-        if onClickURL:
-            menuItem.set_name( onClickURL )
-            menuItem.connect( "activate", self.onMenuItemClick )
-
-        return menuItem
+        subMenu.remove( separator ) #TODO Now seems silly to have this...can the planets function methodology be used here instead?
 
 
     def createMenuItemAndAppend( self, menu, label, onClickURL ):
@@ -1064,7 +1053,7 @@ class IndicatorLunar( IndicatorBase ):
         return menuItem
 
 
-    def __createMenuItem( self, label, onClickURL = "" ):
+    def __createMenuItem( self, label, onClickURL ):
         menuItem = Gtk.MenuItem.new_with_label( label )
         if onClickURL:
             menuItem.set_name( onClickURL )
