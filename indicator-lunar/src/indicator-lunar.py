@@ -103,6 +103,7 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_SATELLITES = "satellites"
     CONFIG_SATELLITES_ADD_NEW = "satellitesAddNew"
     CONFIG_SATELLITES_SORT_BY_DATE_TIME = "satellitesSortByDateTime"
+    CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET = "showRiseWhenSetBeforeSunset"
     CONFIG_SHOW_SATELLITE_NOTIFICATION = "showSatelliteNotification"
     CONFIG_SHOW_WEREWOLF_WARNING = "showWerewolfWarning"
     CONFIG_STARS = "stars"
@@ -290,7 +291,10 @@ class IndicatorLunar( IndicatorBase ):
 
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
-        utcNow = utcNow - datetime.timedelta( hours = 6 )#TODO Testing
+
+        #TODO Testing
+        # utcNow = utcNow - datetime.timedelta( hours = 6 )
+        self.showRiseWhenSetBeforeSunset = True
         
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -750,7 +754,7 @@ class IndicatorLunar( IndicatorBase ):
             self.createMenuItem( menu, self.getMenuIndent( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url )
 
 
-    def updateMenuPlanets( self, menu ):
+    def updateMenuPlanetsORIGINAL( self, menu ):
         planets = [ ]
         for planet in self.planets:
             if self.display( IndicatorLunar.astroBackend.BodyType.PLANET, planet ):
@@ -769,6 +773,23 @@ class IndicatorLunar( IndicatorBase ):
                 subMenu.append( separator )
 
             subMenu.remove( separator )
+
+
+    def updateMenuPlanets( self, menu ):
+        subMenu = Gtk.Menu()
+        indent = self.getMenuIndent( 1 )
+        for name in self.planets:
+            current = len( subMenu )
+            url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
+            if self.appendMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, indent * 2, url ):
+                translatedName = IndicatorLunar.astroBackend.PLANET_NAMES_TRANSLATIONS[ name ]
+                subMenu.insert( self.createMenuItemNEW( indent + translatedName, url ), current )
+                subMenu.append( Gtk.SeparatorMenuItem() )
+
+        # subMenu.remove( separator ) #TODO Change this to remove last child (but may need to do so in the if clause below.
+        if len( subMenu.get_children() ) > 0:
+            menuItem = self.createMenuItem( menu, _( "Planets" ) )
+            menuItem.set_submenu( subMenu )
 
 
     def updateMenuStars( self, menu ):
@@ -855,9 +876,8 @@ class IndicatorLunar( IndicatorBase ):
             displayBody = True
             if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Body rises/sets.
 
-                option = True#TODO Make this an option
 #TODO Test at high latitudes...sun may never be up or always up....so may need to check for sun present in data.
-                if option:
+                if self.showRiseWhenSetBeforeSunset:
                     targetBodyType = \
                         bodyType == IndicatorLunar.astroBackend.BodyType.COMET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
@@ -893,8 +913,7 @@ class IndicatorLunar( IndicatorBase ):
                     onClickURL )
 
             else:
-                option = True#TODO Make this an option
-                if option:
+                if self.showRiseWhenSetBeforeSunset:
                     targetBodyType = \
                         bodyType == IndicatorLunar.astroBackend.BodyType.COMET or \
                         bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET or \
@@ -911,7 +930,6 @@ class IndicatorLunar( IndicatorBase ):
                                 _( "Rise: " ) + \
                                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
                                 onClickURL )
-                            print( str( bodyType ) + " : " + str( nameTag ) )
 
                     else:
                         self.__createMenuAzimuthAltitudeSetDateTime( menu, key, indent, onClickURL )
@@ -1008,6 +1026,62 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Altitude: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
                 onClickURL )
+
+
+    def appendMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
+        key = ( bodyType, nameTag )
+        appended = False
+        if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Implies this body rises/sets (not always up).
+            if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]:
+                if not self.hideBodiesBelowHorizon:
+                    appended = True
+                    self.createMenuItem(
+                        menu,
+                        indent + \
+                        _( "Rise: " ) + \
+                        self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                        onClickURL )
+
+            else:
+                appended = True
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Azimuth: " ) + \
+                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
+                    onClickURL )
+
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Altitude: " ) + \
+                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
+                    onClickURL )
+
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Set: " ) + \
+                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] ),
+                    onClickURL )
+
+        elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Body is 'always up'.
+            appended = True
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Azimuth: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
+                onClickURL )
+
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Altitude: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
+                onClickURL )
+
+        return appended
 
 
     # Display the rise/set information for each satellite.
@@ -1167,6 +1241,15 @@ class IndicatorLunar( IndicatorBase ):
     def createMenuItem( self, menu, label, onClickURL = "" ):
         menuItem = Gtk.MenuItem.new_with_label( label )
         menu.append( menuItem )
+        if onClickURL:
+            menuItem.set_name( onClickURL )
+            menuItem.connect( "activate", self.onMenuItemClick )
+
+        return menuItem
+
+
+    def createMenuItemNEW( self, label, onClickURL = "" ):
+        menuItem = Gtk.MenuItem.new_with_label( label )
         if onClickURL:
             menuItem.set_name( onClickURL )
             menuItem.connect( "activate", self.onMenuItemClick )
@@ -2171,6 +2254,7 @@ class IndicatorLunar( IndicatorBase ):
         self.satellitesAddNew = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
         self.satellitesSortByDateTime = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
 
+        self.showRiseWhenSetBeforeSunset = config.get( IndicatorLunar.CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET, False )
         self.showSatelliteNotification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, False )
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
 
@@ -2221,6 +2305,7 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.CONFIG_SATELLITES : satellites,
             IndicatorLunar.CONFIG_SATELLITES_ADD_NEW : self.satellitesAddNew,
             IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME : self.satellitesSortByDateTime,
+            IndicatorLunar.CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET : self.showRiseWhenSetBeforeSunset,
             IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION : self.showSatelliteNotification,
             IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING : self.showWerewolfWarning,
             IndicatorLunar.CONFIG_STARS : self.stars,
