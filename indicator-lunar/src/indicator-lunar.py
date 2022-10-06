@@ -298,12 +298,8 @@ class IndicatorLunar( IndicatorBase ):
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
 
-        # utcNow = utcNow - datetime.timedelta( hours = 6 ) #TODO Testing
-
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
-
-        start = datetime.datetime.utcnow() #TODO Testing
 
         # Update backend.
         self.dataPrevious = self.data
@@ -319,8 +315,6 @@ class IndicatorLunar( IndicatorBase ):
             self.magnitude,
             self.getLogging() )
 
-        print( ( datetime.datetime.utcnow() - start ).total_seconds() ) #TODO Testing
-
         if self.dataPrevious is None: # Happens only on first run or when the user alters the satellite visibility window.
             self.dataPrevious = self.data
 
@@ -328,9 +322,7 @@ class IndicatorLunar( IndicatorBase ):
         if self.debug:
             menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
 
-        start = datetime.datetime.utcnow() #TODO Testing
         self.updateMenu( menu, utcNow )
-        print( ( datetime.datetime.utcnow() - start ).total_seconds() ) #TODO Testing
         self.setLabel( self.processTags() )
         self.updateIcon()
 
@@ -765,61 +757,6 @@ class IndicatorLunar( IndicatorBase ):
                 menu,
                 self.getMenuIndent( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude,
                 url )
-
-
-    def updateMenuPlanets( self, menu ):
-        subMenu = Gtk.Menu()
-        for name in self.planets:
-            current = len( subMenu )
-            url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
-            if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, self.getMenuIndent( 1 ) * 2, url ):
-                displayName = IndicatorLunar.astroBackend.PLANET_NAMES_TRANSLATIONS[ name ]
-                self.createMenuItemAndInsert( subMenu, self.getMenuIndent( 1 ) + displayName, url, current )
-                subMenu.append( Gtk.SeparatorMenuItem() )
-
-        if len( subMenu.get_children() ) > 0:
-            self.createMenuItemAndAppend( menu, _( "Planets" ), "" ).set_submenu( subMenu )
-
-
-    def updateMenuStars( self, menu ):
-        subMenu = Gtk.Menu()
-        for name in self.stars:
-            current = len( subMenu )
-            url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
-            if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, self.getMenuIndent( 1 ) * 2, url ):
-                displayName = IndicatorLunar.astroBackend.getStarNameTranslation( name )
-                self.createMenuItemAndInsert( subMenu, self.getMenuIndent( 1 ) + displayName, url, current )
-                subMenu.append( Gtk.SeparatorMenuItem() )
-
-        if len( subMenu.get_children() ) > 0:
-            self.createMenuItemAndAppend( menu, _( "Stars" ), "" ).set_submenu( subMenu )
-
-
-    def updateMenuCometsMinorPlanets( self, menu, bodyType ):
-        subMenu = Gtk.Menu()
-
-        if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-            bodies = self.comets
-
-        else:
-            bodies = self.minorPlanets
-
-        for name in bodies:
-            current = len( subMenu )
-            if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-                url = IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( name ) #TODO Test
-
-            else:
-                url = IndicatorLunar.SEARCH_URL_MINOR_PLANET + name
-
-            if self.__updateMenuCommon( subMenu, bodyType, name, self.getMenuIndent( 1 ) * 2, url ):
-                displayName = name if name[ 0 ].isdigit() else name.title()
-                self.createMenuItemAndInsert( subMenu, self.getMenuIndent( 1 ) + displayName, url, current )
-                subMenu.append( Gtk.SeparatorMenuItem() )
-
-        if len( subMenu.get_children() ) > 0:
-            label = _( "Comets" ) if bodyType == IndicatorLunar.astroBackend.BodyType.COMET else _( "Minor Planets" )
-            self.createMenuItemAndAppend( menu, label, "" ).set_submenu( subMenu )
 
 
     def updateMenuPlanetsMinorPlanetsCometsStars( self, menu, menuLabel, bodies, bodyType ):
