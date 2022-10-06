@@ -294,7 +294,7 @@ class IndicatorLunar( IndicatorBase ):
 
         #TODO Testing
         # utcNow = utcNow - datetime.timedelta( hours = 6 )
-        self.showRiseWhenSetBeforeSunset = True
+        self.showRiseWhenSetBeforeSunset = False
         
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -994,6 +994,39 @@ class IndicatorLunar( IndicatorBase ):
             onClickURL )
 
 
+    def __createMenuRiseAzimuthAltitudeSet( self, menu, key, indent, onClickURL, rise, set ):
+        if rise:
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Rise: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                onClickURL )
+
+        else:
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Azimuth: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
+                onClickURL )
+
+            self.createMenuItem(
+                menu,
+                indent + \
+                _( "Altitude: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
+                onClickURL )
+
+            if set:
+                self.createMenuItem(
+                    menu,
+                    indent + \
+                    _( "Set: " ) + \
+                    self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] ),
+                    onClickURL )
+
+
 #TODO Delete if/when the above stays.
     def updateMenuCommonORIGINAL( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
         key = ( bodyType, nameTag )
@@ -1052,12 +1085,13 @@ class IndicatorLunar( IndicatorBase ):
             if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]: # Body will rise.
                 if not self.hideBodiesBelowHorizon:
                     appended = True
-                    self.createMenuItem(
-                        menu,
-                        indent + \
-                        _( "Rise: " ) + \
-                        self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
-                        onClickURL )
+                    self.__createMenuRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, True, False )
+                    # self.createMenuItem(
+                    #     menu,
+                    #     indent + \
+                    #     _( "Rise: " ) + \
+                    #     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                    #     onClickURL )
 
             else: # Body will set.
                 if self.showRiseWhenSetBeforeSunset:
@@ -1072,20 +1106,21 @@ class IndicatorLunar( IndicatorBase ):
                     if targetBodyType and sunSet < sunRise and self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] < sunSet:
                         if not self.hideBodiesBelowHorizon:
                             appended = True
-                            self.createMenuItem(
-                                menu,
-                                indent + \
-                                _( "Rise: " ) + \
-                                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
-                                onClickURL )
+                            self.__createMenuRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, True, False )
+                            # self.createMenuItem(
+                            #     menu,
+                            #     indent + \
+                            #     _( "Rise: " ) + \
+                            #     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
+                            #     onClickURL )
 
                     else:
                         appended = True
-                        self.__createMenuAzimuthAltitudeSetDateTime( menu, key, indent, onClickURL )
+                        self.__createMenuRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, True )
 
                 else:
                     appended = True
-                    self.__createMenuAzimuthAltitudeSetDateTime( menu, key, indent, onClickURL )
+                    self.__createMenuRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, True )
 
 
                 # appended = True
@@ -1112,19 +1147,20 @@ class IndicatorLunar( IndicatorBase ):
 
         elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Body is 'always up'.
             appended = True
-            self.createMenuItem(
-                menu,
-                indent + \
-                _( "Azimuth: " ) + \
-                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
-                onClickURL )
-
-            self.createMenuItem(
-                menu,
-                indent + \
-                _( "Altitude: " ) + \
-                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
-                onClickURL )
+            self.__createMenuRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, False )
+            # self.createMenuItem(
+            #     menu,
+            #     indent + \
+            #     _( "Azimuth: " ) + \
+            #     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
+            #     onClickURL )
+            #
+            # self.createMenuItem(
+            #     menu,
+            #     indent + \
+            #     _( "Altitude: " ) + \
+            #     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
+            #     onClickURL )
 
         return appended
 
