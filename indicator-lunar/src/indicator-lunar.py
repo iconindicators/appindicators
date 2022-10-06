@@ -793,6 +793,23 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def updateMenuStars( self, menu ):
+        subMenu = Gtk.Menu()
+        indent = self.getMenuIndent( 1 )
+        for name in self.stars:
+            current = len( subMenu )
+            url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
+            if self.appendMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, indent * 2, url ):
+                translatedName = IndicatorLunar.astroBackend.getStarNameTranslation( name )
+                subMenu.insert( self.createMenuItemNEW( indent + translatedName, url ), current )
+                subMenu.append( Gtk.SeparatorMenuItem() )
+
+        if len( subMenu.get_children() ) > 0:
+            menuItem = self.createMenuItemNEW( _( "Stars" ) )
+            menuItem.set_submenu( subMenu )
+            menu.append( menuItem )
+
+
+    def updateMenuStarsORIGINAL( self, menu ):
         stars = [ ]
         for star in self.stars:
             if self.display( IndicatorLunar.astroBackend.BodyType.STAR, star ):
