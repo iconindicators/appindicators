@@ -650,7 +650,7 @@ class IndicatorLunar( IndicatorBase ):
         Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
 
 
-    def updateMenuMoon( self, menu ):
+    def updateMenuMoonORIGINAL( self, menu ):
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
         if self.display( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON ):
             menuItem = self.createMenuItem( menu, _( "Moon" ) )
@@ -695,7 +695,52 @@ class IndicatorLunar( IndicatorBase ):
             self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
 
-    def updateMenuSun( self, menu ):
+    def updateMenuMoon( self, menu ):
+        subMenu = Gtk.Menu()
+        indent = self.getMenuIndent( 1 )
+        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, indent, IndicatorLunar.SEARCH_URL_MOON ):
+            menuItem = self.createMenuItemNEW( _( "Moon" ) )
+            menuItem.set_submenu( subMenu )
+            menu.append( menuItem )
+            subMenu.append( Gtk.SeparatorMenuItem() )
+            key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
+
+            subMenu.append( self.createMenuItemNEW(
+                self.getMenuIndent( 1 ) + \
+                _( "Phase: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_PHASE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ] ),
+                IndicatorLunar.SEARCH_URL_MOON ) )
+
+            subMenu.append( self.createMenuItemNEW(
+                self.getMenuIndent( 1 ) + _( "Next Phases" ),
+                IndicatorLunar.SEARCH_URL_MOON ) )
+
+            # The phase (illumination) is rounded and so a given phase is entered earlier than what occurs in reality.
+            nextPhases = [ ]
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER, ) ],
+                 _( "First Quarter: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER, ) ] )
+
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_FULL, ) ],
+                _( "Full: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_FULL, ) ] )
+
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_NEW, ) ],
+                _( "New: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_NEW, ) ] )
+
+            nextPhases.append(
+                [ self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER, ) ],
+                _( "Third Quarter: " ), key + ( IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER, ) ] )
+
+            for dateTime, displayText, key in sorted( nextPhases, key = lambda pair: pair[ 0 ] ): # Sort by date of each phase (the first element).
+                label = self.getMenuIndent( 2 ) + displayText + self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
+                subMenu.append( self.createMenuItemNEW( label, IndicatorLunar.SEARCH_URL_MOON ) )
+
+            self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
+
+
+    def updateMenuSunORIGINAL( self, menu ):
         key = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
         if self.display( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN ):
             menuItem = self.createMenuItem( menu, _( "Sun" ) )
@@ -724,23 +769,59 @@ class IndicatorLunar( IndicatorBase ):
             self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
 
-    def __updateMenuEclipse( self, menu, bodyType, nameTag, url ):
-        key = ( bodyType, nameTag )
-        self.createMenuItem( menu, self.getMenuIndent( 1 ) + _( "Eclipse" ), url )
+    def updateMenuSun( self, menu ):
+        subMenu = Gtk.Menu()
+        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, self.getMenuIndent( 1 ), IndicatorLunar.SEARCH_URL_SUN ):
+            menuItem = self.createMenuItemNEW( _( "Sun" ) )
+            menuItem.set_submenu( subMenu )
+            menu.append( menuItem )
+            subMenu.append( Gtk.SeparatorMenuItem() )
+            key = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
 
-        self.createMenuItem(
-            menu,
+            equinoxLabel = \
+                self.getMenuIndent( 1 ) + \
+                _( "Equinox: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] )
+
+            equinoxMenuItem = self.createMenuItemNEW( equinoxLabel, IndicatorLunar.SEARCH_URL_SUN )
+
+            solsticeLabel = \
+                self.getMenuIndent( 1 ) + \
+                _( "Solstice: " ) + \
+                self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ] )
+
+            solsticeMenuItem = self.createMenuItemNEW( solsticeLabel, IndicatorLunar.SEARCH_URL_SUN )
+
+            if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ]:
+                subMenu.append( equinoxMenuItem )
+                subMenu.append( solsticeMenuItem )
+
+            else:
+                subMenu.append( solsticeMenuItem )
+                subMenu.append( equinoxMenuItem )
+
+            self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
+
+
+    def __updateMenuEclipse( self, menu, bodyType, nameTag, url ):
+        menu.append( Gtk.SeparatorMenuItem() )
+        key = ( bodyType, nameTag )
+
+        menu.append( self.createMenuItemNEW(
+            self.getMenuIndent( 1 ) + _( "Eclipse" ),
+            url ) )
+
+        menu.append( self.createMenuItemNEW( 
             self.getMenuIndent( 2 ) + \
             _( "Date/Time: " ) + \
             self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
-            url )
+            url ) )
 
-        self.createMenuItem(
-            menu,
+        menu.append( self.createMenuItemNEW( 
             self.getMenuIndent( 2 ) + \
             _( "Type: " ) + \
             self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
-            url )
+            url ) )
 
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
             latitude = self.formatData(
@@ -751,7 +832,7 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE,
                 self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
 
-            self.createMenuItem( menu, self.getMenuIndent( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url )
+            menu.append( self.createMenuItemNEW( self.getMenuIndent( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude, url ) )
 
 
     def updateMenuPlanetsORIGINAL( self, menu ):
@@ -781,7 +862,7 @@ class IndicatorLunar( IndicatorBase ):
         for name in self.planets:
             current = len( subMenu )
             url = IndicatorLunar.SEARCH_URL_PLANET + name.lower()
-            if self.appendMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, indent * 2, url ):
+            if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.PLANET, name, indent * 2, url ):
                 translatedName = IndicatorLunar.astroBackend.PLANET_NAMES_TRANSLATIONS[ name ]
                 subMenu.insert( self.createMenuItemNEW( indent + translatedName, url ), current )
                 subMenu.append( Gtk.SeparatorMenuItem() )
@@ -798,7 +879,7 @@ class IndicatorLunar( IndicatorBase ):
         for name in self.stars:
             current = len( subMenu )
             url = IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
-            if self.appendMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, indent * 2, url ):
+            if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.STAR, name, indent * 2, url ):
                 translatedName = IndicatorLunar.astroBackend.getStarNameTranslation( name )
                 subMenu.insert( self.createMenuItemNEW( indent + translatedName, url ), current )
                 subMenu.append( Gtk.SeparatorMenuItem() )
@@ -1045,13 +1126,13 @@ class IndicatorLunar( IndicatorBase ):
                 onClickURL )
 
 
-    def appendMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
+    def __updateMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
         key = ( bodyType, nameTag )
         appended = False
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # This body rises/sets.
             if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]: # Body will rise.
                 if not self.hideBodiesBelowHorizon:
-                    self.__createMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, True, False )
+                    self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, True, False )
                     appended = True
 
             else: # Body will set.
@@ -1066,25 +1147,25 @@ class IndicatorLunar( IndicatorBase ):
                     sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
                     if targetBodyType and sunSet < sunRise and self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] < sunSet:
                         if not self.hideBodiesBelowHorizon:
-                            self.__createMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, True, False )
+                            self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, True, False )
                             appended = True
 
                     else:
-                        self.__createMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, True )
+                        self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, True )
                         appended = True
 
                 else:
-                    self.__createMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, True )
+                    self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, True )
                     appended = True
 
         elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Body is 'always up'.
-            self.__createMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, False )
+            self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, onClickURL, False, False )
             appended = True
 
         return appended
 
 
-    def __createMenuItemsRiseAzimuthAltitudeSet( self, menu, key, indent, onClickURL, rise, set ):
+    def __updateMenuItemsRiseAzimuthAltitudeSet( self, menu, key, indent, onClickURL, rise, set ):
         if rise:
             self.createMenuItem(
                 menu,
