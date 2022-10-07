@@ -763,7 +763,7 @@ class IndicatorLunar( IndicatorBase ):
 
         def getURLPlanet( name ): return IndicatorLunar.SEARCH_URL_PLANET + name.lower()
         def getURLMinorPlanet( name ): return IndicatorLunar.SEARCH_URL_MINOR_PLANET + name
-        def getURLComet( name ): return IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( name ) #TODO Test
+        def getURLComet( name ): return IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( name ) #TODO Fix once COBS is sorted.
         def getURLStar( name ): return IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
 
 
