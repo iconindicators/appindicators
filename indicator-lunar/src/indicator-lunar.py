@@ -1038,7 +1038,7 @@ class IndicatorLunar( IndicatorBase ):
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
 
-        subMenu.remove( separator ) #TODO Now seems silly to have this...can the planets function methodology be used here instead?
+        subMenu.remove( separator )
 
 
     def createMenuItemAndAppend( self, menu, label, onClickURL ):
