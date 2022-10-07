@@ -338,12 +338,12 @@ class IndicatorLunar( IndicatorBase ):
     def updateData( self, utcNow ):
         # Update comet data.
 #TODO Commented out until comets are resolved.
-        # self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-        #     utcNow, self.cometOrbitalElementData,
-        #     IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-        #     self.downloadCountComet, self.nextDownloadTimeComet,
-        #     DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
-        #     DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+            utcNow, self.cometOrbitalElementData,
+            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+            self.downloadCountComet, self.nextDownloadTimeComet,
+            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometOrbitalElementData, self.comets )
@@ -530,10 +530,10 @@ class IndicatorLunar( IndicatorBase ):
     def updateMenu( self, menu, utcNow ):
         self.updateMenuMoon( menu )
         self.updateMenuSun( menu )
-        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Planets" ), self.planets, IndicatorLunar.astroBackend.BodyType.PLANET )
-        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Minor Planets" ), self.minorPlanets, IndicatorLunar.astroBackend.BodyType.MINOR_PLANET )
-        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Comets" ), self.comets, IndicatorLunar.astroBackend.BodyType.COMET )
-        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Stars" ), self.stars, IndicatorLunar.astroBackend.BodyType.STAR )
+        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Planets" ), self.planets, None, IndicatorLunar.astroBackend.BodyType.PLANET )
+        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Minor Planets" ), self.minorPlanets, self.minorPlanetOrbitalElementData, IndicatorLunar.astroBackend.BodyType.MINOR_PLANET )
+        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Comets" ), self.comets, self.cometOrbitalElementData, IndicatorLunar.astroBackend.BodyType.COMET )
+        self.updateMenuPlanetsMinorPlanetsCometsStars( menu, _( "Stars" ), self.stars, None, IndicatorLunar.astroBackend.BodyType.STAR )
         self.updateMenuSatellites( menu, utcNow )
 
 
@@ -759,7 +759,7 @@ class IndicatorLunar( IndicatorBase ):
                 url )
 
 
-    def updateMenuPlanetsMinorPlanetsCometsStars( self, menu, menuLabel, bodies, bodyType ):
+    def updateMenuPlanetsMinorPlanetsCometsStars( self, menu, menuLabel, bodies, bodiesData, bodyType ):
 
         def getURLPlanet( name ): return IndicatorLunar.SEARCH_URL_PLANET + name.lower()
         def getURLMinorPlanet( name ): return IndicatorLunar.SEARCH_URL_MINOR_PLANET + name
@@ -767,32 +767,30 @@ class IndicatorLunar( IndicatorBase ):
         def getURLStar( name ): return IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
 
 
-        def getURLFunction( bodyType ):
+        def getURLFunction():
             if bodyType == IndicatorLunar.astroBackend.BodyType.PLANET: urlFunction = getURLPlanet
             elif bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET: urlFunction = getURLMinorPlanet
             elif bodyType == IndicatorLunar.astroBackend.BodyType.COMET: urlFunction = getURLComet
             elif bodyType == IndicatorLunar.astroBackend.BodyType.STAR: urlFunction = getURLStar
-
             return urlFunction
 
 
         def getDisplayNamePlanet( name ): return IndicatorLunar.astroBackend.PLANET_NAMES_TRANSLATIONS[ name ]
-        def getDisplayNameMinorPlanet( name ): return name if name[ 0 ].isdigit() else name.title() #TODO Check if this instead can just be the name.
-        def getDisplayNameComet( name ): return name if name[ 0 ].isdigit() else name.title()
+        def getDisplayNameMinorPlanet( name ): return bodiesData[ name ].getName()
+        def getDisplayNameComet( name ): return bodiesData[ name ].getName()
         def getDisplayNameStar( name ): return IndicatorLunar.astroBackend.getStarNameTranslation( name )
 
 
-        def getDisplayNameFunction( bodyType ):
+        def getDisplayNameFunction():
             if bodyType == IndicatorLunar.astroBackend.BodyType.PLANET: displayNameFunction = getDisplayNamePlanet
             elif bodyType == IndicatorLunar.astroBackend.BodyType.MINOR_PLANET: displayNameFunction = getDisplayNameMinorPlanet
             elif bodyType == IndicatorLunar.astroBackend.BodyType.COMET: displayNameFunction = getDisplayNameComet
             elif bodyType == IndicatorLunar.astroBackend.BodyType.STAR: displayNameFunction = getDisplayNameStar
-
             return displayNameFunction
 
 
-        urlFunction = getURLFunction( bodyType )
-        displayNameFunction = getDisplayNameFunction( bodyType )
+        urlFunction = getURLFunction()
+        displayNameFunction = getDisplayNameFunction()
         indent = self.getMenuIndent( 1 )
         indentDouble = self.getMenuIndent( 2 )
         subMenu = Gtk.Menu()
