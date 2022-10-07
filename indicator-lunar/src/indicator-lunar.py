@@ -338,12 +338,12 @@ class IndicatorLunar( IndicatorBase ):
     def updateData( self, utcNow ):
         # Update comet data.
 #TODO Commented out until comets are resolved.
-        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-            utcNow, self.cometOrbitalElementData,
-            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-            self.downloadCountComet, self.nextDownloadTimeComet,
-            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
-            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+        # self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+        #     utcNow, self.cometOrbitalElementData,
+        #     IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+        #     self.downloadCountComet, self.nextDownloadTimeComet,
+        #     DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+        #     DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometOrbitalElementData, self.comets )
