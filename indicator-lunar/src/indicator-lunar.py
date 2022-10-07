@@ -1288,16 +1288,16 @@ class IndicatorLunar( IndicatorBase ):
         showRiseWhenSetBeforeSunsetCheckbutton = Gtk.CheckButton.new_with_label( _( "Show rise when set is before sunset" ) )
         showRiseWhenSetBeforeSunsetCheckbutton.set_active( self.showRiseWhenSetBeforeSunset )
         showRiseWhenSetBeforeSunsetCheckbutton.set_tooltip_text( _(
-            "If checked, all bodies below the horizon\n" + \
-            "are hidden (excludes satellites)." ) )
-#TODO Update tooltip        
+            "If a body sets before sunset,\n" + \
+            "show the body's next rise instead\n" + \
+            "(excludes satellites)." ) )
         grid.attach( showRiseWhenSetBeforeSunsetCheckbutton, 0, 0, 1, 1 )
 
         hideBodiesBelowTheHorizonCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
         hideBodiesBelowTheHorizonCheckbutton.set_active( self.hideBodiesBelowHorizon )
         hideBodiesBelowTheHorizonCheckbutton.set_tooltip_text( _(
-            "If checked, all bodies below the horizon\n" + \
-            "are hidden (excludes satellites)." ) )
+            "Hide a body if it is yet to rise\n" + \
+            "(excludes satellites)." ) )
         grid.attach( hideBodiesBelowTheHorizonCheckbutton, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1305,7 +1305,9 @@ class IndicatorLunar( IndicatorBase ):
         box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies fainter than magnitude" ) ), False, False, 0 )
-        toolTip = _( "Planets, stars, comets and minor planets\nwith a fainter magnitude will be hidden." )
+        toolTip = _(
+            "A body with a fainter magnitude will be hidden\n" + \
+            "(excludes satellites)." )
         spinnerMagnitude = self.createSpinButton(
             self.magnitude, int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ), int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
 
@@ -1315,20 +1317,20 @@ class IndicatorLunar( IndicatorBase ):
         minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
         minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
         minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
-        minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "If checked, all minor planets are added." ) )
+        minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "All minor planets are automatically added." ) )
         grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
 
         cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
-        cometsAddNewCheckbutton.set_tooltip_text( _( "If checked, all comets are added." ) )
+        cometsAddNewCheckbutton.set_tooltip_text( _( "All comets are automatically added." ) )
 #TODO Comment out before release if comets unresolved.
         grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 5 )
         satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text( _( "If checked, all satellites are added." ) )
+        satellitesAddNewCheckbox.set_tooltip_text( _( "All satellites are automatically added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 5, 1, 1 )
 
         sortSatellitesByDateTimeCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
@@ -1337,7 +1339,7 @@ class IndicatorLunar( IndicatorBase ):
         sortSatellitesByDateTimeCheckbutton.set_tooltip_text( _(
             "If checked, satellites are sorted\n" + \
             "by rise date/time.\n\n" + \
-            "Otherwise satellites are sorted\n" + \
+            "Otherwise, satellites are sorted\n" + \
             "by Name then Number." ) )
         grid.attach( sortSatellitesByDateTimeCheckbutton, 0, 6, 1, 1 )
 

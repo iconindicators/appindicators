@@ -124,7 +124,7 @@ class IndicatorStardate( IndicatorBase ):
         showClassicCheckbutton.set_tooltip_text( _(
             "If checked, show stardate 'classic' based on\n\n" + \
             "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
-            "Otherwise show stardate '2009 revised' based on\n\n" + \
+            "Otherwise, show stardate '2009 revised' based on\n\n" + \
             "\thttps://en.wikipedia.org/wiki/Stardate" ) )
         grid.attach( showClassicCheckbutton, 0, 0, 1, 1 )
 

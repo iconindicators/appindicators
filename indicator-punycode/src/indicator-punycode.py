@@ -184,7 +184,7 @@ class IndicatorPunycode( IndicatorBase ):
         outputBothCheckbutton.set_tooltip_text( _(
             "If checked, the output text is sent\n" + \
             "to both the clipboard and primary.\n\n" + \
-            "Otherwise the output is sent back\n" + \
+            "Otherwise, the output is sent back\n" + \
             "only to the input source." ) )
         outputBothCheckbutton.set_active( self.outputBoth )
         outputBothCheckbutton.set_margin_top( 10 )

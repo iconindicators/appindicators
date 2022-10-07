@@ -367,8 +367,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         sendCommandToLogCheckbutton = Gtk.CheckButton.new_with_label( _( "Send command to log" ) )
         sendCommandToLogCheckbutton.set_active( self.sendCommandToLog )
         sendCommandToLogCheckbutton.set_tooltip_text( _(
-            "If checked, when a script is run,\n" + \
-            "the full command will be sent to the log\n" + \
+            "When a script is run,\n" + \
+            "send the command to the log\n" + \
             "(located in your home directory)." ) )
 
         grid.attach( sendCommandToLogCheckbutton, 0, 31, 1, 1 )
