@@ -16,11 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create a star ephemeris containing stars with a common name.
-# The ephemeris for Skyfield is saved to file.
-# The ephemeris for PyEphem is printed to screen, suitable for pasting in a Python file.
+# Create a star ephemeris for use in both PyEphem and Skyfield using stars from PyEphem,
+# keeping only those present in the IAU CSN Catalog with accompanying HIP and absolute magnitude.
 
 
+from ephem import stars
 from pandas import read_csv
 from skyfield.api import Star, load
 from skyfield.data import hipparcos
@@ -33,32 +33,28 @@ nameStart = 19
 nameEnd = 36
 hipStart = 91
 hipEnd = 96
-absoluteMagnitudeStart = 82
-absoluteMagnitudeEnd = 86
 
 
-def getStarsAndHIPs( starFile, maximumAbsoluteMagnitude ):
-    starsAndHIPs = [ ]
-    fIn = open( starFile, 'r' )
+def getStarsAndHIPs( iauCatalogFile ):
+    starsFromPyEphem = stars.stars.keys()
+    starsAndHIPsFromIAU = [ ]
+    fIn = open( iauCatalogFile, 'r' )
     for line in fIn:
         if line.startswith( '#' ) or line.startswith( '$' ):
             continue
 
         try:
-            absoluteMagnitude = float( line[ absoluteMagnitudeStart - 1 : absoluteMagnitudeEnd - 1 + 1 ] )
-            if absoluteMagnitude > maximumAbsoluteMagnitude:
-                continue 
-
             nameUTF8 = line[ nameStart - 1 : nameEnd - 1 + 1 ].strip()
-            hip = int( line[ hipStart - 1 : hipEnd - 1 + 1 ] )
-            starsAndHIPs.append( [ nameUTF8, hip ] )
+            if nameUTF8 in starsFromPyEphem:
+                hip = int( line[ hipStart - 1 : hipEnd - 1 + 1 ] )
+                starsAndHIPsFromIAU.append( [ nameUTF8, hip ] )
 
         except ValueError:
             pass
 
     fIn.close()
 
-    return starsAndHIPs
+    return starsAndHIPsFromIAU
 
 
 def printFormattedStars( starsAndHIPs ):
@@ -107,12 +103,10 @@ def printEphemerisPyEphem( bspFile , starEphemeris, starsAndHIPs ):
     sunAt = load( bspFile )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
     for name, hip in starsAndHIPs:
         row = stars.loc[ hip ]
-        absoluteMagnitude = row[ "magnitude" ]
         star = Star.from_dataframe( row )
         rightAscension, declination, _ = sunAt.observe( star ).radec()
 
-        rowWithSpectralType = starsWithSpectralType.loc[ hip ]
-        spectralType = rowWithSpectralType[ "SpType" ]
+        spectralType = starsWithSpectralType.loc[ hip ][ "SpType" ]
         if isinstance( spectralType, str ):
             spectralType = spectralType[ : 2 ]   
 
@@ -125,7 +119,7 @@ def printEphemerisPyEphem( bspFile , starEphemeris, starsAndHIPs ):
             spectralType,
             '%.8f' % rightAscension.hours + '|' + str( star.ra_mas_per_year ),
             '%.8f' % declination.degrees + '|' + str( star.dec_mas_per_year ),
-            absoluteMagnitude,
+            row[ "magnitude" ],
         ]
 
         line = ','.join( str( item ) for item in components )
@@ -141,17 +135,15 @@ if __name__ == "__main__":
             Takes the star information and:
             1) Prints a list of star names, corresponding HIP and star name for translation (as a Python list of lists).
             2) Creates a star ephemeris file for Skyfield.
-            3) Prints stars and corresponding PyEphem format ephemeris (as a Python dictionary).
+            3) Prints a star ephemeris for PyEphem as a Python dictionary.
 
-            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat 15.0 de421.bsp stars.dat''' ) )
+            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat''' ) )
 
     starInformationURL = "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
-    parser.add_argument( "starInformation", help = "The list of stars, downloaded from " + starInformationURL + " and saved as a text file." )
+    parser.add_argument( "starInformation", help = "A text file containing the list of stars, downloaded from " + starInformationURL + "." )
 
     starEphemerisURL = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
-    parser.add_argument( "starEphemeris", help = "A star ephemeris file, typically named hip_main.dat and downloaded from " + starEphemerisURL + "." )
-
-    parser.add_argument( "starMaximumAbsoluteMagnitude", help = "Any star which has an absolute magnitude exceeding this number will be dropped." )
+    parser.add_argument( "starEphemeris", help = "A star ephemeris file, typically hip_main.dat and downloaded from " + starEphemerisURL + "." )
 
     planetEphemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
     parser.add_argument( "planetEphemeris", help = "A planet ephemeris file in .bsp format, downloaded from " + planetEphemerisURL + "." )
@@ -159,7 +151,7 @@ if __name__ == "__main__":
     parser.add_argument( "outputFilenameForSkyfieldStarEphemeris", help = "The output filename for the Skyfield star ephemeris." )
     args = parser.parse_args()
 
-    starsAndHIPS = getStarsAndHIPs( args.starInformation, float( args.starMaximumAbsoluteMagnitude ) )
-    printFormattedStars( starsAndHIPS )
-    createEphemerisSkyfield( args.outputFilenameForSkyfieldStarEphemeris, args.starEphemeris, starsAndHIPS )
-    printEphemerisPyEphem( args.planetEphemeris, args.starEphemeris, starsAndHIPS )
+    starsAndHIPs = getStarsAndHIPs( args.starInformation )
+    printFormattedStars( starsAndHIPs )
+    createEphemerisSkyfield( args.outputFilenameForSkyfieldStarEphemeris, args.starEphemeris, starsAndHIPs )
+    printEphemerisPyEphem( args.planetEphemeris, args.starEphemeris, starsAndHIPs )
