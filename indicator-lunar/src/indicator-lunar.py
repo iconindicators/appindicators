@@ -792,13 +792,7 @@ class IndicatorLunar( IndicatorBase ):
             self.createMenuItemAndAppend( menu, menuLabel, "" ).set_submenu( subMenu )
 
 
-#TODO Update
-    #    The user preference for hiding a body if the body is below the horizon.
-    #
-    #    The astro backend behaviour:
-    #        The rise/set/az/alt is present for a body which rises and sets.
-    #        The az/alt is present for a body 'always up'.
-    #        No data is present for a body 'never up'.
+    # For the given body, creates the menu items relating to rise/set/aziumth/altitude.
     def __updateMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
         key = ( bodyType, nameTag )
         appended = False
