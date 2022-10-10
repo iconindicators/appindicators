@@ -349,7 +349,9 @@ class AstroPyEphem( AstroBase ):
 
         else:
             for key in cometsMinorPlanets:
-                if key in orbitalElementData and key in apparentMagnitudeData and float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
+                if key in orbitalElementData and \
+                   key in apparentMagnitudeData and \
+                   float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
                     body = computeBody( observer, orbitalElementData[ key ].getData() )
                     if not isBad( body ):
                         AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
