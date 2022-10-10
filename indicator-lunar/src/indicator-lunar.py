@@ -44,17 +44,6 @@
 # Issue is visibility..without a magnitude, how to determine if the shower is within range to be visible?
 
 
-#TODO For satellites and comets / minor planets,
-# it is possible a user has checked one body and
-# data is updated down the road,
-# but that body is no longer present.
-# How/when/is that body purged?
-#
-# Maybe test by either...
-#    - Add a dummy item into TLE or OE or AM, then remove.
-#    - Add a dummy item to the user preferences of sat/comet/mp.
-
-
 #TODO Is it possible for apparent magnitude and oe to get out of sync?
 
 
