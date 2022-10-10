@@ -44,9 +44,6 @@
 # Issue is visibility..without a magnitude, how to determine if the shower is within range to be visible?
 
 
-#TODO Is it possible for apparent magnitude and oe to get out of sync?
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
