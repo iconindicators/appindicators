@@ -103,13 +103,26 @@ class DataProviderOrbitalElement( DataProvider ):
                     primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
                     absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
                     slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
-                    epochDate = minorPlanet[ "epoch" ][ 5 : 7 ] + '/' + minorPlanet[ "epoch" ][ 8 : 10 ] + '/' + minorPlanet[ "epoch" ][ 0 : 4 ]
                     meanAnomalyEpoch = str( minorPlanet[ 'm' ] )
                     argumentPerihelion = str( minorPlanet[ "peri" ] )
                     longitudeAscendingNode = str( minorPlanet[ "node" ] )
                     inclinationToEcliptic = str( minorPlanet[ 'i' ] )
                     orbitalEccentricity = str( minorPlanet[ 'e' ] )
                     semimajorAxis = str( minorPlanet[ 'a' ] )
+
+                    # Whilst Skyfield has one format for minor planets,
+                    # XEphem has three body based on the value of the eccentricity: < 1, == 1, > 1:
+                    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+                    # When the eccentricity is >= 1, the format is the same and requires date of epoch of perihelion,
+                    # which does not appear to be present in the Lowell data.
+                    # After checking both the Minor Planet Center's MPCORB.DAT and Lowell's astorb.dat,
+                    # there are no bodies for which the eccentricity is >= 1.0
+                    # Therefore this should not be a problem of concern...
+                    # ...however, screen out a body with such an eccentricity just to be safe!
+                    if float( orbitalEccentricity ) >= 1.0:
+                        logging.error( "Found a body with eccentricity >= 1.0:" )
+                        logging.error( "\t" + str( minorPlanet ) )
+                        continue
 
                     if orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
                         components = [
