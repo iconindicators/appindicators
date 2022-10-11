@@ -29,21 +29,6 @@
 # remove 'comet' from the description in debian/control.
 
 
-#TODO Is it possible/feasible to list meteor showers?
-# Daniel Franklin
-# git@danielfranklin.id.au
-# https://github.com/dfranklinau/astronote/blob/master/astronote/celestial.py
-#
-# https://www.ta3.sk/IAUC22DB/MDC2022/
-# https://www.ta3.sk/IAUC22DB/MDC2022/Roje/roje_lista.php?corobic_roje=1&sort_roje=0
-#
-# https://www.imo.net/
-#
-#
-# On a quick look, the data from ta3 above could be an ephemeris and be used to compute rise/set/az/alt.
-# Issue is visibility..without a magnitude, how to determine if the shower is within range to be visible?
-
-
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
