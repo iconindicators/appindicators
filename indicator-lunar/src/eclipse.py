@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Switch to new code in testEclipseDate.py
+
+
 #TODO For Skfield, need to somehow translate eclipse type (maybe in astroskyfield) to the NEW eclipse type.
  
 
