@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO For Skfield, need to somehow translate eclipse type (maybe in astroskyfield) to the NEW eclipse type.
+ 
+
+#TODO Update/correct
 # Lunar/solar eclipse tables from 2014 to 2099.
 # Courtesy of Fred Espenak and Jean Meeus.
 
