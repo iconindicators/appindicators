@@ -261,10 +261,10 @@ class AstroPyEphem( AstroBase ):
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
         if not AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
-            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_first_quarter_moon( ephemNow ).datetime() )
-            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( ephem.next_full_moon( ephemNow ).datetime() )
-            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
-            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = ephem.next_first_quarter_moon( ephemNow ).datetime()
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = ephem.next_full_moon( ephemNow ).datetime()
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = ephem.next_last_quarter_moon( ephemNow ).datetime()
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = ephem.next_new_moon( ephemNow ).datetime()
 
             AstroPyEphem.__calculateEclipse( ephemNow, data, key, False )
 
@@ -277,15 +277,14 @@ class AstroPyEphem( AstroBase ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
             equinox = ephem.next_equinox( ephemNow )
             solstice = ephem.next_solstice( ephemNow )
-            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( equinox.datetime() )
-            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( solstice.datetime() )
+            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = equinox.datetime()
+            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = solstice.datetime()
 
             AstroPyEphem.__calculateEclipse( ephemNow, data, key, True )
 
 
     @staticmethod
     def __calculateEclipse( ephemNow, data, key, isSolar ):
-#TODO Switch to using DateTime not string.
         if isSolar:
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( ephemNow.datetime() )
 
@@ -374,8 +373,8 @@ class AstroPyEphem( AstroBase ):
             # Must compute az/alt BEFORE rise/set otherwise results will be incorrect.
             data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
-            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( observer.next_rising( body ).datetime() )
-            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( observer.next_setting( body ).datetime() )
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = observer.next_rising( body ).datetime()
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = observer.next_setting( body ).datetime()
 
         except ephem.AlwaysUpError:
             pass
@@ -428,12 +427,12 @@ class AstroPyEphem( AstroBase ):
                     passIsVisible = AstroPyEphem.__isSatellitePassVisible( observerVisiblePasses, earthSatellite, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] )
                     if passBeforeEndDateTime and passIsVisible:
                         data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
-                            AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ].datetime() )
+                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ].datetime()
 
                         data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] )
 
                         data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
-                            AstroBase.toDateTimeString( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime() )
+                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime()
 
                         data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_ANGLE ] )
                         foundPass = True

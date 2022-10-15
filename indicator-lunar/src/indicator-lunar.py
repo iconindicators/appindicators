@@ -463,12 +463,12 @@ class IndicatorLunar( IndicatorBase ):
             dataName = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == IndicatorLunar.astroBackend.BodyType.SATELLITE:
                 if dataName == IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME:
-                    dateTime = datetime.datetime.strptime( self.data[ key ], IndicatorLunar.astroBackend.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+                    dateTime = self.data[ key ]
                     dateTimeMinusFourMinutes = dateTime - datetime.timedelta( minutes = 4 ) # Set an earlier time for the rise to ensure the rise and set are displayed.
                     dateTimes.append( dateTimeMinusFourMinutes )
 
                 elif dataName == IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME:
-                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], IndicatorLunar.astroBackend.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+                    dateTimes.append( self.data[ key ] )
 
             else:
                 if dataName == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME or \
@@ -480,7 +480,7 @@ class IndicatorLunar( IndicatorBase ):
                    dataName == IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME or \
                    dataName == IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE or \
                    dataName == IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER:
-                    dateTimes.append( datetime.datetime.strptime( self.data[ key ], IndicatorLunar.astroBackend.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS ) )
+                    dateTimes.append( self.data[ key ] )
 
         utcNow = datetime.datetime.utcnow()
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
@@ -556,19 +556,13 @@ class IndicatorLunar( IndicatorBase ):
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if ( key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
-                riseTime = datetime.datetime.strptime(
-                    self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
-                    IndicatorLunar.astroBackend.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-
+                riseTime = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
                 if ( riseTime - datetime.timedelta( minutes = 2 ) ) <= utcNow: # Two minute buffer.
                     satelliteCurrentNotifications.append( [ number, riseTime ] )
                     self.satellitePreviousNotifications.append( number )
 
             if ( key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ) in self.data:
-                setTime = datetime.datetime.strptime(
-                    self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
-                    IndicatorLunar.astroBackend.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-
+                setTime = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
                 if number in self.satellitePreviousNotifications and setTime < utcNow: # Notification has been sent and satellite has now set.
                     self.satellitePreviousNotifications.remove( number )
 
@@ -881,13 +875,14 @@ class IndicatorLunar( IndicatorBase ):
     def updateMenuSatellites( self, menu, utcNow ):
         satellites = [ ]
         satellitesPolar = [ ]
-        now = IndicatorLunar.astroBackend.toDateTimeString( utcNow )
-        nowPlusFiveMinutes = IndicatorLunar.astroBackend.toDateTimeString( utcNow + datetime.timedelta( minutes = 5 ) )
+        utcNowPlusFiveMinutes = utcNow + datetime.timedelta( minutes = 5 )
 
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets.
-                if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes: # Satellite will rise within the next five minutes.
+                x = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ]
+                y = utcNowPlusFiveMinutes
+                if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes: # Satellite will rise within the next five minutes.
                     satellites.append( [
                         number,
                         self.satelliteGeneralPerturbationData[ number ].getName(),
@@ -899,8 +894,8 @@ class IndicatorLunar( IndicatorBase ):
                 else: # Satellite will rise more than five minutes from now; look at previous transit.
                     if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.dataPrevious:
                         inTransit = \
-                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < nowPlusFiveMinutes and \
-                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] > now
+                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes and \
+                            self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] > utcNow
 
                         if inTransit:
                             satellites.append( [
@@ -1040,7 +1035,6 @@ class IndicatorLunar( IndicatorBase ):
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB:
             displayData = str( int( float( data ) ) ) + "°"
 
-#TODO Consider changing the backends (astropyephem and astroskyfield) to insert datetime as a DateTime object without converting first to a string.
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME or \
              dataTag == IndicatorLunar.astroBackend.DATA_TAG_EQUINOX or \
              dataTag == IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER or \
@@ -1073,8 +1067,7 @@ class IndicatorLunar( IndicatorBase ):
                 displayData = longitude + "° " +_( "W" )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE:
-#TODO Ensure this works when running under Skyfield.
-            displayData = eclipse.getEclipseTypeText( data )
+            displayData = eclipse.getEclipseTypeAsText( data )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION:
             displayData = data + "%"
@@ -1089,11 +1082,9 @@ class IndicatorLunar( IndicatorBase ):
         return displayData
 
 
-    # Converts a UTC date/time string to a local date/time string in the given format.
-    def toLocalDateTimeString( self, utcDateTimeString, outputFormat ):
-        utcDateTime = datetime.datetime.strptime( utcDateTimeString, IndicatorLunar.astroBackend.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-        localDateTime = utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None )
-        return localDateTime.strftime( outputFormat )
+    # Converts a UTC date/time to a local date/time string in the given format.
+    def toLocalDateTimeString( self, utcDateTime, outputFormat ):
+        return utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ).strftime( outputFormat )
 
 
     # https://stackoverflow.com/a/64097432/2156453
@@ -1777,7 +1768,6 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
-
         COLUMN_INDEX_TOGGLE = 0
         COLUMN_INDEX_DATA = 1
 
@@ -1908,15 +1898,6 @@ class IndicatorLunar( IndicatorBase ):
             Notify.Notification.new( summary, message, self.createFullMoonIcon() ).show()
 
         else:
-            # Create mock data.
-            utcNow = str( datetime.datetime.utcnow() )
-            if utcNow.index( '.' ) > -1:
-                utcNow = utcNow.split( '.' )[ 0 ] # Remove fractional seconds.
-
-            utcNowPlusTenMinutes = str( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ) )
-            if utcNowPlusTenMinutes.index( '.' ) > -1:
-                utcNowPlusTenMinutes = utcNowPlusTenMinutes.split( '.' )[ 0 ] # Remove fractional seconds.
-
             def replaceTags( text ):
                 return \
                     text. \
@@ -1924,9 +1905,9 @@ class IndicatorLunar( IndicatorBase ):
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( utcNow, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
+                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( datetime.datetime.utcnow(), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( utcNowPlusTenMinutes, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
+                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
             summary = replaceTags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
             message = replaceTags( message )

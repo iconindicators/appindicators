@@ -338,8 +338,8 @@ class AstroSkyfield( AstroBase ):
 
         lunarPhase = AstroBase.getLunarPhase(
             illumination,
-            eventsToDateTimes[ almanac.MOON_PHASES.index( "Full Moon" ) ],
-            eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ] )
+            eventsToDateTimes[ almanac.MOON_PHASES.index( "Full Moon" ) ].replace( tzinfo = None ),
+            eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ].replace( tzinfo = None ) )
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunarPhase # Needed for notification.
 
         sunAltAz = locationAtNow.observe( sun ).apparent().altaz()
@@ -348,10 +348,10 @@ class AstroSkyfield( AstroBase ):
         neverUp = AstroSkyfield.__calculateCommon( now, nowPlusThirtySixHours, data, key, locationAtNow, moon )
 
         if not neverUp:
-            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "First Quarter" ) ] )
-            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "Full Moon" ) ] )
-            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "Last Quarter" ) ] )
-            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ] )
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = eventsToDateTimes[ almanac.MOON_PHASES.index( "First Quarter" ) ].replace( tzinfo = None )
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = eventsToDateTimes[ almanac.MOON_PHASES.index( "Full Moon" ) ].replace( tzinfo = None )
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = eventsToDateTimes[ almanac.MOON_PHASES.index( "Last Quarter" ) ].replace( tzinfo = None )
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ].replace( tzinfo = None )
 
             AstroSkyfield.__calculateEclipse( now, nowPlusOneYear, data, key, False )
 
@@ -377,8 +377,8 @@ class AstroSkyfield( AstroBase ):
                 if almanac.SEASON_EVENTS_NEUTRAL.index( "June Solstice" ) in eventsToDateTimes \
                 else almanac.SEASON_EVENTS_NEUTRAL.index( "December Solstice" )
 
-            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ keyEquinox ] )
-            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ keySolstice ] )
+            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = eventsToDateTimes[ keyEquinox ].replace( tzinfo = None )
+            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = eventsToDateTimes[ keySolstice ].replace( tzinfo = None )
 
             AstroSkyfield.__calculateEclipse( now, nowPlusOneYear, data, key, True )
 
@@ -387,30 +387,32 @@ class AstroSkyfield( AstroBase ):
     def __calculateEclipse( now, nowPlusOneYear, data, key, isSolar ):
 
         # https://rhodesmill.org/skyfield/almanac.html
-        def __toNativeEclipseType( skyfieldEclipseType ):
-            if skyfieldEclipseType == 0:
-                nativeEclipseType = eclipse.EclipseType.PENUMBRAL
+        def __getNativeEclipseType( skyfieldEclipseType, isLunar ):
+            nativeEclipseType = None
+            if isLunar:
+                if skyfieldEclipseType == eclipselib.LUNAR_ECLIPSES.index( "Partial" ):
+                    nativeEclipseType = eclipse.EclipseType.PARTIAL
 
-            elif skyfieldEclipseType == 1:
-                nativeEclipseType = eclipse.EclipseType.PARTIAL
+                elif skyfieldEclipseType == eclipselib.LUNAR_ECLIPSES.index( "Penumbral" ):
+                    nativeEclipseType = eclipse.EclipseType.PENUMBRAL
 
-            else: # 2
-                nativeEclipseType = eclipse.EclipseType.TOTAL
+                else: # Total
+                    nativeEclipseType = eclipse.EclipseType.TOTAL
 
             return nativeEclipseType
 
 
-#TODO When solar eclipses are implemented, swap over to the code below,
-# add in additional eclipse types (above, if required)
-# and update the eclipse credit in the indicator.
+#TODO When solar eclipses are implemented:
+# swap over to the code below;
+# add in additional eclipse types (above, if required);
+# update the eclipse credit in the indicator.
 # https://github.com/skyfielders/python-skyfield/issues/445
             # dateTimes, events, details = eclipselib.solar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.SOLAR_ECLIPSES[ events[ 0 ] ]
 
-#TODO Switch to using DateTime not string.
         if isSolar:
-            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime() )
+            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime().replace( tzinfo = None ) )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
@@ -421,8 +423,8 @@ class AstroSkyfield( AstroBase ):
 # If feasible, add here and remove check in indicator front-end.
 # https://github.com/skyfielders/python-skyfield/discussions/801
             dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = __toNativeEclipseType( events[ 0 ] )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_datetime().replace( tzinfo = None )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = __getNativeEclipseType( events[ 0 ], True )
 
 
     @staticmethod
@@ -546,7 +548,6 @@ class AstroSkyfield( AstroBase ):
         neverUp = False
         dateTimes, events = almanac.find_discrete( now, nowPlusWhatever, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
         if len( events ) >= 2:
-            dateTimes = dateTimes.utc_datetime()
             foundRiseSet = True
             if events[ 0 ] == 1 and events[ 1 ] == 0: # Rise = 1, set = 0, https://rhodesmill.org/skyfield/almanac.html
                 riseDateTime = dateTimes[ 0 ]
@@ -560,8 +561,8 @@ class AstroSkyfield( AstroBase ):
                 foundRiseSet = False
 
             if foundRiseSet:
-                data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime )
-                data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( setDateTime )
+                data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = riseDateTime.utc_datetime().replace( tzinfo = None )
+                data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = setDateTime.utc_datetime().replace( tzinfo = None )
 
                 alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
                 data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
@@ -633,11 +634,11 @@ class AstroSkyfield( AstroBase ):
                 if riseDateTime is not None and \
                    culminationDateTimes and \
                    AstroSkyfield.__isSatellitePassVisible( timeScale, riseDateTime, dateTime, isTwilightFunction, earthSatellite ):
-                    data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = AstroBase.toDateTimeString( riseDateTime.utc_datetime() )
+                    data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = riseDateTime.utc_datetime().replace( tzinfo = None )
                     alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( riseDateTime ).altaz()
                     data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = str( az.radians )
 
-                    data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = AstroBase.toDateTimeString( dateTime.utc_datetime() )
+                    data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = dateTime.utc_datetime().replace( tzinfo = None )
                     alt, az, earthSatelliteDistance = ( earthSatellite - location ).at( dateTime ).altaz()
                     data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = str( az.radians )
 

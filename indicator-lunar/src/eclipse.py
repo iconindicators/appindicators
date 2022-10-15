@@ -190,15 +190,14 @@ def __getEclipse( utcNow, eclipses, fieldYear, fieldMonth, fieldDay, fieldTimeUT
             if longitude.endswith( 'E' ):
                 theLongitude = '-' + theLongitude 
 
-#TODO Return dateTime as a DateTime not as a string.
-            eclipseInformation = str( dateTime ), __getEclipseType( eclipseType ), theLatitude, theLongitude
+            eclipseInformation = dateTime, __getEclipseTypeFromTableValue( eclipseType ), theLatitude, theLongitude
             break
 
     return eclipseInformation
 
 
 # Returns the translated descriptive text for a given eclipse type.
-def getEclipseTypeText( eclipseType ):
+def getEclipseTypeAsText( eclipseType ):
     if eclipseType == EclipseType.ANNULAR:
         eclipseTypeText = _( "Annular" )
 
@@ -219,17 +218,17 @@ def getEclipseTypeText( eclipseType ):
 
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
-def __getEclipseType( eclipseType ):
-    if eclipseType == 'A':
+def __getEclipseTypeFromTableValue( eclipseTypeFromTableValue ):
+    if eclipseTypeFromTableValue == 'A':
         __eclipseType = EclipseType.ANNULAR
 
-    elif eclipseType == 'H':
+    elif eclipseTypeFromTableValue == 'H':
         __eclipseType = EclipseType.HYBRID
 
-    elif eclipseType == 'P':
+    elif eclipseTypeFromTableValue == 'P':
         __eclipseType = EclipseType.PARTIAL
 
-    elif eclipseType == 'N':
+    elif eclipseTypeFromTableValue == 'N':
         __eclipseType = EclipseType.PENUMBRAL
 
     else: # T

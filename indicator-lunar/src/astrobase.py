@@ -688,11 +688,6 @@ class AstroBase( ABC ):
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
-    @staticmethod
-    def toDateTimeString( dateTime ):
-        return dateTime.strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-
-
     # Take a start/end date/time used to search for a satellite transit
     # and determine where a given start/end hour will overlap.
     #
