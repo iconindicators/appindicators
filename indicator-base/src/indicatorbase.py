@@ -231,8 +231,9 @@ class IndicatorBase( ABC ):
 
         aboutDialog.run()
         aboutDialog.destroy()
-        os.remove( changeLog ) #TODO Maybe wrap into a try/except?
         self.__setMenuSensitivity( True )
+        if os.path.exists( changeLog ):
+            os.remove( changeLog ) # In case a user runs more than one instance of the same indicator.
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
