@@ -1040,6 +1040,7 @@ class IndicatorLunar( IndicatorBase ):
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB:
             displayData = str( int( float( data ) ) ) + "°"
 
+#TODO Consider changing the backends (astropyephem and astroskyfield) to insert datetime as a DateTime object without converting first to a string.
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME or \
              dataTag == IndicatorLunar.astroBackend.DATA_TAG_EQUINOX or \
              dataTag == IndicatorLunar.astroBackend.DATA_TAG_FIRST_QUARTER or \
@@ -1072,6 +1073,8 @@ class IndicatorLunar( IndicatorBase ):
                 displayData = longitude + "° " +_( "W" )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE:
+#TODO Will likely need to change when underlying eclipse.py changes.
+#TODO Ensure new code works when running under Skyfield.
             if data == eclipse.ECLIPSE_TYPE_ANNULAR:
                 displayData = _( "Annular" )
 
