@@ -266,12 +266,7 @@ class AstroPyEphem( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( ephem.next_last_quarter_moon( ephemNow ).datetime() )
             data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( ephem.next_new_moon( ephemNow ).datetime() )
 
-#TODO Switch to using DateTime not string.
-            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseLunar( ephemNow.datetime() )
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+            AstroPyEphem.__calculateEclipse( ephemNow, data, key, False )
 
 
     @staticmethod
@@ -285,12 +280,22 @@ class AstroPyEphem( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( equinox.datetime() )
             data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( solstice.datetime() )
 
+            AstroPyEphem.__calculateEclipse( ephemNow, data, key, True )
+
+
+    @staticmethod
+    def __calculateEclipse( ephemNow, data, key, isSolar ):
 #TODO Switch to using DateTime not string.
+        if isSolar:
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( ephemNow.datetime() )
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+
+        else:
+            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseLunar( ephemNow.datetime() )
+
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     @staticmethod
