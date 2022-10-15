@@ -231,7 +231,7 @@ class IndicatorBase( ABC ):
 
         aboutDialog.run()
         aboutDialog.destroy()
-        os.remove( changeLog )
+        os.remove( changeLog ) #TODO Maybe wrap into a try/except?
         self.__setMenuSensitivity( True )
 
 
@@ -585,8 +585,8 @@ class IndicatorBase( ABC ):
         downloaded = False
         try:
             response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w' ) as f:
-                f.write( response )
+            with open( filename, 'w' ) as fIn:
+                fIn.write( response )
 
             downloaded = True
 
@@ -607,8 +607,8 @@ class IndicatorBase( ABC ):
         config = { }
         if os.path.isfile( configFile ):
             try:
-                with open( configFile, 'r' ) as f:
-                    config = json.load( f )
+                with open( configFile, 'r' ) as fIn:
+                    config = json.load( fIn )
 
             except Exception as e:
                 config = { }
@@ -630,8 +630,8 @@ class IndicatorBase( ABC ):
         configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
         success = True
         try:
-            with open( configFile, 'w' ) as f:
-                f.write( json.dumps( config ) )
+            with open( configFile, 'w' ) as fIn:
+                fIn.write( json.dumps( config ) )
 
         except Exception as e:
             logging.exception( e )
@@ -776,8 +776,8 @@ class IndicatorBase( ABC ):
         if theFile: # A value of "" evaluates to False.
             filename = self.__getCacheDirectory() + theFile
             try:
-                with open( filename, 'rb' ) as f:
-                    data = pickle.load( f )
+                with open( filename, 'rb' ) as fIn:
+                    data = pickle.load( fIn )
 
             except Exception as e:
                 data = None
@@ -808,8 +808,8 @@ class IndicatorBase( ABC ):
             extension
 
         try:
-            with open( cacheFile, 'wb' ) as f:
-                pickle.dump( binaryData, f )
+            with open( cacheFile, 'wb' ) as fIn:
+                pickle.dump( binaryData, fIn )
 
         except Exception as e:
             logging.exception( e )
@@ -861,8 +861,8 @@ class IndicatorBase( ABC ):
         text = ""
         if os.path.isfile( cacheFile ):
             try:
-                with open( cacheFile, 'r' ) as f:
-                    text = f.read()
+                with open( cacheFile, 'r' ) as fIn:
+                    text = fIn.read()
 
             except Exception as e:
                 text = ""
@@ -906,8 +906,8 @@ class IndicatorBase( ABC ):
 
     def __writeCacheText( self, text, cacheFile ):
         try:
-            with open( cacheFile, 'w' ) as f:
-                f.write( text )
+            with open( cacheFile, 'w' ) as fIn:
+                fIn.write( text )
 
         except Exception as e:
             logging.exception( e )
