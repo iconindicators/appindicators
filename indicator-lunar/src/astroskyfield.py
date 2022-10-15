@@ -353,12 +353,7 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "Last Quarter" ) ] )
             data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ almanac.MOON_PHASES.index( "New Moon" ) ] )
 
-            dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.LUNAR_ECLIPSES[ events[ 0 ] ]
-#TODO Submitted a discussion to see if possible to get the lat/long.
-# If feasible, add here and remove check in indicator front-end.
-# https://github.com/skyfielders/python-skyfield/discussions/801
+            AstroSkyfield.__calculateEclipse( now, nowPlusOneYear, data, key, False )
 
 
     @staticmethod
@@ -385,18 +380,49 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ keyEquinox ] )
             data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = AstroBase.toDateTimeString( eventsToDateTimes[ keySolstice ] )
 
-#TODO When solar eclipses are implemented, swap over to the code below and update the eclipse credit in the indicator.
+            AstroSkyfield.__calculateEclipse( now, nowPlusOneYear, data, key, True )
+
+
+    @staticmethod
+    def __calculateEclipse( now, nowPlusOneYear, data, key, isSolar ):
+
+        # https://rhodesmill.org/skyfield/almanac.html
+        def __toNativeEclipseType( skyfieldEclipseType ):
+            if skyfieldEclipseType == 0:
+                nativeEclipseType = eclipse.EclipseType.PENUMBRAL
+
+            elif skyfieldEclipseType == 1:
+                nativeEclipseType = eclipse.EclipseType.PARTIAL
+
+            else: # 2
+                nativeEclipseType = eclipse.EclipseType.TOTAL
+
+            return nativeEclipseType
+
+
+#TODO When solar eclipses are implemented, swap over to the code below,
+# add in additional eclipse types (above, if required)
+# and update the eclipse credit in the indicator.
 # https://github.com/skyfielders/python-skyfield/issues/445
             # dateTimes, events, details = eclipselib.solar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.SOLAR_ECLIPSES[ events[ 0 ] ]
 
 #TODO Switch to using DateTime not string.
+        if isSolar:
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime() )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+
+        else:
+#TODO Submitted a discussion to see if possible to get the lat/long.
+# If feasible, add here and remove check in indicator front-end.
+# https://github.com/skyfielders/python-skyfield/discussions/801
+            dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
+            data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = __toNativeEclipseType( events[ 0 ] )
 
 
     @staticmethod
