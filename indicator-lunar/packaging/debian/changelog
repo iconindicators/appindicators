@@ -1,5 +1,6 @@
 indicator-lunar (1.0.96-1) bionic; urgency=low
 
+  * Bug fix: PyEphem/XEphem credit omitted from previous release.
   * Over the years, PyEphem's list of stars has accumulated duplicates
     and misspellings, which must be kept for backward compatibility.
     The list of stars has now been sanitised using the IAU CSN Catalog at
@@ -11,7 +12,7 @@ indicator-lunar (1.0.96-1) bionic; urgency=low
   * Added option that if that body's set is before sunset, show that body's
     immediate next rise.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 12 Oct 2022 19:55:07 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 15 Oct 2022 19:55:07 +1000
 
 
 indicator-lunar (1.0.95-1) bionic; urgency=low
