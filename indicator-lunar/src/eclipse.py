@@ -16,11 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO For Skyfield, need to somehow translate eclipse type (maybe in astroskyfield) to the NEW eclipse type.
- 
-
 # Lunar/solar eclipse tables up to and including the year 2040.
-# Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC).
+# Eclipse Predictions by Fred Espenak, NASA/GSFC Emeritus
+# https://eclipse.gsfc.nasa.gov/eclipse.html
 
 
 from enum import Enum
