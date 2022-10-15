@@ -52,7 +52,7 @@ class IndicatorLunar( IndicatorBase ):
     # Allow switching between backends.
     astroBackendPyEphem = "AstroPyEphem"
     astroBackendSkyfield = "AstroSkyfield"
-    astroBackendName = astroBackendPyEphem
+    astroBackendName = astroBackendSkyfield
     astroBackend = getattr( __import__( astroBackendName.lower() ), astroBackendName )
 
     message = astroBackend.getStatusMessage()
@@ -88,8 +88,8 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
     CREDIT_COMETS = _( "Comet data by Comet Observation Database. https://cobs.si" )
-    CREDIT_ECLIPSES = _( "Eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" )
-    CREDIT_ECLIPSE_SOLAR_ONLY = _( "Solar eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" )
+    CREDIT_ECLIPSES = _( "Eclipse Predictions by Fred Espenak and Jean Meeus (NASA's GSFC). https://eclipse.gsfc.nasa.gov" ) #TODO Check this appears correctly.
+    CREDIT_ECLIPSE_SOLAR_ONLY = _( "Solar eclipse information by Fred Espenak and Jean Meeus. https://eclipse.gsfc.nasa.gov" )  #TODO Need to update according to new acknowledgment above but only for solar.
     CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
     CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://www.celestrak.com" )
     if astroBackendName == astroBackendPyEphem:
@@ -1073,22 +1073,8 @@ class IndicatorLunar( IndicatorBase ):
                 displayData = longitude + "° " +_( "W" )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE:
-#TODO Will likely need to change when underlying eclipse.py changes.
-#TODO Ensure new code works when running under Skyfield.
-            if data == eclipse.ECLIPSE_TYPE_ANNULAR:
-                displayData = _( "Annular" )
-
-            elif data == eclipse.ECLIPSE_TYPE_HYBRID:
-                displayData = _( "Hybrid (Annular/Total)" )
-
-            elif data == eclipse.ECLIPSE_TYPE_PARTIAL:
-                displayData = _( "Partial" )
-
-            elif data == eclipse.ECLIPSE_TYPE_PENUMBRAL:
-                displayData = _( "Penumbral" )
-
-            else: # Assume eclipse.ECLIPSE_TYPE_TOTAL:
-                displayData = _( "Total" )
+#TODO Ensure this works when running under Skyfield.
+            displayData = eclipse.getEclipseTypeText( data )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION:
             displayData = data + "%"

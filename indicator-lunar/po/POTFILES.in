@@ -3,4 +3,5 @@
 astrobase.py
 astropyephem.py
 astroskyfield.py
+eclipse.py
 indicator-lunar.py

@@ -391,7 +391,8 @@ class AstroSkyfield( AstroBase ):
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.SOLAR_ECLIPSES[ events[ 0 ] ]
 
-            dateTime, eclipseType, latitude, longitude = eclipse.getEclipse( now.utc_datetime(), False )
+#TODO Switch to using DateTime not string.
+            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime() )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
