@@ -201,6 +201,7 @@ class IndicatorLunar( IndicatorBase ):
         self.__removeCacheFilesVersion93()
         self.__removeCacheFilesVersion94()
         self.__removeCacheFilesVersion95()
+
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
 
