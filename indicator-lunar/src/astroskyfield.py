@@ -55,7 +55,7 @@ import datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( AstroBase ):
 
-    # Planets epehemeris is created with a reduced date range:
+    # Planets ephemeris is created with a reduced date range:
     #
     #    python3 -m jplephem excerpt startDate endDate inFile.bsp outFile.bsp
     #
@@ -80,7 +80,7 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
     __EPHEMERIS_PLANETS = load( "planets.bsp" )
 
-    # Created to contain only commonly named stars using 'createephemerisstars.py'.
+    # Stars ephemeris must be created using 'createephemerisstars.py'.
     with load.open( "stars.dat" ) as f:
         __EPHEMERIS_STARS = hipparcos.load_dataframe( f )
 
@@ -399,17 +399,11 @@ class AstroSkyfield( AstroBase ):
                 else: # Total
                     nativeEclipseType = eclipse.EclipseType.TOTAL
 
+            else:
+                pass #TODO Implement when Skyfield implements solar eclipses.
+
             return nativeEclipseType
 
-
-#TODO When solar eclipses are implemented:
-# swap over to the code below;
-# add in additional eclipse types (above, if required);
-# update the eclipse credit in the indicator.
-# https://github.com/skyfielders/python-skyfield/issues/445
-            # dateTimes, events, details = eclipselib.solar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
-            # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_strftime( AstroBase.DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS )
-            # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipselib.SOLAR_ECLIPSES[ events[ 0 ] ]
 
         if isSolar:
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime().replace( tzinfo = None ) )
@@ -417,6 +411,12 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
+
+#TODO When solar eclipses are implemented, swap the code above with the code below and update the eclipse credit in the indicator.
+# https://github.com/skyfielders/python-skyfield/issues/445
+            # dateTimes, events, details = eclipselib.solar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
+            # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_datetime().replace( tzinfo = None )
+            # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = __getNativeEclipseType( events[ 0 ], False )
 
         else:
 #TODO Submitted a discussion to see if possible to get the lat/long.
