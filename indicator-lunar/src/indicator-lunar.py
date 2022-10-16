@@ -102,8 +102,8 @@ class IndicatorLunar( IndicatorBase ):
     DATA_INDEX_BODY_NAME = 1
     DATA_INDEX_DATA_NAME = 2
 
-    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used when displaying the satellite rise notification.
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M" # Used to display any body's rise/set in the menu.
 
     EXTENSION_SVG = ".svg"
 

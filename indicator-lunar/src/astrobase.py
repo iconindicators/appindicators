@@ -225,10 +225,10 @@ class AstroBase( ABC ):
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
 
 
-    STARS_INDEX_NAME = 0
-    STARS_INDEX_HIP = 1
-    STARS_INDEX_NAME_TRANSLATION = 2
-    STARS_INDEX_TAG_TRANSLATION = 3
+    __STARS_INDEX_NAME = 0
+    __STARS_INDEX_HIP = 1
+    __STARS_INDEX_NAME_TRANSLATION = 2
+    __STARS_INDEX_TAG_TRANSLATION = 3
 
 
     # PyEphem provides a list of stars and data, whereas Skyfield does not.
@@ -394,7 +394,6 @@ class AstroBase( ABC ):
 
 
     # Miscellaneous.
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspaceHHcolonMMcolonSS = "%Y-%m-%d %H:%M:%S"
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which are brighter than the sun, so set a lower limit.
 
@@ -467,37 +466,37 @@ class AstroBase( ABC ):
 
     @staticmethod
     def __getStarRow( star ):
-        return next( i for i in AstroBase.STARS if i[ AstroBase.STARS_INDEX_NAME ] == star )
+        return next( i for i in AstroBase.STARS if i[ AstroBase.__STARS_INDEX_NAME ] == star )
 
 
     @staticmethod
     def getStarHIP( star ):
-        return AstroBase.__getStarRow( star )[ AstroBase.STARS_INDEX_HIP ]
+        return AstroBase.__getStarRow( star )[ AstroBase.__STARS_INDEX_HIP ]
 
 
     @staticmethod
     def getStarNameTranslation( star ):
-        return AstroBase.__getStarRow( star )[ AstroBase.STARS_INDEX_NAME_TRANSLATION ]
+        return AstroBase.__getStarRow( star )[ AstroBase.__STARS_INDEX_NAME_TRANSLATION ]
 
 
     @staticmethod
     def getStarTagTranslation( star ):
-        return AstroBase.__getStarRow( star )[ AstroBase.STARS_INDEX_TAG_TRANSLATION ]
+        return AstroBase.__getStarRow( star )[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ]
 
 
     @staticmethod
     def getStarNames():
-        return [ i[ AstroBase.STARS_INDEX_NAME ] for i in AstroBase.STARS ]
+        return [ i[ AstroBase.__STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
     @staticmethod
     def getStarHIPs():
-        return [ i[ AstroBase.STARS_INDEX_HIP ] for i in AstroBase.STARS ]
+        return [ i[ AstroBase.__STARS_INDEX_HIP ] for i in AstroBase.STARS ]
 
 
     @staticmethod
     def getStarTagTranslations():
-        return [ i[ AstroBase.STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
+        return [ i[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
 
 
     # Calculate apparent magnitude.
