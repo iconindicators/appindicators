@@ -29,7 +29,7 @@
 #    https://futureboy.us/fsp/sun.fsp
 #    https://www.satellite-calculations.com/
 #    https://aa.usno.navy.mil/data/docs/mrst.php
-#    https://www.celestrak.org/columns/v03n01
+#    https://celestrak.org/columns/v03n01
 #    https://celestrak.org/NORAD/elements
 #    https://www.n2yo.com
 #    https://www.heavens-above.com

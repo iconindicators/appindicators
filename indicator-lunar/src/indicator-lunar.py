@@ -91,7 +91,7 @@ class IndicatorLunar( IndicatorBase ):
     CREDIT_ECLIPSES = _( "Eclipse predictions by Fred Espenak, NASA/GSFC Emeritus. https://eclipse.gsfc.nasa.gov" )
     CREDIT_ECLIPSE_SOLAR_ONLY = _( "Solar eclipse predictions by Fred Espenak, NASA/GSFC Emeritus. https://eclipse.gsfc.nasa.gov" )
     CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
-    CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://www.celestrak.org" )
+    CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://celestrak.org" )
     if astroBackendName == astroBackendPyEphem:
         CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
 
