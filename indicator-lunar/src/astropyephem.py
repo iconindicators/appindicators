@@ -478,7 +478,7 @@ class AstroPyEphem( AstroBase ):
     #
     #    https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
     #    https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
-    #    https://www.celestrak.com/columns/v03n01
+    #    https://www.celestrak.org/columns/v03n01
     @staticmethod
     def __isSatellitePassVisible( observerVisiblePasses, satellite, passDateTime ):
         observerVisiblePasses.date = passDateTime
