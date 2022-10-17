@@ -482,12 +482,11 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def __isSatellitePassVisible( observerVisiblePasses, satellite, passDateTime ):
         observerVisiblePasses.date = passDateTime
-
         satellite.compute( observerVisiblePasses )
         sun = ephem.Sun()
         sun.compute( observerVisiblePasses )
 
         return \
-            satellite.eclipsed is False and \
+            not satellite.eclipsed and \
             sun.alt > ephem.degrees( "-18" ) and \
             sun.alt < ephem.degrees( "-6" )
