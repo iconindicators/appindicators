@@ -1667,7 +1667,7 @@ msgid ""
 "with a fainter magnitude will be hidden."
 msgstr ""
 "Планеты, звезды, кометы и малые планеты с меньшей\n"
-"звездной величиной будут скрыты.
+"звездной величиной будут скрыты."
 
 #: indicator-lunar.py:1275
 msgid "Add new minor planets"
