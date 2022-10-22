@@ -1165,8 +1165,8 @@ class IndicatorLunar( IndicatorBase ):
         indicatorText.set_tooltip_text( _(
             "The text shown next to the indicator icon,\n" + \
             "or tooltip where applicable.\n\n" + \
-            "The icon text can contain text and tags\n" + \
-            "from the table below.\n\n" + \
+            "The icon text may contain text and/or\n" + \
+            "tags from the table below.\n\n" + \
             "To associate text with one or more tags,\n" + \
             "enclose the text and tag(s) within { }.\n\n" + \
             "For example\n\n" + \
