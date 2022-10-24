@@ -57,20 +57,29 @@ class GP( object ):
     def __init__( self, xmlFieldsFromOMM ):
         self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ]
 
+        xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = "123456"
+
+
         self.satelliteRecord = Satrec()
         omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
 
-        # The TLE format does not support a satellite catalog number (NORAD number) greater than 99,999.
-        # Therefore, when the satellite information is requested as a TLE,
-        # substitute '0' for the satellite catalog number when in excess of 99,999.
+        # The TLE format does not support satellite catalog numbers (NORAD number) greater than 99,999.
         #
-        # Unfortunately, cannot alter the satellite catalog number once it is set as it is protected.
-        # Instead, keep a second record around as required.
-        self.satelliteRecordTLESafe = self.satelliteRecord
-        if int( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > 99999:
-            self.satelliteRecordTLESafe = Satrec()
-            xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = str( 0 )
-            omm.initialize( self.satelliteRecordTLESafe, xmlFieldsFromOMM )
+        # When the SGP4 exporter converts from OMM to TLE, such a catalog number will be erroneously omitted:
+        #    https://github.com/brandon-rhodes/python-sgp4/issues/97
+        #
+        # Would like to set the catalog number to '0' (which is unused) after the OMM object is initialised
+        # and before the export to TLE; unfortunately, the catalog number is protected.
+        #
+        # Therefore, keep a second record around, as required, with catalog number set to '0'.
+        # self.satelliteRecordTLESafe = self.satelliteRecord
+        # if int( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > 99999:
+        #     self.satelliteRecordTLESafe = Satrec()
+        #     noradCatId = xmlFieldsFromOMM[ "NORAD_CAT_ID" ] # Save for replacement after initialisation.
+        #     xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = str( 0 )
+        #     omm.initialize( self.satelliteRecordTLESafe, xmlFieldsFromOMM )
+        #     xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = noradCatId
+
 
         self.tleLineOne = None
         self.tleLineTwo = None
@@ -82,7 +91,17 @@ class GP( object ):
 
     def getTLELineOneLineTwo( self ):
         if self.tleLineOne is None:
-            self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecordTLESafe )
+#TODO Alternate version for handling a satellite catalog number < 99999.
+# In such a case, export the satellite record back out to OMM, set the catalog number to '0',
+# then create a dummy satellite record and from that, export to TLE.
+            ommData = exporter.export_omm( self.satelliteRecord, self.getName() )
+            ommData[ "NORAD_CAT_ID" ] = str( 0 )
+            satelliteRecord = Satrec()
+            omm.initialize( satelliteRecord, ommData )
+            self.tleLineOne, self.tleLineTwo = exporter.export_tle( satelliteRecord )
+
+        # if self.tleLineOne is None:
+        #     self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecordTLESafe )
 
         return self.tleLineOne, self.tleLineTwo
 
