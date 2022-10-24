@@ -252,8 +252,8 @@ class AstroBase( ABC ):
     #        Contains around 96 stars, with some names misspelt.
     #        Not all stars in PyEphem are present in this list.
     #
-    # Ultimately, use PyEphem's list of stars, dropping those which are misspelt
-    # or not listed in the IAU CSN Catalog.
+    # Ultimately, start with PyEphem's list of stars and drop those which are not
+    # listed in the IAU CSN Catalog.
     #
     # DO NOT EDIT: Content must be created using 'createephemerisstars.py'.
     STARS = [
