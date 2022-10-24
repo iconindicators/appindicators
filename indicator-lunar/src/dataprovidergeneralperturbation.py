@@ -55,55 +55,14 @@ class DataProviderGeneralPerturbation( DataProvider ):
 class GP( object ):
 
     def __init__( self, xmlFieldsFromOMM ):
-        self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ]
-
-        xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = "123456"
-
-
         self.satelliteRecord = Satrec()
         omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
 
-        # The TLE format does not support satellite catalog numbers (NORAD number) greater than 99,999.
-        #
-        # When the SGP4 exporter converts from OMM to TLE, such a catalog number will be erroneously omitted:
-        #    https://github.com/brandon-rhodes/python-sgp4/issues/97
-        #
-        # Would like to set the catalog number to '0' (which is unused) after the OMM object is initialised
-        # and before the export to TLE; unfortunately, the catalog number is protected.
-        #
-        # Therefore, keep a second record around, as required, with catalog number set to '0'.
-        # self.satelliteRecordTLESafe = self.satelliteRecord
-        # if int( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > 99999:
-        #     self.satelliteRecordTLESafe = Satrec()
-        #     noradCatId = xmlFieldsFromOMM[ "NORAD_CAT_ID" ] # Save for replacement after initialisation.
-        #     xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = str( 0 )
-        #     omm.initialize( self.satelliteRecordTLESafe, xmlFieldsFromOMM )
-        #     xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = noradCatId
+        self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ] # Satellite record does not hold the name.
 
-
+        # Initialise on demand.
         self.tleLineOne = None
         self.tleLineTwo = None
-
-
-    def getInternationalDesignator( self ):
-        return self.satelliteRecord.intldesg
-
-
-    def getTLELineOneLineTwo( self ):
-        if self.tleLineOne is None:
-#TODO Alternate version for handling a satellite catalog number < 99999.
-# In such a case, export the satellite record back out to OMM, set the catalog number to '0',
-# then create a dummy satellite record and from that, export to TLE.
-            ommData = exporter.export_omm( self.satelliteRecord, self.getName() )
-            ommData[ "NORAD_CAT_ID" ] = str( 0 )
-            satelliteRecord = Satrec()
-            omm.initialize( satelliteRecord, ommData )
-            self.tleLineOne, self.tleLineTwo = exporter.export_tle( satelliteRecord )
-
-        # if self.tleLineOne is None:
-        #     self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecordTLESafe )
-
-        return self.tleLineOne, self.tleLineTwo
 
 
     def getName( self ):
@@ -114,8 +73,36 @@ class GP( object ):
         return str( self.satelliteRecord.satnum )
 
 
+    def getInternationalDesignator( self ):
+        return self.satelliteRecord.intldesg
+
+
     def getSatelliteRecord( self ):
         return self.satelliteRecord
+
+
+    def getTLELineOneLineTwo( self ):
+        if self.tleLineOne is None:
+            if self.satelliteRecord.satnum > 99999:
+                # The TLE format does not support satellite catalog numbers (NORAD number) greater than 99,999.
+                #
+                # When the SGP4 exporter converts from OMM to TLE, such a catalog number will be erroneously omitted:
+                #    https://github.com/brandon-rhodes/python-sgp4/issues/97
+                #
+                # Ideally set the catalog number to '0' (which is unused) after the OMM object is initialised
+                # (before the export to TLE); unfortunately, the catalog number is protected.
+                #
+                # Therefore, export to OMM, set the catalog number to '0' then export to TLE.
+                ommData = exporter.export_omm( self.satelliteRecord, self.getName() )
+                ommData[ "NORAD_CAT_ID" ] = str( 0 )
+                satelliteRecord = Satrec()
+                omm.initialize( satelliteRecord, ommData )
+                self.tleLineOne, self.tleLineTwo = exporter.export_tle( satelliteRecord )
+
+            else:
+                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+
+        return self.tleLineOne, self.tleLineTwo
 
 
     def __str__( self ):
