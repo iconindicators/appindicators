@@ -29,10 +29,10 @@ import argparse, textwrap
 
 
 # Indices for columns at http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt.
-nameStart = 19
-nameEnd = 36
-hipStart = 91
-hipEnd = 96
+iaucsnNameStart = 19
+iaucsnNameEnd = 36
+iaucsnHipStart = 91
+iaucsnHipEnd = 96
 
 
 def getStarsAndHIPs( iauCatalogFile ):
@@ -44,9 +44,9 @@ def getStarsAndHIPs( iauCatalogFile ):
             continue
 
         try:
-            nameUTF8 = line[ nameStart - 1 : nameEnd - 1 + 1 ].strip()
+            nameUTF8 = line[ iaucsnNameStart - 1 : iaucsnNameEnd - 1 + 1 ].strip()
             if nameUTF8 in starsFromPyEphem:
-                hip = int( line[ hipStart - 1 : hipEnd - 1 + 1 ] )
+                hip = int( line[ iaucsnHipStart - 1 : iaucsnHipEnd - 1 + 1 ] )
                 starsAndHIPsFromIAU.append( [ nameUTF8, hip ] )
 
         except ValueError:
@@ -63,11 +63,11 @@ def printFormattedStars( starsAndHIPs ):
         print(
             "        [ " + \
             "\"" + name.upper() + "\"," + \
-            ( ' ' * ( nameEnd - nameStart - len( name ) + 1 ) ) + \
+            ( ' ' * ( iaucsnNameEnd - iaucsnNameStart - len( name ) + 1 ) ) + \
             str( hip ) + ", " + \
-            ( ' ' * ( hipEnd - hipStart - len( str( hip ) ) + 1 ) ) + \
+            ( ' ' * ( iaucsnHipEnd - iaucsnHipStart - len( str( hip ) ) + 1 ) ) + \
             "_( \"" + name.title() + "\" )," + \
-            ( ' ' * ( nameEnd - nameStart - len( name ) + 1 ) ) + \
+            ( ' ' * ( iaucsnNameEnd - iaucsnNameStart - len( name ) + 1 ) ) + \
             "_( \"" + name.upper() + "\" ) ]," )
 
     print( "Done" )
@@ -123,7 +123,7 @@ def printEphemerisPyEphem( bspFile , starEphemeris, starsAndHIPs ):
         ]
 
         line = ','.join( str( item ) for item in components )
-        print( "        \"" + name.upper() + "\"" + ( ' ' * ( nameEnd - nameStart - len( name ) + 1 ) ) + ": \"" + line + "\"," )
+        print( "        \"" + name.upper() + "\"" + ( ' ' * ( iaucsnNameEnd - iaucsnNameStart - len( name ) + 1 ) ) + ": \"" + line + "\"," )
 
     print( "Done" )
 
