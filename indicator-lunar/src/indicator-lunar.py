@@ -38,8 +38,8 @@ gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
 
-from dataproviderapparentmagnitude import AM, DataProviderApparentMagnitude
-from dataprovidergeneralperturbation import DataProviderGeneralPerturbation, GP
+from dataproviderapparentmagnitude import DataProviderApparentMagnitude
+from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
 from dataproviderorbitalelement import DataProviderOrbitalElement, OE
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
