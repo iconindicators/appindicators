@@ -270,9 +270,6 @@ class IndicatorLunar( IndicatorBase ):
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
 
-        utcNow += datetime.timedelta( days = 14 )
-        utcNow += datetime.timedelta( hours = 8 )
-
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 
@@ -289,16 +286,6 @@ class IndicatorLunar( IndicatorBase ):
             self.minorPlanets, self.minorPlanetOrbitalElementData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
             self.getLogging() )
-
-        # lunarIlluminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) ) #TODO Check what happens at full...is it 100% ever?
-        key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
-        print( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] )
-        print( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) )
-        print( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
-        print( int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) ) )
-        print( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ] )
-
-
 
         if self.dataPrevious is None: # Happens only on first run or when the user alters the satellite visibility window.
             self.dataPrevious = self.data
@@ -529,7 +516,7 @@ class IndicatorLunar( IndicatorBase ):
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) ) #TODO Check what happens at full...is it 100% ever?
+        lunarIlluminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.getSVGIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
         iconFilename = self.writeCacheText( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
@@ -539,7 +526,7 @@ class IndicatorLunar( IndicatorBase ):
     def notificationFullMoon( self ):
         utcNow = datetime.datetime.utcnow()
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) )
+        lunarIlluminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         lunarPhase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
 
         if ( lunarPhase == IndicatorLunar.astroBackend.LUNAR_PHASE_WAXING_GIBBOUS or lunarPhase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON ) and \
