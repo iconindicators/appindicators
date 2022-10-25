@@ -270,6 +270,25 @@ class IndicatorLunar( IndicatorBase ):
     def update( self, menu ):
         utcNow = datetime.datetime.utcnow()
 
+        utcNow = utcNow + datetime.timedelta( days = 29 )
+        utcNow = utcNow + datetime.timedelta( hours = 0 )
+        # utcNow = utcNow + datetime.timedelta( minutes = 18 )
+        print( utcNow.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ).strftime( str( IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM ) ) )
+
+# 8
+# 2022-11-08  21:50
+# 99 True
+
+# 9
+# 2022-11-08  22:51
+# 99 False
+
+# 15 7 
+# 13 9
+
+
+
+
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
 

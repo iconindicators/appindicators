@@ -330,7 +330,7 @@ class AstroSkyfield( AstroBase ):
         moonAtNowApparent = moonAtNow.apparent()
 
         sun = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ]
-        illumination = int( moonAtNowApparent.fraction_illuminated( sun ) * 100 )
+        # illumination = int( moonAtNowApparent.fraction_illuminated( sun ) * 100 ) #TODO As per PyEphem, see what happens if the int() is removed.  Can it ever be over 100%
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         dateTimes, events = almanac.find_discrete( now, nowPlusThirtyOneDays, almanac.moon_phases( AstroSkyfield.__EPHEMERIS_PLANETS ) )

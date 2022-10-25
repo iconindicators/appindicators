@@ -561,38 +561,55 @@ class AstroBase( ABC ):
     #    nextNewMoonDate The date of the next new moon.
     @staticmethod
     def getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
-        phase = None
-        if nextFullMoonDate < nextNewMoonDate: # Between a new moon and a full moon...
-            if( illuminationPercentage > 99 ):
-                phase = AstroBase.LUNAR_PHASE_FULL_MOON
+        if( illuminationPercentage >= 99 ):
+            phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
-            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
+        elif illuminationPercentage <= 1:
+            phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
-            elif illuminationPercentage == 50:
-                phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
+        else: # 1 < illuminationPercentage < 99
+            betweenNewAndFull = nextNewMoonDate > nextFullMoonDate
+            if illuminationPercentage > 51:
+                phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS if betweenNewAndFull else AstroBase.LUNAR_PHASE_WANING_GIBBOUS
 
-            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
+            elif illuminationPercentage < 49:
+                phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT if betweenNewAndFull else AstroBase.LUNAR_PHASE_WANING_CRESCENT
 
-            else: # illuminationPercentage < 1
-                phase = AstroBase.LUNAR_PHASE_NEW_MOON
+            else: # illuminationPercentage == 50
+                phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER if betweenNewAndFull else AstroBase.LUNAR_PHASE_THIRD_QUARTER
 
-        else: # Between a full moon and the next new moon...
-            if( illuminationPercentage > 99 ):
-                phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
-            elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-                phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
-
-            elif illuminationPercentage == 50:
-                phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
-
-            elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-                phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
-
-            else: # illuminationPercentage < 1
-                phase = AstroBase.LUNAR_PHASE_NEW_MOON
+        # if nextFullMoonDate < nextNewMoonDate: # Between a new moon and a full moon...
+        #     if( illuminationPercentage >= 99 ):
+        #         phase = AstroBase.LUNAR_PHASE_FULL_MOON
+        #
+        #     elif illuminationPercentage < 99 and illuminationPercentage > 50:
+        #         phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
+        #
+        #     elif illuminationPercentage == 50: #TODO Test this happens
+        #         phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
+        #
+        #     elif illuminationPercentage < 50 and illuminationPercentage > 1:
+        #         phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
+        #
+        #     else: # illuminationPercentage <= 1
+        #         phase = AstroBase.LUNAR_PHASE_NEW_MOON
+        #
+        # else: # Between a full moon and the next new moon...
+        #     if( illuminationPercentage > 99 ):
+        #         phase = AstroBase.LUNAR_PHASE_FULL_MOON
+        #
+        #     elif illuminationPercentage <= 99 and illuminationPercentage > 50:
+        #         phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
+        #
+        #     elif illuminationPercentage == 50:
+        #         phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
+        #
+        #     elif illuminationPercentage < 50 and illuminationPercentage >= 1:
+        #         phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
+        #
+        #     else: # illuminationPercentage < 1
+        #         phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         return phase
 
