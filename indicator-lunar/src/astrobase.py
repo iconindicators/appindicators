@@ -561,7 +561,7 @@ class AstroBase( ABC ):
     #    nextNewMoonDate The date of the next new moon.
     @staticmethod
     def getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
-        if( illuminationPercentage >= 99 ):
+        if illuminationPercentage >= 99:
             phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
         elif illuminationPercentage <= 1:
