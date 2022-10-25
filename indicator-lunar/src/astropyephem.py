@@ -252,7 +252,7 @@ class AstroPyEphem( AstroBase ):
         moon = ephem.Moon( observer )
         sun = ephem.Sun( observer )
 
-        data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( int( moon.phase ) ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( moon.phase ) # Needed for icon.
 
         phase = AstroBase.getLunarPhase( moon.phase, ephem.next_full_moon( ephemNow ), ephem.next_new_moon( ephemNow ) ) # Need for notification.
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase

@@ -556,7 +556,7 @@ class AstroBase( ABC ):
 
     # Get the lunar phase.
     #
-    #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+    #    illuminationPercentage The brightness from 0 to 100 inclusive.
     #    nextFullMoonDate The date of the next full moon.
     #    nextNewMoonDate The date of the next new moon.
     @staticmethod
@@ -577,39 +577,6 @@ class AstroBase( ABC ):
 
             else: # illuminationPercentage == 50
                 phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER if betweenNewAndFull else AstroBase.LUNAR_PHASE_THIRD_QUARTER
-
-
-        # if nextFullMoonDate < nextNewMoonDate: # Between a new moon and a full moon...
-        #     if( illuminationPercentage >= 99 ):
-        #         phase = AstroBase.LUNAR_PHASE_FULL_MOON
-        #
-        #     elif illuminationPercentage < 99 and illuminationPercentage > 50:
-        #         phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
-        #
-        #     elif illuminationPercentage == 50: #TODO Test this happens
-        #         phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
-        #
-        #     elif illuminationPercentage < 50 and illuminationPercentage > 1:
-        #         phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
-        #
-        #     else: # illuminationPercentage <= 1
-        #         phase = AstroBase.LUNAR_PHASE_NEW_MOON
-        #
-        # else: # Between a full moon and the next new moon...
-        #     if( illuminationPercentage > 99 ):
-        #         phase = AstroBase.LUNAR_PHASE_FULL_MOON
-        #
-        #     elif illuminationPercentage <= 99 and illuminationPercentage > 50:
-        #         phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
-        #
-        #     elif illuminationPercentage == 50:
-        #         phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
-        #
-        #     elif illuminationPercentage < 50 and illuminationPercentage >= 1:
-        #         phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
-        #
-        #     else: # illuminationPercentage < 1
-        #         phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         return phase
 
