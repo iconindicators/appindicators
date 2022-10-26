@@ -575,7 +575,7 @@ class AstroBase( ABC ):
             elif illuminationPercentage < 49:
                 phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT if betweenNewAndFull else AstroBase.LUNAR_PHASE_WANING_CRESCENT
 
-            else: # illuminationPercentage == 50
+            else:
                 phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER if betweenNewAndFull else AstroBase.LUNAR_PHASE_THIRD_QUARTER
 
         return phase

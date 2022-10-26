@@ -516,9 +516,10 @@ class IndicatorLunar( IndicatorBase ):
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
-        lunarBrightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
-        svgIconText = self.getSVGIconText( lunarIlluminationPercentage, lunarBrightLimbAngleInDegrees )
+        phase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
+        illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
+        brightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
+        svgIconText = self.getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
         iconFilename = self.writeCacheText( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
@@ -526,11 +527,11 @@ class IndicatorLunar( IndicatorBase ):
     def notificationFullMoon( self ):
         utcNow = datetime.datetime.utcnow()
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
-        lunarIlluminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
-        lunarPhase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
+        illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
+        phase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
 
-        if ( lunarPhase == IndicatorLunar.astroBackend.LUNAR_PHASE_WAXING_GIBBOUS or lunarPhase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON ) and \
-           lunarIlluminationPercentage >= 96 and \
+        if ( phase == IndicatorLunar.astroBackend.LUNAR_PHASE_WAXING_GIBBOUS or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON ) and \
+           illuminationPercentage >= 96 and \
            ( ( self.lastFullMoonNotfication + datetime.timedelta( hours = 1 ) ) < utcNow ):
 
             summary = self.werewolfWarningSummary
@@ -543,7 +544,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def createFullMoonIcon( self ):
         return self.writeCacheText(
-            self.getSVGIconText( 100, None ),
+            self.getSVGIconText( IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON, None, None ),
             IndicatorLunar.ICON_CACHE_BASENAME,
             IndicatorLunar.EXTENSION_SVG )
 
@@ -1101,37 +1102,38 @@ class IndicatorLunar( IndicatorBase ):
 
     # Creates the SVG icon text representing the moon given the illumination and bright limb angle.
     #
+    #    phase The current phase of the moon.
     #    illuminationPercentage The brightness ranging from 0 to 100 inclusive.
-    #
-    #    brightLimbAngleInDegrees The angle of the bright limb, relative to zenith, ranging from 0 to 360 inclusive.
-    #                             Ignored if illuminationPercentage is 0 or 100.
-    def getSVGIconText( self, illuminationPercentage, brightLimbAngleInDegrees ):
+    #                           Ignored when phase is full/new or first/third quarter.
+    #    brightLimbAngleInDegrees Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
+    #                             Ignored when phase is full/new.
+    def getSVGIconText( self, phase, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
         height = 100
         radius = float( width / 2 ) * 0.8 # Ensure the icon takes up most of the viewing area with a small boundary.
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
 
-        if illuminationPercentage == 0 or illuminationPercentage == 100:
+        if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
-            if illuminationPercentage == 0: # New
+            if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
                 body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
 
             else: # Full
                 body += '" fill="#' + colour + '" />'
 
-        else:
+        else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
             body = '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
                    'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
                    str( width / 2 + radius ) + ' ' + str( height / 2 )
 
-            if illuminationPercentage == 50: # Quarter
+            if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FIRST_QUARTER or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_THIRD_QUARTER:
                 body += ' Z"'
 
-            elif illuminationPercentage < 50: # Crescent
+            elif phase == IndicatorLunar.astroBackend.LUNAR_PHASE_WANING_CRESCENT or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_WAXING_CRESCENT:
                 body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 ' + \
                         str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
-            else: # Gibbous
+            else: # Waning/Waxing Gibbous
                 body += ' A ' + str( radius ) + ' ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 ' + \
                         str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
