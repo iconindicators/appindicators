@@ -47,6 +47,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
     SERIES = [
+        "lunar",
         "kinetic",
         "jammy",
         "impish",
@@ -103,7 +104,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.76",
+            version = "1.0.77",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 

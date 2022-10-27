@@ -1,5 +1,12 @@
 indicator-ppa-download-statistics (1.0.76-1) bionic; urgency=low
 
+  * Added lunar to the list of series.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Oct 2022 9:37:23 +1000
+
+
+indicator-ppa-download-statistics (1.0.76-1) bionic; urgency=low
+
   * The debian/compat file had version 11 whereas should have been version 10
     which caused build problems.
 
