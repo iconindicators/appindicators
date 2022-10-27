@@ -19,6 +19,11 @@
 # Application indicator for VirtualBox™ virtual machines.
 
 
+#TODO Can the list of VMs in the indicator menu and in the preferences dialog be sorted the same way?
+# Can or should the VMs be sorted by group (alphabeticallY) then by machine (alphabetically)?
+# What is the relationship, if any, between what VirtualBoxManager displays and how I sort?
+
+
 INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
