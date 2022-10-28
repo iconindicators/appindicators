@@ -35,8 +35,9 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
 from indicatorbase import IndicatorBase
+from virtualmachine import Group, VirtualMachine
 
-import datetime, os, time, virtualmachine
+import datetime, os, time
 
 
 class IndicatorVirtualBox( IndicatorBase ):
@@ -87,17 +88,32 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def buildMenu( self, menu ):
+
+        def addItemsToStore( menu, items, indent ):
+            for item in sorted( items, key = lambda x: ( type( x ) is not Group, x.getName() ) ): # Checking if an item is a group, the result is True (1) or False (0).
+                if type( item ) is Group:
+                    print( "    " * indent + item.getName() )
+                    addItemsToStore( self.__addGroupToMenu( menu, item, indent, runningUUIDs ), item.getItems(), indent + 1 )
+
+                else:
+                    uuid = item.getUUID()
+                    self.__addVirtualMachineToMenu( menu, item, indent, item.getUUID() in runningUUIDs )
+                    print( "    " * indent + item.getName() )
+
+
         if self.isVBoxManageInstalled():
             virtualMachines = self.getVirtualMachines()
             if virtualMachines:
                 runningNames, runningUUIDs = self.getRunningVirtualMachines()
-                for item in sorted( virtualMachines, key = lambda item: item.getName().lower() ):
-                    if type( item ) == virtualmachine.Group:
-                        self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
-
-                    else:
-                        self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningUUIDs )
-
+                addItemsToStore( menu, self.getVirtualMachines(), 0 )
+            #     runningNames, runningUUIDs = self.getRunningVirtualMachines()
+            #     for item in sorted( virtualMachines, key = lambda item: item.getName().lower() ):
+            #         if type( item ) is Group: #TODO Fix
+            #             self.addMenuItemForGroup( menu, item, 0, runningUUIDs )
+            #
+            #         else:
+            #             self.addMenuItemForVirtualMachine( menu, item, 0, item.getUUID() in runningUUIDs )
+            #
             else:
                 menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
 
@@ -112,6 +128,34 @@ class IndicatorVirtualBox( IndicatorBase ):
             menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
 
 
+    def __addGroupToMenu( self, menu, group, level, runningUUIDs ):
+        indent = level * self.getMenuIndent( 1 )
+        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
+        menu.append( menuItem )
+
+        if self.showSubmenu:
+            menu = Gtk.Menu()
+            menuItem.set_submenu( menu )
+
+        return menu
+
+
+    def __addVirtualMachineToMenu( self, menu, virtualMachine, level, isRunning ):
+        indent = level * self.getMenuIndent( 1 )
+        if isRunning:
+            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
+            menuItem.set_active( True )
+
+        else:
+            menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )
+
+        menuItem.connect( "activate", self._onVirtualMachine, virtualMachine )
+        menu.append( menuItem )
+
+
+
+
+
     def addMenuItemForGroup( self, menu, group, level, runningUUIDs ):
         indent = level * self.getMenuIndent( 1 )
         menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
@@ -122,7 +166,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             menuItem.set_submenu( menu )
 
         for item in sorted( group.getItems(), key = lambda item: item.getName().lower() ):
-            if type( item ) == virtualmachine.Group:
+            if type( item ) is Group:  #TODO Fix
                 self.addMenuItemForGroup( menu, item, level + 1, runningUUIDs )
 
             else:
@@ -172,7 +216,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __getVirtualMachinesForAutoStart( self, virtualMachines, virtualMachinesForAutoStart ):
         for item in virtualMachines:
-            if type( item ) == virtualmachine.Group:
+            if type( item ) is Group:  #TODO Fix
                 self.__getVirtualMachinesForAutoStart( item.getItems(), virtualMachinesForAutoStart )
 
             else:
@@ -284,19 +328,19 @@ class IndicatorVirtualBox( IndicatorBase ):
     def getVirtualMachines( self ):
         virtualMachines = [ ]
         try:
-            def addVirtualMachine( group, name, uuid, groups ):
+            def __addVirtualMachineToMenu( group, name, uuid, groups ):
                 for groupName in groups:
-                    theGroup = next( ( x for x in group.getItems() if type( x ) == virtualmachine.Group and x.getName() == groupName ), None )
+                    theGroup = next( ( x for x in group.getItems() if type( x ) is Group and x.getName() == groupName ), None ) #TODO Fix
                     if theGroup is None:
-                        theGroup = virtualmachine.Group( groupName )
+                        theGroup = Group( groupName )  #TODO Fix
                         group.addItem( theGroup )
 
                     group = theGroup
 
-                group.addItem( virtualmachine.VirtualMachine( name, uuid ) )
+                group.addItem( VirtualMachine( name, uuid ) ) #TODO Fix
 
 
-            topGroup = virtualmachine.Group( "" ) # Only needed whilst parsing results from VBoxManage...
+            topGroup = Group( "" ) # Only needed whilst parsing results from VBoxManage...    #TODO Fix
             listVirtualMachines = self.processGet( "VBoxManage list vms --long" )
             for line in listVirtualMachines.splitlines():
                 if line.startswith( "Name:" ):
@@ -349,7 +393,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         def addItemsToStore( parent, items ):
             groupsExist = False
             for item in items:
-                if type( item ) == virtualmachine.Group:
+                if type( item ) is Group: #TODO Fix
                     groupsExist = True
                     addItemsToStore( treeStore.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
 
