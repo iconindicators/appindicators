@@ -1,3 +1,12 @@
+indicator-virtual-box (1.0.70-1) bionic; urgency=low
+
+  * Unified the indicator menu and Preferences dialog such that groups are
+    displayed first, sorted alphabetically, followed by virtual machines,
+    again sorted alphabetically.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 9:34:19 +1000
+
+
 indicator-virtual-box (1.0.69-1) bionic; urgency=low
 
   * Bug fix: When bringing a running virtual machine window to front fails
