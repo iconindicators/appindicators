@@ -1,10 +1,11 @@
 indicator-virtual-box (1.0.70-1) bionic; urgency=low
 
-  * Unified the indicator menu and Preferences dialog such that groups are
-    displayed first, sorted alphabetically, followed by virtual machines,
-    again sorted alphabetically.
+  * Bug fix: nested groups were unsorted and the indicator menu was sorted
+    differently to that in the Preferences dialog.
+    A new preference has been added to sort groups and virtual machines equally
+    or instead, sort groups first, followed by virtual machines.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 9:34:19 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 10:32:19 +1000
 
 
 indicator-virtual-box (1.0.69-1) bionic; urgency=low
