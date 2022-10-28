@@ -40,6 +40,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
+    CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY = "sortGroupsAndVirtualMachinesEqually"
     CONFIG_VIRTUAL_MACHINE_PREFERENCES = "virtualMachinePreferences"
     CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME = "virtualboxManagerWindowName"
 
@@ -105,7 +106,14 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __buildMenu( self, menu, items, indent, runningUUIDs ):
         # for item in sorted( items, key = lambda x: ( type( x ) is not Group, x.getName() ) ): # Checking if an item is a group results in True (1) or False (0).
-        for item in sorted( items, key = lambda x: ( x.getName().lower() ) ): # Checking if an item is a group results in True (1) or False (0).
+        # for item in sorted( items, key = lambda x: ( x.getName().lower() ) ): # Checking if an item is a group results in True (1) or False (0).
+        if self.sortGroupsAndVirtualMachinesEqually:
+            sortedItems = sorted( items, key = lambda x: ( x.getName().lower() ) )
+
+        else:
+            sortedItems = sorted( items, key = lambda x: ( type( x ) is not Group, x.getName().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+
+        for item in sortedItems:
             if type( item ) is Group:
                 self.__buildMenu(
                     self.__addGroupToMenu( menu, item, indent, runningUUIDs ),
@@ -390,13 +398,23 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         grid.attach( box, 0, 0, 1, 1 )
 
+        sortGroupsAndVirtualMachinesEquallyCheckbox = Gtk.CheckButton.new_with_label( _( "Sort groups and virtual machines equally" ) )
+        sortGroupsAndVirtualMachinesEquallyCheckbox.set_tooltip_text( _(
+            "If checked, groups and virtual machines\n" + \
+            "are sorted without distinction.\n\n" + \
+            "Otherwise, groups are sorted first,\n" + \
+            "followed by virtual machines." ) )
+        sortGroupsAndVirtualMachinesEquallyCheckbox.set_active( self.sortGroupsAndVirtualMachinesEqually )
+
+        grid.attach( sortGroupsAndVirtualMachinesEquallyCheckbox, 0, 1, 1, 1 )
+
         showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show groups as submenus" ) )
         showAsSubmenusCheckbox.set_tooltip_text( _(
             "If checked, groups are shown using submenus.\n\n" + \
             "Otherwise, groups are shown as an indented list." ) )
         showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
-        row = 1
+        row = 2
         if groupsExist:
             grid.attach( showAsSubmenusCheckbox, 0, row, 1, 1 )
             row += 1
@@ -449,6 +467,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.virtualboxManagerWindowName = windowName.get_text().strip()
             self.delayBetweenAutoStartInSeconds = spinnerDelay.get_value_as_int()
             self.showSubmenu = showAsSubmenusCheckbox.get_active()
+            self.sortGroupsAndVirtualMachinesEqually = sortGroupsAndVirtualMachinesEquallyCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
             self.__updateVirtualMachinePreferences( treeStore, treeView.get_model().get_iter_first() )
@@ -459,7 +478,14 @@ class IndicatorVirtualBox( IndicatorBase ):
     def __addItemsToStore( self, treeStore, parent, items ):
         groupsExist = False
         # for item in sorted( items, key = lambda x: ( type( x ) is not Group, x.getName() ) ): # Checking if an item is a group results in True (1) or False (0).
-        for item in sorted( items, key = lambda x: ( x.getName().lower() ) ): # Checking if an item is a group results in True (1) or False (0).
+        # for item in sorted( items, key = lambda x: ( x.getName().lower() ) ): # Checking if an item is a group results in True (1) or False (0).
+        if self.sortGroupsAndVirtualMachinesEqually:
+            sortedItems = sorted( items, key = lambda x: ( x.getName().lower() ) )
+
+        else:
+            sortedItems = sorted( items, key = lambda x: ( type( x ) is not Group, x.getName().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+
+        for item in sortedItems:
             if type( item ) is Group:
                 groupsExist = True
                 self.__addItemsToStore( treeStore, treeStore.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
@@ -555,6 +581,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self.delayBetweenAutoStartInSeconds = config.get( IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS, 10 )
         self.refreshIntervalInMinutes = config.get( IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
         self.showSubmenu = config.get( IndicatorVirtualBox.CONFIG_SHOW_SUBMENU, False )
+        self.sortGroupsAndVirtualMachinesEqually = config.get( IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY, True )
         self.virtualMachinePreferences = config.get( IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES, { } ) # Store information about VMs.  Key is VM UUID; value is [ autostart (bool), start command (str) ]
         self.virtualboxManagerWindowName = config.get( IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME, "Oracle VM VirtualBox Manager" )
 
@@ -564,6 +591,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS : self.delayBetweenAutoStartInSeconds,
             IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES : self.refreshIntervalInMinutes,
             IndicatorVirtualBox.CONFIG_SHOW_SUBMENU : self.showSubmenu,
+            IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY : self.sortGroupsAndVirtualMachinesEqually,
             IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES : self.virtualMachinePreferences,
             IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME : self.virtualboxManagerWindowName
         }
