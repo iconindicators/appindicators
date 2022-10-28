@@ -105,8 +105,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def __buildMenu( self, menu, items, indent, runningUUIDs ):
-        # for item in sorted( items, key = lambda x: ( type( x ) is not Group, x.getName() ) ): # Checking if an item is a group results in True (1) or False (0).
-        # for item in sorted( items, key = lambda x: ( x.getName().lower() ) ): # Checking if an item is a group results in True (1) or False (0).
         if self.sortGroupsAndVirtualMachinesEqually:
             sortedItems = sorted( items, key = lambda x: ( x.getName().lower() ) )
 
@@ -477,8 +475,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __addItemsToStore( self, treeStore, parent, items ):
         groupsExist = False
-        # for item in sorted( items, key = lambda x: ( type( x ) is not Group, x.getName() ) ): # Checking if an item is a group results in True (1) or False (0).
-        # for item in sorted( items, key = lambda x: ( x.getName().lower() ) ): # Checking if an item is a group results in True (1) or False (0).
         if self.sortGroupsAndVirtualMachinesEqually:
             sortedItems = sorted( items, key = lambda x: ( x.getName().lower() ) )
 
@@ -488,7 +484,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         for item in sortedItems:
             if type( item ) is Group:
                 groupsExist = True
-                self.__addItemsToStore( treeStore, treeStore.append( parent, [ item.getName(), None, None, None ] ), item.getItems() )
+                self.__addItemsToStore(
+                    treeStore,
+                    treeStore.append( parent, [ item.getName(), None, None, None ] ),
+                    item.getItems() )
 
             else:
                 row = [
