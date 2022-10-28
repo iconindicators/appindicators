@@ -1,5 +1,5 @@
 # Portable Object Template for indicator-virtual-box.
-# Copyright (C) 2015-2021 Bernard Giannetti
+# Copyright (C) 2015-2022 Bernard Giannetti
 # This file is distributed under the same license as the indicator-virtual-box package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
