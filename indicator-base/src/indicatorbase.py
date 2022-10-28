@@ -370,7 +370,7 @@ class IndicatorBase( ABC ):
         dialog.set_title( title )
         messageArea = dialog.get_message_area()
         for child in messageArea.get_children():
-            if type( child ) == Gtk.Label:
+            if type( child ) is Gtk.Label:
                 child.set_selectable( True )
 
         dialog.run()
