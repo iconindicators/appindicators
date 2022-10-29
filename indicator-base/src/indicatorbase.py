@@ -72,17 +72,15 @@ class IndicatorBase( ABC ):
         self.version = version
         self.copyrightStartYear = copyrightStartYear
         self.comments = comments
-
-        self.icon = self.indicatorName # Located in /usr/share/icons
-        self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
-        self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-
-        self.copyrightName = "Bernard Giannetti"
-        self.authors = [ self.copyrightName + " " + self.website ]
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
         self.debug = debug
 
+        self.icon = self.indicatorName # Located in /usr/share/icons
+        self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
+        self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
+        self.copyrightName = "Bernard Giannetti"
+        self.authors = [ self.copyrightName + " " + self.website ]
         self.secondaryActivateTarget = None
         self.updateTimerID = None
 
