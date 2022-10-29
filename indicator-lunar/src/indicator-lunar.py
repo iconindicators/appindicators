@@ -175,7 +175,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.96",
+            version = "1.0.97",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
             creditz = IndicatorLunar.CREDIT )
@@ -1110,7 +1110,7 @@ class IndicatorLunar( IndicatorBase ):
     def getSVGIconText( self, phase, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
         height = 100
-        radius = float( width / 2 ) * 0.8 # Ensure the icon takes up most of the viewing area with a small boundary.
+        radius = float( width / 2 )
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
 
         if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:

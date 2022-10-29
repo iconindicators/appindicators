@@ -1,3 +1,10 @@
+indicator-lunar (1.0.97-1) bionic; urgency=low
+
+  * Increased size of icon to take up entire permissible area.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
+
+
 indicator-lunar (1.0.96-1) bionic; urgency=low
 
   * Bug fix: PyEphem/XEphem credit omitted from previous release.

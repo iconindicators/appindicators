@@ -1,8 +1,9 @@
 indicator-stardate (1.0.41-1) bionic; urgency=low
 
+  * Increased size of icon to take up entire permissible area.
   * Update release to bionic as xenial is end of life.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 May 2022 23:12:37 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
 
 
 indicator-stardate (1.0.40-1) xenial; urgency=low

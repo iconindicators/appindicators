@@ -1,3 +1,10 @@
+indicator-on-this-day (1.0.12-1) bionic; urgency=low
+
+  * Increased size of icon to take up entire permissible area.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
+
+
 indicator-on-this-day (1.0.11-1) bionic; urgency=low
 
   * The debian/compat file had version 11 whereas should have been version 10

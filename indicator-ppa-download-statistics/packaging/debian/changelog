@@ -1,8 +1,9 @@
-indicator-ppa-download-statistics (1.0.76-1) bionic; urgency=low
+indicator-ppa-download-statistics (1.0.77-1) bionic; urgency=low
 
+  * Increased size of icon to take up entire permissible area.
   * Added lunar to the list of series.
 
- -- Bernard Giannetti <thebernmeister@hotmail.com>  Fri, 28 Oct 2022 9:37:23 +1000
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
 
 
 indicator-ppa-download-statistics (1.0.76-1) bionic; urgency=low

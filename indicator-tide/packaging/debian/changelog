@@ -1,3 +1,10 @@
+indicator-tide (1.0.26-1) bionic; urgency=low
+
+  * Increased size of icon to take up entire permissible area.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
+
+
 indicator-tide (1.0.25-1) bionic; urgency=low
 
   * Around the middle of 2021, the UKHO reduced their coverage of tidal data

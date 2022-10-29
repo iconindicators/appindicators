@@ -1,3 +1,10 @@
+indicator-script-runner (1.0.19-1) bionic; urgency=low
+
+  * Increased size of icon to take up entire permissible area.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
+
+
 indicator-script-runner (1.0.18-1) bionic; urgency=low
 
   * Workaround for odd focus behaviour; in the Preferences dialog, when

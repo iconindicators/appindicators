@@ -1,3 +1,10 @@
+indicator-virtual-box (1.0.71-1) bionic; urgency=low
+
+  * Increased size of icon to take up entire permissible area.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 13:39:27 +1000
+
+
 indicator-virtual-box (1.0.70-1) bionic; urgency=low
 
   * Bug fix: nested groups were unsorted and additionally, the indicator menu

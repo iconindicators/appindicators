@@ -10,7 +10,7 @@
    version="1.1"
    viewBox="0 0 22 22"
    id="svg3109"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
    width="100%"
    height="100%"
    sodipodi:docname="indicator-lunar.svg">
@@ -37,14 +37,14 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1056"
+     inkscape:window-height="1053"
      id="namedview3113"
      showgrid="true"
      inkscape:zoom="26.700352"
-     inkscape:cx="11.656449"
-     inkscape:cy="14.639444"
+     inkscape:cx="10.852088"
+     inkscape:cy="13.960309"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg3109"
      showborder="true"
@@ -62,8 +62,8 @@
        snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <path
-     d="M 15.545453,10.99314 V 1.9931381 a 9.0000006,9.0000006 0 1 0 0,18.0000009 4.5000004,9.0000006 0 1 1 0,-18.0000009"
+     d="M 16.490626,10.99314 V 0.10313801 a 10.890001,10.890001 0 1 0 0,21.78000099 5.4450005,10.890001 0 1 1 0,-21.78000099"
      id="path3111"
      inkscape:connector-curvature="0"
-     style="fill:#fff200" />
+     style="fill:#fff200;stroke-width:1.21000004" />
 </svg>

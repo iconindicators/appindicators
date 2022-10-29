@@ -13,7 +13,7 @@
    height="22"
    width="22"
    version="1.0"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
    sodipodi:docname="indicator-punycode.svg">
   <defs
      id="defs8" />
@@ -27,14 +27,14 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1004"
+     inkscape:window-height="1053"
      id="namedview6"
      showgrid="true"
-     inkscape:zoom="64.136364"
-     inkscape:cx="8.5801978"
-     inkscape:cy="9.5427053"
+     inkscape:zoom="32.068182"
+     inkscape:cx="10.009937"
+     inkscape:cy="10.588365"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg3229">
     <inkscape:grid
@@ -49,59 +49,59 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <g
-     transform="translate(0,0.99038912)"
+     transform="matrix(1.2,0,0,1.2,-2.2,-1.1269147)"
      id="g3821-8"
      style="opacity:0.2">
     <text
-       sodipodi:linespacing="125%"
        id="text3766-5"
        y="16.186235"
        x="1"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="16.186235"
          x="1"
          id="tspan3768-7"
-         sodipodi:role="line">Я</tspan></text>
+         sodipodi:role="line"
+         style="font-size:14px;line-height:1.25;font-family:sans-serif">Я</tspan></text>
     <text
        transform="scale(-1,1)"
-       sodipodi:linespacing="125%"
        id="text3766-8-8"
        y="16.183247"
        x="-21"
-       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="16.183247"
          x="-21"
          id="tspan3768-8-6"
-         sodipodi:role="line">Я</tspan></text>
+         sodipodi:role="line"
+         style="font-size:14px;line-height:1.25;font-family:sans-serif">Я</tspan></text>
   </g>
   <text
      xml:space="preserve"
-     style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#78dc96;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
-     x="1"
-     y="16.186235"
-     id="text3766"
-     sodipodi:linespacing="125%"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#78dc96;fill-opacity:1;stroke:none;stroke-width:1.20000005"
+     x="-1"
+     y="17.108101"
+     id="text3766"><tspan
        sodipodi:role="line"
        id="tspan3768"
-       x="1"
-       y="16.186235">Я</tspan></text>
+       x="-1"
+       y="17.108101"
+       style="font-size:16.79999924px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005">Я</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:14px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Bold"
-     x="-21"
-     y="16.183247"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;stroke-width:1.20000005"
+     x="-23"
+     y="17.104515"
      id="text3766-8"
-     sodipodi:linespacing="125%"
      transform="scale(-1,1)"><tspan
        sodipodi:role="line"
        id="tspan3768-8"
-       x="-21"
-       y="16.183247">Я</tspan></text>
+       x="-23"
+       y="17.104515"
+       style="font-size:16.79999924px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005">Я</tspan></text>
 </svg>
