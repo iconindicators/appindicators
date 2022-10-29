@@ -1,6 +1,6 @@
-indicator-fortune (1.0.38-1) bionic; urgency=low
+indicator-fortune (1.0.39-1) bionic; urgency=low
 
-  * Code refactor caused base class variables to be uninitialised. 
+  * Code refactor caused base class variables to be uninitialised.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 15:13:20 +1000
 
