@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-ppa-download-statistics 1.0.77\n"
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.78\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2020-04-02 13:10+1100\n"
 "PO-Revision-Date: 2020-04-06 11:15+0300\n"
