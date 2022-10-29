@@ -1098,76 +1098,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return '[' + self.__createKey( script.getGroup(), script.getName() ) + ']' in self.indicatorText
 
 
-    # In version 14 the 'directory' attribute was removed.
-    # If a value for 'directory' is present, prepend to the 'command'.
-    #
-    # Map the old format scripts from JSON:
-    #
-    #    group, name, directory, command, terminalOpen, playSound, showNotification
-    #
-    # to the new format of script object:
-    #
-    #    group, name, directory + command, terminalOpen, playSound, showNotification
-    def __convertFromVersion13ToVersion14( self, scripts ):
-        convertedScripts = [ ]
-        for script in scripts:
-            convertedScript = [ ]
-            convertedScript.append( script[ 0 ] )
-            convertedScript.append( script[ 1 ] )
-
-            if script[ 2 ] == "": # No directory specified, so only take the command.
-                convertedScript.append( script[ 3 ] )
-
-            else: # Combine the directory and command.
-                convertedScript.append( "cd " + script[ 2 ] + "; " + script[ 3 ] )
-
-            convertedScript.append( script[ 4 ] )
-            convertedScript.append( script[ 5 ] )
-            convertedScript.append( script[ 6 ] )
-            convertedScripts.append( convertedScript )
-
-        return convertedScripts
-
-
-    # In version 16 background scripts were added.
-    # All scripts prior to this change are deemed to be non-background scripts.
-    def __convertFromVersion15ToVersion16( self, scripts, groupDefault, nameDefault ):
-        nonBackgroundScripts = [ ]
-        for script in scripts:
-            nonBackgroundScript = [ ]
-            nonBackgroundScript.append( script[ 0 ] )
-            nonBackgroundScript.append( script[ 1 ] )
-            nonBackgroundScript.append( script[ 2 ] )
-            nonBackgroundScript.append( script[ 4 ] )
-            nonBackgroundScript.append( script[ 5 ] )
-            nonBackgroundScript.append( script[ 3 ] )
-            nonBackgroundScript.append( script[ 0 ] == groupDefault and script[ 1 ] == nameDefault )
-
-            nonBackgroundScripts.append( nonBackgroundScript )
-
-        # Add in sample background scripts and indicator text,
-        # ensuring there is no clash with existing groups! 
-        group = "Background Script Examples"
-        while True:
-            clash = False
-            for script in nonBackgroundScripts:
-                if script[ 0 ] == group:
-                    group += "..."
-                    clash = True
-                    break
-
-            if not clash:
-                break
-
-        backgroundScripts = [ ]
-        backgroundScripts.append( [ group, "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", True, True, 60, True ] )
-        backgroundScripts.append( [ group, "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5, False ] )
-
-        self.indicatorText = " [" + group + "::Internet Down][" + group + "::Available Memory]"
-
-        return nonBackgroundScripts, backgroundScripts
-
-
     def loadConfig( self, config ):
         self.hideGroups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
         self.indicatorText = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" )
@@ -1177,23 +1107,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         self.scripts = [ ]
         if config:
-            if config.get( IndicatorBase.CONFIG_VERSION ) is None: # Need to do upgrade(s)...
-                scripts = config.get( "scripts", [ ] )
-
-                if scripts and len( scripts[ 0 ] ) == 7:
-                    scripts = self.__convertFromVersion13ToVersion14( scripts )
-                    self.requestSaveConfig()
-
-                if scripts and len( scripts[ 0 ] ) == 6:
-                    groupDefault = config.get( "scriptGroupDefault", "" )
-                    nameDefault = config.get( "scriptNameDefault", "" )
-                    scriptsNonBackground, scriptsBackground = self.__convertFromVersion15ToVersion16( scripts, groupDefault, nameDefault )
-                    self.requestSaveConfig()
-
-            else:
-                scriptsNonBackground = config.get( self.CONFIG_SCRIPTS_NON_BACKGROUND, [ ] )
-                scriptsBackground = config.get( self.CONFIG_SCRIPTS_BACKGROUND, [ ] )
-
+            scriptsNonBackground = config.get( self.CONFIG_SCRIPTS_NON_BACKGROUND, [ ] )
             for script in scriptsNonBackground:
                 skript = NonBackground(
                     script[ IndicatorScriptRunner.JSON_GROUP ],
@@ -1206,6 +1120,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 self.scripts.append( skript )
 
+            scriptsBackground = config.get( self.CONFIG_SCRIPTS_BACKGROUND, [ ] )
             for script in scriptsBackground:
                 skript = Background(
                     script[ IndicatorScriptRunner.JSON_GROUP ],
