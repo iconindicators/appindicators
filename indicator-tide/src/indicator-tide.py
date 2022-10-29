@@ -45,7 +45,7 @@ class IndicatorTide( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.26",
+            version = "1.0.27",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information." ) )
 
