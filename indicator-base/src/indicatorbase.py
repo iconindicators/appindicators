@@ -42,7 +42,6 @@ import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 class IndicatorBase( ABC ):
 
     # Private
-    __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
     __DIALOG_DEFAULT_HEIGHT = 480
     __DIALOG_DEFAULT_WIDTH = 640

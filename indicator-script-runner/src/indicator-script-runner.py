@@ -1177,7 +1177,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         self.scripts = [ ]
         if config:
-            if config.get( self.CONFIG_VERSION ) is None: # Need to do upgrade(s)...
+            if config.get( IndicatorBase.CONFIG_VERSION ) is None: # Need to do upgrade(s)...
                 scripts = config.get( "scripts", [ ] )
 
                 if scripts and len( scripts[ 0 ] ) == 7:
