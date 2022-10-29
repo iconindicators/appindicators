@@ -1,9 +1,9 @@
 indicator-virtual-box (1.0.70-1) bionic; urgency=low
 
-  * Bug fix: nested groups were unsorted and the indicator menu was sorted
-    differently to that in the Preferences dialog.
-    A new preference has been added to sort groups and virtual machines equally
-    or instead, sort groups first, followed by virtual machines.
+  * Bug fix: nested groups were unsorted and additionally, the indicator menu
+    was sorted differently to that in the Preferences dialog.
+    A new preference has been added to either sort groups and virtual machines
+    equally, or instead, sort groups first, then followed by virtual machines.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 29 Oct 2022 10:32:19 +1000
 
