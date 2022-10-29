@@ -337,6 +337,8 @@ class AstroPyEphem( AstroBase ):
                     math.isnan( body.sun_distance ) # Have found MPC data may contain ***** in lieu of actual data!
 
             except Exception as e:
+#TODO Cannot release comets stuff until PyEphem 4.1.4 is released.
+#TODO Once running PyEphem 4.1.4, can then easily determine which comets are causing the error and maybe report back to COBS.
                 # Some comets with a near-parabolic orbit will trigger an error...
                 # https://github.com/brandon-rhodes/pyephem/issues/239
                 bad = True
