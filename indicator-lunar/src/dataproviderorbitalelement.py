@@ -233,8 +233,6 @@ class DataProviderOrbitalElement( DataProvider ):
     # Download orbital element data for comets from Comet Observation Database and save to the given filename.
     @staticmethod
     def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType ):
-#TODO Wait on Jure to figure final API...
-# https://cobs.si/help/cobs_api/elements_api/
         url = "https://cobs.si/api/elements.api"
         if orbitalElementDataType == OE.DataType.SKYFIELD_COMET:
             url += "?format=mpc"
