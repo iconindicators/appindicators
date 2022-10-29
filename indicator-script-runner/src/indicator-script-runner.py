@@ -84,7 +84,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.20",
+            version = "1.0.21",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
 
