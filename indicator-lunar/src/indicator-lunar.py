@@ -197,22 +197,12 @@ class IndicatorLunar( IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
 
-        self.__removeCacheFilesVersion89()
         self.__removeCacheFilesVersion93()
         self.__removeCacheFilesVersion94()
         self.__removeCacheFilesVersion95()
 
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
-
-
-    def __removeCacheFilesVersion89( self ):
-        # In version 90, cache data filenames changed format.
-        self.flushCache( "comet-oe-", 0 )
-        self.flushCache( "minorplanet-oe-bright-", 0 )
-        self.flushCache( "minorplanet-oe-critical-", 0 )
-        self.flushCache( "minorplanet-oe-distant-", 0 )
-        self.flushCache( "minorplanet-oe-unusual-", 0 )
 
 
     def __removeCacheFilesVersion93( self ):
