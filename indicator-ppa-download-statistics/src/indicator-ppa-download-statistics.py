@@ -380,7 +380,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             "&exact_match=false&ordered=false"
 
         try:
-            publishedBinaries = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+            publishedBinaries = json.loads( urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
             hasPublisedBinaries = publishedBinaries[ "total_size" ] > 0
 
         except Exception as e:
@@ -412,7 +412,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         while( publishedBinaryCounter < totalPublishedBinaries and ppa.getStatus() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
                 currentURL =  url + "&ws.start=" + str( publishedBinaryCounter )
-                publishedBinaries = json.loads( urlopen( currentURL, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                publishedBinaries = json.loads( urlopen( currentURL, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
                 self.getLogging().error( "Problem with " + currentURL )
@@ -451,7 +451,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.getName() + "/+binarypub/" + \
                     packageId + "?ws.op=getDownloadCount"
 
-                downloadCount = json.loads( urlopen( url, timeout = self.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                downloadCount = json.loads( urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
                 if str( downloadCount ).isnumeric():
                     packageName = publishedBinaries[ "entries" ][ i ][ "binary_package_name" ]
                     packageVersion = publishedBinaries[ "entries" ][ i ][ "binary_package_version" ]
@@ -595,7 +595,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         grid.attach( combinePPAsCheckbutton, 0, 1, 1, 1 )
 
         ignoreVersionArchitectureSpecificCheckbutton = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
-        ignoreVersionArchitectureSpecificCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        ignoreVersionArchitectureSpecificCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         ignoreVersionArchitectureSpecificCheckbutton.set_tooltip_text( _(
             "Sometimes architecture specific\n" + \
             "packages with the same package\n" + \
@@ -629,7 +629,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         label = Gtk.Label.new( _( "  Clip amount" ) )
         label.set_sensitive( sortByDownloadCheckbutton.get_active() )
-        label.set_margin_left( self.INDENT_WIDGET_LEFT )
+        label.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
 
         spinner = self.createSpinButton(

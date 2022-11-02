@@ -322,17 +322,17 @@ class IndicatorFortune( IndicatorBase ):
 
         radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
         radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
-        radioMiddleMouseClickNewFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
+        radioMiddleMouseClickNewFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 1, 1 )
 
         radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
         radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
-        radioMiddleMouseClickCopyLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
+        radioMiddleMouseClickCopyLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 1, 1 )
 
         radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
         radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
-        radioMiddleMouseClickShowLastFortune.set_margin_left( self.INDENT_WIDGET_LEFT )
+        radioMiddleMouseClickShowLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )

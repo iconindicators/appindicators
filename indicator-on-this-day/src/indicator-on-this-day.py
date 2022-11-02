@@ -262,18 +262,18 @@ class IndicatorOnThisDay( IndicatorBase ):
         radioCopyToClipboard = Gtk.RadioButton.new_with_label_from_widget( None, _( "Copy event to clipboard" ) )
         radioCopyToClipboard.set_tooltip_text( _( "Copy the event text and date to the clipboard." ) )
         radioCopyToClipboard.set_active( self.copyToClipboard )
-        radioCopyToClipboard.set_margin_left( self.INDENT_WIDGET_LEFT )
+        radioCopyToClipboard.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( radioCopyToClipboard, 0, 2, 1, 1 )
 
         radioInternetSearch = Gtk.RadioButton.new_with_label_from_widget( radioCopyToClipboard, _( "Search event on the internet" ) )
         radioInternetSearch.set_tooltip_text( _( "Open the default web browser and search for the event." ) )
         radioInternetSearch.set_active( not self.copyToClipboard )
-        radioInternetSearch.set_margin_left( self.INDENT_WIDGET_LEFT )
+        radioInternetSearch.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( radioInternetSearch, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
-        box.set_margin_left( self.INDENT_WIDGET_LEFT * 2 )
+        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT * 2 )
 
         label = Gtk.Label.new( _( "URL" ) )
         label.set_halign( Gtk.Align.START )

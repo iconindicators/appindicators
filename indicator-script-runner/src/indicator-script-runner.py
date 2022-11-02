@@ -389,7 +389,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         hideGroupsCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide groups" ) )
         hideGroupsCheckbutton.set_active( self.hideGroups )
         hideGroupsCheckbutton.set_sensitive( not self.showScriptsInSubmenus )
-        hideGroupsCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        hideGroupsCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         hideGroupsCheckbutton.set_tooltip_text( _(
             "If checked, only script names are displayed.\n" + \
             "Otherwise, script names are indented\n" + \
@@ -879,14 +879,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
 
         terminalCheckbutton = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
-        terminalCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        terminalCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         terminalCheckbutton.set_tooltip_text( _( "Leave the terminal open on script completion." ) )
         terminalCheckbutton.set_active( False if add else type( script ) is NonBackground and script.getTerminalOpen() )
         terminalCheckbutton.set_sensitive( True if add else type( script ) is NonBackground )
         grid.attach( terminalCheckbutton, 0, 15, 1, 1 )
 
         defaultScriptCheckbutton = Gtk.CheckButton.new_with_label( _( "Default script" ) )
-        defaultScriptCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        defaultScriptCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         defaultScriptCheckbutton.set_active( False if add else type( script ) is NonBackground and script.getDefault() )
         defaultScriptCheckbutton.set_sensitive( True if add else type( script ) is NonBackground )
         defaultScriptCheckbutton.set_tooltip_text( _(
@@ -909,7 +909,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
+        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
 
         label = Gtk.Label.new( _( "Interval" ) )
         label.set_sensitive( False if add else type( script ) is Background )
@@ -929,7 +929,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid.attach( box, 0, 18, 1, 1 )
 
         forceUpdateCheckbutton = Gtk.CheckButton.new_with_label( _( "Force update" ) )
-        forceUpdateCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        forceUpdateCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         forceUpdateCheckbutton.set_active( False if add else type( script ) is Background and script.getForceUpdate() )
         forceUpdateCheckbutton.set_sensitive( True if add else type( script ) is Background )
         forceUpdateCheckbutton.set_tooltip_text( _(

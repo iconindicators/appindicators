@@ -168,7 +168,7 @@ class IndicatorPunycode( IndicatorBase ):
             "Input is taken from the clipboard after\n" + \
             "a CTRL-X or CTRL-C (or equivalent)." ) )
         inputClipboardRadio.set_active( self.inputClipboard )
-        inputClipboardRadio.set_margin_left( self.INDENT_WIDGET_LEFT )
+        inputClipboardRadio.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( inputClipboardRadio, 0, 1, 1, 1 )
 
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
@@ -177,7 +177,7 @@ class IndicatorPunycode( IndicatorBase ):
             "selected text after a middle mouse\n" + \
             "click of the indicator icon." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
-        inputPrimaryRadio.set_margin_left( self.INDENT_WIDGET_LEFT )
+        inputPrimaryRadio.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
 
         outputBothCheckbutton = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )

@@ -1836,7 +1836,7 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( checkbutton, 0, gridStartIndex, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_TEXT_LEFT )
+        box.set_margin_left( IndicatorBase.INDENT_TEXT_LEFT )
 
         label = Gtk.Label.new( summaryLabel )
         box.pack_start( label, False, False, 0 )
@@ -1851,7 +1851,7 @@ class IndicatorLunar( IndicatorBase ):
         checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( self.INDENT_TEXT_LEFT )
+        box.set_margin_left( IndicatorBase.INDENT_TEXT_LEFT )
 
         label = Gtk.Label.new( messageLabel )
         label.set_valign( Gtk.Align.START )

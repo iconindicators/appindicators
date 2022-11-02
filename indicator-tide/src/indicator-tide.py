@@ -213,7 +213,7 @@ class IndicatorTide( IndicatorBase ):
         showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
         showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
         showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
-        showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( self.INDENT_WIDGET_LEFT )
+        showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
 
         grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 3, 1, 1 )
