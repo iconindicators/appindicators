@@ -181,10 +181,6 @@ class IndicatorBase( ABC ):
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
-    def setAboutComments( self, comments ):
-        self.comments = comments
-
-
     def __onAbout( self, widget ):
         self.__setMenuSensitivity( False )
         GLib.idle_add( self.__onAboutInternal, widget )
