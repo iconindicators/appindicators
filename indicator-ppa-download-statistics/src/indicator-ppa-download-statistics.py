@@ -19,6 +19,11 @@
 # Application indicator which displays PPA download statistics.
 
 
+#TODO Icon does not appear in Lubuntu
+# /usr/share/icons/hicolor/apps/
+
+
+
 INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
