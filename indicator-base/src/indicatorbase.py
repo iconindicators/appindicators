@@ -53,12 +53,6 @@ class IndicatorBase( ABC ):
 
     __JSON_EXTENSION = ".json"
 
-#TODO Remove
-    __TERMINAL_GNOME = "gnome-terminal"
-    __TERMINAL_LXDE = "lxterminal"
-    __TERMINAL_LXQT = "qterminal" #TODO Might be needed for Lubuntu 20.04+
-    __TERMINAL_XFCE = "xfce4-terminal"
-
     __TERMINALS_AND_EXECUTION_FLAGS = [
         [ "gnome-terminal", "--" ],
         [ "lxterminal", "-e" ],
@@ -557,33 +551,6 @@ class IndicatorBase( ABC ):
             if terminal is not None:
                 executionFlag = _executionFlag
                 break
-
-        if terminal:
-            terminal = terminal.strip()
-
-        if terminal == "":
-            terminal = None
-            executionFlag = None
-
-        return terminal, executionFlag
-
-
-    # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
-    def getTerminalAndExecutionFlagORIG( self ):
-        terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
-        executionFlag = "--" #TODO Probably make these constants.
-
-        if terminal is None:
-            terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXDE )
-            executionFlag = "-e"
-
-            if terminal is None: #TODO Added another clause for Lubuntu 20.04+ but it does not work...ask Oleg.  Seems the " ${SHELL} -c '" in the script runner indicator might be causing the actual problem. 
-                terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXQT )
-                executionFlag = "-e"
-
-                if terminal is None:
-                    terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_XFCE )
-                    executionFlag = "-x"
 
         if terminal:
             terminal = terminal.strip()
