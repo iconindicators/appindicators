@@ -53,10 +53,18 @@ class IndicatorBase( ABC ):
 
     __JSON_EXTENSION = ".json"
 
+#TODO Remove
     __TERMINAL_GNOME = "gnome-terminal"
     __TERMINAL_LXDE = "lxterminal"
     __TERMINAL_LXQT = "qterminal" #TODO Might be needed for Lubuntu 20.04+
     __TERMINAL_XFCE = "xfce4-terminal"
+
+    __TERMINALS_AND_EXECUTION_FLAGS = [
+        [ "gnome-terminal", "--" ],
+        [ "lxterminal", "-e" ],
+        [ "qterminal", "-e" ],
+        [ "xfce4-terminal", "-x" ] ]
+
 
     # Public
     CONFIG_VERSION = "version"
@@ -539,8 +547,29 @@ class IndicatorBase( ABC ):
         return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT
 
 
-    # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
+    # Return the full path and name of the executable for the current terminal and the corresponding execution flag.
+    # None otherwise.
     def getTerminalAndExecutionFlag( self ):
+        terminal = None
+        executionFlag = None
+        for _terminal, _executionFlag in IndicatorBase.__TERMINALS_AND_EXECUTION_FLAGS:
+            terminal = self.processGet( "which " + _terminal )
+            if terminal is not None:
+                executionFlag = _executionFlag
+                break
+
+        if terminal:
+            terminal = terminal.strip()
+
+        if terminal == "":
+            terminal = None
+            executionFlag = None
+
+        return terminal, executionFlag
+
+
+    # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
+    def getTerminalAndExecutionFlagORIG( self ):
         terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
         executionFlag = "--" #TODO Probably make these constants.
 
