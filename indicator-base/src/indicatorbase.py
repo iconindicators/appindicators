@@ -48,6 +48,7 @@ class IndicatorBase( ABC ):
     __JSON_EXTENSION = ".json"
     __TERMINAL_GNOME = "gnome-terminal"
     __TERMINAL_LXDE = "lxterminal"
+    __TERMINAL_LXQT = "qterminal" #TODO Might be needed for Lubuntu 20.04+
     __TERMINAL_XFCE = "xfce4-terminal"
 
     # Public
@@ -103,7 +104,6 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
-        self.indicator.set_title( self.indicatorName ) # Used for Lubuntu/Xubuntu (show indicator name rather than the default script name).
 
         self.__loadConfig()
 
@@ -167,7 +167,7 @@ class IndicatorBase( ABC ):
 
     def setLabel( self, text ):
         self.indicator.set_label( text, text )  # Second parameter is a hint for the typical length.
-        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.
+        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.    #TODO Seems you cannot change the title after the indicator is started on Lubuntu 20.04+.  Check what happens on Xubuntu.
 
 
     def requestMouseWheelScrollEvents( self ):
@@ -526,15 +526,19 @@ class IndicatorBase( ABC ):
     # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
     def getTerminalAndExecutionFlag( self ):
         terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_GNOME )
-        executionFlag = "--"
+        executionFlag = "--" #TODO Probably make these constants.
 
         if terminal is None:
             terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXDE )
             executionFlag = "-e"
 
-            if terminal is None:
-                terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_XFCE )
-                executionFlag = "-x"
+            if terminal is None: #TODO Added another clause for Lubuntu 20.04+ but it does not work...ask Oleg.  Seems the " ${SHELL} -c '" in the script runner indicator might be causing the actual problem. 
+                terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_LXQT )
+                executionFlag = "-e"
+
+                if terminal is None:
+                    terminal = self.processGet( "which " + IndicatorBase.__TERMINAL_XFCE )
+                    executionFlag = "-x"
 
         if terminal:
             terminal = terminal.strip()
