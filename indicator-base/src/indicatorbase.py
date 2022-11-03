@@ -103,6 +103,7 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
+        self.indicator.set_title( self.indicatorName ) # Used for Lubuntu/Xubuntu (show indicator name rather than the default script name).
 
         self.__loadConfig()
 
