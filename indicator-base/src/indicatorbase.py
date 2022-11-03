@@ -25,6 +25,9 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
+#TODO Icons look too big for Xubuntu...what can be done?
+
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
