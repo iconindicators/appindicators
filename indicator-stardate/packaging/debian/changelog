@@ -1,3 +1,11 @@
+indicator-stardate (1.0.43-1) bionic; urgency=low
+
+  * Now supports Lubuntu/LXQt by writing the stardate to a menu item as
+    tooltips/labels are unsupported.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 22:48:44 +1000
+
+
 indicator-stardate (1.0.42-1) bionic; urgency=low
 
   * Code refactor caused base class variables to be uninitialised.
