@@ -185,7 +185,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.97",
+            version = "1.0.99",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
             creditz = IndicatorLunar.CREDIT )
@@ -295,8 +295,10 @@ class IndicatorLunar( IndicatorBase ):
             menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
 
         self.updateMenu( menu, utcNow )
-        self.setLabel( self.processTags() )
-        self.updateIcon()
+
+        if not self.isDesktopEnvironmentLXQt():
+            self.setLabel( self.processTags() )
+            self.updateIcon()
 
         if self.showWerewolfWarning:
             self.notificationFullMoon()
@@ -1228,7 +1230,8 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
+        if not self.isDesktopEnvironmentLXQt():
+            notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.
         grid = self.createGrid()

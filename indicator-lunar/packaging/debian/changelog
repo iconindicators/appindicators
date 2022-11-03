@@ -1,3 +1,11 @@
+indicator-lunar (1.0.99-1) bionic; urgency=low
+
+  * Now supports Lubuntu/LXQt: As tooltips/labels are unsupported, the 'icon'
+    tab in the Preferences is hidden.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 23:03:32 +1000
+
+
 indicator-lunar (1.0.98-1) bionic; urgency=low
 
   * Code refactor caused base class variables to be uninitialised.

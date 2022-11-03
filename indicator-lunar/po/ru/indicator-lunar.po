@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-lunar 1.0.98\n"
+"Project-Id-Version: indicator-lunar 1.0.99\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2022-10-23 09:53+1100\n"
 "PO-Revision-Date: 2022-08-08 14:35+0300\n"
