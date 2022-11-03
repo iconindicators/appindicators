@@ -19,16 +19,10 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
-#TODO On Lubuntu, there is no label next to the icon,
-# but using the title/label will not work as it seems
-# setting the title/label after the indicator is started has no effect.
-# So need to add a menu item to show the stardate.
-
-
-#TODO The icon also looks a little odd...
+#TODO The icon  looks a little odd...is it my eyes or really is odd?
+# Check against the icon in the /usr/share/icons/hicolor directory.
 # ...maybe try not writing any label/title and see if that makes a difference.
 # Tried but made no difference.
-
 
 
 INDICATOR_NAME = "indicator-stardate"
