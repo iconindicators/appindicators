@@ -159,6 +159,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += "; ${SHELL}"
 
         command += "'"
+        print( "Command: " ) #TODO Debugging 
+        print( command ) #TODO Debugging
 
         if self.sendCommandToLog:
             self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
