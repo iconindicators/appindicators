@@ -386,7 +386,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        box.pack_start( Gtk.Label( _( "Calendar file" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Calendar file" ) ), False, False, 0 )
 
         fileEntry = Gtk.Entry()
         fileEntry.set_editable( False )
