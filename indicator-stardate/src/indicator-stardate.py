@@ -19,6 +19,13 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
+#TODO On Lubuntu, there is no label next to the icon,
+# but using the title/label will not work as it seems
+# setting the title/label after the indicator is started has no effect.
+# So need to add a menu item to show the stardate.
+
+
+
 INDICATOR_NAME = "indicator-stardate"
 import gettext
 gettext.install( INDICATOR_NAME )
