@@ -29,6 +29,9 @@
 # remove 'comet' from the description in debian/control.
 
 
+#TODO On Lubuntu, the dynamic icon does not show up.
+
+
 #TODO On Lubuntu, there is no label next to the icon,
 # but using the title/label will not work as it seems
 # setting the title/label after the indicator is started has no effect.
