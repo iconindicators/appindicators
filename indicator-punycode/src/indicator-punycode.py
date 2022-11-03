@@ -38,16 +38,6 @@
 # MajiKoi5-783gue6qz075azm5e    
 
 
-#TODO Got these
-#
-# /home/bernard/Programming/Indicators/indicator-punycode/src/indicator-punycode.py:72: PyGTKDeprecationWarning: Using positional arguments with the GObject constructor has been deprecated. Please specify keyword(s) for "label" or use a class specific constructor. See: https://wiki.gnome.org/PyGObject/InitializerDeprecations
-#   menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
-# /home/bernard/Programming/Indicators/indicator-punycode/src/indicator-punycode.py:76: PyGTKDeprecationWarning: Using positional arguments with the GObject constructor has been deprecated. Please specify keyword(s) for "label" or use a class specific constructor. See: https://wiki.gnome.org/PyGObject/InitializerDeprecations
-#   menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
-#
-# when doing a convert.
-
-
 #TODO Select long text, do a conversion and should get an exception.
 #
 #     label empty or too long
@@ -104,11 +94,11 @@ class IndicatorPunycode( IndicatorBase ):
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
+            menuItem = Gtk.MenuItem.new_with_label( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ IndicatorPunycode.RESULTS_UNICODE ] )
             menu.append( menuItem )
 
-            menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
+            menuItem = Gtk.MenuItem.new_with_label( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
             menuItem.connect( "activate", self.pasteToClipboard, result[ IndicatorPunycode.RESULTS_ASCII ] )
             menu.append( menuItem )
 

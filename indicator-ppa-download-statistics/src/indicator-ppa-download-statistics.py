@@ -188,7 +188,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
-        menuItem = Gtk.MenuItem( indent + message )
+        menuItem = Gtk.MenuItem.new_with_label( indent + message )
         menu.append( menuItem )
 
 

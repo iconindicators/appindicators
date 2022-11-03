@@ -114,7 +114,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
             indent = self.getMenuIndent( 1 )
             for group in sorted( scriptsByGroup.keys(), key = str.lower ):
-                menuItem = Gtk.MenuItem( group )
+                menuItem = Gtk.MenuItem.new_with_label( group )
                 menu.append( menuItem )
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
