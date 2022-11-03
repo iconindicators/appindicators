@@ -25,6 +25,11 @@
 # So need to add a menu item to show the stardate.
 
 
+#TODO The icon also looks a little odd...
+# ...maybe try not writing any label/title and see if that makes a difference.
+# Tried but made no difference.
+
+
 
 INDICATOR_NAME = "indicator-stardate"
 import gettext
@@ -72,7 +77,14 @@ class IndicatorStardate( IndicatorBase ):
             stardateInteger, stardateFraction = stardate.getStardate2009Revised( now )
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
-        self.setLabel( stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger ) )
+        stardateString = stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger )
+        if self.isDesktopEnvironmentLXQt(): # Lubuntu (LXQt) does not show a tooltip nor label, so add in a menu item to display the stardate.
+            menu.append( Gtk.MenuItem.new_with_label( stardateString ) )
+            menu.append( Gtk.SeparatorMenuItem() )
+
+        else:
+            self.setLabel( stardateString )
+
         return numberOfSecondsToNextUpdate
 
 

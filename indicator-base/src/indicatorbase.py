@@ -46,9 +46,13 @@ class IndicatorBase( ABC ):
 
     # Private
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    __DESKTOP_LXQT = "LXQt"
+
     __DIALOG_DEFAULT_HEIGHT = 480
     __DIALOG_DEFAULT_WIDTH = 640
+
     __JSON_EXTENSION = ".json"
+
     __TERMINAL_GNOME = "gnome-terminal"
     __TERMINAL_LXDE = "lxterminal"
     __TERMINAL_LXQT = "qterminal" #TODO Might be needed for Lubuntu 20.04+
@@ -524,6 +528,15 @@ class IndicatorBase( ABC ):
 
         except ValueError:
             return False
+
+
+    def getDesktopEnvironment( self ):
+        return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
+
+
+    def isDesktopEnvironmentLXQt( self ):
+        desktopEnvironment = self.getDesktopEnvironment()
+        return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT
 
 
     # Return the full path and name of the executable for the current terminal and the corresponding execution flag; None for each on failure.
