@@ -23,7 +23,7 @@
 #TODO Examples
 #
 # 短. co
-# xn--s7y.co
+# xn--s7y. co
 #
 # München
 # xn--mnchen-3ya
@@ -46,9 +46,6 @@
 #   menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
 #
 # when doing a convert.
-
-
-#TODO Do the same conversion twice; try to stop duplicate results being displayed...maybe move the result to the top. 
 
 
 #TODO Select long text, do a conversion and should get an exception.
@@ -170,8 +167,6 @@ class IndicatorPunycode( IndicatorBase ):
                 self.results.insert( 0, result )
 
                 self.cullResults()
-                # if len( self.results ) > self.resultHistoryLength:
-                #     self.results = self.results[ : self.resultHistoryLength ]
 
                 GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
                 self.requestUpdate()
