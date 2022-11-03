@@ -20,6 +20,16 @@
 # optionally display results in the icon label.
 
 
+#TODO On Lubuntu, there is no label next to the icon,
+# but using the title/label will not work as it seems
+# setting the title/label after the indicator is started has no effect.
+# So somehow hide the background stuff in the Preferences and/or grey out stuff?
+
+
+#TODO On Lubuntu, there is an error when running a foreground script.
+# Have found the terminal is a different name, but there is more to it.
+
+
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )

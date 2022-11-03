@@ -29,6 +29,13 @@
 # remove 'comet' from the description in debian/control.
 
 
+#TODO On Lubuntu, there is no label next to the icon,
+# but using the title/label will not work as it seems
+# setting the title/label after the indicator is started has no effect.
+# So perhaps just comment out the icon TAB in the Preferences?
+# Seems to be no issue with calling the setLabel as it has no effect.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
