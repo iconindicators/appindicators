@@ -30,6 +30,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
+from pathlib import Path
 
 import datetime, importlib.util, os, sys, webbrowser
 
@@ -45,41 +46,54 @@ class IndicatorTide( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.27",
+            version = "1.0.28",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information." ) )
 
 
     def update( self, menu ):
-        tidalReadings = [ ]
-        try:
-            spec = importlib.util.spec_from_file_location( self.userScriptClassName, self.userScriptPathAndFilename )
-            module = importlib.util.module_from_spec( spec )
-            sys.modules[ self.userScriptClassName ] = module
-            spec.loader.exec_module( module )
-            klazz = getattr( module, self.userScriptClassName )
-            tidalReadings = klazz.getTideData( self.getLogging() )
-
-        except FileNotFoundError as e:
-            self.getLogging().error( "Could not find user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
-            self.getLogging().exception( e )
-
-        except AttributeError as e:
-            self.getLogging().error( "Could not find class in user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
-            self.getLogging().exception( e )
-
-        except Exception as e:
-            self.getLogging().error( "Error running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
-            self.getLogging().exception( e )
-
-        if tidalReadings:
-            self.buildMenu( menu, tidalReadings )
+        if self.userScriptPathAndFilename == "" and self.userScriptClassName == "": 
+            # First time the indicator is run, or really, when there is no preference/json file,
+            # there will be no user script specified,
+            # so there will be no tidal data,
+            # so do not treat this an exception.
+            label = _( "No user script specified!" )
+            summary = _( "No user script specified!" )
+            message = _( "Please specify a user script and class name in the preferences." )
+            menu.append( Gtk.MenuItem.new_with_label( label ) )
+            Notify.Notification.new( summary, message, self.icon ).show()
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( _( "No tidal data available!" ) ) )
-            summary = _( "No tidal data available!" )
-            message = _( "Check the log in your home directory." )
-            Notify.Notification.new( summary, message, self.icon ).show()
+            tidalReadings = [ ]
+            try:
+                spec = importlib.util.spec_from_file_location( self.userScriptClassName, self.userScriptPathAndFilename )
+                module = importlib.util.module_from_spec( spec )
+                sys.modules[ self.userScriptClassName ] = module
+                spec.loader.exec_module( module )
+                klazz = getattr( module, self.userScriptClassName )
+                tidalReadings = klazz.getTideData( self.getLogging() )
+                self.buildMenu( menu, tidalReadings )
+
+            except FileNotFoundError as e:
+                label = _( "User script could not be found!" )
+                summary = _( "User script could not be found!" )
+                message = _( "Please check the user script in the preferences." )
+
+            except AttributeError as e:
+                label = _( "User script class name could not be found!" )
+                summary = _( "User script class name could not be found!" )
+                message = _( "Please check the user script class name in the preferences." )
+
+            except Exception as e:
+                label = _( "Error running user script!" )
+                summary = _( "Error running user script!" )
+                message = _( "Check the log file in your home directory." )
+                self.getLogging().error( "Error running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
+                self.getLogging().exception( e )
+
+            if not tidalReadings:
+                menu.append( Gtk.MenuItem.new_with_label( label ) )
+                Notify.Notification.new( summary, message, self.icon ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
         now = datetime.datetime.now()
@@ -230,7 +244,7 @@ class IndicatorTide( IndicatorBase ):
                 self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbutton.get_active()
 
                 if userScriptPathAndFilename.get_text() and userScriptClassName.get_text():
-                    if not os.path.isfile( userScriptPathAndFilename.get_text().strip() ):
+                    if not Path( userScriptPathAndFilename.get_text().strip() ).is_file():
                         self.showMessage( dialog, _( "The user script path/filename cannot be found." ) )
                         userScriptPathAndFilename.grab_focus()
                         continue

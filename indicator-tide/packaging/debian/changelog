@@ -1,3 +1,11 @@
+indicator-tide (1.0.28-1) bionic; urgency=low
+
+  * Rather than throw an exception, gracefully handle when there is no user
+    script specified (typically first time the indicator is run).
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 16:38:16 +1000
+
+
 indicator-tide (1.0.27-1) bionic; urgency=low
 
   * Code refactor caused base class variables to be uninitialised.
