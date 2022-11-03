@@ -20,31 +20,6 @@
 # by text highlight or clipboard, then convert between Unicode and ASCII.
 
 
-#TODO Examples
-#
-# 短. co
-# xn--s7y. co
-#
-# München
-# xn--mnchen-3ya
-#
-# みんな
-# xn--q9jyb4c
-#
-# abæcdöef   
-# abcdef-qua4k
-# 
-# MajiでKoiする5秒前    
-# MajiKoi5-783gue6qz075azm5e    
-
-
-#TODO Select long text, do a conversion and should get an exception.
-#
-#     label empty or too long
-#
-# Maybe trap this (check if text is too long, however that is measured) and instead of logging, notify the user.
-
-
 INDICATOR_NAME = "indicator-punycode"
 import gettext
 gettext.install( INDICATOR_NAME )
