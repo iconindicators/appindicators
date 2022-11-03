@@ -20,6 +20,44 @@
 # by text highlight or clipboard, then convert between Unicode and ASCII.
 
 
+#TODO Examples
+#
+# 短. co
+# xn--s7y.co
+#
+# München
+# xn--mnchen-3ya
+#
+# みんな
+# xn--q9jyb4c
+#
+# abæcdöef   
+# abcdef-qua4k
+# 
+# MajiでKoiする5秒前    
+# MajiKoi5-783gue6qz075azm5e    
+
+
+#TODO Got these
+#
+# /home/bernard/Programming/Indicators/indicator-punycode/src/indicator-punycode.py:72: PyGTKDeprecationWarning: Using positional arguments with the GObject constructor has been deprecated. Please specify keyword(s) for "label" or use a class specific constructor. See: https://wiki.gnome.org/PyGObject/InitializerDeprecations
+#   menuItem = Gtk.MenuItem( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
+# /home/bernard/Programming/Indicators/indicator-punycode/src/indicator-punycode.py:76: PyGTKDeprecationWarning: Using positional arguments with the GObject constructor has been deprecated. Please specify keyword(s) for "label" or use a class specific constructor. See: https://wiki.gnome.org/PyGObject/InitializerDeprecations
+#   menuItem = Gtk.MenuItem( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
+#
+# when doing a convert.
+
+
+#TODO Do the same conversion twice; try to stop duplicate results being displayed...maybe move the result to the top. 
+
+
+#TODO Select long text, do a conversion and should get an exception.
+#
+#     label empty or too long
+#
+# Maybe trap this (check if text is too long, however that is measured) and instead of logging, notify the user.
+
+
 INDICATOR_NAME = "indicator-punycode"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -51,7 +89,7 @@ class IndicatorPunycode( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.13",
+            version = "1.0.14",
             copyrightStartYear = "2016",
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
@@ -131,8 +169,9 @@ class IndicatorPunycode( IndicatorBase ):
 
                 self.results.insert( 0, result )
 
-                if len( self.results ) > self.resultHistoryLength:
-                    self.results = self.results[ : self.resultHistoryLength ]
+                self.cullResults()
+                # if len( self.results ) > self.resultHistoryLength:
+                #     self.results = self.results[ : self.resultHistoryLength ]
 
                 GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
                 self.requestUpdate()
@@ -141,6 +180,11 @@ class IndicatorPunycode( IndicatorBase ):
                 self.getLogging().exception( e )
                 self.getLogging().error( "Error converting '" + protocol + text + pathQuery + "'." )
                 Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
+
+
+    def cullResults( self ):
+        if len( self.results ) > self.resultHistoryLength:
+            self.results = self.results[ : self.resultHistoryLength ]
 
 
     def pasteToClipboard( self, menuItem, text ):
@@ -227,6 +271,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.outputBoth = outputBothCheckbutton.get_active()
             self.dropPathQuery = dropPathQueryCheckbutton.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
+            self.cullResults()
 
         return responseType
 

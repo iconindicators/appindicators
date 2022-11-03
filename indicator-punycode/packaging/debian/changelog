@@ -1,3 +1,11 @@
+indicator-punycode (1.0.14-1) bionic; urgency=low
+
+  * Bug fix: When reducing the maximum results in the Preferences, the results
+    were not actually reduced until the next conversion.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 13:11:56 +1000
+
+
 indicator-punycode (1.0.13-1) bionic; urgency=low
 
   * Code refactor caused base class variables to be uninitialised.
