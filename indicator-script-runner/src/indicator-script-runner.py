@@ -36,8 +36,9 @@ gettext.install( INDICATOR_NAME )
 
 import gi
 gi.require_version( "Gtk", "3.0" )
+gi.require_version( "Notify", "0.7" )
 
-from gi.repository import GLib, Gtk, Pango
+from gi.repository import GLib, Gtk, Notify, Pango
 from indicatorbase import IndicatorBase
 from script import Background, NonBackground
 from threading import Thread
@@ -156,26 +157,40 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def onScriptMenuItem( self, menuItem, script ):
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
-        command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-        command += script.getCommand()
+        if terminal is None:
+            message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
+            self.getLogging().error( message )
+            Notify.Notification.new( "Cannot run script", message, self.icon ).show()
 
-        if script.getShowNotification():
-            command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY_NON_BACKGROUND.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+        elif self.isTerminalQTerminal():
+            # As a result of this issue
+            #    https://github.com/lxqt/qterminal/issues/335
+            # the default terminal in Lubuntu (qterminal) fails to parse argument.
+            # Although a fix has been made, it is unlikely qterminal will be updated in the repository any time soon.
+            # So the quickest/easiest workaround is to install gnome-terminal. 
+            message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
+            self.getLogging().error( message )
+            Notify.Notification.new( "Cannot run script", message, self.icon ).show()
 
-        if script.getPlaySound():
-            command += "; " + IndicatorScriptRunner.COMMAND_SOUND
+        else:
+            command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
+            command += script.getCommand()
 
-        if script.getTerminalOpen():
-            command += "; ${SHELL}"
+            if script.getShowNotification():
+                command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY_NON_BACKGROUND.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
-        command += "'"
-        print( "Command: " ) #TODO Debugging 
-        print( command ) #TODO Debugging
+            if script.getPlaySound():
+                command += "; " + IndicatorScriptRunner.COMMAND_SOUND
 
-        if self.sendCommandToLog:
-            self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
+            if script.getTerminalOpen():
+                command += "; ${SHELL}"
 
-        Thread( target = self.processCall, args = ( command, ) ).start()
+            command += "'"
+
+            if self.sendCommandToLog:
+                self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
+
+            Thread( target = self.processCall, args = ( command, ) ).start()
 
 
     def updateBackgroundScripts( self, now ):

@@ -44,7 +44,6 @@ import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 class IndicatorBase( ABC ):
 
-    # Private
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
     __DESKTOP_LXQT = "LXQt"
 
@@ -54,13 +53,12 @@ class IndicatorBase( ABC ):
     __JSON_EXTENSION = ".json"
 
     __TERMINALS_AND_EXECUTION_FLAGS = [
-        [ "gnome-terminal", "--" ],
+        [ "gnome-terminal", "--" ], # Must ALWAYS be listed first so as to be the "default".
         [ "lxterminal", "-e" ],
         [ "qterminal", "-e" ],
         [ "xfce4-terminal", "-x" ] ]
 
 
-    # Public
     CONFIG_VERSION = "version"
     EXTENSION_TEXT = ".txt"
     INDENT_TEXT_LEFT = 25
@@ -539,6 +537,15 @@ class IndicatorBase( ABC ):
     def isDesktopEnvironmentLXQt( self ):
         desktopEnvironment = self.getDesktopEnvironment()
         return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT
+
+
+    def isTerminalQTerminal( self ):
+        terminalIsQTerminal = False
+        terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
+        if terminal is not None and "qterminal" in terminal:
+            terminalIsQTerminal = True
+
+        return terminalIsQTerminal 
 
 
     # Return the full path and name of the executable for the current terminal and the corresponding execution flag.
