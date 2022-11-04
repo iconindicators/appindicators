@@ -26,10 +26,6 @@
 # So somehow hide the background stuff in the Preferences and/or grey out stuff?
 
 
-#TODO On Lubuntu, there is an error when running a foreground script.
-# Have found the terminal is a different name, but there is more to it.
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
