@@ -56,6 +56,7 @@ class IndicatorBase( ABC ):
         [ "gnome-terminal", "--" ], # Must ALWAYS be listed first so as to be the "default".
         [ "lxterminal", "-e" ],
         [ "qterminal", "-e" ],
+        [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ]
 
 
