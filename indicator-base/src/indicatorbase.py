@@ -38,6 +38,11 @@
 # TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
 
 
+# TODO In Lubuntu 20.04, check the middle mouse click works for Fortune, PPA, Punycode, Script Runner.
+# This might help too if there is a problem:
+#    https://manual.lubuntu.me/stable/5/5.1/lxqt-panel.html?highlight=mouse%20middle
+
+
 # TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
 
 
