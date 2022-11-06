@@ -25,7 +25,30 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Icons look too big for Xubuntu...what can be done?
+#TODO Icons look too big for Xubuntu 20.04...what can be done?
+
+
+#TODO Icons for Ubuntu Budgie 20.04 across the board seem a little big.
+
+
+#TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
+# On first glance, colour is ffffff.
+
+
+# TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
+
+
+# TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
+
+
+# TODO In Ubuntu Budgie, Indicator Script Runner needs to test background scripts.
+
+
+# TODO In Ubuntu Budgie, Indicator Tide needs to test with user script.
+
+
+# TODO In Ubuntu Budgie, Indicator Virtual Box icon does not appear.
+# Try a remove, purge, update icon cache, restart, install.
 
 
 import gi
@@ -175,7 +198,14 @@ class IndicatorBase( ABC ):
 
     def setLabel( self, text ):
         self.indicator.set_label( text, text )  # Second parameter is a hint for the typical length.
-        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.    #TODO Seems you cannot change the title after the indicator is started on Lubuntu 20.04+.  Check what happens on Xubuntu.
+
+        #TODO Seems you cannot change the title after the indicator is started on Lubuntu 20.04+.  
+        # Check what happens on Xubuntu.
+        # Maybe also (for Lubuntu/Xubuntu) set the title (or is it label, or both)
+        # back in the __init__.  
+        # If not set, the hover text will be the name of the script (with .py)
+        # but if I set the indicator name, it will be the script minus the .py.
+        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.    
 
 
     def requestMouseWheelScrollEvents( self ):

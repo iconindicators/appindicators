@@ -29,10 +29,12 @@
 # remove 'comet' from the description in debian/control.
 
 
-#TODO On Lubuntu, the dynamic icon does not show up.
+#TODO On Lubuntu 20.04, the dynamic icon does not show up.
+# Check that the icon name changes...or maybe not.
+# Maybe on Lubuntu, need to use the icon's orginal name?
 
 
-#TODO On Lubuntu, there is no label next to the icon,
+#TODO On Lubuntu 20.04, there is no label next to the icon,
 # but using the title/label will not work as it seems
 # setting the title/label after the indicator is started has no effect.
 # So perhaps just comment out the icon TAB in the Preferences?

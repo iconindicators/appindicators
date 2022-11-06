@@ -19,10 +19,13 @@
 # Application indicator which displays the current Star Trek™ stardate.
 
 
-#TODO The icon  looks a little odd...is it my eyes or really is odd?
-# Check against the icon in the /usr/share/icons/hicolor directory.
-# ...maybe try not writing any label/title and see if that makes a difference.
-# Tried but made no difference.
+#TODO On Lubuntu 20.04, the icon looks a little odd...is it my eyes or really is odd?
+# See 
+#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
+# for a description of the issue.
+# The icon likely comes from Papirus, but does not explain the mix up.
+# Need to log an issue at
+# https://discourse.lubuntu.me/ 
 
 
 INDICATOR_NAME = "indicator-stardate"
