@@ -25,6 +25,14 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
+#TODO Going forward, in terms of external hosting of source code
+# and deploying alternatives to .deb files via PPA...
+#    https://github.com/alexmurray/indicator-sensors
+#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
+#
+# Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
+
+
 #TODO Icons look too big for Xubuntu 20.04...what can be done?
 
 
@@ -56,6 +64,12 @@
 # Try a remove, purge, update icon cache, restart, install.
 
 
+# TODO In Ubuntu MATE, Indicator Script Runner needs to test background scripts.
+
+
+# TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
+
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
@@ -83,6 +97,7 @@ class IndicatorBase( ABC ):
     __TERMINALS_AND_EXECUTION_FLAGS = [
         [ "gnome-terminal", "--" ], # Must ALWAYS be listed first so as to be the "default".
         [ "lxterminal", "-e" ],
+        [ "mate-terminal", "-x" ],
         [ "qterminal", "-e" ],
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ]
@@ -570,6 +585,9 @@ class IndicatorBase( ABC ):
         return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
+#TODO Maybe either change this or have another function
+# to ask if labels are supported.  Maybe also if tooltips are supported.
+# Lubuntu supports neither labels nor tooltips.
     def isDesktopEnvironmentLXQt( self ):
         desktopEnvironment = self.getDesktopEnvironment()
         return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT

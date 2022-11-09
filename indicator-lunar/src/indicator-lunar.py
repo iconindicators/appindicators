@@ -41,6 +41,13 @@
 # Seems to be no issue with calling the setLabel as it has no effect.
 
 
+#TODO On Ubuntu Mate 2004, the icon is hicolor so need to figure out the theme.
+
+
+#TODO On Ubuntu Mate 2004, the icon is a horizontally stretched bar!
+# But the icon during initialisation (NOT hicolor) is regular/correct size).
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
