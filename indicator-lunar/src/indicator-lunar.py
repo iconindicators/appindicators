@@ -46,6 +46,9 @@
 
 #TODO On Ubuntu Mate 2004, the icon is a horizontally stretched bar!
 # But the icon during initialisation (NOT hicolor) is regular/correct size).
+# Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
+# When I set the size to 22 x 22, the icon seemed much better...but not correct.
+# Not sure if this a quirk of MATE or I've fundamentally made some mistake...
 
 
 INDICATOR_NAME = "indicator-lunar"
