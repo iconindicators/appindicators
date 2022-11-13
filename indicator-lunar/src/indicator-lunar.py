@@ -286,9 +286,10 @@ class IndicatorLunar( IndicatorBase ):
 
         self.updateMenu( menu, utcNow )
 
-        if self.isDesktopEnvironmentLXQt():
+        if not self.isDesktopEnvironmentLXQt():
             self.setLabel( self.processTags() )
-            self.updateIcon()
+
+        self.updateIcon() #TODO Should this not be used for Lubuntu?
 
         if self.showWerewolfWarning:
             self.notificationFullMoon()
@@ -1104,7 +1105,7 @@ class IndicatorLunar( IndicatorBase ):
         height = 100
         radius = float( width / 2 )
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
-
+        print( "xxxx")#TODO
         if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
@@ -1220,7 +1221,7 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
-        if self.isDesktopEnvironmentLXQt():
+        if not self.isDesktopEnvironmentLXQt():
             notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.

@@ -25,9 +25,12 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-# TODO In Lubuntu 20.04, check the middle mouse click works for Fortune, PPA, Punycode, Script Runner.
-# This might help too if there is a problem:
-#    https://manual.lubuntu.me/stable/5/5.1/lxqt-panel.html?highlight=mouse%20middle
+#TODO On Lubuntu 20.04 Indicator Lunar, the dynamic icon does not show up.
+# Looks like a default error/missing icon perhaps.
+# Check that the icon name changes...or maybe not.
+# Maybe on Lubuntu, need to use the icon's orginal name?
+# Unsure if this is for Indicator Lunar...if so, maybe this is the same issue as in Ubuntu Budgie?
+# On Lubuntu, have tried setting width/height to 22 and also 100%.  Icon still does not come up...what next?
 
 
 #TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
@@ -46,12 +49,6 @@
 # https://jenkov.com/tutorials/svg/svg-viewport-view-box.html
 # https://www.digitalocean.com/community/tutorials/svg-svg-viewbox
 # https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
-
-
-#TODO On Lubuntu 20.04, the dynamic icon does not show up.
-# Check that the icon name changes...or maybe not.
-# Maybe on Lubuntu, need to use the icon's orginal name?
-# Unsure if this is for Indicator Lunar...if so, maybe this is the same issue as in Ubuntu Budgie?
 
 
 # TODO In Ubuntu Budgie, Indicator Tide needs to test with user script.
@@ -95,6 +92,10 @@
 # The icon likely comes from Papirus, but does not explain the mix up.
 # Need to log an issue at
 # https://discourse.lubuntu.me/ 
+#
+# Not sure about this now as the default icon seems fine (although does not observe transparency
+# as there is a full circle in the background).
+# Also the icon theme reports back as Yaru.  So what is going on...? 
 
 
 #TODO On Lubuntu 20.04, icon labels are unsupported.
@@ -199,6 +200,7 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
+        print( "Theme name:", self.getThemeName() ) #TODO Test
 
 
     def main( self ):
@@ -260,14 +262,7 @@ class IndicatorBase( ABC ):
 
     def setLabel( self, text ):
         self.indicator.set_label( text, text )  # Second parameter is a hint for the typical length.
-
-        #TODO Seems you cannot change the title after the indicator is started on Lubuntu 20.04+.  
-        # Check what happens on Xubuntu.
-        # Maybe also (for Lubuntu/Xubuntu) set the title (or is it label, or both)
-        # back in the __init__.  
-        # If not set, the hover text will be the name of the script (with .py)
-        # but if I set the indicator name, it will be the script minus the .py.
-        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.    
+        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.    
 
 
     def requestMouseWheelScrollEvents( self ):
@@ -593,6 +588,8 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getThemeColour( self, defaultColour ):
+        print( "getting theme colour...") #TODO Test
+        print( "default colour:", defaultColour ) #TODO Test
         themeNames = {
             "Adwaita"                : "bebebe",
             "elementary-xfce-darker" : "f3f3f3",
@@ -602,10 +599,14 @@ class IndicatorBase( ABC ):
             "Yaru"                   : "dbdbdb" }
 
         themeName = self.getThemeName()
+        print( "theme name:", themeName )
         themeColour = defaultColour
         if themeName in themeNames:
             themeColour = themeNames[ themeName ]
-
+            print( themeName, themeColour )#TODO Test
+#TODO Check this function prints out on all Ubuntu flavours.
+#If not, need to add in the default theme and find that from the terminal:
+#    gsettings list-recursively | grep icon-theme
         return themeColour
 
 
