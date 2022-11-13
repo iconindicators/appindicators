@@ -622,9 +622,8 @@ class IndicatorBase( ABC ):
         return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
-#TODO Maybe either change this or have another function
-# to ask if labels are supported.  Maybe also if tooltips are supported.
-# Lubuntu supports neither labels nor tooltips.
+    # Lubuntu (LXQt) does not show an icon label and
+    # the tooltip seems to be unchangeable after initialisation.
     def isDesktopEnvironmentLXQt( self ):
         desktopEnvironment = self.getDesktopEnvironment()
         return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT

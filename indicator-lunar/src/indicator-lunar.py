@@ -286,7 +286,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.updateMenu( menu, utcNow )
 
-        if not self.isDesktopEnvironmentLXQt():
+        if self.isDesktopEnvironmentLXQt():
             self.setLabel( self.processTags() )
             self.updateIcon()
 
@@ -1220,7 +1220,7 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
-        if not self.isDesktopEnvironmentLXQt():
+        if self.isDesktopEnvironmentLXQt():
             notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.

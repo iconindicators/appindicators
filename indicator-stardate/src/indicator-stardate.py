@@ -66,7 +66,7 @@ class IndicatorStardate( IndicatorBase ):
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
         stardateString = stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger )
-        if self.isDesktopEnvironmentLXQt(): # Lubuntu (LXQt) does not show a tooltip nor label, so add in a menu item to display the stardate.
+        if self.isDesktopEnvironmentLXQt():
             menu.append( Gtk.MenuItem.new_with_label( stardateString ) )
             menu.append( Gtk.SeparatorMenuItem() )
 
