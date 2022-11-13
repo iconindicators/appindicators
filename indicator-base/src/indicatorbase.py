@@ -33,6 +33,21 @@
 # Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
 
 
+#TODO On Lubuntu 20.04, the icon looks a little odd for Indicator Lunar...is it my eyes or really is odd?
+# See 
+#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
+# for a description of the issue.
+# The icon likely comes from Papirus, but does not explain the mix up.
+# Need to log an issue at
+# https://discourse.lubuntu.me/ 
+
+
+#TODO On Lubuntu 20.04, icon labels are unsupported.
+# Using the title/label will not work as it seems
+# setting the title/label after the indicator is started has no effect.
+# So somehow hide the background stuff in the Preferences and/or grey out stuff?
+
+
 #TODO Icons look too big for Xubuntu 20.04...what can be done?
 
 
@@ -68,6 +83,28 @@
 
 
 # TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
+
+
+#TODO On Lubuntu 20.04, the dynamic icon does not show up.
+# Check that the icon name changes...or maybe not.
+# Maybe on Lubuntu, need to use the icon's orginal name?
+
+
+#TODO On Lubuntu 20.04, there is no label next to the icon,
+# but using the title/label will not work as it seems
+# setting the title/label after the indicator is started has no effect.
+# So perhaps just comment out the icon TAB in the Preferences?
+# Seems to be no issue with calling the setLabel as it has no effect.
+
+
+#TODO On Ubuntu Mate 2004, the icon is hicolor so need to figure out the theme.
+
+
+#TODO On Ubuntu Mate 2004, the icon is a horizontally stretched bar!
+# But the icon during initialisation (NOT hicolor) is regular/correct size).
+# Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
+# When I set the size to 22 x 22, the icon seemed much better...but not correct.
+# Not sure if this a quirk of MATE or I've fundamentally made some mistake...
 
 
 import gi

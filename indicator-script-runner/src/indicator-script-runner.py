@@ -20,12 +20,6 @@
 # optionally display results in the icon label.
 
 
-#TODO On Lubuntu 20.04, icon labels are unsupported.
-# Using the title/label will not work as it seems
-# setting the title/label after the indicator is started has no effect.
-# So somehow hide the background stuff in the Preferences and/or grey out stuff?
-
-
 INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
