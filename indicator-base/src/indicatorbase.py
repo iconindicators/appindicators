@@ -25,6 +25,61 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
+# TODO In Lubuntu 20.04, check the middle mouse click works for Fortune, PPA, Punycode, Script Runner.
+# This might help too if there is a problem:
+#    https://manual.lubuntu.me/stable/5/5.1/lxqt-panel.html?highlight=mouse%20middle
+
+
+#TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
+# On first glance, colour is ffffff.
+# Can maybe test this by copying the icons from ubuntu-mono-light across and then change the colour (after rebuild of icon cache)?
+
+
+# TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
+# Is there a forum to ask about this?
+# Maybe first verify this all again...
+
+
+# TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
+# Might need to specify viewBox along with width/height?
+# Compare the default/startup icon against the dynamic one.
+# https://jenkov.com/tutorials/svg/svg-viewport-view-box.html
+# https://www.digitalocean.com/community/tutorials/svg-svg-viewbox
+# https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
+
+
+#TODO On Lubuntu 20.04, the dynamic icon does not show up.
+# Check that the icon name changes...or maybe not.
+# Maybe on Lubuntu, need to use the icon's orginal name?
+# Unsure if this is for Indicator Lunar...if so, maybe this is the same issue as in Ubuntu Budgie?
+
+
+# TODO In Ubuntu Budgie, Indicator Tide needs to test with user script.
+
+
+# TODO In Ubuntu Budgie, Indicator Virtual Box icon does not appear.
+# Try a remove, purge, update icon cache, restart, install.
+
+
+# TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
+
+
+#TODO In Ubuntu Budgie, Indicator Script Runner needs to test background scripts.
+
+
+#TODO In Ubuntu MATE, Indicator Script Runner needs to test background scripts.
+
+
+#TODO On Ubuntu Mate 2004, the icon is hicolor so need to figure out the theme.
+
+
+#TODO On Ubuntu Mate 2004, the icon is a horizontally stretched bar for Indicator Lunar!
+# But the icon during initialisation (NOT hicolor) is regular/correct size).
+# Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
+# When I set the size to 22 x 22, the icon seemed much better...but not correct.
+# Not sure if this a quirk of MATE or I've fundamentally made some mistake...
+
+
 #TODO Going forward, in terms of external hosting of source code
 # and deploying alternatives to .deb files via PPA...
 #    https://github.com/alexmurray/indicator-sensors
@@ -33,7 +88,7 @@
 # Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
 
 
-#TODO On Lubuntu 20.04, the icon looks a little odd for Indicator Lunar...is it my eyes or really is odd?
+#TODO On Lubuntu 20.04, the icon looks a completely different icon for Indicator Lunar.
 # See 
 #    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
 # for a description of the issue.
@@ -45,66 +100,16 @@
 #TODO On Lubuntu 20.04, icon labels are unsupported.
 # Using the title/label will not work as it seems
 # setting the title/label after the indicator is started has no effect.
-# So somehow hide the background stuff in the Preferences and/or grey out stuff?
+# For Indicator Script Runner, somehow hide the background stuff in the Preferences and/or grey out stuff?
+# Also perhaps just comment out the icon TAB in the Preferences?
+# What about the attributes/fields for background scripts when create/edit a script?
+# Comment those out too?
 
 
 #TODO Icons look too big for Xubuntu 20.04...what can be done?
 
 
 #TODO Icons for Ubuntu Budgie 20.04 across the board seem a little big.
-
-
-#TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
-# On first glance, colour is ffffff.
-
-
-# TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
-
-
-# TODO In Lubuntu 20.04, check the middle mouse click works for Fortune, PPA, Punycode, Script Runner.
-# This might help too if there is a problem:
-#    https://manual.lubuntu.me/stable/5/5.1/lxqt-panel.html?highlight=mouse%20middle
-
-
-# TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
-
-
-# TODO In Ubuntu Budgie, Indicator Script Runner needs to test background scripts.
-
-
-# TODO In Ubuntu Budgie, Indicator Tide needs to test with user script.
-
-
-# TODO In Ubuntu Budgie, Indicator Virtual Box icon does not appear.
-# Try a remove, purge, update icon cache, restart, install.
-
-
-# TODO In Ubuntu MATE, Indicator Script Runner needs to test background scripts.
-
-
-# TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
-
-
-#TODO On Lubuntu 20.04, the dynamic icon does not show up.
-# Check that the icon name changes...or maybe not.
-# Maybe on Lubuntu, need to use the icon's orginal name?
-
-
-#TODO On Lubuntu 20.04, there is no label next to the icon,
-# but using the title/label will not work as it seems
-# setting the title/label after the indicator is started has no effect.
-# So perhaps just comment out the icon TAB in the Preferences?
-# Seems to be no issue with calling the setLabel as it has no effect.
-
-
-#TODO On Ubuntu Mate 2004, the icon is hicolor so need to figure out the theme.
-
-
-#TODO On Ubuntu Mate 2004, the icon is a horizontally stretched bar!
-# But the icon during initialisation (NOT hicolor) is regular/correct size).
-# Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
-# When I set the size to 22 x 22, the icon seemed much better...but not correct.
-# Not sure if this a quirk of MATE or I've fundamentally made some mistake...
 
 
 import gi
