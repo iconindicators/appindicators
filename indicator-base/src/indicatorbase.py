@@ -25,10 +25,23 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Lubuntu 20.04 Indicator Stardate:
-# A similarly looking icon to the stardate SVG icon appears.
-# This icon likely comes from Papirus, but does not explain why that icon has the name
-# indicator-stardate.svg
+#TODO Lubuntu 20.04 Indicator Stardate
+# A similarly looking icon to the stardate SVG icon appears instead.
+# The icon is found in
+#    /usr/share/icons/
+#                    Papirus-Light/16x16/panel
+#                    Papirus-Light/22x22/panel
+#                    Papirus-Light/24x24/panel
+#                    Papirus/16x16/panel
+#                    Papirus/22x22/panel
+#                    Papirus/24x24/panel
+#                    ePapirus-Light/24x24/panel
+#
+# all with the icon name indicator-stardate.svg
+#
+# Have rebuilt the icon cache to no avail.
+#
+# Have logged an issue to find the name/source of the original icon.
 #
 #    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
 #
@@ -42,8 +55,10 @@
 # Maybe transparency is not observed.
 # Check by setting another indicator's icon (which also uses transparency or similar)
 # as the dynamic icon to see if the same issue arises.
-#
-# For the dynamic icon, it does not display and instead shows a grey/white circle,
+
+
+#TODO Lubuntu 20.04 Indicator Lunar:
+# The dynamic icon does not display and instead shows a grey/white circle,
 # presumably meaning the icon is not being displayed or not found?
 # I suspected the SVG being written out for the dynamic icon was broken,
 # so tried the writing out the SVG of the fixed icon as the dynamic icon and the icon still does not display.
@@ -63,6 +78,26 @@
 # In the Preferences,
 #    hide the icon tab;
 #    when add/edit a script, hide the background attributes/fields.
+
+
+#TODO On Lubuntu 20.04
+# Indicators Fortune/Lunar have the Yaru icon chosen which is good
+# (although Lunar seems odd discussed in TODO above).
+#
+# Stardate has the wrong icon chosen as discussed in TODO above.
+#
+# All other icons are hicolor and I don't understand why.
+# When printing the theme name via Indicator Base, the theme is Yaru.
+#
+# If from a terminal I run
+#    gsettings get org.gnome.desktop.interface gtk-theme
+# I get Arc-Darker
+#
+# If from a terminal I run
+#    gsettings get org.gnome.desktop.interface icon-theme
+# I get Adwaita
+#
+# Makes no sense!
 
 
 #TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
