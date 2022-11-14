@@ -25,12 +25,44 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO On Lubuntu 20.04 Indicator Lunar, the dynamic icon does not show up.
-# Looks like a default error/missing icon perhaps.
-# Check that the icon name changes...or maybe not.
-# Maybe on Lubuntu, need to use the icon's orginal name?
-# Unsure if this is for Indicator Lunar...if so, maybe this is the same issue as in Ubuntu Budgie?
-# On Lubuntu, have tried setting width/height to 22 and also 100%.  Icon still does not come up...what next?
+#TODO Lubuntu 20.04 Indicator Stardate:
+# A similarly looking icon to the stardate SVG icon appears.
+# This icon likely comes from Papirus, but does not explain why that icon has the name
+# indicator-stardate.svg
+#
+#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
+#
+# Need to log an issue at
+#    https://discourse.lubuntu.me/ 
+# once the icon name from Papirus is found to figure out how this mixup has happened.
+
+
+#TODO Lubuntu 20.04 Indicator Lunar:
+# The default icon appears, but is enclosed in a circle.
+# Maybe transparency is not observed.
+# Check by setting another indicator's icon (which also uses transparency or similar)
+# as the dynamic icon to see if the same issue arises.
+#
+# For the dynamic icon, it does not display and instead shows a grey/white circle,
+# presumably meaning the icon is not being displayed or not found?
+# I suspected the SVG being written out for the dynamic icon was broken,
+# so tried the writing out the SVG of the fixed icon as the dynamic icon and the icon still does not display.
+#
+# I suspect, as per the label which seems cannot be changed after the indicator starts up,
+# the icon cannot be changed either.
+#
+# Need to log an issue at
+#    https://discourse.lubuntu.me/
+# creating a simply indicator which updates the label and icon. 
+#
+# The workaround is simply show the fixed icon and never attempt to change the icon.
+
+
+#TODO On Lubuntu 20.04 Script Runner
+# As icon labels are unsupported, cannot have background scripts.
+# In the Preferences,
+#    hide the icon tab;
+#    when add/edit a script, hide the background attributes/fields.
 
 
 #TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
@@ -58,10 +90,13 @@
 # Try a remove, purge, update icon cache, restart, install.
 
 
-# TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
-
-
 #TODO In Ubuntu Budgie, Indicator Script Runner needs to test background scripts.
+
+
+#TODO Icons for Ubuntu Budgie 20.04 across the board seem a little big.
+
+
+# TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
 
 
 #TODO In Ubuntu MATE, Indicator Script Runner needs to test background scripts.
@@ -77,40 +112,15 @@
 # Not sure if this a quirk of MATE or I've fundamentally made some mistake...
 
 
+#TODO Icons look too big for Xubuntu 20.04...what can be done?
+
+
 #TODO Going forward, in terms of external hosting of source code
 # and deploying alternatives to .deb files via PPA...
 #    https://github.com/alexmurray/indicator-sensors
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
 #
 # Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
-
-
-#TODO On Lubuntu 20.04, the icon looks a completely different icon for Indicator Lunar.
-# See 
-#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
-# for a description of the issue.
-# The icon likely comes from Papirus, but does not explain the mix up.
-# Need to log an issue at
-# https://discourse.lubuntu.me/ 
-#
-# Not sure about this now as the default icon seems fine (although does not observe transparency
-# as there is a full circle in the background).
-# Also the icon theme reports back as Yaru.  So what is going on...? 
-
-
-#TODO On Lubuntu 20.04, icon labels are unsupported.
-# Using the title/label will not work as it seems
-# setting the title/label after the indicator is started has no effect.
-# For Indicator Script Runner, somehow hide the background stuff in the Preferences and/or grey out stuff?
-# Also perhaps just comment out the icon TAB in the Preferences?
-# What about the attributes/fields for background scripts when create/edit a script?
-# Comment those out too?
-
-
-#TODO Icons look too big for Xubuntu 20.04...what can be done?
-
-
-#TODO Icons for Ubuntu Budgie 20.04 across the board seem a little big.
 
 
 import gi
@@ -200,7 +210,17 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
-        print( "Theme name:", self.getThemeName() ) #TODO Test
+        print( "Theme name (indicator base init):", self.getThemeName() ) #TODO Test
+
+        # props = Gtk.Settings().get_default().list_properties()
+        # for prop in props:
+        #     if "theme" in prop.name:
+        #         print( prop.name )
+        #         print( Gtk.Settings().get_default().get_property( prop.name ) )
+        #         print()
+        # print()
+
+
 
 
     def main( self ):
@@ -599,7 +619,7 @@ class IndicatorBase( ABC ):
             "Yaru"                   : "dbdbdb" }
 
         themeName = self.getThemeName()
-        print( "theme name:", themeName )
+        print( "Theme name (indicator base theme colour lookup):", themeName ) #TODO Test
         themeColour = defaultColour
         if themeName in themeNames:
             themeColour = themeNames[ themeName ]

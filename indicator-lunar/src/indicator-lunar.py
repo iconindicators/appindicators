@@ -285,11 +285,9 @@ class IndicatorLunar( IndicatorBase ):
             menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
 
         self.updateMenu( menu, utcNow )
-
-        if not self.isDesktopEnvironmentLXQt():
-            self.setLabel( self.processTags() )
-
-        self.updateIcon() #TODO Should this not be used for Lubuntu?
+        self.setLabel( self.processTags() ) # Lubuntu ignores setting the label after the indicator has started.
+        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set after the indicator is initialised.
+            self.updateIcon()
 
         if self.showWerewolfWarning:
             self.notificationFullMoon()
@@ -1102,10 +1100,9 @@ class IndicatorLunar( IndicatorBase ):
     #                             Ignored when phase is full/new.
     def getSVGIconText( self, phase, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
-        height = 100
+        height = width
         radius = float( width / 2 )
         colour = self.getThemeColour( defaultColour = "fff200" ) # Default to hicolor.
-        print( "xxxx")#TODO
         if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
