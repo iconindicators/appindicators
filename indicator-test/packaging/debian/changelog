@@ -1,0 +1,41 @@
+indicator-test (1.0.5-1) bionic; urgency=low
+
+  * Created a mock indicator which tests all manner of indicator capabilities;
+    OSD, mouse wheel scroll, middle mouse icon click, et al.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 16 Nov 2022 15:09:46 +1000
+
+
+indicator-test (1.0.4-1) bionic; urgency=low
+
+  * Testing debian/control/compat level of 10.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 22 Jun 2022 16:16:46 +1000
+
+
+indicator-test (1.0.3-1) focal; urgency=low
+
+  * Testing install of pyephem through apt-get.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 13 Jun 2016 16:15:46 +1000
+
+
+indicator-test (1.0.2-1) bionic; urgency=low
+
+  * Testing.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 13 Jun 2016 16:14:46 +1000
+
+
+indicator-test (1.0.1-1) bionic; urgency=low
+
+  * Testing.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 12 Jun 2016 16:14:46 +1000
+
+
+indicator-test (1.0.0-1) bionic; urgency=low
+
+  * Testing.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sat, 11 Jun 2016 16:14:46 +1000

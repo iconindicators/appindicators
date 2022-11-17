@@ -1,0 +1,22 @@
+# Portable Object Template for indicator-test.
+# Copyright (C) 2016-2022 Bernard Giannetti
+# This file is distributed under the same license as the indicator-test package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indicator-test 1.0.5\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+msgid "Nothing"
+msgstr ""
