@@ -25,125 +25,6 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Lubuntu 20.04 Indicator Stardate
-# A similarly looking icon to the stardate SVG icon appears instead.
-# The icon is found in
-#    /usr/share/icons/
-#                    Papirus-Light/16x16/panel
-#                    Papirus-Light/22x22/panel
-#                    Papirus-Light/24x24/panel
-#                    Papirus/16x16/panel
-#                    Papirus/22x22/panel
-#                    Papirus/24x24/panel
-#                    ePapirus-Light/24x24/panel
-#
-# all with the icon name indicator-stardate.svg
-#
-# Have rebuilt the icon cache to no avail.
-#
-# Have logged an issue to find the name/source of the original icon.
-#
-#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
-#
-# Need to log an issue at
-#    https://discourse.lubuntu.me/ 
-# once the icon name from Papirus is found to figure out how this mixup has happened.
-
-
-#TODO Lubuntu 20.04 Indicator Lunar:
-# The startup icon appears, but is enclosed in a circle.
-# Maybe transparency is not observed.
-# Check by setting another indicator's icon (which also uses transparency or similar)
-# as the dynamic icon to see if the same issue arises.
-
-
-#TODO Lubuntu 20.04 Indicator Lunar:
-# The dynamic icon does not display and instead shows a grey/white circle,
-# presumably meaning the icon is not being displayed or not found?
-# I suspected the SVG being written out for the dynamic icon was broken,
-# so tried the writing out the SVG of the fixed icon as the dynamic icon and the icon still does not display.
-#
-# I suspect, as per the label which seems cannot be changed after the indicator starts up,
-# the icon cannot be changed either.
-#
-# Need to log an issue at
-#    https://discourse.lubuntu.me/
-# creating a simply indicator which updates the label and icon. 
-#
-# The workaround is simply show the fixed icon and never attempt to change the icon.
-
-
-#TODO On Lubuntu 20.04 Script Runner
-# As icon labels are unsupported, cannot have background scripts.
-# In the Preferences,
-#    hide the icon tab;
-#    when add/edit a script, hide the background attributes/fields.
-
-
-#TODO On Lubuntu 20.04
-# Indicators Fortune/Lunar have the Yaru icon chosen which is good
-# (although Lunar seems odd discussed in TODO above).
-#
-# Stardate has the wrong icon chosen as discussed in TODO above.
-#
-# All other icons are hicolor and I don't understand why.
-# When printing the theme name via Indicator Base, the theme is Yaru.
-#
-# If from a terminal I run
-#    gsettings get org.gnome.desktop.interface gtk-theme
-# I get Arc-Darker
-#
-# If from a terminal I run
-#    gsettings get org.gnome.desktop.interface icon-theme
-# I get Adwaita
-#
-# Makes no sense!
-#
-# Check to see if there are icon directories for Arc-Darker and Adwaita;
-# my icons should be there for Adwaita.
-
-
-# TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
-# What to do? 
-#    Grey out the option;
-#    Remove the option (so have a test for Ubuntu Budgie);
-#    Change tooltip to include text "where supported".
-
-
-# TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
-# Might need to specify viewBox along with width/height?
-# Compare the default/startup icon against the dynamic one.
-# https://jenkov.com/tutorials/svg/svg-viewport-view-box.html
-# https://www.digitalocean.com/community/tutorials/svg-svg-viewbox
-# https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
-
-
-# TODO In Ubuntu Budgie, Indicator Virtual Box icon does not appear.
-# Try a remove, purge, touch icon directories, update icon cache, restart, install.
-# Still no show...yet I've found in /usr/share/icons/Pocillo/24/Panel an icon
-# for indicator virtual box.
-# This has the same feel as the Lubuntu Papirus indicator stardate icon.
-# What is going on?
-# Maybe I need to create a test indicator, upload to PPA Testing
-# which contains icons for Papirus and Pocillo.
-
-
-#TODO Ubuntu Mate Indicator Lunar:
-# The icon is a horizontally stretched bar and is hicolor!
-# But the icon during initialisation (NOT hicolor) is regular/correct size).
-# Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
-# When I set the size to 22 x 22, the icon seemed much better...but not correct.
-# Not sure if this a quirk of MATE or I've fundamentally made some mistake...
-
-
-#TODO Going forward, in terms of external hosting of source code
-# and deploying alternatives to .deb files via PPA...
-#    https://github.com/alexmurray/indicator-sensors
-#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
-#
-# Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
-
-
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
@@ -231,17 +112,6 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
-        print( "Theme name (indicator base init):", self.getIconThemeName() ) #TODO Test
-
-        # props = Gtk.Settings().get_default().list_properties()
-        # for prop in props:
-        #     if "theme" in prop.name:
-        #         print( prop.name )
-        #         print( Gtk.Settings().get_default().get_property( prop.name ) )
-        #         print()
-        # print()
-
-
 
 
     def main( self ):
@@ -629,8 +499,6 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getIconThemeColour( self, defaultColour ):
-        print( "getting theme colour...") #TODO Test
-        print( "default colour:", defaultColour ) #TODO Test
         themeNames = {
             "Adwaita"                : "bebebe",
             "elementary-xfce-darker" : "f3f3f3",
@@ -640,14 +508,10 @@ class IndicatorBase( ABC ):
             "Yaru"                   : "dbdbdb" }
 
         themeName = self.getIconThemeName()
-        print( "Theme name (indicator base theme colour lookup):", themeName ) #TODO Test
         themeColour = defaultColour
         if themeName in themeNames:
             themeColour = themeNames[ themeName ]
-            print( themeName, themeColour )#TODO Test
-#TODO Check this function prints out on all Ubuntu flavours.
-#If not, need to add in the default theme and find that from the terminal:
-#    gsettings list-recursively | grep icon-theme
+
         return themeColour
 
 
