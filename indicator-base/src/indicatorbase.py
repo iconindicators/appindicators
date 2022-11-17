@@ -51,7 +51,7 @@
 
 
 #TODO Lubuntu 20.04 Indicator Lunar:
-# The default icon appears, but is enclosed in a circle.
+# The startup icon appears, but is enclosed in a circle.
 # Maybe transparency is not observed.
 # Check by setting another indicator's icon (which also uses transparency or similar)
 # as the dynamic icon to see if the same issue arises.
@@ -98,16 +98,19 @@
 # I get Adwaita
 #
 # Makes no sense!
+#
+# Check to see if there are icon directories for Arc-Darker and Adwaita;
+# my icons should be there for Adwaita.
 
 
-#TODO In Ubuntu Budgie 20.04, the icon hicolor is chosen because there is no icon for the theme Pocillo.
-# On first glance, colour is ffffff.
-# Can maybe test this by copying the icons from ubuntu-mono-light across and then change the colour (after rebuild of icon cache)?
+#TODO On Ubuntu Budgie, the theme is Pocillo with colour #ffffff so add to build-debian-common.
 
 
 # TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
-# Is there a forum to ask about this?
-# Maybe first verify this all again...
+# What to do? 
+#    Grey out the option;
+#    Remove the option (so have a test for Ubuntu Budgie);
+#    Change tooltip to include text "where supported".
 
 
 # TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
@@ -118,36 +121,25 @@
 # https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
 
 
-# TODO In Ubuntu Budgie, Indicator Tide needs to test with user script.
-
-
 # TODO In Ubuntu Budgie, Indicator Virtual Box icon does not appear.
-# Try a remove, purge, update icon cache, restart, install.
+# Try a remove, purge, touch icon directories, update icon cache, restart, install.
+# Still no show...yet I've found in /usr/share/icons/Pocillo/24/Panel an icon
+# for indicator virtual box.
+# This has the same feel as the Lubuntu Papirus indicator stardate icon.
+# What is going on?
+# Maybe I need to create a test indicator, upload to PPA Testing
+# which contains icons for Papirus and Pocillo.
 
 
-#TODO In Ubuntu Budgie, Indicator Script Runner needs to test background scripts.
-
-
-#TODO Icons for Ubuntu Budgie 20.04 across the board seem a little big.
-
-
-# TODO In Ubuntu MATE, need icons for whatever the theme is (mate or menta perhaps.
-
-
-#TODO In Ubuntu MATE, Indicator Script Runner needs to test background scripts.
-
-
-#TODO On Ubuntu Mate 2004, the icon is hicolor so need to figure out the theme.
-
-
-#TODO On Ubuntu Mate 2004, the icon is a horizontally stretched bar for Indicator Lunar!
+#TODO Ubuntu Mate Indicator Lunar:
+# The icon is a horizontally stretched bar and is hicolor!
 # But the icon during initialisation (NOT hicolor) is regular/correct size).
 # Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
 # When I set the size to 22 x 22, the icon seemed much better...but not correct.
 # Not sure if this a quirk of MATE or I've fundamentally made some mistake...
 
 
-#TODO Icons look too big for Xubuntu 20.04...what can be done?
+#TODO On Ubuntu MATE, the theme is Ambiant-MATE with colour #dfdbd2 so add to build-debian-common.
 
 
 #TODO Going forward, in terms of external hosting of source code
@@ -245,7 +237,7 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
-        print( "Theme name (indicator base init):", self.getThemeName() ) #TODO Test
+        print( "Theme name (indicator base init):", self.getIconThemeName() ) #TODO Test
 
         # props = Gtk.Settings().get_default().list_properties()
         # for prop in props:
@@ -636,13 +628,13 @@ class IndicatorBase( ABC ):
         return "      " * indent
 
 
-    def getThemeName( self ):
+    def getIconThemeName( self ):
         return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
 
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
-    def getThemeColour( self, defaultColour ):
+    def getIconThemeColour( self, defaultColour ):
         print( "getting theme colour...") #TODO Test
         print( "default colour:", defaultColour ) #TODO Test
         themeNames = {
@@ -653,7 +645,7 @@ class IndicatorBase( ABC ):
             "ubuntu-mono-light"      : "3c3c3c",
             "Yaru"                   : "dbdbdb" }
 
-        themeName = self.getThemeName()
+        themeName = self.getIconThemeName()
         print( "Theme name (indicator base theme colour lookup):", themeName ) #TODO Test
         themeColour = defaultColour
         if themeName in themeNames:
@@ -1048,7 +1040,7 @@ class IndicatorBase( ABC ):
     # text: The text to write.
     # filename: The name of the file.
     #
-    # Returns True on success; False otherwise.
+    # Returns filename written on success; None otherwise.
     def writeCacheTextWithoutTimestamp( self, text, filename ):
         return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
 
@@ -1064,7 +1056,7 @@ class IndicatorBase( ABC ):
     # or
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
-    # Returns True on success; False otherwise.
+    # Returns filename written on success; None otherwise.
     def writeCacheText( self, text, basename, extension = EXTENSION_TEXT ):
         cacheFile = \
             self.__getCacheDirectory() + \
