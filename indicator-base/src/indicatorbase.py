@@ -103,9 +103,6 @@
 # my icons should be there for Adwaita.
 
 
-#TODO On Ubuntu Budgie, the theme is Pocillo with colour #ffffff so add to build-debian-common.
-
-
 # TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
 # What to do? 
 #    Grey out the option;
@@ -137,9 +134,6 @@
 # Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
 # When I set the size to 22 x 22, the icon seemed much better...but not correct.
 # Not sure if this a quirk of MATE or I've fundamentally made some mistake...
-
-
-#TODO On Ubuntu MATE, the theme is Ambiant-MATE with colour #dfdbd2 so add to build-debian-common.
 
 
 #TODO Going forward, in terms of external hosting of source code
