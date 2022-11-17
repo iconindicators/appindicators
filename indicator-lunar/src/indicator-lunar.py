@@ -286,7 +286,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.updateMenu( menu, utcNow )
         self.setLabel( self.processTags() ) # Lubuntu ignores setting the label after the indicator has started.
-        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set after the indicator is initialised.
+        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
             self.updateIcon()
 
         if self.showWerewolfWarning:

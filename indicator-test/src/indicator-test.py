@@ -41,6 +41,7 @@ class IndicatorTest( IndicatorBase ):
 
     CONFIG_X = "x"
 
+
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
@@ -95,8 +96,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __useIconFromUserCache( self ):
-        # Remove the check below on Lubuntu to see if using the same icon as used in startup actually works...        
-        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set after the indicator is initialised.
+        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
             with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
                 svg = fIn.read()
 

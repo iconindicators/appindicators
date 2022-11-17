@@ -80,34 +80,12 @@
 #    when add/edit a script, hide the background attributes/fields.
 
 
-#TODO On Lubuntu 20.04
-# Indicators Fortune/Lunar have the Yaru icon chosen which is good
-# (although Lunar seems odd discussed in TODO above).
-#
-# Stardate has the wrong icon chosen as discussed in TODO above.
-#
-# All other icons are hicolor and I don't understand why.
-# When printing the theme name via Indicator Base, the theme is Yaru.
-#
-# If from a terminal I run
-#    gsettings get org.gnome.desktop.interface gtk-theme
-# I get Arc-Darker
-#
-# If from a terminal I run
-#    gsettings get org.gnome.desktop.interface icon-theme
-# I get Adwaita
-#
-# Makes no sense!
-#
-# Check to see if there are icon directories for Arc-Darker and Adwaita;
-# my icons should be there for Adwaita.
-
-
 # TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
 # What to do? 
 #    Grey out the option;
 #    Remove the option (so have a test for Ubuntu Budgie);
 #    Change tooltip to include text "where supported".
+# Does this also happen on Lubuntu?
 
 
 # TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
@@ -116,16 +94,6 @@
 # https://jenkov.com/tutorials/svg/svg-viewport-view-box.html
 # https://www.digitalocean.com/community/tutorials/svg-svg-viewbox
 # https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
-
-
-# TODO In Ubuntu Budgie, Indicator Virtual Box icon does not appear.
-# Try a remove, purge, touch icon directories, update icon cache, restart, install.
-# Still no show...yet I've found in /usr/share/icons/Pocillo/24/Panel an icon
-# for indicator virtual box.
-# This has the same feel as the Lubuntu Papirus indicator stardate icon.
-# What is going on?
-# Maybe I need to create a test indicator, upload to PPA Testing
-# which contains icons for Papirus and Pocillo.
 
 
 #TODO Ubuntu Mate Indicator Lunar:
