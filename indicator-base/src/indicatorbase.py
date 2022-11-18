@@ -52,19 +52,16 @@
 
 #TODO Lubuntu 20.04 Indicator Lunar:
 # The startup icon appears, but is enclosed in a circle.
-# Maybe transparency is not observed.
-# Check by setting another indicator's icon (which also uses transparency or similar)
-# as the dynamic icon to see if the same issue arises.
+# Does not happen with the other indicator's icon.
 
 
 #TODO Lubuntu 20.04 Indicator Lunar:
 # The dynamic icon does not display and instead shows a grey/white circle,
 # presumably meaning the icon is not being displayed or not found?
-# I suspected the SVG being written out for the dynamic icon was broken,
-# so tried the writing out the SVG of the fixed icon as the dynamic icon and the icon still does not display.
 #
 # I suspect, as per the label which seems cannot be changed after the indicator starts up,
 # the icon cannot be changed either.
+# However if I set the icon back to the default icon, the icon shows up.
 #
 # Need to log an issue at
 #    https://discourse.lubuntu.me/
@@ -77,7 +74,7 @@
 # As icon labels are unsupported, cannot have background scripts.
 # In the Preferences,
 #    hide the icon tab;
-#    when add/edit a script, hide the background attributes/fields.
+#    when add/edit a script, hide the background attributes/fields;
 
 
 # TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
@@ -85,7 +82,13 @@
 #    Grey out the option;
 #    Remove the option (so have a test for Ubuntu Budgie);
 #    Change tooltip to include text "where supported".
-# Does this also happen on Lubuntu?
+#
+# For Script Runner, how does the default script stuff now work with no middle mouse click?
+# Can/should the GUI elements be hidden?
+#
+# According to 
+#    https://launchpad.net/ubuntu/+source/budgie-indicator-applet/+changelog
+# maybe supported in 22.04 so guess need to check!
 
 
 # TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
@@ -110,6 +113,26 @@
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
 #
 # Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
+#
+# Distribution other than PPA:
+#     https://snapcraft.io/about
+#     https://flathub.org/home
+
+
+#TODO Port indicators to an Ubuntu variant which supports appindicator...
+#    https://www.ubuntukylin.com/downloads/download-en.html
+#    https://ubuntuunity.org/download/
+#
+# Port indicators to non-Ubuntu variant which support GNOME:
+#    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
+#    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
+#
+# Worth trying Kubuntu?
+#    https://kubuntu.org/alternative-downloads/
+#
+# Miscellaneous:
+#    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
+#    https://itsfoss.com/enable-applet-indicator-gnome/
 
 
 import gi
@@ -200,16 +223,6 @@ class IndicatorBase( ABC ):
 
         self.__loadConfig()
         print( "Theme name (indicator base init):", self.getIconThemeName() ) #TODO Test
-
-        # props = Gtk.Settings().get_default().list_properties()
-        # for prop in props:
-        #     if "theme" in prop.name:
-        #         print( prop.name )
-        #         print( Gtk.Settings().get_default().get_property( prop.name ) )
-        #         print()
-        # print()
-
-
 
 
     def main( self ):
@@ -597,9 +610,7 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getIconThemeColour( self, defaultColour ):
-        print( "getting theme colour...") #TODO Test
-        print( "default colour:", defaultColour ) #TODO Test
-        themeNames = {
+        iconThemeNames = {
             "Adwaita"                : "bebebe",
             "elementary-xfce-darker" : "f3f3f3",
             "Lubuntu"                : "4c4c4c",
@@ -607,16 +618,12 @@ class IndicatorBase( ABC ):
             "ubuntu-mono-light"      : "3c3c3c",
             "Yaru"                   : "dbdbdb" }
 
-        themeName = self.getIconThemeName()
-        print( "Theme name (indicator base theme colour lookup):", themeName ) #TODO Test
-        themeColour = defaultColour
-        if themeName in themeNames:
-            themeColour = themeNames[ themeName ]
-            print( themeName, themeColour )#TODO Test
-#TODO Check this function prints out on all Ubuntu flavours.
-#If not, need to add in the default theme and find that from the terminal:
-#    gsettings list-recursively | grep icon-theme
-        return themeColour
+        iconThemeName = self.getIconThemeName()
+        iconThemeColour = defaultColour
+        if iconThemeName in iconThemeNames:
+            iconThemeColour = iconThemeNames[ iconThemeName ]
+
+        return iconThemeColour
 
 
     def getLogging( self ):
@@ -637,6 +644,7 @@ class IndicatorBase( ABC ):
         return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
+#TODO Test how this works on Lubuntu 22.04.
     # Lubuntu (LXQt) does not show an icon label and
     # the tooltip seems to be unchangeable after initialisation.
     def isDesktopEnvironmentLXQt( self ):
@@ -644,6 +652,10 @@ class IndicatorBase( ABC ):
         return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT
 
 
+#TODO Need to be careful here...
+# If the issue with qterminal has been fixed,
+# maybe need another function to determine if we are on 20.04 or 22.04 (or something in between).
+# This function alone might stop a script from running on 22.04 when the script will in fact run.
     def isTerminalQTerminal( self ):
         terminalIsQTerminal = False
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
