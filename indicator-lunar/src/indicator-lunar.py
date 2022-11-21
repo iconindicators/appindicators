@@ -29,6 +29,9 @@
 # remove 'comet' from the description in debian/control.
 
 
+#TODO Maybe change the ISS SVG icon to some simpler satellite icon.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -286,6 +289,8 @@ class IndicatorLunar( IndicatorBase ):
 
         self.updateMenu( menu, utcNow )
         self.setLabel( self.processTags() ) # Lubuntu ignores setting the label after the indicator has started.
+
+#TODO Really should be something like isDynamicIconSupported().        
         if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
             self.updateIcon()
 
@@ -1130,9 +1135,10 @@ class IndicatorLunar( IndicatorBase ):
             body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + \
                     str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
+        # Different view box dimensions compared with the default icon because this icon is created using a bound box of 100 x 100.
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100">' + body + '</svg>'
+                '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
 
 
     def onPreferences( self, dialog ):
@@ -1218,7 +1224,7 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
-        if not self.isDesktopEnvironmentLXQt():
+        if not self.isDesktopEnvironmentLXQt(): #TODO Really should be a function such as isLabelOrTooltipSupported()
             notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.

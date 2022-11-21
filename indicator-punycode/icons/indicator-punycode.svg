@@ -1,107 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   id="svg3229"
-   height="22"
-   width="22"
-   version="1.0"
-   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="indicator-punycode.svg">
-  <defs
-     id="defs8" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1053"
-     id="namedview6"
-     showgrid="true"
-     inkscape:zoom="32.068182"
-     inkscape:cx="10.009937"
-     inkscape:cy="10.588365"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg3229">
-    <inkscape:grid
-       type="xygrid"
-       id="grid3819" />
-  </sodipodi:namedview>
-  <metadata
-     id="metadata9">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
+<svg viewBox="0 0 22 22" width="22" height="22" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <g
-     transform="matrix(1.2,0,0,1.2,-2.2,-1.1269147)"
-     id="g3821-8"
-     style="opacity:0.2">
+    transform="matrix(1.2,0,0,1.2,-2.2,-1.1269147)"
+    style="opacity:0.2">
     <text
-       id="text3766-5"
-       y="16.186235"
-       x="1"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
-       xml:space="preserve"><tspan
-         y="16.186235"
-         x="1"
-         id="tspan3768-7"
-         sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">Я</tspan></text>
+      y="16.186235"
+      x="1"
+      style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"><tspan
+        y="16.186235"
+        x="1"
+        style="font-size:14px;line-height:1.25;font-family:sans-serif">Я</tspan></text>
     <text
-       transform="scale(-1,1)"
-       id="text3766-8-8"
-       y="16.183247"
-       x="-21"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"
-       xml:space="preserve"><tspan
-         y="16.183247"
-         x="-21"
-         id="tspan3768-8-6"
-         sodipodi:role="line"
-         style="font-size:14px;line-height:1.25;font-family:sans-serif">Я</tspan></text>
+      transform="scale(-1,1)"
+      y="16.183247"
+      x="-21"
+      style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none"><tspan
+        y="16.183247"
+        x="-21"
+        style="font-size:14px;line-height:1.25;font-family:sans-serif">Я</tspan></text>
   </g>
   <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#78dc96;fill-opacity:1;stroke:none;stroke-width:1.20000005"
-     x="-1"
-     y="17.108101"
-     id="text3766"><tspan
-       sodipodi:role="line"
-       id="tspan3768"
-       x="-1"
-       y="17.108101"
-       style="font-size:16.79999924px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005">Я</tspan></text>
+    style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#78dc96;fill-opacity:1;stroke:none;stroke-width:1.20000005"
+    x="-1"
+    y="17.108101"><tspan
+      x="-1"
+      y="17.108101"
+      style="font-size:16.79999924px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005">Я</tspan></text>
   <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;stroke-width:1.20000005"
-     x="-23"
-     y="17.104515"
-     id="text3766-8"
-     transform="scale(-1,1)"><tspan
-       sodipodi:role="line"
-       id="tspan3768-8"
-       x="-23"
-       y="17.104515"
-       style="font-size:16.79999924px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005">Я</tspan></text>
+    style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#6496dc;fill-opacity:1;stroke:none;stroke-width:1.20000005"
+    x="-23"
+    y="17.104515"
+    transform="scale(-1,1)"><tspan
+      x="-23"
+      y="17.104515"
+      style="font-size:16.79999924px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005">Я</tspan></text>
 </svg>

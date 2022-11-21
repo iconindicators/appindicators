@@ -30,7 +30,7 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 
-import datetime, random
+import datetime, os, random
 
 
 class IndicatorTest( IndicatorBase ):
@@ -71,12 +71,80 @@ class IndicatorTest( IndicatorBase ):
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Switch to dynamic icon in user cache" )
-        menuItem.connect( "activate", lambda widget: self.__useIconFromUserCache() )
+        menuItem = Gtk.MenuItem.new_with_label( "Use default icon" )
+        menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
         menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Switch to default icon" )
-        menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
+        menuItem = Gtk.MenuItem.new_with_label( "Use default icon copied to user cache with colour change" )
+        menuItem.connect( "activate", lambda widget: self.__useIconCopiedFromDefault() )
+        menu.append( menuItem )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (FULL_MOON)" )
+        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "FULL_MOON" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (WANING_GIBBOUS)" )
+        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "WANING_GIBBOUS" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (THIRD_QUARTER)" )
+        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "THIRD_QUARTER" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (NEW_MOON)" )
+        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "NEW_MOON" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (WAXING_CRESCENT)" )
+        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "WAXING_CRESCENT" ) )
+        menu.append( menuItem )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-fortune.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-fortune.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-lunar.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-lunar.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-lunar-satellite.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-lunar-satellite.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-on-this-day.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-on-this-day.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-ppa-download-statistics.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-ppa-download-statistics.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-punycode.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-punycode.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-script-runner.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-script-runner.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-stardate.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-stardate.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-test.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-test.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-tide.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-tide.svg" ) )
+        menu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-virtual-box.svg in $HOME" ) )
+        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-virtual-box.svg" ) )
         menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -95,12 +163,12 @@ class IndicatorTest( IndicatorBase ):
         menu.append( Gtk.MenuItem.new_with_label( _( "X: " + str( self.X ) ) ) )
 
 
-    def __useIconFromUserCache( self ):
+    def __useIconCopiedFromDefault( self ):
         if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
             with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
                 svg = fIn.read()
 
-            # When testing locally...
+            # If testing locally (without being installed via PPA/deb)...
             # with open( "../icons/indicator-test.svg", 'r' ) as fIn:
             #     svg = fIn.read()
 
@@ -120,6 +188,61 @@ class IndicatorTest( IndicatorBase ):
 
     def __getCurrentTime( self ):
         return datetime.datetime.now().strftime( "%H:%M:%S" )
+
+
+    def __useIconDynamicallyCreated( self, phase ):
+        illuminationPercentage = 35
+        brightLimbAngleInDegrees = 65
+        svgIconText = self.__getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
+        iconFilename = self.writeCacheText( svgIconText, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
+        self.indicator.set_icon_full( iconFilename, "" )
+
+
+    def __useIconInHomeDirectory( self, iconName ):
+        self.indicator.set_icon_full( os.getenv( "HOME" ) + '/' + iconName, "" )
+
+
+    # Virtually a direct copy from Indicator Lunar to test dynamically created SVG icons in the user cache.
+    # phase The current phase of the moon.
+    # illuminationPercentage The brightness ranging from 0 to 100 inclusive.
+    #                        Ignored when phase is full/new or first/third quarter.
+    # brightLimbAngleInDegrees Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
+    #                          Ignored when phase is full/new.
+    def __getSVGIconText( self, phase, illuminationPercentage, brightLimbAngleInDegrees ):
+        width = 100
+        height = width
+        radius = float( width / 2 )
+        colour = self.getIconThemeColour( defaultColour = "fff200" ) # Default to hicolor.
+        if phase == "FULL_MOON" or phase == "NEW_MOON":
+            body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
+            if phase == "NEW_MOON":
+                body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
+
+            else: # Full
+                body += '" fill="#' + colour + '" />'
+
+        else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
+            body = '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
+                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
+                   str( width / 2 + radius ) + ' ' + str( height / 2 )
+
+            if phase == "FIRST_QUARTER" or phase == "THIRD_QUARTER":
+                body += ' Z"'
+
+            elif phase == "WANING_CRESCENT" or phase == "WAXING_CRESCENT":
+                body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illuminationPercentage ) / 50 ) + ' 0 0 0 ' + \
+                        str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+
+            else: # Waning/Waxing Gibbous
+                body += ' A ' + str( radius ) + ' ' + str( radius * ( illuminationPercentage - 50 ) / 50 ) + ' 0 0 1 ' + \
+                        str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+
+            body += ' transform="rotate(' + str( -brightLimbAngleInDegrees ) + ' ' + \
+                    str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
+
+        return '<?xml version="1.0" standalone="no"?>' \
+               '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 22 22" width="22" height="22">' + body + '</svg>'
 
 
     def onPreferences( self, dialog ):

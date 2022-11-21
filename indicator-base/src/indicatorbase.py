@@ -25,7 +25,41 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Lubuntu 20.04 Indicator Stardate
+#TODO Probably need a function isMiddleMouseClickSupported()
+# For Fortune, hide the Preference GUI element.
+# For PPA, no effect, nothing to hide.
+# For Punycode, change Preference tooltip.
+# For Script Runner, no default script, so hide GUI element in Preference.
+# For Virtual Box, cannot launch VirtualBox Manager, so nothing else to do.
+
+
+#TODO Probably need a function isMiddleWheelScrollSupported()
+# For Stardate, nothing to hide.
+# For Virtual Box, nothing to hide.
+
+
+#TODO Given that:
+# Not all platforms support a label next to the icon (Lubuntu, Xubuntu, Kubuntu);
+# Not all platforms support writing a tooltip after initialisation (Lubuntu);
+# Not all platforms support middle mouse click (Lubutu, Budgie);
+# Not all platforms support mouse scroll (Lubuntu);
+# Figure out where these functions are used and
+# if a function is needed to detect these platforms
+# in order to provide alternate functionality (write a menu item in Stardate)
+# or to hide/disable functionality (Script Runner default script and background scripts).
+# If for example, mouse scrolling is unsupported,
+# perhaps no need to detect this as the functionality is provided elsewhere (as in Stardate).
+
+
+#TODO Lubuntu 20.04 Test
+# Middle mouse click does not work.
+# See Ubuntu Budgie 20.04 below.
+#
+# Cannot show anything in label (tooltip) after initialisation.
+# Affects Lunar, Script Runner, Stardate.
+
+
+#TODO Lubuntu 20.04 Stardate
 # A similarly looking icon to the stardate SVG icon appears instead.
 # The icon is found in
 #    /usr/share/icons/
@@ -50,17 +84,16 @@
 # once the icon name from Papirus is found to figure out how this mixup has happened.
 
 
-#TODO Lubuntu 20.04 Indicator Lunar:
+#TODO Lubuntu 20.04 Lunar
 # The startup icon appears, but is enclosed in a circle.
 # Does not happen with the other indicator's icon.
 
 
-#TODO Lubuntu 20.04 Indicator Lunar:
+#TODO Lubuntu 20.04 Lunar
 # The dynamic icon does not display and instead shows a grey/white circle,
 # presumably meaning the icon is not being displayed or not found?
 #
-# I suspect, as per the label which seems cannot be changed after the indicator starts up,
-# the icon cannot be changed either.
+# I suspect (as for the label), cannot be changed to another icon after the indicator starts up.
 # However if I set the icon back to the default icon, the icon shows up.
 #
 # Need to log an issue at
@@ -70,14 +103,15 @@
 # The workaround is simply show the fixed icon and never attempt to change the icon.
 
 
-#TODO On Lubuntu 20.04 Script Runner
+#TODO Lubuntu 20.04 Script Runner
 # As icon labels are unsupported, cannot have background scripts.
 # In the Preferences,
 #    hide the icon tab;
 #    when add/edit a script, hide the background attributes/fields;
 
 
-# TODO In Ubuntu Budgie, the middle mouse click does not work on Fortune, PPA, Punycode, Script Runner.
+# TODO Ubuntu Budgie 20.04 Fortune/PPA/Punycode/Script Runner/Virtual Box
+# Middle mouse click does not work. 
 # What to do? 
 #    Grey out the option;
 #    Remove the option (so have a test for Ubuntu Budgie);
@@ -88,23 +122,32 @@
 #
 # According to 
 #    https://launchpad.net/ubuntu/+source/budgie-indicator-applet/+changelog
-# maybe supported in 22.04 so guess need to check!
+# maybe supported in 22.04 so need to check!
 
 
-# TODO In Ubuntu Budgie, Indicator Lunar dynamic icon is HUGE!
+# TODO Ubuntu Budgie 20.04 Lunar
+# Dynamic icon is HUGE!
 # Might need to specify viewBox along with width/height?
 # Compare the default/startup icon against the dynamic one.
 # https://jenkov.com/tutorials/svg/svg-viewport-view-box.html
 # https://www.digitalocean.com/community/tutorials/svg-svg-viewbox
 # https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
+#
+# Tried adding after the viewBox:
+#    width="22" height="22"
+# and the icon was spot on.
+# Now test across all others...
 
 
-#TODO Ubuntu Mate Indicator Lunar:
+#TODO Ubuntu Mate Lunar
 # The icon is a horizontally stretched bar and is hicolor!
 # But the icon during initialisation (NOT hicolor) is regular/correct size).
 # Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
 # When I set the size to 22 x 22, the icon seemed much better...but not correct.
 # Not sure if this a quirk of MATE or I've fundamentally made some mistake...
+# 
+# When testing icons via set during indicator initialisation, the icon size is fine.
+# But when setting after the fact (either a copy from /usr/share/icons or dynamic SVG) the icon is chopped.
 
 
 #TODO Going forward, in terms of external hosting of source code
@@ -120,15 +163,13 @@
 
 
 #TODO Port indicators to an Ubuntu variant which supports appindicator...
-#    https://www.ubuntukylin.com/downloads/download-en.html
 #    https://ubuntuunity.org/download/
+#    https://kubuntu.org/alternative-downloads/
+#    https://www.ubuntukylin.com/downloads/download-en.html
 #
 # Port indicators to non-Ubuntu variant which support GNOME:
 #    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
 #    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
-#
-# Worth trying Kubuntu?
-#    https://kubuntu.org/alternative-downloads/
 #
 # Miscellaneous:
 #    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
@@ -222,7 +263,6 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
-        print( "Theme name (indicator base init):", self.getIconThemeName() ) #TODO Test
 
 
     def main( self ):
@@ -645,6 +685,8 @@ class IndicatorBase( ABC ):
 
 
 #TODO Test how this works on Lubuntu 22.04.
+#TODO Maybe need to other functions which call this function such as
+# isLabelOrTooltipSupported() and isDynamicIconSupported().
     # Lubuntu (LXQt) does not show an icon label and
     # the tooltip seems to be unchangeable after initialisation.
     def isDesktopEnvironmentLXQt( self ):
