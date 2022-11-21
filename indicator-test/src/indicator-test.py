@@ -69,6 +69,9 @@ class IndicatorTest( IndicatorBase ):
         menu.append( Gtk.MenuItem.new_with_label( command + "icon-theme: " + self.processGet( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
         menu.append( Gtk.MenuItem.new_with_label( command + "gtk-theme: " + self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
 
+        command = "echo $XDG_CURRENT_DESKTOP"
+        menu.append( Gtk.MenuItem.new_with_label( command + ": " + self.processGet( command ).strip() ) )
+
         menu.append( Gtk.SeparatorMenuItem() )
 
         menuItem = Gtk.MenuItem.new_with_label( "Use default icon" )
@@ -157,6 +160,10 @@ class IndicatorTest( IndicatorBase ):
         menuItem = Gtk.MenuItem.new_with_label( "Show current time in OSD" )
         menuItem.connect( "activate", lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.icon ).show() )
         menu.append( menuItem )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        menu.append( Gtk.MenuItem.new_with_label( "Middle mouse button click supported: " + str( self.isMouseMiddleButtonClickSupported() ) ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 

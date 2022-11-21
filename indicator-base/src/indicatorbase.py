@@ -25,7 +25,7 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Probably need a function isMiddleMouseClickSupported()
+#TODO Probably need a function isMouseMiddleClickSupported()
 # For Fortune, hide the Preference GUI element.
 # For PPA, no effect, nothing to hide.
 # For Punycode, change Preference tooltip.
@@ -33,9 +33,25 @@
 # For Virtual Box, cannot launch VirtualBox Manager, so nothing else to do.
 
 
-#TODO Probably need a function isMiddleWheelScrollSupported()
+#TODO Probably need a function isMouseWheelScrollSupported()
 # For Stardate, nothing to hide.
 # For Virtual Box, nothing to hide.
+
+
+#TODO Probably need a function isLabelOrTooltipSupported() or just isLabelSupported()
+# Not a good name because really this is for the situation
+# in Lubuntu 20.04 setting the label (which becomes the tooltip)
+# after the indicator has initialised.
+# Maybe instead isDynamicLabelSupported() or isLabelChangingSupported()
+# Maybe use Updating instead of Changing.
+#
+# This effects Lunar and Script Runner.
+
+
+#TODO Probably need a function isDynamicIconSupported() or isIconChangingSupported()
+# Maybe use Updating instead of Changing.
+#
+# This effects Lunar.
 
 
 #TODO Given that:
@@ -193,6 +209,8 @@ import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 class IndicatorBase( ABC ):
 
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+
+    __DESKTOP_BUDGIE = "Budgie:GNOME"
     __DESKTOP_LXQT = "LXQt"
 
     __DIALOG_DEFAULT_HEIGHT = 480
@@ -726,6 +744,51 @@ class IndicatorBase( ABC ):
             executionFlag = None
 
         return terminal, executionFlag
+
+
+#TODO Needed by...
+# For Fortune, hide the Preference GUI element.
+# For PPA, no effect, nothing to hide.
+# For Punycode, change Preference tooltip.
+# For Script Runner, no default script, so hide GUI element in Preference.
+# For Virtual Box, cannot launch VirtualBox Manager, so nothing else to do.
+#
+#TODO Need to check against 22.04 on all platforms!
+    # Lubuntu 20.04 and Ubuntu Budgie 20.04 do not support mouse middle button click.
+    def isMouseMiddleButtonClickSupported( self ):
+        mouseMiddleButtonClickSupported = True
+        desktopEnvironment = self.getDesktopEnvironment()
+        if desktopEnvironment is None or \
+           desktopEnvironment == IndicatorBase.__DESKTOP_BUDGIE or \
+           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT:
+            mouseMiddleButtonClickSupported = False
+
+        return mouseMiddleButtonClickSupported
+
+
+
+#TODO Probably need a function isMouseWheelScrollSupported()
+# For Stardate, nothing to hide.
+# For Virtual Box, nothing to hide.
+
+
+#TODO Probably need a function isLabelOrTooltipSupported() or just isLabelSupported()
+# Not a good name because really this is for the situation
+# in Lubuntu 20.04 setting the label (which becomes the tooltip)
+# after the indicator has initialised.
+# Maybe instead isDynamicLabelSupported() or isLabelChangingSupported()
+# Maybe use Updating instead of Changing.
+#
+# This effects Lunar and Script Runner.
+
+
+#TODO Probably need a function isDynamicIconSupported() or isIconChangingSupported()
+# Maybe use Updating instead of Changing.
+#
+# This effects Lunar.
+
+
+
 
 
     # Converts a list of inner lists to a GTK ListStore.

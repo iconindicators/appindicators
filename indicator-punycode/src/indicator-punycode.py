@@ -62,7 +62,7 @@ class IndicatorPunycode( IndicatorBase ):
     def update( self, menu ):
         menuItem = Gtk.MenuItem.new_with_label( _( "Convert" ) )
         menu.append( menuItem )
-        menuItem.connect( "activate", self.onConvert )
+        menuItem.connect( "activate", self.onConvertNEW )
         self.secondaryActivateTarget = menuItem
 
         indent = "    "
@@ -70,12 +70,83 @@ class IndicatorPunycode( IndicatorBase ):
             menu.append( Gtk.SeparatorMenuItem() )
 
             menuItem = Gtk.MenuItem.new_with_label( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
-            menuItem.connect( "activate", self.pasteToClipboard, result[ IndicatorPunycode.RESULTS_UNICODE ] )
+            menuItem.connect( "activate", self.sendTextToOutput, result[ IndicatorPunycode.RESULTS_UNICODE ] )
             menu.append( menuItem )
 
             menuItem = Gtk.MenuItem.new_with_label( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
-            menuItem.connect( "activate", self.pasteToClipboard, result[ IndicatorPunycode.RESULTS_ASCII ] )
+            menuItem.connect( "activate", self.sendTextToOutput, result[ IndicatorPunycode.RESULTS_ASCII ] )
             menu.append( menuItem )
+
+
+    def onConvertNEW( self, menuItem ):
+        summary =_( "Nothing to convert..." )
+        if self.inputClipboard:
+            print( "Clipboard" )#TODO
+            text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+            if text is None:
+                Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.icon ).show()
+
+            else:
+                self.__doConversion( text )
+
+        else:
+            # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
+            def clipboardTextReceivedFunc( clipboard, text, data ):
+                if text is None:
+                    Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.icon ).show()
+
+                else:
+                    self.__doConversion( text )
+
+            print( "Primary" )#TODO
+            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( clipboardTextReceivedFunc, None )
+
+
+    def __doConversion( self, text ):
+        protocol = ""
+        result = re.split( r"(^.*//)", text )
+        if len( result ) == 3:
+            protocol = result[ 1 ]
+            text = result[ 2 ]
+
+        pathQuery = ""
+        result = re.split( r"(/.*$)", text )
+        if len( result ) == 3:
+            text = result[ 0 ]
+            if not self.dropPathQuery:
+                pathQuery = result[ 1 ]
+
+        try:
+            convertedText = ""
+            if text.find( "xn--" ) == -1:
+                labels = [ ]
+                for label in text.split( "." ):
+                    labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
+
+                convertedText = str( b'.'.join( labels ), "utf-8" )
+                result = [ protocol + text + pathQuery, protocol + convertedText + pathQuery ]
+
+            else:
+                for label in text.split( "." ):
+                    convertedText += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
+
+                convertedText = convertedText[ : -1 ]
+                result = [ protocol + convertedText + pathQuery, protocol + text + pathQuery ]
+
+            if result in self.results:
+                self.results.remove( result )
+
+            self.results.insert( 0, result )
+
+            self.cullResults()
+
+            GLib.idle_add( self.sendTextToOutput, None, protocol + convertedText + pathQuery )
+            self.requestUpdate()
+
+        except Exception as e:
+            self.getLogging().exception( e )
+            self.getLogging().error( "Error converting '" + protocol + text + pathQuery + "'." )
+            Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
 
 
     def onConvert( self, menuItem ):
@@ -130,10 +201,8 @@ class IndicatorPunycode( IndicatorBase ):
                     self.results.remove( result )
 
                 self.results.insert( 0, result )
-
                 self.cullResults()
-
-                GLib.idle_add( self.pasteToClipboard, None, protocol + convertedText + pathQuery )
+                GLib.idle_add( self.sendTextToOutput, None, protocol + convertedText + pathQuery )
                 self.requestUpdate()
 
             except Exception as e:
@@ -147,15 +216,15 @@ class IndicatorPunycode( IndicatorBase ):
             self.results = self.results[ : self.resultHistoryLength ]
 
 
-    def pasteToClipboard( self, menuItem, text ):
+    def sendTextToOutput( self, menuItem, text ):
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
-
+        
         else:
             if self.inputClipboard:
                 Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
-
+        
             else:
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
 
@@ -165,31 +234,27 @@ class IndicatorPunycode( IndicatorBase ):
 
         label = Gtk.Label.new( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
+        if self.isMouseMiddleButtonClickSupported():
+            label.set_tooltip_text( _( "A mouse middle button click will start the conversion." ) )
+
         grid.attach( label, 0, 0, 1, 1 )
 
         inputClipboardRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
-        inputClipboardRadio.set_tooltip_text( _(
-            "Input is taken from the clipboard after\n" + \
-            "a CTRL-X or CTRL-C (or equivalent)." ) )
+        inputClipboardRadio.set_tooltip_text( _( "Input is taken from the clipboard." ) )
         inputClipboardRadio.set_active( self.inputClipboard )
         inputClipboardRadio.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( inputClipboardRadio, 0, 1, 1, 1 )
 
         inputPrimaryRadio = Gtk.RadioButton.new_with_label_from_widget( inputClipboardRadio, _( "Primary" ) )
-        inputPrimaryRadio.set_tooltip_text( _(
-            "Input is taken from the currently\n" + \
-            "selected text after a middle mouse\n" + \
-            "click of the indicator icon." ) )
+        inputPrimaryRadio.set_tooltip_text( _( "Input is taken from the currently selected text." ) )
         inputPrimaryRadio.set_active( not self.inputClipboard )
         inputPrimaryRadio.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( inputPrimaryRadio, 0, 2, 1, 1 )
 
         outputBothCheckbutton = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )
         outputBothCheckbutton.set_tooltip_text( _(
-            "If checked, the output text is sent\n" + \
-            "to both the clipboard and primary.\n\n" + \
-            "Otherwise, the output is sent back\n" + \
-            "only to the input source." ) )
+            "If checked, the converted text is sent\n" + \
+            "to both the clipboard and primary." ) )
         outputBothCheckbutton.set_active( self.outputBoth )
         outputBothCheckbutton.set_margin_top( 10 )
         grid.attach( outputBothCheckbutton, 0, 3, 1, 1 )
