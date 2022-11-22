@@ -70,18 +70,17 @@ class IndicatorPunycode( IndicatorBase ):
             menu.append( Gtk.SeparatorMenuItem() )
 
             menuItem = Gtk.MenuItem.new_with_label( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
-            menuItem.connect( "activate", self.sendTextToOutput, result[ IndicatorPunycode.RESULTS_UNICODE ] )
+            menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_UNICODE ] )
             menu.append( menuItem )
 
             menuItem = Gtk.MenuItem.new_with_label( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
-            menuItem.connect( "activate", self.sendTextToOutput, result[ IndicatorPunycode.RESULTS_ASCII ] )
+            menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_ASCII ] )
             menu.append( menuItem )
 
 
     def onConvertNEW( self, menuItem ):
         summary =_( "Nothing to convert..." )
         if self.inputClipboard:
-            print( "Clipboard" )#TODO
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
             if text is None:
                 Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.icon ).show()
@@ -98,7 +97,6 @@ class IndicatorPunycode( IndicatorBase ):
                 else:
                     self.__doConversion( text )
 
-            print( "Primary" )#TODO
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( clipboardTextReceivedFunc, None )
 
 
@@ -140,7 +138,7 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.cullResults()
 
-            GLib.idle_add( self.sendTextToOutput, None, protocol + convertedText + pathQuery )
+            GLib.idle_add( self.sendResultsToOutput, None, protocol + convertedText + pathQuery )
             self.requestUpdate()
 
         except Exception as e:
@@ -202,7 +200,7 @@ class IndicatorPunycode( IndicatorBase ):
 
                 self.results.insert( 0, result )
                 self.cullResults()
-                GLib.idle_add( self.sendTextToOutput, None, protocol + convertedText + pathQuery )
+                GLib.idle_add( self.sendResultsToOutput, None, protocol + convertedText + pathQuery )
                 self.requestUpdate()
 
             except Exception as e:
@@ -216,7 +214,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.results = self.results[ : self.resultHistoryLength ]
 
 
-    def sendTextToOutput( self, menuItem, text ):
+    def sendResultsToOutput( self, menuItem, text ):
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
@@ -234,9 +232,6 @@ class IndicatorPunycode( IndicatorBase ):
 
         label = Gtk.Label.new( _( "Input source" ) )
         label.set_halign( Gtk.Align.START )
-        if self.isMouseMiddleButtonClickSupported():
-            label.set_tooltip_text( _( "A mouse middle button click will start the conversion." ) )
-
         grid.attach( label, 0, 0, 1, 1 )
 
         inputClipboardRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
@@ -254,7 +249,9 @@ class IndicatorPunycode( IndicatorBase ):
         outputBothCheckbutton = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )
         outputBothCheckbutton.set_tooltip_text( _(
             "If checked, the converted text is sent\n" + \
-            "to both the clipboard and primary." ) )
+            "to both the clipboard and primary.\n\n" + \
+            "Otherwise the converted text is sent\n" + \
+            "only to the input source" ) )
         outputBothCheckbutton.set_active( self.outputBoth )
         outputBothCheckbutton.set_margin_top( 10 )
         grid.attach( outputBothCheckbutton, 0, 3, 1, 1 )
