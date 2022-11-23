@@ -163,7 +163,8 @@ class IndicatorTest( IndicatorBase ):
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        menu.append( Gtk.MenuItem.new_with_label( "Middle mouse button click supported: " + str( self.isMouseMiddleButtonClickSupported() ) ) )
+#TODO Not sure if this is valid now.
+        # menu.append( Gtk.MenuItem.new_with_label( "Middle mouse button click supported: " + str( self.isMouseMiddleButtonClickSupported() ) ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -171,22 +172,24 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __useIconCopiedFromDefault( self ):
-        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
-            with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
-                svg = fIn.read()
-
-            # If testing locally (without being installed via PPA/deb)...
-            # with open( "../icons/indicator-test.svg", 'r' ) as fIn:
-            #     svg = fIn.read()
-
-            randomColour = \
-                "{:02x}".format( random.randint( 0, 255 ) ) + \
-                "{:02x}".format( random.randint( 0, 255 ) ) + \
-                "{:02x}".format( random.randint( 0, 255 ) )
-
-            svg = svg.replace( "6496dc", randomColour )
-            fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
-            self.indicator.set_icon_full( fOut, "" )
+#TODO Revisit this function.        
+        # if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
+        #     with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
+        #         svg = fIn.read()
+        #
+        #     # If testing locally (without being installed via PPA/deb)...
+        #     # with open( "../icons/indicator-test.svg", 'r' ) as fIn:
+        #     #     svg = fIn.read()
+        #
+        #     randomColour = \
+        #         "{:02x}".format( random.randint( 0, 255 ) ) + \
+        #         "{:02x}".format( random.randint( 0, 255 ) ) + \
+        #         "{:02x}".format( random.randint( 0, 255 ) )
+        #
+        #     svg = svg.replace( "6496dc", randomColour )
+        #     fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
+        #     self.indicator.set_icon_full( fOut, "" )
+        pass
 
 
     def __useIconDefault( self ):
