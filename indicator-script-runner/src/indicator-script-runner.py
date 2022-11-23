@@ -156,7 +156,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             # As a result of this issue
             #    https://github.com/lxqt/qterminal/issues/335
             # the default terminal in Lubuntu (qterminal) fails to parse argument.
-            # Although a fix has been made, it is unlikely qterminal will be updated in the repository any time soon.
+            # Although a fix has been made, it is unlikely the repository will be updated any time soon.
             # So the quickest/easiest workaround is to install gnome-terminal. 
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
             self.getLogging().error( message )
@@ -434,7 +434,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             "\tReturn non-empty text on success\n" + \
             "\tand empty text otherwise.\n\n" + \
             "Only background scripts added to the\n" + \
-            "icon text will be run." ) )
+            "icon text will be run.\n\n" + \
+            "Not supported on all desktops." ) )
 
         box.pack_start( indicatorTextEntry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -909,7 +910,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         defaultScriptCheckbutton.set_tooltip_text( _(
             "One script may be set as default\n" + \
             "which is run on a middle mouse\n" + \
-            "click of the indicator icon." ) )
+            "click of the indicator icon.\n\n" + \
+            "Not supported on all desktops." ) )
         grid.attach( defaultScriptCheckbutton, 0, 16, 1, 1 )
 
         scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
