@@ -19,6 +19,18 @@
 # Application indicator which displays calendar events.
 
 
+#TODO This is an umbrella over the other TODOs below...
+# Not sure if the format for the date in each calendar data text file
+# is converted to match the format of the localised date for the locale.
+# 
+# Find examples of odd date formats in various calendar files and see what we get.
+# 
+# Regardless, how am I to know the format of date on say a Russian computer?
+
+
+#TODO Look for duplicate dates AND events
+
+
 INDICATOR_NAME = "indicator-on-this-day"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -79,6 +91,9 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.requestUpdate( delay = fiveSecondsAfterMidnight )
 
         if self.notify:
+#TODO Why are we getting the date via a process?  If all we need is the current date, use Python.  
+# Waiting on Oleg to send me back what happens on a RU locale/language machine.
+# Maybe the date format is locale sensitive...          
             today = self.processGet( "date +'%b %d'" ).strip() # It is assumed/hoped the dates in the calendar result are short date format.
             for event in events:
                 if today == event.getDate():
@@ -127,12 +142,76 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         self.writeCacheTextWithoutTimestamp( content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
+        # Run the calendar command and parse the results.
+        eventsSortedByDate = [ ]
+        command = "calendar -f " + self.getCacheDirectory() + IndicatorOnThisDay.CALENDARS_FILENAME + " -A 366"
+        for line in self.processGet( command ).splitlines():
+            if line is None or len( line.strip() ) == 0:
+                continue
+
+            if line.startswith( "\t" ): # Continuation of the previous event.
+                date = eventsSortedByDate[ -1 ].getDate()
+                description = eventsSortedByDate[ -1 ].getDescription() + " " + line.strip()
+                del eventsSortedByDate[ -1 ]
+                eventsSortedByDate.append( Event( date, description ) )
+
+            else:
+                line = line.split( "\t" ) # Start of event: the month/day are separated from the event by a TAB.
+                date = line[ 0 ].replace( "*", "" ).strip()
+                description = line[ -1 ].strip() # Take the last element as there may be more than one TAB character throwing out the index of the event in the line.
+                eventsSortedByDate.append( Event( date, description ) )
+
+        # for event in eventsSortedByDate: print( event )#TODO Testing
+        print( len( eventsSortedByDate ))
+
+        # Sort events further by description.
+        i = 0
+        j = i + 1
+        eventsSortedByDateThenDescription = [ ]
+        while True:
+            if j == len( eventsSortedByDate ):
+                eventsSortedByDateThenDescription += sorted( eventsSortedByDate[ i : j ], key = lambda event: event.getDescription() )
+                break
+
+            if eventsSortedByDate[ j ].getDate() == eventsSortedByDate[ i ].getDate():
+                j += 1
+
+            else:
+                eventsSortedByDateThenDescription += sorted( eventsSortedByDate[ i : j ], key = lambda event: event.getDescription() )
+                i = j
+                j = i + 1
+
+        # for event in eventsSortedByDateThenDescription: print( event )#TODO Testing
+        print( len( eventsSortedByDateThenDescription ))
+
+        # Remove duplicate events.
+        eventsSortedByDateThenDescriptionWithoutDuplicates = [ ]
+        for event in eventsSortedByDateThenDescription:
+            if event not in eventsSortedByDateThenDescriptionWithoutDuplicates:
+                eventsSortedByDateThenDescriptionWithoutDuplicates.append( event )
+
+        print()
+        # for event in eventsSortedByDateThenDescriptionWithoutDuplicates: print( event )#TODO Testing
+        print( len( eventsSortedByDateThenDescriptionWithoutDuplicates))
+
+        return eventsSortedByDateThenDescriptionWithoutDuplicates
+
+
+    def getEventsORIGINAL( self ):
+        # Write the path of each calendar file to a temporary file - allows for one call to calendar.
+        content = ""
+        for calendar in self.calendars:
+            if os.path.isfile( calendar ):
+                content += "#include <" +calendar + ">\n"
+
+        self.writeCacheTextWithoutTimestamp( content, IndicatorOnThisDay.CALENDARS_FILENAME )
+
         # Run the calendar command and parse the results, one event per line, sometimes...
         events = [ ]
         command = "calendar -f " + self.getCacheDirectory() + IndicatorOnThisDay.CALENDARS_FILENAME + " -A 366"
         for line in self.processGet( command ).splitlines():
-            if( line is None or len( line.strip() ) == 0 ):
-                continue # Ubuntu 17.04 inserts an empty line between events.
+            if line is None or len( line.strip() ) == 0:
+                continue
 
             if line.startswith( "\t" ): # When a line starts with a TAB, this is a continuation of the previous event.
                 date = events[ -1 ].getDate()
@@ -141,12 +220,13 @@ class IndicatorOnThisDay( IndicatorBase ):
                 events.append( Event( date, description ) )
 
             else:
-                line = line.split( "\t" ) # This is a regular line with the month/day separated by TAB from the event.
-                date = line[ 0 ].replace( "*", "" ).strip()
+                line = line.split( "\t" ) # This is a regular line with the month and day separated by TAB from the event.
+                date = line[ 0 ].replace( "*", "" ).strip() #TODO Find examples of *
                 description = line[ -1 ].strip() # Take the last element as there may be more than one TAB character throwing out the index of the event in the line.
                 events.append( Event( date, description ) )
 
         # Sort events of the same date by description.
+#TODO Seems convoluted...is there an easier way to sort?
         sortedEvents = [ ]
         i = 0
         j = 1
