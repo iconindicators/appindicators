@@ -288,10 +288,9 @@ class IndicatorLunar( IndicatorBase ):
             menu.append( Gtk.MenuItem.new_with_label( IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() ) )
 
         self.updateMenu( menu, utcNow )
-        self.setLabel( self.processTags() ) # Lubuntu ignores setting the label after the indicator has started.
+        self.setLabel( self.processTags() )
 
-#TODO Really should be something like isDynamicIconSupported().
-        if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
+        if self.isIconUpdateSupported():
             self.updateIcon()
 
         if self.showWerewolfWarning:
@@ -1172,7 +1171,8 @@ class IndicatorLunar( IndicatorBase ):
             "If any tag contains no data at render time,\n" + \
             "the tag will be removed.\n\n" + \
             "If a removed tag is within { }, the tag and\n" + \
-            "text will be removed." ) )
+            "text will be removed.\n\n" + \
+            "Not supported on all desktops." ) )
         box.pack_start( indicatorText, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -1224,8 +1224,7 @@ class IndicatorLunar( IndicatorBase ):
         scrolledWindow.add( tree )
         grid.attach( scrolledWindow, 0, 2, 1, 1 )
 
-        if not self.isDesktopEnvironmentLXQt(): #TODO Really should be a function such as isLabelOrTooltipSupported()
-            notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.
         grid = self.createGrid()
