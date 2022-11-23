@@ -25,56 +25,6 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Probably need a function isMouseMiddleClickSupported()
-# For Fortune, hide the Preference GUI element.
-# For PPA, no effect, nothing to hide.
-# For Punycode, change Preference tooltip.
-# For Script Runner, no default script, so hide GUI element in Preference.
-# For Virtual Box, cannot launch VirtualBox Manager, so nothing else to do.
-
-
-#TODO Probably need a function isMouseWheelScrollSupported()
-# For Stardate, nothing to hide.
-# For Virtual Box, nothing to hide.
-
-
-#TODO Probably need a function isLabelOrTooltipSupported() or just isLabelSupported()
-# Not a good name because really this is for the situation
-# in Lubuntu 20.04 setting the label (which becomes the tooltip)
-# after the indicator has initialised.
-# Maybe instead isDynamicLabelSupported() or isLabelChangingSupported()
-# Maybe use Updating instead of Changing.
-#
-# This effects Lunar and Script Runner.
-
-
-#TODO Probably need a function isDynamicIconSupported() or isIconChangingSupported()
-# Maybe use Updating instead of Changing.
-#
-# This effects Lunar.
-
-
-#TODO Given that:
-# Not all platforms support a label next to the icon (Lubuntu, Xubuntu, Kubuntu);
-# Not all platforms support writing a tooltip after initialisation (Lubuntu);
-# Not all platforms support middle mouse click (Lubutu, Budgie);
-# Not all platforms support mouse scroll (Lubuntu);
-# Figure out where these functions are used and
-# if a function is needed to detect these platforms
-# in order to provide alternate functionality (write a menu item in Stardate)
-# or to hide/disable functionality (Script Runner default script and background scripts).
-# If for example, mouse scrolling is unsupported,
-# perhaps no need to detect this as the functionality is provided elsewhere (as in Stardate).
-
-
-#TODO Lubuntu 20.04 Test
-# Middle mouse click does not work.
-# See Ubuntu Budgie 20.04 below.
-#
-# Cannot show anything in label (tooltip) after initialisation.
-# Affects Lunar, Script Runner, Stardate.
-
-
 #TODO Lubuntu 20.04 Stardate
 # A similarly looking icon to the stardate SVG icon appears instead.
 # The icon is found in
@@ -114,56 +64,14 @@
 #
 # Need to log an issue at
 #    https://discourse.lubuntu.me/
-# creating a simply indicator which updates the label and icon. 
+# creating a simple indicator which updates the label and icon. 
 #
 # The workaround is simply show the fixed icon and never attempt to change the icon.
+# Also check against Lubuntu 22.04
 
 
-#TODO Lubuntu 20.04 Script Runner
-# As icon labels are unsupported, cannot have background scripts.
-# In the Preferences,
-#    hide the icon tab;
-#    when add/edit a script, hide the background attributes/fields;
-
-
-# TODO Ubuntu Budgie 20.04 Fortune/PPA/Punycode/Script Runner/Virtual Box
-# Middle mouse click does not work. 
-# What to do? 
-#    Grey out the option;
-#    Remove the option (so have a test for Ubuntu Budgie);
-#    Change tooltip to include text "where supported".
-#
-# For Script Runner, how does the default script stuff now work with no middle mouse click?
-# Can/should the GUI elements be hidden?
-#
-# According to 
-#    https://launchpad.net/ubuntu/+source/budgie-indicator-applet/+changelog
-# maybe supported in 22.04 so need to check!
-
-
-# TODO Ubuntu Budgie 20.04 Lunar
-# Dynamic icon is HUGE!
-# Might need to specify viewBox along with width/height?
-# Compare the default/startup icon against the dynamic one.
-# https://jenkov.com/tutorials/svg/svg-viewport-view-box.html
-# https://www.digitalocean.com/community/tutorials/svg-svg-viewbox
-# https://discourse.ubuntubudgie.org/t/appindicator-applet-wont-scale-icons-on-top-panel/2062
-#
-# Tried adding after the viewBox:
-#    width="22" height="22"
-# and the icon was spot on.
-# Now test across all others...
-
-
-#TODO Ubuntu Mate Lunar
-# The icon is a horizontally stretched bar and is hicolor!
-# But the icon during initialisation (NOT hicolor) is regular/correct size).
-# Seems the icon at 100 x 100 is too large, so it's not stretched, but rather taking up a large space.
-# When I set the size to 22 x 22, the icon seemed much better...but not correct.
-# Not sure if this a quirk of MATE or I've fundamentally made some mistake...
-# 
-# When testing icons via set during indicator initialisation, the icon size is fine.
-# But when setting after the fact (either a copy from /usr/share/icons or dynamic SVG) the icon is chopped.
+# TODO Check all default icons appear correctly across all platforms
+# and check dynamic icons too.
 
 
 #TODO Going forward, in terms of external hosting of source code
@@ -178,12 +86,11 @@
 #     https://flathub.org/home
 
 
-#TODO Port indicators to an Ubuntu variant which supports appindicator...
+#TODO Port indicators to:
 #    https://ubuntuunity.org/download/
 #    https://kubuntu.org/alternative-downloads/
 #    https://www.ubuntukylin.com/downloads/download-en.html
 #
-# Port indicators to non-Ubuntu variant which support GNOME:
 #    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
 #    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
 #
@@ -703,19 +610,38 @@ class IndicatorBase( ABC ):
 
 
 #TODO Test how this works on Lubuntu 22.04.
-#TODO Maybe need to other functions which call this function such as
-# isLabelOrTooltipSupported() and isDynamicIconSupported().
-    # Lubuntu (LXQt) does not show an icon label and
-    # the tooltip seems to be unchangeable after initialisation.
-    def isDesktopEnvironmentLXQt( self ):
+# May need to adjust the check for LXQt AND 20.04.
+    # Lubuntu 20.04 (LXQt) ignores any change to the icon after initialisation.
+    # If the icon is changed, the icon is replaced with a strange grey/white circle.
+    def isIconUpdateSupported( self ):
+        iconUpdateSupported = True
         desktopEnvironment = self.getDesktopEnvironment()
-        return desktopEnvironment is not None and desktopEnvironment == IndicatorBase.__DESKTOP_LXQT
+        if desktopEnvironment is None or \
+           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT:
+            iconUpdateSupported = False
+
+        return iconUpdateSupported
+
+
+#TODO Test how this works on Lubuntu 22.04.
+# May need to adjust the check for LXQt AND 20.04.
+# Also Kubuntu apparently has no labels...but might have tooltips so check.
+    # Lubuntu 20.04 (LXQt) ignores any change to the label/tooltip after initialisation.
+    def isLabelUpdateSupported( self ):
+        labelUpdateSupported = True
+        desktopEnvironment = self.getDesktopEnvironment()
+        if desktopEnvironment is None or \
+           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT:
+            labelUpdateSupported = False
+
+        return labelUpdateSupported
 
 
 #TODO Need to be careful here...
 # If the issue with qterminal has been fixed,
 # maybe need another function to determine if we are on 20.04 or 22.04 (or something in between).
 # This function alone might stop a script from running on 22.04 when the script will in fact run.
+# Or perhaps also get the version number of qterminal.
     def isTerminalQTerminal( self ):
         terminalIsQTerminal = False
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
@@ -744,51 +670,6 @@ class IndicatorBase( ABC ):
             executionFlag = None
 
         return terminal, executionFlag
-
-
-#TODO Needed by...
-# For Fortune, hide the Preference GUI element.
-# For PPA, no effect, nothing to hide.
-# For Punycode, change Preference tooltip.
-# For Script Runner, no default script, so hide GUI element in Preference.
-# For Virtual Box, cannot launch VirtualBox Manager, so nothing else to do.
-#
-#TODO Need to check against 22.04 on all platforms!
-    # Lubuntu 20.04 and Ubuntu Budgie 20.04 do not support mouse middle button click.
-    def isMouseMiddleButtonClickSupported( self ):
-        mouseMiddleButtonClickSupported = True
-        desktopEnvironment = self.getDesktopEnvironment()
-        if desktopEnvironment is None or \
-           desktopEnvironment == IndicatorBase.__DESKTOP_BUDGIE or \
-           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT:
-            mouseMiddleButtonClickSupported = False
-
-        return mouseMiddleButtonClickSupported
-
-
-
-#TODO Probably need a function isMouseWheelScrollSupported()
-# For Stardate, nothing to hide.
-# For Virtual Box, nothing to hide.
-
-
-#TODO Probably need a function isLabelOrTooltipSupported() or just isLabelSupported()
-# Not a good name because really this is for the situation
-# in Lubuntu 20.04 setting the label (which becomes the tooltip)
-# after the indicator has initialised.
-# Maybe instead isDynamicLabelSupported() or isLabelChangingSupported()
-# Maybe use Updating instead of Changing.
-#
-# This effects Lunar and Script Runner.
-
-
-#TODO Probably need a function isDynamicIconSupported() or isIconChangingSupported()
-# Maybe use Updating instead of Changing.
-#
-# This effects Lunar.
-
-
-
 
 
     # Converts a list of inner lists to a GTK ListStore.
