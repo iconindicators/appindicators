@@ -314,27 +314,26 @@ class IndicatorFortune( IndicatorBase ):
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        if self.isMouseMiddleButtonClickSupported():
-            label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
-            label.set_tooltip_text( _( "Not supported on all versions/derivatives of Ubuntu." ) )
-            label.set_halign( Gtk.Align.START )
-            label.set_margin_top( 10 )
-            grid.attach( label, 0, 3, 1, 1 )
+        label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
+        label.set_tooltip_text( _( "Not supported on all desktops." ) )
+        label.set_halign( Gtk.Align.START )
+        label.set_margin_top( 10 )
+        grid.attach( label, 0, 3, 1, 1 )
 
-            radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
-            radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
-            radioMiddleMouseClickNewFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-            grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 1, 1 )
+        radioMiddleMouseClickNewFortune = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show a new fortune" ) )
+        radioMiddleMouseClickNewFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
+        radioMiddleMouseClickNewFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        grid.attach( radioMiddleMouseClickNewFortune, 0, 4, 1, 1 )
 
-            radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
-            radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
-            radioMiddleMouseClickCopyLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-            grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 1, 1 )
+        radioMiddleMouseClickCopyLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Copy current fortune to clipboard" ) )
+        radioMiddleMouseClickCopyLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+        radioMiddleMouseClickCopyLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        grid.attach( radioMiddleMouseClickCopyLastFortune, 0, 5, 1, 1 )
 
-            radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
-            radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
-            radioMiddleMouseClickShowLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-            grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
+        radioMiddleMouseClickShowLastFortune = Gtk.RadioButton.new_with_label_from_widget( radioMiddleMouseClickNewFortune, _( "Show current fortune" ) )
+        radioMiddleMouseClickShowLastFortune.set_active( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+        radioMiddleMouseClickShowLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
@@ -343,15 +342,14 @@ class IndicatorFortune( IndicatorBase ):
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
-            if self.isMouseMiddleButtonClickSupported():
-                if radioMiddleMouseClickNewFortune.get_active():
-                    self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+            if radioMiddleMouseClickNewFortune.get_active():
+                self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
 
-                elif radioMiddleMouseClickCopyLastFortune.get_active():
-                    self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
+            elif radioMiddleMouseClickCopyLastFortune.get_active():
+                self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
 
-                else:
-                    self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
+            else:
+                self.middleMouseClickOnIcon = IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
 
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.skipFortuneCharacterCount = spinnerCharacterCount.get_value_as_int()
