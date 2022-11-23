@@ -62,7 +62,7 @@ class IndicatorPunycode( IndicatorBase ):
     def update( self, menu ):
         menuItem = Gtk.MenuItem.new_with_label( _( "Convert" ) )
         menu.append( menuItem )
-        menuItem.connect( "activate", self.onConvertNEW )
+        menuItem.connect( "activate", self.onConvert )
         self.secondaryActivateTarget = menuItem
 
         indent = "    "
@@ -78,7 +78,7 @@ class IndicatorPunycode( IndicatorBase ):
             menu.append( menuItem )
 
 
-    def onConvertNEW( self, menuItem ):
+    def onConvert( self, menuItem ):
         summary =_( "Nothing to convert..." )
         if self.inputClipboard:
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
@@ -147,68 +147,6 @@ class IndicatorPunycode( IndicatorBase ):
             Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
 
 
-    def onConvert( self, menuItem ):
-        Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( self.doConversion, None )
-
-
-    def doConversion( self, clipboard, text, data ):
-        if self.inputClipboard:
-            text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
-
-        if text is None:
-            if self.inputClipboard:
-                message = _( "No text is in the clipboard." )
-
-            else:
-                message = _( "No text is highlighted/selected." )
-
-            Notify.Notification.new( _( "Nothing to convert..." ), message, self.icon ).show()
-
-        else:
-            protocol = ""
-            result = re.split( r"(^.*//)", text )
-            if len( result ) == 3:
-                protocol = result[ 1 ]
-                text = result[ 2 ]
-
-            pathQuery = ""
-            result = re.split( r"(/.*$)", text )
-            if len( result ) == 3:
-                text = result[ 0 ]
-                if not self.dropPathQuery:
-                    pathQuery = result[ 1 ]
-
-            try:
-                convertedText = ""
-                if text.find( "xn--" ) == -1:
-                    labels = [ ]
-                    for label in text.split( "." ):
-                        labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
-
-                    convertedText = str( b'.'.join( labels ), "utf-8" )
-                    result = [ protocol + text + pathQuery, protocol + convertedText + pathQuery ]
-
-                else:
-                    for label in text.split( "." ):
-                        convertedText += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
-
-                    convertedText = convertedText[ : -1 ]
-                    result = [ protocol + convertedText + pathQuery, protocol + text + pathQuery ]
-
-                if result in self.results:
-                    self.results.remove( result )
-
-                self.results.insert( 0, result )
-                self.cullResults()
-                GLib.idle_add( self.sendResultsToOutput, None, protocol + convertedText + pathQuery )
-                self.requestUpdate()
-
-            except Exception as e:
-                self.getLogging().exception( e )
-                self.getLogging().error( "Error converting '" + protocol + text + pathQuery + "'." )
-                Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.icon ).show()
-
-
     def cullResults( self ):
         if len( self.results ) > self.resultHistoryLength:
             self.results = self.results[ : self.resultHistoryLength ]
@@ -251,7 +189,7 @@ class IndicatorPunycode( IndicatorBase ):
             "If checked, the converted text is sent\n" + \
             "to both the clipboard and primary.\n\n" + \
             "Otherwise the converted text is sent\n" + \
-            "only to the input source" ) )
+            "only to the input source." ) )
         outputBothCheckbutton.set_active( self.outputBoth )
         outputBothCheckbutton.set_margin_top( 10 )
         grid.attach( outputBothCheckbutton, 0, 3, 1, 1 )
