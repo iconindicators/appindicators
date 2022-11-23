@@ -66,12 +66,12 @@ class IndicatorStardate( IndicatorBase ):
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
 
         stardateString = stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger )
-        if self.isDesktopEnvironmentLXQt():
-            menu.append( Gtk.MenuItem.new_with_label( stardateString ) )
-            menu.append( Gtk.SeparatorMenuItem() )
+        if self.isLabelUpdateSupported():
+            self.setLabel( stardateString )
 
         else:
-            self.setLabel( stardateString )
+            menu.append( Gtk.MenuItem.new_with_label( stardateString ) )
+            menu.append( Gtk.SeparatorMenuItem() )
 
         return numberOfSecondsToNextUpdate
 
