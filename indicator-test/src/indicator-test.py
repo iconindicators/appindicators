@@ -29,6 +29,7 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
+from pathlib import Path
 
 import datetime, os, random
 
@@ -63,6 +64,9 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __buildMenu( self, menu ):
+        homeDirectory = self.processGet( "echo $HOME" ).strip()
+        cacheDirectory = self.getCacheDirectory()
+
         menu.append( Gtk.MenuItem.new_with_label( "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + self.getIconThemeName() ) )
 
         command = "gsettings get org.gnome.desktop.interface "
@@ -70,7 +74,7 @@ class IndicatorTest( IndicatorBase ):
         menu.append( Gtk.MenuItem.new_with_label( command + "gtk-theme: " + self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
 
         command = "echo $XDG_CURRENT_DESKTOP"
-        menu.append( Gtk.MenuItem.new_with_label( command + ": " + self.processGet( command ).strip() ) )
+        menu.append( Gtk.MenuItem.new_with_label( command + ": " + self.getDesktopEnvironment() ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -84,71 +88,35 @@ class IndicatorTest( IndicatorBase ):
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (FULL_MOON)" )
-        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "FULL_MOON" ) )
-        menu.append( menuItem )
+        icons = [ "FULL_MOON",
+                  "WANING_GIBBOUS",
+                  "THIRD_QUARTER",
+                  "NEW_MOON",
+                  "WAXING_CRESCENT" ]
 
-        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (WANING_GIBBOUS)" )
-        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "WANING_GIBBOUS" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (THIRD_QUARTER)" )
-        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "THIRD_QUARTER" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (NEW_MOON)" )
-        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "NEW_MOON" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( "Use on-the-fly icon created in user cache (WAXING_CRESCENT)" )
-        menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( "WAXING_CRESCENT" ) )
-        menu.append( menuItem )
+        for icon in icons:
+            menuItem = Gtk.MenuItem.new_with_label( _( "Use " + icon + " dynamically created in " + cacheDirectory ) )
+            menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( icon ) )
+            menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-fortune.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-fortune.svg" ) )
-        menu.append( menuItem )
+        icons = [ "indicator-fortune.svg",
+                  "indicator-lunar.svg",
+                  "indicator-lunar-satellite.svg",
+                  "indicator-on-this-day.svg",
+                  "indicator-ppa-download-statistics.svg",
+                  "indicator-punycode.svg",
+                  "indicator-script-runner.svg",
+                  "indicator-stardate.svg",
+                  "indicator-test.svg",
+                  "indicator-tide.svg",
+                  "indicator-virtual-box.svg" ]
 
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-lunar.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-lunar.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-lunar-satellite.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-lunar-satellite.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-on-this-day.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-on-this-day.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-ppa-download-statistics.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-ppa-download-statistics.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-punycode.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-punycode.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-script-runner.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-script-runner.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-stardate.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-stardate.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-test.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-test.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-tide.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-tide.svg" ) )
-        menu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Use indicator-virtual-box.svg in $HOME" ) )
-        menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( "indicator-virtual-box.svg" ) )
-        menu.append( menuItem )
+        for icon in icons:
+            menuItem = Gtk.MenuItem.new_with_label( _( "Use " + icon + " in " + homeDirectory ) )
+            menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( icon ) )
+            menu.append( menuItem )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -163,33 +131,26 @@ class IndicatorTest( IndicatorBase ):
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-#TODO Not sure if this is valid now.
-        # menu.append( Gtk.MenuItem.new_with_label( "Middle mouse button click supported: " + str( self.isMouseMiddleButtonClickSupported() ) ) )
-
-        menu.append( Gtk.SeparatorMenuItem() )
-
         menu.append( Gtk.MenuItem.new_with_label( _( "X: " + str( self.X ) ) ) )
 
 
     def __useIconCopiedFromDefault( self ):
-#TODO Revisit this function.        
-        # if not self.isDesktopEnvironmentLXQt(): # Lubuntu becomes confused and drops the icon if set via a full path.
-        #     with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
-        #         svg = fIn.read()
-        #
-        #     # If testing locally (without being installed via PPA/deb)...
-        #     # with open( "../icons/indicator-test.svg", 'r' ) as fIn:
-        #     #     svg = fIn.read()
-        #
-        #     randomColour = \
-        #         "{:02x}".format( random.randint( 0, 255 ) ) + \
-        #         "{:02x}".format( random.randint( 0, 255 ) ) + \
-        #         "{:02x}".format( random.randint( 0, 255 ) )
-        #
-        #     svg = svg.replace( "6496dc", randomColour )
-        #     fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
-        #     self.indicator.set_icon_full( fOut, "" )
-        pass
+        if self.isIconUpdateSupported():
+            with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
+                svg = fIn.read()
+
+            # If testing locally (without being installed via PPA/deb)...
+            # with open( "../icons/indicator-test.svg", 'r' ) as fIn:
+            #     svg = fIn.read()
+
+            randomColour = \
+                "{:02x}".format( random.randint( 0, 255 ) ) + \
+                "{:02x}".format( random.randint( 0, 255 ) ) + \
+                "{:02x}".format( random.randint( 0, 255 ) )
+
+            svg = svg.replace( "6496dc", randomColour )
+            fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
+            self.indicator.set_icon_full( fOut, "" )
 
 
     def __useIconDefault( self ):
@@ -209,7 +170,12 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __useIconInHomeDirectory( self, iconName ):
-        self.indicator.set_icon_full( os.getenv( "HOME" ) + '/' + iconName, "" )
+        iconFile = os.getenv( "HOME" ) + '/' + iconName
+        if Path( iconFile ).is_file():
+            self.indicator.set_icon_full( iconFile, "" )
+
+        else:
+            Notify.Notification.new( "Cannot locate " + iconFile, "Please ensure the file is present.", self.icon ).show()
 
 
     # Virtually a direct copy from Indicator Lunar to test dynamically created SVG icons in the user cache.
@@ -252,7 +218,7 @@ class IndicatorTest( IndicatorBase ):
 
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 22 22" width="22" height="22">' + body + '</svg>'
+               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
 
 
     def onPreferences( self, dialog ):
