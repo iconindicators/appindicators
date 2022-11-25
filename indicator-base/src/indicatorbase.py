@@ -25,6 +25,9 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
+#TODO Check Indicator Test on all 20.04 platforms!
+
+
 #TODO Lubuntu 20.04 Stardate
 # A similarly looking icon to the stardate SVG icon appears instead.
 # The icon is found in
