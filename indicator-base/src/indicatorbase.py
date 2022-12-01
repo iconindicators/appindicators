@@ -25,7 +25,17 @@
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO Check Indicator Test on all 20.04 platforms!
+#TODO When tested on all Ubuntu platforms, perhaps tip off 
+# https://www.omgubuntu.co.uk/tip
+
+
+#TODO Check Indicator Test...
+# Kubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
+# Lubuntu 20.04 No label; tooltip is not dynamic; icon is not dynamic.
+# Uubuntu Budgie 20.04 No mouse middle click.
+# Ubuntu MATE 20.04 Dynamic icon (without being clicked) is truncated.
+# Ubuntu Unity 20.04 ALL GOOD
+# Xubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
 #TODO Lubuntu 20.04 Stardate
@@ -73,10 +83,6 @@
 # Also check against Lubuntu 22.04
 
 
-# TODO Check all default icons appear correctly across all platforms
-# and check dynamic icons too.
-
-
 #TODO Going forward, in terms of external hosting of source code
 # and deploying alternatives to .deb files via PPA...
 #    https://github.com/alexmurray/indicator-sensors
@@ -90,8 +96,6 @@
 
 
 #TODO Port indicators to:
-#    https://ubuntuunity.org/download/
-#    https://kubuntu.org/alternative-downloads/
 #    https://www.ubuntukylin.com/downloads/download-en.html
 #
 #    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
@@ -120,8 +124,9 @@ class IndicatorBase( ABC ):
 
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
-    __DESKTOP_BUDGIE = "Budgie:GNOME"
     __DESKTOP_LXQT = "LXQt"
+    __DESKTOP_MATE = "MATE"
+    __DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
 
     __DIALOG_DEFAULT_HEIGHT = 480
     __DIALOG_DEFAULT_WIDTH = 640
@@ -130,6 +135,7 @@ class IndicatorBase( ABC ):
 
     __TERMINALS_AND_EXECUTION_FLAGS = [
         [ "gnome-terminal", "--" ], # Must ALWAYS be listed first so as to be the "default".
+        [ "konsole", "-e" ],
         [ "lxterminal", "-e" ],
         [ "mate-terminal", "-x" ],
         [ "qterminal", "-e" ],
@@ -566,9 +572,12 @@ class IndicatorBase( ABC ):
         return spinner
 
 
-    # Standardised amount of indent spacing used in menus.
-    def getMenuIndent( self, indent ):
-        return "      " * indent
+    def getMenuIndent( self, indent = 1 ):
+        indentAmount = "      " * indent
+        if self.getDesktopEnvironment() == IndicatorBase.__DESKTOP_UNITY7:
+            indentAmount = "      " * ( indent - 1 )
+
+        return indentAmount
 
 
     def getIconThemeName( self ):
@@ -612,23 +621,27 @@ class IndicatorBase( ABC ):
         return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
-#TODO Test how this works on Lubuntu 22.04.
-# May need to adjust the check for LXQt AND 20.04.
-    # Lubuntu 20.04 (LXQt) ignores any change to the icon after initialisation.
+#TODO
+# Test for Lubuntu 22.04 (may need to adjust the check for LXQt AND 20.04)
+# Test for MATE 22.04
+    # Lubuntu 20.04 ignores any change to the icon after initialisation.
     # If the icon is changed, the icon is replaced with a strange grey/white circle.
+    #
+    # Ubuntu MATE 20.04 truncates the icon when changed
+    # but strangely the icon is fine when clicked.
     def isIconUpdateSupported( self ):
         iconUpdateSupported = True
         desktopEnvironment = self.getDesktopEnvironment()
         if desktopEnvironment is None or \
-           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT:
+           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT or \
+           desktopEnvironment == IndicatorBase.__DESKTOP_MATE:
             iconUpdateSupported = False
 
         return iconUpdateSupported
 
 
-#TODO Test how this works on Lubuntu 22.04.
-# May need to adjust the check for LXQt AND 20.04.
-# Also Kubuntu apparently has no labels...but might have tooltips so check.
+#TODO Test how this works on Lubuntu 22.04 (may need to adjust the check for LXQt AND 20.04)
+# Also maybe Budgie or MATE?
     # Lubuntu 20.04 (LXQt) ignores any change to the label/tooltip after initialisation.
     def isLabelUpdateSupported( self ):
         labelUpdateSupported = True

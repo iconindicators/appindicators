@@ -16,6 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Add colours for Yaru-unity-dark and Yaru-unity-light (Ubuntu Unity).
+
+
+#TODO
+# To get the screen resolution to stay after being set,
+# rather than snapping back to 800x600:
+# https://askubuntu.com/questions/1230797/ubuntu-20-04-vm-always-resizes-screen-to-default-size-when-booting
+
+
 # Application indicator to test stuff.
 
 
@@ -30,6 +39,7 @@ gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 from pathlib import Path
+from threading import Thread
 
 import datetime, os, random
 
@@ -46,7 +56,7 @@ class IndicatorTest( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.5",
+            version = "1.0.6",
             copyrightStartYear = "2016",
             comments = _( "Test" ) )
 
@@ -61,33 +71,55 @@ class IndicatorTest( IndicatorBase ):
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         self.setLabel( self.__getCurrentTime() )
+        print( "Mouse wheel is scrolling..." )
 
 
     def __buildMenu( self, menu ):
-        homeDirectory = self.processGet( "echo $HOME" ).strip()
-        cacheDirectory = self.getCacheDirectory()
+        self.__buildMenuDesktop( menu )
+        self.__buildMenuIconDefault( menu )
+        self.__buildMenuIconDynamic( menu )
+        self.__buildMenuLabelTooltipOSD( menu )
+        self.__buildMenuTerminal( menu )
+        self.__buildMenuPreferences( menu )
+        self.__buildMenuLabelIconUpdating( menu )
+        self.__buildMenuExecuteCommand( menu )
 
-        menu.append( Gtk.MenuItem.new_with_label( "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + self.getIconThemeName() ) )
+
+    def __buildMenuDesktop( self, menu ):
+        subMenu = Gtk.Menu()
+
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + self.getIconThemeName() ) )
 
         command = "gsettings get org.gnome.desktop.interface "
-        menu.append( Gtk.MenuItem.new_with_label( command + "icon-theme: " + self.processGet( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
-        menu.append( Gtk.MenuItem.new_with_label( command + "gtk-theme: " + self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + command + "icon-theme: " + self.processGet( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + command + "gtk-theme: " + self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
 
-        command = "echo $XDG_CURRENT_DESKTOP"
-        menu.append( Gtk.MenuItem.new_with_label( command + ": " + self.getDesktopEnvironment() ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.getDesktopEnvironment() ) )
 
-        menu.append( Gtk.SeparatorMenuItem() )
+        menuItem = Gtk.MenuItem.new_with_label( "Desktop" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Use default icon" )
+
+    def __buildMenuIconDefault( self, menu ):
+        subMenu = Gtk.Menu()
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon" )
         menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
-        menu.append( menuItem )
+        subMenu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Use default icon copied to user cache with colour change" )
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon copied to user cache with colour change" )
         menuItem.connect( "activate", lambda widget: self.__useIconCopiedFromDefault() )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Icon (default)" )
+        menuItem.set_submenu( subMenu )
         menu.append( menuItem )
 
-        menu.append( Gtk.SeparatorMenuItem() )
 
+    def __buildMenuIconDynamic( self, menu ):
+        subMenu = Gtk.Menu()
+        cacheDirectory = self.getCacheDirectory()
         icons = [ "FULL_MOON",
                   "WANING_GIBBOUS",
                   "THIRD_QUARTER",
@@ -95,43 +127,76 @@ class IndicatorTest( IndicatorBase ):
                   "WAXING_CRESCENT" ]
 
         for icon in icons:
-            menuItem = Gtk.MenuItem.new_with_label( _( "Use " + icon + " dynamically created in " + cacheDirectory ) )
-            menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( icon ) )
-            menu.append( menuItem )
+            menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory )
+            menuItem.set_name( icon )
+            menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( widget.props.name ) )
+            subMenu.append( menuItem )
 
-        menu.append( Gtk.SeparatorMenuItem() )
-
-        icons = [ "indicator-fortune.svg",
-                  "indicator-lunar.svg",
-                  "indicator-lunar-satellite.svg",
-                  "indicator-on-this-day.svg",
-                  "indicator-ppa-download-statistics.svg",
-                  "indicator-punycode.svg",
-                  "indicator-script-runner.svg",
-                  "indicator-stardate.svg",
-                  "indicator-test.svg",
-                  "indicator-tide.svg",
-                  "indicator-virtual-box.svg" ]
-
-        for icon in icons:
-            menuItem = Gtk.MenuItem.new_with_label( _( "Use " + icon + " in " + homeDirectory ) )
-            menuItem.connect( "activate", lambda widget: self.__useIconInHomeDirectory( icon ) )
-            menu.append( menuItem )
-
-        menu.append( Gtk.SeparatorMenuItem() )
-
-        menuItem = Gtk.MenuItem.new_with_label( _( "Show current time in label" ) )
-        menuItem.connect( "activate", lambda widget: self.setLabel( self.__getCurrentTime() ) )
+        menuItem = Gtk.MenuItem.new_with_label( "Icon (dynamic)" )
+        menuItem.set_submenu( subMenu )
         menu.append( menuItem )
+
+
+    def __buildMenuLabelTooltipOSD( self, menu ):
+        subMenu = Gtk.Menu()
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in label" )
+        menuItem.connect( "activate", lambda widget: ( print( "mouse middle click" ), self.setLabel( self.__getCurrentTime() ) ) )
         self.secondaryActivateTarget = menuItem
+        subMenu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Show current time in OSD" )
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in OSD" )
         menuItem.connect( "activate", lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.icon ).show() )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Label / Tooltip / OSD" )
+        menuItem.set_submenu( subMenu )
         menu.append( menuItem )
 
-        menu.append( Gtk.SeparatorMenuItem() )
 
-        menu.append( Gtk.MenuItem.new_with_label( _( "X: " + str( self.X ) ) ) )
+    def __buildMenuTerminal( self, menu ):
+        subMenu = Gtk.Menu()
+
+        terminal, executionFlag = self.getTerminalAndExecutionFlag()
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Terminal: " + str( terminal ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Execution flag: " + str( executionFlag ) ) )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Terminal" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
+
+
+    def __buildMenuPreferences( self, menu ):
+        subMenu = Gtk.Menu()
+
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "X: " + str( self.X ) ) )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Preferences" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
+
+
+    def __buildMenuLabelIconUpdating( self, menu ):
+        subMenu = Gtk.Menu()
+
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Icon: " + str( self.isIconUpdateSupported() ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Label / Tooltip: " + str( self.isLabelUpdateSupported() ) ) )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Label / Tooltip / Icon Updating" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
+
+
+    def __buildMenuExecuteCommand( self, menu ):
+        subMenu = Gtk.Menu()
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Run \'ls\' and display results." )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand() )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Execute Command" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
 
 
     def __useIconCopiedFromDefault( self ):
@@ -219,6 +284,31 @@ class IndicatorTest( IndicatorBase ):
         return '<?xml version="1.0" standalone="no"?>' \
                '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
                '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
+
+
+    def __executeCommand( self ):
+        terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
+        if terminal is None:
+            message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
+            self.getLogging().error( message )
+            Notify.Notification.new( "Cannot run script", message, self.icon ).show()
+
+        elif self.isTerminalQTerminal():
+            # As a result of this issue
+            #    https://github.com/lxqt/qterminal/issues/335
+            # the default terminal in Lubuntu (qterminal) fails to parse argument.
+            # Although a fix has been made, it is unlikely the repository will be updated any time soon.
+            # So the quickest/easiest workaround is to install gnome-terminal. 
+            message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
+            self.getLogging().error( message )
+            Notify.Notification.new( "Cannot run script", message, self.icon ).show()
+
+        else:
+            command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
+            command += "ls -la"
+            command += "; ${SHELL}"
+            command += "'"
+            Thread( target = self.processCall, args = ( command, ) ).start()
 
 
     def onPreferences( self, dialog ):

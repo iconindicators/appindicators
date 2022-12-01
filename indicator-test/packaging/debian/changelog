@@ -1,3 +1,11 @@
+indicator-test (1.0.6-1) bionic; urgency=low
+
+  * Lots of changes to support 20.04 versions of Kubuntu, Lubuntu, Ubuntu Budgie,
+    Ubuntu MATE, Ubuntu Unity and Xubuntu.
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 1 Dec 2022 18:51:11 +1000
+
+
 indicator-test (1.0.5-1) bionic; urgency=low
 
   * Created a mock indicator which tests all manner of indicator capabilities;
