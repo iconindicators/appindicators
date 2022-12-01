@@ -616,21 +616,21 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateMenuMoon( self, menu ):
         subMenu = Gtk.Menu()
-        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, self.getMenuIndent( 1 ), IndicatorLunar.SEARCH_URL_MOON ):
+        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, self.getMenuIndent(), IndicatorLunar.SEARCH_URL_MOON ):
             self.createMenuItemAndAppend( menu, _( "Moon" ), "" ).set_submenu( subMenu )
             subMenu.append( Gtk.SeparatorMenuItem() )
             key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
 
             self.createMenuItemAndAppend(
                 subMenu,
-                self.getMenuIndent( 1 ) + \
+                self.getMenuIndent() + \
                 _( "Phase: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_PHASE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ] ),
                 IndicatorLunar.SEARCH_URL_MOON )
 
             self.createMenuItemAndAppend(
                 subMenu,
-                self.getMenuIndent( 1 ) + _( "Next Phases" ),
+                self.getMenuIndent() + _( "Next Phases" ),
                 IndicatorLunar.SEARCH_URL_MOON )
 
             # The phase (illumination) is rounded and so a given phase is entered earlier than what occurs in reality.
@@ -660,18 +660,18 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateMenuSun( self, menu ):
         subMenu = Gtk.Menu()
-        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, self.getMenuIndent( 1 ), IndicatorLunar.SEARCH_URL_SUN ):
+        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, self.getMenuIndent(), IndicatorLunar.SEARCH_URL_SUN ):
             self.createMenuItemAndAppend( menu, _( "Sun" ), "" ).set_submenu( subMenu )
             subMenu.append( Gtk.SeparatorMenuItem() )
             key = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
 
             equinoxLabel = \
-                self.getMenuIndent( 1 ) + \
+                self.getMenuIndent() + \
                 _( "Equinox: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] )
 
             solsticeLabel = \
-                self.getMenuIndent( 1 ) + \
+                self.getMenuIndent() + \
                 _( "Solstice: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ] )
 
@@ -690,7 +690,7 @@ class IndicatorLunar( IndicatorBase ):
         menu.append( Gtk.SeparatorMenuItem() )
         key = ( bodyType, nameTag )
 
-        self.createMenuItemAndAppend( menu, self.getMenuIndent( 1 ) + _( "Eclipse" ), url )
+        self.createMenuItemAndAppend( menu, self.getMenuIndent() + _( "Eclipse" ), url )
 
         self.createMenuItemAndAppend(
             menu,
@@ -753,7 +753,7 @@ class IndicatorLunar( IndicatorBase ):
 
         urlFunction = getURLFunction()
         displayNameFunction = getDisplayNameFunction()
-        indent = self.getMenuIndent( 1 )
+        indent = self.getMenuIndent()
         indentDouble = self.getMenuIndent( 2 )
         subMenu = Gtk.Menu()
         for name in bodies:
@@ -952,7 +952,7 @@ class IndicatorLunar( IndicatorBase ):
         menuItem = self.createMenuItemAndAppend( menu, label, "" )
         subMenu = Gtk.Menu()
         menuItem.set_submenu( subMenu )
-        indent = self.getMenuIndent( 1 )
+        indent = self.getMenuIndent()
         indentDouble = self.getMenuIndent( 2 )
         indentTriple = self.getMenuIndent( 3 )
         for info in satellites:

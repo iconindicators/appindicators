@@ -126,7 +126,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.sortPublishedBinariesByDownloadCountAndClip( self.sortByDownloadAmount )
 
         if self.showSubmenu:
-            indent = self.getMenuIndent( 1 )
+            indent = self.getMenuIndent()
             for ppa in ppas:
                 menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )
                 menu.append( menuItem )
@@ -142,7 +142,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     menuItem.set_submenu( subMenu )
 
         else:
-            indent = self.getMenuIndent( 1 )
+            indent = self.getMenuIndent()
             for ppa in ppas:
                 menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )
                 menu.append( menuItem )
