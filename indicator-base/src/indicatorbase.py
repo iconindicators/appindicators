@@ -598,7 +598,6 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getIconThemeColour( self, defaultColour ):
-
         iconThemeName = self.getIconThemeName()
         iconThemeColour = defaultColour
         if iconThemeName in IndicatorBase.__ICON_THEME_NAMES:
