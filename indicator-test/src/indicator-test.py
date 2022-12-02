@@ -16,15 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Add colours for Yaru-unity-dark and Yaru-unity-light (Ubuntu Unity).
-
-
-#TODO
-# To get the screen resolution to stay after being set,
-# rather than snapping back to 800x600:
-# https://askubuntu.com/questions/1230797/ubuntu-20-04-vm-always-resizes-screen-to-default-size-when-booting
-
-
 # Application indicator to test stuff.
 
 
