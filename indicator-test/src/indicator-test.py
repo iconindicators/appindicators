@@ -18,6 +18,7 @@
 
 # Application indicator to test stuff.
 
+
 # Checked against...
 # Kubuntu 20.04, 22.04: No mouse wheel scroll; tooltip in lieu of label.
 # Lubuntu 20.04, 22.04: No label; tooltip is not dynamic; icon is not dynamic.
@@ -28,8 +29,6 @@
 # Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
 # Ubuntu Unity 20.04 ALL GOOD
 # Xubuntu 20.04, 22.04: No mouse wheel scroll; tooltip in lieu of label.
-
-
 
 
 INDICATOR_NAME = "indicator-test"
