@@ -29,17 +29,6 @@
 # https://www.omgubuntu.co.uk/tip
 
 
-#TODO Check Indicator Test...
-# Kubuntu 20.04, 22.04: No mouse wheel scroll; tooltip in lieu of label.
-# Lubuntu 20.04, 22.04: No label; tooltip is not dynamic; icon is not dynamic.
-# Ubuntu Budgie 20.04 No mouse middle click.
-# Ubuntu Budgie 22.04 ALL GOOD
-# Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
-# Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
-# Ubuntu Unity 20.04 ALL GOOD
-# Xubuntu 20.04, 22.04: No mouse wheel scroll; tooltip in lieu of label.
-
-
 #TODO Lubuntu 20.04 Stardate
 # A similarly looking icon to the stardate SVG icon appears instead.
 # The icon is found in
@@ -137,6 +126,22 @@ class IndicatorBase( ABC ):
 
     __DIALOG_DEFAULT_HEIGHT = 480
     __DIALOG_DEFAULT_WIDTH = 640
+
+    __ICON_THEME_NAMES = {
+        "Adwaita"                   : "bebebe",
+        "Ambiant-MATE"              : "dfdbd2",
+        "breeze"                    : "232629",
+        "breeze-dark"               : "eff0f1",
+        "elementary-xfce-darker"    : "f3f3f3",
+        "Lubuntu"                   : "4c4c4c",
+        "Pocillo"                   : "ffffff",
+        "ubuntu-mono-dark"          : "dfdbd2",
+        "ubuntu-mono-light"         : "3c3c3c",
+        "Yaru"                      : "dbdbdb",
+        "Yaru-MATE-dark"            : "f9f9f9",
+        "Yaru-MATE-light"           : "808080",
+        "Yaru-unity-dark"           : "dfdbd2",
+        "Yaru-unity-light"          : "3c3c3c" }
 
     __JSON_EXTENSION = ".json"
 
@@ -593,26 +598,11 @@ class IndicatorBase( ABC ):
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
     def getIconThemeColour( self, defaultColour ):
-        iconThemeNames = {
-            "Adwaita"                   : "bebebe",
-            "Ambiant-MATE"              : "dfdbd2",
-            "breeze"                    : "232629",
-            "breeze-dark"               : "eff0f1",
-            "elementary-xfce-darker"    : "f3f3f3",
-            "Lubuntu"                   : "4c4c4c",
-            "Pocillo"                   : "ffffff",
-            "ubuntu-mono-dark"          : "dfdbd2",
-            "ubuntu-mono-light"         : "3c3c3c",
-            "Yaru"                      : "dbdbdb",
-            "Yaru-MATE-dark"            : "f9f9f9",
-            "Yaru-MATE-light"           : "808080",
-            "Yaru-unity-dark"           : "dfdbd2",
-            "Yaru-unity-light"          : "3c3c3c" }
 
         iconThemeName = self.getIconThemeName()
         iconThemeColour = defaultColour
-        if iconThemeName in iconThemeNames:
-            iconThemeColour = iconThemeNames[ iconThemeName ]
+        if iconThemeName in IndicatorBase.__ICON_THEME_NAMES:
+            iconThemeColour = IndicatorBase.__ICON_THEME_NAMES[ iconThemeName ]
 
         return iconThemeColour
 
