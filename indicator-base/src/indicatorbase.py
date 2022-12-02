@@ -30,12 +30,14 @@
 
 
 #TODO Check Indicator Test...
-# Kubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
-# Lubuntu 20.04 No label; tooltip is not dynamic; icon is not dynamic.
-# Uubuntu Budgie 20.04 No mouse middle click.
-# Ubuntu MATE 20.04 Dynamic icon (without being clicked) is truncated.
+# Kubuntu 20.04, 22.04: No mouse wheel scroll; tooltip in lieu of label.
+# Lubuntu 20.04, 22.04: No label; tooltip is not dynamic; icon is not dynamic.
+# Ubuntu Budgie 20.04 No mouse middle click.
+# Ubuntu Budgie 22.04 ALL GOOD
+# Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
+# Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
 # Ubuntu Unity 20.04 ALL GOOD
-# Xubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
+# Xubuntu 20.04, 22.04: No mouse wheel scroll; tooltip in lieu of label.
 
 
 #TODO Lubuntu 20.04 Stardate
@@ -81,6 +83,11 @@
 #
 # The workaround is simply show the fixed icon and never attempt to change the icon.
 # Also check against Lubuntu 22.04
+
+
+#TODO Ubuntu MATE 20.04 Lunar
+# Dynamic icon is scaled and truncated, but looks okay on clicking.
+# Log an issue.
 
 
 #TODO Going forward, in terms of external hosting of source code
@@ -133,15 +140,14 @@ class IndicatorBase( ABC ):
 
     __JSON_EXTENSION = ".json"
 
-    __TERMINALS_AND_EXECUTION_FLAGS = [
-        [ "gnome-terminal", "--" ], # Must ALWAYS be listed first so as to be the "default".
+    __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # Must ALWAYS be listed first so as to be the "default".
+    __TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
         [ "lxterminal", "-e" ],
         [ "mate-terminal", "-x" ],
         [ "qterminal", "-e" ],
         [ "tilix", "-e" ],
-        [ "xfce4-terminal", "-x" ] ]
-
+        [ "xfce4-terminal", "-x" ] ] )
 
     CONFIG_VERSION = "version"
     EXTENSION_TEXT = ".txt"
@@ -588,12 +594,20 @@ class IndicatorBase( ABC ):
     # The defaultColour will be returned if the current theme has no colour defined.
     def getIconThemeColour( self, defaultColour ):
         iconThemeNames = {
-            "Adwaita"                : "bebebe",
-            "elementary-xfce-darker" : "f3f3f3",
-            "Lubuntu"                : "4c4c4c",
-            "ubuntu-mono-dark"       : "dfdbd2",
-            "ubuntu-mono-light"      : "3c3c3c",
-            "Yaru"                   : "dbdbdb" }
+            "Adwaita"                   : "bebebe",
+            "Ambiant-MATE"              : "dfdbd2",
+            "breeze"                    : "232629",
+            "breeze-dark"               : "eff0f1",
+            "elementary-xfce-darker"    : "f3f3f3",
+            "Lubuntu"                   : "4c4c4c",
+            "Pocillo"                   : "ffffff",
+            "ubuntu-mono-dark"          : "dfdbd2",
+            "ubuntu-mono-light"         : "3c3c3c",
+            "Yaru"                      : "dbdbdb",
+            "Yaru-MATE-dark"            : "f9f9f9",
+            "Yaru-MATE-light"           : "808080",
+            "Yaru-unity-dark"           : "dfdbd2",
+            "Yaru-unity-light"          : "3c3c3c" }
 
         iconThemeName = self.getIconThemeName()
         iconThemeColour = defaultColour
@@ -607,7 +621,6 @@ class IndicatorBase( ABC ):
         return logging
 
 
-    # Returns True if a number; False otherwise.
     def isNumber( self, numberAsString ):
         try:
             float( numberAsString )
@@ -621,28 +634,33 @@ class IndicatorBase( ABC ):
         return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
-#TODO
-# Test for Lubuntu 22.04 (may need to adjust the check for LXQt AND 20.04)
-# Test for MATE 22.04
-    # Lubuntu 20.04 ignores any change to the icon after initialisation.
+    def isUbuntuVariant2004( self ):
+        ubuntuVariant2004 = False
+        try:
+            ubuntuVariant2004 = True if self.processGet( "lsb_release -rs" ).strip() == "20.04" else False
+
+        except:
+            pass
+
+        return ubuntuVariant2004
+
+
+    # Lubuntu 20.04/22.04 ignores any change to the icon after initialisation.
     # If the icon is changed, the icon is replaced with a strange grey/white circle.
     #
-    # Ubuntu MATE 20.04 truncates the icon when changed
-    # but strangely the icon is fine when clicked.
+    # Ubuntu MATE 20.04 truncates the icon when changed, despite the icon being fine when clicked.
     def isIconUpdateSupported( self ):
         iconUpdateSupported = True
         desktopEnvironment = self.getDesktopEnvironment()
         if desktopEnvironment is None or \
            desktopEnvironment == IndicatorBase.__DESKTOP_LXQT or \
-           desktopEnvironment == IndicatorBase.__DESKTOP_MATE:
+           ( desktopEnvironment == IndicatorBase.__DESKTOP_MATE and self.isUbuntuVariant2004() ):
             iconUpdateSupported = False
 
         return iconUpdateSupported
 
 
-#TODO Test how this works on Lubuntu 22.04 (may need to adjust the check for LXQt AND 20.04)
-# Also maybe Budgie or MATE?
-    # Lubuntu 20.04 (LXQt) ignores any change to the label/tooltip after initialisation.
+    # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
     def isLabelUpdateSupported( self ):
         labelUpdateSupported = True
         desktopEnvironment = self.getDesktopEnvironment()
@@ -653,11 +671,9 @@ class IndicatorBase( ABC ):
         return labelUpdateSupported
 
 
-#TODO Need to be careful here...
-# If the issue with qterminal has been fixed,
-# maybe need another function to determine if we are on 20.04 or 22.04 (or something in between).
-# This function alone might stop a script from running on 22.04 when the script will in fact run.
-# Or perhaps also get the version number of qterminal.
+    # As a result of
+    #    https://github.com/lxqt/qterminal/issues/335
+    # provide a way to determine if qterminal is the current terminal.
     def isTerminalQTerminal( self ):
         terminalIsQTerminal = False
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()

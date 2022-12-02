@@ -83,6 +83,7 @@ class IndicatorTest( IndicatorBase ):
         self.__buildMenuPreferences( menu )
         self.__buildMenuLabelIconUpdating( menu )
         self.__buildMenuExecuteCommand( menu )
+        self.__buildMenuUbuntuVariant( menu )
 
 
     def __buildMenuDesktop( self, menu ):
@@ -199,6 +200,17 @@ class IndicatorTest( IndicatorBase ):
         menu.append( menuItem )
 
 
+    def __buildMenuUbuntuVariant( self, menu ):
+        subMenu = Gtk.Menu()
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Is Ubuntu variant 20.04: " + str( self.isUbuntuVariant2004() ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Ubuntu Variant" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
+
+
     def __useIconCopiedFromDefault( self ):
         if self.isIconUpdateSupported():
             with open( "/usr/share/icons/hicolor/scalable/apps/" + self.icon + IndicatorTest.CACHE_ICON_EXTENSION, 'r' ) as fIn:
@@ -309,6 +321,7 @@ class IndicatorTest( IndicatorBase ):
             command += "; ${SHELL}"
             command += "'"
             Thread( target = self.processCall, args = ( command, ) ).start()
+            print( "Executing command: " + command )
 
 
     def onPreferences( self, dialog ):
