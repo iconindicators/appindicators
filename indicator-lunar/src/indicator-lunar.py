@@ -108,8 +108,6 @@ class IndicatorLunar( IndicatorBase ):
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used when displaying the satellite rise notification.
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M" # Used to display any body's rise/set in the menu.
 
-    EXTENSION_SVG = ".svg"
-
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
     ICON_SATELLITE = INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
@@ -148,7 +146,7 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_NOTIFICATION_SUMMARY_DEFAULT = \
         astroBackend.SATELLITE_TAG_NAME + " : " + \
         astroBackend.SATELLITE_TAG_NUMBER + " : " + \
-        astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + _( " now rising..." )
+        astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR + " " + _( "now rising..." )
 
     # The satellite menu contains the satellite number then satellite name,
     # followed by other items depending on the satellite's status (rising, in transit or always up).
@@ -515,7 +513,7 @@ class IndicatorLunar( IndicatorBase ):
         illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         brightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
-        iconFilename = self.writeCacheText( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorLunar.EXTENSION_SVG )
+        iconFilename = self.writeCacheText( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorBase.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -541,7 +539,7 @@ class IndicatorLunar( IndicatorBase ):
         return self.writeCacheText(
             self.getSVGIconText( IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON, None, None ),
             IndicatorLunar.ICON_CACHE_BASENAME,
-            IndicatorLunar.EXTENSION_SVG )
+            IndicatorBase.EXTENSION_SVG )
 
 
     def notificationSatellites( self ):
@@ -1842,7 +1840,7 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach( checkbutton, 0, gridStartIndex, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( IndicatorBase.INDENT_TEXT_LEFT )
+        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
 
         label = Gtk.Label.new( summaryLabel )
         box.pack_start( label, False, False, 0 )
@@ -1857,7 +1855,7 @@ class IndicatorLunar( IndicatorBase ):
         checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( IndicatorBase.INDENT_TEXT_LEFT )
+        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
 
         label = Gtk.Label.new( messageLabel )
         label.set_valign( Gtk.Align.START )

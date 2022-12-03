@@ -120,6 +120,8 @@ class IndicatorBase( ABC ):
 
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
+    __CONFIG_VERSION = "version"
+
     __DESKTOP_LXQT = "LXQt"
     __DESKTOP_MATE = "MATE"
     __DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
@@ -127,7 +129,7 @@ class IndicatorBase( ABC ):
     __DIALOG_DEFAULT_HEIGHT = 480
     __DIALOG_DEFAULT_WIDTH = 640
 
-    __ICON_THEME_NAMES = {
+    __ICON_THEMES = {
         "Adwaita"                   : "bebebe",
         "Ambiant-MATE"              : "dfdbd2",
         "breeze"                    : "232629",
@@ -143,7 +145,7 @@ class IndicatorBase( ABC ):
         "Yaru-unity-dark"           : "dfdbd2",
         "Yaru-unity-light"          : "3c3c3c" }
 
-    __JSON_EXTENSION = ".json"
+    __EXTENSION_JSON = ".json"
 
     __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # Must ALWAYS be listed first so as to be the "default".
     __TERMINALS_AND_EXECUTION_FLAGS.extend( [
@@ -154,10 +156,9 @@ class IndicatorBase( ABC ):
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ] )
 
-    CONFIG_VERSION = "version"
+    EXTENSION_SVG = ".svg"
     EXTENSION_TEXT = ".txt"
-    INDENT_TEXT_LEFT = 25
-    INDENT_WIDGET_LEFT = 20
+    INDENT_WIDGET_LEFT = 25
     URL_TIMEOUT_IN_SECONDS = 20
 
 
@@ -600,8 +601,8 @@ class IndicatorBase( ABC ):
     def getIconThemeColour( self, defaultColour ):
         iconThemeName = self.getIconThemeName()
         iconThemeColour = defaultColour
-        if iconThemeName in IndicatorBase.__ICON_THEME_NAMES:
-            iconThemeColour = IndicatorBase.__ICON_THEME_NAMES[ iconThemeName ]
+        if iconThemeName in IndicatorBase.__ICON_THEMES:
+            iconThemeColour = IndicatorBase.__ICON_THEMES[ iconThemeName ]
 
         return iconThemeColour
 
@@ -747,7 +748,7 @@ class IndicatorBase( ABC ):
 
     # Read a dictionary of configuration from a JSON text file.
     def __loadConfig( self ):
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
+        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__EXTENSION_JSON
         config = { }
         if os.path.isfile( configFile ):
             try:
@@ -769,9 +770,9 @@ class IndicatorBase( ABC ):
     def __saveConfig( self, returnStatus = True ):
         config = self.saveConfig() # Call to implementation in indicator.
 
-        config[ IndicatorBase.CONFIG_VERSION ] = self.version
+        config[ IndicatorBase.__CONFIG_VERSION ] = self.version
 
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__JSON_EXTENSION
+        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__EXTENSION_JSON
         success = True
         try:
             with open( configFile, 'w' ) as fIn:

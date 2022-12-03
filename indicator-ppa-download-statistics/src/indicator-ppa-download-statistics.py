@@ -627,7 +627,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         box = Gtk.Box( spacing = 6 )
 
-        label = Gtk.Label.new( _( "  Clip amount" ) )
+        label = Gtk.Label.new( _( "Clip amount" ) )
         label.set_sensitive( sortByDownloadCheckbutton.get_active() )
         label.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
