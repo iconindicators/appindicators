@@ -1025,7 +1025,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         else:
             self.ppas = [ ]
-            self.ppas.append( PPA( "thebernmeister", "ppa", "focal", "amd64" ) )
+            self.ppas.append( PPA( "thebernmeister", "ppa", "jammy", "amd64" ) )
 
             filterText = [
                 "indicator-fortune",
@@ -1039,7 +1039,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 "indicator-virtual-box" ]
 
             self.filters = Filters()
-            self.filters.addFilter( "thebernmeister", "ppa", "focal", "amd64", filterText )
+            self.filters.addFilter( "thebernmeister", "ppa", "jammy", "amd64", filterText )
             self.requestSaveConfig()
 
 
