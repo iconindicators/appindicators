@@ -1,7 +1,7 @@
 indicator-test (1.0.6-1) bionic; urgency=low
 
-  * Lots of changes to support 20.04 versions of Kubuntu, Lubuntu, Ubuntu Budgie,
-    Ubuntu MATE, Ubuntu Unity and Xubuntu.
+  * Lots of changes to support 20.04/22.04 versions of Kubuntu, Lubuntu,
+    Ubuntu, Ubuntu Budgie, Ubuntu MATE, Ubuntu Unity and Xubuntu.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 1 Dec 2022 18:51:11 +1000
 
