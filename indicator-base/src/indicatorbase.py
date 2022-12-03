@@ -92,6 +92,10 @@
 
 
 #TODO Port indicators to:
+#    https://www.linuxmint.com/
+#    https://www.bodhilinux.com/
+#    https://elementary.io/
+#    https://zorin.com/os/
 #    https://www.ubuntukylin.com/downloads/download-en.html
 #
 #    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
