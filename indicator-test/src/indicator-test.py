@@ -27,6 +27,7 @@
 # Ubuntu Budgie 22.04 ALL GOOD
 # Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
 # Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
+# Ubuntu 20.04, 22.04 ALL GOOD
 # Ubuntu Unity 20.04 ALL GOOD
 # Xubuntu 20.04, 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
