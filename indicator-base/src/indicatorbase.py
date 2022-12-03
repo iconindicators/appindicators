@@ -23,6 +23,28 @@
 #     https://wiki.gnome.org/Projects/PyGObject/Threading
 #     https://wiki.ubuntu.com/NotifyOSD
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
+#
+# Not all functionality works across all platforms/desktops...
+#
+#    Kubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
+#    Kubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
+#
+#    Lubuntu 20.04 No label; tooltip is not dynamic; icon is not dynamic.
+#    Lubuntu 22.04 No label; tooltip is not dynamic; icon is not dynamic.
+#
+#    Ubuntu 20.04 ALL GOOD
+#    Ubuntu 22.04 ALL GOOD
+#
+#    Ubuntu Budgie 20.04 No mouse middle click.
+#    Ubuntu Budgie 22.04 ALL GOOD
+#
+#    Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
+#    Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
+#
+#    Ubuntu Unity 20.04 ALL GOOD
+#
+#    Xubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
+#    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
 #TODO When tested on all Ubuntu platforms, perhaps tip off 
