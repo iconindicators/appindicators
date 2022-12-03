@@ -123,7 +123,6 @@ copyTopLevelAndSource()
 }
 
 
-
 # Arguments:
 #   Array of hicolor icons names present in the icons directory.
 #   Array of hicolor colours present across ALL hicolor icons.
