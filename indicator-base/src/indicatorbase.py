@@ -155,6 +155,8 @@ class IndicatorBase( ABC ):
     __DIALOG_DEFAULT_HEIGHT = 480
     __DIALOG_DEFAULT_WIDTH = 640
 
+    __EXTENSION_JSON = ".json"
+
     __ICON_THEMES = {
         "Adwaita"                   : "bebebe",
         "Ambiant-MATE"              : "dfdbd2",
@@ -171,8 +173,6 @@ class IndicatorBase( ABC ):
         "Yaru-unity-dark"           : "dfdbd2",
         "Yaru-unity-light"          : "3c3c3c" }
 
-    __EXTENSION_JSON = ".json"
-
     __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # Must ALWAYS be listed first so as to be the "default".
     __TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
@@ -184,7 +184,9 @@ class IndicatorBase( ABC ):
 
     EXTENSION_SVG = ".svg"
     EXTENSION_TEXT = ".txt"
+
     INDENT_WIDGET_LEFT = 25
+
     URL_TIMEOUT_IN_SECONDS = 20
 
 
