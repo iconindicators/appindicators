@@ -25,11 +25,7 @@
 # Waiting on Jure @ COBS to resolve.
 
 
-#TODO If comets are unresolved for next release,
-# remove 'comet' from the description in debian/control.
-
-
-#TODO Maybe change the ISS SVG icon to some simpler satellite icon.
+#TODO When comets are resolved, replace 'comet' in the description in debian/control.
 
 
 INDICATOR_NAME = "indicator-lunar"
