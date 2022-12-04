@@ -20,12 +20,50 @@
 # comet, star and satellite information.
 
 
-#TODO The comets data from COBS does not contain updated absolute magnitude data.
+#TODO The comet data from COBS does not contain updated absolute magnitude data.
 # Also, the data contains spurious data (easier to see in the MPC format).
 # Waiting on Jure @ COBS to resolve.
-
-
-#TODO When comets are resolved, replace 'comet' in the description in debian/control.
+#
+# When comet data is resolved...
+#    Replace 'comet' in the description in debian/control.
+#
+#    Replace CREDIT_COMETS back into
+#        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
+#    and
+#        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
+#
+#    Replace 'comet' back into
+#        comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
+#
+#
+# Uncomment
+#        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+#            utcNow, self.cometOrbitalElementData,
+#            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+#            self.downloadCountComet, self.nextDownloadTimeComet,
+#            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+#            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+#
+#    Check the call to IndicatorLunar.astroBackend.getDesignationComet( name ) still works.
+#
+#    Uncomment/unhide in the Preferences
+#        grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
+#    
+#    Uncomment/unhide in the Preferences
+#        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+#
+#
+# In astropyephem, __calculateCometsMinorPlanets(),
+# the exception will not actually function correctly unless using PyEphem 4.1.4,
+# yet to be released (and still cannot test until comet data is resolved).
+# For now, given there is no comet data,
+# the function will not ever be called, so is safe to leave as is.
+# When PyEphem 4.1.4 is released and we have comet data from COBS, test the function and 
+# if any exception is thrown, report back to COBS as potentially bad comet data.
+#
+#
+# In dataproviderorbitalelement, __downloadFromCometObservationDatabase(),
+# Waiting on Jure to figure out final API.
 
 
 INDICATOR_NAME = "indicator-lunar"
@@ -92,10 +130,10 @@ class IndicatorLunar( IndicatorBase ):
     CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
     CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://celestrak.org" )
     if astroBackendName == astroBackendPyEphem:
-        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
+        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
 
     else:
-        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ] #TODO Remove comets if not ready.
+        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
 
     DATA_INDEX_BODY_TYPE = 0
     DATA_INDEX_BODY_NAME = 1
@@ -174,7 +212,7 @@ class IndicatorLunar( IndicatorBase ):
             indicatorName = INDICATOR_NAME,
             version = "1.0.99",
             copyrightStartYear = "2012",
-            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ), #TODO Remove comet if not available.
+            comments = _( "Displays lunar, solar, planetary, minor planet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
         self.debug = True #TODO Testing
@@ -298,7 +336,6 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-#TODO Commented out until comets are resolved.
         # self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
         #     utcNow, self.cometOrbitalElementData,
         #     IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
@@ -719,7 +756,7 @@ class IndicatorLunar( IndicatorBase ):
 
         def getURLPlanet( name ): return IndicatorLunar.SEARCH_URL_PLANET + name.lower()
         def getURLMinorPlanet( name ): return IndicatorLunar.SEARCH_URL_MINOR_PLANET + name
-        def getURLComet( name ): return IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( name ) #TODO Fix once COBS is sorted.
+        def getURLComet( name ): return IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( name )
         def getURLStar( name ): return IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
 
 
@@ -1262,8 +1299,7 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "All comets are automatically added." ) )
-#TODO Comment out before release if comets unresolved.
-        grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
+        # grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 5 )
@@ -1359,8 +1395,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-#TODO Comment out before release if comets unresolved.
-        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.astroBackend.getStarNames():
