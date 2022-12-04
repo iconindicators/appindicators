@@ -12,3 +12,4 @@ Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-
 Description: Application indicator for VirtualBox™ virtual machines.
  A user can start any of their virtual machines from the indicator
  or select any virtual machine to be automatically started.
+

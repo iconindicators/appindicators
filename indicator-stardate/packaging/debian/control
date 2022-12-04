@@ -12,3 +12,4 @@ Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-
 Description: Application indicator which displays the current stardate.
  A user can show either the classic version of the current startdate or
  use the new version developed for the 2009 movie reboot.
+
