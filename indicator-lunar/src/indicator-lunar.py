@@ -20,6 +20,52 @@
 # comet, star and satellite information.
 
 
+#TODO The comet data from COBS does not contain updated absolute magnitude data.
+# Also, the data contains spurious data (easier to see in the MPC format).
+# Waiting on Jure @ COBS to resolve.
+#
+# When comet data is resolved...
+#    Replace 'comet' in the description in debian/control.
+#
+#    Replace CREDIT_COMETS back into
+#        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
+#    and
+#        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
+#
+#    Replace 'comet' back into
+#        comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
+#
+#
+# Uncomment
+#        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+#            utcNow, self.cometOrbitalElementData,
+#            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+#            self.downloadCountComet, self.nextDownloadTimeComet,
+#            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+#            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+#
+#    Check the call to IndicatorLunar.astroBackend.getDesignationComet( name ) still works.
+#
+#    Uncomment/unhide in the Preferences
+#        grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
+#    
+#    Uncomment/unhide in the Preferences
+#        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+#
+#
+# In astropyephem, __calculateCometsMinorPlanets(),
+# the exception will not actually function correctly unless using PyEphem 4.1.4,
+# yet to be released (and still cannot test until comet data is resolved).
+# For now, given there is no comet data,
+# the function will not ever be called, so is safe to leave as is.
+# When PyEphem 4.1.4 is released and we have comet data from COBS, test the function and 
+# if any exception is thrown, report back to COBS as potentially bad comet data.
+#
+#
+# In dataproviderorbitalelement, __downloadFromCometObservationDatabase(),
+# Waiting on Jure to figure out final API.
+
+
 INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -168,6 +214,8 @@ class IndicatorLunar( IndicatorBase ):
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, minor planet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
+
+        self.debug = True #TODO Testing
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key: combination of three tags: body type, body name and data name.

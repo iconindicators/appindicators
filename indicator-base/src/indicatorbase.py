@@ -47,6 +47,87 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO When tested on all Ubuntu platforms, perhaps tip off 
+# https://www.omgubuntu.co.uk/tip
+
+
+#TODO Lubuntu 20.04 Stardate
+# A similarly looking icon to the stardate SVG icon appears instead.
+# The icon is found in
+#    /usr/share/icons/
+#                    Papirus-Light/16x16/panel
+#                    Papirus-Light/22x22/panel
+#                    Papirus-Light/24x24/panel
+#                    Papirus/16x16/panel
+#                    Papirus/22x22/panel
+#                    Papirus/24x24/panel
+#                    ePapirus-Light/24x24/panel
+#
+# all with the icon name indicator-stardate.svg
+#
+# Have rebuilt the icon cache to no avail.
+#
+# Have logged an issue to find the name/source of the original icon.
+#
+#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
+#
+# Need to log an issue at
+#    https://discourse.lubuntu.me/ 
+# once the icon name from Papirus is found to figure out how this mixup has happened.
+
+
+#TODO Lubuntu 20.04 Lunar
+# The startup icon appears, but is enclosed in a circle.
+# Does not happen with the other indicator's icon.
+
+
+#TODO Lubuntu 20.04 Lunar
+# The dynamic icon does not display and instead shows a grey/white circle,
+# presumably meaning the icon is not being displayed or not found?
+#
+# I suspect (as for the label), cannot be changed to another icon after the indicator starts up.
+# However if I set the icon back to the default icon, the icon shows up.
+#
+# Need to log an issue at
+#    https://discourse.lubuntu.me/
+# creating a simple indicator which updates the label and icon. 
+#
+# The workaround is simply show the fixed icon and never attempt to change the icon.
+# Also check against Lubuntu 22.04
+
+
+#TODO Ubuntu MATE 20.04 Lunar
+# Dynamic icon is scaled and truncated, but looks okay on clicking.
+# Log an issue.
+
+
+#TODO Going forward, in terms of external hosting of source code
+# and deploying alternatives to .deb files via PPA...
+#    https://github.com/alexmurray/indicator-sensors
+#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
+#
+# Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
+#
+# Distribution other than PPA:
+#     https://snapcraft.io/about
+#     https://flathub.org/home
+
+
+#TODO Port indicators to:
+#    https://www.linuxmint.com/
+#    https://www.bodhilinux.com/
+#    https://elementary.io/
+#    https://zorin.com/os/
+#    https://www.ubuntukylin.com/downloads/download-en.html
+#
+#    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
+#    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
+#
+# Miscellaneous:
+#    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
+#    https://itsfoss.com/enable-applet-indicator-gnome/
+
+
 import gi
 gi.require_version( "AppIndicator3", "0.1" )
 gi.require_version( "GLib", "2.0" )
