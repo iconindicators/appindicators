@@ -58,7 +58,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.13",
+            version = "1.0.14",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 

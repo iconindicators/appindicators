@@ -1,3 +1,23 @@
+indicator-on-this-day (1.0.14-1) bionic; urgency=low
+
+  * Now works on the following Ubuntu variants/versions...
+      Kubuntu 20.04
+      Kubuntu 22.04
+      Lubuntu 20.04
+      Lubuntu 22.04
+      Ubuntu 20.04
+      Ubuntu 22.04
+      Ubuntu Budgie 20.04
+      Ubuntu Budgie 22.04
+      Ubuntu MATE 20.04
+      Ubuntu MATE 22.04  
+      Ubuntu Unity 20.04
+      Xubuntu 20.04
+      Xubuntu 22.04
+
+ -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 4 Dec 2022 10:09:06 +1000
+
+
 indicator-on-this-day (1.0.13-1) bionic; urgency=low
 
   * Code refactor caused base class variables to be uninitialised.

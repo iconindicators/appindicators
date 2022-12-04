@@ -1,7 +1,20 @@
 indicator-lunar (1.0.99-1) bionic; urgency=low
 
-  * Now supports Lubuntu/LXQt: As tooltips/labels are unsupported, the 'icon'
-    tab in the Preferences is hidden.
+  * Now works on the following Ubuntu variants/versions...
+      Kubuntu 20.04
+      Kubuntu 22.04
+      Ubuntu 20.04
+      Ubuntu 22.04
+      Ubuntu Budgie 20.04
+      Ubuntu Budgie 22.04
+      Ubuntu MATE 22.04  
+      Ubuntu Unity 20.04
+      Xubuntu 20.04
+      Xubuntu 22.04
+  * Limited functionality on the following Ubuntu variants/versions...
+      Lubuntu 20.04 - No label; tooltip is not dynamic; icon is not dynamic.
+      Lubuntu 22.04 - No label; tooltip is not dynamic; icon is not dynamic.
+      Ubuntu MATE 20.04 - Dynamic icon is truncated (set to fixed).
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 23:03:32 +1000
 
