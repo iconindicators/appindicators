@@ -47,11 +47,7 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
-#TODO When tested on all Ubuntu platforms, perhaps tip off 
-# https://www.omgubuntu.co.uk/tip
-
-
-#TODO Lubuntu 20.04 Stardate
+#TODO Lubuntu 20.04/22.04 Stardate
 # A similarly looking icon to the stardate SVG icon appears instead.
 # The icon is found in
 #    /usr/share/icons/
@@ -74,6 +70,9 @@
 # Need to log an issue at
 #    https://discourse.lubuntu.me/ 
 # once the icon name from Papirus is found to figure out how this mixup has happened.
+#
+# Logged issue
+#    https://discourse.lubuntu.me/t/icons-hijacked/3863
 
 
 #TODO Lubuntu 20.04 Lunar
