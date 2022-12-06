@@ -47,59 +47,19 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
-#TODO Lubuntu 20.04/22.04 Stardate
-# A similarly looking icon to the stardate SVG icon appears instead.
-# The icon is found in
-#    /usr/share/icons/
-#                    Papirus-Light/16x16/panel
-#                    Papirus-Light/22x22/panel
-#                    Papirus-Light/24x24/panel
-#                    Papirus/16x16/panel
-#                    Papirus/22x22/panel
-#                    Papirus/24x24/panel
-#                    ePapirus-Light/24x24/panel
-#
-# all with the icon name indicator-stardate.svg
-#
-# Have rebuilt the icon cache to no avail.
-#
-# Have logged an issue to find the name/source of the original icon.
-#
+#TODO Lubuntu 20.04/22.04 Stardate, Fortune, Lunar, Virtual Box
+# The *Papirus* theme contains icons for the above indicators.
+# Seems they took it upon themselves to do this, so logged an issue.
 #    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
 #
-# Need to log an issue at
-#    https://discourse.lubuntu.me/ 
-# once the icon name from Papirus is found to figure out how this mixup has happened.
+# Have added colors for each *Papirus* to the build script.
 #
-# Logged issue
+# However, getting the icon theme name gives Yaru and not ePapirus.
+# Waiting to hear back from 
 #    https://discourse.lubuntu.me/t/icons-hijacked/3863
+# on how to get the correct icon theme.
 #
-# Turns out the icon theme I find via GTK settings gives the wrong answer. 
-# The icon theme by default is ePapirus which is highly colourised.
-# Given that I've added colours for Papirus themes,
-# this issue only applies to Lunar when creating the icon.
-# It means the hicolor icon will be created...but actually it won't
-# because on Lubuntu, there are no dynamic icons!
-
-
-#TODO Lubuntu 20.04 Lunar
-# The startup icon appears, but is enclosed in a circle.
-# Does not happen with the other indicator's icon.
-
-
-#TODO Lubuntu 20.04 Lunar
-# The dynamic icon does not display and instead shows a grey/white circle,
-# presumably meaning the icon is not being displayed or not found?
-#
-# I suspect (as for the label), cannot be changed to another icon after the indicator starts up.
-# However if I set the icon back to the default icon, the icon shows up.
-#
-# Need to log an issue at
-#    https://discourse.lubuntu.me/
-# creating a simple indicator which updates the label and icon. 
-#
-# The workaround is simply show the fixed icon and never attempt to change the icon.
-# Also check against Lubuntu 22.04
+# But really this is irrelevant because on Lubuntu, dynamic icons are not supported.
 
 
 #TODO Ubuntu MATE 20.04 Lunar
