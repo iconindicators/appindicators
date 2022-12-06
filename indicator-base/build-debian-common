@@ -55,8 +55,8 @@ INDICATOR_BASE=../indicator-base
 
 
 # Supported themes and corresponding colours.
-themeNames=(   "Adwaita" "Ambiant-MATE" "breeze" "breeze-dark" "elementary-xfce-darker" "Lubuntu" "Pocillo" "ubuntu-mono-dark" "ubuntu-mono-light"  "Yaru"  "Yaru-MATE-dark"  "Yaru-MATE-light"  "Yaru-unity-dark"  "Yaru-unity-light"  )
-themeColours=(  bebebe       dfdbd2      232629      eff0f1               f3f3f3         4c4c4c    ffffff          dfdbd2             3c3c3c        dbdbdb       f9f9f9             808080              dfdbd2             3c3c3c )
+themeNames=(   "Adwaita" "Ambiant-MATE" "breeze" "breeze-dark" "elementary-xfce-darker" "ePapirus" "Lubuntu" "Papirus" "Papirus-Light" "Pocillo" "ubuntu-mono-dark" "ubuntu-mono-light"  "Yaru"  "Yaru-MATE-dark"  "Yaru-MATE-light"  "Yaru-unity-dark"  "Yaru-unity-light"  )
+themeColours=(  bebebe       dfdbd2      232629      eff0f1               f3f3f3         ffffff     4c4c4c    dfdfdf         444444     dfdbd2             3c3c3c        dbdbdb       f9f9f9             808080              dfdbd2             3c3c3c )
 
 
 # Arguments: 

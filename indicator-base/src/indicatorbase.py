@@ -73,6 +73,10 @@
 #
 # Logged issue
 #    https://discourse.lubuntu.me/t/icons-hijacked/3863
+#
+# Turns out the icon theme I find via GTK settings gives the wrong answer. 
+# The icon theme by default is ePapirus which is highly colourised.
+# So do I simply (somehow) copy my hicolor over to the ePapirus (and Papirus*) directories?
 
 
 #TODO Lubuntu 20.04 Lunar
