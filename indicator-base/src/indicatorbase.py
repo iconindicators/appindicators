@@ -47,14 +47,8 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
-#TODO Lubuntu 20.04/22.04 Stardate, Fortune, Lunar, Virtual Box
-# The *Papirus* theme contains icons for the above indicators.
-# Seems they took it upon themselves to do this, so logged an issue.
-#    https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/issues/3327
-#
-# Have added colors for each *Papirus* to the build script.
-#
-# However, getting the icon theme name gives Yaru and not ePapirus.
+#TODO Lubuntu 20.04/22.04 Lunar
+# Getting the icon theme name gives Yaru and not ePapirus (defined in LXQt Appearance Configuration).
 # Waiting to hear back from 
 #    https://discourse.lubuntu.me/t/icons-hijacked/3863
 # on how to get the correct icon theme.
