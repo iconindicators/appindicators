@@ -76,7 +76,10 @@
 #
 # Turns out the icon theme I find via GTK settings gives the wrong answer. 
 # The icon theme by default is ePapirus which is highly colourised.
-# So do I simply (somehow) copy my hicolor over to the ePapirus (and Papirus*) directories?
+# Given that I've added colours for Papirus themes,
+# this issue only applies to Lunar when creating the icon.
+# It means the hicolor icon will be created...but actually it won't
+# because on Lubuntu, there are no dynamic icons!
 
 
 #TODO Lubuntu 20.04 Lunar
