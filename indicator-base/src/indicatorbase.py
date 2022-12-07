@@ -47,6 +47,13 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO 
+# Look at sound-switcher
+#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
+# It tries first to import AyatanaAppIndicator3.
+# Should I be doing this?
+
+
 #TODO Lubuntu 20.04/22.04 Lunar
 # Getting the icon theme name gives Yaru and not ePapirus (defined in LXQt Appearance Configuration).
 # Waiting to hear back from 
@@ -56,36 +63,27 @@
 # But really this is irrelevant because on Lubuntu, dynamic icons are not supported.
 
 
-#TODO Ubuntu MATE 20.04 Lunar
-# Dynamic icon is scaled and truncated, but looks okay on clicking.
-# Log an issue.
-
-
-#TODO Going forward, in terms of external hosting of source code
-# and deploying alternatives to .deb files via PPA...
-#    https://github.com/alexmurray/indicator-sensors
-#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
-#
-# Also, look at sound-switcher as it tries first to import AyatanaAppIndicator3.
-#
-# Distribution other than PPA:
-#     https://snapcraft.io/about
-#     https://flathub.org/home
-
-
-#TODO Port indicators to:
+#TODO Future work...
+# Port indicators to Ubuntu variants:
 #    https://www.linuxmint.com/
 #    https://www.bodhilinux.com/
 #    https://elementary.io/
 #    https://zorin.com/os/
 #    https://www.ubuntukylin.com/downloads/download-en.html
 #
+# Port indicators to non-Ubuntu but GNOME based variants...
 #    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
 #    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
 #
 # Miscellaneous:
 #    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
 #    https://itsfoss.com/enable-applet-indicator-gnome/
+#
+# External hosting of source code and deployment other than PPA...
+#    https://github.com/alexmurray/indicator-sensors
+#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
+#    https://snapcraft.io/about
+#    https://flathub.org/home
 
 
 import gi
