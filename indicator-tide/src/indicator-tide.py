@@ -185,28 +185,34 @@ class IndicatorTide( IndicatorBase ):
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
-        box = Gtk.Box( spacing = 6 )
+        label = Gtk.Label.new( _( "User Script" ) )
+        label.set_halign( Gtk.Align.START )
+        grid.attach( label, 0, 0, 1, 1 )
 
-        box.pack_start( Gtk.Label.new( _( "User script" ) ), False, False, 0 )
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+
+        box.pack_start( Gtk.Label.new( _( "Path and filename" ) ), False, False, 0 )
 
         userScriptPathAndFilename = Gtk.Entry()
         userScriptPathAndFilename.set_text( self.userScriptPathAndFilename )
         userScriptPathAndFilename.set_hexpand( True )
-        userScriptPathAndFilename.set_tooltip_text( _( "Full path and filename of user's Python3 script." ) )
+        userScriptPathAndFilename.set_tooltip_text( _( "Full path and filename\nof user's Python3 script." ) )
 
         box.pack_start( userScriptPathAndFilename, True, True, 0 )
 
-        grid.attach( box, 0, 0, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
 
-        box.pack_start( Gtk.Label.new( _( "User class" ) ), False, False, 0 )
+        box.pack_start( Gtk.Label.new( _( "Class name" ) ), False, False, 0 )
 
         userScriptClassName = Gtk.Entry()
         userScriptClassName.set_text( self.userScriptClassName )
         userScriptClassName.set_hexpand( True )
         userScriptClassName.set_tooltip_text( _(
-            "Class name within the user script,\n" + \
+            "Class name within the user script\n" + \
             "which must contain the function\n\n" + \
             "    getTideData()\n\n" + \
             "implemented by the user to obtain\n" + \
@@ -216,13 +222,13 @@ class IndicatorTide( IndicatorBase ):
 
         box.set_margin_bottom( 10 )
 
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach( box, 0, 2, 1, 1 )
 
         showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
         showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
         showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
 
-        grid.attach( showAsSubmenusCheckbutton, 0, 2, 1, 1 )
+        grid.attach( showAsSubmenusCheckbutton, 0, 3, 1, 1 )
 
         showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
         showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
@@ -230,7 +236,7 @@ class IndicatorTide( IndicatorBase ):
         showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
 
-        grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 3, 1, 1 )
+        grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 4, 1, 1 )
 
         showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
 
