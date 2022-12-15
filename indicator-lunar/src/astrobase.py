@@ -648,14 +648,14 @@ class AstroBase( ABC ):
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitudeInDegrees/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
     @staticmethod
-    def getZenithAngleOfBrightLimb( utcNow, sunRA, sunDec, bodyRA, bodyDec, bodyLat, bodyLong ):
+    def getZenithAngleOfBrightLimb( utcNow, sunRA, sunDec, bodyRA, bodyDec, observerLat, observerLon ):
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
         y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
         x = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
         positionAngleOfBrightLimb = math.atan2( y, x )
 
         # Multiply by 15 to convert from decimal time to decimal degrees; section 22 of Practical Astronomy with Your Calculator.
-        localSiderealTime = math.radians( AstroBase.getSiderealTime( utcNow, bodyLong ) * 15 )
+        localSiderealTime = math.radians( AstroBase.getSiderealTime( utcNow, observerLon ) * 15 )
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
         # https://tycho.usno.navy.mil/sidereal.html
@@ -665,7 +665,7 @@ class AstroBase( ABC ):
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hourAngle )
-        x = math.tan( bodyLat ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
+        x = math.tan( observerLat ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
         parallacticAngle = math.atan2( y, x )
 
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
