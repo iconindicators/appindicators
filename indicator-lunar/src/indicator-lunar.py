@@ -53,15 +53,6 @@
 #        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 #
 #
-# In astropyephem, __calculateCometsMinorPlanets(),
-# the exception will not actually function correctly unless using PyEphem 4.1.4,
-# yet to be released (and still cannot test until comet data is resolved).
-# For now, given there is no comet data,
-# the function will not ever be called, so is safe to leave as is.
-# When PyEphem 4.1.4 is released and we have comet data from COBS, test the function and 
-# if any exception is thrown, report back to COBS as potentially bad comet data.
-#
-#
 # In dataproviderorbitalelement, __downloadFromCometObservationDatabase(),
 # Waiting on Jure to figure out final API.
 
