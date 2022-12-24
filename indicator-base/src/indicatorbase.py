@@ -42,16 +42,21 @@
 #    Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
 #
 #    Ubuntu Unity 20.04 ALL GOOD
+#    Ubuntu Unity 22.04 ALL GOOD
 #
 #    Xubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
 #TODO 
-# Look at sound-switcher
+# Look at sound-switcher which does several interesting things...
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
-# It tries first to import AyatanaAppIndicator3.
-# Should I be doing this?
+#
+#    Autostart indicator...how does it do this?
+#
+#    Creates snap and other packages for deployment.
+#
+#    It tries first to import AyatanaAppIndicator3.
 
 
 #TODO Lubuntu 20.04/22.04 Lunar
