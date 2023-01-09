@@ -57,6 +57,14 @@
 #    Creates snap and other packages for deployment.
 #
 #    It tries first to import AyatanaAppIndicator3.
+#
+# https://snapcraft.io/docs/snapcraft-overview
+#
+# https://askubuntu.com/questions/40011/how-to-let-dpkg-i-install-dependencies-for-me
+# https://askubuntu.com/questions/1090826/deb-package-cant-install-its-dependencies-when-using-dpkg
+#
+# https://github.com/yktoo/indicator-sound-switcher/blob/dev/debian/control
+# https://github.com/yktoo/indicator-sound-switcher/blob/dev/snap/local/launch.sh
 
 
 #TODO Lubuntu 20.04/22.04 Lunar
