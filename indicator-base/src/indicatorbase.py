@@ -78,9 +78,6 @@
 
 #TODO Future work...
 # Port indicators to Ubuntu variants:
-#    Ubuntu Unity 22.04
-#        https://ubuntuunity.org/download/
-#        https://fosstorrents.com/distributions/ubuntu-unity/
 #    https://www.linuxmint.com/
 #    https://www.bodhilinux.com/
 #    https://elementary.io/
