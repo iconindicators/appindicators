@@ -48,6 +48,10 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO Make a note somewhere/somehow about installing the .deb file on debian
+# that need to first install GNOME Shell extension Kstatusnotifier or whatever it is called.
+
+
 #TODO
 # In indicator-on-this-day, look at debian/control and look at 
 # Depends:  fortune-mod
@@ -119,14 +123,22 @@
 
 
 import gi
-gi.require_version( "AppIndicator3", "0.1" )
+
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+try:
+    gi.require_version( "AyatanaAppIndicator3", "0.1" )
+    from gi.repository import AyatanaAppIndicator3 as AppIndicator
+
+except ValueError:
+    gi.require_version( "AppIndicator3", "0.1" )
+    from gi.repository import AppIndicator3 as AppIndicator
+
 from abc import ABC
 from bisect import bisect_right
-from gi.repository import AppIndicator3, GLib, Gtk, Notify
+from gi.repository import GLib, Gtk, Notify
 from urllib.request import urlopen
 
 import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
@@ -218,12 +230,12 @@ class IndicatorBase( ABC ):
         menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         menu.show_all()
 
-        self.indicator = AppIndicator3.Indicator.new(
+        self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
             self.indicatorName, # Icon name
-            AppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+            AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
-        self.indicator.set_status( AppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
