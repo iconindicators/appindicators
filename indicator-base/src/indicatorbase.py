@@ -52,6 +52,12 @@
 # that need to first install GNOME Shell extension Kstatusnotifier or whatever it is called.
 
 
+#TODO Mention somewhere on Debian to use gnome-tweak to get indicators to auto start.
+# https://unix.stackexchange.com/questions/374012/how-to-manage-startup-applications-in-debian-9
+#
+# What about a mention for the method on Ubuntu?
+
+
 #TODO
 # In indicator-on-this-day, look at debian/control and look at 
 # Depends:  fortune-mod
@@ -88,6 +94,8 @@
 #
 # https://github.com/yktoo/indicator-sound-switcher/blob/dev/debian/control
 # https://github.com/yktoo/indicator-sound-switcher/blob/dev/snap/local/launch.sh
+#
+# For autostart with a snap, see how this works...need to do something different?
 
 
 #TODO Lubuntu 20.04/22.04 Lunar
