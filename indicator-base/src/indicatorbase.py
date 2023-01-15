@@ -48,6 +48,15 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO
+# In indicator-on-this-day, look at debian/control and look at 
+# Depends:  fortune-mod
+# Should this be there?
+# ...don't think so.  Cannot find a link to that and the calendar package.
+# 
+# However, should instead have 'calendar' or 'bsdmainutils'?
+
+
 #TODO 
 # Look at sound-switcher which does several interesting things...
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
