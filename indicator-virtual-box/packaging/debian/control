@@ -2,14 +2,23 @@ Source: indicator-virtual-box
 Maintainer: Bernard Giannetti <thebernmeister@hotmail.com>
 Section: python
 Priority: optional
-Build-Depends: python3 (>= 3.6), debhelper (>= 11), dh-python
+Build-Depends:
+ debhelper (>= 11),
+ dh-python,
+ python3 (>= 3.6)
 Standards-Version: 4.1.3
+Homepage: https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 X-Python3-Version: >= 3.6
 
 Package: indicator-virtual-box
 Architecture: all
-Depends: ${misc:Depends}, ${python3:Depends}, gir1.2-appindicator3-0.1, python3-gi, wmctrl, python3-notify2
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ gir1.2-ayatanaappindicator3-0.1 | gir1.2-appindicator3-0.1,
+ python3-gi,
+ wmctrl,
+ python3-notify2
 Description: Application indicator for VirtualBox™ virtual machines.
  A user can start any of their virtual machines from the indicator
  or select any virtual machine to be automatically started.
-
