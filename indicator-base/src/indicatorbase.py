@@ -48,6 +48,24 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO For the snap work, need to make the python project all proper...
+#
+# https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
+# Need a LICENSE.TXT file...so can this be just coppied from the debian/copyright file?  
+# If this is used, need to (during the build of the snap) alter the end year.
+
+
+#TODO For a Python project
+# https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#your-package
+# Perhaps consider putting code for a given indicator in src/indicator-test/ rather than src?
+# Ditto for all other indicators.
+
+
+#TODO If  Project-Id-Version in the POT file is not required,
+# that removes one place where the version number is stored.
+# https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/gettext.html#SEC9
+
+
 #TODO Make a note somewhere/somehow about installing the .deb file on debian
 # that need to first install GNOME Shell extension Kstatusnotifier or whatever it is called.
 
