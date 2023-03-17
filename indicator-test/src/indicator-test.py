@@ -23,12 +23,13 @@ INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
 
-import gi
-gi.require_version( "Gtk", "3.0" )
-gi.require_version( "Notify", "0.7" )
+from indicatorbase import IndicatorBase  #TODO MOved to up top...is this safe?
+
+# import gi #TODO Is this needed as it is in IndicatorBase?
+# gi.require_version( "Gtk", "3.0" ) #TODO Is this needed as it is in IndicatorBase?
+# gi.require_version( "Notify", "0.7" ) #TODO Is this needed as it is in IndicatorBase?
 
 from gi.repository import Gtk, Notify
-from indicatorbase import IndicatorBase
 from pathlib import Path
 from threading import Thread
 
