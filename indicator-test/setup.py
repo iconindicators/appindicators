@@ -2,9 +2,68 @@
 # -*- coding: utf-8 -*-
 
 
+#TODO Current thinking/plan for creating snaps...
+#
+# To create a snap, need to have a well-behaved/formed Python project with a setup.py
+# Based on reading, but still need to verify via official documentation,
+# https://docs.python.org/3/distutils/setupscript.html
+# other files may or may not be required to get to the snap build stage such as
+# setup.cfg, README*, MANIFEST* and others.
+#
+# To create the Python default source distribution use
+#
+#    python setup.py sdist
+#
+# To create the snap, assuming the snap-specific configuration .yaml file is created
+# (and possibly other stuff), must be able to create a Python wheel successfully.
+#
+# May be possible to then create a source DEB release based on the ability to create an RPM
+#
+#    python setup.py bdist_rpm
+#
+# See
+#
+#    python setup.py bdist --help-formats
+# 
+# which could then replace hopefully the dedicated shell script to build the DEB source file.
+#
+# HOWEVER, Python is deprecating setup.py in some capacity.
+# Unsure if that means setup.py will be completely dropped, but it certainly seems in the next year or so
+# some major change is afoot.
+#
+# The new way for a Python project to be built/configured is to use pyproject.toml.
+# Unfortunately, the snap build does not support pyproject.toml
+#
+# For now, get the simplest setup.py working to get a snap built.
+# If/when the time comes, migrated to pyproject.toml assuming either
+# snap supports pyproject.toml or there is a way to make snap build using a
+# pyproject.toml converted to a setup.py
+#
+# Ideally, want a well-behaved/formed Python project from the outset using pyproject.toml
+# and from that all other builds (DEB source for LaunchPad, snap, et al) come from that.
+#
+# For further consideration...
+#    Can/should the current changelog file be changed to the Python format
+#    and then part of the build for DEB source takes the Python format changelog
+#    and converts to the DEB format?
+#
+# ALL TODOS BELOW MAY OR MAY NOT NO LONGER APPLY!
+
+
 #TODO Setup Tools, setup.py
 # https://docs.python.org/3/distutils/introduction.html
 # https://setuptools.pypa.io/en/latest/setuptools.html
+# https://packaging.python.org/en/latest/
+# https://pypa-build.readthedocs.io/en/stable/
+# https://peps.python.org/pep-0517/
+#
+# https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
+#
+# https://forum.snapcraft.io/
+# https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+#
+# https://sinoroc.gitlab.io/kb/python/package_data.html
+# https://discuss.python.org/t/how-to-package-translation-files-po-mo-in-a-future-proof-way/20096
 
 
 #TODO As per 
@@ -89,6 +148,16 @@
 
 #TODO Something to keep in mind when deciding to do or not to do Flathub
 # https://github.com/PlaintextGroup/oss-virtual-incubator/blob/main/proposals/flathub-linux-app-store.md
+
+
+# https://forum.snapcraft.io/t/parse-info-on-pythonpart-utilizing-pyproject-toml/33294
+# https://forum.snapcraft.io/t/building-a-core20-python-snap-using-pyproject-toml/22028
+# https://stackoverflow.com/questions/73310069/should-i-be-using-only-pyproject-toml
+# https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
+# https://stackoverflow.com/questions/71193095/questions-on-pyproject-toml-vs-setup-py
+# https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+
 
 
 from setuptools import setup, find_packages
