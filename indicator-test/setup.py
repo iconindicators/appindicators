@@ -6,7 +6,9 @@
 #
 # To create a snap, need to have a well-behaved/formed Python project with a setup.py
 # Based on reading, but still need to verify via official documentation,
-# https://docs.python.org/3/distutils/setupscript.html
+#    https://docs.python.org/3/distutils/setupscript.html
+#    https://packaging.python.org/en/latest/
+#    https://github.com/pypa/sampleproject/tree/db5806e0a3204034c51b1c00dde7d5eb3fa2532e
 # other files may or may not be required to get to the snap build stage such as
 # setup.cfg, README*, MANIFEST* and others.
 #
@@ -52,6 +54,7 @@
 #    Ideally should be in the setup.py (or perhaps setup.cfg).
 #    Look into this as would need to removed the version number from say
 #    each indicator's main .py file and be replaced at build time.
+#    https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
 #
 # ALL TODOS BELOW MAY OR MAY NOT NO LONGER APPLY!
 
@@ -163,6 +166,35 @@
 # https://stackoverflow.com/questions/71193095/questions-on-pyproject-toml-vs-setup-py
 # https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+
+
+
+
+
+#TODO Examples from
+# https://docs.python.org/3/distutils/setupscript.html
+#
+#
+# from distutils.core import setup
+# setup(name='foo',
+#       version='1.0',
+#       py_modules=['foo'],
+#       )
+#
+#
+#
+#
+# from distutils.core import setup
+#
+# setup(name='Distutils',
+#       version='1.0',
+#       description='Python Distribution Utilities',
+#       author='Greg Ward',
+#       author_email='gward@python.net',
+#       url='https://www.python.org/sigs/distutils-sig/',
+#       packages=['distutils', 'distutils.command'],
+#      )
+
 
 
 
