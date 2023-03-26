@@ -50,6 +50,8 @@
 #
 #    Is it possible to have a single version number location?
 #    Ideally should be in the setup.py (or perhaps setup.cfg).
+#    Look into this as would need to removed the version number from say
+#    each indicator's main .py file and be replaced at build time.
 #
 # ALL TODOS BELOW MAY OR MAY NOT NO LONGER APPLY!
 
