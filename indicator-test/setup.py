@@ -43,9 +43,13 @@
 # and from that all other builds (DEB source for LaunchPad, snap, et al) come from that.
 #
 # For further consideration...
+#
 #    Can/should the current changelog file be changed to the Python format
 #    and then part of the build for DEB source takes the Python format changelog
 #    and converts to the DEB format?
+#
+#    Is it possible to have a single version number location?
+#    Ideally should be in the setup.py (or perhaps setup.cfg).
 #
 # ALL TODOS BELOW MAY OR MAY NOT NO LONGER APPLY!
 
