@@ -19,6 +19,13 @@
 # Download from URL, load from file and hold in memory general perturbations for satellites.
 
 
+#TODO Not sure if these apply
+#	https://github.com/brandon-rhodes/python-sgp4/commit/19990f3f2a5af9d054a84797a8ede0892b487912
+#	https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
+# Might affect Skyfield rather than TLEs here.  
+# Need to see if there is a problem and if the commits above apply anywhere...
+
+
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase
 from sgp4 import exporter, omm

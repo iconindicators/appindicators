@@ -591,6 +591,8 @@ class AstroSkyfield( AstroBase ):
         return neverUp
 
 
+#TODO There may (or may not!) be a better way to do all of this...
+# https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-1500973930
     # References:
     #    https://github.com/skyfielders/python-skyfield/issues/327
     #    https://github.com/skyfielders/python-skyfield/issues/558
