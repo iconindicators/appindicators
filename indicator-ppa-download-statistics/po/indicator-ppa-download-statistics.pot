@@ -1,12 +1,12 @@
 # Portable Object Template for indicator-ppa-download-statistics.
-# Copyright (C) 2015-2022 Bernard Giannetti
+# Copyright (C) 2015-2023 Bernard Giannetti
 # This file is distributed under the same license as the indicator-ppa-download-statistics package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-ppa-download-statistics 1.0.79\n"
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.80\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2020-04-02 13:10+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
