@@ -55,6 +55,8 @@
 #    Look into this as would need to removed the version number from say
 #    each indicator's main .py file and be replaced at build time.
 #    https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
+#    https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
+#    https://stackoverflow.com/questions/60430112/single-sourcing-package-version-for-setup-cfg-python-projects
 #
 # ALL TODOS BELOW MAY OR MAY NOT NO LONGER APPLY!
 
