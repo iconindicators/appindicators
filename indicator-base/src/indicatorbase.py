@@ -48,6 +48,19 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO If I ever end up changing things to build a Python PyPI package for each indicator,
+# it may be advantageous to reorganise the projects layouts.
+# IndicatorBase code (and stuff) could be under an Indicator project and
+# all the other indicators are also under this new Indicator project.
+# These may help: 
+#   https://stackoverflow.com/questions/18087122/python-sharing-common-code-among-a-family-of-scripts
+#   https://stackoverflow.com/questions/73580708/how-to-share-code-between-python-internals-projectshttps://stackoverflow.com/questions/48954870/how-to-share-code-between-python-projects
+#   https://discuss.python.org/t/multiple-related-programs-one-pyproject-toml-or-multiple-projects/17427/2
+#
+# If I still need a setup.py for snaps say, will need to convert the toml:
+#   https://pypi.org/project/poetry2setup/
+
+
 #TODO For the snap work, need to make the python project all proper...
 #
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
