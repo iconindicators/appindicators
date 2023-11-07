@@ -89,6 +89,67 @@
 # What about a mention for the method on Ubuntu?
 
 
+#TODO History for getting stuff running on Debian...maybe clean up.
+#
+#     1  ping www.google.com
+#     2  ip a
+#     3  exit
+#     4  cd Downloads/
+#     5  ls
+#     6  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#     7  sudo adduser bernard sudo
+#     8  su -
+#     9  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    10  exit
+#    11  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    12  cd Downloads/
+#    13  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    14  sudo apt-get -f install
+#    15  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    16  ls -l
+#    17  rm indicator-test_1.0.6-1_all.deb 
+#    18  ls -l
+#    19  ps -eaf | grep archive
+#    20  ps -eaf | grep test
+#    21  kill 2594
+#    22  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    23  sudo apt-get -f install
+#    24  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    25  ls -l
+#    26  sudo chmod a+w indicator-test_1.0.6-1_all.deb 
+#    27  ls -l
+#    28  mkdir tmp
+#    29  dpkg-deb -R indicator-test_1.0.6-1_all.deb tmp
+#    30  dpkg-deb -b tmp out.deb
+#    31  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    32  sudo apt-get -f install
+#    33  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    34  sudo apt install gir1.2-ayatanaappindicator3-0.1 
+#    35  sudo apt --fix-broken install
+#    36  sudo apt install gir1.2-ayatanaappindicator3-0.1 
+#    37  ls /usr/share/indic*
+#    38  ls /usr/share/
+#    39  dpkg-deb -b tmp out.deb
+#    40  sudo apt remove indicater-test
+#    41  sudo apt remove indicaoer-test
+#    42  sudo apt remove indicator-test
+#    43  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    44  sudo apt instal python3-notify2
+#    45  sudo apt install python3-notfy2
+#    46  sudo apt update
+#    47  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    48  sudo apt --fix-broken install
+#    49  /usr/share/indicator-test/indicator-test.py 
+#    50  sudo nano /usr/share/indicator-test/indicator-test.py 
+#    51  sudo nano /usr/share/indicator-test/indicatorbase.py 
+#    52  /usr/share/indicator-test/indicator-test.py 
+#    53  sudo apt remove indicator-test
+#    54  dpkg-deb -b tmp out.deb
+#    55  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
+#    56  history
+#    57  history > debianHistory.txt
+
+
 #TODO
 # In indicator-on-this-day, look at debian/control and look at 
 # Depends:  fortune-mod
