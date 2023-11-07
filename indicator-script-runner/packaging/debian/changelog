@@ -1,6 +1,6 @@
 indicator-script-runner (1.0.24-1) bionic; urgency=low
 
-  * Bug fix: Added missing libnotify-bin and pulseaudio-utils from
+  * Bug fix: Added missing 'libnotify-bin' and 'pulseaudio-utils' to
     debian/control "Depends".
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jan 2023 14:58:39 +1000
