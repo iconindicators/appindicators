@@ -47,6 +47,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
     SERIES = [
+        "noble",
         "mantic",
         "lunar",
         "kinetic",
