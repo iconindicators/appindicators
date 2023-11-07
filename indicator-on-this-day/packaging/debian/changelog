@@ -1,8 +1,8 @@
 indicator-on-this-day (1.0.16-1) bionic; urgency=low
 
   * Bug fix: Added missing 'calendar' to debian/control "Depends".
-  * Lowered the initial guess for numbers of menu items
-    as the menu would flow off the screen at times.
+  * Lowered the initial guess for numbers of menu items as the menu
+    would flow off the screen at times.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 8 Nov 2023 10:14:31 +1000
 
