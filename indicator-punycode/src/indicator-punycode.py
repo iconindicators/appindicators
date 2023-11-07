@@ -51,7 +51,7 @@ class IndicatorPunycode( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.14",
+            version = "1.0.15",
             copyrightStartYear = "2016",
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )

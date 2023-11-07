@@ -43,7 +43,7 @@ class IndicatorStardate( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.43",
+            version = "1.0.44",
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [ 
