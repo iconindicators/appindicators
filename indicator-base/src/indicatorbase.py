@@ -150,25 +150,6 @@
 #    57  history > debianHistory.txt
 
 
-#TODO
-# In indicator-on-this-day, look at debian/control and look at 
-# Depends:  fortune-mod
-# Should this be there?
-# ...don't think so.  Cannot find a link to that and the calendar package.
-# 
-# However, should instead have 'calendar' or 'bsdmainutils'?
-#
-# Removed 'fortune-mod'...so need to test the install at some point!
-
-
-#TODO
-# In indicator-script-runner, look at debian/control and look at 
-# Depends:  libnotify-bin
-# Should this be there?
-# ...don't think so.
-# Compared to other indicators have replaced with python3-notify2...so need to test the install at some point!
-
-
 #TODO 
 # Look at sound-switcher which does several interesting things...
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
