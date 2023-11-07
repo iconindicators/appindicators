@@ -15,7 +15,7 @@ Architecture: all
 Depends:
  ${misc:Depends},
  ${python3:Depends},
- calendar
+ calendar,
  gir1.2-ayatanaappindicator3-0.1 | gir1.2-appindicator3-0.1,
  python3-gi,
  python3-notify2
