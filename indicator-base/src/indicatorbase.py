@@ -80,7 +80,7 @@
 
 
 #TODO Make a note somewhere/somehow about installing the .deb file on debian
-# that need to first install GNOME Shell extension Kstatusnotifier or whatever it is called.
+# that need to first install GNOME Shell extension "AppIndicator andKStatusNotifierItem Support"
 
 
 #TODO Mention somewhere on Debian to use gnome-tweak to get indicators to auto start.
