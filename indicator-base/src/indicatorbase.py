@@ -260,6 +260,20 @@
 # This was useful in exaplaing the problem but only good for solving
 # by using a venv.
 # https://stackoverflow.com/a/75696359/2156453
+#
+# Perhaps in the debian/postinst all we need to do is modify
+#   sudo pip3 install --ignore-installed --upgrade ephem sgp4 || true
+# to be instead something that can do the following...
+#   
+#    71  cd /home/bernard
+#    72  python3 -m venv .venv
+#    73  sudo apt install python3.11-venv 
+#    74  python3 -m venv .venv
+#    75  source .venv/bin/activate
+#    76  python3 -m pip install --upgrade pip
+#    77  cd Programming/PlayListMaker/
+#    78  python3 -m pip install -e .
+#    79  playlistmaker 
 
 
 import gi
