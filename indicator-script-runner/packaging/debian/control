@@ -16,8 +16,10 @@ Depends:
  ${misc:Depends},
  ${python3:Depends},
  gir1.2-ayatanaappindicator3-0.1 | gir1.2-appindicator3-0.1,
+ libnotify-bin
  python3-gi,
- python3-notify2
+ python3-notify2,
+ pulseaudio-utils
 Description: Run a terminal command or script from an indicator.
  The user can specify a terminal command or script with parameters and use
  the mouse (or keyboard shortcut where applicable) to execute the
