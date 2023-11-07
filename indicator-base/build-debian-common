@@ -4,7 +4,7 @@
 # Common code for the build-debian script for all indicators.
 #
 # Install the packages:
-#   sudo apt install devscripts dh-make build-essential lintian gpg
+#   sudo apt install build-essential devscripts dh-make dh-python gpg lintian rsync
 #
 #
 # Import secret key into gpg.  In a terminal, change to the directory containing the files
