@@ -161,6 +161,12 @@
 #    https://flathub.org/home
 
 
+#TODO May need to convert a pyproject.toml to a DEB if we continue with LaunchPad/PPA releases.
+#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
+#   https://stackoverflow.com/questions/1382569/how-do-i-do-debian-packaging-of-a-python-package?rq=3
+#   https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
+
+
 import gi
 
 gi.require_version( "GLib", "2.0" )
