@@ -39,7 +39,7 @@
 #    Ubuntu Budgie 22.04 ALL GOOD
 #
 #    Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
-#    Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.  
+#    Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.
 #
 #    Ubuntu Unity 20.04 ALL GOOD
 #    Ubuntu Unity 22.04 ALL GOOD
@@ -454,7 +454,7 @@ class IndicatorBase( ABC ):
 
     def setLabel( self, text ):
         self.indicator.set_label( text, text )  # Second parameter is a hint for the typical length.
-        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.    
+        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
 
 
     def requestMouseWheelScrollEvents( self ):
@@ -710,7 +710,7 @@ class IndicatorBase( ABC ):
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
     def getMenuItemsGuess( self ):
         screenHeightsInPixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
-        numbersOfMenuItems = [ 18, 24, 25, 29, 32, 33, 34 ]
+        numbersOfMenuItems = [ 15, 15, 15, 20, 20, 20, 20 ]
 
         screenHeightInPixels = Gtk.Window().get_screen().get_height()
         if screenHeightInPixels < screenHeightsInPixels[ 0 ]:
@@ -854,7 +854,7 @@ class IndicatorBase( ABC ):
         if terminal is not None and "qterminal" in terminal:
             terminalIsQTerminal = True
 
-        return terminalIsQTerminal 
+        return terminalIsQTerminal
 
 
     # Return the full path and name of the executable for the current terminal and the corresponding execution flag.
