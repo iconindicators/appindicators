@@ -338,6 +338,37 @@
 # Python library in a venv?  Need the full path to the venv?
 
 
+#TODO
+# In terms of simplifying/unifying the projects to share resources, reduce duplication 
+# and better mimic a Python project using pyproject.toml, here is a rough road map...
+#
+#   Create a pyproject.toml for each indicator.  Should there be one for indicatorbase
+#   from which each indicator uses as a base file requiring a merge?  That requires a script.
+#   
+#   Many files in packaging/debian are identical across all indicators,
+#   so move to indicatorbase/packaging/debian and need the buildDeb/buildLaunchPad script  
+#   to copy files across as needed.
+#   
+#   Obviously have to replace most of the functionality within the build-debian-common script
+#   and each build-debian script for each indicator will need to perhaps be now a config file?
+#   
+#   Assuming we go with now a proper Python CHANGELOG.md, will need a script to convert the
+#   existing packaging/debian/changelog for each indicator into a CHANGELOG.md 
+#   but also the buildDeb script needs to now take CHANGELOG.md and make a changelog for the .deb
+#   file on the fly (during the build process).
+#   
+#   For the buildDeb script, it is worth to first create a Python whl file and from there
+#   pull that apart to then create the Deb/LaunchPad package?
+#   
+#   Should the buildDeb script be a single script sitting above the indicator directories,
+#   and takes a parameter (the indicator directory name) to build?
+#   Could also take a list of directory names to build multiple indicators.
+#   
+#   What about a script to upload to LaunchPad PPA?
+#   Again, sits at the top and takes a single directory name, or list,
+#   and visits each indicator-whatever/release directory to do the upload?
+
+
 import gi
 
 gi.require_version( "GLib", "2.0" )
