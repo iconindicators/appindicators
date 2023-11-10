@@ -54,7 +54,8 @@
 # all the other indicators are also under this new Indicator project.
 # These may help: 
 #   https://stackoverflow.com/questions/18087122/python-sharing-common-code-among-a-family-of-scripts
-#   https://stackoverflow.com/questions/73580708/how-to-share-code-between-python-internals-projectshttps://stackoverflow.com/questions/48954870/how-to-share-code-between-python-projects
+#   https://stackoverflow.com/questions/73580708/how-to-share-code-between-python-internals-projects
+#   https://stackoverflow.com/questions/48954870/how-to-share-code-between-python-projects
 #   https://discuss.python.org/t/multiple-related-programs-one-pyproject-toml-or-multiple-projects/17427/2
 #
 # If I still need a setup.py for snaps say, will need to convert the toml:
@@ -77,6 +78,11 @@
 #TODO If  Project-Id-Version in the POT file is not required,
 # that removes one place where the version number is stored.
 # https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/gettext.html#SEC9
+#
+# Not sure about this...we merge the POT from indicatorbase and indicator-whatever
+# to make the release POT/PO/MO...
+# Is the Project-Id-Version the version of the package being built/released,
+# or is it the most recent version of the package for which the POT has been updated/refreshed? 
 
 
 #TODO Make a note somewhere/somehow about installing the .deb file on debian
@@ -87,6 +93,8 @@
 # https://unix.stackexchange.com/questions/374012/how-to-manage-startup-applications-in-debian-9
 #
 # What about a mention for the method on Ubuntu?
+#
+# Maybe it is just easier to put the autostart checkbox back in to the Preferences?
 
 
 #TODO History for getting stuff running on Debian...maybe clean up.
@@ -255,6 +263,79 @@
 #    77  cd Programming/PlayListMaker/
 #    78  python3 -m pip install -e .
 #    79  playlistmaker 
+#
+# More on this issue
+#   https://stackoverflow.com/questions/76873955/pip-install-user-doesnt-work-on-debian-12
+#   https://stackoverflow.com/questions/76465606/why-is-pip3-9-trying-to-use-the-debian-12-python3-11
+#   https://stackoverflow.com/questions/75608323/how-do-i-solve-error-externally-managed-environment-every-time-i-use-pip-3
+#   https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana
+#   https://stackoverflow.com/questions/77253338/best-practice-using-python-packages-not-developing-on-debian-12
+#   https://www.reddit.com/r/debian/comments/14g9np9/debian_12_pip_makes_trouble/
+
+
+#TODO 
+# Trying to build indicators on Debian bookworm
+#
+# May need to override lintian...but not sure what is actually happing.
+#
+# https://manpages.debian.org/jessie/devscripts/debuild.1.en.html
+#
+# https://bugs.launchpad.net/ubuntu/+source/lintian/+bug/1303603/comments/5
+#
+# https://debian-lint-maint.debian.narkive.com/Kn68ZHpO/can-i-override-lintian-s-bad-distribution-error
+#
+# ONLY really applicable if I really need to build or release using Debian...unlikely, so maybe ignore this issue.
+
+
+#TODO Given the error message on Debian bookworm when install indicator-lunar:
+#
+#     error: externally-managed-environment
+#
+# which implies that either the DEB file needs to no longer run pip (in the postinst)
+# or instead install the indicators only via pip.
+#
+# For the first option, can the other way to install using a venv be used?
+#
+# For the second option, are the DEB requirements (like fortune) be installed via a pip package?
+#
+# May be of help...
+#   https://stackoverflow.com/questions/64005822/how-to-specify-external-system-dependencies-to-a-python-package
+#   https://stackoverflow.com/questions/5729051/python-package-external-dependencies?rq=3
+#   https://stackoverflow.com/questions/55293003/how-to-handle-external-dependencies-in-python
+#
+# Need to find more sources, but from what I have read,
+# despite each indicator being entirely Python,
+# due to the operating system dependencies (ayatana, fortune-mod, wmctrl, et al),
+# I should really be using a DEB (or other similar OS package)
+# as the Python packaging system (toml/PyPI) is only intended for pure Python
+# without external dependencies.
+
+
+#TODO If we go the route of making snaps, seems .toml is supported (in some way at least):
+#   https://snapcraft.io/docs/python-apps
+
+
+#TODO More on indicator-lunar and how to get Python dependencies (ephem, numpy, et al)...
+# Currently use debian/postinst to install ephem et al.
+# Need to change to work on Ubuntu 24.04 given the changes via PEP 668.
+# Can either make the change in postinst to create venv directory just for
+# the current version of indicator-lunar...which implies need a postrm 
+# or whatever it is called to clean up...OR
+# ...could run the indicator and do a check at runtime for the presence of ephem et al
+# and if not present, give the user a list of instructions on how to install
+# but then how does the clean up happen on uninstall?
+#
+# Maybe go with a modified postinst (and a new postrm) but ALSO have a runtime check
+# to ensure ephem et al are installed and if not, point user to a readme on how to install
+# (but at this stage if ephem is not present, the installation should be assumed to be broken).
+
+
+#TODO
+# Assuming (more than likely) that we go with using debian/postinst to 
+# install ephem et al using venv, need to figure out exactly how to 
+# create the venv, how to activate (is this only needed once?)
+# how can a Python script in /usr/share/indicator-lunar refer to a 
+# Python library in a venv?  Need the full path to the venv?
 
 
 import gi
