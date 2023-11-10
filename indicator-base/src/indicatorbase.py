@@ -367,6 +367,16 @@
 #   What about a script to upload to LaunchPad PPA?
 #   Again, sits at the top and takes a single directory name, or list,
 #   and visits each indicator-whatever/release directory to do the upload?
+#
+#   Should have a README.md at the very top describing how everything hangs together.
+#   Need though a README.md for each indicator-whatever...what does it say
+#   in terms of project building, etc?  Perhaps nothing...
+#   should just say what the project/indicator is all about in terms of what is does.
+#   Not sure about this...
+#   Perhaps one thing to mention in terms of the project is the licence (refer to very top of all).
+#
+#   There can be a common top-level LICENCE file at the top and is copied across to each deb on build.
+
 
 
 import gi
