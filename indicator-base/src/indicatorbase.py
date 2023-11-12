@@ -95,6 +95,12 @@
 # What about a mention for the method on Ubuntu?
 #
 # Maybe it is just easier to put the autostart checkbox back in to the Preferences?
+#
+# Another aspect (see changelog) is the delay in autostart.
+# Perhaps if the autostart checkbox is put back in,
+# also add in a spinner for the delay
+# (which would have to be shoved into the 
+#         ~/.config/autostart/indicator-lunar.py.desktop
 
 
 #TODO History for getting stuff running on Debian...maybe clean up.
