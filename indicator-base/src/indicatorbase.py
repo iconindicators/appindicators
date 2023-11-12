@@ -376,7 +376,11 @@
 #   Perhaps one thing to mention in terms of the project is the licence (refer to very top of all).
 #
 #   There can be a common top-level LICENCE file at the top and is copied across to each deb on build.
-
+#
+#   What to do about the unittests.py in each indicator?
+#   Really should be in a sub-folder called tests and the file should be called something 
+#   like test_indicator_whatever.py
+#   Regardless, should the unit tests be included in the build?
 
 
 import gi
