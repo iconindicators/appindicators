@@ -48,6 +48,11 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO Markdown viewer/editor
+#   https://stackedit.io/app
+#   https://markdownlivepreview.com/
+
+
 #TODO If I ever end up changing things to build a Python PyPI package for each indicator,
 # it may be advantageous to reorganise the projects layouts.
 # IndicatorBase code (and stuff) could be under an Indicator project and
