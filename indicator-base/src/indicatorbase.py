@@ -216,6 +216,8 @@
 #    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
 #    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
 #
+# Is it possible to port to FreeBSD and/or NetBSD?
+#
 # Miscellaneous:
 #    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
 #    https://itsfoss.com/enable-applet-indicator-gnome/
