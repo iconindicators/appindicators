@@ -10,7 +10,7 @@ indicator-punycode (1.0.14-1) bionic; urgency=low
 
   * Bug fix: When reducing the maximum results in the Preferences, the results
     were not actually reduced until the next conversion.
-  * Bug fix: Fixed a deprecation warning when creating menu items.    
+  * Bug fix: Fixed a deprecation warning when creating menu items.
   * Now works on the following Ubuntu variants/versions...
       Kubuntu 20.04
       Kubuntu 22.04
@@ -20,7 +20,7 @@ indicator-punycode (1.0.14-1) bionic; urgency=low
       Ubuntu 22.04
       Ubuntu Budgie 22.04
       Ubuntu MATE 20.04
-      Ubuntu MATE 22.04  
+      Ubuntu MATE 22.04
       Ubuntu Unity 20.04
       Xubuntu 20.04
       Xubuntu 22.04

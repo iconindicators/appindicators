@@ -15,7 +15,7 @@ indicator-lunar (1.0.99-1) bionic; urgency=low
       Ubuntu 22.04
       Ubuntu Budgie 20.04
       Ubuntu Budgie 22.04
-      Ubuntu MATE 22.04  
+      Ubuntu MATE 22.04
       Ubuntu Unity 20.04
       Xubuntu 20.04
       Xubuntu 22.04
@@ -533,7 +533,7 @@ indicator-lunar (1.0.58-1) precise; urgency=low
     the preferences file by an order of magnitude.
   * The option to automatically add new satellites and orbital
     elements now also works when clicking OK in the preferences.
-  * Added distance to Earth in kilometres for the Moon's menu item.    
+  * Added distance to Earth in kilometres for the Moon's menu item.
   * Added timeouts to the TLE/OE download.
   * Added caching of TLE/OE downloaded data to avoid over-taxing the
     respective data sources and to run the indicator off-line.
@@ -924,7 +924,7 @@ indicator-lunar (1.0.24-1) precise; urgency=low
 indicator-lunar (1.0.23-1) precise; urgency=low
 
   * The update sometimes occurred slightly earlier than when appropriate,
-    likely due to truncating a float to int.  
+    likely due to truncating a float to int.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 31 Jul 2013 10:11:13 +1000
 

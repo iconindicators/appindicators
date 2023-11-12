@@ -15,7 +15,7 @@ indicator-virtual-box (1.0.73-1) bionic; urgency=low
       Ubuntu 22.04
       Ubuntu Budgie 22.04
       Ubuntu MATE 20.04
-      Ubuntu MATE 22.04  
+      Ubuntu MATE 22.04
       Ubuntu Unity 20.04
   * Limited functionality on the following Ubuntu variants/versions...
       Kubuntu 20.04 - No mouse wheel scroll.

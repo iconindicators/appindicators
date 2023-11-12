@@ -19,7 +19,7 @@ indicator-ppa-download-statistics (1.0.79-1) bionic; urgency=low
       Ubuntu 22.04
       Ubuntu Budgie 22.04
       Ubuntu MATE 20.04
-      Ubuntu MATE 22.04  
+      Ubuntu MATE 22.04
       Ubuntu Unity 20.04
       Xubuntu 20.04
       Xubuntu 22.04
@@ -781,7 +781,7 @@ indicator-ppa-download-statistics (1.0.1-1) precise; urgency=low
 
 indicator-ppa-download-statistics (1.0.0-1) precise; urgency=low
 
-  * Initial release.  
+  * Initial release.
   * Tested on Ubuntu and Lubuntu.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Wed, 4 Jul 2012 9:19:54 +1000
