@@ -1,7 +1,7 @@
 indicator-punycode (1.0.15-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Ubuntu Unity 22.04
+      * Ubuntu Unity 22.04
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jan 2023 14:58:39 +1000
 
@@ -12,20 +12,20 @@ indicator-punycode (1.0.14-1) bionic; urgency=low
     were not actually reduced until the next conversion.
   * Bug fix: Fixed a deprecation warning when creating menu items.
   * Now works on the following Ubuntu variants/versions...
-      Kubuntu 20.04
-      Kubuntu 22.04
-      Lubuntu 20.04
-      Lubuntu 22.04
-      Ubuntu 20.04
-      Ubuntu 22.04
-      Ubuntu Budgie 22.04
-      Ubuntu MATE 20.04
-      Ubuntu MATE 22.04
-      Ubuntu Unity 20.04
-      Xubuntu 20.04
-      Xubuntu 22.04
+      * Kubuntu 20.04
+      * Kubuntu 22.04
+      * Lubuntu 20.04
+      * Lubuntu 22.04
+      * Ubuntu 20.04
+      * Ubuntu 22.04
+      * Ubuntu Budgie 22.04
+      * Ubuntu MATE 20.04
+      * Ubuntu MATE 22.04
+      * Ubuntu Unity 20.04
+      * Xubuntu 20.04
+      * Xubuntu 22.04
   * Limited functionality on the following Ubuntu variants/versions...
-      Ubuntu Budgie 20.04 - No mouse middle click.
+      * Ubuntu Budgie 20.04 - No mouse middle click.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 13:11:56 +1000
 

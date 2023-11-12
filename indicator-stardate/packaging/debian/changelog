@@ -1,7 +1,7 @@
 indicator-stardate (1.0.44-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Ubuntu Unity 22.04
+      * Ubuntu Unity 22.04
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jan 2023 14:58:39 +1000
 
@@ -9,20 +9,20 @@ indicator-stardate (1.0.44-1) bionic; urgency=low
 indicator-stardate (1.0.43-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Ubuntu 20.04
-      Ubuntu 22.04
-      Ubuntu Budgie 20.04
-      Ubuntu Budgie 22.04
-      Ubuntu MATE 20.04
-      Ubuntu MATE 22.04
-      Ubuntu Unity 20.04
+      * Ubuntu 20.04
+      * Ubuntu 22.04
+      * Ubuntu Budgie 20.04
+      * Ubuntu Budgie 22.04
+      * Ubuntu MATE 20.04
+      * Ubuntu MATE 22.04
+      * Ubuntu Unity 20.04
   * Limited functionality on the following Ubuntu variants/versions...
-      Kubuntu 20.04 - No mouse wheel scroll.
-      Kubuntu 22.04 - No mouse wheel scroll.
-      Lubuntu 20.04 - No label; no dynamic tooltip (uses a menu item).
-      Lubuntu 22.04 - No label; no dynamic tooltip (uses a menu item).
-      Xubuntu 20.04 - No mouse wheel scroll.
-      Xubuntu 22.04 - No mouse wheel scroll.
+      * Kubuntu 20.04 - No mouse wheel scroll.
+      * Kubuntu 22.04 - No mouse wheel scroll.
+      * Lubuntu 20.04 - No label; no dynamic tooltip (uses a menu item).
+      * Lubuntu 22.04 - No label; no dynamic tooltip (uses a menu item).
+      * Xubuntu 20.04 - No mouse wheel scroll.
+      * Xubuntu 22.04 - No mouse wheel scroll.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 22:48:44 +1000
 

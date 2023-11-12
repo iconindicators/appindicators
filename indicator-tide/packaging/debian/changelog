@@ -1,7 +1,7 @@
 indicator-tide (1.0.29-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Ubuntu Unity 22.04
+      * Ubuntu Unity 22.04
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jan 2023 14:58:39 +1000
 
@@ -11,19 +11,19 @@ indicator-tide (1.0.28-1) bionic; urgency=low
   * Rather than throw an exception, gracefully handle when there is no user
     script specified (typically first time the indicator is run).
   * Now works on the following Ubuntu variants/versions...
-      Kubuntu 20.04
-      Kubuntu 22.04
-      Lubuntu 20.04
-      Lubuntu 22.04
-      Ubuntu 20.04
-      Ubuntu 22.04
-      Ubuntu Budgie 20.04
-      Ubuntu Budgie 22.04
-      Ubuntu MATE 20.04
-      Ubuntu MATE 22.04
-      Ubuntu Unity 20.04
-      Xubuntu 20.04
-      Xubuntu 22.04
+      * Kubuntu 20.04
+      * Kubuntu 22.04
+      * Lubuntu 20.04
+      * Lubuntu 22.04
+      * Ubuntu 20.04
+      * Ubuntu 22.04
+      * Ubuntu Budgie 20.04
+      * Ubuntu Budgie 22.04
+      * Ubuntu MATE 20.04
+      * Ubuntu MATE 22.04
+      * Ubuntu Unity 20.04
+      * Xubuntu 20.04
+      * Xubuntu 22.04
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Thu, 3 Nov 2022 16:38:16 +1000
 
@@ -228,6 +228,11 @@ indicator-tide (1.0.9-1) trusty; urgency=low
 
 indicator-tide (1.0.8-1) trusty; urgency=low
 
+  * Bug fix: Tidal readings are now displayed based on the date/time.
+    If all of a port's readings contain both date and time, each reading is
+    converted to user local date/time.
+    If at least one of a port's readings is missing the time, all of the
+    readings are shown in port local date/time (as per original source).
   * Bug fix: Tidal readings are now displayed based on the date/time:
       If all of a port's readings contain both date and time, each reading is
       converted to user local date/time.

@@ -1,7 +1,7 @@
 indicator-virtual-box (1.0.74-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Ubuntu Unity 22.04
+      * Ubuntu Unity 22.04
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Mon, 9 Jan 2023 14:58:39 +1000
 
@@ -9,20 +9,20 @@ indicator-virtual-box (1.0.74-1) bionic; urgency=low
 indicator-virtual-box (1.0.73-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Lubuntu 20.04
-      Lubuntu 22.04
-      Ubuntu 20.04
-      Ubuntu 22.04
-      Ubuntu Budgie 22.04
-      Ubuntu MATE 20.04
-      Ubuntu MATE 22.04
-      Ubuntu Unity 20.04
+      * Lubuntu 20.04
+      * Lubuntu 22.04
+      * Ubuntu 20.04
+      * Ubuntu 22.04
+      * Ubuntu Budgie 22.04
+      * Ubuntu MATE 20.04
+      * Ubuntu MATE 22.04
+      * Ubuntu Unity 20.04
   * Limited functionality on the following Ubuntu variants/versions...
-      Kubuntu 20.04 - No mouse wheel scroll.
-      Kubuntu 22.04 - No mouse wheel scroll.
-      Ubuntu Budgie 20.04 - No mouse middle click.
-      Xubuntu 20.04 - No mouse wheel scroll.
-      Xubuntu 22.04 - No mouse wheel scroll.
+      * Kubuntu 20.04 - No mouse wheel scroll.
+      * Kubuntu 22.04 - No mouse wheel scroll.
+      * Ubuntu Budgie 20.04 - No mouse middle click.
+      * Xubuntu 20.04 - No mouse wheel scroll.
+      * Xubuntu 22.04 - No mouse wheel scroll.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 4 Dec 2022 10:09:06 +1000
 

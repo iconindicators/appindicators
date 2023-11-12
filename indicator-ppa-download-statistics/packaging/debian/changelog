@@ -1,7 +1,7 @@
 indicator-ppa-download-statistics (1.0.80-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Ubuntu Unity 22.04
+      * Ubuntu Unity 22.04
   * Added noble to the list of series.
   * Added mantic to the list of series.
 
@@ -11,20 +11,20 @@ indicator-ppa-download-statistics (1.0.80-1) bionic; urgency=low
 indicator-ppa-download-statistics (1.0.79-1) bionic; urgency=low
 
   * Now works on the following Ubuntu variants/versions...
-      Kubuntu 20.04
-      Kubuntu 22.04
-      Lubuntu 20.04
-      Lubuntu 22.04
-      Ubuntu 20.04
-      Ubuntu 22.04
-      Ubuntu Budgie 22.04
-      Ubuntu MATE 20.04
-      Ubuntu MATE 22.04
-      Ubuntu Unity 20.04
-      Xubuntu 20.04
-      Xubuntu 22.04
+      * Kubuntu 20.04
+      * Kubuntu 22.04
+      * Lubuntu 20.04
+      * Lubuntu 22.04
+      * Ubuntu 20.04
+      * Ubuntu 22.04
+      * Ubuntu Budgie 22.04
+      * Ubuntu MATE 20.04
+      * Ubuntu MATE 22.04
+      * Ubuntu Unity 20.04
+      * Xubuntu 20.04
+      * Xubuntu 22.04
   * Limited functionality on the following Ubuntu variants/versions...
-      Ubuntu Budgie 20.04 - No mouse middle click.
+      * Ubuntu Budgie 20.04 - No mouse middle click.
   * Changed default series from focal to jammy.
 
  -- Bernard Giannetti <thebernmeister@hotmail.com>  Sun, 4 Dec 2022 10:09:06 +1000
