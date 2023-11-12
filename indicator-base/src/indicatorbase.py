@@ -108,6 +108,11 @@
 #         ~/.config/autostart/indicator-lunar.py.desktop
 
 
+#TODO
+# Check each .desktop file...
+# Indicator Lunar has a path component which others do not!
+
+
 #TODO History for getting stuff running on Debian...maybe clean up.
 #
 #     1  ping www.google.com
