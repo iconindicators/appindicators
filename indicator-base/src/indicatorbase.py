@@ -1448,6 +1448,8 @@ class IndicatorBase( ABC ):
 
 #TODO Testing to see if I can call a function that is "static" (not requiring the class to be instantiated)
 # for an indicator to get its name/version/etc from it pyproject/toml.
+# The desciption in the debian/control is differnet to the comments passed in when init() the indicator...
+# Maybe can also get the copyright start year from the README.md?
     def test():
         print( "test")
 
