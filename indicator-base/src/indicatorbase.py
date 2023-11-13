@@ -1446,6 +1446,12 @@ class IndicatorBase( ABC ):
         return result
 
 
+#TODO Testing to see if I can call a function that is "static" (not requiring the class to be instantiated)
+# for an indicator to get its name/version/etc from it pyproject/toml.
+    def test():
+        print( "test")
+
+
 # Log file handler which truncates the file when the file size limit is reached.
 #
 # References:

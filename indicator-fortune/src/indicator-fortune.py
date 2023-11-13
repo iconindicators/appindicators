@@ -19,6 +19,14 @@
 # Application indicator which displays fortunes.
 
 
+#TODO Testing if I can maybe use this as a way to call
+# a function(s) in IndicatorBase that pulls out the version, indicator name, etc, etc
+# from the pyproject.toml
+print( "hee")
+from indicatorbase import IndicatorBase
+IndicatorBase.test()
+
+
 INDICATOR_NAME = "indicator-fortune"
 import gettext
 gettext.install( INDICATOR_NAME )
