@@ -70,7 +70,7 @@
 #TODO For the snap work, need to make the python project all proper...
 #
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
-# Need a LICENSE.TXT file...so can this be just coppied from the debian/copyright file?  
+# Need a LICENSE.TXT file...so can this be just copied from the debian/copyright file?  
 # If this is used, need to (during the build of the snap) alter the end year.
 
 
@@ -84,10 +84,9 @@
 # that removes one place where the version number is stored.
 # https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/gettext.html#SEC9
 #
-# Not sure about this...we merge the POT from indicatorbase and indicator-whatever
-# to make the release POT/PO/MO...
-# Is the Project-Id-Version the version of the package being built/released,
-# or is it the most recent version of the package for which the POT has been updated/refreshed? 
+# Given that I'm not releasing to PyPI, leave as is (just a src directory).
+# However may need to change this in the future if wanting to build a snap, etc
+# and that requires a properly formatted Python project.
 
 
 #TODO Make a note somewhere/somehow about installing the .deb file on debian
@@ -399,6 +398,22 @@
 #   Really should be in a sub-folder called tests and the file should be called something 
 #   like test_indicator_whatever.py
 #   Regardless, should the unit tests be included in the build?
+
+
+#TODO If there is no intention of releasing to PyPI,
+# in the pyproject.toml why have the build tag specifying setuptools?
+# Maybe ditch it...see if that is legal.
+# Maybe ask on StackExchange...what is the point of the pyproject.toml if
+# I'm never installing on PyPI (or as a python module) and instead will only do DEB et al?
+
+
+#TODO Making a deb from toml
+#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
+#   https://manpages.debian.org/unstable/dh-python/pybuild.1.en.html
+
+
+#TODO Might be useful
+#   https://pypi.org/project/platformdirs/
 
 
 import gi

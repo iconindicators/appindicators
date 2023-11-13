@@ -25,6 +25,20 @@
 print( "hee")
 from indicatorbase import IndicatorBase
 IndicatorBase.test()
+# But now I'm not sure about this...
+# The indicators will be installed to /usr/share/ using DEB package manager...
+# ...not using PIP.
+# That means the version in pyproject.toml will not be accessible from
+#   metadata.version( __package__ )
+# so unless the pyproject.toml is included in the release (perhaps it should for completeness)
+# then should I get the version from the toml just by parsing?
+# Same for description...but then how to translate?
+# The description for the indicator is different to the one line description in the debian/control.
+# Perhaps the description in the debian/control should come from the pyproject.toml rather than the control.cfg?
+# Can we have our own tags in the pyproject.toml?  If so, ditch the control.cfg.
+# According to 
+#   https://stackoverflow.com/questions/76924873/can-i-add-custom-data-to-a-pyproject-toml-file
+# no custom tags (at least for me as I'm not installing on PyPI).
 
 
 INDICATOR_NAME = "indicator-fortune"
