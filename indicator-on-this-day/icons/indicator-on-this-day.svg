@@ -14,7 +14,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="indicator-on-this-day.svg">
+   sodipodi:docname="indicator-on-this-day (copy).svg">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -24,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="18.009126"
-     inkscape:cx="-0.50321335"
-     inkscape:cy="5.6910367"
+     inkscape:zoom="36.018252"
+     inkscape:cx="7.514814"
+     inkscape:cy="10.657106"
      inkscape:document-units="px"
      inkscape:current-layer="g2985"
      showgrid="true"
@@ -106,17 +106,6 @@
          d="m 232.94993,265.44793 c 1.22715,0 1.22715,0 1.22715,0"
          id="path3121-7-5"
          inkscape:connector-curvature="0" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:14.39999962px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.20000005"
-         x="218.90315"
-         y="271.00842"
-         id="text2993"><tspan
-           sodipodi:role="line"
-           id="tspan2995"
-           x="218.90315"
-           y="271.00842"
-           style="font-size:48px;line-height:1.25;font-family:sans-serif;stroke-width:1.20000005"> </tspan></text>
       <path
          style="display:inline;fill:none;stroke:#6999b9;stroke-width:0.55868423;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          d="m 219.10324,271.79053 c 14.69825,0 14.69825,0 14.69825,0"
