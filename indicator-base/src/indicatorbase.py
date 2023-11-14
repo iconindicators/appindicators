@@ -416,6 +416,11 @@
 #   https://pypi.org/project/platformdirs/
 
 
+#TODO Double check each copyRightStartYear in the init of each indicator 
+# matches the same year in the respective changelog...depends on where/how we source the start year.
+# Does/should the pyproject.toml come into play?
+
+
 import gi
 
 gi.require_version( "GLib", "2.0" )
