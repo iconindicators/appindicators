@@ -23,7 +23,13 @@ INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
 
-from indicatorbase import IndicatorBase  #TODO MOved to up top...is this safe?
+from indicatorbase import IndicatorBase  #TODO MOved to up top...is this safe?  
+# What about _() already in indicatorbase.py... 
+# ...they will miss out on being pulled in from po/mo.
+# If the indicator name can be obtained from say the new pyproject.toml
+# (by parsing directly and not via Pip as that is now impossible due to a deb install)
+# then in indicatorbase.py we can get the indicator name and initialise gettext et al.
+
 
 # import gi #TODO Is this needed as it is in IndicatorBase?
 # gi.require_version( "Gtk", "3.0" ) #TODO Is this needed as it is in IndicatorBase?
