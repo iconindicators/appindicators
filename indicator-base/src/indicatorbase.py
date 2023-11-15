@@ -421,6 +421,9 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
 
+#TODO Can/should the indicatorName, version, copyrightStartYear, copyrightName, website come from pyproject.toml?
+# The Comments need to be translated so I guess they have to be in .py somewhere.
+# What about artwork/creditz?  Can they be put into the pyproject.toml?
     def __init__( self,
                   indicatorName,
                   version,
