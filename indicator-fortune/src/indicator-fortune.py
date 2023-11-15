@@ -39,6 +39,10 @@ IndicatorBase.test()
 # According to 
 #   https://stackoverflow.com/questions/76924873/can-i-add-custom-data-to-a-pyproject-toml-file
 # no custom tags (at least for me as I'm not installing on PyPI).
+#
+# Investigate about having dynamic/runtime values for
+#    version/description/name
+# as that may be an option for using pyproject.toml as the single source.
 
 
 INDICATOR_NAME = "indicator-fortune"
