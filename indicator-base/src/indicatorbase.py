@@ -48,6 +48,13 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
+#TODO For PPA Indicator, need some way to be reminded every 6 months
+# about adding in new version of Ubuntu.
+# Do this in a script (but where/how does the script run)?
+# Or just a note somewhere, maybe on the front page README.md?
+# Maybe Github or whereever I ultimatel host the source/project will have a note/reminder thingy.
+
+
 #TODO If I ever end up changing things to build a Python PyPI package for each indicator,
 # it may be advantageous to reorganise the projects layouts.
 # IndicatorBase code (and stuff) could be under an Indicator project and
