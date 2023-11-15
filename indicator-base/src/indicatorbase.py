@@ -389,6 +389,26 @@
 #   https://pypi.org/project/platformdirs/
 
 
+#TODO Create Deb from Python...dunno if useful...
+#   https://stackoverflow.com/questions/64345965/how-can-i-debian-package-a-python-application-with-a-systemd-unit-using-stdeb3-p
+#
+#   https://stackoverflow.com/questions/76208149/build-python-debian-package-with-setuptools
+#
+#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
+#
+#   https://discuss.python.org/t/looking-for-an-up-to-date-step-by-step-guide-to-create-a-deb-from-a-python-package/15766/4
+#
+#   https://www.debian.org/doc/packaging-manuals/python-policy/
+#
+#   https://pypi.org/project/wheel2deb/
+#
+#   https://github.com/upciti/wheel2deb/issues/54
+#
+#   https://stackoverflow.com/questions/12079607/make-virtualenv-inherit-specific-packages-from-your-global-site-packages
+#
+#   https://stackoverflow.com/questions/71976246/how-add-default-packages-to-all-new-pythons-venvs
+
+
 import gi
 
 gi.require_version( "GLib", "2.0" )
