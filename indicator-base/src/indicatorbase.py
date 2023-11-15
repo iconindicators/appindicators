@@ -107,6 +107,23 @@
 #         ~/.config/autostart/indicator-lunar.py.desktop
 
 
+#TODO Ideally include the project name in the CHANGELOG.md
+# and that means here we need to skip it.
+# Something like:
+#   
+#   # Changelog for indicator-fortune
+#   
+#   
+# Or:
+#   
+#   # Changelog
+#   This is the changelog for indicator-fortune
+#   
+
+
+#TODO Perhaps have a script for releaseLaunchPad which takes multiple indicator names and does the upload?    
+
+
 #TODO History for getting stuff running on Debian...maybe clean up.
 #
 #     1  ping www.google.com
