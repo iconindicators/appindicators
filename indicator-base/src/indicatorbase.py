@@ -24,7 +24,7 @@
 #     https://wiki.ubuntu.com/NotifyOSD
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 #
-# Not all functionality works across all platforms/desktops...
+# Not all functionality works across all distributions/versions...
 #
 #    Kubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
 #    Kubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
@@ -86,10 +86,6 @@
 # and will likely need to change the utils/buildDebian.py
 
 
-#TODO Make a note somewhere/somehow about installing the .deb file on debian
-# that need to first install GNOME Shell extension "AppIndicator andKStatusNotifierItem Support"
-
-
 #TODO Mention somewhere on Debian to use gnome-tweak to get indicators to auto start.
 # https://unix.stackexchange.com/questions/374012/how-to-manage-startup-applications-in-debian-9
 #
@@ -105,78 +101,21 @@
 
 
 #TODO Ideally include the project name in the CHANGELOG.md
-# and that means here we need to skip it.
+# but that means we need to skip it in the convertMarkdowntoDebian.py script.
 # Something like:
 #   
 #   # Changelog for indicator-fortune
-#   
 #   
 # Or:
 #   
 #   # Changelog
 #   This is the changelog for indicator-fortune
-#   
 
 
 #TODO History for getting stuff running on Debian...maybe clean up.
 #
-#     1  ping www.google.com
-#     2  ip a
-#     3  exit
-#     4  cd Downloads/
-#     5  ls
-#     6  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#     7  sudo adduser bernard sudo
-#     8  su -
-#     9  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    10  exit
-#    11  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    12  cd Downloads/
-#    13  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    14  sudo apt-get -f install
-#    15  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    16  ls -l
-#    17  rm indicator-test_1.0.6-1_all.deb 
-#    18  ls -l
-#    19  ps -eaf | grep archive
-#    20  ps -eaf | grep test
-#    21  kill 2594
-#    22  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    23  sudo apt-get -f install
-#    24  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    25  ls -l
-#    26  sudo chmod a+w indicator-test_1.0.6-1_all.deb 
-#    27  ls -l
-#    28  mkdir tmp
-#    29  dpkg-deb -R indicator-test_1.0.6-1_all.deb tmp
-#    30  dpkg-deb -b tmp out.deb
-#    31  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    32  sudo apt-get -f install
-#    33  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    34  sudo apt install gir1.2-ayatanaappindicator3-0.1 
-#    35  sudo apt --fix-broken install
-#    36  sudo apt install gir1.2-ayatanaappindicator3-0.1 
-#    37  ls /usr/share/indic*
-#    38  ls /usr/share/
-#    39  dpkg-deb -b tmp out.deb
-#    40  sudo apt remove indicater-test
-#    41  sudo apt remove indicaoer-test
-#    42  sudo apt remove indicator-test
-#    43  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    44  sudo apt instal python3-notify2
-#    45  sudo apt install python3-notfy2
-#    46  sudo apt update
-#    47  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    48  sudo apt --fix-broken install
-#    49  /usr/share/indicator-test/indicator-test.py 
-#    50  sudo nano /usr/share/indicator-test/indicator-test.py 
-#    51  sudo nano /usr/share/indicator-test/indicatorbase.py 
-#    52  /usr/share/indicator-test/indicator-test.py 
-#    53  sudo apt remove indicator-test
-#    54  dpkg-deb -b tmp out.deb
-#    55  sudo dpkg -i indicator-test_1.0.6-1_all.deb 
-#    56  history
-#    57  history > debianHistory.txt
+#    sudo adduser bernard sudo
+#    su -
 
 
 #TODO 
@@ -446,6 +385,9 @@ class IndicatorBase( ABC ):
 
     __EXTENSION_JSON = ".json"
 
+#TODO Seems some of these could be wrong...compare against originals...
+#...and also against the buildDebian.py script.
+# Is it possible to download the icon themes on their own rather than run up each VM/OS?
     __ICON_THEMES = {
         "Adwaita"                   : "bebebe",
         "Ambiant-MATE"              : "dfdbd2",
