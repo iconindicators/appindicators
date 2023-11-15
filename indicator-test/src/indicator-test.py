@@ -19,6 +19,92 @@
 # Application indicator to test stuff.
 
 
+
+#TODO Current thinking/plan for creating snaps et al...
+#
+# Ideally, want a well-behaved/formed Python project from the outset using pyproject.toml
+# and from that all other builds (DEB source for LaunchPad, snap, et al) come from that.
+#
+#
+# Single version number location
+#   https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
+#   https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
+#   https://stackoverflow.com/questions/60430112/single-sourcing-package-version-for-setup-cfg-python-projects
+#
+#
+# Packaging
+# https://setuptools.pypa.io/en/latest/setuptools.html
+# https://packaging.python.org/en/latest/
+# https://pypa-build.readthedocs.io/en/stable/
+# https://ianhopkinson.org.uk/2022/02/understanding-setup-py-setup-cfg-and-pyproject-toml-in-python/
+# http://ivory.idyll.org/blog/2021-transition-to-pyproject.toml-example.html
+# https://stackoverflow.com/questions/7110604/is-there-a-standard-way-to-create-debian-packages-for-distributing-python-progra
+# https://www.wefearchange.org/2010/05/from-python-package-to-ubuntu-package.html
+#
+#
+# Good background on Python build/env
+#   https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
+#   https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+#   https://sinoroc.gitlab.io/kb/python/package_data.html
+#
+#
+
+
+#TODO i18n
+# https://discuss.python.org/t/how-to-package-translation-files-po-mo-in-a-future-proof-way/20096
+# https://stackoverflow.com/questions/22958245/what-is-the-correct-way-to-include-localisation-in-python-packages
+# https://stackoverflow.com/questions/53285634/is-there-a-portable-way-to-provide-localization-of-a-package-distributed-on-pypi?noredirect=1&lq=1
+# https://github.com/s-ball/mo_installer
+# https://stackoverflow.com/questions/55365356/how-to-include-localized-message-in-python-setuptools?noredirect=1&lq=1
+# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
+# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
+#
+# May be of use too for i18n
+# https://github.com/thinkle/gourmet/blob/master/setup.py
+# https://github.com/PythonOT/POT/blob/master/setup.py
+# https://github.com/moinwiki/moin/blob/master/setup.py
+# https://github.com/GourmandRecipeManager/gourmand/blob/main/setup.py
+#
+# https://www.mattlayman.com/blog/2015/i18n/
+#
+# https://stackoverflow.com/questions/32609248/setuptools-adding-additional-files-outside-package
+
+
+#TODO
+# Should the src directory be replaced with src/indicator-test?
+
+
+#TODO Still need __init__.py given now using pyproject.toml AND will likely never be installing via Pip?
+# Based on this, yes:
+#    https://stackoverflow.com/a/48804718/2156453
+#
+# Also from distutils introduction link above:
+#
+#    package
+#        a module that contains other modules; typically contained in a directory in the filesystem
+#        and distinguished from other directories by the presence of a file __init__.py.
+
+
+#TODO AppImage
+# https://appimage.org/
+
+
+#TODO Flathub
+# https://github.com/PlaintextGroup/oss-virtual-incubator/blob/main/proposals/flathub-linux-app-store.md
+
+
+#TODO Snap
+# https://forum.snapcraft.io/t/parse-info-on-pythonpart-utilizing-pyproject-toml/33294
+# https://forum.snapcraft.io/t/building-a-core20-python-snap-using-pyproject-toml/22028
+# https://stackoverflow.com/questions/73310069/should-i-be-using-only-pyproject-toml
+# https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
+# https://stackoverflow.com/questions/71193095/questions-on-pyproject-toml-vs-setup-py
+# https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+
+
+
+
 INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
