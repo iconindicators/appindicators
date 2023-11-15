@@ -48,11 +48,6 @@
 #    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
-#TODO Markdown viewer/editor
-#   https://stackedit.io/app
-#   https://markdownlivepreview.com/
-
-
 #TODO If I ever end up changing things to build a Python PyPI package for each indicator,
 # it may be advantageous to reorganise the projects layouts.
 # IndicatorBase code (and stuff) could be under an Indicator project and
@@ -78,15 +73,10 @@
 # https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#your-package
 # Perhaps consider putting code for a given indicator in src/indicator-test/ rather than src?
 # Ditto for all other indicators.
-
-
-#TODO If  Project-Id-Version in the POT file is not required,
-# that removes one place where the version number is stored.
-# https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/gettext.html#SEC9
 #
-# Given that I'm not releasing to PyPI, leave as is (just a src directory).
-# However may need to change this in the future if wanting to build a snap, etc
-# and that requires a properly formatted Python project.
+# Maybe this won't be necessary if the snap build just works...
+# Otherwise, move each indicator's src directory to indicator-<name>/src
+# and will likely need to change the utils/buildDebian.py
 
 
 #TODO Make a note somewhere/somehow about installing the .deb file on debian
@@ -119,9 +109,6 @@
 #   # Changelog
 #   This is the changelog for indicator-fortune
 #   
-
-
-#TODO Perhaps have a script for releaseLaunchPad which takes multiple indicator names and does the upload?    
 
 
 #TODO History for getting stuff running on Debian...maybe clean up.
@@ -302,20 +289,6 @@
 #   https://www.reddit.com/r/debian/comments/14g9np9/debian_12_pip_makes_trouble/
 
 
-#TODO 
-# Trying to build indicators on Debian bookworm
-#
-# May need to override lintian...but not sure what is actually happing.
-#
-# https://manpages.debian.org/jessie/devscripts/debuild.1.en.html
-#
-# https://bugs.launchpad.net/ubuntu/+source/lintian/+bug/1303603/comments/5
-#
-# https://debian-lint-maint.debian.narkive.com/Kn68ZHpO/can-i-override-lintian-s-bad-distribution-error
-#
-# ONLY really applicable if I really need to build or release using Debian...unlikely, so maybe ignore this issue.
-
-
 #TODO Given the error message on Debian bookworm when install indicator-lunar:
 #
 #     error: externally-managed-environment
@@ -368,44 +341,25 @@
 
 
 #TODO
-# In terms of simplifying/unifying the projects to share resources, reduce duplication 
-# and better mimic a Python project using pyproject.toml, here is a rough road map...
-#
-#   Create a pyproject.toml for each indicator.  Should there be one for indicatorbase
-#   from which each indicator uses as a base file requiring a merge?  That requires a script.
-#   
-#   Many files in packaging/debian are identical across all indicators,
-#   so move to indicatorbase/packaging/debian and need the buildDeb/buildLaunchPad script  
-#   to copy files across as needed.
-#   
-#   Obviously have to replace most of the functionality within the build-debian-common script
-#   and each build-debian script for each indicator will need to perhaps be now a config file?
-#   
-#   Assuming we go with now a proper Python CHANGELOG.md, will need a script to convert the
-#   existing packaging/debian/changelog for each indicator into a CHANGELOG.md 
-#   but also the buildDeb script needs to now take CHANGELOG.md and make a changelog for the .deb
-#   file on the fly (during the build process).
-#   
-#   For the buildDeb script, it is worth to first create a Python whl file and from there
-#   pull that apart to then create the Deb/LaunchPad package?
-#   
-#   Should the buildDeb script be a single script sitting above the indicator directories,
-#   and takes a parameter (the indicator directory name) to build?
-#   Could also take a list of directory names to build multiple indicators.
-#   
-#   What about a script to upload to LaunchPad PPA?
-#   Again, sits at the top and takes a single directory name, or list,
-#   and visits each indicator-whatever/release directory to do the upload?
-#
+# Should there be a pyproject.toml for each indicator or one in indicatorbase
+# and from that using a cfg file in each indicator's directory, merge in specifics
+# (like how I do that for debian/control)?
+
+
+#TODO
 #   Should have a README.md at the very top describing how everything hangs together.
 #   Need though a README.md for each indicator-whatever...what does it say
 #   in terms of project building, etc?  Perhaps nothing...
 #   should just say what the project/indicator is all about in terms of what is does.
 #   Not sure about this...
 #   Perhaps one thing to mention in terms of the project is the licence (refer to very top of all).
-#
+
+
+#TODO
 #   There can be a common top-level LICENCE file at the top and is copied across to each deb on build.
-#
+
+
+#TODO
 #   What to do about the unittests.py in each indicator?
 #   Really should be in a sub-folder called tests and the file should be called something 
 #   like test_indicator_whatever.py
@@ -426,11 +380,6 @@
 
 #TODO Might be useful
 #   https://pypi.org/project/platformdirs/
-
-
-#TODO Double check each copyRightStartYear in the init of each indicator 
-# matches the same year in the respective changelog...depends on where/how we source the start year.
-# Does/should the pyproject.toml come into play?
 
 
 import gi
