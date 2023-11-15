@@ -233,11 +233,6 @@ indicator-tide (1.0.8-1) trusty; urgency=low
     converted to user local date/time.
     If at least one of a port's readings is missing the time, all of the
     readings are shown in port local date/time (as per original source).
-  * Bug fix: Tidal readings are now displayed based on the date/time:
-      If all of a port's readings contain both date and time, each reading is
-      converted to user local date/time.
-      If at least one of a port's readings is missing the time, all of the
-      readings are shown in port local date/time (as per original source).
   * Corrected warnings in .desktop file.
   * Changed the format of the tide type, time and level to have the type first
     (rather than time first) to match the data source.
