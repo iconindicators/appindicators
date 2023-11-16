@@ -19,22 +19,6 @@
 # Application indicator which displays fortunes.
 
 
-#TODO
-# indicator-fortune didn't filter out
-#
-# It's a very *__UN*lucky week in which to be took dead.
-#         -- Churchy La Femme
-#
-# hmmm looks good in Firefox...in the fortune history dialog 
-# (and the OSD there are two unknown chars before the UN.
-#
-# Does not happen on Ubuntu but does on Debian...why?
-# All I can think of is there is a newer version on Debian 
-# which has been edited and now contains a spurious char 
-# (two of them actually) and maybe I can screen for this.
-
-
-
 #TODO Testing if I can maybe use this as a way to call
 # a function(s) in IndicatorBase that pulls out the version, indicator name, etc, etc
 # from the pyproject.toml
@@ -200,9 +184,11 @@ class IndicatorFortune( IndicatorBase ):
                     # Examples:
                     #     Ask not for whom the <CONTROL-G> tolls.
                     #         *** System shutdown message from root ***
+                    #     It's a very *__UN*lucky week in which to be took dead.   <--- On Debian 12 this is x0008
                     output = ""
                     for c in self.fortune:
-                        if codecs.encode( str.encode( c ), "hex" ) == b'07':
+                        if codecs.encode( str.encode( c ), "hex" ) == b'07' or \
+                           codecs.encode( str.encode( c ), "hex" ) == b'08':
                             continue
 
                         output += c
