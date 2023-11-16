@@ -52,7 +52,7 @@ from distutils.version import LooseVersion
 
 import datetime, eclipse, importlib, io, locale, math
 
-
+#TODO Remove the references to creating the bsp once the new script to create planets.bsp is sorted.
 class AstroSkyfield( AstroBase ):
 
     # Planets ephemeris is created with a reduced date range:
