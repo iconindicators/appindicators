@@ -98,18 +98,6 @@
 # If so, use the LICENSE.md (just the one at the top level) and buildDebian.md can use/copy that to debian/.
 
 
-#TODO Ideally include the project name in the CHANGELOG.md
-# but that means we need to skip it in the convertMarkdowntoDebian.py script.
-# Something like:
-#   
-#   # Changelog for indicator-fortune
-#   
-# Or:
-#   
-#   # Changelog
-#   This is the changelog for indicator-fortune
-
-
 #TODO Packaging
 #   https://setuptools.pypa.io/en/latest/setuptools.html
 #   https://packaging.python.org/en/latest/
@@ -225,7 +213,8 @@
 # Need to move the unittests for each in to a tests sub directory and call them test_indicator_whatever.py
 # After that, make the unitests look like that of playlistmaker.
 # Should the unit tests be included in the build/release?
-
+#
+# DELETE ALL THE UNIT TESTS!    
 
 #TODO May be useful in indicatorbase for finding user dirs and simlar in a os-independent manner:
 #   https://pypi.org/project/platformdirs/
