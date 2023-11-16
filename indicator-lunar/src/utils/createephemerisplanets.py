@@ -63,6 +63,8 @@ def createEphemerisPlanets( inBsp, outBsp, years ):
     print( "Created", outBsp )
 
 
+#TODO Need to test this!!!
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description = "Reduce the date range of a .bsp from today to a specified number of years from today." )
