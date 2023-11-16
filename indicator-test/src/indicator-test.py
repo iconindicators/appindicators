@@ -299,14 +299,6 @@
 # Can Python script in /usr/share/indicator-lunar refer to a Python library in a venv?
 # Need the full path to the venv?
 
-#TODO
-# When astroskyfield.py is included in the release,
-# the debBuild.py script needs to somehow ensure planets.bsp and stars.dat are created.
-# Then somehow amend the debBuild script to look for the bsp/dat.
-# Maybe use a MANIFEST.in and list these two files there?
-# Regardless the build must fail if the bsp/dat are not present.
-# The build script can let the caller know the bsp/dat need to be present.
-
 
 INDICATOR_NAME = "indicator-test"
 import gettext

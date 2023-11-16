@@ -19,6 +19,13 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO If/when astroskyfield.py is included in the release,
+# the debBuild.py script must ensure planets.bsp and stars.dat included.
+# Maybe use a MANIFEST.in and list these two files there?
+# Regardless the build must fail if the bsp/dat are not present.
+# The build script can let the caller know the bsp/dat need to be present.
+
+
 #TODO If/when switching to Skyfield (PyEphem may still be chosen as a backend by the user),
 # Will need several changes:
 #
