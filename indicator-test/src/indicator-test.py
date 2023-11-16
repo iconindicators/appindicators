@@ -94,6 +94,8 @@
 # If so, need to mofidy the buildDebian.py
 # use a common license file at the top of the project.  
 #   https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
+# Is the debian/copyright the same as the LICENSE.md referred to in a pyproject.toml?
+# If so, use the LICENSE.md (just the one at the top level) and buildDebian.md can use/copy that to debian/.
 
 
 #TODO Ideally include the project name in the CHANGELOG.md
@@ -129,6 +131,11 @@
 #   https://github.com/upciti/wheel2deb/issues/54
 #   https://stackoverflow.com/questions/12079607/make-virtualenv-inherit-specific-packages-from-your-global-site-packages
 #   https://stackoverflow.com/questions/71976246/how-add-default-packages-to-all-new-pythons-venvs
+#   https://stackoverflow.com/questions/70272023/using-pyproject-toml-with-flexible-version-from-datetime
+#   https://stackoverflow.com/questions/75526020/dynamically-version-a-pyproject-toml-package-without-importing-runtime-dependenc
+#   https://stackoverflow.com/questions/74608905/single-source-of-truth-for-python-project-version-in-presence-of-pyproject-toml
+#   https://stackoverflow.com/questions/76041299/using-values-generated-by-python-scripts-in-dynamic-fields-in-pyproject-toml
+#   https://stackoverflow.com/questions/76081078/using-the-return-value-of-a-python-function-as-the-value-for-version-field-in-py
 
 
 #TODO Good background on Python build/env
