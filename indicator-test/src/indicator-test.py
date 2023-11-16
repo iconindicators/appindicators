@@ -224,6 +224,86 @@
 #   https://pypi.org/project/platformdirs/
 
 
+#TODO To get an indicator to autostart on Debian, need to use gnome-tweak
+#   https://unix.stackexchange.com/questions/374012/how-to-manage-startup-applications-in-debian-9
+#
+# Perhaps it is easier to put the autostart checkbox back in to the Preferences?
+# Also add a spinner for the autostart delay which would have to be written to the .desktop file.
+
+
+#TODO When installing indicator-lunar on Debian bookworm, got an error:
+#
+#     error: externally-managed-environment
+#
+#     × This environment is externally managed
+#     ╰─> To install Python packages system-wide, try apt install
+#     python3-xyz, where xyz is the package you are trying to
+#     install.
+#
+#     If you wish to install a non-Debian-packaged Python package,
+#     create a virtual environment using python3 -m venv path/to/venv.
+#     Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+#     sure you have python3-full installed.
+#
+#     If you wish to install a non-Debian packaged Python application,
+#     it may be easiest to use pipx install xyz, which will manage a
+#     virtual environment for you. Make sure you have pipx installed.
+#
+#     See /usr/share/doc/python3.11/README.venv for more information.
+#
+#     note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+#     hint: See PEP 668 for the detailed specification.
+#
+# This will affect Ubuntu 24.04 onward as Pip has been changed such that
+# Python packages need to be installed into a virtual environment.
+#
+# So for ephem/sgp4 and eventually skyfield, need to make a change.
+# 
+#   https://stackoverflow.com/a/75696359/2156453
+#
+# Perhaps in the debian/postinst all we need to do is modify
+#   sudo pip3 install --ignore-installed --upgrade ephem sgp4 || true
+# to be instead something that can do the following...
+#   
+#    71  cd /home/bernard
+#    72  python3 -m venv .venv
+#    73  sudo apt install python3.11-venv 
+#    74  python3 -m venv .venv
+#    75  source .venv/bin/activate
+#    76  python3 -m pip install --upgrade pip
+#    77  cd Programming/PlayListMaker/
+#    78  python3 -m pip install -e .
+#    79  playlistmaker 
+#
+# More on this issue
+#   https://stackoverflow.com/questions/76873955/pip-install-user-doesnt-work-on-debian-12
+#   https://stackoverflow.com/questions/76465606/why-is-pip3-9-trying-to-use-the-debian-12-python3-11
+#   https://stackoverflow.com/questions/75608323/how-do-i-solve-error-externally-managed-environment-every-time-i-use-pip-3
+#   https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana
+#   https://stackoverflow.com/questions/77253338/best-practice-using-python-packages-not-developing-on-debian-12
+#   https://www.reddit.com/r/debian/comments/14g9np9/debian_12_pip_makes_trouble/
+#   https://stackoverflow.com/questions/64005822/how-to-specify-external-system-dependencies-to-a-python-package
+#   https://stackoverflow.com/questions/5729051/python-package-external-dependencies?rq=3
+#   https://stackoverflow.com/questions/55293003/how-to-handle-external-dependencies-in-python
+#
+# If the postinst will no longer work in kicking off an install to a venv,
+# will have to do a runtime check in the indicator to look for ephem et al
+# and if not present, explain to the user how to install via pip into a venv.
+#
+# If the postinst does work, likely need a postrm to clean up the pip installation.
+#
+#
+# Maybe go with a modified postinst (and a new postrm) but ALSO have a runtime check
+# to ensure ephem et al are installed and if not, point user to a readme on how to install
+# (but at this stage if ephem is not present, the installation should be assumed to be broken).
+#
+# How permanent is a venv?  Do we need a venv for each indicator as needed,
+# and even then one for each version of each indicator?
+#
+# Can Python script in /usr/share/indicator-lunar refer to a Python library in a venv?
+# Need the full path to the venv?
+
+
 INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
