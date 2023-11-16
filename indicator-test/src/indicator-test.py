@@ -209,14 +209,7 @@
 # For autostart with a snap, see how this works...need to do something different?
 
 
-#TODO 
-# Need to move the unittests for each in to a tests sub directory and call them test_indicator_whatever.py
-# After that, make the unitests look like that of playlistmaker.
-# Should the unit tests be included in the build/release?
-#
-# DELETE ALL THE UNIT TESTS!    
-
-#TODO May be useful in indicatorbase for finding user dirs and simlar in a os-independent manner:
+#TODO May be useful in indicatorbase for finding user dirs and similar in a os-independent manner:
 #   https://pypi.org/project/platformdirs/
 
 
@@ -226,7 +219,7 @@
 # Perhaps it is easier to put the autostart checkbox back in to the Preferences?
 # Also add a spinner for the autostart delay which would have to be written to the .desktop file.
 # Before embarking on this, first test on Debian 12 that placing the .desktop file
-# into .config/autostart/indicator-... actually works.
+# into .config/autostart/indicator-... actually
 
 
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
