@@ -55,37 +55,6 @@
 # Maybe Github or whereever I ultimatel host the source/project will have a note/reminder thingy.
 
 
-#TODO If I ever end up changing things to build a Python PyPI package for each indicator,
-# it may be advantageous to reorganise the projects layouts.
-# IndicatorBase code (and stuff) could be under an Indicator project and
-# all the other indicators are also under this new Indicator project.
-# These may help: 
-#   https://stackoverflow.com/questions/18087122/python-sharing-common-code-among-a-family-of-scripts
-#   https://stackoverflow.com/questions/73580708/how-to-share-code-between-python-internals-projects
-#   https://stackoverflow.com/questions/48954870/how-to-share-code-between-python-projects
-#   https://discuss.python.org/t/multiple-related-programs-one-pyproject-toml-or-multiple-projects/17427/2
-#
-# If I still need a setup.py for snaps say, will need to convert the toml:
-#   https://pypi.org/project/poetry2setup/
-
-
-#TODO For the snap work, need to make the python project all proper...
-#
-# https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
-# Need a LICENSE.TXT file...so can this be just copied from the debian/copyright file?  
-# If this is used, need to (during the build of the snap) alter the end year.
-
-
-#TODO For a Python project
-# https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#your-package
-# Perhaps consider putting code for a given indicator in src/indicator-test/ rather than src?
-# Ditto for all other indicators.
-#
-# Maybe this won't be necessary if the snap build just works...
-# Otherwise, move each indicator's src directory to indicator-<name>/src
-# and will likely need to change the utils/buildDebian.py
-
-
 #TODO Mention somewhere on Debian to use gnome-tweak to get indicators to auto start.
 # https://unix.stackexchange.com/questions/374012/how-to-manage-startup-applications-in-debian-9
 #
@@ -100,83 +69,14 @@
 #         ~/.config/autostart/indicator-lunar.py.desktop
 
 
-#TODO Ideally include the project name in the CHANGELOG.md
-# but that means we need to skip it in the convertMarkdowntoDebian.py script.
-# Something like:
-#   
-#   # Changelog for indicator-fortune
-#   
-# Or:
-#   
-#   # Changelog
-#   This is the changelog for indicator-fortune
-
-
 #TODO History for getting stuff running on Debian...maybe clean up.
 #
 #    sudo adduser bernard sudo
 #    su -
 
 
-#TODO 
-# Look at sound-switcher which does several interesting things...
-#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
-#
-#    Autostart indicator...how does it do this?
-#
-#    Creates snap and other packages for deployment.
-#
-#    It tries first to import AyatanaAppIndicator3.
-#
-# https://snapcraft.io/docs/snapcraft-overview
-#
-# https://askubuntu.com/questions/40011/how-to-let-dpkg-i-install-dependencies-for-me
-# https://askubuntu.com/questions/1090826/deb-package-cant-install-its-dependencies-when-using-dpkg
-#
-# https://github.com/yktoo/indicator-sound-switcher/blob/dev/debian/control
-# https://github.com/yktoo/indicator-sound-switcher/blob/dev/snap/local/launch.sh
-#
-# For autostart with a snap, see how this works...need to do something different?
 
 
-#TODO Lubuntu 20.04/22.04 Lunar
-# Getting the icon theme name gives Yaru and not ePapirus (defined in LXQt Appearance Configuration).
-# Waiting to hear back from 
-#    https://discourse.lubuntu.me/t/icons-hijacked/3863
-# on how to get the correct icon theme.
-#
-# But really this is irrelevant because on Lubuntu, dynamic icons are not supported.
-
-
-#TODO Future work...
-# Port indicators to Ubuntu variants:
-#    https://www.linuxmint.com/
-#    https://www.bodhilinux.com/
-#    https://elementary.io/
-#    https://zorin.com/os/
-#    https://www.ubuntukylin.com/downloads/download-en.html
-#
-# Port indicators to non-Ubuntu but GNOME based variants...
-#    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
-#    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
-#
-# Is it possible to port to FreeBSD and/or NetBSD?
-#
-# Miscellaneous:
-#    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
-#    https://itsfoss.com/enable-applet-indicator-gnome/
-#
-# External hosting of source code and deployment other than PPA...
-#    https://github.com/alexmurray/indicator-sensors
-#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
-#    https://snapcraft.io/about
-#    https://flathub.org/home
-
-
-#TODO May need to convert a pyproject.toml to a DEB if we continue with LaunchPad/PPA releases.
-#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
-#   https://stackoverflow.com/questions/1382569/how-do-i-do-debian-packaging-of-a-python-package?rq=3
-#   https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
 
 
 #TODO When installing indicator-lunar on Debian bookworm,
@@ -259,10 +159,6 @@
 # without external dependencies.
 
 
-#TODO If we go the route of making snaps, seems .toml is supported (in some way at least):
-#   https://snapcraft.io/docs/python-apps
-
-
 #TODO More on indicator-lunar and how to get Python dependencies (ephem, numpy, et al)...
 # Currently use debian/postinst to install ephem et al.
 # Need to change to work on Ubuntu 24.04 given the changes via PEP 668.
@@ -284,68 +180,6 @@
 # create the venv, how to activate (is this only needed once?)
 # how can a Python script in /usr/share/indicator-lunar refer to a 
 # Python library in a venv?  Need the full path to the venv?
-
-
-#TODO
-# Should there be a pyproject.toml for each indicator or one in indicatorbase
-# and from that using a cfg file in each indicator's directory, merge in specifics
-# (like how I do that for debian/control)?
-
-
-#TODO
-#   Should have a README.md at the very top describing how everything hangs together.
-#   Need though a README.md for each indicator-whatever...what does it say
-#   in terms of project building, etc?  Perhaps nothing...
-#   should just say what the project/indicator is all about in terms of what is does.
-#   Not sure about this...
-#   Perhaps one thing to mention in terms of the project is the licence (refer to very top of all).
-
-
-#TODO
-#   There can be a common top-level LICENCE file at the top and is copied across to each deb on build.
-
-
-#TODO
-#   What to do about the unittests.py in each indicator?
-#   Really should be in a sub-folder called tests and the file should be called something 
-#   like test_indicator_whatever.py
-#   Regardless, should the unit tests be included in the build?
-
-
-#TODO If there is no intention of releasing to PyPI,
-# in the pyproject.toml why have the build tag specifying setuptools?
-# Maybe ditch it...see if that is legal.
-# Maybe ask on StackExchange...what is the point of the pyproject.toml if
-# I'm never installing on PyPI (or as a python module) and instead will only do DEB et al?
-
-
-#TODO Making a deb from toml
-#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
-#   https://manpages.debian.org/unstable/dh-python/pybuild.1.en.html
-
-
-#TODO Might be useful
-#   https://pypi.org/project/platformdirs/
-
-
-#TODO Create Deb from Python...dunno if useful...
-#   https://stackoverflow.com/questions/64345965/how-can-i-debian-package-a-python-application-with-a-systemd-unit-using-stdeb3-p
-#
-#   https://stackoverflow.com/questions/76208149/build-python-debian-package-with-setuptools
-#
-#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
-#
-#   https://discuss.python.org/t/looking-for-an-up-to-date-step-by-step-guide-to-create-a-deb-from-a-python-package/15766/4
-#
-#   https://www.debian.org/doc/packaging-manuals/python-policy/
-#
-#   https://pypi.org/project/wheel2deb/
-#
-#   https://github.com/upciti/wheel2deb/issues/54
-#
-#   https://stackoverflow.com/questions/12079607/make-virtualenv-inherit-specific-packages-from-your-global-site-packages
-#
-#   https://stackoverflow.com/questions/71976246/how-add-default-packages-to-all-new-pythons-venvs
 
 
 import gi

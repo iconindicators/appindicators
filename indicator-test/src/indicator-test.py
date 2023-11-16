@@ -19,35 +19,122 @@
 # Application indicator to test stuff.
 
 
+#TODO Future work...
+# Port indicators to Ubuntu variants:
+#    https://www.linuxmint.com/
+#    https://www.bodhilinux.com/
+#    https://elementary.io/
+#    https://zorin.com/os/
+#    https://www.ubuntukylin.com/downloads/download-en.html
+#
+# Port indicators to non-Ubuntu but GNOME based variants...
+#    https://www.ubuntupit.com/best-gnome-based-linux-distributions/
+#    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
+#
+# Is it possible to port to FreeBSD and/or NetBSD?
+#
+# Miscellaneous:
+#    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
+#    https://itsfoss.com/enable-applet-indicator-gnome/
+#
+# External hosting of source code and deployment other than PPA...
+#    https://github.com/alexmurray/indicator-sensors
+#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
+#    https://snapcraft.io/about
+#    https://flathub.org/home
+
 
 #TODO Current thinking/plan for creating snaps et al...
 #
 # Ideally, want a well-behaved/formed Python project from the outset using pyproject.toml
 # and from that all other builds (DEB source for LaunchPad, snap, et al) come from that.
 #
+# Each indicator comprises pure Python and so on the face of it,
+# should be candidates for installation via PyPI.
+# However, given the additional files requiring installation such as icons, .desktop, et al 
+# which MUST go into the file system, it seems that a .deb is the only option.
+# I have seen discussion of this situation on StackOverflow et al...an OS package is best. 
 #
-# Single version number location
+# So, convert all indicators to use a pyproject.toml, 
+# despite not being used to create the .deb file.
+#
+# The theory/hope is that when creating a snap/rpm/flatpak/appimage
+# the pyproject.toml will make life easier,
+# although I suspect for each snap/rpm/flatpak/appimage I will likely
+# need a script to prepare the files/layout before calling the specific
+# tool to build (as I do in my new buildDebian.py which ultimately calls debuild.
+
+
+#TODO The only outstanding issue for moving to pyproject.toml
+# is obtaining the version/name/author/description.
+# For a Pip installed package, those tags are accessible at run time.
+# The idea is to have the version et al in one place and that is pyproject.toml.
+#
+# If the packages are now .deb file, the pyproject.toml is not available.
+# So what to do...include the pyproject.toml in the installation directory
+# and in say indicatorbase.py parse the file at run time?
+
+
+#TODO Single version number location
 #   https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
 #   https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
 #   https://stackoverflow.com/questions/60430112/single-sourcing-package-version-for-setup-cfg-python-projects
-#
-#
-# Packaging
-# https://setuptools.pypa.io/en/latest/setuptools.html
-# https://packaging.python.org/en/latest/
-# https://pypa-build.readthedocs.io/en/stable/
-# https://ianhopkinson.org.uk/2022/02/understanding-setup-py-setup-cfg-and-pyproject-toml-in-python/
-# http://ivory.idyll.org/blog/2021-transition-to-pyproject.toml-example.html
-# https://stackoverflow.com/questions/7110604/is-there-a-standard-way-to-create-debian-packages-for-distributing-python-progra
-# https://www.wefearchange.org/2010/05/from-python-package-to-ubuntu-package.html
-#
-#
-# Good background on Python build/env
+
+
+#TODO Shared project layout
+#   https://stackoverflow.com/questions/18087122/python-sharing-common-code-among-a-family-of-scripts
+#   https://stackoverflow.com/questions/73580708/how-to-share-code-between-python-internals-projects
+#   https://stackoverflow.com/questions/48954870/how-to-share-code-between-python-projects
+#   https://discuss.python.org/t/multiple-related-programs-one-pyproject-toml-or-multiple-projects/17427/2
+
+
+#TODO Need a LICENSE.TXT or md or similar
+# See pyproject.toml and what are the options.
+# Is the license the same as the debian/copyright file?
+# If so, need to mofidy the buildDebian.py
+# use a common license file at the top of the project.  
+#   https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
+
+
+#TODO Ideally include the project name in the CHANGELOG.md
+# but that means we need to skip it in the convertMarkdowntoDebian.py script.
+# Something like:
+#   
+#   # Changelog for indicator-fortune
+#   
+# Or:
+#   
+#   # Changelog
+#   This is the changelog for indicator-fortune
+
+
+#TODO Packaging
+#   https://setuptools.pypa.io/en/latest/setuptools.html
+#   https://packaging.python.org/en/latest/
+#   https://pypa-build.readthedocs.io/en/stable/
+#   https://ianhopkinson.org.uk/2022/02/understanding-setup-py-setup-cfg-and-pyproject-toml-in-python/
+#   http://ivory.idyll.org/blog/2021-transition-to-pyproject.toml-example.html
+#   https://stackoverflow.com/questions/7110604/is-there-a-standard-way-to-create-debian-packages-for-distributing-python-progra
+#   https://www.wefearchange.org/2010/05/from-python-package-to-ubuntu-package.html
+#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
+#   https://stackoverflow.com/questions/1382569/how-do-i-do-debian-packaging-of-a-python-package?rq=3
+#   https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
+#   https://manpages.debian.org/unstable/dh-python/pybuild.1.en.html
+#   https://stackoverflow.com/questions/64345965/how-can-i-debian-package-a-python-application-with-a-systemd-unit-using-stdeb3-p
+#   https://stackoverflow.com/questions/76208149/build-python-debian-package-with-setuptools
+#   https://stackoverflow.com/questions/63304163/how-to-create-a-deb-package-for-a-python-project-without-setup-py
+#   https://discuss.python.org/t/looking-for-an-up-to-date-step-by-step-guide-to-create-a-deb-from-a-python-package/15766/4
+#   https://www.debian.org/doc/packaging-manuals/python-policy/
+#   https://pypi.org/project/wheel2deb/
+#   https://github.com/upciti/wheel2deb/issues/54
+#   https://stackoverflow.com/questions/12079607/make-virtualenv-inherit-specific-packages-from-your-global-site-packages
+#   https://stackoverflow.com/questions/71976246/how-add-default-packages-to-all-new-pythons-venvs
+
+
+#TODO Good background on Python build/env
 #   https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
 #   https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
 #   https://sinoroc.gitlab.io/kb/python/package_data.html
-#
-#
 
 
 #TODO i18n
@@ -72,6 +159,7 @@
 
 #TODO
 # Should the src directory be replaced with src/indicator-test?
+# Hopefully will be okay as is...but maybe snap et al require it?
 
 
 #TODO Still need __init__.py given now using pyproject.toml AND will likely never be installing via Pip?
@@ -94,15 +182,46 @@
 
 
 #TODO Snap
-# https://forum.snapcraft.io/t/parse-info-on-pythonpart-utilizing-pyproject-toml/33294
-# https://forum.snapcraft.io/t/building-a-core20-python-snap-using-pyproject-toml/22028
-# https://stackoverflow.com/questions/73310069/should-i-be-using-only-pyproject-toml
-# https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
-# https://stackoverflow.com/questions/71193095/questions-on-pyproject-toml-vs-setup-py
-# https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
-# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+#   https://snapcraft.io/docs/python-apps
+#   https://forum.snapcraft.io/t/parse-info-on-pythonpart-utilizing-pyproject-toml/33294
+#   https://forum.snapcraft.io/t/building-a-core20-python-snap-using-pyproject-toml/22028
+#   https://stackoverflow.com/questions/73310069/should-i-be-using-only-pyproject-toml
+#   https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
+#   https://stackoverflow.com/questions/71193095/questions-on-pyproject-toml-vs-setup-py
+#   https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
+#   https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+#   https://pypi.org/project/poetry2setup/
 
 
+#TODO 
+# Look at sound-switcher which does several interesting things...
+#    https://yktoo.com/en/software/sound-switcher-indicator/#installation
+#
+#    Autostart indicator...how does it do this?
+#
+#    Creates snap and other packages for deployment.
+#
+#    It tries first to import AyatanaAppIndicator3.
+#
+# https://snapcraft.io/docs/snapcraft-overview
+#
+# https://askubuntu.com/questions/40011/how-to-let-dpkg-i-install-dependencies-for-me
+# https://askubuntu.com/questions/1090826/deb-package-cant-install-its-dependencies-when-using-dpkg
+#
+# https://github.com/yktoo/indicator-sound-switcher/blob/dev/debian/control
+# https://github.com/yktoo/indicator-sound-switcher/blob/dev/snap/local/launch.sh
+#
+# For autostart with a snap, see how this works...need to do something different?
+
+
+#TODO 
+# Need to move the unittests for each in to a tests sub directory and call them test_indicator_whatever.py
+# After that, make the unitests look like that of playlistmaker.
+# Should the unit tests be included in the build/release?
+
+
+#TODO May be useful in indicatorbase for finding user dirs and simlar in a os-independent manner:
+#   https://pypi.org/project/platformdirs/
 
 
 INDICATOR_NAME = "indicator-test"
