@@ -16,13 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create a planet ephemeris for use in Skyfield.
-# The resultant ephemeris will commence from (one month back from) today's date
-# to end at the specified number of years from today.
+# Create a planet ephemeris for use in Skyfield which commences from
+# today's date to end at the specified number of years from today.
+#
+# The start date is actually wound back one month to take into account
+# a quirk of the Skyfield lunar eclipse algorithm.
 #
 # This script essentially wraps up the following command:
-#
-#    python3 -m jplephem excerpt startDate endDate inFile.bsp outFile.bsp
 #
 #    python3 -m jplephem excerpt startDate endDate inFile.bsp outFile.bsp
 #
@@ -38,7 +38,8 @@
 #    ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
 #    ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
 #
-# Alternate method: Download a .bsp and use spkmerge to create a smaller subset:
+# Alternately to running this script, download a .bsp and
+# use spkmerge to create a smaller subset:
 #    https://github.com/skyfielders/python-skyfield/issues/123
 #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
 
@@ -58,12 +59,10 @@ def createEphemerisPlanets( inBsp, outBsp, years ):
         startDate.strftime( dateFormat ) + " " + \
         endDate.strftime( dateFormat ) + " " + \
         inBsp + " " + outBsp
-    print( "Creating planets ephemeris...\n\t", command )
-#    subprocess.call( command, shell = True )
+    print( "Processing...\n\t", command )
+    subprocess.call( command, shell = True )
     print( "Created", outBsp )
 
-
-#TODO Need to test this!!!
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
