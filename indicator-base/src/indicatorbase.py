@@ -24,7 +24,7 @@
 #     https://wiki.ubuntu.com/NotifyOSD
 #     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 #
-# Not all functionality works across all distributions/versions...
+# Not all functionality is available across all distributions/versions...
 #
 #    Kubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
 #    Kubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
