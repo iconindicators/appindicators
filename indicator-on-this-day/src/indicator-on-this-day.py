@@ -307,6 +307,9 @@ class IndicatorOnThisDay( IndicatorBase ):
         notifyCheckbutton.set_margin_top( 10 )
         grid.attach( notifyCheckbutton, 0, 5, 1, 1 )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 6, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -327,6 +330,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.copyToClipboard = radioCopyToClipboard.get_active()
             self.searchURL = searchEngineEntry.get_text().strip()
             self.notify = notifyCheckbutton.get_active()
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
 

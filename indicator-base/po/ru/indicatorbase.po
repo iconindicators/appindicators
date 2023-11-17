@@ -57,3 +57,15 @@ msgstr "список изменений"
 #: indicatorbase.py:174
 msgid "error log"
 msgstr "журнал ошибок"
+
+#: indicatorbase.py:275
+msgid "Autostart"
+msgstr "Автозапуск"
+
+#: indicatorbase.py:276
+msgid "Run the indicator automatically."
+msgstr "Запускать индикатор автоматически."
+
+#: indicatorbase.py:280
+msgid "Start up delay (seconds)."
+msgstr "Задержка запуска (в секундах)."

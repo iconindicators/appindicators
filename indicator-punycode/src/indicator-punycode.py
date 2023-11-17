@@ -222,6 +222,9 @@ class IndicatorPunycode( IndicatorBase ):
 
         grid.attach( box, 0, 5, 1, 1 )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 6, 1, 1 )
+
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
@@ -231,6 +234,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.outputBoth = outputBothCheckbutton.get_active()
             self.dropPathQuery = dropPathQueryCheckbutton.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
             self.cullResults()
 
         return responseType

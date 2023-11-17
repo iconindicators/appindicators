@@ -240,6 +240,9 @@ class IndicatorTide( IndicatorBase ):
 
         showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 5, 1, 1 )
+
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
@@ -269,6 +272,7 @@ class IndicatorTide( IndicatorBase ):
                 self.userScriptPathAndFilename = userScriptPathAndFilename.get_text().strip()
                 self.userScriptClassName = userScriptClassName.get_text().strip()
 
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
             break
 
         return responseType

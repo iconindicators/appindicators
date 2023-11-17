@@ -79,6 +79,8 @@ import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
 
 class IndicatorBase( ABC ):
 
+    __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
     __CONFIG_VERSION = "version"
@@ -91,6 +93,10 @@ class IndicatorBase( ABC ):
     __DIALOG_DEFAULT_WIDTH = 640
 
     __EXTENSION_JSON = ".json"
+
+    __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
+    __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
+
 
 #TODO Seems some of these could be wrong...compare against originals...
 #...and also against the buildDebian.py script.
@@ -152,6 +158,10 @@ class IndicatorBase( ABC ):
 
         self.creditz = creditz
         self.debug = debug
+
+        self.desktopFile = self.indicatorName + ".py.desktop"
+        self.desktopFileApplications = "/usr/share/applications/" + self.desktopFile
+        self.desktopFileUser = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
 
         self.icon = self.indicatorName # Located in /usr/share/icons
         self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
@@ -400,6 +410,32 @@ class IndicatorBase( ABC ):
         self.__setMenuSensitivity( True, True )
 
 
+    def createAutostartCheckboxAndDelaySpinner( self ):
+        autostart, delay = self.getAutostartAndDelay()
+
+        autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
+        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        autostartCheckbox.set_active( autostart )
+
+        autostartSpinner = \
+            self.createSpinButton(
+                delay,
+                0,
+                1000,
+                toolTip = _( "Start up delay (seconds)." ) )
+
+        autostartSpinner.set_sensitive( autostartCheckbox.get_active() )
+
+        autostartCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, autostartSpinner )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+        box.pack_start( autostartCheckbox, False, False, 0 )
+        box.pack_start( autostartSpinner, False, False, 0 )
+
+        return autostartCheckbox, autostartSpinner, box
+
+
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
@@ -574,6 +610,53 @@ class IndicatorBase( ABC ):
             iconThemeColour = IndicatorBase.__ICON_THEMES[ iconThemeName ]
 
         return iconThemeColour
+
+
+    def getAutostartAndDelay( self ):
+        autostart = False
+        delay = 0
+        try:
+            if os.path.exists( self.desktopFileUser ):
+                with open( self.desktopFileUser, 'r' ) as f:
+                    for line in f:
+                        if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + "=true" in line:
+                            autostart = True
+
+                        if IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' in line:
+                            delay = int( line.split( '=' )[ 1 ].strip() )
+
+        except Exception as e:
+            logging.exception( e )
+            autostart = False
+            delay = 0
+
+        return autostart, delay
+
+
+    def setAutostartAndDelay( self, isSet, delay ):
+        try:
+            if isSet:
+                if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
+                    os.makedirs( IndicatorBase.__AUTOSTART_PATH )
+
+                output = ""
+                with open( self.desktopFileApplications, 'r' ) as f:
+                    for line in f:
+                        if IndicatorBase.__X_GNOME_AUTOSTART_DELAY in line:
+                            output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
+
+                        else:
+                            output += line
+
+                with open( self.desktopFileUser, 'w' ) as f:
+                    f.write( output )
+
+            else:
+                if os.path.exists( self.desktopFileUser ):
+                    os.remove( self.desktopFileUser )
+
+        except Exception as e:
+            logging.exception( e )
 
 
     def getLogging( self ):

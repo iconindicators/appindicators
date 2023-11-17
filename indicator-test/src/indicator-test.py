@@ -213,15 +213,6 @@
 #   https://pypi.org/project/platformdirs/
 
 
-#TODO To get an indicator to autostart on Debian, need to use gnome-tweak
-#   https://unix.stackexchange.com/questions/374012/how-to-manage-startup-applications-in-debian-9
-#
-# Perhaps it is easier to put the autostart checkbox back in to the Preferences?
-# Also add a spinner for the autostart delay which would have to be written to the .desktop file.
-# Before embarking on this, first test on Debian 12 that placing the .desktop file
-# into .config/autostart/indicator-... actually
-
-
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
 #
 #     error: externally-managed-environment

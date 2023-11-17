@@ -151,6 +151,9 @@ class IndicatorStardate( IndicatorBase ):
 
         showClassicCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showIssueCheckbutton, padIntegerCheckbutton )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 3, 1, 1 )
+
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
@@ -159,6 +162,7 @@ class IndicatorStardate( IndicatorBase ):
             self.padInteger = padIntegerCheckbutton.get_active()
             self.showClassic = showClassicCheckbutton.get_active()
             self.showIssue = showIssueCheckbutton.get_active()
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
 

@@ -455,6 +455,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         grid.attach( box, 0, row, 1, 1 )
         row += 1
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, row, 1, 1 )
+        row += 1
+
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -469,6 +473,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
             self.__updateVirtualMachinePreferences( treeStore, treeView.get_model().get_iter_first() )
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
 

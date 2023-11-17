@@ -416,6 +416,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid.attach( hideGroupsCheckbutton, 0, 2, 1, 1 )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        box.set_margin_top( 30 ) # Put some distance from the prior section.
+        grid.attach( box, 0, 3, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Icon text settings.
@@ -509,6 +513,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.indicatorText = indicatorTextEntry.get_text()
             self.indicatorTextSeparator = indicatorTextSeparatorEntry.get_text()
             self.initialiseBackgroundScripts()
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
 

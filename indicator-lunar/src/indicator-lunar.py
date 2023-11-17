@@ -1568,6 +1568,10 @@ class IndicatorLunar( IndicatorBase ):
         longitude.set_text( str( self.longitude ) )
         elevation.set_text( str( self.elevation ) )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        box.set_margin_top( 30 ) # Put some distance from the prior section.
+        grid.attach( box, 0, 4, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "Location" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -1677,6 +1681,7 @@ class IndicatorLunar( IndicatorBase ):
             self.longitude = float( longitudeValue )
             self.elevation = float( elevationValue )
 
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
             break
 
         return responseType

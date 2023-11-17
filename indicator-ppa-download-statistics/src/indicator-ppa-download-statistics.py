@@ -657,6 +657,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         lowBandwidthCheckbutton.set_margin_top( 10 )
         grid.attach( lowBandwidthCheckbutton, 0, 5, 1, 1 )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 6, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -695,6 +698,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     filterStore[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split() )
                 treeiter = filterStore.iter_next( treeiter )
 
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
         return responseType
 
 

@@ -363,6 +363,9 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickShowLastFortune.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         grid.attach( radioMiddleMouseClickShowLastFortune, 0, 6, 1, 1 )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 7, 1, 1 )
+
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.vbox.pack_start( notebook, True, True, 0 )
@@ -393,6 +396,8 @@ class IndicatorFortune( IndicatorBase ):
                     self.fortunes.append( [ store[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ], False ] )
 
                 treeiter = store.iter_next( treeiter )
+
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
 
