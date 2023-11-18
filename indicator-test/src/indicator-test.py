@@ -42,6 +42,10 @@
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
 #    https://snapcraft.io/about
 #    https://flathub.org/home
+# What about SourceForge?  Still uses SVN which is a good thing.
+# Are the download stats available through an API?
+# If so, add/amend the PPA Download Statistic indicator.
+# https://sourceforge.net/p/forge/documentation/Download%20Stats%20API/
 
 
 #TODO Current thinking/plan for creating snaps et al...
@@ -188,6 +192,10 @@
 #   https://pypi.org/project/poetry2setup/
 
 
+#TODO Debian install from PPA
+#   https://unix.stackexchange.com/questions/248367/how-to-install-ppas-from-launchpad-on-non-ubuntu-distros-like-debian
+
+
 #TODO 
 # Look at sound-switcher which does several interesting things...
 #    https://yktoo.com/en/software/sound-switcher-indicator/#installation
@@ -284,6 +292,25 @@
 #
 # Can Python script in /usr/share/indicator-lunar refer to a Python library in a venv?
 # Need the full path to the venv?
+
+
+#TODO What about support for other Linux distributions?  Do I build an equivalent .deb for these?
+#   https://en.wikipedia.org/wiki/Arch_Linux
+#
+#   https://en.wikipedia.org/wiki/Fedora_Linux
+#   https://opensource.com/article/18/9/how-build-rpm-packages
+#   https://www.howtoforge.com/tutorial/how-to-convert-packages-between-deb-and-rpm/
+#   https://developers.redhat.com/blog/2019/03/18/rpm-packaging-guide-creating-rpm#creating_the_rpm_package_for_vitetris
+#   https://www.reddit.com/r/Fedora/comments/trwdok/new_to_fedora_how_to_show_app_indicator_icons_on/
+#   https://www.reddit.com/r/Fedora/comments/ucbunn/no_application_icons_displayed_in_the_tray/
+#   https://www.reddit.com/r/Fedora/comments/z0wz53/libayatanaappindicator3dev_package_on_fedora/
+#   https://packages.fedoraproject.org/pkgs/gnome-shell-extension-appindicator/gnome-shell-extension-appindicator/
+#   https://unix.stackexchange.com/questions/6766/is-there-is-a-ppa-service-equivalent-in-the-fedora-world
+#   https://forums.fedoraforum.org/showthread.php?330198-To-PPA-or-not-to-PPA
+#
+#   https://en.wikipedia.org/wiki/Gentoo_Linux
+#
+#   https://en.wikipedia.org/wiki/Slackware
 
 
 INDICATOR_NAME = "indicator-test"
