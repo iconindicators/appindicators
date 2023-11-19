@@ -93,6 +93,28 @@ class IndicatorFortune( IndicatorBase ):
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
 
+#TODO Testing to get metadata from whl which will have to be deployed in same directory as Python source.
+# Maybe ask on StackOverflow if that's the best place...
+# and what if the whl just contains the metadata...no actual stuff? 
+#
+# https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+# https://docs.python.org/3/library/importlib.metadata.html
+# https://stackoverflow.com/questions/75776672/can-pip-be-used-with-a-custom-metapath-finder
+# https://stackoverflow.com/questions/69336071/figuring-the-required-python-modules-and-their-versions-of-a-python-process
+# https://stackoverflow.com/questions/71835165/bug-in-python-metadata-py
+        from importlib import metadata
+        from pathlib import Path
+        print( Path().cwd())
+        # dists = metadata.distributions(path=[ '/home/bernard/Programming/Indicators/indicator-fortune/dist/indicator_fortune-1.0.41-py3-none-any.whl'] )
+        dists = metadata.distributions(path=[ 'indicator_fortune-1.0.41-py3-none-any.whl'] )
+        for d in dists:
+            print('Found package', d.metadata['Name'], '==', d.metadata['Version'])
+
+        import sys
+        if True: sys.exit( 1 )
+
+
+
     def __removeOldHistoryFileVersion36( self ):
         self.removeFileFromCache( "fortune-history" )
 
