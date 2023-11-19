@@ -20,6 +20,19 @@
 
 
 #TODO If/when astroskyfield.py is included in the release,
+# need to update the pyproject.toml to include the planets.bsp and stars.dat
+# See
+#   https://github.com/pypa/sampleproject/blob/main/pyproject.toml
+#
+#   # This is configuration specific to the `setuptools` build backend.
+#   # If you are using a different build backend, you will need to change this.
+#   [tool.setuptools]
+#   # If there are data files included in your packages that need to be
+#   # installed, specify them here.
+#   package-data = {"sample" = ["*.dat"]}
+
+
+#TODO If/when astroskyfield.py is included in the release,
 # the debBuild.py script must ensure planets.bsp and stars.dat included.
 # Maybe use a MANIFEST.in and list these two files there?
 # Regardless the build must fail if the bsp/dat are not present.
