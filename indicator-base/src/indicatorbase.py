@@ -72,9 +72,11 @@ except ValueError:
 from abc import ABC
 from bisect import bisect_right
 from gi.repository import GLib, Gtk, Notify
+from importlib import metadata
+from pathlib import Path
 from urllib.request import urlopen
 
-import datetime, gzip, json, logging.handlers, os, pickle, shutil, subprocess
+import datetime, email.policy, gzip, json, logging.handlers, os, pickle, shutil, subprocess, sys
 
 
 class IndicatorBase( ABC ):
@@ -98,6 +100,7 @@ class IndicatorBase( ABC ):
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
 
+#TODO Eventually want to try and use the themes from iconthemes.py
 #TODO Seems some of these could be wrong...compare against originals...
 #...and also against the buildDebian.py script.
 # Is it possible to download the icon themes on their own rather than run up each VM/OS?
@@ -134,9 +137,8 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
 
-#TODO Can/should the indicatorName, version, copyrightStartYear, copyrightName, website come from pyproject.toml?
-# The Comments need to be translated so I guess they have to be in .py somewhere.
-# What about artwork/creditz?  Can they be put into the pyproject.toml?
+#TODO Could use this to get indicator name before being passed in from the relevant indicator.
+#     indicatorName = Path( __file__ ).name,  #TODO Could also get from metadata as per the version.
     def __init__( self,
                   indicatorName,
                   version,
@@ -147,15 +149,33 @@ class IndicatorBase( ABC ):
                   debug = False ):
 
         self.indicatorName = indicatorName
-        self.version = version
+
+        wheelMetadata, errorMessage = self._getMetadataFromWheel()
+        if wheelMetadata is None:
+            self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
+            sys.exit()
+
+        self.version = wheelMetadata.metadata[ "Version" ]
+
         self.copyrightStartYear = copyrightStartYear
         self.comments = comments
 
-        self.copyrightName = "Bernard Giannetti"
-        self.website = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
-        self.authors = [ self.copyrightName + " " + self.website ]
-        self.artwork = artwork if artwork else self.authors
+        # https://stackoverflow.com/a/75803208/2156453
+        emailMessageObject = email.message_from_string(
+            f'To: { wheelMetadata.metadata[ "Author-email" ] }',
+            policy = email.policy.default, )
 
+        self.copyrightNames = [ ]
+        for address in emailMessageObject[ "to" ].addresses:
+            self.copyrightNames.append( address.display_name )
+
+        self.website = wheelMetadata.metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
+
+        self.authors = [ ]
+        for author in self.copyrightNames:
+            self.authors.append( author + " " + self.website )
+
+        self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
         self.debug = debug
 
@@ -188,6 +208,46 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
+
+
+    def _getMetadataFromWheel( self ):
+        firstMetadata = None
+        errorMessage = None
+
+        firstWheel = next( Path( "." ).glob( "*.whl" ), None )
+        if firstWheel is None:
+            errorMessage = _( "TODO Tell user was expecting to find a wheel in directory of indicator!" )
+
+        else:
+            firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
+            if firstMetadata is None:
+                errorMessage = _( "TODO Tell user was expecting to find metadata in wheel in directory of indicator!" )
+
+        return firstMetadata, errorMessage
+
+
+#TODO Remove
+    def _getMetadataFromWheelOLD( self ):
+        from importlib import metadata
+        from pathlib import Path
+        print('--------')
+
+        firstPythonFile = next( Path( "." ).glob( "*.py" ), None )
+        print( firstPythonFile )
+        print('--------')
+
+        firstWheelFile = next( Path( "." ).glob( "*.whl" ), None )
+        if firstWheelFile is None:
+            message = "bad"
+            IndicatorBase.showMessageStatic( message, Gtk.MessageType.ERROR, self.indicatorName )
+
+            self.showMessage( None, "message", Gtk.MessageType.ERROR, self.indicatorName )
+            
+            import sys
+            sys.exit()
+
+        wheelMetadata = ( next( metadata.distributions( path = [ firstWheelFile ] ) ) )
+        return wheelMetadata
 
 
     def main( self ):
@@ -279,7 +339,7 @@ class IndicatorBase( ABC ):
         copyrightText = \
             "Copyright \xa9 " + \
             self.copyrightStartYear + '-' + str( datetime.datetime.now().year ) + " " + \
-            self.copyrightName
+            ' '.join( self.copyrightNames )
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -1187,14 +1247,6 @@ class IndicatorBase( ABC ):
             result = None
 
         return result
-
-
-#TODO Testing to see if I can call a function that is "static" (not requiring the class to be instantiated)
-# for an indicator to get its name/version/etc from it pyproject/toml.
-# The desciption in the debian/control is differnet to the comments passed in when init() the indicator...
-# Maybe can also get the copyright start year from the README.md?
-    def test():
-        print( "test")
 
 
 # Log file handler which truncates the file when the file size limit is reached.
