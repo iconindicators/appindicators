@@ -100,7 +100,6 @@ class IndicatorBase( ABC ):
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
 
-#TODO Eventually want to try and use the themes from iconthemes.py
 #TODO Seems some of these could be wrong...compare against originals...
 #...and also against the buildDebian.py script.
 # Is it possible to download the icon themes on their own rather than run up each VM/OS?
