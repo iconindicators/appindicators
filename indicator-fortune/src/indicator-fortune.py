@@ -19,32 +19,6 @@
 # Application indicator which displays fortunes.
 
 
-#TODO Testing if I can maybe use this as a way to call
-# a function(s) in IndicatorBase that pulls out the version, indicator name, etc, etc
-# from the pyproject.toml
-print( "hee")
-from indicatorbase import IndicatorBase
-IndicatorBase.test()
-# But now I'm not sure about this...
-# The indicators will be installed to /usr/share/ using DEB package manager...
-# ...not using PIP.
-# That means the version in pyproject.toml will not be accessible from
-#   metadata.version( __package__ )
-# so unless the pyproject.toml is included in the release (perhaps it should for completeness)
-# then should I get the version from the toml just by parsing?
-# Same for description...but then how to translate?
-# The description for the indicator is different to the one line description in the debian/control.
-# Perhaps the description in the debian/control should come from the pyproject.toml rather than the control.cfg?
-# Can we have our own tags in the pyproject.toml?  If so, ditch the control.cfg.
-# According to 
-#   https://stackoverflow.com/questions/76924873/can-i-add-custom-data-to-a-pyproject-toml-file
-# no custom tags (at least for me as I'm not installing on PyPI).
-#
-# Investigate about having dynamic/runtime values for
-#    version/description/name
-# as that may be an option for using pyproject.toml as the single source.
-
-
 INDICATOR_NAME = "indicator-fortune"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -85,7 +59,7 @@ class IndicatorFortune( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.41",
+            version = "x.y.z",  #TODO Eventually will be dropped.
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
@@ -93,28 +67,7 @@ class IndicatorFortune( IndicatorBase ):
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
 
 
-#TODO Testing to get metadata from whl which will have to be deployed in same directory as Python source.
-# Maybe ask on StackOverflow if that's the best place...
-# and what if the whl just contains the metadata...no actual stuff? 
-#
-# https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
-# https://docs.python.org/3/library/importlib.metadata.html
-# https://stackoverflow.com/questions/75776672/can-pip-be-used-with-a-custom-metapath-finder
-# https://stackoverflow.com/questions/69336071/figuring-the-required-python-modules-and-their-versions-of-a-python-process
-# https://stackoverflow.com/questions/71835165/bug-in-python-metadata-py
-        from importlib import metadata
-        from pathlib import Path
-        print( Path().cwd())
-        # dists = metadata.distributions(path=[ '/home/bernard/Programming/Indicators/indicator-fortune/dist/indicator_fortune-1.0.41-py3-none-any.whl'] )
-        dists = metadata.distributions(path=[ 'indicator_fortune-1.0.41-py3-none-any.whl'] )
-        for d in dists:
-            print('Found package', d.metadata['Name'], '==', d.metadata['Version'])
-
-        import sys
-        if True: sys.exit( 1 )
-
-
-
+#TODO Consider dropping this.
     def __removeOldHistoryFileVersion36( self ):
         self.removeFileFromCache( "fortune-history" )
 
