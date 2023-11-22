@@ -48,37 +48,6 @@
 # https://sourceforge.net/p/forge/documentation/Download%20Stats%20API/
 
 
-#TODO Current thinking/plan for creating snaps et al...
-#
-# Ideally, want a well-behaved/formed Python project from the outset using pyproject.toml
-# and from that all other builds (DEB source for LaunchPad, snap, et al) come from that.
-#
-# Each indicator comprises pure Python and so on the face of it,
-# should be candidates for installation via PyPI.
-# However, given the additional files requiring installation such as icons, .desktop, et al 
-# which MUST go into the file system, it seems that a .deb is the only option.
-# I have seen discussion of this situation on StackOverflow et al...an OS package is best. 
-#
-# So, convert all indicators to use a pyproject.toml, 
-# despite not being used to create the .deb file.
-#
-# The theory/hope is that when creating a snap/rpm/flatpak/appimage
-# the pyproject.toml will make life easier,
-# although I suspect for each snap/rpm/flatpak/appimage I will likely
-# need a script to prepare the files/layout before calling the specific
-# tool to build (as I do in my new buildDebian.py which ultimately calls debuild.
-
-
-#TODO The only outstanding issue for moving to pyproject.toml
-# is obtaining the version/name/author/description.
-# For a Pip installed package, those tags are accessible at run time.
-# The idea is to have the version et al in one place and that is pyproject.toml.
-#
-# If the packages are now .deb file, the pyproject.toml is not available.
-# So what to do...include the pyproject.toml in the installation directory
-# and in say indicatorbase.py parse the file at run time?
-
-
 #TODO Single version number location
 #   https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
 #   https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
@@ -90,16 +59,6 @@
 #   https://stackoverflow.com/questions/73580708/how-to-share-code-between-python-internals-projects
 #   https://stackoverflow.com/questions/48954870/how-to-share-code-between-python-projects
 #   https://discuss.python.org/t/multiple-related-programs-one-pyproject-toml-or-multiple-projects/17427/2
-
-
-#TODO Need a LICENSE.TXT or md or similar
-# See pyproject.toml and what are the options.
-# Is the license the same as the debian/copyright file?
-# If so, need to mofidy the buildDebian.py
-# use a common license file at the top of the project.  
-#   https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/#license-txt
-# Is the debian/copyright the same as the LICENSE.md referred to in a pyproject.toml?
-# If so, use the LICENSE.md (just the one at the top level) and buildDebian.md can use/copy that to debian/.
 
 
 #TODO Packaging
@@ -326,6 +285,9 @@
 #TODO Need to figure out for indicator-lunar how to install pyephem et al 
 # via the preinst/postinst scripts working given how `pip` has changed things.
 # If I cannot, need to add something about how to install and remove on the main README.md
+
+
+#TODO Need to go through each pyproject.toml and update name/description/version/classifiers.
 
 
 INDICATOR_NAME = "indicator-test"
