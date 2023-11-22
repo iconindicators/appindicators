@@ -298,6 +298,11 @@
 #   https://en.wikipedia.org/wiki/Arch_Linux
 #
 #   https://en.wikipedia.org/wiki/Fedora_Linux
+#   https://rpm-guide.readthedocs.io/en/latest/index.html
+#   https://discuss.python.org/t/tool-to-build-a-rpm-package-backed-by-pep-517/4020/14
+#   https://stackoverflow.com/questions/42286786/how-to-create-a-rpm-for-python-application
+#   https://rpm.org/documentation.html
+#   https://refspecs.linuxbase.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html
 #   https://opensource.com/article/18/9/how-build-rpm-packages
 #   https://www.howtoforge.com/tutorial/how-to-convert-packages-between-deb-and-rpm/
 #   https://developers.redhat.com/blog/2019/03/18/rpm-packaging-guide-creating-rpm#creating_the_rpm_package_for_vitetris
@@ -311,6 +316,11 @@
 #   https://en.wikipedia.org/wiki/Gentoo_Linux
 #
 #   https://en.wikipedia.org/wiki/Slackware
+
+
+#TODO Need to figure out for indicator-lunar how to install pyephem et al 
+# via the preinst/postinst scripts working given how `pip` has changed things.
+# If I cannot, need to add something about how to install and remove on the main README.md
 
 
 INDICATOR_NAME = "indicator-test"

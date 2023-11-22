@@ -1968,18 +1968,21 @@ class IndicatorLunar( IndicatorBase ):
         return theCity
 
 
+#TODO Consider dropping this.
     def __useNewCityNameConfigVersion93( self, config ):
         if self.city is None:
             self.city = config.get( "city" )
             self.requestSaveConfig( delay = 5 )
 
 
+#TODO Consider dropping this.
     def __dropPlutoVersion93( self ):
         if "PLUTO" in self.planets:
             self.planets.remove( "PLUTO" )
             self.requestSaveConfig( delay = 5 )
 
 
+#TODO Consider dropping this.
     def __dropOldStarsVersion96( self ):
         stars = [ ]
         for star in self.stars:
