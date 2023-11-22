@@ -298,6 +298,11 @@
 #   https://en.wikipedia.org/wiki/Arch_Linux
 #
 #   https://en.wikipedia.org/wiki/Fedora_Linux
+#   https://stackoverflow.com/questions/59248180/how-to-install-rpmdev-tools-on-ubuntu
+#   https://superuser.com/questions/615023/how-to-build-rpm-package-correctly
+#   https://stackoverflow.com/questions/29038961/how-can-i-build-an-rpm-package-in-a-debian-based-system
+#   https://rpm-packaging-guide.github.io/#packaging-software
+#   https://blog.jwf.io/2017/11/first-rpm-package-fedora/
 #   https://rpm-guide.readthedocs.io/en/latest/index.html
 #   https://discuss.python.org/t/tool-to-build-a-rpm-package-backed-by-pep-517/4020/14
 #   https://stackoverflow.com/questions/42286786/how-to-create-a-rpm-for-python-application
