@@ -16,8 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays lunar, solar, planetary, minor planet,
-# comet, star and satellite information.
+# Application indicator for the home astronomer.
 
 
 #TODO The comet data from COBS does not contain updated absolute magnitude data.
@@ -221,7 +220,7 @@ class IndicatorLunar( IndicatorBase ):
         self.satelliteGeneralPerturbationData = { } # Key: satellite number; Value: GP object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-        self.lastFullMoonNotfication = datetime.datetime.utcnow() - datetime.timedelta( hours = 1 )
+        self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
 
         self.__removeCacheFilesVersion93()
         self.__removeCacheFilesVersion94()
@@ -276,7 +275,7 @@ class IndicatorLunar( IndicatorBase ):
         self.downloadCountMinorPlanet = 0
         self.downloadCountSatellite = 0
 
-        utcNow = datetime.datetime.utcnow()
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         self.nextDownloadTimeApparentMagnitude = utcNow
         self.nextDownloadTimeComet = utcNow
         self.nextDownloadTimeMinorPlanet = utcNow
@@ -284,7 +283,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def update( self, menu ):
-        utcNow = datetime.datetime.utcnow()
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
 
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -500,7 +499,7 @@ class IndicatorLunar( IndicatorBase ):
                    dataName == IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER:
                     dateTimes.append( self.data[ key ] )
 
-        utcNow = datetime.datetime.utcnow()
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
@@ -542,7 +541,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def notificationFullMoon( self ):
-        utcNow = datetime.datetime.utcnow()
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
         illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         phase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
@@ -571,7 +570,7 @@ class IndicatorLunar( IndicatorBase ):
         INDEX_RISE_TIME = 1
         satelliteCurrentNotifications = [ ]
 
-        utcNow = datetime.datetime.utcnow()
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if ( key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
@@ -1929,9 +1928,9 @@ class IndicatorLunar( IndicatorBase ):
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER_TRANSLATION, "25544" ). \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION, "1998-067A" ). \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
-                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( datetime.datetime.utcnow(), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
+                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION, self.toLocalDateTimeString( datetime.datetime.now( datetime.timezone.utc ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) ). \
                     replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION, "321°" ). \
-                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( datetime.datetime.utcnow() + datetime.timedelta( minutes = 10 ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
+                    replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION, self.toLocalDateTimeString( datetime.datetime.now( datetime.timezone.utc ) + datetime.timedelta( minutes = 10 ), IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
             summary = replaceTags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
             message = replaceTags( message )

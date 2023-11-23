@@ -22,7 +22,7 @@ import datetime, stardate
 # Exercise the Stardate API.
 print( "Stardate API version: " + stardate.getVersion(), "\n" )
 
-utcNow = datetime.datetime.utcnow()
+utcNow = datetime.datetime.now( datetime.timezone.utc )
 print( "UTC now:", utcNow, "\n" )
 
 stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( utcNow )

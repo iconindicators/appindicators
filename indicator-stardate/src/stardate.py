@@ -70,11 +70,11 @@ import datetime, math
 # For example, an index of 3 (Gregorian date of 2283/10/5) corresponds to the rate of 0.5 stardate units per day.
 # The month is one-based (January = 1).
 __gregorianDates = [
-    datetime.datetime( 2162, 1, 4, ),
-    datetime.datetime( 2162, 1, 4 ),
-    datetime.datetime( 2270, 1, 26 ),
-    datetime.datetime( 2283, 10, 5 ),
-    datetime.datetime( 2323, 1, 1 ) ]
+    datetime.datetime( 2162, 1, 4, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
+    datetime.datetime( 2162, 1, 4, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
+    datetime.datetime( 2270, 1, 26, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
+    datetime.datetime( 2283, 10, 5, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
+    datetime.datetime( 2323, 1, 1, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ) ]
 
 
 # Rates (in stardate units per day) for each 'classic' stardate era.
@@ -274,7 +274,7 @@ def getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFra
     minutes = ( hours - int( hours ) ) * 60.0
     seconds = ( minutes - int( minutes ) ) * 60.0
 
-    gregorianDateTime = datetime.datetime( __gregorianDates[ index ].year, __gregorianDates[ index ].month, __gregorianDates[ index ].day )
+    gregorianDateTime = datetime.datetime( __gregorianDates[ index ].year, __gregorianDates[ index ].month, __gregorianDates[ index ].day, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) )
     gregorianDateTime += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )
     return gregorianDateTime
 

@@ -55,7 +55,7 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def update( self, menu ):
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now( datetime.timezone.utc )
         if self.showClassic:
             stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( now )
             numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, True )
@@ -81,7 +81,7 @@ class IndicatorStardate( IndicatorBase ):
         # cycle through the possible combinations of options for display in the stardate.
         # If showing a 'classic' stardate and padding is not required, ignore the padding option.
         if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( datetime.datetime.utcnow() )
+            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( datetime.datetime.now( datetime.timezone.utc ) )
             paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
             if paddingRequired:
                 if self.showIssue and self.padInteger:

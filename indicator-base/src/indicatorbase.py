@@ -272,7 +272,7 @@ class IndicatorBase( ABC ):
 
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-            self.nextUpdateTime = datetime.datetime.utcnow() + datetime.timedelta( seconds = nextUpdateInSeconds )
+            self.nextUpdateTime = datetime.datetime.now( datetime.timezone.utc ) + datetime.timedelta( seconds = nextUpdateInSeconds )
 
         else:
             self.nextUpdateTime = None
@@ -378,7 +378,7 @@ class IndicatorBase( ABC ):
             GLib.idle_add( self.__update )
 
         elif self.nextUpdateTime: # User cancelled and there is a next update time present...
-            secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.utcnow() ).total_seconds()
+            secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.now( datetime.timezone.utc ) ).total_seconds()
             if secondsToNextUpdate > 10: # Scheduled update is still in the future (10 seconds or more), so reschedule...
                 GLib.timeout_add_seconds( int( secondsToNextUpdate ), self.__update )
 
@@ -917,7 +917,7 @@ class IndicatorBase( ABC ):
     def getCacheFilenameWithTimestamp( self, basename, extension = EXTENSION_TEXT ):
         return self.__getCacheDirectory() + \
                basename + \
-               datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+               datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
                extension
 
 
@@ -972,7 +972,7 @@ class IndicatorBase( ABC ):
     # Any file extension is ignored in determining if the file should be deleted or not.
     def flushCache( self, basename, maximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
-        cacheMaximumAgeDateTime = datetime.datetime.utcnow() - datetime.timedelta( hours = maximumAgeInHours )
+        cacheMaximumAgeDateTime = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = maximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
                 dateTime = file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
@@ -1036,7 +1036,7 @@ class IndicatorBase( ABC ):
         cacheFile = \
             self.__getCacheDirectory() + \
             basename + \
-            datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
         try:
@@ -1130,7 +1130,7 @@ class IndicatorBase( ABC ):
         cacheFile = \
             self.__getCacheDirectory() + \
             basename + \
-            datetime.datetime.utcnow().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
         return self.__writeCacheText( text, cacheFile )
