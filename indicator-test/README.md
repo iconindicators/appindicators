@@ -1,1 +1,0 @@
-This indicator will never be released but in testing, still may need to create a .deb/.whl using buildDebian.py/buildWheel.py.  So don't need this file (as it will come from the top level) but keep a README.txt for information purposes only.
