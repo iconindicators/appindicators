@@ -140,7 +140,7 @@ class IndicatorBase( ABC ):
 
     def __init__( self,
                   indicatorName,
-                  version,
+                  version, #TODO Eventually will be dropped.
                   copyrightStartYear,
                   comments,
                   artwork = None,
