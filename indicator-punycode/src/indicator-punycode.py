@@ -16,8 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator to let a user select a domain name,
-# by text highlight or clipboard, then convert between Unicode and ASCII.
+# Application indicator which converts domain names between Unicode and ASCII.
 
 
 INDICATOR_NAME = "indicator-punycode"

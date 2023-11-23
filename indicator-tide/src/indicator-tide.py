@@ -17,7 +17,6 @@
 
 
 # Application indicator which displays tidal information.
-# The end user must write a Python3 script to obtain the tidal data.
 
 
 INDICATOR_NAME = "indicator-tide"

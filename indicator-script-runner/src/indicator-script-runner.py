@@ -16,8 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator to run a terminal command or script;
-# optionally display results in the icon label.
+# Application indicator to run a terminal command or script from an indicator.
 
 
 INDICATOR_NAME = "indicator-script-runner"
