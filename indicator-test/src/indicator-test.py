@@ -272,7 +272,8 @@
 # If I cannot, need to add something about how to install and remove on the main README.md
 
 
-#TODO Need to go through each pyproject.toml and update name/description/version/classifiers.
+#TODO For indicator-test, fix pyproject.toml and update name/description/version/classifiers.
+# Also I think it needs a control.cfg
 
 
 INDICATOR_NAME = "indicator-test"
