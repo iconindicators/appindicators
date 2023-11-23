@@ -52,6 +52,7 @@
 #   https://packaging.python.org/en/latest/guides/single-sourcing-package-version/
 #   https://stackoverflow.com/questions/72357031/set-version-of-module-from-a-file-when-configuring-setuptools-using-setup
 #   https://stackoverflow.com/questions/60430112/single-sourcing-package-version-for-setup-cfg-python-projects
+#   https://stackoverflow.com/questions/74608905/single-source-of-truth-for-python-project-version-in-presence-of-pyproject-toml
 
 
 #TODO Shared project layout
@@ -113,22 +114,6 @@
 # https://www.mattlayman.com/blog/2015/i18n/
 #
 # https://stackoverflow.com/questions/32609248/setuptools-adding-additional-files-outside-package
-
-
-#TODO
-# Should the src directory be replaced with src/indicator-test?
-# Hopefully will be okay as is...but maybe snap et al require it?
-
-
-#TODO Still need __init__.py given now using pyproject.toml AND will likely never be installing via Pip?
-# Based on this, yes:
-#    https://stackoverflow.com/a/48804718/2156453
-#
-# Also from distutils introduction link above:
-#
-#    package
-#        a module that contains other modules; typically contained in a directory in the filesystem
-#        and distinguished from other directories by the presence of a file __init__.py.
 
 
 #TODO AppImage

@@ -52,7 +52,7 @@
 # about adding in new version of Ubuntu.
 # Do this in a script (but where/how does the script run)?
 # Or just a note somewhere, maybe on the front page README.md?
-# Maybe Github or whereever I ultimatel host the source/project will have a note/reminder thingy.
+# Maybe Github or whereever I ultimately host the source/project will have a note/reminder thingy.
 
 
 import gi
@@ -99,26 +99,6 @@ class IndicatorBase( ABC ):
     __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
-
-#TODO Seems some of these could be wrong...compare against originals...
-#...and also against the buildDebian.py script.
-# Is it possible to download the icon themes on their own rather than run up each VM/OS?
-    __ICON_THEMES = {
-        "Adwaita"                   : "bebebe",
-        "Ambiant-MATE"              : "dfdbd2",
-        "breeze"                    : "232629",
-        "breeze-dark"               : "eff0f1",
-        "elementary-xfce-darker"    : "f3f3f3",
-        "Lubuntu"                   : "4c4c4c",
-        "Pocillo"                   : "ffffff",
-        "ubuntu-mono-dark"          : "dfdbd2",
-        "ubuntu-mono-light"         : "3c3c3c",
-        "Yaru"                      : "dbdbdb",
-        "Yaru-MATE-dark"            : "f9f9f9",
-        "Yaru-MATE-light"           : "808080",
-        "Yaru-unity-dark"           : "dfdbd2",
-        "Yaru-unity-light"          : "3c3c3c" }
-
     __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # Must ALWAYS be listed first so as to be the "default".
     __TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
@@ -131,13 +111,33 @@ class IndicatorBase( ABC ):
     EXTENSION_SVG = ".svg"
     EXTENSION_TEXT = ".txt"
 
+#TODO Need to check all of these values!
+# Is it possible to download the icon themes on their own rather than run up each VM/OS?
+# Also check the Adwaita icons on Debian 12...mine are darker than those for network/volume.
+    ICON_THEMES = {
+        "Adwaita"                   : "bebebe",
+        "Ambiant-MATE"              : "dfdbd2",
+        "breeze"                    : "232629",
+        "breeze-dark"               : "eff0f1",
+        "elementary-xfce-darker"    : "f3f3f3",
+        "ePapirus"                  : "ffffff",
+        "Lubuntu"                   : "4c4c4c",
+        "Papirus"                   : "dfdfdf",
+        "Papirus-Light"             : "444444",
+        "Pocillo"                   : "ffffff",
+        "ubuntu-mono-dark"          : "dfdbd2",
+        "ubuntu-mono-light"         : "3c3c3c",
+        "Yaru"                      : "dbdbdb",
+        "Yaru-MATE-dark"            : "f9f9f9",
+        "Yaru-MATE-light"           : "808080",
+        "Yaru-unity-dark"           : "dfdbd2",
+        "Yaru-unity-light"          : "3c3c3c" }
+
     INDENT_WIDGET_LEFT = 25
 
     URL_TIMEOUT_IN_SECONDS = 20
 
 
-#TODO Could use this to get indicator name before being passed in from the relevant indicator.
-#     indicatorName = Path( __file__ ).name,  #TODO Could also get from metadata as per the version.
     def __init__( self,
                   indicatorName,
                   version,
@@ -215,38 +215,14 @@ class IndicatorBase( ABC ):
 
         firstWheel = next( Path( "." ).glob( "*.whl" ), None )
         if firstWheel is None:
-            errorMessage = _( "TODO Tell user was expecting to find a wheel in directory of indicator!" )
+            errorMessage = _( "Expected to find a .whl in the same directory as the indicator, but none was found!" ) #TODO Translate
 
         else:
             firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
             if firstMetadata is None:
-                errorMessage = _( "TODO Tell user was expecting to find metadata in wheel in directory of indicator!" )
+                errorMessage = _( "No metadata was found in {0}" ).format( firstWheel )  #TODO Translate
 
         return firstMetadata, errorMessage
-
-
-#TODO Remove
-    def _getMetadataFromWheelOLD( self ):
-        from importlib import metadata
-        from pathlib import Path
-        print('--------')
-
-        firstPythonFile = next( Path( "." ).glob( "*.py" ), None )
-        print( firstPythonFile )
-        print('--------')
-
-        firstWheelFile = next( Path( "." ).glob( "*.whl" ), None )
-        if firstWheelFile is None:
-            message = "bad"
-            IndicatorBase.showMessageStatic( message, Gtk.MessageType.ERROR, self.indicatorName )
-
-            self.showMessage( None, "message", Gtk.MessageType.ERROR, self.indicatorName )
-            
-            import sys
-            sys.exit()
-
-        wheelMetadata = ( next( metadata.distributions( path = [ firstWheelFile ] ) ) )
-        return wheelMetadata
 
 
     def main( self ):
@@ -665,8 +641,8 @@ class IndicatorBase( ABC ):
     def getIconThemeColour( self, defaultColour ):
         iconThemeName = self.getIconThemeName()
         iconThemeColour = defaultColour
-        if iconThemeName in IndicatorBase.__ICON_THEMES:
-            iconThemeColour = IndicatorBase.__ICON_THEMES[ iconThemeName ]
+        if iconThemeName in IndicatorBase.ICON_THEMES:
+            iconThemeColour = IndicatorBase.ICON_THEMES[ iconThemeName ]
 
         return iconThemeColour
 
