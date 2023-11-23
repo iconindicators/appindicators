@@ -63,13 +63,7 @@ class IndicatorFortune( IndicatorBase ):
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
-        self.__removeOldHistoryFileVersion36() # History file had the ".txt" extension added in version 36 so remove old file.
         self.removeFileFromCache( IndicatorFortune.HISTORY_FILE )
-
-
-#TODO Consider dropping this.
-    def __removeOldHistoryFileVersion36( self ):
-        self.removeFileFromCache( "fortune-history" )
 
 
     def update( self, menu ):

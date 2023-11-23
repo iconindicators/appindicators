@@ -62,13 +62,6 @@ class IndicatorOnThisDay( IndicatorBase ):
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
-        self.__removeOldCalendarsFileVersion10() # Cached calendars file had ".txt" extension added in version 10, so remove old file.
-
-
-#TODO Consider dropping this.
-    def __removeOldCalendarsFileVersion10( self ):
-        self.removeFileFromCache( "calendars" )
-
 
     def update( self, menu ):
         events = self.getEvents()

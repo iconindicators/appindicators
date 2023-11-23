@@ -1967,35 +1967,8 @@ class IndicatorLunar( IndicatorBase ):
         return theCity
 
 
-#TODO Consider dropping this.
-    def __useNewCityNameConfigVersion93( self, config ):
-        if self.city is None:
-            self.city = config.get( "city" )
-            self.requestSaveConfig( delay = 5 )
-
-
-#TODO Consider dropping this.
-    def __dropPlutoVersion93( self ):
-        if "PLUTO" in self.planets:
-            self.planets.remove( "PLUTO" )
-            self.requestSaveConfig( delay = 5 )
-
-
-#TODO Consider dropping this.
-    def __dropOldStarsVersion96( self ):
-        stars = [ ]
-        for star in self.stars:
-            if star in IndicatorLunar.astroBackend.getStarNames():
-                stars.append( star )
-
-        if len( self.stars ) > len( stars ):
-            self.stars = stars
-            self.requestSaveConfig( delay = 5 )
-
-
     def loadConfig( self, config ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
-        self.__useNewCityNameConfigVersion93( config )
         if self.city is None:
             self.city = self.getDefaultCity()
             self.latitude, self.longitude, self.elevation = IndicatorLunar.astroBackend.getLatitudeLongitudeElevation( self.city )
@@ -2019,7 +1992,6 @@ class IndicatorLunar( IndicatorBase ):
         self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 3 ) # Although a value of 6 is visible with the naked eye, that gives too many minor planets initially.
 
         self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, IndicatorLunar.astroBackend.PLANETS )
-        self.__dropPlutoVersion93()
 
         self.satelliteLimitStart = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 ) # 4pm
         self.satelliteLimitEnd = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 22 ) # 10pm
@@ -2034,7 +2006,6 @@ class IndicatorLunar( IndicatorBase ):
         self.showWerewolfWarning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
 
         self.stars = config.get( IndicatorLunar.CONFIG_STARS, [ ] )
-        self.__dropOldStarsVersion96()
 
         self.werewolfWarningMessage = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE, IndicatorLunar.WEREWOLF_WARNING_MESSAGE_DEFAULT )
         self.werewolfWarningSummary = config.get( IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY, IndicatorLunar.WEREWOLF_WARNING_SUMMARY_DEFAULT )
