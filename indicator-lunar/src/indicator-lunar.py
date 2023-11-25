@@ -19,6 +19,11 @@
 # Application indicator for the home astronomer.
 
 
+#TODO Should really have a postrm!
+# Might be of help:
+#   https://unix.stackexchange.com/questions/357840/how-can-i-create-a-proper-debian-postinst-and-postrm-script
+
+
 #TODO The comet data from COBS does not contain updated absolute magnitude data.
 # Also, the data contains spurious data (easier to see in the MPC format).
 # Waiting on Jure @ COBS to resolve.
