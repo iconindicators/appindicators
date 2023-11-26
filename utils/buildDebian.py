@@ -21,12 +21,12 @@
 # Install the packages:
 #   sudo apt install build-essential devscripts dh-make dh-python gpg lintian rsync
 #
-# Import secret key into gpg.  In a terminal,
-# change to the directory containing the files
-#	'YouName.asc'   pubring.pkr   secring.skr
+# Import secret key into gpg.
+# In a terminal, change to the directory containing the files
+#   asciiArmouredSignature.asc   pubring.pkr   secring.skr
 #
 # and run
-#	gpg --import secring.skr
+#   gpg --import secring.skr
 #
 # References:
 # TODO Check all of these URLs...
