@@ -163,10 +163,6 @@
 # For autostart with a snap, see how this works...need to do something different?
 
 
-#TODO May be useful in indicatorbase for finding user dirs and similar in a os-independent manner:
-#   https://pypi.org/project/platformdirs/
-
-
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
 #
 #     error: externally-managed-environment
