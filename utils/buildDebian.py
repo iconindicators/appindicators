@@ -133,22 +133,19 @@ def _ensureVersionInChangelogMarkdownMatchesPyprojectToml( changelogMarkdown, ve
     return versionPyprojectToml == versionChangelogMarkdown
 
 
-#TODO This is not quite right...
-# FOr a given indicator there will be 
-#     a folder named indicator-fortune-1.0.42
-#     a file named indicator-fortune_1.0.42.orig.tar.gz
-# 
-# So need to delete both, for a given indicator
-# independent of version number
-# and in a loop as there might be multiple. 
-def _createReleaseDirectoryForIndicator( directory, indicatorName, version ):
-    directoryReleaseIndicator = Path( directory + os.sep + indicatorName + '-' + version )
-    if Path( directoryReleaseIndicator ).is_dir():
-        shutil.rmtree( directoryReleaseIndicator )
+def _createReleaseDirectoryForIndicator( directoryReleaseDebian, indicatorName, version ):
+    for item in Path( directoryReleaseDebian ).glob( "*" ):
+        if indicatorName in item.name:
+            if item.is_dir():
+                shutil.rmtree( str( item ) )
 
-    directoryReleaseIndicator.mkdir( parents = True )
+            else:
+                os.remove( str( item ) )
 
-    return str( directoryReleaseIndicator )
+    directoryReleaseDebianIndicator = Path( directoryReleaseDebian + os.sep + indicatorName + '-' + version )
+    directoryReleaseDebianIndicator.mkdir( parents = True )
+
+    return str( directoryReleaseDebianIndicator )
 
 
 def _chmodReadAndWriteForAll( file ):
