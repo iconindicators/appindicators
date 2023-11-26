@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Stardate Indicator
+Name[ru]=Индикатор звёздной даты
+Icon=indicator-stardate
+Exec=/usr/share/indicator-stardate/indicator-stardate.py
+Categories=Utility;Amusement;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=On This Day Indicator
+Name[ru]=Индикатор событий дня
+Icon=indicator-on-this-day
+Exec=/usr/share/indicator-on-this-day/indicator-on-this-day.py
+Categories=Utility;Amusement;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=PPA Download Statistics Indicator
+Name[cs]=PPA indikátor statisktik stahování
+Name[ru]=Индикатор статистики закачек из PPA
+Icon=indicator-ppa-download-statistics
+Exec=/usr/share/indicator-ppa-download-statistics/indicator-ppa-download-statistics.py
+Categories=Utility;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0
