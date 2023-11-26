@@ -17,21 +17,19 @@
 
 
 # Build a DEBIAN source package for one or more indicators.
-
-
-#TODO From original build-debian-common:
+#
 # Install the packages:
 #   sudo apt install build-essential devscripts dh-make dh-python gpg lintian rsync
 #
-# Import secret key into gpg.  In a terminal, change to the directory containing the files
-#
-#	'Bernard Giannetti.asc' pubring.pkr secring.skr
+# Import secret key into gpg.  In a terminal,
+# change to the directory containing the files
+#	'YouName.asc'   pubring.pkr   secring.skr
 #
 # and run
-#
 #	gpg --import secring.skr
 #
-# References for building a Debian package for PPA...
+# References:
+# TODO Check all of these URLs...
 #    http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
 #    http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
 #    http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
