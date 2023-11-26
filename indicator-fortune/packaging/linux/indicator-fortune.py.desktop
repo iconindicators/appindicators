@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Fortune Indicator
+Name[ru]=Индикатор изречений
+Icon=indicator-fortune
+Exec=/usr/share/indicator-fortune/indicator-fortune.py
+Categories=Utility;Amusement;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0
