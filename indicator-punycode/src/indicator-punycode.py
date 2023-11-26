@@ -23,16 +23,18 @@ INDICATOR_NAME = "indicator-punycode"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import encodings.idna
+
 import gi
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+import re
+
 from gi.repository import Gdk, GLib, Gtk, Notify
 from indicatorbase import IndicatorBase
-
-import encodings.idna, re
 
 
 class IndicatorPunycode( IndicatorBase ):
@@ -50,7 +52,6 @@ class IndicatorPunycode( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.15",
             copyrightStartYear = "2016",
             comments = _( "Convert domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )

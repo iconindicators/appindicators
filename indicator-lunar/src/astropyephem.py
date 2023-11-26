@@ -285,6 +285,16 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def __calculateEclipse( ephemNow, data, key, isSolar ):
+#TODO ephemNow.datetime() is NOT timezone aware.
+#Not sure if this is a problem as such here...
+# Do we pass back just a date/time string everywhere
+# (in planets, stars, satellites, etc, etc)
+# and then deal with the timezone after that...?
+#
+# In the satellite stuff, I need to get the satellite rise/set datetime
+# and compare against utcNowPlus5Minutes (which has a timezone
+# as it derives from the original utcNow which has a timezone).
+# So all datetime strings add to data MUST HAVE A TIMEZONE OF UTC!        
         if isSolar:
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( ephemNow.datetime() )
 

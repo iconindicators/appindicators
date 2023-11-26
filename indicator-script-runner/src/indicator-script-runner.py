@@ -23,16 +23,18 @@ INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import concurrent.futures, copy, datetime
+
 import gi
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
+
+import math
 
 from gi.repository import GLib, Gtk, Notify, Pango
 from indicatorbase import IndicatorBase
 from script import Background, NonBackground
 from threading import Thread
-
-import concurrent.futures, copy, datetime, math
 
 
 class IndicatorScriptRunner( IndicatorBase ):
@@ -84,13 +86,12 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.24",
             copyrightStartYear = "2016",
             comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
 
 
     def update( self, menu ):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now( datetime.timezone.utc )  #TODO Is this correct to have UTC?
         self.updateMenu( menu )
         self.updateBackgroundScripts( now )
         self.setLabel( self.processTags() )
@@ -1106,7 +1107,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def initialiseBackgroundScripts( self ):
         self.backgroundScriptResults = { }
         self.backgroundScriptNextUpdateTime = { }
-        now = datetime.datetime.now()
+        now = datetime.datetime.now( datetime.timezone.utc )  #TODO Is this correct to have UTC?
         for script in self.scripts:
             if type( script ) is Background:
                 self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ] = None

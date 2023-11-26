@@ -23,14 +23,16 @@ INDICATOR_NAME = "indicator-stardate"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import datetime
+
 import gi
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 
+import stardate
+
 from gi.repository import GLib, Gtk
 from indicatorbase import IndicatorBase
-
-import datetime, stardate
 
 
 class IndicatorStardate( IndicatorBase ):
@@ -43,7 +45,6 @@ class IndicatorStardate( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.44",
             copyrightStartYear = "2012",
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [ 
@@ -81,7 +82,9 @@ class IndicatorStardate( IndicatorBase ):
         # cycle through the possible combinations of options for display in the stardate.
         # If showing a 'classic' stardate and padding is not required, ignore the padding option.
         if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( datetime.datetime.now( datetime.timezone.utc ) )
+            stardateIssue, stardateInteger, stardateFraction = \
+                stardate.getStardateClassic( datetime.datetime.now( datetime.timezone.utc ) )
+
             paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
             if paddingRequired:
                 if self.showIssue and self.padInteger:

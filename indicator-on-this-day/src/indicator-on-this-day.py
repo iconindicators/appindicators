@@ -23,17 +23,19 @@ INDICATOR_NAME = "indicator-on-this-day"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import fnmatch
+
 import gi
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+import os, webbrowser
+
 from event import Event
 from datetime import date, datetime, timedelta
 from gi.repository import Gdk, Gtk, Notify
 from indicatorbase import IndicatorBase
-
-import fnmatch, os, webbrowser
 
 
 class IndicatorOnThisDay( IndicatorBase ):
@@ -58,7 +60,6 @@ class IndicatorOnThisDay( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.16",
             copyrightStartYear = "2017",
             comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
@@ -68,12 +69,13 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.buildMenu( menu, events )
 
         # Set next update just after midnight.
-        now = datetime.now()
+        now = datetime.now()  #TODO Needs to be local timezone?
         justAfterMidnight = ( now + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
         fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
         self.requestUpdate( delay = fiveSecondsAfterMidnight )
 
         if self.notify:
+                    #TODO Should .today() be in local timezone?
             today = datetime.today().strftime( '%b %d' ) # It is assumed/hoped the dates in the calendar result are always short date format irrespective of locale.
             for event in events:
                 if today == event.getDate():

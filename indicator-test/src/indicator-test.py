@@ -121,6 +121,8 @@
 
 
 #TODO Flathub
+# https://flatpak.org/setup/Ubuntu
+# https://docs.flatpak.org/en/latest/first-build.html
 # https://github.com/PlaintextGroup/oss-virtual-incubator/blob/main/proposals/flathub-linux-app-store.md
 
 
@@ -226,7 +228,6 @@
 #
 # If the postinst does work, likely need a postrm to clean up the pip installation.
 #
-#
 # Maybe go with a modified postinst (and a new postrm) but ALSO have a runtime check
 # to ensure ephem et al are installed and if not, point user to a readme on how to install
 # (but at this stage if ephem is not present, the installation should be assumed to be broken).
@@ -272,31 +273,22 @@
 # If I cannot, need to add something about how to install and remove on the main README.md
 
 
-#TODO For indicator-test, fix pyproject.toml and update name/description/version/classifiers.
-# Also I think it needs a control.cfg
-
-
 INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
 
-from indicatorbase import IndicatorBase  #TODO MOved to up top...is this safe?  
-# What about _() already in indicatorbase.py... 
-# ...they will miss out on being pulled in from po/mo.
-# If the indicator name can be obtained from say the new pyproject.toml
-# (by parsing directly and not via Pip as that is now impossible due to a deb install)
-# then in indicatorbase.py we can get the indicator name and initialise gettext et al.
+import datetime
 
+import gi
+gi.require_version( "Gtk", "3.0" )
+gi.require_version( "Notify", "0.7" )
 
-# import gi #TODO Is this needed as it is in IndicatorBase?
-# gi.require_version( "Gtk", "3.0" ) #TODO Is this needed as it is in IndicatorBase?
-# gi.require_version( "Notify", "0.7" ) #TODO Is this needed as it is in IndicatorBase?
+import os, random
 
 from gi.repository import Gtk, Notify
+from indicatorbase import IndicatorBase  
 from pathlib import Path
 from threading import Thread
-
-import datetime, os, random
 
 
 class IndicatorTest( IndicatorBase ):
@@ -311,7 +303,6 @@ class IndicatorTest( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.6",
             copyrightStartYear = "2016",
             comments = _( "Test" ) )
 
@@ -490,7 +481,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __getCurrentTime( self ):
-        return datetime.datetime.now().strftime( "%H:%M:%S" )
+        return datetime.datetime.now( datetime.timezone.utc ).strftime( "%H:%M:%S" ) #TODO Have now added UTC so is this still okay?
 
 
     def __useIconDynamicallyCreated( self, phase ):

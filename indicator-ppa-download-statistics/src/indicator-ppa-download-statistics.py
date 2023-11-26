@@ -23,16 +23,18 @@ INDICATOR_NAME = "indicator-ppa-download-statistics"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import concurrent.futures
+
 import gi
 gi.require_version( "Gtk", "3.0" )
+
+import json, locale, tempfile, webbrowser
 
 from copy import deepcopy
 from gi.repository import Gtk
 from indicatorbase import IndicatorBase
 from ppa import Filters, PPA, PublishedBinary
 from urllib.request import urlopen
-
-import concurrent.futures, json, locale, tempfile, webbrowser
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
@@ -106,7 +108,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.80",
             copyrightStartYear = "2012",
             comments = _( "Display the total downloads of PPAs." ) )
 

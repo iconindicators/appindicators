@@ -23,16 +23,18 @@ INDICATOR_NAME = "indicator-virtual-box"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import datetime
+
 import gi
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+import os, time
+
 from gi.repository import Gdk, Gtk, Notify
 from indicatorbase import IndicatorBase
 from virtualmachine import Group, VirtualMachine
-
-import datetime, os, time
 
 
 class IndicatorVirtualBox( IndicatorBase ):
@@ -60,12 +62,11 @@ class IndicatorVirtualBox( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.74",
             copyrightStartYear = "2012",
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
         self.autoStartRequired = True
-        self.dateTimeOfLastNotification = datetime.datetime.now()
+        self.dateTimeOfLastNotification = datetime.datetime.now() #TODO Add UTC?     datetime.timezone.utc 
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
 
@@ -222,7 +223,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = delayInSeconds ) < datetime.datetime.now() ):
             Notify.Notification.new( summary, message, self.icon ).show()
             self.dateTimeOfLastNotification = datetime.datetime.now()
-
+#TODO Add UTC to both lines above?      datetime.timezone.utc 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         if self.isVBoxManageInstalled():

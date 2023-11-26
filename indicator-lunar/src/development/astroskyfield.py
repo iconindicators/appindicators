@@ -404,6 +404,7 @@ class AstroSkyfield( AstroBase ):
 
 
         if isSolar:
+#TODO Check why I'm putting in tzinfo = None...want UTC and timezone aware.
             dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime().replace( tzinfo = None ) )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
@@ -421,6 +422,7 @@ class AstroSkyfield( AstroBase ):
 # If feasible, add here and remove check in indicator front-end.
 # https://github.com/skyfielders/python-skyfield/discussions/801
             dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
+#TODO Check why I'm putting in tzinfo = None...want UTC and timezone aware.
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_datetime().replace( tzinfo = None )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = __getNativeEclipseType( events[ 0 ], True )
 

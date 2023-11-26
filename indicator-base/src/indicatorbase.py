@@ -19,33 +19,10 @@
 # Base class for application indicators.
 #
 # References:
-#     https://python-gtk-3-tutorial.readthedocs.org
-#     https://wiki.gnome.org/Projects/PyGObject/Threading
-#     https://wiki.ubuntu.com/NotifyOSD
-#     https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
-#
-# Not all functionality is available across all distributions/versions...
-#
-#    Kubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
-#    Kubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
-#
-#    Lubuntu 20.04 No label; tooltip is not dynamic; icon is not dynamic.
-#    Lubuntu 22.04 No label; tooltip is not dynamic; icon is not dynamic.
-#
-#    Ubuntu 20.04 ALL GOOD
-#    Ubuntu 22.04 ALL GOOD
-#
-#    Ubuntu Budgie 20.04 No mouse middle click.
-#    Ubuntu Budgie 22.04 ALL GOOD
-#
-#    Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
-#    Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.
-#
-#    Ubuntu Unity 20.04 ALL GOOD
-#    Ubuntu Unity 22.04 ALL GOOD
-#
-#    Xubuntu 20.04 No mouse wheel scroll; tooltip in lieu of label.
-#    Xubuntu 22.04 No mouse wheel scroll; tooltip in lieu of label.
+#   https://python-gtk-3-tutorial.readthedocs.org
+#   https://wiki.gnome.org/Projects/PyGObject/Threading
+#   https://wiki.ubuntu.com/NotifyOSD
+#   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
 #TODO For PPA Indicator, need some way to be reminded every 6 months
@@ -55,11 +32,23 @@
 # Maybe Github or whereever I ultimately host the source/project will have a note/reminder thingy.
 
 
-import gi
+#TODO Maybe look at each indiator's imports
+# and if any have date, time or datetime
+# check to see how the date/time is used
+# and if timezone should be incorporated.
 
+
+import datetime, email.policy
+
+import gi
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
+
+import gzip, json, logging.handlers, os, pickle, shutil, subprocess, sys
+
+from abc import ABC
+from bisect import bisect_right
 
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
@@ -69,14 +58,10 @@ except ValueError:
     gi.require_version( "AppIndicator3", "0.1" )
     from gi.repository import AppIndicator3 as AppIndicator
 
-from abc import ABC
-from bisect import bisect_right
 from gi.repository import GLib, Gtk, Notify
 from importlib import metadata
 from pathlib import Path
 from urllib.request import urlopen
-
-import datetime, email.policy, gzip, json, logging.handlers, os, pickle, shutil, subprocess, sys
 
 
 class IndicatorBase( ABC ):
@@ -140,7 +125,6 @@ class IndicatorBase( ABC ):
 
     def __init__( self,
                   indicatorName,
-                  version, #TODO Eventually will be dropped.
                   copyrightStartYear,
                   comments,
                   artwork = None,
@@ -244,7 +228,7 @@ class IndicatorBase( ABC ):
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.debug:
-            nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
+            nextUpdateDateTime = datetime.datetime.now( datetime.timezone.utc ) + datetime.timedelta( seconds = nextUpdateInSeconds )    #TODO Is this correct to have UTC?
             label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] # Remove fractional seconds.
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
@@ -311,9 +295,10 @@ class IndicatorBase( ABC ):
         aboutDialog.set_authors( self.authors )
         aboutDialog.set_comments( self.comments )
 
+  #TODO Is this correct to have UTC?
         copyrightText = \
             "Copyright \xa9 " + \
-            self.copyrightStartYear + '-' + str( datetime.datetime.now().year ) + " " + \
+            self.copyrightStartYear + '-' + str( datetime.datetime.now( datetime.timezone.utc ).year ) + " " + \
             ' '.join( self.copyrightNames )
 
         aboutDialog.set_copyright( copyrightText )
@@ -725,7 +710,8 @@ class IndicatorBase( ABC ):
     # Lubuntu 20.04/22.04 ignores any change to the icon after initialisation.
     # If the icon is changed, the icon is replaced with a strange grey/white circle.
     #
-    # Ubuntu MATE 20.04 truncates the icon when changed, despite the icon being fine when clicked.
+    # Ubuntu MATE 20.04 truncates the icon when changed,
+    # despite the icon being fine when clicked.
     def isIconUpdateSupported( self ):
         iconUpdateSupported = True
         desktopEnvironment = self.getDesktopEnvironment()
@@ -749,7 +735,7 @@ class IndicatorBase( ABC ):
 
 
     # As a result of
-    #    https://github.com/lxqt/qterminal/issues/335
+    #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
     def isTerminalQTerminal( self ):
         terminalIsQTerminal = False
@@ -760,7 +746,8 @@ class IndicatorBase( ABC ):
         return terminalIsQTerminal
 
 
-    # Return the full path and name of the executable for the current terminal and the corresponding execution flag.
+    # Return the full path and name of the executable for the
+    # current terminal and the corresponding execution flag;
     # None otherwise.
     def getTerminalAndExecutionFlag( self ):
         terminal = None
@@ -898,7 +885,7 @@ class IndicatorBase( ABC ):
     #
     # basename: The text used to form the file name, typically the name of the calling application.
     #
-    # Returns the datetime of the newest file in the cache.  None if no file can be found.
+    # Returns the datetime of the newest file in the cache; None if no file can be found.
     def getCacheDateTime( self, basename ):
         expiry = None
         theFile = ""
@@ -908,7 +895,9 @@ class IndicatorBase( ABC ):
 
         if theFile: # A value of "" evaluates to False.
             dateTimeComponent = theFile[ len( basename ) : len( basename ) + 14 ]
-            expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
+            # expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
+#TODO Line above was not timezone aware.
+            expiry = datetime.datetime.strptime( dateTimeComponent + "+00:00", IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS + "%z" )
 
         return expiry
 
@@ -923,7 +912,7 @@ class IndicatorBase( ABC ):
 
     # Search through the cache for all files matching the basename.
     #
-    # Returns the newest filename matching the basename on success: None otherwise.
+    # Returns the newest filename matching the basename on success; None otherwise.
     def getCacheNewestFilename( self, basename ):
         cacheDirectory = self.__getCacheDirectory()
         cacheFile = ""
@@ -977,9 +966,13 @@ class IndicatorBase( ABC ):
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
                 dateTime = file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
-                    fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                    fileDateTime = datetime.datetime.strptime( dateTime + "+00:00", IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS + "%z" )
+#TODO ORIG                    # fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
                     if fileDateTime < cacheMaximumAgeDateTime:
                         os.remove( cacheDirectory + file )
+#TODO Got this when running indicator-lunar:
+#     if fileDateTime < cacheMaximumAgeDateTime:
+# TypeError: can't compare offset-naive and offset-aware datetimes
 
 
     # Read the most recent binary file from the cache.
@@ -1132,6 +1125,11 @@ class IndicatorBase( ABC ):
             basename + \
             datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
+#TODO Changing the reading/writing of the datetime here 
+# from local timezone to UTC, is the problematic
+# for existing cached data that is in local?
+# Should get flushed out within a few days?
+# Which indicator has the longest age for the cache?  
 
         return self.__writeCacheText( text, cacheFile )
 

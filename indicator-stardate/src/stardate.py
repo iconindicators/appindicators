@@ -166,7 +166,9 @@ def getStardate2009Revised( gregorianDateTime ):
         raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
 
     stardateInteger = gregorianDateTime.year
-    stardateFraction = ( datetime.date( gregorianDateTime.year, gregorianDateTime.month, gregorianDateTime.day ) - datetime.date( gregorianDateTime.year, 1, 1 ) ).days + 1
+    stardateFraction = \
+        ( datetime.date( gregorianDateTime.year, gregorianDateTime.month, gregorianDateTime.day ) - \
+          datetime.date( gregorianDateTime.year, 1, 1 ) ).days + 1
 
     return stardateInteger, stardateFraction
 
@@ -274,7 +276,13 @@ def getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFra
     minutes = ( hours - int( hours ) ) * 60.0
     seconds = ( minutes - int( minutes ) ) * 60.0
 
-    gregorianDateTime = datetime.datetime( __gregorianDates[ index ].year, __gregorianDates[ index ].month, __gregorianDates[ index ].day, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) )
+    gregorianDateTime = \
+        datetime.datetime( 
+            __gregorianDates[ index ].year, 
+            __gregorianDates[ index ].month, 
+            __gregorianDates[ index ].day, 
+            tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) )
+
     gregorianDateTime += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )
     return gregorianDateTime
 

@@ -65,18 +65,19 @@ INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import datetime, eclipse
+
 import gi
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+import locale, math, re, sys, webbrowser
 
 from dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
 from dataproviderorbitalelement import DataProviderOrbitalElement, OE
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
-
-import datetime, eclipse, locale, math, re, sys, webbrowser
 
 
 class IndicatorLunar( IndicatorBase ):
@@ -205,7 +206,6 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.100",
             copyrightStartYear = "2012",
             comments = _( "Displays lunar, solar, planetary, minor planet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )

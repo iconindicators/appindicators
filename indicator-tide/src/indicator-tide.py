@@ -23,15 +23,17 @@ INDICATOR_NAME = "indicator-tide"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import datetime
+
 import gi
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 
+import importlib.util, os, sys, webbrowser
+
 from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 from pathlib import Path
-
-import datetime, importlib.util, os, sys, webbrowser
 
 
 class IndicatorTide( IndicatorBase ):
@@ -45,7 +47,6 @@ class IndicatorTide( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "1.0.29",
             copyrightStartYear = "2015",
             comments = _( "Displays tidal information." ) )
 
@@ -95,7 +96,7 @@ class IndicatorTide( IndicatorBase ):
                 Notify.Notification.new( summary, message, self.icon ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
-        now = datetime.datetime.now()
+        now = datetime.datetime.now()#TODO Need to add UTC but is this correct?      datetime.timezone.utc 
         fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
         return ( fiveMinutesAfterMidnight - now ).total_seconds()
 

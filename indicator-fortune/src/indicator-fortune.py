@@ -23,6 +23,8 @@ INDICATOR_NAME = "indicator-fortune"
 import gettext
 gettext.install( INDICATOR_NAME )
 
+import codecs, os
+
 import gi
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
@@ -30,8 +32,6 @@ gi.require_version( "Notify", "0.7" )
 
 from gi.repository import Gdk, Gtk, Notify
 from indicatorbase import IndicatorBase
-
-import codecs, os
 
 
 class IndicatorFortune( IndicatorBase ):
@@ -49,7 +49,9 @@ class IndicatorFortune( IndicatorBase ):
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, the notification summary should be emitted as a warning (rather than a regular fortune).
+    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, 
+                                        # the notification summary should be emitted as a warning
+                                        # (rather than a regular fortune).
 
     # Data model columns used in the Preferences dialog.
     COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
@@ -59,7 +61,6 @@ class IndicatorFortune( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             indicatorName = INDICATOR_NAME,
-            version = "x.y.z",  #TODO Eventually will be dropped.
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
