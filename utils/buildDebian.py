@@ -29,30 +29,30 @@
 #   gpg --import secring.skr
 #
 # References:
-# TODO Check all of these URLs...
-#    http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
-#    http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
-#    http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
-#	 https://stackoverflow.com/questions/65117979/problems-using-debuild-to-upload-a-python-gtk-program-to-launchpad
-#	 https://askubuntu.com/questions/399552/how-to-create-a-deb-package-for-a-python3-script
-#    http://blog.garethj.com/2009/06/02/building-deb-packages-for-python-applications
-#    http://developer.ubuntu.com/packaging/html/debian-dir-overview.html
-#    http://help.launchpad.net/Packaging/PPA/Uploading
-#    http://help.ubuntu.com/community/PythonRecipes/DebianPackage
-#    http://savetheions.com/2010/01/20/packaging-python-applicationsmodules-for-debian
-#    http://shallowsky.com/blog/programming/packaging-launchpad-ppas.html
-#    http://ubuntulinuxtipstricks.blogspot.com.au/2010/08/is-packaging-new-software-hard.html
-#    http://wiki.debian.org/Python/Packaging
-#    http://wiki.ubuntu.com/MOTU/School/PackagingWithoutCompiling
-#    http://wiki.ubuntu.com/PackagingGuide/HandsOn
-#    http://wiki.ubuntu.com/PackagingGuide/Python
-#    http://www.debian.org/doc/manuals/maint-guide
-#    http://www.debian.org/doc/packaging-manuals/python-policy
-#    http://www.debian-administration.org/articles/336
-#    http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
-#    http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
-#    https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-#    https://developer.gnome.org/icon-theme-spec/
+#   http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
+#   https://fpm.readthedocs.io/
+#   http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
+#   http://askubuntu.com/questions/90764/how-do-i-create-a-deb-package-for-a-single-python-script
+#   https://stackoverflow.com/questions/65117979/problems-using-debuild-to-upload-a-python-gtk-program-to-launchpad
+#   https://askubuntu.com/questions/399552/how-to-create-a-deb-package-for-a-python3-script
+#   http://blog.garethj.com/2009/06/02/building-deb-packages-for-python-applications
+#   http://developer.ubuntu.com/packaging/html/debian-dir-overview.html
+#   http://help.launchpad.net/Packaging/PPA/Uploading
+#   http://help.ubuntu.com/community/PythonRecipes/DebianPackage
+#   http://savetheions.com/2010/01/20/packaging-python-applicationsmodules-for-debian
+#   http://shallowsky.com/blog/programming/packaging-launchpad-ppas.html
+#   http://ubuntulinuxtipstricks.blogspot.com.au/2010/08/is-packaging-new-software-hard.html
+#   http://wiki.debian.org/Python/Packaging
+#   http://wiki.ubuntu.com/MOTU/School/PackagingWithoutCompiling
+#   http://wiki.ubuntu.com/PackagingGuide/HandsOn
+#   http://wiki.ubuntu.com/PackagingGuide/Python
+#   http://www.debian.org/doc/manuals/maint-guide
+#   http://www.debian.org/doc/packaging-manuals/python-policy
+#   http://www.debian-administration.org/articles/336
+#   http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
+#   http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
+#   https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+#   https://developer.gnome.org/icon-theme-spec/
 #   https://askubuntu.com/questions/30145/ppa-packaging-having-versions-of-packages-for-multiple-distros
 
 
