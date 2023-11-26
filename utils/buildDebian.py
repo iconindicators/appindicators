@@ -19,7 +19,7 @@
 # Build a DEBIAN source package for one or more indicators.
 #
 # Install the packages:
-#   sudo apt install build-essential devscripts dh-make dh-python gpg lintian rsync
+#   sudo apt install build-essential devscripts dh-make dh-python gpg lintian
 #
 # Import secret key into gpg.
 # In a terminal, change to the directory containing the files
