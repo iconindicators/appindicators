@@ -6,4 +6,3 @@ Exec=/usr/share/indicator-test/indicator-test.py
 Categories=Utility;
 X-GNOME-Autostart-enabled=true
 X-GNOME-Autostart-Delay=0
-Name[en_AU]=indicator-test.py.desktop
