@@ -174,8 +174,8 @@ def __getEclipse( utcNow, eclipses, fieldYear, fieldMonth, fieldDay, fieldTimeUT
         day = fields[ fieldDay ]
         timeUTC = fields[ fieldTimeUTC ]
         deltaT = fields[ fieldDeltaT ]
-        dateString = year + ", " + __months[ month ] + ", " + day + ", " + timeUTC + "+00:00"
-        format = "%Y, %m, %d, %H:%M:%S%z"
+        dateString = year + ", " + __months[ month ] + ", " + day + ", " + timeUTC
+        format = "%Y, %m, %d, %H:%M:%S"
         dateTime = datetime.datetime.strptime( dateString, format ) - datetime.timedelta( seconds = int( deltaT ) ) # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
 
         if utcNow.timestamp() <= dateTime.timestamp():

@@ -863,13 +863,13 @@ class IndicatorBase( ABC ):
     # and if the timestamp is older than the current date/time
     # plus the maximum age, returns True, otherwise False.
     # If no file can be found, returns True.
-    def isCacheStale( self, utcNow, basename, maximumAgeInHours ):
+    def isCacheStale( self, utcNowWithoutTimezone, basename, maximumAgeInHours ):
         cacheDateTime = self.getCacheDateTime( basename )
         if cacheDateTime is None:
             stale = True
 
         else:
-            stale = ( cacheDateTime + datetime.timedelta( hours = maximumAgeInHours ) ) < utcNow
+            stale = ( cacheDateTime + datetime.timedelta( hours = maximumAgeInHours ) ) < utcNowWithoutTimezone
 
         return stale
 
