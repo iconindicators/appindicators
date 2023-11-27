@@ -96,9 +96,9 @@ class IndicatorTide( IndicatorBase ):
                 Notify.Notification.new( summary, message, self.icon ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
-        now = datetime.datetime.now()#TODO Need to add UTC but is this correct?      datetime.timezone.utc 
-        fiveMinutesAfterMidnight = ( now + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
-        return ( fiveMinutesAfterMidnight - now ).total_seconds()
+        today = datetime.datetime.today()
+        fiveMinutesAfterMidnight = ( today + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+        return ( fiveMinutesAfterMidnight - today ).total_seconds()
 
 
     def buildMenu( self, menu, tidalReadings ):
