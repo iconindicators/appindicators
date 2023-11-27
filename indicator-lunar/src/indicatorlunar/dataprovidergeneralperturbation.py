@@ -16,14 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory general perturbations for satellites.
-
-
-#TODO Not sure if these apply
-#	https://github.com/brandon-rhodes/python-sgp4/commit/19990f3f2a5af9d054a84797a8ede0892b487912
-#	https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
-# Might affect Skyfield rather than TLEs here.  
-# Need to see if there is a problem and if the commits above apply anywhere...
+# Download from URL, load from file and hold in memory,
+# general perturbations for satellites.
 
 
 from dataprovider import DataProvider
@@ -100,6 +94,18 @@ class GP( object ):
                 # (before the export to TLE); unfortunately, the catalog number is protected.
                 #
                 # Therefore, export to OMM, set the catalog number to '0' then export to TLE.
+#TODO Given the new writable field satnum_str in Satrec, the code below may be simplified.
+# Not sure what to exactly write to the satnum_str field;
+# currently setting a 0 to the NORAD_CAT_ID before converting to Satrec.
+# So first need an example of a satnum > 99999 (in length, not value).
+# Then set the satnum_str to the value from satelliteRecord.satnum
+# and see what happens in the omm.initialise (does the value actually get set?)
+# and after that, viewing the satettite info (name, number, rise, set, position)
+# is all correct.
+#   https://github.com/brandon-rhodes/python-sgp4/commit/19990f3f2a5af9d054a84797a8ede0892b487912
+#   https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
+# Need to check in PyEphem as it likely won't support a satnum > 99999.  
+# Need to check in Skyfield as it likely will support a satnum > 99999.
                 ommData = exporter.export_omm( self.satelliteRecord, self.getName() )
                 ommData[ "NORAD_CAT_ID" ] = str( 0 )
                 satelliteRecord = Satrec()
