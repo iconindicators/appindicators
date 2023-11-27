@@ -54,6 +54,7 @@
 #   https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
 #   https://developer.gnome.org/icon-theme-spec/
 #   https://askubuntu.com/questions/30145/ppa-packaging-having-versions-of-packages-for-multiple-distros
+#   https://askubuntu.com/questions/144122/when-should-mo-files-be-generated
 
 
 import sys
@@ -251,9 +252,6 @@ def _copyHicolorIconsCreateThemedIcons( directoryIndicator, directoryReleaseIndi
 
 
 def _copyPOCreateMO( directoryIndicator, directoryReleaseIndicator ):
-#TODO There is a TODO below in the create debianinstall...
-#...only want the .mo files.
-# What does/did build-debian.sh do?
     directoryReleaseIndicatorPO = Path( str( directoryReleaseIndicator ) + os.sep + "po" )
     directoryIndicatorPO = directoryIndicator + os.sep + "po"
 
@@ -376,7 +374,8 @@ def _createDebianInstall( directoryIndicator, directoryReleaseIndicator, directo
     #   all Python files in src
     #   each icon in each theme, to scalable/apps, apps/16, apps/22, apps/24 and apps/48
     #   each mo file
-    #   po files?
+
+    #TODO What about...
     #   readme?
     #   license?
     #   changelog?  Or is that already in the .orig.tar.gz and that is good enough?
@@ -409,7 +408,7 @@ def _createDebianInstall( directoryIndicator, directoryReleaseIndicator, directo
             f.write( base + '/apps/24\n' )
             f.write( base + '/apps/24\n' )
 
-        for moFile in sorted( list( Path( directoryReleaseIndicator + os.sep + "po" ).rglob( "*.mo" ) ) ):#TODO Only writing .mo and not po/pot...check TODO elsewhere above...maybe only copy .mo and not the others.
+        for moFile in sorted( list( Path( directoryReleaseIndicator + os.sep + "po" ).rglob( "*.mo" ) ) ):
             languageCode = moFile.parent.parts[ -1 ]
             f.write( "po/" + languageCode + '/' + moFile.name + " /usr/share/locale/" + languageCode + "/LC_MESSAGES" )
 
