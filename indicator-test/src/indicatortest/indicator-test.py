@@ -227,7 +227,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __getCurrentTime( self ):
-        return datetime.datetime.now( datetime.timezone.utc ).strftime( "%H:%M:%S" ) #TODO Have now added UTC so is this still okay?
+        return datetime.datetime.today().strftime( "%H:%M:%S" )
 
 
     def __useIconDynamicallyCreated( self, phase ):
