@@ -69,16 +69,15 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.buildMenu( menu, events )
 
         # Set next update just after midnight.
-        now = datetime.now()  #TODO Needs to be local timezone?
-        justAfterMidnight = ( now + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
-        fiveSecondsAfterMidnight = int( ( justAfterMidnight - now ).total_seconds() )
+        today = datetime.today()
+        justAfterMidnight = ( today + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
+        fiveSecondsAfterMidnight = int( ( justAfterMidnight - today ).total_seconds() )
         self.requestUpdate( delay = fiveSecondsAfterMidnight )
 
         if self.notify:
-                    #TODO Should .today() be in local timezone?
-            today = datetime.today().strftime( '%b %d' ) # It is assumed/hoped the dates in the calendar result are always short date format irrespective of locale.
+            todayInShortDateFormat = today.strftime( '%b %d' ) # It is assumed/hoped the dates in the calendar result are always short date format irrespective of locale.
             for event in events:
-                if today == event.getDate():
+                if todayInShortDateFormat == event.getDate():
                     Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.icon ).show()
 
 
