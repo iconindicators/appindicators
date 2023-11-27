@@ -73,12 +73,10 @@
 #    https://developer.gnome.org/icon-theme-spec/
 
 
+import argparse, datetime, os, re, shutil, stat, subprocess, sys, textwrap
 
 from pathlib import Path
 from subprocess import call
-
-import argparse, datetime, os, re, shutil, stat, subprocess, sys, textwrap
-
 
 
 def _releaseToLaunchpad( releaseDirectoryForIndicator ):

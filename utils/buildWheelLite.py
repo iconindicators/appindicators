@@ -23,9 +23,9 @@
 # so does not technically create a true whl.
 
 
-from pathlib import Path
-
 import argparse, os, shutil, subprocess
+
+from pathlib import Path
 
 
 def _buildWheelForIndicators( directoryRelease, indicatorNames ):

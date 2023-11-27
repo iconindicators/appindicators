@@ -24,9 +24,9 @@
 #   https://markdownlivepreview.com/
 
 
-from datetime import datetime
-
 import argparse, textwrap
+
+from datetime import datetime
 
 
 _distributionsAndEndOfLifeDates = {

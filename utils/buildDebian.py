@@ -57,14 +57,12 @@
 #   https://askubuntu.com/questions/144122/when-should-mo-files-be-generated
 
 
-import sys
+import argparse, datetime, os, re, shutil, stat, subprocess, sys, textwrap
+
 sys.path.append( "indicator-base/src" )
 from indicatorbase import indicatorbase
-# import indicatorbase #TODO Only for testing
 
 from pathlib import Path
-
-import argparse, datetime, os, re, shutil, stat, subprocess, textwrap
 
 
 #TODO Look at build-debian shell script to see if something has been missed.
