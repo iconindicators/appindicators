@@ -225,7 +225,7 @@ class IndicatorLunar( IndicatorBase ):
         self.satelliteGeneralPerturbationData = { } # Key: satellite number; Value: GP object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-        self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
+        self.lastFullMoonNotfication = datetime.datetime.today() - datetime.timedelta( hours = 1 )
 
         self.__removeCacheFilesVersion93()
         self.__removeCacheFilesVersion94()
@@ -280,7 +280,7 @@ class IndicatorLunar( IndicatorBase ):
         self.downloadCountMinorPlanet = 0
         self.downloadCountSatellite = 0
 
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
+        utcNow = datetime.datetime.today()
         self.nextDownloadTimeApparentMagnitude = utcNow
         self.nextDownloadTimeComet = utcNow
         self.nextDownloadTimeMinorPlanet = utcNow
@@ -288,7 +288,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def update( self, menu ):
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
+        utcNow = datetime.datetime.today()
 
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -504,7 +504,7 @@ class IndicatorLunar( IndicatorBase ):
                    dataName == IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER:
                     dateTimes.append( self.data[ key ] )
 
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
+        utcNow = datetime.datetime.today()
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
@@ -546,7 +546,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def notificationFullMoon( self ):
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
+        utcNow = datetime.datetime.today()
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
         illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         phase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
@@ -575,7 +575,7 @@ class IndicatorLunar( IndicatorBase ):
         INDEX_RISE_TIME = 1
         satelliteCurrentNotifications = [ ]
 
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
+        utcNow = datetime.datetime.today()
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if ( key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
@@ -1113,8 +1113,8 @@ class IndicatorLunar( IndicatorBase ):
     # https://stackoverflow.com/a/64097432/2156453
     # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
     def convertStartHourAndEndHourToDateTimeInUTC( self, startHour, endHour ):
-        startHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = startHour ).astimezone( datetime.timezone.utc )
-        endHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = endHour ).astimezone( datetime.timezone.utc )
+        startHourAsDateTimeInUTC = datetime.datetime.today().replace( hour = startHour ).astimezone( datetime.timezone.utc )
+        endHourAsDateTimeInUTC = datetime.datetime.today().replace( hour = endHour ).astimezone( datetime.timezone.utc )
         if endHourAsDateTimeInUTC < startHourAsDateTimeInUTC:
             endHourAsDateTimeInUTC = endHourAsDateTimeInUTC + datetime.timedelta( days = 1 )
 
