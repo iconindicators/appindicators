@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import datetime #TODO Is this needed?
-
-
 class Reading( object ):
     # date: Date of reading, as a string.
     # time: Time of reading, as a string.
