@@ -44,9 +44,9 @@
 #    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
 
 
-from dateutil.relativedelta import relativedelta
-
 import argparse, datetime, subprocess
+
+from dateutil.relativedelta import relativedelta
 
 
 def createEphemerisPlanets( inBsp, outBsp, years ):

@@ -19,9 +19,9 @@
 # Store a PPA's details, published binaries and filters.
 
 
-from enum import Enum
-
 import operator
+
+from enum import Enum
 
 
 class Filters( object ):

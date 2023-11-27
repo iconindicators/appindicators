@@ -19,9 +19,9 @@
 # Download from URL, load from file and hold in memory apparent magnitude for comets and minor planets.
 
 
-from dataprovider import DataProvider
-
 import datetime, requests
+
+from dataprovider import DataProvider
 
 
 class DataProviderApparentMagnitude( DataProvider ):

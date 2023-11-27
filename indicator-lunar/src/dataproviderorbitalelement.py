@@ -19,11 +19,11 @@
 # Download from URL, load from file and hold in memory orbital elements for comets and minor planets.
 
 
+import datetime, requests
+
 from dataprovider import DataProvider
 from enum import Enum
 from indicatorbase import IndicatorBase
-
-import datetime, requests
 
 
 class DataProviderOrbitalElement( DataProvider ):

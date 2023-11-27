@@ -56,15 +56,15 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def update( self, menu ):
-        now = datetime.datetime.now( datetime.timezone.utc )
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         if self.showClassic:
-            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( now )
-            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, True )
+            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( utcNow )
+            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( utcNow, True )
 
         else:
             stardateIssue = None
-            stardateInteger, stardateFraction = stardate.getStardate2009Revised( now )
-            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( now, False )
+            stardateInteger, stardateFraction = stardate.getStardate2009Revised( utcNow )
+            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( utcNow, False )
 
         stardateString = stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, self.showIssue, self.padInteger )
         if self.isLabelUpdateSupported():

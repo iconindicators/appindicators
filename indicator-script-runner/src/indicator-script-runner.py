@@ -91,7 +91,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def update( self, menu ):
-        today = datetime.datetime.today()
+        today = datetime.datetime.now()
         self.updateMenu( menu )
         self.updateBackgroundScripts( today )
         self.setLabel( self.processTags() )
@@ -1107,7 +1107,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def initialiseBackgroundScripts( self ):
         self.backgroundScriptResults = { }
         self.backgroundScriptNextUpdateTime = { }
-        today = datetime.datetime.today()
+        today = datetime.datetime.now()
         for script in self.scripts:
             if type( script ) is Background:
                 self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ] = None

@@ -227,7 +227,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __getCurrentTime( self ):
-        return datetime.datetime.today().strftime( "%H:%M:%S" )
+        return datetime.datetime.now().strftime( "%H:%M:%S" )
 
 
     def __useIconDynamicallyCreated( self, phase ):

@@ -55,22 +55,23 @@
 # Will also need to include the latest versions of planets.bsp and stars.dat (might need add to packaging/debian/install).
 
 
+import datetime, eclipse, importlib, io, locale, math
+
+from astrobase import AstroBase
+from distutils.version import LooseVersion
+
 try:
+    import skyfield
     from skyfield import almanac, constants, eclipselib
     from skyfield.api import EarthSatellite, load, Star, wgs84
     from skyfield.data import hipparcos, mpc
     from skyfield.magnitudelib import planetary_magnitude
     from skyfield.trigonometry import position_angle_of
-    import skyfield
     available = True
 
 except ImportError:
     available = False
 
-from astrobase import AstroBase
-from distutils.version import LooseVersion
-
-import datetime, eclipse, importlib, io, locale, math
 
 class AstroSkyfield( AstroBase ):
 
@@ -404,8 +405,7 @@ class AstroSkyfield( AstroBase ):
 
 
         if isSolar:
-#TODO Check why I'm putting in tzinfo = None...want UTC and timezone aware.
-            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime().replace( tzinfo = None ) )
+            dateTime, eclipseType, latitude, longitude = eclipse.getEclipseSolar( now.utc_datetime() )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTime
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
@@ -422,7 +422,6 @@ class AstroSkyfield( AstroBase ):
 # If feasible, add here and remove check in indicator front-end.
 # https://github.com/skyfielders/python-skyfield/discussions/801
             dateTimes, events, details = eclipselib.lunar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
-#TODO Check why I'm putting in tzinfo = None...want UTC and timezone aware.
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_datetime().replace( tzinfo = None )
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = __getNativeEclipseType( events[ 0 ], True )
 

@@ -39,10 +39,10 @@
 #    https://tracksat.space
 
 
+import datetime, math
+
 from abc import ABC, abstractmethod
 from enum import Enum
-
-import datetime, math
 
 
 class AstroBase( ABC ):

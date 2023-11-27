@@ -69,7 +69,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.buildMenu( menu, events )
 
         # Set next update just after midnight.
-        today = datetime.today()
+        today = datetime.now()
         justAfterMidnight = ( today + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
         fiveSecondsAfterMidnight = int( ( justAfterMidnight - today ).total_seconds() )
         self.requestUpdate( delay = fiveSecondsAfterMidnight )

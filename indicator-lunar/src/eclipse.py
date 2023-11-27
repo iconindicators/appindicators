@@ -21,9 +21,9 @@
 # https://eclipse.gsfc.nasa.gov/eclipse.html
 
 
-from enum import Enum
-
 import datetime
+
+from enum import Enum
 
 
 class EclipseType( Enum ):

@@ -96,7 +96,7 @@ class IndicatorTide( IndicatorBase ):
                 Notify.Notification.new( summary, message, self.icon ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
-        today = datetime.datetime.today()
+        today = datetime.datetime.now()
         fiveMinutesAfterMidnight = ( today + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
         return ( fiveMinutesAfterMidnight - today ).total_seconds()
 
