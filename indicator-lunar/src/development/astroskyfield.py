@@ -30,29 +30,17 @@
 #   # If there are data files included in your packages that need to be
 #   # installed, specify them here.
 #   package-data = {"sample" = ["*.dat"]}
-
-
-#TODO If/when astroskyfield.py is included in the release,
-# the debBuild.py script must ensure planets.bsp and stars.dat included.
+#
 # Maybe use a MANIFEST.in and list these two files there?
 # Regardless the build must fail if the bsp/dat are not present.
-# The build script can let the caller know the bsp/dat need to be present.
-
-
-#TODO If/when switching to Skyfield (PyEphem may still be chosen as a backend by the user),
-# Will need several changes:
-#
-#   Add astroskyfield.py to build-debian and debian/install.
-#
-#   Remove astropyephem.py from build-debian and debian/install (if ONLY running Skyfield).
-#
-#   Add to debian/postinst the line
+# The buildDebian.py script can let the caller know the bsp/dat need to be present.
+# Add astroskyfield.py, planets.bsp and stars.dat to debian/install.
+# Remove astropyephem.py from debian/install (if ONLY running Skyfield).
+# Add to debian/postinst the line (or equivalent if using a venv)
 #       sudo pip3 install --ignore-installed --upgrade pandas pip skyfield || true
 # 
 # https://askubuntu.com/questions/260978/add-custom-steps-to-source-packages-debian-package-postinst
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
-#
-# Will also need to include the latest versions of planets.bsp and stars.dat (might need add to packaging/debian/install).
 
 
 import datetime, eclipse, importlib, io, locale, math
@@ -289,18 +277,17 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def getLatitudeLongitudeElevation( city ):
-        # Latitude = 0
-        # Longitude = 1
-        # Elevation = 2
+        # Latitude = 0, Longitude = 1, Elevation = 2
         return \
             AstroSkyfield._city_data.get( city )[ 0 ], \
             AstroSkyfield._city_data.get( city )[ 1 ], \
             AstroSkyfield._city_data.get( city )[ 2 ]
 
 
+#TODO Need to change the install command (or have a different version) for venv.
     @staticmethod
     def getStatusMessage():
-        minimalRequiredVersion = "1.45"
+        minimalRequiredVersion = "1.46"
         installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade pandas pip skyfield"
         message = None
         if not available:
