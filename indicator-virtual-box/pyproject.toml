@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "indicator-virtual-box"
-version = "1.0.74"
+version = "1.0.75"
 authors = [
     { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
 ]
