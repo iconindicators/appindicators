@@ -370,16 +370,12 @@ def _copyDebianControl( directoryIndicator, directoryReleaseIndicator, pyproject
 
 def _createDebianInstall( directoryIndicator, directoryReleaseIndicator, directoryReleaseWheel ):
     # Create the debian/install file and insert paths to:
+    #   readme
+    #   license
     #   desktop file
     #   all Python files in src
     #   each icon in each theme, to scalable/apps, apps/16, apps/22, apps/24 and apps/48
     #   each mo file
-
-    #TODO What about...
-    #   readme?
-    #   license?
-    #   changelog?  Or is that already in the .orig.tar.gz and that is good enough?
-    # Look at build-debian shell script to see if something has been missed.
     directoryReleaseIndicatorInstallFile = directoryReleaseIndicator + os.sep + "debian" + os.sep + "install"
     with open( directoryReleaseIndicatorInstallFile, 'w' ) as f:
         f.write( directoryIndicator + ".desktop usr/share/applications\n" )
