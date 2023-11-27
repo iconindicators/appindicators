@@ -66,7 +66,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
         self.autoStartRequired = True
-        self.dateTimeOfLastNotification = datetime.datetime.now() #TODO Add UTC?     datetime.timezone.utc 
+        self.dateTimeOfLastNotification = datetime.datetime.today()
         self.scrollDirectionIsUp = True
         self.scrollUUID = None
 
@@ -220,10 +220,10 @@ class IndicatorVirtualBox( IndicatorBase ):
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
     # Prevent notifications from appearing until a set time has elapsed since the previous notification.
     def sendNotificationWithDelay( self, summary, message, delayInSeconds = 0 ):
-        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = delayInSeconds ) < datetime.datetime.now() ):
+        if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = delayInSeconds ) < datetime.datetime.today() ):
             Notify.Notification.new( summary, message, self.icon ).show()
-            self.dateTimeOfLastNotification = datetime.datetime.now()
-#TODO Add UTC to both lines above?      datetime.timezone.utc 
+            self.dateTimeOfLastNotification = datetime.datetime.today()
+
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
         if self.isVBoxManageInstalled():
