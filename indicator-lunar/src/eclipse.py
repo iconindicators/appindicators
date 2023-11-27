@@ -145,7 +145,7 @@ __eclipsesSolar = \
 # Gets the upcoming lunar eclipse.
 #
 # Returns a tuple:
-#    DateTime in UTC
+#    DateTime in UTC with UTC timezone
 #    EclipseType
 #    latitude (south is negative)
 #    longitude (east is negative)
@@ -156,7 +156,7 @@ def getEclipseLunar( utcNow ):
 # Gets the upcoming solar eclipse.
 #
 # Returns a tuple:
-#    DateTime in UTC
+#    DateTime in UTC with UTC timezone
 #    EclipseType
 #    latitude (south is negative)
 #    longitude (east is negative)
@@ -174,14 +174,9 @@ def __getEclipse( utcNow, eclipses, fieldYear, fieldMonth, fieldDay, fieldTimeUT
         day = fields[ fieldDay ]
         timeUTC = fields[ fieldTimeUTC ]
         deltaT = fields[ fieldDeltaT ]
-        # dateTime = datetime.datetime.strptime( year + ", " + __months[ month ] + ", " + day + ", " + timeUTC, "%Y, %m, %d, %H:%M:%S" ) - \
-        #            datetime.timedelta( seconds = int( deltaT ) ) # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
-#TODO Above code was timezone unaware...need to switch to below that has a timezone (of UTC).
         dateString = year + ", " + __months[ month ] + ", " + day + ", " + timeUTC + "+00:00"
         format = "%Y, %m, %d, %H:%M:%S%z"
-        dateTime = \
-            datetime.datetime.strptime( dateString, format ) - \
-            datetime.timedelta( seconds = int( deltaT ) ) # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
+        dateTime = datetime.datetime.strptime( dateString, format ) - datetime.timedelta( seconds = int( deltaT ) ) # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
 
         if utcNow.timestamp() <= dateTime.timestamp():
             eclipseType = fields[ fieldType ][ 0 ]
