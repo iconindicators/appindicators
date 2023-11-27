@@ -32,12 +32,6 @@
 # Maybe Github or whereever I ultimately host the source/project will have a note/reminder thingy.
 
 
-#TODO Maybe look at each indiator's imports
-# and if any have date, time or datetime
-# check to see how the date/time is used
-# and if timezone should be incorporated.
-
-
 import datetime, email.policy
 
 import gi
@@ -228,7 +222,7 @@ class IndicatorBase( ABC ):
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.debug:
-            nextUpdateDateTime = datetime.datetime.today() + datetime.timedelta( seconds = nextUpdateInSeconds )    #TODO Is this correct to have UTC?
+            nextUpdateDateTime = datetime.datetime.today() + datetime.timedelta( seconds = nextUpdateInSeconds )
             label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] # Remove fractional seconds.
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
