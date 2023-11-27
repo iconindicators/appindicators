@@ -295,10 +295,9 @@ class IndicatorBase( ABC ):
         aboutDialog.set_authors( self.authors )
         aboutDialog.set_comments( self.comments )
 
-  #TODO Is this correct to have UTC?
         copyrightText = \
             "Copyright \xa9 " + \
-            self.copyrightStartYear + '-' + str( datetime.datetime.now( datetime.timezone.utc ).year ) + " " + \
+            self.copyrightStartYear + '-' + str( datetime.datetime.today().year ) + " " + \
             ' '.join( self.copyrightNames )
 
         aboutDialog.set_copyright( copyrightText )
