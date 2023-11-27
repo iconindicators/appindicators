@@ -54,14 +54,14 @@ To run `indicator-fortune` for example, press the `Super`/`Windows` key to open 
 
 
 ## Limitations
-Distributions/versions on which there is full functionality:
+Distributions/versions with full functionality:
 - `Ubuntu 20.04`
 - `Ubuntu 22.04`
 - `Ubuntu Budgie 22.04`
 - `Ubuntu Unity 20.04`
 - `Ubuntu Unity 22.04`
 
-Distributions/versions on which there is limited functionality:
+Distributions/versions with limited functionality:
 - `Kubuntu 20.04` No mouse wheel scroll; tooltip in lieu of label.
 - `Kubuntu 22.04` No mouse wheel scroll; tooltip in lieu of label.
 - `Lubuntu 20.04` No label; tooltip is not dynamic; icon is not dynamic.
