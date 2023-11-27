@@ -457,6 +457,7 @@ class AstroBase( ABC ):
     def getStatusMessage():
         return None
 
+
     # Returns the version of the underlying astronomical library.
     @staticmethod
     @abstractmethod
