@@ -91,13 +91,13 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def update( self, menu ):
-        now = datetime.datetime.now( datetime.timezone.utc )  #TODO Is this correct to have UTC?
+        today = datetime.datetime.today()
         self.updateMenu( menu )
-        self.updateBackgroundScripts( now )
+        self.updateBackgroundScripts( today )
         self.setLabel( self.processTags() )
 
         # Calculate next update...
-        nextUpdate = now + datetime.timedelta( hours = 100 ) # Set an update time well into the future.
+        nextUpdate = today + datetime.timedelta( hours = 100 ) # Set an update time well into the future.
         for script in self.scripts:
             key = self.__createKey( script.getGroup(), script.getName() )
 
@@ -106,7 +106,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                self.isBackgroundScriptInIndicatorText( script ):
                 nextUpdate = self.backgroundScriptNextUpdateTime[ key ]
 
-        nextUpdateInSeconds = int( math.ceil( ( nextUpdate - now ).total_seconds() ) )
+        nextUpdateInSeconds = int( math.ceil( ( nextUpdate - today ).total_seconds() ) )
         return 60 if nextUpdateInSeconds < 60 else nextUpdateInSeconds
 
 
@@ -1107,11 +1107,11 @@ class IndicatorScriptRunner( IndicatorBase ):
     def initialiseBackgroundScripts( self ):
         self.backgroundScriptResults = { }
         self.backgroundScriptNextUpdateTime = { }
-        now = datetime.datetime.now( datetime.timezone.utc )  #TODO Is this correct to have UTC?
+        today = datetime.datetime.today()
         for script in self.scripts:
             if type( script ) is Background:
                 self.backgroundScriptResults[ self.__createKey( script.getGroup(), script.getName() ) ] = None
-                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = now
+                self.backgroundScriptNextUpdateTime[ self.__createKey( script.getGroup(), script.getName() ) ] = today
 
 
     def __createKey( self, group, name ):
