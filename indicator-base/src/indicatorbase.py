@@ -228,7 +228,7 @@ class IndicatorBase( ABC ):
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.debug:
-            nextUpdateDateTime = datetime.datetime.now( datetime.timezone.utc ) + datetime.timedelta( seconds = nextUpdateInSeconds )    #TODO Is this correct to have UTC?
+            nextUpdateDateTime = datetime.datetime.today() + datetime.timedelta( seconds = nextUpdateInSeconds )    #TODO Is this correct to have UTC?
             label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] # Remove fractional seconds.
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
@@ -256,7 +256,7 @@ class IndicatorBase( ABC ):
 
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-            self.nextUpdateTime = datetime.datetime.now( datetime.timezone.utc ) + datetime.timedelta( seconds = nextUpdateInSeconds )
+            self.nextUpdateTime = datetime.datetime.today() + datetime.timedelta( seconds = nextUpdateInSeconds )
 
         else:
             self.nextUpdateTime = None
@@ -362,7 +362,7 @@ class IndicatorBase( ABC ):
             GLib.idle_add( self.__update )
 
         elif self.nextUpdateTime: # User cancelled and there is a next update time present...
-            secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.now( datetime.timezone.utc ) ).total_seconds()
+            secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.today() ).total_seconds()
             if secondsToNextUpdate > 10: # Scheduled update is still in the future (10 seconds or more), so reschedule...
                 GLib.timeout_add_seconds( int( secondsToNextUpdate ), self.__update )
 
@@ -894,9 +894,7 @@ class IndicatorBase( ABC ):
 
         if theFile: # A value of "" evaluates to False.
             dateTimeComponent = theFile[ len( basename ) : len( basename ) + 14 ]
-            # expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
-#TODO Line above was not timezone aware.
-            expiry = datetime.datetime.strptime( dateTimeComponent + "+00:00", IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS + "%z" )
+            expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
 
         return expiry
 
@@ -905,7 +903,7 @@ class IndicatorBase( ABC ):
     def getCacheFilenameWithTimestamp( self, basename, extension = EXTENSION_TEXT ):
         return self.__getCacheDirectory() + \
                basename + \
-               datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+               datetime.datetime.today().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
                extension
 
 
@@ -960,18 +958,14 @@ class IndicatorBase( ABC ):
     # Any file extension is ignored in determining if the file should be deleted or not.
     def flushCache( self, basename, maximumAgeInHours ):
         cacheDirectory = self.__getCacheDirectory()
-        cacheMaximumAgeDateTime = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = maximumAgeInHours )
+        cacheMaximumAgeDateTime = datetime.datetime.today() - datetime.timedelta( hours = maximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
                 dateTime = file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
-                    fileDateTime = datetime.datetime.strptime( dateTime + "+00:00", IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS + "%z" )
-#TODO ORIG                    # fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                    fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
                     if fileDateTime < cacheMaximumAgeDateTime:
                         os.remove( cacheDirectory + file )
-#TODO Got this when running indicator-lunar:
-#     if fileDateTime < cacheMaximumAgeDateTime:
-# TypeError: can't compare offset-naive and offset-aware datetimes
 
 
     # Read the most recent binary file from the cache.
@@ -1028,7 +1022,7 @@ class IndicatorBase( ABC ):
         cacheFile = \
             self.__getCacheDirectory() + \
             basename + \
-            datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.today().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
         try:
@@ -1122,13 +1116,8 @@ class IndicatorBase( ABC ):
         cacheFile = \
             self.__getCacheDirectory() + \
             basename + \
-            datetime.datetime.now( datetime.timezone.utc ).strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.today().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
-#TODO Changing the reading/writing of the datetime here 
-# from local timezone to UTC, is the problematic
-# for existing cached data that is in local?
-# Should get flushed out within a few days?
-# Which indicator has the longest age for the cache?  
 
         return self.__writeCacheText( text, cacheFile )
 
