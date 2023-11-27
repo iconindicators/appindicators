@@ -6,11 +6,11 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 
 - `indicator-lunar` displays lunar, solar, planetary, minor planet, star and satellite information.
 
-- `indicator-on-this-day`displays calendar/history events for today and future dates.
+- `indicator-on-this-day` displays calendar/history events for today and future dates.
 
 - `indicator-ppa-download-statistics` displays the download counts for packages in a `Launchpad PPA`.
 
-- `indicator-punycode`converts domain names between Unicode and ASCII.
+- `indicator-punycode` converts domain names between Unicode and ASCII.
 
 - `indicator-script-runner` allows a user to run a terminal command or script from the indicator menu, optionally showing the output in the icon label.
 
@@ -22,7 +22,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 
 
 ## Requirements
-- For `Ubuntu`, you must enable the `Ubuntu appIndicators`extension using `GNOME Tweaks`.
+- For `Ubuntu`, you must enable the `Ubuntu appIndicators` extension using `GNOME Tweaks`.
 
 - For `Debian 12 (bookworm)` you must [install](https://extensions.gnome.org/extension/615/appindicator-support/) the `GNOME Shell` extension `AppIndicator and KStatusNotifierItem Support`. 
 
@@ -50,7 +50,7 @@ sudo dpkg -i indicator-fortune_1.0.41-1_all.deb && sudo apt-get install -f
 ```
 
 ## Usage
-To run `indicator-fortune`for example, press the `Super`/`Windows` key to open the `Show Applications`overlay, type `fortune`into the search bar and the icon should be present for you to click.
+To run `indicator-fortune` for example, press the `Super`/`Windows` key to open the `Show Applications` overlay, type `fortune` into the search bar and the icon should be present for you to click.
 
 
 ## Limitations
