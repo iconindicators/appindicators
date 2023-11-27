@@ -10,6 +10,7 @@
         datetime.datetime.utcnow()
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
+- Removed old eclipse information.
 
 ## v1.0.100 (2023-01-09)
 
