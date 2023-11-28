@@ -640,26 +640,36 @@ class IndicatorBase( ABC ):
 
 
     def setAutostartAndDelay( self, isSet, delay ):
+        if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
+            os.makedirs( IndicatorBase.__AUTOSTART_PATH )
+
+        if not os.path.exists( self.desktopFileUser ):
+            shutil.copy( self.desktopFileApplications, self.desktopFileUser )
+
         try:
-            if isSet:
-                if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
-                    os.makedirs( IndicatorBase.__AUTOSTART_PATH )
+            output = ""
+            with open( self.desktopFileUser, 'r' ) as f:
+                for line in f:
+                    if IndicatorBase.__X_GNOME_AUTOSTART_DELAY in line:
+                        output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
-                output = ""
-                with open( self.desktopFileApplications, 'r' ) as f:
-                    for line in f:
-                        if IndicatorBase.__X_GNOME_AUTOSTART_DELAY in line:
-                            output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
+                    elif IndicatorBase.__X_GNOME_AUTOSTART_ENABLED in line:
+                        output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( isSet ).lower() + '\n'
 
-                        else:
-                            output += line
+                    else:
+                        output += line
 
-                with open( self.desktopFileUser, 'w' ) as f:
-                    f.write( output )
+            # If the user has an old .desktop file,
+            # there may not be an autostart enable field and/or
+            # an autostart delay field, so manually add in.
+            if IndicatorBase.__X_GNOME_AUTOSTART_DELAY not in output:
+                output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
-            else:
-                if os.path.exists( self.desktopFileUser ):
-                    os.remove( self.desktopFileUser )
+            if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED not in output:
+                output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( isSet ).lower() + '\n'
+
+            with open( self.desktopFileUser, 'w' ) as f:
+                f.write( output )
 
         except Exception as e:
             logging.exception( e )
