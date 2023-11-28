@@ -137,6 +137,8 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuLabelTooltipOSD( self, menu ):
         subMenu = Gtk.Menu()
 
+#TODO Why does the text appear for middle mouse click when I choose the current time in label?
+# Where else does this happen?
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in label" )
         menuItem.connect( "activate", lambda widget: ( print( "mouse middle click" ), self.setLabel( self.__getCurrentTime() ) ) )
         self.secondaryActivateTarget = menuItem
