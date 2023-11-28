@@ -19,6 +19,10 @@
 # Application indicator to test stuff.
 
 
+#TODO Check this works on Debian 12 and
+# then update README.md as appropriate.
+
+
 INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
