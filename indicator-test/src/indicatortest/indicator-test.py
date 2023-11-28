@@ -316,6 +316,7 @@ class IndicatorTest( IndicatorBase ):
             print( "Executing command: " + command )
 
 
+#TODO Perhaps put in the autostart stuff?
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
