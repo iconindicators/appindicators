@@ -25,13 +25,6 @@
 #   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-#TODO For PPA Indicator, need some way to be reminded every 6 months
-# about adding in new version of Ubuntu.
-# Do this in a script (but where/how does the script run)?
-# Or just a note somewhere, maybe on the front page README.md?
-# Maybe Github or whereever I ultimately host the source/project will have a note/reminder thingy.
-
-
 import datetime, email.policy
 
 import gi
