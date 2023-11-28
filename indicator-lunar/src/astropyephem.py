@@ -227,9 +227,10 @@ class AstroPyEphem( AstroBase ):
             _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_ELEVATION ]
 
 
+#TODO Need to change the install command (or have a different version) for venv.
     @staticmethod
     def getStatusMessage():
-        minimalRequiredVersion = "4.1.3"
+        minimalRequiredVersion = "4.1.5"
         installationCommand = "sudo apt-get install -y python3-pip\nsudo pip3 install --ignore-installed --upgrade ephem"
         message = None
         if not available:
