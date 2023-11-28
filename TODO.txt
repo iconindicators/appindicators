@@ -238,3 +238,6 @@
 #   https://en.wikipedia.org/wiki/Gentoo_Linux
 #
 #   https://en.wikipedia.org/wiki/Slackware
+#
+# For other distributions, need to check if 
+# X-GNOME-Autostart-enabled and X-GNOME-Autostart-Delay apply.
