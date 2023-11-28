@@ -19,6 +19,10 @@
 # Application indicator to test stuff.
 
 
+#TODO Check this works on Debian 12 and
+# then update README.md as appropriate.
+
+
 INDICATOR_NAME = "indicator-test"
 import gettext
 gettext.install( INDICATOR_NAME )
@@ -133,6 +137,8 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuLabelTooltipOSD( self, menu ):
         subMenu = Gtk.Menu()
 
+#TODO Why does the text appear for middle mouse click when I choose the current time in label?
+# Where else does this happen?
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in label" )
         menuItem.connect( "activate", lambda widget: ( print( "mouse middle click" ), self.setLabel( self.__getCurrentTime() ) ) )
         self.secondaryActivateTarget = menuItem
@@ -316,6 +322,7 @@ class IndicatorTest( IndicatorBase ):
             print( "Executing command: " + command )
 
 
+#TODO Perhaps put in the autostart stuff?
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
