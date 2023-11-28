@@ -29,6 +29,9 @@
 #   gpg --import secring.skr
 #
 # References:
+#   https://www.debian.org/doc/manuals/maint-guide/
+#   http://www.debian.org/doc/packaging-manuals/python-policy
+#   http://www.debian-administration.org/articles/336
 #   http://askubuntu.com/questions/27715/create-a-deb-package-from-scripts-or-binaries
 #   https://fpm.readthedocs.io/
 #   http://askubuntu.com/questions/28562/how-do-i-create-a-ppa-for-a-working-program
@@ -46,9 +49,6 @@
 #   http://wiki.ubuntu.com/MOTU/School/PackagingWithoutCompiling
 #   http://wiki.ubuntu.com/PackagingGuide/HandsOn
 #   http://wiki.ubuntu.com/PackagingGuide/Python
-#   http://www.debian.org/doc/manuals/maint-guide
-#   http://www.debian.org/doc/packaging-manuals/python-policy
-#   http://www.debian-administration.org/articles/336
 #   http://news.softpedia.com/news/How-to-Repack-Deb-Files-on-Debian-and-Ubuntu-404930.shtml
 #   http://blog.packagecloud.io/debian/debuild/packaging/2015/06/08/buildling-deb-packages-with-debuild
 #   https://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
