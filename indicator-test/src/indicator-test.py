@@ -331,7 +331,6 @@ class IndicatorTest( IndicatorBase ):
             print( "Executing command: " + command )
 
 
-#TODO Perhaps put in the autostart stuff?
     def onPreferences( self, dialog ):
         grid = self.createGrid()
 
@@ -340,12 +339,16 @@ class IndicatorTest( IndicatorBase ):
         xCheckbutton.set_tooltip_text( _( "Enable/disable X" ) )
         grid.attach( xCheckbutton, 0, 0, 1, 1 )
 
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 1, 1, 1 )
+
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()
         if responseType == Gtk.ResponseType.OK:
             self.X = xCheckbutton.get_active()
+            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
 
