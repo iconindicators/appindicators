@@ -46,7 +46,7 @@ For example, for`indicator-fortune`, the `.deb` most current, as of this writing
 
 In a `terminal`:
 ```
-sudo dpkg -i indicator-fortune_1.0.41-1_all.deb && sudo apt-get install -f
+sudo dpkg -i indicator-fortune_1.0.41-1_all.deb && sudo apt install -f
 ```
 
 ## Usage
