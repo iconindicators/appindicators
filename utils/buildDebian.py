@@ -486,9 +486,7 @@ def _buildDebianSourcePackageForIndicator( directoryRelease, indicatorName ):
                     directoryReleaseWheel,
                     pyprojectTomlMetadata )
 
-                #TODO Check the parameters passed to debuild...I saw somewhere (cannot recall) slightly different parameters.
-# https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
-# I think debuild calls dpkg-buildpackage...
+                # https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
                 subprocess.call( "debuild -S -sa", shell = True, cwd = directoryReleaseIndicator )
                 # subprocess.call( "debuild -sa -us -uc", shell = True, cwd = directoryReleaseIndicator ) #TODO Should/how to do a binary build?
 
@@ -496,6 +494,36 @@ def _buildDebianSourcePackageForIndicator( directoryRelease, indicatorName ):
 
         else:
             print( f"Unable to create .deb for { indicatorName }: the (most recent) version in CHANGELOG.md does not match that in pyproject.toml!" )
+
+
+def _printUploadToLaunchpadCommandForIndicators( directoryRelease, indicators ):
+    directoryReleaseDebian = directoryRelease + os.sep + "debian"
+
+    foundChanges = [ ]
+    missingChanges = [ ]
+    for indicator in indicators:
+        changesFilesForIndicator = [ ] # There may be more than once source package for the indicator.
+        for item in Path( directoryReleaseDebian ).glob( "*.changes" ):
+            if indicator in item.name:
+                changesFilesForIndicator.append( item )
+
+        if changesFilesForIndicator:
+            foundChanges.append( sorted( changesFilesForIndicator )[ -1 ] ) # Take the highest version.
+
+        else:
+            missingChanges.append( indicator )
+
+    if missingChanges:
+        print( "\nNo .changes files found in\n\t", directoryReleaseDebian, "\nfor" )
+        for missingChange in missingChanges:
+            print( '\t', missingChange )
+
+    print( '\n' * 2 )
+
+    if foundChanges:
+        print( "To upload to LaunchPad, change to the directory\n\t", directoryReleaseDebian, "\nand run" )
+        for foundChange in foundChanges:
+            print( "\tdput ppa:thebernmeister/ppa", foundChange.name ) 
 
 
 #TODO Might want a way to allow building a Deb binary?
@@ -519,6 +547,8 @@ if __name__ == "__main__":
 
         for indicatorToBuild in args.indicators:
             _buildDebianSourcePackageForIndicator( args.directoryRelease, indicatorToBuild )
+
+        _printUploadToLaunchpadCommandForIndicators( args.directoryRelease, args.indicators )
 
     else:
         print( "The script must be run from the top level directory (one above utils)." )

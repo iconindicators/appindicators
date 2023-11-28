@@ -52,7 +52,7 @@ def _getReleaseCommandForIndicator( directoryDebianSourcePackages, indicatorToRe
 
     else:
         missingChanges.append( indicatorToRelease )
-    
+
 
 #TODO Rename and change description, etc, etc...
 # I think it safer to print the upload command and the user can copy/paste.
