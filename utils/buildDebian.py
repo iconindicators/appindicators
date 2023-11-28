@@ -68,6 +68,12 @@ from pathlib import Path
 #TODO Look at build-debian shell script to see if something has been missed.
 
 
+#TODO Good idea to use existing build-debian for each indicator
+# and compare the resultant built files/directories
+# with what buildDebian.py produces
+# (will have to ignore the .whl, CHANGLOG.md, etc)
+
+
 def _getMetadataFromPyprojectToml( indicatorDirectory ):
     patternAuthors = re.compile( "authors = .*" )
     patternDescription = re.compile( "description = .*" )
@@ -449,17 +455,6 @@ def _copyDebian( directoryIndicator, directoryReleaseIndicator, directoryRelease
     _convertChangelogMarkdownToDebian( directoryIndicator, directoryReleaseIndicator, pyprojectTomlMetadata )
 
 
-#TODO Good idea to use existing build-debian for each indicator
-# and compare the resultant built files/directories
-# with what buildDebian.py produces
-# (will have to ignore the .whl, CHANGLOG.md, etc)
-
-
-#TODO I noticed the dput command from the shell script:
-#           command = "dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"
-# and the is _ between name and version.
-#But there is a hypen as a result of this script...where/why does the hyphen come in?
-# From the directory first created?
 def _buildDebianSourcePackageForIndicator( directoryRelease, indicatorName ):
     pyprojectTomlMetadata = _getMetadataFromPyprojectToml( indicatorName )
     if pyprojectTomlMetadata:
@@ -488,7 +483,9 @@ def _buildDebianSourcePackageForIndicator( directoryRelease, indicatorName ):
 
                 # https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
                 subprocess.call( "debuild -S -sa", shell = True, cwd = directoryReleaseIndicator )
-                # subprocess.call( "debuild -sa -us -uc", shell = True, cwd = directoryReleaseIndicator ) #TODO Should/how to do a binary build?
+
+                #TODO Might want a way to allow building a Deb binary?
+                # subprocess.call( "debuild -sa -us -uc", shell = True, cwd = directoryReleaseIndicator )
 
                 # shutil.rmtree( releaseDirectoryForIndicator )  #TODO Put back in
 
@@ -526,7 +523,6 @@ def _printUploadToLaunchpadCommandForIndicators( directoryRelease, indicators ):
             print( "\tdput ppa:thebernmeister/ppa", foundChange.name ) 
 
 
-#TODO Might want a way to allow building a Deb binary?
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description = "Create a Debian source package for one or more indicators." )
