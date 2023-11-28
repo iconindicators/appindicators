@@ -300,7 +300,8 @@ def _createOrigTarGz( directoryIndicator, directoryReleaseIndicator, version ):
 
 
 def _copyDebianCopyright( directoryIndicator, directoryReleaseIndicator ):
-    # Get start year from CHANGELOG.md (first year of release is next to first release version).
+    # Get start year from CHANGELOG.md
+    # (first year of release is next to version of first release).
     with open( str( directoryIndicator ) + os.sep + "CHANGELOG.md", 'r' ) as f:
         contents = f.read()
         indexFirstRelease = contents.rfind( "## v" )
@@ -436,6 +437,7 @@ def _copyDebian( directoryIndicator, directoryReleaseIndicator, directoryRelease
             directoryIndicatorDebian + os.sep + "postinst",
             directoryReleaseIndicator + os.sep + "debian" )
 
+#TODO This will copy indicator-lunar's postrm which is currently NOT ready for release!
     if os.path.exists( directoryIndicatorDebian + os.sep + "postrm" ):
         shutil.copy(
             directoryIndicatorDebian + os.sep + "postrm",
@@ -447,6 +449,17 @@ def _copyDebian( directoryIndicator, directoryReleaseIndicator, directoryRelease
     _convertChangelogMarkdownToDebian( directoryIndicator, directoryReleaseIndicator, pyprojectTomlMetadata )
 
 
+#TODO Good idea to use existing build-debian for each indicator
+# and compare the resultant built files/directories
+# with what buildDebian.py produces
+# (will have to ignore the .whl, CHANGLOG.md, etc)
+
+
+#TODO I noticed the dput command from the shell script:
+#           command = "dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes"
+# and the is _ between name and version.
+#But there is a hypen as a result of this script...where/why does the hyphen come in?
+# From the directory first created?
 def _buildDebianSourcePackageForIndicator( directoryRelease, indicatorName ):
     pyprojectTomlMetadata = _getMetadataFromPyprojectToml( indicatorName )
     if pyprojectTomlMetadata:
@@ -476,16 +489,10 @@ def _buildDebianSourcePackageForIndicator( directoryRelease, indicatorName ):
                 #TODO Check the parameters passed to debuild...I saw somewhere (cannot recall) slightly different parameters.
 # https://help.launchpad.net/Packaging/PPA/BuildingASourcePackage
 # I think debuild calls dpkg-buildpackage...
-                # subprocess.call( "debuild -S -sa", shell = True, cwd = directoryReleaseIndicator )
+                subprocess.call( "debuild -S -sa", shell = True, cwd = directoryReleaseIndicator )
                 # subprocess.call( "debuild -sa -us -uc", shell = True, cwd = directoryReleaseIndicator ) #TODO Should/how to do a binary build?
 
                 # shutil.rmtree( releaseDirectoryForIndicator )  #TODO Put back in
-                pass #TODO Remove
-
-#TODO Maybe print to user that they now should use the upload script...
-#   echo -e "\nTo upload to LaunchPad, change to the 'build' directory and run:\n"
-#   echo -e "    dput ppa:thebernmeister/ppa ${NAME}_${VERSION}-1_source.changes\n"
-# }
 
         else:
             print( f"Unable to create .deb for { indicatorName }: the (most recent) version in CHANGELOG.md does not match that in pyproject.toml!" )
