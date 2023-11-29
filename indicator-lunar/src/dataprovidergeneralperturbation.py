@@ -84,7 +84,9 @@ class GP( object ):
 
     def getTLELineOneLineTwo( self ):
         if self.tleLineOne is None:
+            print( self.satelliteRecord.satnum_str )
             if self.satelliteRecord.satnum > 99999:
+                print( self.satelliteRecord )
                 # The TLE format does not support satellite catalog numbers (NORAD number) greater than 99,999.
                 #
                 # When the SGP4 exporter converts from OMM to TLE, such a catalog number will be erroneously omitted:
@@ -100,12 +102,32 @@ class GP( object ):
 # So first need an example of a satnum > 99999 (in length, not value).
 # Then set the satnum_str to the value from satelliteRecord.satnum
 # and see what happens in the omm.initialise (does the value actually get set?)
-# and after that, viewing the satettite info (name, number, rise, set, position)
+# and after that, viewing the satellite info (name, number, rise, set, position)
 # is all correct.
 #   https://github.com/brandon-rhodes/python-sgp4/commit/19990f3f2a5af9d054a84797a8ede0892b487912
 #   https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
 # Need to check in PyEphem as it likely won't support a satnum > 99999.  
 # Need to check in Skyfield as it likely will support a satnum > 99999.
+#
+#
+# Wondering now based on 
+#   https://github.com/brandon-rhodes/pyephem/discussions/243
+# seems SGP4 does not support numbers above a certain range,
+# so dealing with a satnum > 99999 is somewhat of a false barrier...
+# there is another barrier just waiting.
+# So should I first confirm this?
+# The suggestion is to swap out the satnum when too large for TLE
+# at the time of passing in to be calculated...maybe that is an option.
+# But if there is another barrier further along then what is the point?
+# Need to investigate further...maybe ask Brandon in issue 243 above.
+#
+#
+#Sent email to David dvallado@comspoc.com asking why if the noradID/satnum
+# is supposed to be 9 digits, does that mean SGP4's satnum needs to change from 6 chars to 9?
+#
+# Also, based on
+#   https://github.com/brandon-rhodes/python-sgp4/commit/56c1c4da0e9735b7a76939c2cb582bae134220ee,
+# it seems that the upper limit of SGP4 (at least in python-sgp4) is satnum <= 339999.
                 ommData = exporter.export_omm( self.satelliteRecord, self.getName() )
                 ommData[ "NORAD_CAT_ID" ] = str( 0 )
                 satelliteRecord = Satrec()
