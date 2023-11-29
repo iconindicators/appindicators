@@ -2,6 +2,12 @@
 # via the preinst/postinst scripts working given how `pip` has changed things.
 # If I cannot, need to add something about how to install and remove on the main README.md
 # See discussion about error on Debian bookworm and venv.
+#
+# As per a comment below the question in 
+#   https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana/75696359#75696359
+# will likely need
+#   python3-full
+# in the Debian install depends.
 
 
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
@@ -50,13 +56,9 @@
 #
 # More on this issue
 #   https://stackoverflow.com/questions/76873955/pip-install-user-doesnt-work-on-debian-12
-#   https://stackoverflow.com/questions/76465606/why-is-pip3-9-trying-to-use-the-debian-12-python3-11
 #   https://stackoverflow.com/questions/75608323/how-do-i-solve-error-externally-managed-environment-every-time-i-use-pip-3
-#   https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana
-#   https://stackoverflow.com/questions/77253338/best-practice-using-python-packages-not-developing-on-debian-12
-#   https://www.reddit.com/r/debian/comments/14g9np9/debian_12_pip_makes_trouble/
+#   https://stackoverflow.com/a/75696359/2156453
 #   https://stackoverflow.com/questions/64005822/how-to-specify-external-system-dependencies-to-a-python-package
-#   https://stackoverflow.com/questions/5729051/python-package-external-dependencies?rq=3
 #   https://stackoverflow.com/questions/55293003/how-to-handle-external-dependencies-in-python
 #
 # If the postinst will no longer work in kicking off an install to a venv,
