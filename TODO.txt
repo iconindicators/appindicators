@@ -10,6 +10,13 @@
 # in the Debian install depends.
 
 
+#TODO As per
+#   https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
+# it is recommended not to use venv and instead suggests
+#   https://pdm-project.org/latest/
+# so do some reading about PDM.
+
+
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
 #
 #     error: externally-managed-environment
