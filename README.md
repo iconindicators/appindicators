@@ -24,7 +24,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 ## Requirements
 - For `Ubuntu`, you must enable the `Ubuntu appIndicators` extension using `GNOME Tweaks`.
 
-- For `Debian 12 (bookworm)` you must [install](https://extensions.gnome.org/extension/615/appindicator-support/) the `GNOME Shell` extension `AppIndicator and KStatusNotifierItem Support`. 
+- For `Debian 12` you must [install](https://extensions.gnome.org/extension/615/appindicator-support/) the `GNOME Shell` extension `AppIndicator and KStatusNotifierItem Support`. 
 
 
 ## Installation
@@ -55,6 +55,7 @@ To run `indicator-fortune` for example, press the `Super`/`Windows` key to open 
 
 ## Limitations
 Distributions/versions with full functionality:
+- `Debian 11`
 - `Ubuntu 20.04`
 - `Ubuntu 22.04`
 - `Ubuntu Budgie 22.04`
