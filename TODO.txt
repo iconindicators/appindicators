@@ -1,6 +1,7 @@
 #TODO Need to figure out for indicator-lunar how to install pyephem et al 
 # via the preinst/postinst scripts working given how `pip` has changed things.
 # If I cannot, need to add something about how to install and remove on the main README.md
+# See discussion about error on Debian bookworm and venv.
 
 
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
@@ -75,6 +76,36 @@
 # Need the full path to the venv?
 
 
+#TODO Good background on Python build/env
+#   https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
+#   https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
+#   https://sinoroc.gitlab.io/kb/python/package_data.html
+
+
+#TODO i18n
+# Should look at i18n at least for pyproject.toml and how to include translation file in a .whl...
+# https://discuss.python.org/t/how-to-package-translation-files-po-mo-in-a-future-proof-way/20096
+# https://stackoverflow.com/questions/22958245/what-is-the-correct-way-to-include-localisation-in-python-packages
+# https://stackoverflow.com/questions/53285634/is-there-a-portable-way-to-provide-localization-of-a-package-distributed-on-pypi?noredirect=1&lq=1
+# https://github.com/s-ball/mo_installer
+# https://stackoverflow.com/questions/55365356/how-to-include-localized-message-in-python-setuptools?noredirect=1&lq=1
+# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
+# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
+#
+# https://github.com/thinkle/gourmet/blob/master/setup.py
+# https://github.com/PythonOT/POT/blob/master/setup.py
+# https://github.com/moinwiki/moin/blob/master/setup.py
+# https://github.com/GourmandRecipeManager/gourmand/blob/main/setup.py
+#
+# https://www.mattlayman.com/blog/2015/i18n/
+#
+# https://stackoverflow.com/questions/32609248/setuptools-adding-additional-files-outside-package
+#
+# Also look at Sound Switcher below which has i18n/po and also a snap.
+
+
+
+
 #TODO Future work...
 # Port indicators to Ubuntu variants:
 #    https://www.linuxmint.com/
@@ -144,32 +175,6 @@
 #   https://stackoverflow.com/questions/74608905/single-source-of-truth-for-python-project-version-in-presence-of-pyproject-toml
 #   https://stackoverflow.com/questions/76041299/using-values-generated-by-python-scripts-in-dynamic-fields-in-pyproject-toml
 #   https://stackoverflow.com/questions/76081078/using-the-return-value-of-a-python-function-as-the-value-for-version-field-in-py
-
-
-#TODO Good background on Python build/env
-#   https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
-#   https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html
-#   https://sinoroc.gitlab.io/kb/python/package_data.html
-
-
-#TODO i18n
-# https://discuss.python.org/t/how-to-package-translation-files-po-mo-in-a-future-proof-way/20096
-# https://stackoverflow.com/questions/22958245/what-is-the-correct-way-to-include-localisation-in-python-packages
-# https://stackoverflow.com/questions/53285634/is-there-a-portable-way-to-provide-localization-of-a-package-distributed-on-pypi?noredirect=1&lq=1
-# https://github.com/s-ball/mo_installer
-# https://stackoverflow.com/questions/55365356/how-to-include-localized-message-in-python-setuptools?noredirect=1&lq=1
-# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
-# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
-#
-# May be of use too for i18n
-# https://github.com/thinkle/gourmet/blob/master/setup.py
-# https://github.com/PythonOT/POT/blob/master/setup.py
-# https://github.com/moinwiki/moin/blob/master/setup.py
-# https://github.com/GourmandRecipeManager/gourmand/blob/main/setup.py
-#
-# https://www.mattlayman.com/blog/2015/i18n/
-#
-# https://stackoverflow.com/questions/32609248/setuptools-adding-additional-files-outside-package
 
 
 #TODO AppImage
