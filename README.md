@@ -56,22 +56,17 @@ To run `indicator-fortune` for example, press the `Super`/`Windows` key to open 
 ## Limitations
 Distributions/versions with full functionality:
 - `Debian 11`
-- `Ubuntu 20.04`
-- `Ubuntu 22.04`
+- `Ubuntu 20.04 / 22.04`
 - `Ubuntu Budgie 22.04`
-- `Ubuntu Unity 20.04`
-- `Ubuntu Unity 22.04`
+- `Ubuntu Unity 20.04 / 22.04`
 
 Distributions/versions with limited functionality:
-- `Kubuntu 20.04` No mouse wheel scroll; tooltip in lieu of label.
-- `Kubuntu 22.04` No mouse wheel scroll; tooltip in lieu of label.
-- `Lubuntu 20.04` No label; tooltip is not dynamic; icon is not dynamic.
-- `Lubuntu 22.04` No label; tooltip is not dynamic; icon is not dynamic.
+- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.
+- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.
 - `Ubuntu Budgie 20.04` No mouse middle click.
 - `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.
 - `Ubuntu MATE 22.04` Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.
-- `Xubuntu 20.04` No mouse wheel scroll; tooltip in lieu of label.
-- `Xubuntu 22.04` No mouse wheel scroll; tooltip in lieu of label.
+- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.
 
 
 ## License
