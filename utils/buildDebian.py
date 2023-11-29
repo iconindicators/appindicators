@@ -82,7 +82,7 @@ def _getMetadataFromPyprojectToml( indicatorDirectory ):
     patternVersion = re.compile( "version = .*" )
     patternEndBracket = re.compile( ']' )
 
-    # Would like to use 'tomlib' but it is only in 3.11 and so is unavailable for Ubuntu 20.04.
+    # Would like to use 'tomlib' but it is only in 3.11 which is unavailable for Ubuntu 20.04.
     processingAuthors = False
     metadata = { }
     for line in open( indicatorDirectory + os.sep + "pyproject.toml" ).readlines():
