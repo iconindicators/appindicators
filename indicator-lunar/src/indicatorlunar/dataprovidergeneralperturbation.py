@@ -46,8 +46,19 @@ class DataProviderGeneralPerturbation( DataProvider ):
     def load( filename, logging ):
         data = { }
         for fields in omm.parse_xml( filename ):
-            gp = GP( fields )
-            data[ gp.getNumber() ] = gp
+            if float( fields[ "NORAD_CAT_ID" ] ) > float( "339999" ):
+                # The current version of python-sgp4 (a wrapper for C++ sgp)
+                # has an upper limit of 339,999 for the NORAD catalog number:
+                #   https://github.com/brandon-rhodes/pyephem/discussions/243
+                # Therefore drop any satellite until sgp4 can handle up to 999,999,999.
+                logging.warning(
+                    "Dropping satellite with NORAD catalog number",  
+                    fields[ "NORAD_CAT_ID" ],
+                    "as it exceeds the python-sgp4 upper limit of 339999." )
+
+            else:
+                gp = GP( fields )
+                data[ gp.getNumber() ] = gp
 
         return data
 
@@ -59,7 +70,20 @@ class GP( object ):
         self.satelliteRecord = Satrec()
         omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
 
-        self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ] # Satellite record does not hold the name.
+        # Satellite record does not hold the name.
+        self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ]
+
+        # The TLE format supports a NORAD catalog number up to five alpha-numeric characters,
+        # whereas OMM supports a NORAD catalog number from 1 up to 999,999,999.
+        # The SGP4 exporter will throw an exception when converting from OMM to TLE
+        # with a NORAD catalog number longer than five characters:
+        #   https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
+        # Therefore, if/when required to obtain the TLE from the OMM data,
+        # set the NORAD catalog number to '0' which, although is an invalid value,
+        # can be ignored as the TLE is only needed to compute the satellite trajectory.
+        self.number = self.satelliteRecord.satnum_str
+        if len( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > 5:
+            self.satelliteRecord.satnum_str = "00000"
 
         # Initialise on demand.
         self.tleLineOne = None
@@ -71,7 +95,7 @@ class GP( object ):
 
 
     def getNumber( self ):
-        return str( self.satelliteRecord.satnum )
+        return self.number
 
 
     def getInternationalDesignator( self ):
@@ -84,58 +108,7 @@ class GP( object ):
 
     def getTLELineOneLineTwo( self ):
         if self.tleLineOne is None:
-            print( self.satelliteRecord.satnum_str )
-            if self.satelliteRecord.satnum > 99999:
-                print( self.satelliteRecord )
-                # The TLE format does not support satellite catalog numbers (NORAD number) greater than 99,999.
-                #
-                # When the SGP4 exporter converts from OMM to TLE, such a catalog number will be erroneously omitted:
-                #    https://github.com/brandon-rhodes/python-sgp4/issues/97
-                #
-                # Ideally set the catalog number to '0' (which is unused) after the OMM object is initialised
-                # (before the export to TLE); unfortunately, the catalog number is protected.
-                #
-                # Therefore, export to OMM, set the catalog number to '0' then export to TLE.
-#TODO Given the new writable field satnum_str in Satrec, the code below may be simplified.
-# Not sure what to exactly write to the satnum_str field;
-# currently setting a 0 to the NORAD_CAT_ID before converting to Satrec.
-# So first need an example of a satnum > 99999 (in length, not value).
-# Then set the satnum_str to the value from satelliteRecord.satnum
-# and see what happens in the omm.initialise (does the value actually get set?)
-# and after that, viewing the satellite info (name, number, rise, set, position)
-# is all correct.
-#   https://github.com/brandon-rhodes/python-sgp4/commit/19990f3f2a5af9d054a84797a8ede0892b487912
-#   https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
-# Need to check in PyEphem as it likely won't support a satnum > 99999.  
-# Need to check in Skyfield as it likely will support a satnum > 99999.
-#
-#
-# Wondering now based on 
-#   https://github.com/brandon-rhodes/pyephem/discussions/243
-# seems SGP4 does not support numbers above a certain range,
-# so dealing with a satnum > 99999 is somewhat of a false barrier...
-# there is another barrier just waiting.
-# So should I first confirm this?
-# The suggestion is to swap out the satnum when too large for TLE
-# at the time of passing in to be calculated...maybe that is an option.
-# But if there is another barrier further along then what is the point?
-# Need to investigate further...maybe ask Brandon in issue 243 above.
-#
-#
-#Sent email to David dvallado@comspoc.com asking why if the noradID/satnum
-# is supposed to be 9 digits, does that mean SGP4's satnum needs to change from 6 chars to 9?
-#
-# Also, based on
-#   https://github.com/brandon-rhodes/python-sgp4/commit/56c1c4da0e9735b7a76939c2cb582bae134220ee,
-# it seems that the upper limit of SGP4 (at least in python-sgp4) is satnum <= 339999.
-                ommData = exporter.export_omm( self.satelliteRecord, self.getName() )
-                ommData[ "NORAD_CAT_ID" ] = str( 0 )
-                satelliteRecord = Satrec()
-                omm.initialize( satelliteRecord, ommData )
-                self.tleLineOne, self.tleLineTwo = exporter.export_tle( satelliteRecord )
-
-            else:
-                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+            self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
 
         return self.tleLineOne, self.tleLineTwo
 
