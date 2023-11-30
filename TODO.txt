@@ -8,13 +8,21 @@
 # will likely need
 #   python3-full
 # in the Debian install depends.
-
-
-#TODO As per
-#   https://chriswarrick.com/blog/2023/01/15/how-to-improve-python-packaging/
-# it is recommended not to use venv and instead suggests
-#   https://pdm-project.org/latest/
-# so do some reading about PDM.
+#
+# Some points from reading various sources...
+# Can create the venv at install time, which also installs ephem/sgp4 via pip.
+# Perhaps a good idea to check at indicator run time if venv/ephem/sgp4 exists
+# and if not, alert the user...either give instructions on how to fix it all
+# by installing, etc, OR, tell user to uninstall indicator and hope that works?
+#
+# If checking at run time, perhaps create the venv and install ephem/sgp4
+# at run time rather than install time.
+# This makes the debian install easier perhaps?
+#
+# How to name the venv?
+# Perhaps in user's HOME directory and call it .venv_indiator_lunar_1_0_100?
+# Perhaps add a datetime to the end in case we need to blow it away?
+# But can blow it away anyway without appending the datetime...
 
 
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
@@ -64,7 +72,6 @@
 # More on this issue
 #   https://stackoverflow.com/questions/76873955/pip-install-user-doesnt-work-on-debian-12
 #   https://stackoverflow.com/questions/75608323/how-do-i-solve-error-externally-managed-environment-every-time-i-use-pip-3
-#   https://stackoverflow.com/a/75696359/2156453
 #   https://stackoverflow.com/questions/64005822/how-to-specify-external-system-dependencies-to-a-python-package
 #   https://stackoverflow.com/questions/55293003/how-to-handle-external-dependencies-in-python
 #
@@ -83,6 +90,10 @@
 #
 # Can Python script in /usr/share/indicator-lunar refer to a Python library in a venv?
 # Need the full path to the venv?
+#
+# According to 
+#   https://dev.to/bowmanjd/python-tools-for-managing-virtual-environments-3bko
+# don't need to activate a venv to use it; can just call the venv directly.
 
 
 #TODO Good background on Python build/env
