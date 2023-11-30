@@ -22,7 +22,7 @@
 
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase
-from sgp4 import exporter, omm
+from sgp4 import alpha5, exporter, omm
 from sgp4.api import Satrec
 
 
@@ -46,46 +46,49 @@ class DataProviderGeneralPerturbation( DataProvider ):
     def load( filename, logging ):
         data = { }
         for fields in omm.parse_xml( filename ):
-            if float( fields[ "NORAD_CAT_ID" ] ) > float( "339999" ):
-                # The current version of python-sgp4 (a wrapper for C++ sgp)
-                # has an upper limit of 339,999 for the NORAD catalog number:
-                #   https://github.com/brandon-rhodes/pyephem/discussions/243
-                # Therefore drop any satellite until sgp4 can handle up to 999,999,999.
-                logging.warning(
-                    "Dropping satellite with NORAD catalog number",  
-                    fields[ "NORAD_CAT_ID" ],
-                    "as it exceeds the python-sgp4 upper limit of 339999." )
-
-            else:
-                gp = GP( fields )
-                data[ gp.getNumber() ] = gp
+            gp = GP( fields )
+            data[ gp.getNumber() ] = gp
 
         return data
 
 
-# Hold general perturbation for a satellite.
 class GP( object ):
+    '''Hold general perturbation for a satellite.'''
 
     def __init__( self, xmlFieldsFromOMM ):
+        '''
+        Take the XML fields from the OMM data and propagate.
+        
+        Unfortunately, the underlying C++ sgp, which performs the propagation,
+        has an upper limit of 339,999 for the NORAD catalog number:
+            https://github.com/brandon-rhodes/pyephem/discussions/243
+
+        Use a sleight of hand to ensure propagation occurs
+        when the NORAD catalog number exceeds 339,999:
+            Swap out the NORAD catalog number with '0'
+            (NORAD catalog numbers start from '1'),
+            perform the propagation, then swap back in.
+
+        Although the resultant satellite record will contain a value of '0'
+        for the NORAD catalog number, the actual NORAD catalog number
+        is still available via getNumber().
+        '''
+
         self.satelliteRecord = Satrec()
-        omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
 
         # Satellite record does not hold the name.
         self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ]
 
-        # The TLE format supports a NORAD catalog number up to five alpha-numeric characters,
-        # whereas OMM supports a NORAD catalog number from 1 up to 999,999,999.
-        # The SGP4 exporter will throw an exception when converting from OMM to TLE
-        # with a NORAD catalog number longer than five characters:
-        #   https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
-        # Therefore, if/when required to obtain the TLE from the OMM data,
-        # set the NORAD catalog number to '0' which, although is an invalid value,
-        # can be ignored as the TLE is only needed to compute the satellite trajectory.
-        self.number = self.satelliteRecord.satnum_str
-        if len( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > 5:
-            self.satelliteRecord.satnum_str = "00000"
+        self.number = xmlFieldsFromOMM[ "NORAD_CAT_ID" ]
+        if float( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > float( "339999" ):
+            xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = '0'
+            omm.initialize( self.satelliteRecord, xmlFieldsFromOMM ) # The satellite record now has a satnum = 0.
+            xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = self.number
 
-        # Initialise on demand.
+        else:
+            omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
+
+        # Generate on demand.
         self.tleLineOne = None
         self.tleLineTwo = None
 
@@ -107,8 +110,29 @@ class GP( object ):
 
 
     def getTLELineOneLineTwo( self ):
+        '''
+        The TLE format supports a NORAD catalog number of five characters,
+        whereas OMM supports a NORAD catalog number from 1 up to 999,999,999.
+
+        When generating the TLE, if the length of the NORAD catalog number
+        exceeds five characters, the NORAD catalog number will be set to '0'
+        in the TLE, which makes no impact upon computing satellite trajectory.
+
+        The actual NORAD catalog number is still available via getNumber().
+        '''
         if self.tleLineOne is None:
-            self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+            if float( self.getNumber() ) > float( "339999" ):
+                # The satnum was set to '0' in the init, so safe to do an export.
+                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+
+            elif len( self.getNumber() ) > 5:
+                # https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
+                self.satelliteRecord.satnum_str = "00000"
+                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+                self.satelliteRecord.satnum_str = alpha5.to_alpha5( int( self.getNumber() ) )
+
+            else:
+                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
 
         return self.tleLineOne, self.tleLineTwo
 
