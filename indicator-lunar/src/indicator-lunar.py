@@ -19,6 +19,13 @@
 # Application indicator for the home astronomer.
 
 
+#TODO Part of the work toward using a venv for ephem/sgp4,
+# perhaps try to use the indicator lunar .desktop file without the
+#   Path=/usr/share/indicator-lunar
+# and see if that makes a difference.
+# Should ensure the test does something to load up planets.bsp and stars.dat.
+
+
 #TODO Should really have a postrm!
 # Might be of help:
 #   https://unix.stackexchange.com/questions/357840/how-can-i-create-a-proper-debian-postinst-and-postrm-script
