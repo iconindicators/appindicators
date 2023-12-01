@@ -7,6 +7,8 @@
 #   https://stackoverflow.com/questions/75602063/pip-install-r-requirements-txt-is-failing-this-environment-is-externally-mana/75696359#75696359
 # will likely need
 #   python3-full
+#   python3-pip
+#   python3-venv
 # in the Debian install depends.
 #
 # Some points from reading various sources...
@@ -23,6 +25,13 @@
 # Perhaps in user's HOME directory and call it .venv_indiator_lunar_1_0_100?
 # Perhaps add a datetime to the end in case we need to blow it away?
 # But can blow it away anyway without appending the datetime...
+#
+#
+# https://www.makeuseof.com/create-python-virtual-environment-on-ubuntu/
+#
+# python3 -m venv /opt/my_first_venv
+#
+# /some/path/to/venv/bin/python -m pip install -U package_name
 
 
 #TODO When installing indicator-lunar on Debian bookworm, got an error:
