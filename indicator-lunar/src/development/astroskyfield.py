@@ -19,6 +19,10 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO This might be useful (date_for_calculate) for satellites:
+#   https://github.com/skyfielders/python-skyfield/issues/919#issuecomment-1835991577
+
+
 #TODO If/when astroskyfield.py is included in the release,
 # need to update the pyproject.toml to include the planets.bsp and stars.dat
 # See
