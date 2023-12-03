@@ -1,3 +1,115 @@
+#TODO Have added a lot of new TODOs below, based on changing of mind and lots of reading.
+#
+# Current thinking is to create a .whl, with or without icons/mo and incorporate the .whl into a .deb.
+# 
+# The same would apply to creating a .rpm.
+# 
+# Given Indicator Lunar will have to switch to a venv so that the Python libraries ephem/sgp4
+# can be installed via pip, what if each indicator is installed via pip, exclusively or in part?
+# 
+# 
+# Option 1
+# --------
+# As described above; create a .whl, partially or complete,
+# and bundle that .whl within a .deb/.rpm which contains
+# the source, icons, .mo and .desktop, then installs
+# OS level packages. 
+# 
+# 
+# Option 2
+# --------
+# Create a complete .whl and upload to PyPI.
+# Create a .deb/.rpm which does not contain the software, icons, .mo,
+# and only installs OS level packages, copies .desktop,
+# creates a venv and installs the software (and icons/.mo) via PyPI. 
+# 
+#
+# Option 3
+# --------
+# Create a complete .whl and upload to PyPI, including .desktop.
+# Create an install command along the lines of:
+#   sudo apt install "OS level package" &&
+#   python3 -m venv $HOME/.venv_indicator_fortune &&
+#   $HOME/.venv_indicator_fortune/python3 install indicator_fortune &&
+#   cp $HOME/.venv_indicator_fortune/.../indicator_fortune/.../indicator-fortune.py.desktop $HOME/.local/share/applications &&
+#   cp $HOME/.venv_indicator_fortune/.../indicator_fortune/.../indicator-fortune.py.desktop $HOME/.config/autostart &&
+# which could be put into a shell script for installation.
+#
+# The command to run is something like:
+#   $HOME/.venv_indicator_fortune/python3 $HOME/.venv_indicator_fortune/.../indicator_fortune/indicator-fortune.py
+
+
+#TODO Some links about things...
+# https://stackoverflow.com/questions/66425077/project-structure-design-where-store-toolbar-icons-and-how-access-them
+# https://github.com/handroll/handroll/tree/master/handroll/locale
+# https://phrase.com/blog/posts/python-localization/
+# https://www.mattlayman.com/blog/2015/i18n/
+# https://docs.python.org/3/library/gettext.html
+# https://potranslator.readthedocs.io/en/latest/usage.html
+# https://wiki.laptop.org/go/Python_i18n
+# https://stackoverflow.com/questions/15853058/run-custom-task-when-call-pip-install?noredirect=1&lq=1
+# https://stackoverflow.com/questions/65130573/in-setup-py-how-to-run-a-system-command-before-any-pip-install?noredirect=1&lq=1
+# https://stackoverflow.com/questions/44549600/custom-post-install-script-not-running-with-pip?rq=3
+# https://stackoverflow.com/questions/44655513/running-post-install-code-from-pypi-via-pip?rq=3
+# https://wiki.archlinux.org/title/desktop_entries
+
+
+#TODO SVG colours 
+# https://johndecember.com/html/spec/colorsvghex.html
+
+
+#TODO Think I should really make sure the project layout is perfect for a Python project.
+# 
+# From
+#   https://packaging.python.org/en/latest/guides/distributing-packages-using-setuptools/
+# Perhaps look at making a source distribution 
+#   python -m build --sdist
+# and then a pure python wheel
+#   python -m build --wheel     check this is correct syntax.
+# ...ensuring all files are included.
+#
+#   https://medium.com/mlearning-ai/a-practical-guide-to-python-project-structure-and-packaging-90c7f7a04f95
+#
+# For indicator lunar, ensure that planets.bsp and stars.dat are included
+# in the sdist and/or wheel.
+# Maybe need a buildWheel.py or buildSdist.py or both
+# that create the planets.bsp/stars.dat...but where to put them?
+# I suspect need to be under src/indicatorlunar/data/
+# which will be created on the fly in those scripts (then cleaned up at the end).
+#
+# Not sure what files are automatically included...
+#   https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html#using-manifest-in
+#   https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+#   https://godatadriven.com/blog/a-practical-guide-to-setuptools-and-pyproject-toml/
+
+
+#TODO Might have to rename utils to tools
+#   https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/
+# Which impacts the build script and the print statements and checks to see
+# if we are in the correct directory.
+# Need to make that stuff dynamic!
+
+
+#TODO Ideas on naming conventions, etc
+#   https://guicommits.com/organize-python-code-like-a-pro/
+
+
+#TODO venv
+#   https://snarky.ca/classifying-python-virtual-environment-workflows/
+
+
+#TODO debian/rules
+#   https://wiki.debian.org/Python/LibraryStyleGuide?action=show&redirect=Python%2FPackaging#debian.2Frules
+#   https://github.com/rsm-gh/build-deb/blob/master/DEBIAN_BASICS.md
+
+
+#TODO
+# Have seen mentioned pybuild in various debian/rules files.  Should I be now using that?
+#   https://www.debian.org/doc/packaging-manuals/python-policy/index.html#pybuild
+#   https://wiki.debian.org/Python/LibraryStyleGuide?action=show&redirect=Python%2FPackaging#debian.2Frules
+#   https://manpages.debian.org/unstable/dh-python/pybuild.1.en.html#flit_plugin
+
+
 #TODO Need to figure out for indicator-lunar how to install pyephem et al 
 # via the preinst/postinst scripts working given how `pip` has changed things.
 # If I cannot, need to add something about how to install and remove on the main README.md
@@ -254,6 +366,7 @@
 #   https://stackoverflow.com/questions/29038961/how-can-i-build-an-rpm-package-in-a-debian-based-system
 #   https://rpm-packaging-guide.github.io/#packaging-software
 #   https://blog.jwf.io/2017/11/first-rpm-package-fedora/
+#   https://discuss.python.org/t/tool-to-build-a-rpm-package-backed-by-pep-517/4020/15
 #   https://rpm-guide.readthedocs.io/en/latest/index.html
 #   https://discuss.python.org/t/tool-to-build-a-rpm-package-backed-by-pep-517/4020/14
 #   https://stackoverflow.com/questions/42286786/how-to-create-a-rpm-for-python-application
