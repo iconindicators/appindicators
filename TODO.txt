@@ -1,3 +1,16 @@
+#TODO If I manage to get option three working,
+# (install indicator-test from PyPI with everything working)
+# consider having a front end called say indicator-suite.py
+# which takes an argument, say indicator-fortune, or just fortune,
+# and that kicks off indicator-fortune.
+# This implies installing indicator-suite installs the front end
+# indicator-suite.py and all other indicators in entirety.
+# If it is needed to install lots of stuff just to get the indicators
+# installed, and a page of information for each indicator on PyPI,
+# and upload each indicator each time a change is made,
+# perhaps bundle all indicators into a single indicator-suite.
+
+
 #TODO OS dependencies...
 sudo apt install libcairo2-dev libgirepository1.0-dev
 
