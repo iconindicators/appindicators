@@ -29,6 +29,13 @@
 # In that case, Indicator Lunar requires planets.bsp and stars.dat
 # to be created during the build process and copied (then removed)
 # to the src/indicatorlunar directory (and included in the pyproject.toml).
+#
+# Also need to (as per buildDebian.py and build-debian) merge
+# Indicator Base po for each language with Indicator XXX po and
+# then create the mo files (then remove move files after the build).
+#
+# Also need to include the .desktop file somewhere so that it can
+# be copied to the user's home directory.
 
 
 import argparse, os, shutil, subprocess
