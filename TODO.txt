@@ -1,3 +1,9 @@
+#TODO OS dependencies...
+sudo apt install libcairo2-dev libgirepository1.0-dev
+
+Perhaps try gobject-introspection instead of libgirepository1.0-dev...what is the relationship?
+
+
 #TODO For getting indicator-test running as a pip installed .whl in a venv:
 python3 -m venv venv
 // 	. ./venv/bin/activate
