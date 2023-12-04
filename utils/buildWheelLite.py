@@ -62,6 +62,10 @@ def _buildWheelForIndicators( directoryRelease, indicatorNames ):
         readmeMarkdown = "README.md"
         shutil.copy( readmeMarkdown, indicatorName )
 
+        indicatorBaseSource = "indicator-base/src/indicatorbase/indicatorbase.py"
+        indicatorBaseDestination = indicatorName + os.sep + "src" + os.sep + indicatorName.replace( '-', '' )
+        shutil.copy( indicatorBaseSource, indicatorBaseDestination )
+
         command = \
             ". ./" + str( directoryVenv ) + "/bin/activate && " + \
             "cd " + indicatorName + " && " + \
@@ -71,6 +75,7 @@ def _buildWheelForIndicators( directoryRelease, indicatorNames ):
 
         os.remove( indicatorName + os.sep + licenseText )
         os.remove( indicatorName + os.sep + readmeMarkdown )
+        os.remove( indicatorBaseDestination + os.sep + "indicatorbase.py" )
 
         for egg in list( Path( indicatorName + os.sep + "src" ).glob( "*.egg-info" ) ):
             shutil.rmtree( egg )
