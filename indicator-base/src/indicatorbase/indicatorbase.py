@@ -120,7 +120,8 @@ class IndicatorBase( ABC ):
 
         self.indicatorName = indicatorName
 
-        projectMetadata = self._getMetadataFromProject()
+        projectMetadata = self._getProjectMetadata()
+        # projectMetadata = self._getMetadataFromProject()
         if projectMetadata is None:
 #TODO Can we even log at this point?
 #Maybe also print out the errorMessage?
@@ -181,6 +182,34 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
+
+
+    def _getProjectMetadata( self ):
+        # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
+        # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+        projectMetadata = None
+        try:
+            projectMetadata = metadata.metadata( self.indicatorName ) # Obtain pyproject.toml information from pip.
+#TODO Check if None and log.
+        except metadata.PackageNotFoundError:
+            pass
+            print( "no package" )
+
+        if projectMetadata is None:
+            # Used only for development/testing when the .whl file is in the indicator's directory.
+            firstWheel = next( Path( "." ).glob( "*.whl" ), None )
+            if firstWheel is None:
+                print( "Expected to find a .whl in the same directory as the indicator, but none was found!" )
+
+            else:
+                firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
+                if firstMetadata is None:
+                    print( "No metadata was found in {0}" ).format( firstWheel )
+
+                else:
+                    projectMetadata = firstMetadata.metadata
+
+        return projectMetadata
 
 
     # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
