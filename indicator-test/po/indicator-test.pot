@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-test 1.0.6\n"
+"Project-Id-Version: indicator-test 1.0.7\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"POT-Creation-Date: 2023-12-04 22:05+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,22 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: indicator-test.py:75
+msgid "Test"
+msgstr ""
 
-msgid "Nothing"
+#: indicator-test.py:323
+msgid ""
+"Cannot run script as no terminal and/or terminal execution flag found; "
+"please install gnome-terminal."
+msgstr ""
+
+#: indicator-test.py:333
+msgid ""
+"Cannot run script as qterminal incorrectly parses arguments; please install "
+"gnome-terminal instead."
+msgstr ""
+
+#: indicator-test.py:349 indicator-test.py:351
+msgid "Enable/disable X"
 msgstr ""
