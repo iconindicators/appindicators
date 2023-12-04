@@ -29,9 +29,19 @@ classifiers = [
 [project.urls]
 homepage = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
+[tool.setuptools.packages.find]
+where = [ "src" ]
+
 [tool.setuptools.package-data]
+"indicatortest.icons" = [ "**/*.svg"  ]
+"indicatortest.locale" = [ "**/*.mo", "**/*.po", "**/*.pot"  ]
+
+#TODO I think I need PyGObject as a dependency.
+
+
+#[tool.setuptools.package-data]
 #"indicatortest.locale" = [ "**/*.mo" ]
-"indicatortest.locale" = [ "**/*.po", "*.pot", "**/*.mo" ]
+#"indicatortest.locale" = [ "**/*.po", "*.pot", "**/*.mo" ]
 
 #[tool.setuptools.exclude-package-data]
 #"indicatortest.locale" = [ "*.pot", "**/*.po" ]
@@ -40,3 +50,7 @@ homepage = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 # https://setuptools.pypa.io/en/latest/userguide/datafiles.html
 # https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html
 # https://discuss.python.org/t/purpose-of-an-sdist/4639/13
+
+
+# For config additional to pyproject.toml use setup.cfg
+#   https://setuptools.pypa.io/en/latest/userguide/quickstart.html

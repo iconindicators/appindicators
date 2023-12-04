@@ -1,3 +1,22 @@
+#TODO For getting indicator-test running as a pip installed .whl in a venv:
+python3 -m venv venv
+// 	. ./venv/bin/activate
+// 	pip3 install release/wheel/indicator_test-1.0.7-py3-none-any.whl 
+// 	python3 venv/lib/python3.8/site-packages/indicatortest/indicator-test.py 
+// 	which python3
+// 	python3 -m pip install --upgrade pip
+// 	python3 -m pip --version
+// 	python3 -m pip install python3-gi
+// 	python3 -m pip install PyGObject
+// 	python3 venv/lib/python3.8/site-packages/indicatortest/indicator-test.py 
+// 	pip3 uninstall release/wheel/indicator_test-1.0.7-py3-none-any.whl 
+// 	pip3 install release/wheel/indicator_test-1.0.7-py3-none-any.whl 
+// 	python3 venv/lib/python3.8/site-packages/indicatortest/indicator-test.py 
+// 	pip3 uninstall release/wheel/indicator_test-1.0.7-py3-none-any.whl 
+// 	pip3 install release/wheel/indicator_test-1.0.7-py3-none-any.whl 
+
+
+
 #TODO The MANIFEST.in is ONLY used for source distributions and NOT for Wheels.
 # So need some other way to include locale/icons.
 #
