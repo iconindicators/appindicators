@@ -121,7 +121,6 @@ class IndicatorBase( ABC ):
         self.indicatorName = indicatorName
 
         projectMetadata = self._getMetadataFromProject()
-        # projectMetadata = self._getMetadataFromWheel()
         if projectMetadata is None:
 #TODO Can we even log at this point?
 #Maybe also print out the errorMessage?
@@ -187,36 +186,11 @@ class IndicatorBase( ABC ):
     # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
     # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
     def _getMetadataFromProject( self ):
-        # try:
-        #     v = metadata.version( self.indicatorName )
-        #     print( v )
-        #
-        #     # for key, value in metadata.metadata( thing ).items():
-        #     #     print( key, '=', value )
-        #
-        #     # print( "next( metadata.distributions().metadata )", next( metadata.distributions() ).metadata )
-        # except Exception as e:
-        #     print( "Exception:", e ) 
-
-        
-        # firstMetadata = None
-        # errorMessage = None
-
-        # firstWheel = next( Path( "." ).glob( "*.whl" ), None )
-        # if firstWheel is None:
-        #     errorMessage = _( "Expected to find a .whl in the same directory as the indicator, but none was found!" ) #TODO Translate
-        #
-        # else:
-        #     firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
-        #     if firstMetadata is None:
-        #         errorMessage = _( "No metadata was found in {0}" ).format( firstWheel )  #TODO Translate
-
         return metadata.metadata( self.indicatorName )
 
 
     # Only to be used if the .whl file for the given indicator
     # is present in the indicator's directory (for testing purposes).
-#TODO May not need to translate the two lines below...
     def _getMetadataFromWheel( self ):
         metadataFromWheel = None
 
