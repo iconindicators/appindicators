@@ -21,6 +21,14 @@
 
 #TODO This script does not (yet) include the icons/po/mo stuff,
 # so does not technically create a true whl.
+#
+# Am moving toward building a full wheel...to include icons/mo.
+# If that works and can access icons/mo, 
+# then likely can solely have the indicators deployed via PyPI.
+#
+# In that case, Indicator Lunar requires planets.bsp and stars.dat
+# to be created during the build process and copied (then removed)
+# to the src/indicatorlunar directory (and included in the pyproject.toml).
 
 
 import argparse, os, shutil, subprocess
