@@ -29,6 +29,8 @@
 #     Need to set the locale to Russian in the code first?
 #
 #  2) Can read/access the relevant indicator for the theme.
+#
+#  3) Need to access planets.bsp/stars.dat
 
 
 
