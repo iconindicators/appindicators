@@ -2,7 +2,6 @@
 requires = [ "setuptools >= 61.0" ]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 name = "indicator-test"
 version = "1.0.7"
@@ -27,6 +26,17 @@ classifiers = [
     "Topic :: Software Development :: Testing"
 ]
 
-
 [project.urls]
 homepage = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
+
+[tool.setuptools.package-data]
+#"indicatortest.locale" = [ "**/*.mo" ]
+"indicatortest.locale" = [ "**/*.po", "*.pot", "**/*.mo" ]
+
+#[tool.setuptools.exclude-package-data]
+#"indicatortest.locale" = [ "*.pot", "**/*.po" ]
+
+
+# https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+# https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html
+# https://discuss.python.org/t/purpose-of-an-sdist/4639/13
