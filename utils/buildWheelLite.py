@@ -46,9 +46,7 @@ from pathlib import Path
 def _buildWheelForIndicators( directoryRelease, indicatorNames ):
     directoryVenv = Path( directoryRelease + os.sep + ".venv" )
     if directoryVenv.is_dir():
-        print( "- - - - - - - - - - - - - - - - - - - - -" )
-        print( "Using the venv located at:", directoryVenv )
-        print( "- - - - - - - - - - - - - - - - - - - - -" )
+        print( "Using the virtual environment located at:", directoryVenv )
 
     else:
         command = \
