@@ -22,6 +22,16 @@
 #   PYTHONPATH="../../../indicator-base/src/indicatorbase" python3  indicator-test.py
 
 
+#TODO Need to prove running as installed to a venv via pip,
+# or simulating by installing the .whl:
+# 
+#  1) Can read/access the .mo file for say Russian
+#     Need to set the locale to Russian in the code first?
+#
+#  2) Can read/access the relevant indicator for the theme.
+
+
+
 #TODO Check this works on Debian 12 and
 # then update README.md as appropriate.
 #
