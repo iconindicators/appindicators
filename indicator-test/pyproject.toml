@@ -1,3 +1,7 @@
+#TODO Is it possible to make this a template and
+# maybe another script with a cfg file to create the pyproject.toml per indicator?
+
+
 [build-system]
 requires = [ "setuptools >= 61.0" ]
 build-backend = "setuptools.build_meta"
@@ -12,6 +16,9 @@ maintainers = [
     { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
 ]
 description = "Application indicator to test indicator functionality."
+dependencies = [
+  "PyGObject",
+] #TODO Add this to all pyproject.toml
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 requires-python = ">=3.8"
@@ -35,8 +42,6 @@ where = [ "src" ]
 [tool.setuptools.package-data]
 "indicatortest.icons" = [ "**/*.svg"  ]
 "indicatortest.locale" = [ "**/*.mo", "**/*.po", "**/*.pot"  ]
-
-#TODO I think I need PyGObject as a dependency.
 
 
 #[tool.setuptools.package-data]
