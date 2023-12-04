@@ -121,7 +121,6 @@ class IndicatorBase( ABC ):
         self.indicatorName = indicatorName
 
         projectMetadata = self._getProjectMetadata()
-        # projectMetadata = self._getMetadataFromProject()
         if projectMetadata is None:
 #TODO Can we even log at this point?
 #Maybe also print out the errorMessage?
@@ -190,13 +189,15 @@ class IndicatorBase( ABC ):
         projectMetadata = None
         try:
             projectMetadata = metadata.metadata( self.indicatorName ) # Obtain pyproject.toml information from pip.
-#TODO Check if None and log.
-        except metadata.PackageNotFoundError:
-            pass
-            print( "no package" )
 
+        except metadata.PackageNotFoundError:
+#TODO Test that if indicator-fortune is installed a venv
+# but running indicator-fortune via Eclipse or from the Programming/indicators directory
+# does that still find the pip information?
+            pass # If the indicator is currently run in testing/development, there will be no pip information.
+
+        # Used only for development/testing when the .whl file is in the indicator's directory.
         if projectMetadata is None:
-            # Used only for development/testing when the .whl file is in the indicator's directory.
             firstWheel = next( Path( "." ).glob( "*.whl" ), None )
             if firstWheel is None:
                 print( "Expected to find a .whl in the same directory as the indicator, but none was found!" )
@@ -210,32 +211,6 @@ class IndicatorBase( ABC ):
                     projectMetadata = firstMetadata.metadata
 
         return projectMetadata
-
-
-    # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
-    # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
-    def _getMetadataFromProject( self ):
-        return metadata.metadata( self.indicatorName )
-
-
-    # Only to be used if the .whl file for the given indicator
-    # is present in the indicator's directory (for testing purposes).
-    def _getMetadataFromWheel( self ):
-        metadataFromWheel = None
-
-        firstWheel = next( Path( "." ).glob( "*.whl" ), None )
-        if firstWheel is None:
-            print( "Expected to find a .whl in the same directory as the indicator, but none was found!" )
-
-        else:
-            firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
-            if firstMetadata is None:
-                print( "No metadata was found in {0}" ).format( firstWheel )
-
-            else:
-                metadataFromWheel = firstMetadata.metadata
-
-        return metadataFromWheel
 
 
     def main( self ):
