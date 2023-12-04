@@ -1,3 +1,33 @@
+#TODO The MANIFEST.in is ONLY used for source distributions and NOT for Wheels.
+# So need some other way to include locale/icons.
+#
+# https://sinoroc.gitlab.io/kb/python/package_data.html
+# https://stackoverflow.com/questions/42791179/why-does-pip-install-not-include-my-package-data-files
+# https://stackoverflow.com/questions/13307408/python-packaging-data-files-are-put-properly-in-tar-gz-file-but-are-not-install
+# https://stackoverflow.com/questions/61624018/include-extra-file-in-a-python-package-using-setuptools
+# https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html
+# https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+# https://github.com/yktoo/indicator-sound-switcher/blob/dev/setup.py
+# https://stackoverflow.com/questions/32609248/setuptools-adding-additional-files-outside-package
+# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
+# https://stackoverflow.com/questions/1612733/including-non-python-files-with-setup-py
+# https://discuss.python.org/t/how-to-package-translation-files-po-mo-in-a-future-proof-way/20096
+# https://stackoverflow.com/questions/53285634/is-there-a-portable-way-to-provide-localization-of-a-package-distributed-on-pypi
+# https://stackoverflow.com/questions/42791179/why-does-pip-install-not-include-my-package-data-files
+# https://stackoverflow.com/questions/22958245/what-is-the-correct-way-to-include-localisation-in-python-packages
+# https://stackoverflow.com/questions/55365356/how-to-include-localized-message-in-python-setuptools
+#
+# https://github.com/koehlma/pygtkspellcheck/blob/17923aee49ea8d7245cc91154b81da5c4f034b22/pyproject.toml
+
+
+#TODO i18n
+# https://docs.python.org/3/library/gettext.html#gettext.bindtextdomain
+
+
+#TODO Access files ar runtime (.mo or icon):
+# https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
+
+
 #TODO Have added a lot of new TODOs below, based on changing of mind and lots of reading.
 #
 # Current thinking is to create a .whl, with or without icons/mo and incorporate the .whl into a .deb.
@@ -47,10 +77,10 @@
 # https://docs.python.org/3/library/gettext.html
 # https://potranslator.readthedocs.io/en/latest/usage.html
 # https://wiki.laptop.org/go/Python_i18n
-# https://stackoverflow.com/questions/15853058/run-custom-task-when-call-pip-install?noredirect=1&lq=1
-# https://stackoverflow.com/questions/65130573/in-setup-py-how-to-run-a-system-command-before-any-pip-install?noredirect=1&lq=1
-# https://stackoverflow.com/questions/44549600/custom-post-install-script-not-running-with-pip?rq=3
-# https://stackoverflow.com/questions/44655513/running-post-install-code-from-pypi-via-pip?rq=3
+# https://stackoverflow.com/questions/15853058/run-custom-task-when-call-pip-install
+# https://stackoverflow.com/questions/65130573/in-setup-py-how-to-run-a-system-command-before-any-pip-install
+# https://stackoverflow.com/questions/44549600/custom-post-install-script-not-running-with-pip
+# https://stackoverflow.com/questions/44655513/running-post-install-code-from-pypi-via-pip
 # https://wiki.archlinux.org/title/desktop_entries
 
 
@@ -227,10 +257,9 @@
 # Should look at i18n at least for pyproject.toml and how to include translation file in a .whl...
 # https://discuss.python.org/t/how-to-package-translation-files-po-mo-in-a-future-proof-way/20096
 # https://stackoverflow.com/questions/22958245/what-is-the-correct-way-to-include-localisation-in-python-packages
-# https://stackoverflow.com/questions/53285634/is-there-a-portable-way-to-provide-localization-of-a-package-distributed-on-pypi?noredirect=1&lq=1
+# https://stackoverflow.com/questions/53285634/is-there-a-portable-way-to-provide-localization-of-a-package-distributed-on-pypi
 # https://github.com/s-ball/mo_installer
-# https://stackoverflow.com/questions/55365356/how-to-include-localized-message-in-python-setuptools?noredirect=1&lq=1
-# https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
+# https://stackoverflow.com/questions/55365356/how-to-include-localized-message-in-python-setuptools
 # https://stackoverflow.com/questions/34070103/how-to-compile-po-gettext-translations-in-setup-py-python-script
 #
 # https://github.com/thinkle/gourmet/blob/master/setup.py
