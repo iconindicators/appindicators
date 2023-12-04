@@ -41,9 +41,20 @@
 # installable to a venv and then works!
 
 
+# using standard Language Code Identifier (LCID) Reference
+
+import locale
+print( locale.getlocale() )
+#locale.setlocale( locale.LC_ALL , "en_GB.utf8" )
+# https://unix.stackexchange.com/a/669744/80583
+
+
 INDICATOR_NAME = "indicator-test"
 import gettext
-gettext.install( INDICATOR_NAME )
+
+print( gettext.translation( INDICATOR_NAME, localedir = "locale" ) )
+
+gettext.install( INDICATOR_NAME, localedir = "locale" )
 
 import datetime
 
