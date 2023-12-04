@@ -120,26 +120,30 @@ class IndicatorBase( ABC ):
 
         self.indicatorName = indicatorName
 
-        wheelMetadata, errorMessage = self._getMetadataFromWheel()
-        if wheelMetadata is None:
+        projectMetadata = self._getMetadataFromProject()
+        # projectMetadata = self._getMetadataFromWheel()
+        if projectMetadata is None:
+#TODO Can we even log at this point?
+#Maybe also print out the errorMessage?
+            errorMessage = _( "Unable to locate project metadata - cannot continue!" ) #TODO Translate
             self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
             sys.exit()
 
-        self.version = wheelMetadata.metadata[ "Version" ]
+        self.version = projectMetadata[ "Version" ]
 
         self.copyrightStartYear = copyrightStartYear
         self.comments = comments
 
         # https://stackoverflow.com/a/75803208/2156453
         emailMessageObject = email.message_from_string(
-            f'To: { wheelMetadata.metadata[ "Author-email" ] }',
+            f'To: { projectMetadata[ "Author-email" ] }',
             policy = email.policy.default, )
 
         self.copyrightNames = [ ]
         for address in emailMessageObject[ "to" ].addresses:
             self.copyrightNames.append( address.display_name )
 
-        self.website = wheelMetadata.metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
+        self.website = projectMetadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
         self.authors = [ ]
         for author in self.copyrightNames:
@@ -180,20 +184,55 @@ class IndicatorBase( ABC ):
         self.__loadConfig()
 
 
+    # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
+    # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+    def _getMetadataFromProject( self ):
+        # try:
+        #     v = metadata.version( self.indicatorName )
+        #     print( v )
+        #
+        #     # for key, value in metadata.metadata( thing ).items():
+        #     #     print( key, '=', value )
+        #
+        #     # print( "next( metadata.distributions().metadata )", next( metadata.distributions() ).metadata )
+        # except Exception as e:
+        #     print( "Exception:", e ) 
+
+        
+        # firstMetadata = None
+        # errorMessage = None
+
+        # firstWheel = next( Path( "." ).glob( "*.whl" ), None )
+        # if firstWheel is None:
+        #     errorMessage = _( "Expected to find a .whl in the same directory as the indicator, but none was found!" ) #TODO Translate
+        #
+        # else:
+        #     firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
+        #     if firstMetadata is None:
+        #         errorMessage = _( "No metadata was found in {0}" ).format( firstWheel )  #TODO Translate
+
+        return metadata.metadata( self.indicatorName )
+
+
+    # Only to be used if the .whl file for the given indicator
+    # is present in the indicator's directory (for testing purposes).
+#TODO May not need to translate the two lines below...
     def _getMetadataFromWheel( self ):
-        firstMetadata = None
-        errorMessage = None
+        metadataFromWheel = None
 
         firstWheel = next( Path( "." ).glob( "*.whl" ), None )
         if firstWheel is None:
-            errorMessage = _( "Expected to find a .whl in the same directory as the indicator, but none was found!" ) #TODO Translate
+            print( "Expected to find a .whl in the same directory as the indicator, but none was found!" )
 
         else:
             firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
             if firstMetadata is None:
-                errorMessage = _( "No metadata was found in {0}" ).format( firstWheel )  #TODO Translate
+                print( "No metadata was found in {0}" ).format( firstWheel )
 
-        return firstMetadata, errorMessage
+            else:
+                metadataFromWheel = firstMetadata.metadata
+
+        return metadataFromWheel
 
 
     def main( self ):
