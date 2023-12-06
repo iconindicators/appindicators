@@ -1,3 +1,25 @@
+#TODO If/when getting venv to work,
+# I wonder if when an indicator is installed,
+# to run the indicator, do I need to activate the venv?
+# According to
+#   https://stackoverflow.com/questions/69319991/how-to-install-a-python-package-into-an-virtual-environment-without-activating-i
+#   https://stackoverflow.com/questions/56936293/run-python-script-without-activating-virtual-environment
+# perhaps not.
+# Simply create the venv as part of the installation process,
+# then the .desktop file has a path to the Python in the venv.
+#
+# One thing to check: in each python script,
+# do I need the 
+	#!/usr/bin/env python3
+	# -*- coding: utf-8 -*-
+# at the top?
+# If a script is not mean to be run, then perhaps not.
+# So given I may need to rewrite the !/usr/bin/env
+# to be something referring to the env, 
+# need to check this first line and what/how do I need it
+# and if needs to be rewrittne...or can be omitted?
+
+
 #TODO If I manage to get option three working,
 # (install indicator-test from PyPI with everything working)
 # consider having a front end called say indicator-suite.py
