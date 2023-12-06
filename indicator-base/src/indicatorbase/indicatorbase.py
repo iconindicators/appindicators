@@ -25,14 +25,7 @@
 #   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-import datetime, email.policy
-
-import gi
-gi.require_version( "GLib", "2.0" )
-gi.require_version( "Gtk", "3.0" )
-gi.require_version( "Notify", "0.7" )
-
-import gzip, json, logging.handlers, os, pickle, shutil, subprocess, sys
+import datetime, email.policy, gettext, gi, gzip, inspect, json, logging.handlers, os, pickle, shutil, subprocess, sys
 
 from abc import ABC
 from bisect import bisect_right
@@ -45,10 +38,30 @@ except ValueError:
     gi.require_version( "AppIndicator3", "0.1" )
     from gi.repository import AppIndicator3 as AppIndicator
 
+#TODO Check all other indicators...ensure the gi.requires is adjacent to and before from gi.repository import...
+gi.require_version( "GLib", "2.0" )
+gi.require_version( "Gtk", "3.0" )
+gi.require_version( "Notify", "0.7" )
 from gi.repository import GLib, Gtk, Notify
+
 from importlib import metadata
 from pathlib import Path
 from urllib.request import urlopen
+
+
+#TODO New code to determine the name of the indicator class,
+# which gives the indicator name and then initialise gettext.
+#TODO Not sure how to organise all these imports...
+# Maybe put all imports first, in alpa order...
+# Then do the stack/gettext code.
+INDICATOR_NAME = None
+for frameRecord in inspect.stack():
+    if "from indicatorbase import IndicatorBase" in str( frameRecord.code_context ):
+        INDICATOR_NAME = Path( frameRecord.filename ).stem
+        break
+
+gettext.install( INDICATOR_NAME, localedir = str( Path( __file__ ).parent ) + os.sep + "locale" )
+#print( "locale directory:", str( Path( __file__ ).parent ) + os.sep + "locale" )
 
 
 class IndicatorBase( ABC ):
@@ -118,7 +131,8 @@ class IndicatorBase( ABC ):
                   creditz = None,
                   debug = False ):
 
-        self.indicatorName = indicatorName
+        # self.indicatorName = indicatorName
+        self.indicatorName = INDICATOR_NAME
 
         projectMetadata = self._getProjectMetadata()
         if projectMetadata is None:

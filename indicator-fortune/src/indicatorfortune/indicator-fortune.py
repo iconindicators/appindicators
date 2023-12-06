@@ -19,18 +19,18 @@
 # Application indicator which displays fortunes.
 
 
-INDICATOR_NAME = "indicator-fortune"
-import gettext
-gettext.install( INDICATOR_NAME )
+#TODO To go
+# INDICATOR_NAME = "indicator-fortune"
+# import gettext
+# gettext.install( INDICATOR_NAME )
 
-import codecs, os
+import codecs, gi, os
 
-import gi
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
-
 from gi.repository import Gdk, Gtk, Notify
+
 from indicatorbase import IndicatorBase
 
 
@@ -60,7 +60,7 @@ class IndicatorFortune( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            indicatorName = INDICATOR_NAME,
+            indicatorName = INDICATOR_NAME,#TODO To go....
             copyrightStartYear = "2013",
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 

@@ -41,45 +41,19 @@
 # installable to a venv and then works!
 
 
-# using standard Language Code Identifier (LCID) Reference
-
-import locale
-print( locale.getlocale() )
-#locale.setlocale( locale.LC_ALL , "en_GB.utf8" )
-# https://unix.stackexchange.com/a/669744/80583
+# from indicatorbase import IndicatorBase  
 
 
-INDICATOR_NAME = "indicator-test"
-import gettext
+# INDICATOR_NAME = "indicator-test"
+# import gettext
+# gettext.install( INDICATOR_NAME )
 
-import os
-from pathlib import Path
-localeDirectory = str( Path( __file__ ).parent ) + os.sep + "locale"
-print("===")
-print( localeDirectory )
-print("===")
+import datetime, gi, os, random
 
-import venv
-print( "__VENV_DIR__:", venv.__VENV_DIR__ )
-
-
-gettext.bindtextdomain( INDICATOR_NAME, localedir = "venv/lib/python3.8/site-packages/indicatortest/locale" )
-
-# gettext.bindtextdomain( INDICATOR_NAME, localedir = localeDirectory )
-# print( gettext.find( INDICATOR_NAME, localedir = "locale", languages = None, all = False ) )
-print( gettext.translation( INDICATOR_NAME, localedir = localeDirectory ) )
-
-gettext.install( INDICATOR_NAME, localedir = localeDirectory )
-
-import datetime
-
-import gi
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
-
-import os, random
-
 from gi.repository import Gtk, Notify
+
 from indicatorbase import IndicatorBase  
 from pathlib import Path
 from threading import Thread
@@ -96,7 +70,7 @@ class IndicatorTest( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            indicatorName = INDICATOR_NAME,
+            indicatorName = "",#INDICATOR_NAME,#TODO Hopefully this can go.
             copyrightStartYear = "2016",
             comments = _( "Test" ) )
 
