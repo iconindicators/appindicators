@@ -52,9 +52,24 @@ print( locale.getlocale() )
 INDICATOR_NAME = "indicator-test"
 import gettext
 
-print( gettext.translation( INDICATOR_NAME, localedir = "locale" ) )
+import os
+from pathlib import Path
+localeDirectory = str( Path( __file__ ).parent ) + os.sep + "locale"
+print("===")
+print( localeDirectory )
+print("===")
 
-gettext.install( INDICATOR_NAME, localedir = "locale" )
+import venv
+print( "__VENV_DIR__:", venv.__VENV_DIR__ )
+
+
+gettext.bindtextdomain( INDICATOR_NAME, localedir = "venv/lib/python3.8/site-packages/indicatortest/locale" )
+
+# gettext.bindtextdomain( INDICATOR_NAME, localedir = localeDirectory )
+# print( gettext.find( INDICATOR_NAME, localedir = "locale", languages = None, all = False ) )
+print( gettext.translation( INDICATOR_NAME, localedir = localeDirectory ) )
+
+gettext.install( INDICATOR_NAME, localedir = localeDirectory )
 
 import datetime
 
