@@ -48,6 +48,12 @@ def _buildWheelForIndicators( directoryRelease, indicatorNames ):
     if directoryVenv.is_dir():
         print( "Using the virtual environment located at:", directoryVenv )
 
+#TODO Despite seeing
+#   Using the virtual environment located at: release/.venv
+# the next line is
+#   * Creating venv isolated environment...
+# Does that mean the venv is still being created?
+
     else:
         command = \
             "python3 -m venv " + str( directoryVenv ) + " && " + \
