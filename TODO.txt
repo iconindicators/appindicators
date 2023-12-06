@@ -181,6 +181,8 @@ python3 -m venv venv
 
 
 #TODO Ideas on naming conventions, etc
+#   https://peps.python.org/pep-0008/
+#   https://docs.python-guide.org/writing/style/
 #   https://guicommits.com/organize-python-code-like-a-pro/
 
 
