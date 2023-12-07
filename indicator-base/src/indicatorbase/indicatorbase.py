@@ -196,10 +196,10 @@ class IndicatorBase( ABC ):
         menu = Gtk.Menu()
         menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         menu.show_all()
-
         self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
-            self.indicatorName, # Icon name    #TODO Need to change this for pip/venv
+#            self.indicatorName, # Icon name
+            str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + ".svg", # Icon name  #TODO Need a function to determine the icon for the theme...maybe do when self.icon is assigned.
             AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
@@ -331,7 +331,18 @@ class IndicatorBase( ABC ):
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-        aboutDialog.set_logo_icon_name( self.indicatorName )    #TODO Need to change this for pip/venv
+        #TODO Cannot get the icon to show in the about dialog.
+        # Maybe use the debugger to step into set_logo_icon_name and see how the icon is loaded.
+        # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/AboutDialog.html#Gtk.AboutDialog
+        # Another idea, how to make a pixbuf and pass that to set_logo?
+        # https://lazka.github.io/pgi-docs/GdkPixbuf-2.0/classes/Pixbuf.html#GdkPixbuf.Pixbuf
+#        aboutDialog.set_logo_icon_name( self.indicatorName + ".svg" )    #TODO Need to change this for pip/venv
+#        aboutDialog.set_logo_icon_name( str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + ".svg" ) #TODO Need a function to determine the icon for the theme...maybe do when self.icon is assigned.
+        gi.require_version( "Gdk", "3.0" )
+        from gi.repository import GdkPixbuf
+        aboutDialog.set_logo(
+            GdkPixbuf.Pixbuf.new_from_file(
+                str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + ".svg" ) )
         aboutDialog.set_program_name( self.indicatorName )
         aboutDialog.set_translator_credits( _( "translator-credits" ) )
         aboutDialog.set_version( self.version )
