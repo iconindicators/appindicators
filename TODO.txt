@@ -363,6 +363,7 @@ python3 -m venv venv
 #    https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
 #
 # Is it possible to port to FreeBSD and/or NetBSD?
+#    https://www.freshports.org/devel/libayatana-appindicator/
 #
 # Miscellaneous:
 #    https://blog.tingping.se/2019/09/07/how-to-design-a-modern-status-icon.html
