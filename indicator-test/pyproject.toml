@@ -1,7 +1,3 @@
-#TODO Is it possible to make this a template and
-# maybe another script with a cfg file to create the pyproject.toml per indicator?
-
-
 [build-system]
 requires = [ "setuptools >= 61.0" ]
 build-backend = "setuptools.build_meta"
@@ -17,8 +13,8 @@ maintainers = [
 ]
 description = "Application indicator to test indicator functionality."
 dependencies = [
-  "PyGObject",
-] #TODO Add this to all pyproject.toml
+  "PyGObject"
+]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 requires-python = ">=3.8"
@@ -42,20 +38,4 @@ where = [ "src" ]
 [tool.setuptools.package-data]
 "indicatortest.icons" = [ "**/*.svg"  ]
 "indicatortest.locale" = [ "**/*.mo", "**/*.po", "**/*.pot"  ]
-
-
-#[tool.setuptools.package-data]
-#"indicatortest.locale" = [ "**/*.mo" ]
-#"indicatortest.locale" = [ "**/*.po", "*.pot", "**/*.mo" ]
-
-#[tool.setuptools.exclude-package-data]
-#"indicatortest.locale" = [ "*.pot", "**/*.po" ]
-
-
-# https://setuptools.pypa.io/en/latest/userguide/datafiles.html
-# https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html
-# https://discuss.python.org/t/purpose-of-an-sdist/4639/13
-
-
-# For config additional to pyproject.toml use setup.cfg
-#   https://setuptools.pypa.io/en/latest/userguide/quickstart.html
+"indicatortest.packaging" = [ "**/*.desktop"  ]

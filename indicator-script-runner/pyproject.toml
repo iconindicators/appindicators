@@ -13,6 +13,9 @@ maintainers = [
     { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
 ]
 description = "Application indicator to run a terminal command or script from an indicator."
+dependencies = [
+  "PyGObject"
+]
 readme = "README.md"
 license = { file = "LICENSE.txt" }
 requires-python = ">=3.8"
