@@ -19,9 +19,6 @@
 # Build a Python Wheel package for one or more indicators.
 
 
-#TODO Rename to buildWheel.py
-
-
 #TODO Check that this script builds a complete wheel...what is missing?
 #
 # Ensure that Indicator Lunar has planets.bsp and stars.dat
