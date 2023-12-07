@@ -25,7 +25,19 @@
 #   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 
 
-import datetime, email.policy, gettext, gi, gzip, inspect, json, logging.handlers, os, pickle, shutil, subprocess, sys
+import datetime
+import email.policy
+import gettext
+import gi
+import gzip
+import inspect
+import json
+import logging.handlers
+import os
+import pickle
+import shutil
+import subprocess
+import sys
 
 from abc import ABC
 from bisect import bisect_right

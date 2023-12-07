@@ -48,15 +48,19 @@
 # import gettext
 # gettext.install( INDICATOR_NAME )
 
-import datetime, gi, os, random
+import datetime
+import gi
+import os
+import random
 
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
 from gi.repository import Gtk, Notify
 
-from indicatorbase import IndicatorBase  
 from pathlib import Path
 from threading import Thread
+
+from indicatorbase import IndicatorBase  
 
 
 class IndicatorTest( IndicatorBase ):
