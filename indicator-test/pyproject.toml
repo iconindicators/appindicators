@@ -41,3 +41,7 @@ where = [ "src" ]
 "indicatortest.icons" = [ "**/*.svg"  ]
 "indicatortest.locale" = [ "**/*.mo", "**/*.po", "**/*.pot"  ]
 "indicatortest.packaging" = [ "**/*.desktop"  ]
+
+#TODO Can we instead do this:
+#"indicatortest" = [ "**/*.desktop", "**/*.mo", "**/*.po", "**/*.pot", "**/*.svg"  ]
+
