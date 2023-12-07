@@ -181,7 +181,10 @@ class IndicatorBase( ABC ):
         self.desktopFileApplications = "/usr/share/applications/" + self.desktopFile
         self.desktopFileUser = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
 
-        self.icon = self.indicatorName # Located in /usr/share/icons #TODO Need to change this for pip/venv
+#TODO Don't seem to actually USE self.icon...why?
+        # print( "Theme name:", self.getIconThemeName() )
+        # print( "Icon exists for theme:", self.getIconThemeName() in IndicatorBase.ICON_THEMES )
+        # self.icon = self.indicatorName # Located in /usr/share/icons #TODO Need to change this for pip/venv
         self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         self.secondaryActivateTarget = None
         self.updateTimerID = None
@@ -198,8 +201,9 @@ class IndicatorBase( ABC ):
         menu.show_all()
         self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
+            self.getIconFilename(), # Icon name
 #            self.indicatorName, # Icon name
-            str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + ".svg", # Icon name  #TODO Need a function to determine the icon for the theme...maybe do when self.icon is assigned.
+#            str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + ".svg", # Icon name  #TODO Need a function to determine the icon for the theme...maybe do when self.icon is assigned.
             AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
@@ -338,6 +342,7 @@ class IndicatorBase( ABC ):
         # https://lazka.github.io/pgi-docs/GdkPixbuf-2.0/classes/Pixbuf.html#GdkPixbuf.Pixbuf
 #        aboutDialog.set_logo_icon_name( self.indicatorName + ".svg" )    #TODO Need to change this for pip/venv
 #        aboutDialog.set_logo_icon_name( str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + ".svg" ) #TODO Need a function to determine the icon for the theme...maybe do when self.icon is assigned.
+#TODO Need to use self.getIconFilename()
         gi.require_version( "Gdk", "3.0" )
         from gi.repository import GdkPixbuf
         aboutDialog.set_logo(
@@ -669,6 +674,17 @@ class IndicatorBase( ABC ):
             iconThemeColour = IndicatorBase.ICON_THEMES[ iconThemeName ]
 
         return iconThemeColour
+
+
+#TODO Ensure this works both when installed via wheel into a venv
+# and when running under IDE (no venv, no wheel)...if that is possible.
+# Might need a fallback within (like the metadata function at the top).
+    def getIconFilename( self ):
+        themeName = self.getIconThemeName()
+        if themeName not in IndicatorBase.ICON_THEMES:
+            themeName = "hicolor"
+
+        return str( Path( __file__ ).parent ) + os.sep + "icons/" + themeName + "/" + self.indicatorName + ".svg"
 
 
     def getAutostartAndDelay( self ):

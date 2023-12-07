@@ -179,7 +179,12 @@ class IndicatorFortune( IndicatorBase ):
             if notificationSummary == "":
                 notificationSummary = " "
 
-        Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
+#TODO Check this works.
+        # Notify.Notification.new( notificationSummary, self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ), self.icon ).show()
+        Notify.Notification.new(
+            notificationSummary,
+            self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ),
+            self.getIconFilename() ).show()
 
 
     def refreshAndShowFortune( self ):

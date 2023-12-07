@@ -170,7 +170,11 @@ class IndicatorTest( IndicatorBase ):
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in OSD" )
-        menuItem.connect( "activate", lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.icon ).show() )
+#TODO The icon doesn't appear...why?  
+        menuItem.connect(
+            "activate",
+            lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.getIconFilename() ).show() )
+
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( "Label / Tooltip / OSD" )
@@ -275,7 +279,10 @@ class IndicatorTest( IndicatorBase ):
             self.indicator.set_icon_full( iconFile, "" )
 
         else:
-            Notify.Notification.new( "Cannot locate " + iconFile, "Please ensure the file is present.", self.icon ).show()
+            Notify.Notification.new(
+                "Cannot locate " + iconFile,
+                "Please ensure the file is present.",
+                self.getIconFilename() ).show()
 
 
     # Virtually a direct copy from Indicator Lunar to test dynamically created SVG icons in the user cache.
@@ -326,7 +333,7 @@ class IndicatorTest( IndicatorBase ):
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
             self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.icon ).show()
+            Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
 
         elif self.isTerminalQTerminal():
             # As a result of this issue
@@ -336,7 +343,7 @@ class IndicatorTest( IndicatorBase ):
             # So the quickest/easiest workaround is to install gnome-terminal. 
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
             self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.icon ).show()
+            Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
 
         else:
             command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
