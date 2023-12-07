@@ -43,7 +43,7 @@ def _intialiseVirtualEnvironment( directoryRelease ):
         command = \
             "python3 -m venv " + str( directoryVirtualEnvironment ) + " && " + \
             ". ./" + str( directoryVirtualEnvironment ) + "/bin/activate && " + \
-            "python3 -m pip install --upgrade build && "
+            "python3 -m pip install --upgrade build"
 
         subprocess.call( command, shell = True )
 
