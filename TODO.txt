@@ -1,3 +1,23 @@
+#TODO Random thoughts...
+# 
+# For the install command, can we have the venv directory a variable in the command?
+# Will let a user change the directory if it clashes with something existing.
+# 
+# What should be the name of the venv we use for the indicators?
+# One venv per indicator, or one venv for all indicators?
+# 
+# If each indicator has its own PyPI page.
+# want a distinct README.md file which 
+# combines common README.md stuff from IndicatorBase
+# and specific README.md stuff from the Indicator itself.
+# But, in the common stuff, likely need a text substitution
+# to insert the indicator name.
+# 
+# Now is a good time to do high level renaming according to standards.
+# So, naming of files (modules), namnig of project, naming of classes.
+# Then naming of globals, etc...
+
+
 #TODO Might be useful for packaging 
 #   https://stackoverflow.com/questions/501597/how-to-distribute-desktop-files-and-icons-for-a-python-package-in-gnome-with
 #   https://stackoverflow.com/questions/48503130/can-pip-and-setuptools-install-icons-and-launchers
