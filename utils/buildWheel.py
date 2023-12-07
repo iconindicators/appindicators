@@ -19,13 +19,9 @@
 # Build a Python Wheel package for one or more indicators.
 
 
-#TODO Check that this script builds a complete wheel...what is missing?
-#
+#TODO 
 # Ensure that Indicator Lunar has planets.bsp and stars.dat
 # in a directory under the src/indicatorlunar/data or similar.
-
-
-#TODO Consider renaming files (modules), classes, functions, variables, ..., according to Python standards. 
 
 
 import argparse
@@ -42,21 +38,12 @@ from indicatorbase import indicatorbase
 
 
 def _intialiseVirtualEnvironment( directoryRelease ):
-    directoryVirtualEnvironment = Path( directoryRelease + os.sep + ".venv" )
-    if directoryVirtualEnvironment.is_dir():
-        print( "Using the virtual environment located at:", directoryVirtualEnvironment )
-
-#TODO Despite seeing
-#   Using the virtual environment located at: release/.venv
-# the next line is
-#   * Creating venv isolated environment...
-# Does that mean the venv is still being created?
-
-    else:
+    directoryVirtualEnvironment = Path( directoryRelease + os.sep + "venv" )
+    if not directoryVirtualEnvironment.is_dir():
         command = \
             "python3 -m venv " + str( directoryVirtualEnvironment ) + " && " + \
             ". ./" + str( directoryVirtualEnvironment ) + "/bin/activate && " + \
-            "python3 -m pip install --upgrade build"
+            "python3 -m pip install --upgrade build && "
 
         subprocess.call( command, shell = True )
 
@@ -221,7 +208,7 @@ def _processIcons( directoryWheel, indicatorName ):
         coloursInHicolorIcon = _getColoursInHicolorIcon( hicolorIcon )
         for themeName in indicatorbase.IndicatorBase.ICON_THEMES:
             directoryIndicatorIconsThemeName = Path( directoryIndicatorIcons + os.sep + themeName )
-            if not directoryIndicatorIconsThemeName.exists(): # Must check as Will have been created if there is more than one icon.
+            if not directoryIndicatorIconsThemeName.exists(): # Must check as will have been created if there is more than one icon.
                 directoryIndicatorIconsThemeName.mkdir( parents = True )
 
             shutil.copy( hicolorIcon, directoryIndicatorIconsThemeName )
@@ -246,16 +233,8 @@ def _buildWheelForIndicator( directoryVenv, directoryWheel, indicatorName ):
 
     command = \
         ". ./" + str( directoryVenv ) + "/bin/activate && " + \
-        "cd " + indicatorName + " && " + \
-        "python3 -m build --outdir " + "../" + str( directoryWheel ) + \
-        " && deactivate" #TODO Check to see this works...but the process will die...so maybe keep the terminal open to see?
-                        # https://stackoverflow.com/a/72320297/2156453
-
-#TODO Seems to be an egg left over
-    # indicator-test-1.0.6/src/indicator_test.egg-info/
-# Maybe there is a build option to not build an egg.
-# Is the egg actually required?
-
+        "cd " + str( directoryWheel ) + os.sep + indicatorName + " && " + \
+        "python3 -m build --outdir ../"
 
     subprocess.call( command, shell = True )
 
@@ -294,11 +273,13 @@ if __name__ == "__main__":
         nargs = '+',
         help = "The list of indicators (such as indicator-fortune indicator-lunar) to build." )
 
-    if Path( "utils/buildWheelLite.py" ).exists():
+    scriptPathAndName = "utils/buildWheel.py"
+    if Path( scriptPathAndName ).exists():
         args = parser.parse_args()
         _buildWheelForIndicators( args.directoryRelease, args.indicators )
 
     else:
-        print( "The script must be run from the top level directory (one above utils)." )
-        print( "For example:" )
-        print( "\tpython3 utils/buildWheelLite.py release indicator-fortune" )
+        print(
+            f"The script must be run from the top level directory (one above utils).\n"
+            f"For example:\n"
+            f"\tpython3 { scriptPathAndName } release indicator-fortune" )
