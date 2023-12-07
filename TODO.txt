@@ -1,3 +1,10 @@
+#TODO IndicatorBase About dialog needs to refer to CHANGELOG.md
+
+
+#TODO If we go the pip route, will need a way to uninstall
+# (delete the venv, delete .desktop)
+
+
 #TODO If/when getting venv to work,
 # I wonder if when an indicator is installed,
 # to run the indicator, do I need to activate the venv?
