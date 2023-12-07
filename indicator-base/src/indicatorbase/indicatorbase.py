@@ -182,7 +182,7 @@ class IndicatorBase( ABC ):
         self.desktopFileApplications = "/usr/share/applications/" + self.desktopFile
         self.desktopFileUser = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
 
-        self.icon = self.indicatorName # Located in /usr/share/icons
+        self.icon = self.indicatorName # Located in /usr/share/icons #TODO Need to change this for pip/venv
         self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         self.secondaryActivateTarget = None
         self.updateTimerID = None
@@ -200,7 +200,7 @@ class IndicatorBase( ABC ):
 
         self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
-            self.indicatorName, # Icon name
+            self.indicatorName, # Icon name    #TODO Need to change this for pip/venv
             AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
@@ -332,7 +332,7 @@ class IndicatorBase( ABC ):
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-        aboutDialog.set_logo_icon_name( self.indicatorName )
+        aboutDialog.set_logo_icon_name( self.indicatorName )    #TODO Need to change this for pip/venv
         aboutDialog.set_program_name( self.indicatorName )
         aboutDialog.set_translator_credits( _( "translator-credits" ) )
         aboutDialog.set_version( self.version )
