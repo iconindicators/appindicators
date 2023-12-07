@@ -1,3 +1,8 @@
+#TODO Might be useful for packaging 
+#   https://stackoverflow.com/questions/501597/how-to-distribute-desktop-files-and-icons-for-a-python-package-in-gnome-with
+#   https://stackoverflow.com/questions/48503130/can-pip-and-setuptools-install-icons-and-launchers
+
+
 #TODO IndicatorBase About dialog needs to refer to CHANGELOG.md
 
 
