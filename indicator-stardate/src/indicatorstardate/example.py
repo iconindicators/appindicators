@@ -16,7 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import datetime, stardate
+import datetime
+
+import stardate
 
 
 # Exercise the Stardate API.

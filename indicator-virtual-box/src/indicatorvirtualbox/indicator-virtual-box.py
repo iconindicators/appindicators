@@ -24,15 +24,15 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import datetime
-
 import gi
+import os
+import time
+
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
-
-import os, time
-
 from gi.repository import Gdk, Gtk, Notify
+
 from indicatorbase import IndicatorBase
 from virtualmachine import Group, VirtualMachine
 

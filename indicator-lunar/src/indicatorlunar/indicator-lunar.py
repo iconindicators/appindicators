@@ -72,18 +72,23 @@ INDICATOR_NAME = "indicator-lunar"
 import gettext
 gettext.install( INDICATOR_NAME )
 
-import datetime, eclipse
-
+import datetime
 import gi
+import locale
+import math
+import re
+import sys
+import webbrowser
+
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
+from gi.repository import Gtk, Notify
 
-import locale, math, re, sys, webbrowser
+import eclipse
 
 from dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
 from dataproviderorbitalelement import DataProviderOrbitalElement, OE
-from gi.repository import Gtk, Notify
 from indicatorbase import IndicatorBase
 
 

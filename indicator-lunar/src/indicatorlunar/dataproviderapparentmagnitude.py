@@ -19,7 +19,8 @@
 # Download from URL, load from file and hold in memory apparent magnitude for comets and minor planets.
 
 
-import datetime, requests
+import datetime
+import requests
 
 from dataprovider import DataProvider
 

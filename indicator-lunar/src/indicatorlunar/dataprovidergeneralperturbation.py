@@ -19,11 +19,11 @@
 # Download from URL, load from file and hold in memory,
 # general perturbations for satellites.
 
+from sgp4 import alpha5, exporter, omm
+from sgp4.api import Satrec
 
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase
-from sgp4 import alpha5, exporter, omm
-from sgp4.api import Satrec
 
 
 class DataProviderGeneralPerturbation( DataProvider ):

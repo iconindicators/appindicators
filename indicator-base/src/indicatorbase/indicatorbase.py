@@ -50,7 +50,6 @@ except ValueError:
     gi.require_version( "AppIndicator3", "0.1" )
     from gi.repository import AppIndicator3 as AppIndicator
 
-#TODO Check all other indicators...ensure the gi.requires is adjacent to and before from gi.repository import...
 gi.require_version( "GLib", "2.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )

@@ -47,9 +47,13 @@
 # https://askubuntu.com/questions/1263305/launchpad-builderror-cant-locate-debian-debhelper-sequence-python3-pm
 
 
-import datetime, eclipse, importlib, io, locale, math
+import datetime
+import eclipse
+import importlib
+import io
+import locale
+import math
 
-from astrobase import AstroBase
 from distutils.version import LooseVersion
 
 try:
@@ -63,6 +67,8 @@ try:
 
 except ImportError:
     available = False
+
+from astrobase import AstroBase
 
 
 class AstroSkyfield( AstroBase ):

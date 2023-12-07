@@ -19,7 +19,12 @@
 # Calculate astronomical information using PyEphem.
 
 
-import datetime, eclipse
+import datetime
+import eclipse
+import locale
+import math
+
+from distutils.version import LooseVersion
 
 try:
     from ephem.cities import _city_data
@@ -29,10 +34,7 @@ try:
 except ImportError:
     available = False
 
-import locale, math
-
 from astrobase import AstroBase
-from distutils.version import LooseVersion
 
 
 class AstroPyEphem( AstroBase ):

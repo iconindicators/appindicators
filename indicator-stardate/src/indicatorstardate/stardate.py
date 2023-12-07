@@ -63,7 +63,8 @@
 # The '2009 revised' stardate is based on https://en.wikipedia.org/wiki/Stardate.
 
 
-import datetime, math
+import datetime
+import math
 
 
 # The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.

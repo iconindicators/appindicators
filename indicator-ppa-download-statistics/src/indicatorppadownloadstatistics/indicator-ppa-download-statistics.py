@@ -24,17 +24,21 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import concurrent.futures
-
 import gi
-gi.require_version( "Gtk", "3.0" )
-
-import json, locale, tempfile, webbrowser
+import json
+import locale
+import tempfile
+import webbrowser
 
 from copy import deepcopy
+
+gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
+
+from urllib.request import urlopen
+
 from indicatorbase import IndicatorBase
 from ppa import Filters, PPA, PublishedBinary
-from urllib.request import urlopen
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):

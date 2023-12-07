@@ -24,17 +24,18 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import fnmatch
-
 import gi
+import os
+import webbrowser
+
+from datetime import date, datetime, timedelta
+
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
-
-import os, webbrowser
+from gi.repository import Gdk, Gtk, Notify
 
 from event import Event
-from datetime import date, datetime, timedelta
-from gi.repository import Gdk, Gtk, Notify
 from indicatorbase import IndicatorBase
 
 

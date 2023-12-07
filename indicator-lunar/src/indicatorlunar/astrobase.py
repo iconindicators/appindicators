@@ -39,7 +39,8 @@
 #    https://tracksat.space
 
 
-import datetime, math
+import datetime
+import math
 
 from abc import ABC, abstractmethod
 from enum import Enum

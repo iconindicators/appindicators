@@ -24,16 +24,19 @@ import gettext
 gettext.install( INDICATOR_NAME )
 
 import datetime
-
 import gi
+import importlib.util
+import os
+import sys
+import webbrowser
+
 gi.require_version( "Gtk", "3.0" )
 gi.require_version( "Notify", "0.7" )
-
-import importlib.util, os, sys, webbrowser
-
 from gi.repository import Gtk, Notify
-from indicatorbase import IndicatorBase
+
 from pathlib import Path
+
+from indicatorbase import IndicatorBase
 
 
 class IndicatorTide( IndicatorBase ):

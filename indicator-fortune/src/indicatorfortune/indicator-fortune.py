@@ -24,7 +24,9 @@
 # import gettext
 # gettext.install( INDICATOR_NAME )
 
-import codecs, gi, os
+import codecs
+import gi
+import os
 
 gi.require_version( "Gdk", "3.0" )
 gi.require_version( "Gtk", "3.0" )

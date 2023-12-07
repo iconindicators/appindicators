@@ -23,18 +23,20 @@ INDICATOR_NAME = "indicator-script-runner"
 import gettext
 gettext.install( INDICATOR_NAME )
 
-import concurrent.futures, copy, datetime
-
+import concurrent.futures
+import copy
+import datetime
 import gi
-gi.require_version( "Gtk", "3.0" )
-gi.require_version( "Notify", "0.7" )
-
 import math
 
+gi.require_version( "Gtk", "3.0" )
+gi.require_version( "Notify", "0.7" )
 from gi.repository import GLib, Gtk, Notify, Pango
+
+from threading import Thread
+
 from indicatorbase import IndicatorBase
 from script import Background, NonBackground
-from threading import Thread
 
 
 class IndicatorScriptRunner( IndicatorBase ):
