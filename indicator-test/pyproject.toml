@@ -32,6 +32,8 @@ classifiers = [
 [project.urls]
 homepage = "https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa"
 
+#TODO Need to add this to all other indicator's pyproject.toml
+#TODO How to include Indicator Lunar stars.dat/planets.bsp?
 [tool.setuptools.packages.find]
 where = [ "src" ]
 
