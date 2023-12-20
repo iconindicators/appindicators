@@ -1,0 +1,63 @@
+# Portable Object Template for indicatorstardate.
+# Copyright (C) 2015-2022 Bernard Giannetti
+# This file is distributed under the same license as the indicatorstardate package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorstardate 1.0.43\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2019-11-19 14:17+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicatorstardate.py:47
+msgid "Shows the current Star Trek™ stardate."
+msgstr ""
+
+#: indicatorstardate.py:48
+msgid ""
+"STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-"
+"trek/stardates"
+msgstr ""
+
+#: indicatorstardate.py:49
+msgid "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
+msgstr ""
+
+#: indicatorstardate.py:121
+msgid "Show stardate 'classic'"
+msgstr ""
+
+#: indicatorstardate.py:124
+msgid ""
+"If checked, show stardate 'classic' based on\n"
+"\n"
+"\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n"
+"\n"
+"Otherwise show stardate '2009 revised' based on\n"
+"\n"
+"\thttps://en.wikipedia.org/wiki/Stardate"
+msgstr ""
+
+#: indicatorstardate.py:130
+msgid "Show ISSUE"
+msgstr ""
+
+#: indicatorstardate.py:134
+msgid "Show the ISSUE of the stardate 'classic'."
+msgstr ""
+
+#: indicatorstardate.py:137
+msgid "Pad INTEGER"
+msgstr ""
+
+#: indicatorstardate.py:141
+msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
+msgstr ""

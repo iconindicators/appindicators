@@ -1,0 +1,16 @@
+# To validate this file:
+#   desktop-file-validate indicatorlunar.py.desktop
+#
+# To install or update this file, although the
+# operating system should update by default and
+# certainly will update on a logout/login or restart:
+#   xdg-desktop-menu install --novendor indicatorlunar.py.desktop
+[Desktop Entry]
+Type=Application
+Name=Indicator Lunar
+Name[ru]=Лунный индикатор
+Icon=indicatorlunar
+Exec=sh -c "\$HOME/.local/bin/indicatorlunar.sh"
+Categories=Science;Astronomy
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0

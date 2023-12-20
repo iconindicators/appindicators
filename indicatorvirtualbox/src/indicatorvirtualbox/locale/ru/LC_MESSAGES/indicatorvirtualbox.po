@@ -1,0 +1,176 @@
+# Russian translation for indicatorvirtualbox.
+# Copyright (C) 2015-2022 Bernard Giannetti
+# This file is distributed under the same license as the indicatorvirtualbox package.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorvirtualbox 1.0.73\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2022-10-29 10:23+1100\n"
+"PO-Revision-Date: 2021-11-03 15:53+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicatorvirtualbox.py:64
+msgid "Shows VirtualBox™ virtual machines and allows them to be started."
+msgstr "Показывает виртуальные машины VirtualBox™ и позволяет запускать их."
+
+#: indicatorvirtualbox.py:98
+msgid "(no virtual machines exist)"
+msgstr "(виртуальные машины не найдены)"
+
+#: indicatorvirtualbox.py:102
+msgid "Launch VirtualBox™ Manager"
+msgstr "Запустить Менеджер VirtualBox"
+
+#: indicatorvirtualbox.py:108
+msgid "(VirtualBox™ is not installed)"
+msgstr "(VirtualBox не установлен)"
+
+#: indicatorvirtualbox.py:182
+msgid ""
+"The virtual machine could not be found - perhaps it has been renamed or "
+"deleted.  The list of virtual machines has been refreshed - please try again."
+msgstr ""
+"Виртуальная машина не найдена: возможно, она была переименована или удалена. "
+"Список виртуальных машин был обновлён - пожалуйста, повторите попытку."
+
+#: indicatorvirtualbox.py:183
+msgid "Error"
+msgstr "Ошибка"
+
+#: indicatorvirtualbox.py:192
+msgid ""
+"Unable to find the window for the virtual machine '{0}' - perhaps it is "
+"running as headless."
+msgstr ""
+"Не удалось найти окно виртуальной машины '{0}': вероятно, она запущена в "
+"автономном режиме."
+
+#: indicatorvirtualbox.py:193 indicatorvirtualbox.py:205
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: indicatorvirtualbox.py:204
+msgid ""
+"Unable to bring the virtual machine '{0}' to front as there is more than one "
+"window with overlapping names."
+msgstr ""
+"Невозможно переместить виртуальную машину '{0}' на передний план, так как "
+"существует несколько окон, чьи имена совпадают."
+
+#: indicatorvirtualbox.py:392
+msgid "Virtual Machine"
+msgstr "Виртуальная машина"
+
+#: indicatorvirtualbox.py:393 indicatorvirtualbox.py:534
+msgid "Autostart"
+msgstr "Автозапуск"
+
+#: indicatorvirtualbox.py:394 indicatorvirtualbox.py:516
+msgid "Start Command"
+msgstr "Команда запуска"
+
+#: indicatorvirtualbox.py:395
+msgid "Double click to edit a virtual machine's properties."
+msgstr "Щёлкните дважды, чтобы отредактировать свойства виртуальной машины."
+
+#: indicatorvirtualbox.py:403
+msgid "Virtual Machines"
+msgstr "Виртуальные машины"
+
+#: indicatorvirtualbox.py:411
+msgid "VirtualBox™ Manager"
+msgstr "Менеджер VirtualBox"
+
+#: indicatorvirtualbox.py:417
+msgid ""
+"The window title of VirtualBox™ Manager.\n"
+"You may have to adjust for your local language."
+msgstr ""
+"Заголовок окна Менеджера VirtualBox.\n"
+"Настройте название для вашего языка."
+
+#: indicatorvirtualbox.py:424
+msgid "Show groups as submenus"
+msgstr "Показывать подменю для групп"
+
+#: indicatorvirtualbox.py:426
+msgid ""
+"If checked, groups are shown using submenus.\n"
+"\n"
+"Otherwise groups are shown as an indented list."
+msgstr ""
+"Если стоит отметка, то группы виртуальных машин\n"
+"отображаются в виде подменю.\n"
+"\n"
+"Иначе группы отображаются в виде списка с отступом."
+
+#: indicatorvirtualbox.py:438
+msgid "Refresh interval (minutes)"
+msgstr "Интервал обновления (в минутах)"
+
+#: indicatorvirtualbox.py:446
+msgid ""
+"How often the list of virtual machines\n"
+"and their running status are updated."
+msgstr ""
+"Насколько часто обновляется список\n"
+"виртуальных машин и их статус."
+
+#: indicatorvirtualbox.py:457
+msgid "Startup delay (seconds)"
+msgstr "Задержка запуска (в секундах)"
+
+#: indicatorvirtualbox.py:465
+msgid ""
+"Amount of time to wait from automatically\n"
+"starting one virtual machine to the next."
+msgstr ""
+"Интервал времени до автоматического запуска следующей\n"
+"виртуальной машины после запуска предыдущей."
+
+#: indicatorvirtualbox.py:473
+msgid "General"
+msgstr "Общие"
+
+#: indicatorvirtualbox.py:527
+msgid ""
+"The terminal command to start the virtual machine such as\n"
+"\n"
+"\tVBoxManage startvm %VM%\n"
+"or\n"
+"\tVBoxHeadless --startvm %VM% --vrde off"
+msgstr ""
+"Консольная команда запуска виртуальной машины, например:\n"
+"\n"
+"\tVBoxManage startvm %VM%\n"
+"или\n"
+"\tVBoxHeadless --startvm %VM% --vrde off"
+
+#: indicatorvirtualbox.py:535
+msgid "Run the virtual machine when the indicator starts."
+msgstr "Запускать виртуальную машину при старте индикатора."
+
+#: indicatorvirtualbox.py:541
+msgid "Virtual Machine Properties"
+msgstr "Свойства виртуальной машины"
+
+#: indicatorvirtualbox.py:549
+msgid "The start command cannot be empty."
+msgstr "Команда запуска не может быть пустой."
+
+#: indicatorvirtualbox.py:554
+msgid ""
+"The start command must contain %VM% which is substituted for the virtual "
+"machine name/id."
+msgstr ""
+"Команда запуска должна содержать %VM%, этот параметр будет заменён названием "
+"или ID виртуальной машины."

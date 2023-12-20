@@ -1,0 +1,202 @@
+# Portable Object Template for indicatoronthisday.
+# Copyright (C) 2017-2022 Bernard Giannetti
+# This file is distributed under the same license as the indicatoronthisday package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatoronthisday 1.0.14\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicatoronthisday.py:49
+msgid "EVENT"
+msgstr ""
+
+#: indicatoronthisday.py:58
+msgid "Calls the 'calendar' program and displays events in the menu."
+msgstr ""
+
+#: indicatoronthisday.py:74
+msgid "On this day..."
+msgstr ""
+
+#: indicatoronthisday.py:186
+msgid "Calendar"
+msgstr ""
+
+#: indicatoronthisday.py:190 indicatoronthisday.py:407
+msgid "Enabled"
+msgstr ""
+
+#: indicatoronthisday.py:196
+msgid "Double click to edit a calendar."
+msgstr ""
+
+#: indicatoronthisday.py:207
+msgid "Add"
+msgstr ""
+
+#: indicatoronthisday.py:208
+msgid "Add a new calendar."
+msgstr ""
+
+#: indicatoronthisday.py:212
+msgid "Remove"
+msgstr ""
+
+#: indicatoronthisday.py:213
+msgid "Remove the selected calendar."
+msgstr ""
+
+#: indicatoronthisday.py:217
+msgid "Reset"
+msgstr ""
+
+#: indicatoronthisday.py:218
+msgid "Reset to factory default."
+msgstr ""
+
+#: indicatoronthisday.py:225
+msgid "Calendars"
+msgstr ""
+
+#: indicatoronthisday.py:232
+msgid "Lines"
+msgstr ""
+
+#: indicatoronthisday.py:237
+msgid "The number of menu items available for display."
+msgstr ""
+
+#: indicatoronthisday.py:243
+msgid "On event click"
+msgstr ""
+
+#: indicatoronthisday.py:248
+msgid "Copy event to clipboard"
+msgstr ""
+
+#: indicatoronthisday.py:249
+msgid "Copy the event text and date to the clipboard."
+msgstr ""
+
+#: indicatoronthisday.py:254
+msgid "Search event on the internet"
+msgstr ""
+
+#: indicatoronthisday.py:255
+msgid "Open the default web browser and search for the event."
+msgstr ""
+
+#: indicatoronthisday.py:264
+msgid "URL"
+msgstr ""
+
+#: indicatoronthisday.py:270
+#, python-brace-format
+msgid ""
+"The URL to search for the event.\n"
+"\n"
+"Use {0} in the URL to specify the\n"
+"position of the event text/date.\n"
+"\n"
+"If the URL is empty and 'search' is selected,\n"
+"the search will effectively be ignored.\n"
+"\n"
+"If the URL is empty and 'copy' is selected,\n"
+"the URL is reset back to factory default."
+msgstr ""
+
+#: indicatoronthisday.py:286
+msgid "Notify"
+msgstr ""
+
+#: indicatoronthisday.py:288
+msgid ""
+"On startup or when saving preferences,\n"
+"show a notification for each of today's events."
+msgstr ""
+
+#: indicatoronthisday.py:297
+msgid "General"
+msgstr ""
+
+#: indicatoronthisday.py:339
+msgid "Reset calendars to factory default?"
+msgstr ""
+
+#: indicatoronthisday.py:353
+msgid "No calendar has been selected."
+msgstr ""
+
+#: indicatoronthisday.py:356
+msgid ""
+"This calendar is part of your system\n"
+"and cannot be removed."
+msgstr ""
+
+#: indicatoronthisday.py:358
+msgid "Remove the selected calendar?"
+msgstr ""
+
+#: indicatoronthisday.py:378
+msgid "Calendar file"
+msgstr ""
+
+#: indicatoronthisday.py:387
+msgid "The path to a calendar file."
+msgstr ""
+
+#: indicatoronthisday.py:390
+msgid "Browse"
+msgstr ""
+
+#: indicatoronthisday.py:394
+msgid ""
+"This calendar is part of your\n"
+"system and cannot be modified."
+msgstr ""
+
+#: indicatoronthisday.py:399
+msgid ""
+"Choose a calendar file.\n"
+"\n"
+"Ensure the calendar file is\n"
+"valid by running through\n"
+"'calendar' in a terminal."
+msgstr ""
+
+#: indicatoronthisday.py:416
+msgid "Add Calendar"
+msgstr ""
+
+#: indicatoronthisday.py:418
+msgid "Edit Calendar"
+msgstr ""
+
+#: indicatoronthisday.py:430
+msgid "The calendar path cannot be empty."
+msgstr ""
+
+#: indicatoronthisday.py:435
+msgid "The calendar path does not exist."
+msgstr ""
+
+#: indicatoronthisday.py:451
+msgid "Choose a calendar file"
+msgstr ""
+
+#: indicatoronthisday.py:458
+msgid ""
+"The calendar is part of your system\n"
+"and is already included."
+msgstr ""

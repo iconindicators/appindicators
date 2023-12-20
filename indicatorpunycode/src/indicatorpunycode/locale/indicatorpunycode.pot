@@ -1,0 +1,116 @@
+# Portable Object Template for indicatorpunycode.
+# Copyright (C) 2016-2022 Bernard Giannetti
+# This file is distributed under the same license as the indicatorpunycode package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorpunycode 1.0.14\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2019-10-17 09:48+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicatorpunycode.py:51
+msgid "Convert domain names between Unicode and ASCII."
+msgstr ""
+
+#: indicatorpunycode.py:58
+msgid "Convert"
+msgstr ""
+
+#: indicatorpunycode.py:67
+msgid "Unicode:  "
+msgstr ""
+
+#: indicatorpunycode.py:71
+msgid "ASCII:  "
+msgstr ""
+
+#: indicatorpunycode.py:85
+msgid "No text is in the clipboard."
+msgstr ""
+
+#: indicatorpunycode.py:88
+msgid "No text is highlighted/selected."
+msgstr ""
+
+#: indicatorpunycode.py:90
+msgid "Nothing to convert..."
+msgstr ""
+
+#: indicatorpunycode.py:137
+msgid "Error converting..."
+msgstr ""
+
+#: indicatorpunycode.py:137
+msgid "See log for more details."
+msgstr ""
+
+#: indicatorpunycode.py:156
+msgid "Input source"
+msgstr ""
+
+#: indicatorpunycode.py:160
+msgid "Clipboard"
+msgstr ""
+
+#: indicatorpunycode.py:162
+msgid ""
+"Input is taken from the clipboard after\n"
+"a CTRL-X or CTRL-C (or equivalent)."
+msgstr ""
+
+#: indicatorpunycode.py:168
+msgid "Primary"
+msgstr ""
+
+#: indicatorpunycode.py:170
+msgid ""
+"Input is taken from the currently\n"
+"selected text after a middle mouse\n"
+"click of the indicator icon."
+msgstr ""
+
+#: indicatorpunycode.py:177
+msgid "Output to clipboard and primary"
+msgstr ""
+
+#: indicatorpunycode.py:179
+msgid ""
+"If checked, the output text is sent\n"
+"to both the clipboard and primary.\n"
+"\n"
+"Otherwise the output is sent back\n"
+"only to the input source."
+msgstr ""
+
+#: indicatorpunycode.py:187
+msgid "Drop path/query in output"
+msgstr ""
+
+#: indicatorpunycode.py:189
+msgid ""
+"If checked, the output text will not\n"
+"contain any path/query (if present)."
+msgstr ""
+
+#: indicatorpunycode.py:198
+msgid "Maximum results"
+msgstr ""
+
+#: indicatorpunycode.py:204
+msgid ""
+"The number of most recent\n"
+"results to show in the menu.\n"
+"\n"
+"Selecting a menu item which\n"
+"contains a result will copy\n"
+"the result to the output."
+msgstr ""

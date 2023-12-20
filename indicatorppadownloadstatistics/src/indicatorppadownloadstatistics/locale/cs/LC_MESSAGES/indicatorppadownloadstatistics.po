@@ -1,0 +1,277 @@
+# Czech translation for indicatorppadownloadstatistics.
+# Copyright (C) 2015-2023 Bernard Giannetti
+# This file is distributed under the same license as the indicatorppadownloadstatistics package.
+# Pavel Rehak <pavel-rehak@email.cz>, 2017-2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorppadownloadstatistics 1.0.80\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2019-10-21 00:24+1100\n"
+"PO-Revision-Date: 2019-10-21 00:24+1100\n"
+"Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
+"Language-Team: \n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: indicatorppadownloadstatistics.py:60
+msgid "(error retrieving PPA)"
+msgstr "(chyba při vyhledávání PPA)"
+
+#: indicatorppadownloadstatistics.py:61
+msgid "(multiple messages - uncombine PPAs)"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:62
+msgid "(no published binaries)"
+msgstr "(žádné uveřejněné binární soubory)"
+
+#: indicatorppadownloadstatistics.py:63
+msgid "(published binaries completely filtered)"
+msgstr "(uveřejněné binární soubory jsou zcela vyfiltrovány)"
+
+#: indicatorppadownloadstatistics.py:71
+msgid "Display the total downloads of PPAs."
+msgstr "Zobrazuje celkový počet stažení z PPA repozitářů."
+
+#: indicatorppadownloadstatistics.py:395
+#: indicatorppadownloadstatistics.py:646
+msgid "PPA User"
+msgstr "Uživatel PPA"
+
+#: indicatorppadownloadstatistics.py:396
+#: indicatorppadownloadstatistics.py:672
+msgid "PPA Name"
+msgstr "Název PPA"
+
+#: indicatorppadownloadstatistics.py:397
+#: indicatorppadownloadstatistics.py:696
+msgid "Series"
+msgstr "Vydání"
+
+#: indicatorppadownloadstatistics.py:398
+#: indicatorppadownloadstatistics.py:712
+msgid "Architecture"
+msgstr "Architektura"
+
+#: indicatorppadownloadstatistics.py:399
+msgid "Double click to edit a PPA."
+msgstr "Dvoujklikem začnete upravovat PPA repozitář."
+
+#: indicatorppadownloadstatistics.py:412
+#: indicatorppadownloadstatistics.py:453
+msgid "Add"
+msgstr "Přidat"
+
+#: indicatorppadownloadstatistics.py:413
+msgid "Add a new PPA."
+msgstr "Přidat nový PPA repozitář."
+
+#: indicatorppadownloadstatistics.py:417
+#: indicatorppadownloadstatistics.py:458
+msgid "Remove"
+msgstr "Odstranit"
+
+#: indicatorppadownloadstatistics.py:418
+msgid "Remove the selected PPA."
+msgstr "Odstranit vybraný PPA repozitář."
+
+#: indicatorppadownloadstatistics.py:424
+msgid "PPAs"
+msgstr "PPA repozitáře"
+
+#: indicatorppadownloadstatistics.py:438
+msgid "PPA"
+msgstr "PPA"
+
+#: indicatorppadownloadstatistics.py:439
+msgid "Filter"
+msgstr "Filtr"
+
+#: indicatorppadownloadstatistics.py:440
+msgid "Double click to edit a filter."
+msgstr "Dvoujklikem začnete upravovat filtr."
+
+#: indicatorppadownloadstatistics.py:454
+msgid "Add a new filter."
+msgstr "Přidat nový filtr."
+
+#: indicatorppadownloadstatistics.py:459
+msgid "Remove the selected filter."
+msgstr "Odstranit vybraný filtr."
+
+#: indicatorppadownloadstatistics.py:465
+msgid "Filters"
+msgstr "Filtry"
+
+#: indicatorppadownloadstatistics.py:470
+msgid "Show PPAs as submenus"
+msgstr "Zobrazit PPA repozitáře jako podmenu"
+
+#: indicatorppadownloadstatistics.py:472
+msgid ""
+"The download statistics for each PPA\n"
+"are shown in a separate submenu."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:477
+msgid "Combine PPAs"
+msgstr "Kombinovat PPA repozitáře"
+
+#: indicatorppadownloadstatistics.py:479
+msgid ""
+"Combine the statistics of binary\n"
+"packages when the PPA user/name\n"
+"are the same.\n"
+"\n"
+"Non-architecture specific packages:\n"
+"If the package names and version\n"
+"numbers of two binary packages are\n"
+"identical, the packages are treated\n"
+"as the same package and the\n"
+"download counts are NOT summed.\n"
+"Packages such as Python fall into\n"
+"this category.\n"
+"\n"
+"Architecture specific packages:\n"
+"If the package names and version\n"
+"numbers of two binary packages are\n"
+"identical, the packages are treated\n"
+"as the same package and the download\n"
+"counts ARE summed.\n"
+"Packages such as compiled C fall into\n"
+"this category."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:502
+msgid "Ignore version for architecture specific"
+msgstr "Ignorovat verze jednotlivých architektur"
+
+#: indicatorppadownloadstatistics.py:505
+msgid ""
+"Sometimes architecture specific\n"
+"packages with the same package\n"
+"name but different version 'number'\n"
+"are logically the SAME package.\n"
+"\n"
+"For example, a C source package for\n"
+"both Ubuntu Saucy and Ubuntu Trusty\n"
+"will be compiled twice, each with a\n"
+"different 'number', despite being\n"
+"the SAME release.\n"
+"\n"
+"Checking this option will ignore the\n"
+"version number when determining if\n"
+"two architecture specific packages\n"
+"are identical.\n"
+"\n"
+"The version number is retained only\n"
+"if it is identical across ALL\n"
+"instances of a published binary."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:527
+msgid "Sort by download"
+msgstr "Řadit podle počtu stažení"
+
+#: indicatorppadownloadstatistics.py:528
+msgid "Sort by download count within each PPA."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:535
+msgid "  Clip amount"
+msgstr "Počet zobrazených řádků"
+
+#: indicatorppadownloadstatistics.py:544
+msgid ""
+"Limit the number of entries\n"
+"when sorting by download.\n"
+"\n"
+"A value of zero will not clip."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:557
+msgid "General"
+msgstr "Obecné"
+
+#: indicatorppadownloadstatistics.py:630
+msgid "No PPA has been selected for removal."
+msgstr "Nebyl vybrán PPA repozitář, který se má odstranit."
+
+#: indicatorppadownloadstatistics.py:634
+msgid "Remove the selected PPA?"
+msgstr "Odstranit vybraný PPA repozitář?"
+
+#: indicatorppadownloadstatistics.py:728
+msgid "Add PPA"
+msgstr "Přidat PPA repozitář"
+
+#: indicatorppadownloadstatistics.py:730
+msgid "Edit PPA"
+msgstr "Upravit PPA repozitář"
+
+#: indicatorppadownloadstatistics.py:745
+msgid "PPA user cannot be empty."
+msgstr "Uživatel PPA nemůže zůstat nevyplněný."
+
+#: indicatorppadownloadstatistics.py:750
+msgid "PPA name cannot be empty."
+msgstr "Název PPA repozitáře nemůže zůstat nevyplněný."
+
+#: indicatorppadownloadstatistics.py:779
+msgid "Duplicates disallowed - there is an identical PPA!"
+msgstr "Duplicity nejsou povoleny - stejný PPA repozitář již existuje!"
+
+#: indicatorppadownloadstatistics.py:796
+msgid "No filter has been selected for removal."
+msgstr "Nebyl vybrán filtr, který se má odstranit."
+
+#: indicatorppadownloadstatistics.py:800
+msgid "Remove the selected filter?"
+msgstr "Odstranit vybraný filtr?"
+
+#: indicatorppadownloadstatistics.py:806
+msgid "Please add a PPA first!"
+msgstr "Nejdříve prosím přidejte PPA repozitář."
+
+#: indicatorppadownloadstatistics.py:817
+msgid "Only one filter per PPA User/Name."
+msgstr "Pouze jeden filtr na uživatele/název PPA repozitáře."
+
+#: indicatorppadownloadstatistics.py:829
+msgid "PPA User/Name"
+msgstr "Uživatel/název PPA repozitáře."
+
+#: indicatorppadownloadstatistics.py:860
+msgid "Filter Text"
+msgstr "Text filtru"
+
+#: indicatorppadownloadstatistics.py:874
+msgid ""
+"Each line of text is a single\n"
+"filter which is compared against\n"
+"each package during download.\n"
+"\n"
+"If a package name contains ANY\n"
+"part of ANY filter, that package\n"
+"is included in the download\n"
+"statistics.\n"
+"\n"
+"Regular expressions and wild\n"
+"cards are not accepted!"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:895
+msgid "Edit Filter"
+msgstr "Upravit filtr"
+
+#: indicatorppadownloadstatistics.py:897
+msgid "Add Filter"
+msgstr "Přidat filtr"
+
+#: indicatorppadownloadstatistics.py:907
+msgid "Please enter filter text!"
+msgstr "Zadejte prosím text filtru!"

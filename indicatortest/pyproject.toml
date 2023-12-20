@@ -1,0 +1,46 @@
+[build-system]
+requires = [ "setuptools >= 61.0" ]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indicatortest"
+version = "1.0.13"
+authors = [
+  { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
+]
+maintainers = [
+  { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
+]
+description = "Application indicator to test indicator functionality."
+dependencies = [
+  "PyGObject"
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+  "Development Status :: 6 - Mature",
+  "Environment :: X11 Applications :: GTK",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Natural Language :: English",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3.8",
+  "Topic :: Software Development :: Testing"
+]
+
+[project.urls]
+homepage = "https://pypi.org/project/indicatortest"
+
+[tool.setuptools.packages.find]
+where = [ "src" ]
+
+[tool.setuptools.package-data]
+indicatortest = [
+  "CHANGELOG.md",
+  "icons/*/*.svg",
+  "locale/*.pot",
+  "locale/*/LC_MESSAGES/*.mo",
+  "locale/*/LC_MESSAGES/*.po",
+  "packaging/linux/*.desktop",
+  "packaging/linux/*.sh"
+]

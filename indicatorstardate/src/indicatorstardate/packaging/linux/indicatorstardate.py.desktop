@@ -1,0 +1,16 @@
+# To validate this file:
+#   desktop-file-validate indicatorstardate.py.desktop
+#
+# To install or update this file, although the
+# operating system should update by default and
+# certainly will update on a logout/login or restart:
+#   xdg-desktop-menu install --novendor indicatorstardate.py.desktop
+[Desktop Entry]
+Type=Application
+Name=Indicator Stardate
+Name[ru]=Индикатор звёздной даты
+Icon=indicatorstardate
+Exec=sh -c "\$HOME/.local/bin/indicatorstardate.sh"
+Categories=Utility;Amusement
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0

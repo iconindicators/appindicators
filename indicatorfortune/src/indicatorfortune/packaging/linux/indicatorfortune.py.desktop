@@ -1,0 +1,16 @@
+# To validate this file:
+#   desktop-file-validate indicatorfortune.py.desktop
+#
+# To install or update this file, although the
+# operating system should update by default and
+# certainly will update on a logout/login or restart:
+#   xdg-desktop-menu install --novendor indicatorfortune.py.desktop
+[Desktop Entry]
+Type=Application
+Name=Indicator Fortune
+Name[ru]=Индикатор изречений
+Icon=indicatorfortune
+Exec=sh -c "\$HOME/.local/bin/indicatorfortune.sh"
+Categories=Utility;Amusement
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0
