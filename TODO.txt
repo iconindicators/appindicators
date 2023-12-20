@@ -1,3 +1,6 @@
+#TODO Need to update /home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase/locale/README
+
+
 #TODO Probably want to add/commit 
 #   convert_markdown_to_debian_changelog.py
 # but then remove as it is now redundant.
