@@ -47,6 +47,19 @@ indicator_names = {
     "indicatorvirtualbox"            : "Indicator VirtualBox™" }
 
 
+indicator_dependencies = {
+    "indicatorfortune"               : "fortune-mod fortunes python3-notify2",
+    "indicatorlunar"                 : "python3-notify2",
+    "indicatoronthisday"             : "calendar python3-notify2",
+    "indicatorppadownloadstatistics" : "",
+    "indicatorpunycode"              : "python3-notify2",
+    "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
+    "indicatorstardate"              : "",
+    "indicatortest"                  : "python3-notify2",
+    "indicatortide"                  : "python3-notify2",
+    "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
+
+
 def _get_introduction( indicator_name ):
     comments = ""
     pattern_tag = re.compile( f".*comments = _\(.*" )
@@ -92,8 +105,10 @@ def _get_installation( indicator_name ):
         f"libgirepository1.0-dev "
         f"pkg-config "
         f"python3-dev "
+        f"python3-gi "
         f"python3-venv "
-        f"python3-notify2\n"
+        f"python3-notify2 "
+        f"{ indicator_dependencies[ indicator_name ] }\n"
         f"```\n"
 
         f"2. Create a `Python` virtual environment, activate and install the indicator package:\n"
