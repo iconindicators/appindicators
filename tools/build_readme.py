@@ -86,7 +86,7 @@ def _get_requirements():
 
 
 def _get_installation( indicator_name ):
-    venv_indicator_home = f"$HOME/.local/venv_{ indicator_name }/lib/python3.*/site-packages/{ indicator_name }"
+    venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
 
     # Reference on installing some of the operating system packages:    
     #   https://stackoverflow.com/a/61164149/2156453

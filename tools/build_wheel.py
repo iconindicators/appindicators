@@ -92,7 +92,7 @@ def _create_run_script( directory_dist, indicator_name ):
         f"#!/bin/sh\n\n"
         f"cd $HOME/.local && \\\n"
         f". venv_{ indicator_name }/bin/activate && \\\n"
-        f"cd venv_{ indicator_name }/lib/python3.*/site-packages/{ indicator_name } && \\\n"
+        f"cd $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name } && \\\n"
         f"python3 { indicator_name }.py\n" )
 
     with open( run_script_path, 'w' ) as f:
