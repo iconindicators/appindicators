@@ -4,6 +4,10 @@
 # explaing to go to PyPI.
 
 
+#TODO SVG colours 
+# https://johndecember.com/html/spec/colorsvghex.html
+
+
 #TODO Testing install of indicatortest whl via pip on OS versions
 #	Ubuntu 20.04   ALL GOOD
 
@@ -50,10 +54,6 @@
 #
 # The command to run is something like:
 #   $HOME/.venv_indicator_fortune/python3 $HOME/.venv_indicator_fortune/.../indicator_fortune/indicator-fortune.py
-
-
-#TODO SVG colours 
-# https://johndecember.com/html/spec/colorsvghex.html
 
 
 #TODO Good background on Python build/env
