@@ -1,9 +1,0 @@
-indicator-ppa-download-statistics.py.desktop usr/share/applications
-src/indicatorbase.py usr/share/indicator-ppa-download-statistics
-src/indicator-ppa-download-statistics.py usr/share/indicator-ppa-download-statistics
-src/ppa.py usr/share/indicator-ppa-download-statistics
-icons/hicolor/indicator-ppa-download-statistics.svg usr/share/icons/hicolor/scalable/apps
-icons/hicolor/indicator-ppa-download-statistics.svg usr/share/icons/hicolor/apps/16
-icons/hicolor/indicator-ppa-download-statistics.svg usr/share/icons/hicolor/apps/22
-icons/hicolor/indicator-ppa-download-statistics.svg usr/share/icons/hicolor/apps/24
-icons/hicolor/indicator-ppa-download-statistics.svg usr/share/icons/hicolor/apps/48

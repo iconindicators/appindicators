@@ -1,8 +1,0 @@
-indicator-punycode.py.desktop usr/share/applications
-src/indicatorbase.py usr/share/indicator-punycode
-src/indicator-punycode.py usr/share/indicator-punycode
-icons/hicolor/indicator-punycode.svg usr/share/icons/hicolor/scalable/apps
-icons/hicolor/indicator-punycode.svg usr/share/icons/hicolor/apps/16
-icons/hicolor/indicator-punycode.svg usr/share/icons/hicolor/apps/22
-icons/hicolor/indicator-punycode.svg usr/share/icons/hicolor/apps/24
-icons/hicolor/indicator-punycode.svg usr/share/icons/hicolor/apps/48

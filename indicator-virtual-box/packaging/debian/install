@@ -1,9 +1,0 @@
-indicator-virtual-box.py.desktop usr/share/applications
-src/indicatorbase.py usr/share/indicator-virtual-box
-src/indicator-virtual-box.py usr/share/indicator-virtual-box
-src/virtualmachine.py usr/share/indicator-virtual-box
-icons/hicolor/indicator-virtual-box.svg usr/share/icons/hicolor/scalable/apps
-icons/hicolor/indicator-virtual-box.svg usr/share/icons/hicolor/apps/16
-icons/hicolor/indicator-virtual-box.svg usr/share/icons/hicolor/apps/22
-icons/hicolor/indicator-virtual-box.svg usr/share/icons/hicolor/apps/24
-icons/hicolor/indicator-virtual-box.svg usr/share/icons/hicolor/apps/48

@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=VirtualBox™ Indicator
-Name[ru]=Индикатор VirtualBox™
-Icon=indicator-virtual-box
-Exec=/usr/share/indicator-virtual-box/indicator-virtual-box.py
-Categories=Utility;
-X-GNOME-Autostart-enabled=true
-X-GNOME-Autostart-Delay=0
