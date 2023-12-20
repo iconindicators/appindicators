@@ -4,10 +4,12 @@
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 
+
 ## v1.0.15 (2023-01-09)
 
 - Now works on the following Ubuntu variants/versions...
   - Ubuntu Unity 22.04
+
 
 ## v1.0.14 (2022-11-03)
 
@@ -29,13 +31,16 @@
 - Limited functionality on the following Ubuntu variants/versions...
   - Ubuntu Budgie 20.04 - No mouse middle click.
 
+
 ## v1.0.13 (2022-10-29)
 
 - Code refactor caused base class variables to be uninitialised.
 
+
 ## v1.0.12 (2022-05-09)
 
 - Update release to bionic as xenial is end of life.
+
 
 ## v1.0.11 (2020-11-05)
 
@@ -61,14 +66,17 @@
 
     Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
 
+
 ## v1.0.10 (2020-04-26)
 
 - Added Yaru icon.
 - Fixed deprecation warnings.
 
+
 ## v1.0.9 (2020-01-06)
 
 - Bug fix: Erroneous call to logging.
+
 
 ## v1.0.8 (2019-09-23)
 
@@ -79,6 +87,7 @@
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
+
 ## v1.0.7 (2019-05-02)
 
 - Tidy up load config of user preferences.
@@ -87,13 +96,16 @@
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
+
 ## v1.0.6 (2018-03-27)
 
 - Removed user config migration code.
 
+
 ## v1.0.5 (2017-10-06)
 
 - Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
+
 
 ## v1.0.4 (2017-05-01)
 
@@ -103,9 +115,11 @@
 - User settings now stored in the directory specified by the environment variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user settings stored in $HOME are migrated to the new location).
 - Update release to trusty as precise is end of life.
 
+
 ## v1.0.3 (2017-02-16)
 
 - Removed superfluous "General" tab from Preferences dialog.
+
 
 ## v1.0.2 (2016-07-24)
 
@@ -115,11 +129,13 @@
 - Overhaul of icons: only the hicolor icon is required and all theme icons are created from the hicolor via the build script.
 - Overhaul of build script: extracted common functions into a separate script used by all indicators.
 
+
 ## v1.0.1 (2016-06-15)
 
 - If a conversion result already exists in the menu, the result is simply moved to the top of the menu. 
 - Removed unnecessary 'Name' translation from .desktop file.
 - Added translation capability to 'Unicode' and 'ASCII'.
+
 
 ## v1.0.0 (2016-06-11)
 

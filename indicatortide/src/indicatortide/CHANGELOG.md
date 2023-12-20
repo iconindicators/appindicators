@@ -4,10 +4,12 @@
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 
+
 ## v1.0.29 (2023-01-09)
 
 - Now works on the following Ubuntu variants/versions...
   - Ubuntu Unity 22.04
+
 
 ## v1.0.28 (2022-11-03)
 
@@ -27,22 +29,27 @@
   - Xubuntu 20.04
   - Xubuntu 22.04
 
+
 ## v1.0.27 (2022-10-29)
 
 - Code refactor caused base class variables to be uninitialised.
 
+
 ## v1.0.26 (2022-10-29)
 
 - Increased size of icon to take up entire permissible area.
+
 
 ## v1.0.25 (2022-08-04)
 
 - Around the middle of 2021, the UKHO reduced their coverage of tidal data from globally to only UK ports.  As no other source for global tidal data has been found, the indicator has been radically overhauled. The end user must now write a Python3 script which downloads/obtains tidal data and pass that data back to the indicator. See the file 'tidedatagetterbase.py' located in the installation directory (typically /usr/share/indicator-tide) as an example. Your script must extend the base class 'TideDataGetterBase' and implement the function 'getTideData' to obtain your tidal data, returning a list of 'tide.Reading' objects. Specify the script path/name and the class name in the Preferences.
 - Update release to bionic as xenial is end of life.
 
+
 ## v1.0.24 (2021-02-03)
 
 - Removed the notification when the tidal data is (successfully) updated. Instead a message is presented on the About dialog to inform the user if the tidal data is in user local time or the time zone of the port. Any errors are shown as a notification to the user and logged to file.
+
 
 ## v1.0.23 (2020-11-05)
 
@@ -68,27 +75,33 @@
 
     Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
 
+
 ## v1.0.22 (2020-09-05)
 
 - Annual renewal of UKHO licence.
+
 
 ## v1.0.21 (2020-04-26)
 
 - Added Yaru icon.
 - Fixed deprecation warnings.
 
+
 ## v1.0.20 (2020-02-08)
 
 - Bug fix: Cache backend generated bad paths with a double slash. 
+
 
 ## v1.0.19 (2019-12-30)
 
 - On-click URL now takes into account daylight savings.
 
+
 ## v1.0.18 (2019-12-29)
 
 - Bug fix: Rollover year to year was incrementing the year for each reading.
 - Bug fix: Removed spurious hard coded string throwing out readings.
+
 
 ## v1.0.17 (2019-09-23)
 
@@ -99,9 +112,11 @@
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
+
 ## v1.0.16 (2019-09-21)
 
 - Fixed typo in tooltip.
+
 
 ## v1.0.15 (2019-05-02)
 
@@ -114,18 +129,22 @@
 - Update debian/control Standards-Version to 3.9.7.
 - Added logging for when the license has expired and data unavailable.
 
+
 ## v1.0.14 (2018-10-03)
 
 - Fixed incorrect grammar in About dialog.
 - Now uses a global URL timeout when attempting downloads.
 
+
 ## v1.0.13 (2018-08-14)
 
 - Annual renewal of UKHO licence.
 
+
 ## v1.0.12 (2018-04-29)
 
 - Bug fix: the [TYPE] and [LEVEL] tags could potentially be translated.
+
 
 ## v1.0.11 (2017-10-23)
 
@@ -133,13 +152,16 @@
 - Now checks for an internet connection before downloading tidal data. This stops the log file cluttering up with failed connection messages.
 - Removed user config migration code.
 
+
 ## v1.0.10 (2017-10-06)
 
 - Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
 
+
 ## v1.0.9 (2017-09-25)
 
 - Bug fix: Handle year changeover when tidal data contains both December and January.
+
 
 ## v1.0.8 (2017-05-02)
 
@@ -155,13 +177,16 @@
 - Port listings have been updated - some additions, some deletions.
 - Update release to trusty as precise is end of life.
 
+
 ## v1.0.7 (2017-02-10)
 
 - Bug fix: Missing python3-notify2 from the debian/control file. Also added a gi.require_version to the source.
 
+
 ## v1.0.6 (2016-12-06)
 
 - Bug fix: Corrected debian/install file to reflect changes to source files.
+
 
 ## v1.0.5 (2016-09-27)
 
@@ -176,9 +201,11 @@
 - Overhaul of icons: only the hicolor icon is required and all theme icons are created from the hicolor via the build script.
 - Overhaul of build script: extracted common functions into a separate script used by all indicators.
 
+
 ## v1.0.4 (2016-09-26)
 
 - Renewed United Kingdom Hydrographic Office annual data access license.
+
 
 ## v1.0.3 (2016-06-06)
 
@@ -186,13 +213,16 @@
 - Icon for ubuntu-mono-dark theme was incorrect colour.
 - Updated comment of desktop file.
 
+
 ## v1.0.2 (2016-02-25)
 
 - Bug fix: Incorrectly handled Feb 29.
 
+
 ## v1.0.1 (2016-02-05)
 
 - Bug fix: Only the first update would occur, subsequent updates did not occur.  Now updates every twelve hours or just after (local) midnight.
+
 
 ## v1.0.0 (2015-09-23)
 

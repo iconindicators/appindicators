@@ -4,15 +4,18 @@
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 
+
 ## v1.0.16 (2023-11-08)
 
 - Bug fix: Added missing 'calendar' to debian/control "Depends".
 - Lowered the initial guess for numbers of menu items as the menu would flow off the screen at times.
 
+
 ## v1.0.15 (2023-01-09)
 
 - Now works on the following Ubuntu variants/versions...
   - Ubuntu Unity 22.04
+
 
 ## v1.0.14 (2022-12-04)
 
@@ -31,22 +34,27 @@
   - Xubuntu 20.04
   - Xubuntu 22.04
 
+
 ## v1.0.13 (2022-10-29)
 
 - Code refactor caused base class variables to be uninitialised.
+
 
 ## v1.0.12 (2022-10-29)
 
 - Increased size of icon to take up entire permissible area.
 
+
 ## v1.0.11 (2022-06-22)
 
 - The debian/compat file had version 11 whereas should have been version 10 which caused build problems.
+
 
 ## v1.0.10 (2022-05-21)
 
 - Added the ".txt" extension to the calendars file located in the user cache.
 - Update release to bionic as xenial is end of life.
+
 
 ## v1.0.9 (2020-11-05)
 
@@ -72,18 +80,22 @@
 
     Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
 
+
 ## v1.0.8 (2020-05-02)
 
 - Removed leading zero from day in date.
+
 
 ## v1.0.7 (2020-04-26)
 
 - Added Yaru icon.
 - Fixed deprecation warnings.
 
+
 ## v1.0.6 (2019-12-05)
 
 - Bug fix: Midnight update caused a crash.
+
 
 ## v1.0.5 (2019-09-23)
 
@@ -94,6 +106,7 @@
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
+
 ## v1.0.4 (2019-05-02)
 
 - The estimate for the number of menu items (lines) was off for GNOME Shell.
@@ -103,17 +116,21 @@
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
+
 ## v1.0.3 (2018-08-13)
 
 - Allow the user to limit the number of events such that a scroll bar does not appear.  Removed the 'Days' preference as it is now redundant.
+
 
 ## v1.0.2 (2018-06-08)
 
 - Removed duplicate calendar entries from the result set.
 
+
 ## v1.0.1 (2017-10-06)
 
 - Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
+
 
 ## v1.0.0 (2017-09-16)
 

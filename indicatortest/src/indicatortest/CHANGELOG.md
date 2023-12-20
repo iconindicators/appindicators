@@ -1,5 +1,10 @@
 # Indicator Test changelog
 
+## v1.0.15 (2023-12-20)
+
+- Corrections made to install and run scripts to avoid globbing paths.  Many thanks to Oleg Moiseichuck!
+
+
 ## v1.0.14 (2023-12-20)
 
 - Updated operating system dependencies.

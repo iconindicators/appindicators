@@ -4,14 +4,17 @@
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 
+
 ## v1.0.24 (2023-11-08)
 
 - Bug fix: Added missing 'libnotify-bin' and 'pulseaudio-utils' to debian/control "Depends".
+
 
 ## v1.0.23 (2023-01-09)
 
 - Now works on the following Ubuntu variants/versions...
   - Ubuntu Unity 22.04
+
 
 ## v1.0.22 (2022-12-04)
 
@@ -31,17 +34,21 @@
   - Lubuntu 22.04 - No label; tooltip is not dynamic (no background scripts).
   - Ubuntu Budgie 20.04 - No mouse middle click (no default script).
 
+
 ## v1.0.21 (2022-10-29)
 
 - Code refactor caused base class variables to be uninitialised.
+
 
 ## v1.0.20 (2022-10-29)
 
 - Haphazard cut/paste resulted in missing code.
 
+
 ## v1.0.19 (2022-10-29)
 
 - Increased size of icon to take up entire permissible area.
+
 
 ## v1.0.18 (2022-09-26)
 
@@ -51,9 +58,11 @@
 
     https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
 
+
 ## v1.0.17 (2022-06-27)
 
 - Added a preference to write out the full command to the log file when a script is executed.
+
 
 ## v1.0.16 (2021-09-30)
 
@@ -69,9 +78,11 @@
     
     As background scripts may have different update intervals, one script may update and another script will not.  The icon text will be updated using both the immediate result from the script which updated and the cached result from scripts which did not update (at that time).  If one script updates every five minutes and another script updates hourly, the result shown in the icon text for the hourly script may be stale due to the cached result.  Consequently, a script can be optionally forced to update quicker than its specified interval.  This option would typically be used for a script which reports exception conditions.
 
+
 ## v1.0.15 (2021-07-15)
 
 - Bug fix: Script Info class constructor had changed and some calls were not updated accordingly.
+
 
 ## v1.0.14 (2021-04-05)
 
@@ -80,6 +91,7 @@
       "cd /the/directory/you/want ; "
 
 - Update release to bionic as xenial is end of life.
+
 
 ## v1.0.13 (2020-11-05)
 
@@ -105,10 +117,12 @@
 
     Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
 
+
 ## v1.0.12 (2020-04-26)
 
 - Added Yaru icon.
 - Fixed deprecation warnings.
+
 
 ## v1.0.11 (2019-09-23)
 
@@ -119,9 +133,11 @@
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
+
 ## v1.0.10 (2019-09-20)
 
 - Bug fix: Indentation error.
+
 
 ## v1.0.9 (2019-05-02)
 
@@ -133,26 +149,32 @@
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
+
 ## v1.0.8 (2018-09-13)
 
 - Bug fix: The terminal flag '--' does not work on Xubuntu/Lubuntu. The terminal flag is dynamically set depending on the terminal in use.
+
 
 ## v1.0.7 (2018-03-27)
 
 - Handle the deprecation of the -e option in gnome-terminal and simplify. Consequently, gnome-terminal is used (rather than x-terminal-emulator), /bin/bash is used (rather than $SHELL) and any text (used for example in the notifications) may need to be checked for correct escape characters.
 - Removed user config migration code.
 
+
 ## v1.0.6 (2018-01-22)
 
 - When a script was removed, the next script selected would be from the first script of the first group, rather than the first script of the same group, causing confusion when deleting multiple scripts.
+
 
 ## v1.0.5 (2018-01-20)
 
 - Bug fix: Script group names were not being sorted case insensitively, resulting in incorrect script group indexes being selected in the Preferences.
 
+
 ## v1.0.4 (2017-10-06)
 
 - Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
+
 
 ## v1.0.3 (2017-05-02)
 
@@ -162,6 +184,7 @@
 - About/Preferences dialogs now block each other - only show one at a time.
 - User settings now stored in the directory specified by the environment variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user settings stored in $HOME are migrated to the new location).
 - Update release to trusty as precise is end of life.
+
 
 ## v1.0.2 (2016-07-24)
 
@@ -175,11 +198,13 @@
 - Overhaul of icons: only the hicolor icon is required and all theme icons are created from the hicolor via the build script.
 - Overhaul of build script: extracted common functions into a separate script used by all indicators.
 
+
 ## v1.0.1 (2016-06-14)
 
 - Bug fix: The sample script for 'update' incorrectly escaped the message in notify-send.
 - Icon for lubuntu theme was incorrect colour.
 - Updated comment of desktop file.
+
 
 ## v1.0.0 (2016-05-23)
 
