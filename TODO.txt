@@ -1,6 +1,3 @@
-#TODO Need to update /home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase/locale/README
-
-
 #TODO Eventually need to update 
 #	https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 #	https://askubuntu.com/questions/30334/what-application-indicators-are-available
