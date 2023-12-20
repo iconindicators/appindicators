@@ -1,5 +1,10 @@
 # Indicator Test changelog
 
+## v1.0.14 (2023-12-20)
+
+- Updated operating system dependencies.
+
+
 ## v1.0.13 (2023-12-20)
 
 - Still wrestling with differences in Markdown rendering in the README.md and how PyPI interprets things!
