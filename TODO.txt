@@ -13,7 +13,7 @@
 # Want to know when all the new stuff is committed
 # and when the old stuff finally gets deleted.
 # Maybe just do a commit (or several) with ALL CAPS as the message.
-# 1. Add all new stuff.     INITIAL COMMIT OF INDICATORS NOW USING PYPROJECT.TOML AND CREATING A WHEEL
+# 1. Add all new stuff.     INITIAL COMMIT OF INDICATORS AND TOOLS USING PYPROJECT.TOML AND CREATING A WHEEL
 # 2. Remove old stuff.		REMOVAL OF LEGACY INDICATORS AND CREATING A DEB
 
 
