@@ -42,17 +42,14 @@ except ModuleNotFoundError:
     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
-def _intialise_virtual_environment( directory_release ):
-    directoryVirtualEnvironment = Path( directory_release + "/venv" )
-    if not directoryVirtualEnvironment.is_dir():
+def _intialise_virtual_environment():
+    if not Path( "venv" ).is_dir():
         command = \
-            "python3 -m venv " + str( directoryVirtualEnvironment ) + " && " + \
-            ". ./" + str( directoryVirtualEnvironment ) + "/bin/activate && " + \
+            "python3 -m venv venv && " + \
+            ". ./venv/bin/activate && " + \
             "python3 -m pip install --upgrade build pip PyGObject"
 
         subprocess.call( command, shell = True )
-
-    return directoryVirtualEnvironment
 
 
 def _run_checks_specific_to_indicator( indicator_name ):
@@ -119,8 +116,6 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
     # Remove any __pycache__ 
     for item in Path( directory_indicator + "/src/" + indicator_name ).glob( "__pycache__" ):
         shutil.rmtree( item )
-
-    # shutil.copy( "LICENSE.txt", directory_indicator )
 
     command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
     subprocess.call( command, shell = True )
@@ -229,9 +224,10 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
             _process_locale( directory_dist, indicator_name )
             _process_icons( directory_dist, indicator_name )
 
-            directory_venv = _intialise_virtual_environment( directory_release )
+            _intialise_virtual_environment()
+
             command = \
-                ". ./" + str( directory_venv ) + "/bin/activate && " + \
+                ". ./venv/bin/activate && " + \
                 "cd " + str( directory_dist ) + os.sep + indicator_name + " && " + \
                 "python3 -m build --outdir ../"
 
