@@ -3,6 +3,7 @@
 ## v1.0.17 (2023-11-22)
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
+- Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AppIndicator library.
 
 
 ## v1.0.16 (2023-11-08)
