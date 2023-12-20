@@ -265,7 +265,9 @@ if __name__ == "__main__":
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         for indicator_name in args.indicators:
-            _build_wheel_for_indicator( args.directoryRelease, indicator_name )
+            message = _build_wheel_for_indicator( args.directoryRelease, indicator_name )
+            if message:
+                print( message )
 
     else:
         print(
