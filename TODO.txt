@@ -8,10 +8,6 @@
 # https://johndecember.com/html/spec/colorsvghex.html
 
 
-#TODO Testing install of indicatortest whl via pip on OS versions
-#	Ubuntu 20.04   ALL GOOD
-
-
 #TODO Not sure if needed in pyproject.toml 'Depends':
 # 	pycairo
 # (and not even sure where I saw this)
