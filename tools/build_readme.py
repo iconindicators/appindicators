@@ -164,6 +164,7 @@ def _get_limitations():
 
         f"Distributions/versions with limited functionality:\n"
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
+        f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
