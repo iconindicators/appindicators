@@ -1,5 +1,11 @@
 # Indicator Fortune changelog
 
+## v1.0.44 (2023-12-22)
+
+- Now supports Fedora 39.
+- Fixed PyGObject 3.11 deprecation warnings.
+
+
 ## v1.0.43 (2023-11-22)
 
 - Corrections made to install and run scripts to avoid globbing paths.  Many thanks to Oleg Moiseichuck!

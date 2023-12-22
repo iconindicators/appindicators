@@ -37,6 +37,8 @@ except ValueError:
     gi.require_version( "Notify", "0.8" )
 from gi.repository import Notify
 
+from pathlib import Path
+
 
 class IndicatorFortune( IndicatorBase ):
 
@@ -49,7 +51,14 @@ class IndicatorFortune( IndicatorBase ):
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
-    DEFAULT_FORTUNE = [ "/usr/share/games/fortunes", Gtk.STOCK_APPLY ]
+    fortune_debian = "/usr/share/games/fortunes"
+    if Path( fortune_debian ).exists():
+        DEFAULT_FORTUNE = [ fortune_debian, Gtk.STOCK_APPLY ]
+
+    else:
+        fortune_fedora = "/usr/share/games/fortune"
+        DEFAULT_FORTUNE = [ fortune_fedora, Gtk.STOCK_APPLY ]
+
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
@@ -540,10 +549,11 @@ class IndicatorFortune( IndicatorBase ):
             action = Gtk.FileChooserAction.OPEN
 
         dialog = Gtk.FileChooserDialog(
-                    title,
-                    addEditDialog,
-                    action,
-                    ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
+                    title = title,
+                    parent = addEditDialog,
+                    action = action )
+
+        dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
 
         dialog.set_transient_for( addEditDialog )
         dialog.set_filename( fortuneFileDirectory.get_text() )
