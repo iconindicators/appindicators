@@ -27,6 +27,7 @@
 #   https://pygobject.readthedocs.io/en/latest/getting_started.html
 #   https://twine.readthedocs.io/en/latest/
 #   https://packaging.python.org/en/latest/tutorials/packaging-projects/        
+#   https://github.com/AyatanaIndicators/libayatana-appindicator
 
 
 import datetime
@@ -46,8 +47,16 @@ import sys
 from abc import ABC
 from bisect import bisect_right
 
-gi.require_version( "AyatanaAppIndicator3", "0.1" )
-from gi.repository import AyatanaAppIndicator3
+try:
+    gi.require_version( "AyatanaAppIndicator3", "0.1" )
+    from gi.repository import AyatanaAppIndicator3 as AppIndicator
+except:
+    try:
+        gi.require_version( "AppIndicator3", "0.1" )
+        from gi.repository import AppIndicator3 as AppIndicator
+    except:
+        print( "Unable to find either AyatanaAppIndicator3 nor AppIndicator3.")
+        sys.exit( 1 )
 
 gi.require_version("GdkPixbuf", "2.0" )
 from gi.repository import GdkPixbuf
@@ -194,12 +203,12 @@ class IndicatorBase( ABC ):
         menu = Gtk.Menu()
         menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         menu.show_all()
-        self.indicator = AyatanaAppIndicator3.Indicator.new(
+        self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
             self.getIconFilename(), # Icon name
-            AyatanaAppIndicator3.IndicatorCategory.APPLICATION_STATUS )
+            AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
-        self.indicator.set_status( AyatanaAppIndicator3.IndicatorStatus.ACTIVE )
+        self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
