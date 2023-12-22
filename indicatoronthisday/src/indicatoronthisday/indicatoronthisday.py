@@ -466,7 +466,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def onBrowseCalendar( self, button, addEditDialog, calendarFile ):
         systemCalendars = self.getCalendars()
-        dialog = Gtk.FileChooserDialog( _( "Choose a calendar file" ), addEditDialog, Gtk.FileChooserAction.OPEN, ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK ) )
+
+        dialog = Gtk.FileChooserDialog(
+                    title = _( "Choose a calendar file" ),
+                    parent = addEditDialog,
+                    action = Gtk.FileChooserAction.OPEN )
+
+        dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
         dialog.set_transient_for( addEditDialog )
         dialog.set_filename( calendarFile.get_text() )
         while( True ):
