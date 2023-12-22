@@ -27,8 +27,6 @@ which will create a `.whl` and `.tar.gz` for `indicatorfortune` in `release/whee
 `python3 tools/upload_wheel.py release/wheel/dist_indicatorfortune`
 which prompt for the username (__token__) and password (which starts with 'pypi-') and then upload the `.whl` and `.tar.gz` to `PyPI`.
 
-TODO How to install from pip...follow the instructions at indicator website.
-
 
 ## Testing on TestPyPI
 A wheel can be uploaded to `TestPyPI`.
@@ -45,10 +43,9 @@ python3 -m pip install --extra-index-url https://test.pypi.org/simple/ indicator
  #
  # https://test.pypi.org/project/indicatortest/
  # https://packaging.python.org/en/latest/tutorials/packaging-projects/
- #
 
 
-## Install Wheel Directly
+## Testing a Local Wheel
 - Document how to build/install/run a wheel locally for testing
   python3 utils/buildWheel.py release indicatortest
   . /venv/bin/activate
@@ -57,7 +54,7 @@ python3 -m pip install --extra-index-url https://test.pypi.org/simple/ indicator
   python3 -m pip uninstall indicatortest
 
 
-##TODO
+## TODO
 - Do high level renaming according to standards.
   Naming of project, naming of modules (files), naming of classes.
   Then naming of globals, naming of functions, naming of variables.
@@ -65,35 +62,15 @@ python3 -m pip install --extra-index-url https://test.pypi.org/simple/ indicator
   - https://docs.python-guide.org/writing/style/
   - https://guicommits.com/organize-python-code-like-a-pro/
 
-- Port indicators to Ubuntu variants:
-  https://www.linuxmint.com/
-  https://www.bodhilinux.com/
-  https://elementary.io/
-  https://zorin.com/os/
-  https://www.ubuntukylin.com/downloads/download-en.html
+- Port indicators to other distributions...
+  - Pop!_OS
+  - Solus
+  - OpenSUSE
+  - CentOS
 
-- Port indicators to non-Ubuntu but GNOME based variants...
-  https://www.ubuntupit.com/best-gnome-based-linux-distributions/
-  https://www.fosslinux.com/43280/the-10-best-gnome-based-linux-distributions.htm
-
-- Is it possible to port to FreeBSD and/or NetBSD?
-  https://www.freshports.org/devel/libayatana-appindicator/
-
-- External hosting of source code and deployment other than PPA...
+- External hosting of source code
 	- https://github.com/alexmurray/indicator-sensors
-    - https://yktoo.com/en/software/sound-switcher-indicator/#installation
-    - https://snapcraft.io/about
-    - https://flathub.org/home
     - What about SourceForge?  Still uses SVN which is a good thing.
-      Are the download stats available through an API?
-      If so, add/amend the PPA Download Statistic indicator.
-      https://sourceforge.net/p/forge/documentation/Download%20Stats%20API/
-
-- Other Linux distributions?
-    - https://en.wikipedia.org/wiki/Arch_Linux
-    - https://en.wikipedia.org/wiki/Fedora_Linux
-    - https://en.wikipedia.org/wiki/Gentoo_Linux
-    - https://en.wikipedia.org/wiki/Slackware
 
 
 ## License

@@ -1,3 +1,25 @@
+#TODO Fedora 38
+# Test and update build readme
+
+
+#TODO Fedora 39
+# Look at why Indicator Test clipboard does not work
+#   https://pyperclip.readthedocs.io/en/latest/
+#   https://pypi.org/project/pyperclip/
+#   https://stackoverflow.com/questions/7606062/is-there-a-way-to-directly-send-a-python-output-to-clipboard
+#   https://stackoverflow.com/questions/73234123/how-copy-file-to-clipboard-using-python-or-cl-to-paste-it-using-strgv-later-on
+#   https://stackoverflow.com/questions/7881230/copy-data-from-the-clipboard-on-linux-mac-and-windows-with-a-single-python-scri
+#   https://stackoverflow.com/questions/69368140/how-can-i-put-text-in-the-clipboard-using-pure-python-in-gnu-linux
+#   https://stackoverflow.com/questions/11063458/python-script-to-copy-text-to-clipboard
+#   https://discuss.python.org/t/copy-to-system-clipboard/16198/2
+#   https://stackoverflow.com/questions/3902263/how-can-python-access-the-x11-clipboard
+#   https://medium.com/analytics-vidhya/clipboard-operations-in-python-3cf2b3bd998c
+#   https://github.com/terryyin/clipboard
+#   https://bugzilla.redhat.com/show_bug.cgi?id=2120129
+#   https://www.reddit.com/r/vim/comments/9jz194/how_to_copy_the_output_from_a_python_script_to/
+#   https://unix.stackexchange.com/questions/668929/how-to-copy-a-string-into-the-x-window-clipboard-with-the-command-line-on-red-ha
+
+
 #TODO Eventually need to update 
 #	https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 #	https://askubuntu.com/questions/30334/what-application-indicators-are-available
