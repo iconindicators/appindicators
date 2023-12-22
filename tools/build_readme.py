@@ -18,6 +18,13 @@
 
 # Create a README.md for an indicator from text common to all indicators and text
 # specific to the indicator, drawn from the indicator's CHANGELOG.md and pyproejct.toml.
+#
+#   https://github.github.com/gfm
+#
+# When testing/editing, to render out in HTML:
+#   python3 -m pip install --upgrade readme_renderer readme_renderer[md]
+#   python3 tools/build_readme.py release indicatortest
+#   python3 -m readme_renderer release/README.md -o release/README.html
 
 
 import argparse
@@ -47,8 +54,8 @@ indicator_names = {
     "indicatorvirtualbox"            : "Indicator VirtualBox™" }
 
 
-indicator_dependencies = {
-    "indicatorfortune"               : "fortune-mod fortunes python3-notify2",
+indicator_dependencies_debian = {
+    "indicatorfortune"               : "fortune-mod fortunes python3-notify2", 
     "indicatorlunar"                 : "python3-notify2",
     "indicatoronthisday"             : "calendar python3-notify2",
     "indicatorppadownloadstatistics" : "",
@@ -58,6 +65,19 @@ indicator_dependencies = {
     "indicatortest"                  : "python3-notify2",
     "indicatortide"                  : "python3-notify2",
     "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
+
+
+indicator_dependencies_fedora = {
+    "indicatorfortune"               : "fortune-mod python3-notify2", 
+    "indicatorlunar"                 : "python3-notify2",
+    "indicatoronthisday"             : "calendar python3-notify2", #TODO Test on Fedora
+    "indicatorppadownloadstatistics" : "",
+    "indicatorpunycode"              : "python3-notify2",
+    "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",   #TODO Test on Fedora
+    "indicatorstardate"              : "",
+    "indicatortest"                  : "python3-notify2",
+    "indicatortide"                  : "python3-notify2",
+    "indicatorvirtualbox"            : "python3-notify2 wmctrl" }   #TODO Test on Fedora
 
 
 def _get_introduction( indicator_name ):
@@ -81,8 +101,14 @@ def _get_requirements():
         f"Using `GNOME Tweaks`, enable the `Ubuntu appIndicators` extension.\n\n"
 
         f"**Debian 11 / 12:** "
-        f"Install the `GNOME Shell` [extension](https://extensions.gnome.org/extension/615/appindicator-support/) \n"
-        f"`AppIndicator and KStatusNotifierItem Support`\n\n" )
+        f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+        f"[extension ](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
+
+        f"**Fedora 39:** "
+        f"Install the `GNOME Shell` extension `AppIndicator and KStatusNotifierItem Support`:\n"
+        f"```\n"
+        f"sudo dnf -y install gnome-shell-extension-appindicator\n"
+        f"```\n\n" )
 
 
 def _get_installation( indicator_name ):
@@ -94,12 +120,13 @@ def _get_installation( indicator_name ):
         f"Installation\n"
         f"------------\n"
 
-        f"**Ubuntu / Debian:** "
         f"Open a `terminal` and...\n"
 
-        f"1. Install operating system packages:\n"
-        f"```\n"
-        f"sudo apt-get -y install "
+        f"1. Install operating system packages:\n\n"
+
+        f"    **Ubuntu / Debian:**\n"
+        f"    ```\n"
+        f"    sudo apt-get -y install "
         f"gir1.2-ayatanaappindicator3-0.1 "
         f"libcairo2-dev "
         f"libgirepository1.0-dev "
@@ -107,36 +134,49 @@ def _get_installation( indicator_name ):
         f"python3-dev "
         f"python3-gi "
         f"python3-venv "
-        f"python3-notify2 "
-        f"{ indicator_dependencies[ indicator_name ] }\n"
-        f"```\n"
+        f"{ indicator_dependencies_debian[ indicator_name ] }\n"
+        f"    ```\n\n"
+
+        f"    **Fedora:**\n"
+        f"    ```\n"
+        f"    sudo dnf -y install "
+        f"libappindicator-gtk3 "
+        f"cairo-devel "
+        f"pkg-config "
+        f"python3-devel "
+        f"python3-gobject "
+        f"gobject-introspection-devel "
+        f"cairo-gobject-devel "
+        f"{ indicator_dependencies_fedora[ indicator_name ] }\n"  #TODO Need to check these exist in Fedora
+        f"    ```\n"
 
         f"2. Create a `Python` virtual environment, activate and install the indicator package:\n"
-        f"```\n"
-        f"python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
-        f". $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"python3 -m pip install --upgrade { indicator_name } && \\\n"
-        f"deactivate\n"
-        f"```\n"
+        f"    ```\n"
+        f"    python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
+        f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade pip { indicator_name } && \\\n"
+        f"    deactivate\n"
+        f"    ```\n"
 
         f"3. Copy icon, run script and desktop file to `$HOME/.local`:\n"
-        f"```\n"
-        f"mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+        f"    ```\n"
+        f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
-        f"cp "
+        f"    cp "
         f"{ venv_indicator_home }/icons/hicolor/{ indicator_name }.svg "
         f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
-        f"mkdir -p $HOME/.local/bin && \\\n"
+        f"    mkdir -p $HOME/.local/bin && \\\n"
 
-        f"cp "
+        f"    cp "
         f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.sh "
         f"$HOME/.local/bin && \\\n"
 
-        f"cp "
+        f"    cp "
         f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.py.desktop "
         f"$HOME/.local/share/applications\n"
-        f"```\n\n" )
+
+        f"    ```\n\n" )
 
 
 def _get_usage( indicator_name ):
@@ -163,6 +203,7 @@ def _get_limitations():
         f"- `Ubuntu Unity 20.04 / 22.04`\n\n"
 
         f"Distributions/versions with limited functionality:\n"
+        f"- `Fedora 39` No clipboard.\n"
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
@@ -177,28 +218,40 @@ def _get_removal( indicator_name ):
         f"Removal\n"
         f"-------\n"
 
-        f"**Ubuntu / Debian:** "
         f"Open a `terminal` and...\n"
 
-        f"1. Remove operating system packages:\n"
-        f"```\n"
-        f"sudo apt-get -y remove "
+        f"1. Remove operating system packages:\n\n"
+
+        f"    **Ubuntu / Debian:**\n"
+        f"    ```\n"
+        f"    sudo apt-get -y remove "
         f"gir1.2-ayatanaappindicator3-0.1 "
         f"libcairo2-dev "
         f"libgirepository1.0-dev "
         f"pkg-config "
         f"python3-dev "
-        f"python3-venv "
-        f"python3-notify2\n"
-        f"```\n"
+        f"python3-venv \n"
+        f"    ```\n\n"
+
+        f"    **Fedora:**\n"
+        f"    ```\n"
+        f"    sudo dnf -y remove "
+        f"libappindicator-gtk3 "
+        f"cairo-devel "
+        f"pkg-config "
+        f"python3-devel "
+        f"python3-gobject "
+        f"gobject-introspection-devel "
+        f"cairo-gobject-devel \n"
+        f"    ```\n"
 
         f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
-        f"```\n"
-        f"rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
-        f"rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
-        f"rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
-        f"rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
-        f"```\n\n" )
+        f"    ```\n"
+        f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
+        f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
+        f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
+        f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
+        f"    ```\n\n" )
 
 
 def _get_license( indicator_name ):
