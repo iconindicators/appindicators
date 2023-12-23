@@ -62,7 +62,7 @@ indicator_dependencies_debian = {
     "indicatorpunycode"              : "python3-notify2",
     "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
     "indicatorstardate"              : "",
-    "indicatortest"                  : "calendar fortune-mod python3-notify2 wmctrl",
+    "indicatortest"                  : "calendar fortune-mod libnotify-bin pulseaudio-utils python3-notify2 wmctrl",
     "indicatortide"                  : "python3-notify2",
     "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
 
@@ -75,7 +75,7 @@ indicator_dependencies_fedora = {
     "indicatorpunycode"              : "python3-notify2",
     "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
     "indicatorstardate"              : "",
-    "indicatortest"                  : "calendar fortune-mod python3-notify2 wmctrl",
+    "indicatortest"                  : "calendar fortune-mod libnotify-bin pulseaudio-utils python3-notify2 wmctrl",
     "indicatortide"                  : "python3-notify2",
     "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
 
