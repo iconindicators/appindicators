@@ -37,7 +37,9 @@ A wheel can be uploaded to `TestPyPI` for testing purposes.
 TODO Figure out the upload command to TestPyPI (from history...also must be a venv in there somewhere).
 
 To install: TODO...
-Because the dependencies (listed in `pyproject.toml`) will be unavailable at `TestPyPI`, will need to specify an alternate install command.  To upload say `indicatortest`:
+Because the dependencies (listed in `pyproject.toml`) will be unavailable at `TestPyPI`,
+will need to specify an alternate install command.  
+To upload say `indicatortest`:
 python3 -m venv venv
 . ./venv/bin/activate
 python3 -m pip install --extra-index-url https://test.pypi.org/simple/ indicatortest
@@ -47,6 +49,9 @@ python3 -m pip install --extra-index-url https://test.pypi.org/simple/ indicator
  #
  # https://test.pypi.org/project/indicatortest/
  # https://packaging.python.org/en/latest/tutorials/packaging-projects/
+
+// python3 -m twine upload --repository testpypi dist/*
+// python3 -m twine upload --username __token__ --repository testpypi dist/*
 
 
 ## Testing a Locally Installed Wheel
