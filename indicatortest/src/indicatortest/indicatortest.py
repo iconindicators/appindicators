@@ -210,11 +210,31 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuExecuteCommand( self, menu ):
         subMenu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Run \'ls\' and display results." )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand() )
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "ls" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "ls -la" ) )
         subMenu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Execute Command" )
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "wmctrl" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "wmctrl -l" ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "calendar" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "calendar -f /usr/share/calendar/calendar.all -A 3" ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "fortune" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "fortune" ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "notify-send" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( f"notify-send -i { self.getIconFilename() } 'summary' 'body'" ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "paplay" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Execute Terminal Command" )
         menuItem.set_submenu( subMenu )
         menu.append( menuItem )
 
@@ -316,7 +336,7 @@ class IndicatorTest( IndicatorBase ):
                '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
 
 
-    def __executeCommand( self ):
+    def __executeCommand( self, command ):
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
@@ -334,12 +354,12 @@ class IndicatorTest( IndicatorBase ):
             Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
 
         else:
-            command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
-            command += "ls -la"
-            command += "; ${SHELL}"
-            command += "'"
-            Thread( target = self.processCall, args = ( command, ) ).start()
-            print( "Executing command: " + command )
+            command_ = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
+            command_ += command
+            command_ += "; ${SHELL}"
+            command_ += "'"
+            Thread( target = self.processCall, args = ( command_, ) ).start()
+            print( "Executing command: " + command_ )
 
 
     def onPreferences( self, dialog ):
