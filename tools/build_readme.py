@@ -62,7 +62,7 @@ indicator_dependencies_debian = {
     "indicatorpunycode"              : "python3-notify2",
     "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
     "indicatorstardate"              : "",
-    "indicatortest"                  : "python3-notify2",
+    "indicatortest"                  : "calendar fortune-mod python3-notify2 wmctrl",
     "indicatortide"                  : "python3-notify2",
     "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
 
@@ -70,14 +70,14 @@ indicator_dependencies_debian = {
 indicator_dependencies_fedora = {
     "indicatorfortune"               : "fortune-mod python3-notify2", 
     "indicatorlunar"                 : "python3-notify2",
-    "indicatoronthisday"             : "calendar python3-notify2", #TODO Test on Fedora
+    "indicatoronthisday"             : "calendar python3-notify2",
     "indicatorppadownloadstatistics" : "",
     "indicatorpunycode"              : "python3-notify2",
-    "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",   #TODO Test on Fedora
+    "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
     "indicatorstardate"              : "",
-    "indicatortest"                  : "python3-notify2",
+    "indicatortest"                  : "calendar fortune-mod python3-notify2 wmctrl",
     "indicatortide"                  : "python3-notify2",
-    "indicatorvirtualbox"            : "python3-notify2 wmctrl" }   #TODO Test on Fedora
+    "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
 
 
 def _get_introduction( indicator_name ):
@@ -92,73 +92,30 @@ def _get_introduction( indicator_name ):
     return comments
 
 
-def _get_requirements():
+def _get_supported_platforms( indicator_name ):
     return (
-        f"Requirements\n"
-        f"------------\n"
+        f"Supported Platforms\n"
+        f"-------------------\n"
 
-        f"**Ubuntu 20.04 or equivalent:** "
-        f"Using `GNOME Tweaks`, enable the `Ubuntu appIndicators` extension.\n\n"
-
-        f"**Debian 11 / 12:** "
-        f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-        f"[extension ](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
-
-        f"**Fedora 39:** "
-        f"Install the `GNOME Shell` extension `AppIndicator and KStatusNotifierItem Support`:\n"
-        f"```\n"
-        f"sudo dnf -y install gnome-shell-extension-appindicator\n"
-        f"```\n\n" )
+        f"`{ indicator_name }` will run on Debian / Ubuntu and Fedora and theoretically, "
+        f"any platform which supports the `appindicator` library.\n\n" )
 
 
-def _get_installation( indicator_name ):
-    venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
-
-    # Reference on installing some of the operating system packages:    
-    #   https://stackoverflow.com/a/61164149/2156453
+def _get_installation_python_virtual_environment( indicator_name ):
     return (
-        f"Installation\n"
-        f"------------\n"
-
-        f"Open a `terminal` and...\n"
-
-        f"1. Install operating system packages:\n\n"
-
-        f"    **Ubuntu / Debian:**\n"
-        f"    ```\n"
-        f"    sudo apt-get -y install "
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-gi "
-        f"python3-venv "
-        f"{ indicator_dependencies_debian[ indicator_name ] }\n"
-        f"    ```\n\n"
-
-        f"    **Fedora:**\n"
-        f"    ```\n"
-        f"    sudo dnf -y install "
-        f"libappindicator-gtk3 "
-        f"cairo-devel "
-        f"pkg-config "
-        f"python3-devel "
-        f"python3-gobject "
-        f"gobject-introspection-devel "
-        f"cairo-gobject-devel "
-        f"{ indicator_dependencies_fedora[ indicator_name ] }\n"  #TODO Need to check these exist in Fedora
-        f"    ```\n"
-
-        f"2. Create a `Python` virtual environment, activate and install the indicator package:\n"
+        f"3. Create a `Python` virtual environment, activate and install the indicator package. Open a `terminal` and...\n"
         f"    ```\n"
         f"    python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade pip { indicator_name } && \\\n"
         f"    deactivate\n"
-        f"    ```\n"
+        f"    ```\n" )
 
-        f"3. Copy icon, run script and desktop file to `$HOME/.local`:\n"
+
+def _get_installation_copy_files( indicator_name ):
+    venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
+    return (
+        f"4. Copy icon, run script and desktop file to `$HOME/.local`. Open a `terminal` and...\n"
         f"    ```\n"
         f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
@@ -177,6 +134,83 @@ def _get_installation( indicator_name ):
         f"$HOME/.local/share/applications\n"
 
         f"    ```\n\n" )
+
+
+def _get_installation_debian( indicator_name ):
+    return (
+        f"<details>"
+        f"<summary><b>Debian / Ubuntu</b></summary>\n\n"
+
+        f"1. Install operating system packages. Open a `terminal` and...\n\n"
+        f"    ```\n"
+        f"    sudo apt-get -y install "
+        f"gir1.2-ayatanaappindicator3-0.1 "
+        f"libcairo2-dev "
+        f"libgirepository1.0-dev "
+        f"pkg-config "
+        f"python3-dev "
+        f"python3-gi "
+        f"python3-venv "
+        f"{ indicator_dependencies_debian[ indicator_name ] }\n"
+        f"    ```\n\n"
+
+        f"2. Install extension:\n\n"
+
+        f"    **Debian:** "
+        f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+        f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
+
+        f"    **Ubuntu:** "
+        f"Run `GNOME Tweaks` and enable the `Ubuntu appIndicators` extension.\n\n"
+
+        f"{ _get_installation_python_virtual_environment( indicator_name ) }"
+
+        f"{ _get_installation_copy_files( indicator_name ) }"
+
+        f"</details>\n\n" )
+
+
+def _get_installation_fedora( indicator_name ):
+    return (
+        f"<details>"
+        f"<summary><b>Fedora</b></summary>\n\n"
+
+        f"1. Install operating system packages. Open a `terminal` and...\n\n"
+        f"    ```\n"
+        f"    sudo dnf -y install "
+        f"libappindicator-gtk3 "
+        f"cairo-devel "
+        f"pkg-config "
+        f"python3-devel "
+        f"python3-gobject "
+        f"gobject-introspection-devel "
+        f"cairo-gobject-devel "
+        f"gnome-extensions-app "
+        f"gnome-shell-extension-appindicator "
+        f"{ indicator_dependencies_fedora[ indicator_name ] }\n"
+        f"    ```\n\n"
+
+        f"2. Enable extension:\n\n"
+        f"    Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n"
+
+        f"{ _get_installation_python_virtual_environment( indicator_name ) }"
+
+        f"{ _get_installation_copy_files( indicator_name ) }"
+
+        f"</details>\n\n" )
+
+
+def _get_installation( indicator_name ):
+
+    # Reference on installing some of the operating system packages:    
+    #   https://stackoverflow.com/a/61164149/2156453
+    return (
+        f"Installation\n"
+        f"------------\n"
+
+        f"{ _get_installation_debian( indicator_name ) }"
+
+        f"{ _get_installation_fedora( indicator_name ) }" )
 
 
 def _get_usage( indicator_name ):
@@ -198,12 +232,13 @@ def _get_limitations():
 
         f"Distributions/versions with full functionality:\n"
         f"- `Debian 11 / 12`\n"
+        f"- `Fedora 38 / 39` on `X.Org`.\n"
         f"- `Ubuntu 20.04 / 22.04`\n"
         f"- `Ubuntu Budgie 22.04`\n"
         f"- `Ubuntu Unity 20.04 / 22.04`\n\n"
 
         f"Distributions/versions with limited functionality:\n"
-        f"- `Fedora 39` No clipboard.\n"
+        f"- `Fedora 38 / 39` No clipboard on `Wayland`.\n"
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
@@ -222,7 +257,7 @@ def _get_removal( indicator_name ):
 
         f"1. Remove operating system packages:\n\n"
 
-        f"    **Ubuntu / Debian:**\n"
+        f"    **Debian / Ubuntu:**\n"
         f"    ```\n"
         f"    sudo apt-get -y remove "
         f"gir1.2-ayatanaappindicator3-0.1 "
@@ -275,7 +310,7 @@ def _create_readme( directory_out, indicator_name ):
 
     with open( Path( directory_out, "README.md" ), 'w' ) as f:
         f.write( _get_introduction( indicator_name ) )
-        f.write( _get_requirements() )
+        f.write( _get_supported_platforms( indicator_name ) )
         f.write( _get_installation( indicator_name ) )
         f.write( _get_usage( indicator_name ) )
         f.write( _get_limitations() )
