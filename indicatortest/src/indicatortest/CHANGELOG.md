@@ -1,5 +1,10 @@
 # Indicator Test changelog
 
+## v1.0.16 (2023-12-22)
+
+- Added terminal commands "fortune", "wmctrl", "calendar", "notify-send" and "paplay".
+
+
 ## v1.0.15 (2023-12-20)
 
 - Corrections made to install and run scripts to avoid globbing paths.  Many thanks to Oleg Moiseichuck!
