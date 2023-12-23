@@ -154,7 +154,7 @@ def _get_installation_debian( indicator_name ):
         f"{ indicator_dependencies_debian[ indicator_name ] }\n"
         f"    ```\n\n"
 
-        f"2. Install extension:\n\n"
+        f"2. Install/enable extension:\n\n"
 
         f"    **Debian:** "
         f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
