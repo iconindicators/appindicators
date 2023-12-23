@@ -1,23 +1,23 @@
-#TODO Fedora 38
-# Test and update build readme
+#TODO
+- Do high level renaming according to standards.
+  Naming of project, naming of modules (files), naming of classes.
+  Then naming of globals, naming of functions, naming of variables.
+  - https://peps.python.org/pep-0008/
+  - https://docs.python-guide.org/writing/style/
+  - https://guicommits.com/organize-python-code-like-a-pro/
 
 
-#TODO Fedora 39
-# Look at why Indicator Test clipboard does not work
-#   https://pyperclip.readthedocs.io/en/latest/
-#   https://pypi.org/project/pyperclip/
-#   https://stackoverflow.com/questions/7606062/is-there-a-way-to-directly-send-a-python-output-to-clipboard
-#   https://stackoverflow.com/questions/73234123/how-copy-file-to-clipboard-using-python-or-cl-to-paste-it-using-strgv-later-on
-#   https://stackoverflow.com/questions/7881230/copy-data-from-the-clipboard-on-linux-mac-and-windows-with-a-single-python-scri
-#   https://stackoverflow.com/questions/69368140/how-can-i-put-text-in-the-clipboard-using-pure-python-in-gnu-linux
-#   https://stackoverflow.com/questions/11063458/python-script-to-copy-text-to-clipboard
-#   https://discuss.python.org/t/copy-to-system-clipboard/16198/2
-#   https://stackoverflow.com/questions/3902263/how-can-python-access-the-x11-clipboard
-#   https://medium.com/analytics-vidhya/clipboard-operations-in-python-3cf2b3bd998c
-#   https://github.com/terryyin/clipboard
-#   https://bugzilla.redhat.com/show_bug.cgi?id=2120129
-#   https://www.reddit.com/r/vim/comments/9jz194/how_to_copy_the_output_from_a_python_script_to/
-#   https://unix.stackexchange.com/questions/668929/how-to-copy-a-string-into-the-x-window-clipboard-with-the-command-line-on-red-ha
+#TODO
+- Port indicators to other distributions...
+  - Pop!_OS
+  - Solus
+  - OpenSUSE
+  - CentOS
+
+
+#TODO External hosting of source code
+#   https://github.com/alexmurray/indicator-sensors
+#   What about SourceForge?  Still uses SVN which is a good thing.
 
 
 #TODO Eventually need to update 
@@ -277,6 +277,7 @@
 # Also look at Sound Switcher below which has i18n/po and also a snap.
 
 
+#         DON"T THINK I NEED THIS ANY MORE.
 #TODO Packaging
 #   https://setuptools.pypa.io/en/latest/setuptools.html
 #   https://packaging.python.org/en/latest/
@@ -303,72 +304,3 @@
 #   https://stackoverflow.com/questions/74608905/single-source-of-truth-for-python-project-version-in-presence-of-pyproject-toml
 #   https://stackoverflow.com/questions/76041299/using-values-generated-by-python-scripts-in-dynamic-fields-in-pyproject-toml
 #   https://stackoverflow.com/questions/76081078/using-the-return-value-of-a-python-function-as-the-value-for-version-field-in-py
-
-
-#TODO AppImage
-# https://appimage.org/
-
-
-#TODO Flathub
-# https://flatpak.org/setup/Ubuntu
-# https://docs.flatpak.org/en/latest/first-build.html
-# https://github.com/PlaintextGroup/oss-virtual-incubator/blob/main/proposals/flathub-linux-app-store.md
-
-
-#TODO Snap
-#   https://snapcraft.io/docs/snapcraft-overview
-#   https://snapcraft.io/docs/python-apps
-#   https://forum.snapcraft.io/t/parse-info-on-pythonpart-utilizing-pyproject-toml/33294
-#   https://forum.snapcraft.io/t/building-a-core20-python-snap-using-pyproject-toml/22028
-#   https://stackoverflow.com/questions/73310069/should-i-be-using-only-pyproject-toml
-#   https://stackoverflow.com/questions/72352801/migration-from-setup-py-to-pyproject-toml-how-to-specify-package-name
-#   https://stackoverflow.com/questions/71193095/questions-on-pyproject-toml-vs-setup-py
-#   https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
-#   https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
-#   https://pypi.org/project/poetry2setup/
-
-
-#TODO Debian install from PPA
-#   https://unix.stackexchange.com/questions/248367/how-to-install-ppas-from-launchpad-on-non-ubuntu-distros-like-debian
-
-
-#TODO 
-# Look at sound-switcher which does several interesting things...
-#   https://yktoo.com/en/software/sound-switcher-indicator/#installation
-#
-# Creates snap and other packages for deployment.
-#
-# https://github.com/yktoo/indicator-sound-switcher/blob/dev/debian/control
-# https://github.com/yktoo/indicator-sound-switcher/blob/dev/snap/local/launch.sh
-#
-# For autostart with a snap, see how this works...need to do something different?
-
-
-#TODO What about support for other Linux distributions?  Do I build an equivalent .deb for these?
-#   https://en.wikipedia.org/wiki/Arch_Linux
-#
-#   https://en.wikipedia.org/wiki/Fedora_Linux
-#   https://stackoverflow.com/questions/59248180/how-to-install-rpmdev-tools-on-ubuntu
-#   https://superuser.com/questions/615023/how-to-build-rpm-package-correctly
-#   https://stackoverflow.com/questions/29038961/how-can-i-build-an-rpm-package-in-a-debian-based-system
-#   https://rpm-packaging-guide.github.io/#packaging-software
-#   https://blog.jwf.io/2017/11/first-rpm-package-fedora/
-#   https://discuss.python.org/t/tool-to-build-a-rpm-package-backed-by-pep-517/4020/15
-#   https://rpm-guide.readthedocs.io/en/latest/index.html
-#   https://discuss.python.org/t/tool-to-build-a-rpm-package-backed-by-pep-517/4020/14
-#   https://stackoverflow.com/questions/42286786/how-to-create-a-rpm-for-python-application
-#   https://rpm.org/documentation.html
-#   https://refspecs.linuxbase.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/pkgformat.html
-#   https://opensource.com/article/18/9/how-build-rpm-packages
-#   https://www.howtoforge.com/tutorial/how-to-convert-packages-between-deb-and-rpm/
-#   https://developers.redhat.com/blog/2019/03/18/rpm-packaging-guide-creating-rpm#creating_the_rpm_package_for_vitetris
-#   https://www.reddit.com/r/Fedora/comments/trwdok/new_to_fedora_how_to_show_app_indicator_icons_on/
-#   https://www.reddit.com/r/Fedora/comments/ucbunn/no_application_icons_displayed_in_the_tray/
-#   https://www.reddit.com/r/Fedora/comments/z0wz53/libayatanaappindicator3dev_package_on_fedora/
-#   https://packages.fedoraproject.org/pkgs/gnome-shell-extension-appindicator/gnome-shell-extension-appindicator/
-#   https://unix.stackexchange.com/questions/6766/is-there-is-a-ppa-service-equivalent-in-the-fedora-world
-#   https://forums.fedoraforum.org/showthread.php?330198-To-PPA-or-not-to-PPA
-#
-#   https://en.wikipedia.org/wiki/Gentoo_Linux
-#
-#   https://en.wikipedia.org/wiki/Slackware

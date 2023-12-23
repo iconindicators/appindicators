@@ -14,7 +14,11 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 - `indicatortide` - (https://pypi.org/project/indicatortide/)[https://pypi.org/project/indicatortide/]
 - `indicatorvirtualbox` - (https://pypi.org/project/indicatorvirtualbox/)[https://pypi.org/project/indicatorvirtualbox/]
 
-Each indicator shares the common code base `indicatorbase`.
+Each indicator shares a common code base `indicatorbase`.
+
+
+## Reminders
+- `indicatorppadownloadstatistics` - requires updating approximately every six months with the latest `Ubuntu` series name.
 
 
 ## Release Procedure
@@ -23,13 +27,13 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 `python3 tools/build_wheel.py release indicatorfortune`
 which will create a `.whl` and `.tar.gz` for `indicatorfortune` in `release/wheel/dist_indicatorfortune`. 
 
-2. Upload the wheel to `PyPI`, open a terminal and...
+2. Upload the wheel to `PyPI`; open a terminal and...
 `python3 tools/upload_wheel.py release/wheel/dist_indicatorfortune`
-which prompt for the username (__token__) and password (which starts with 'pypi-') and then upload the `.whl` and `.tar.gz` to `PyPI`.
+which prompts for the username (__token__) and password (which starts with 'pypi-') and then uploads the `.whl` and `.tar.gz` to `PyPI`.
 
 
 ## Testing on TestPyPI
-A wheel can be uploaded to `TestPyPI`.
+A wheel can be uploaded to `TestPyPI` for testing purposes.
 TODO Figure out the upload command to TestPyPI (from history...also must be a venv in there somewhere).
 
 To install: TODO...
@@ -45,32 +49,13 @@ python3 -m pip install --extra-index-url https://test.pypi.org/simple/ indicator
  # https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 
-## Testing a Local Wheel
+## Testing a Locally Installed Wheel
 - Document how to build/install/run a wheel locally for testing
   python3 utils/buildWheel.py release indicatortest
   . /venv/bin/activate
   python3 -m pip install release/wheel/indicatortest-1.0.6-py3-none-any.whl
   python3 venv/lib/python3.8/site-packages/indicatortest/indicatortest.py
   python3 -m pip uninstall indicatortest
-
-
-## TODO
-- Do high level renaming according to standards.
-  Naming of project, naming of modules (files), naming of classes.
-  Then naming of globals, naming of functions, naming of variables.
-  - https://peps.python.org/pep-0008/
-  - https://docs.python-guide.org/writing/style/
-  - https://guicommits.com/organize-python-code-like-a-pro/
-
-- Port indicators to other distributions...
-  - Pop!_OS
-  - Solus
-  - OpenSUSE
-  - CentOS
-
-- External hosting of source code
-	- https://github.com/alexmurray/indicator-sensors
-    - What about SourceForge?  Still uses SVN which is a good thing.
 
 
 ## License
