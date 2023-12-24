@@ -97,13 +97,13 @@ def _get_supported_platforms( indicator_name ):
         f"Supported Platforms\n"
         f"-------------------\n"
 
-        f"`{ indicator_name }` will run on Debian / Ubuntu and Fedora and theoretically, "
+        f"`{ indicator_name }` runs on Debian,  Ubuntu et al, Fedora and theoretically, "
         f"any platform which supports the `appindicator` library.\n\n" )
 
 
 def _get_installation_python_virtual_environment( indicator_name ):
     return (
-        f"3. Create a `Python` virtual environment, activate and install the indicator package. Open a `terminal` and...\n"
+        f"3. Create a `Python` virtual environment, activate and install the indicator package:\n"
         f"    ```\n"
         f"    python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
@@ -115,7 +115,7 @@ def _get_installation_python_virtual_environment( indicator_name ):
 def _get_installation_copy_files( indicator_name ):
     venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
     return (
-        f"4. Copy icon, run script and desktop file to `$HOME/.local`. Open a `terminal` and...\n"
+        f"4. Copy icon, run script and desktop file to `$HOME/.local`:\n"
         f"    ```\n"
         f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
@@ -141,7 +141,7 @@ def _get_installation_debian( indicator_name ):
         f"<details>"
         f"<summary><b>Debian / Ubuntu</b></summary>\n\n"
 
-        f"1. Install operating system packages. Open a `terminal` and...\n\n"
+        f"1. Install operating system packages:\n\n"
         f"    ```\n"
         f"    sudo apt-get -y install "
         f"gir1.2-ayatanaappindicator3-0.1 "
@@ -175,12 +175,53 @@ def _get_installation_fedora( indicator_name ):
         f"<details>"
         f"<summary><b>Fedora</b></summary>\n\n"
 
-        f"1. Install operating system packages. Open a `terminal` and...\n\n"
+        f"1. Install operating system packages.:\n\n"
         f"    ```\n"
         f"    sudo dnf -y install "
         f"libappindicator-gtk3 "
         f"cairo-devel "
-        f"pkg-config "
+#TODO Check pkgconf-pkg-config on both 38/39
+        f"pkgconf-pkg-config "
+        f"python3-devel "
+        f"python3-gobject "
+        f"gobject-introspection-devel "
+        f"cairo-gobject-devel "
+        f"gnome-extensions-app "
+        f"gnome-shell-extension-appindicator "
+        f"{ indicator_dependencies_fedora[ indicator_name ] }\n"
+        f"    ```\n\n"
+
+        f"2. Enable extension:\n\n"
+        f"    Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n"
+
+        f"{ _get_installation_python_virtual_environment( indicator_name ) }"
+
+        f"{ _get_installation_copy_files( indicator_name ) }"
+
+        f"</details>\n\n" )
+
+
+#TODO Need to update for openSUSE
+def _get_installation_opensuse( indicator_name ):
+    return (
+        f"<details>"
+        f"<summary><b>OpenSUSE</b></summary>\n\n"
+
+        f"1. Install operating system packages.:\n\n"
+        f"    ```\n"
+#TODO So far these were installed:
+#   sudo zypper install -y cairo-devel pkg-config python3-devel python3-notify2 wmctrl
+
+# According to
+#   https://software.opensuse.org/package/gnome-shell-extension-appindicator
+# there is no extension for 15.5, so hold off for now and
+# don't bother with 15.4 as it is EOL end of 2023.
+# Perhaps instead of using Leap (fixed releases)
+# try Tumbleweed which is a rolling release.
+        f"    sudo dnf -y install "
+        f"libappindicator-gtk3 "
+        f"cairo-devel "
+        f"pkgconf-pkg-config "
         f"python3-devel "
         f"python3-gobject "
         f"gobject-introspection-devel "
@@ -225,20 +266,21 @@ def _get_usage( indicator_name ):
         f"Under the `Preferences` there is an `autostart` option to run `{ indicator_name }` on start up.\n\n" )
 
 
-def _get_limitations():
+def _get_distributions_tested():
     return (
-        f"Limitations\n"
-        f"-----------\n"
+        f"Distributions Tested\n"
+        f"--------------------\n"
 
         f"Distributions/versions with full functionality:\n"
-        f"- `Debian 11 / 12`\n"
-        f"- `Fedora 38 / 39` on `X.Org`.\n"
+        f"- `Debian 11 / 12 GNOME on Xorg`\n"
+        f"- `Fedora 38 / 39 GNOME on Xorg`\n"
         f"- `Ubuntu 20.04 / 22.04`\n"
         f"- `Ubuntu Budgie 22.04`\n"
         f"- `Ubuntu Unity 20.04 / 22.04`\n\n"
 
         f"Distributions/versions with limited functionality:\n"
-        f"- `Fedora 38 / 39` No clipboard on `Wayland`.\n"
+        f"- `Debian 11 / 12 GNOME` No clipboard.\n"
+        f"- `Fedora 38 / 39 GNOME` No clipboard.\n"
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
@@ -248,16 +290,23 @@ def _get_limitations():
         f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
 
 
-def _get_removal( indicator_name ):
+def _get_removal_python_virtual_environment( indicator_name ):
     return (
-        f"Removal\n"
-        f"-------\n"
+        f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
+        f"    ```\n"
+        f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
+        f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
+        f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
+        f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
+        f"    ```\n\n" )
 
-        f"Open a `terminal` and...\n"
+
+def _get_removal_debian( indicator_name ):
+    return (
+        f"<details>"
+        f"<summary><b>Debian / Ubuntu</b></summary>\n\n"
 
         f"1. Remove operating system packages:\n\n"
-
-        f"    **Debian / Ubuntu:**\n"
         f"    ```\n"
         f"    sudo apt-get -y remove "
         f"gir1.2-ayatanaappindicator3-0.1 "
@@ -268,25 +317,41 @@ def _get_removal( indicator_name ):
         f"python3-venv \n"
         f"    ```\n\n"
 
-        f"    **Fedora:**\n"
+        f"{ _get_removal_python_virtual_environment( indicator_name ) }"
+
+        f"</details>\n\n" )
+
+
+def _get_removal_fedora( indicator_name ):
+    return (
+        f"<details>"
+        f"<summary><b>Fedora</b></summary>\n\n"
+
+        f"1. Remove operating system packages:\n\n"
         f"    ```\n"
         f"    sudo dnf -y remove "
         f"libappindicator-gtk3 "
         f"cairo-devel "
-        f"pkg-config "
+        f"pkgconf-pkg-config "
         f"python3-devel "
         f"python3-gobject "
         f"gobject-introspection-devel "
         f"cairo-gobject-devel \n"
-        f"    ```\n"
+        f"    ```\n\n"
 
-        f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
-        f"    ```\n"
-        f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
-        f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
-        f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
-        f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
-        f"    ```\n\n" )
+        f"{ _get_removal_python_virtual_environment( indicator_name ) }"
+
+        f"</details>\n\n" )
+
+
+def _get_removal( indicator_name ):
+    return (
+        f"Removal\n"
+        f"-------\n"
+
+        f"{ _get_removal_debian( indicator_name ) }"
+
+        f"{ _get_removal_fedora( indicator_name ) }" )
 
 
 def _get_license( indicator_name ):
@@ -313,7 +378,7 @@ def _create_readme( directory_out, indicator_name ):
         f.write( _get_supported_platforms( indicator_name ) )
         f.write( _get_installation( indicator_name ) )
         f.write( _get_usage( indicator_name ) )
-        f.write( _get_limitations() )
+        f.write( _get_distributions_tested() )
         f.write( _get_removal( indicator_name ) )
         f.write( _get_license( indicator_name ) )
 
