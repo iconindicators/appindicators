@@ -16,6 +16,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Eventually need to update 
+#   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
+#   https://askubuntu.com/questions/30334/what-application-indicators-are-available
+# explaining to go to PyPI.
+
+
+#TODO Not sure if needed in pyproject.toml 'Depends':
+# 	pycairo
+# (and not even sure where I saw this)
+
+
+#TODO
+# Do high level renaming according to standards.
+# Naming of project, naming of modules (files), naming of classes.
+# Then naming of globals, naming of functions, naming of variables.
+#   https://peps.python.org/pep-0008/
+#   https://docs.python-guide.org/writing/style/
+#   https://guicommits.com/organize-python-code-like-a-pro/
+
+
 # Base class for application indicators.
 #
 # References:
@@ -114,6 +134,7 @@ class IndicatorBase( ABC ):
 # Is it possible to download the icon themes on their own rather than run up each VM/OS?
 # The Adwaita icons on Debian 12 are darker than those for network/volume.
 # How can a theme have varying colours?
+# https://johndecember.com/html/spec/colorsvghex.html
     ICON_THEMES = {
         "Adwaita"                   : "bebebe",
         "Ambiant-MATE"              : "dfdbd2",
