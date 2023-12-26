@@ -27,6 +27,11 @@
 #   python3 -m readme_renderer release/README.md -o release/README.html
 
 
+#TODO
+# https://pycairo.readthedocs.io
+# https://pygobject.readthedocs.io
+
+
 import argparse
 import datetime
 import re
@@ -39,6 +44,15 @@ try:
     from indicatorbase import indicatorbase
 except ModuleNotFoundError:
     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
+
+
+
+from enum import Enum
+
+class Operating_System( Enum ):
+    Debian = 1
+    Fedora = 2
+    Ubuntu = 3
 
 
 indicator_names = {
@@ -54,6 +68,13 @@ indicator_names = {
     "indicatorvirtualbox"            : "Indicator VirtualBox™" }
 
 
+#TODO
+# Probably should also add gnome-tweaks
+#
+#TODO For Ubuntu 20.04, calendar should be bsdmainutils.
+# Somehow need to include a version number and have a single apt install line just for 20.04 
+# and a line for 22.04+
+# Maybe convert to a function.
 indicator_dependencies_debian = {
     "indicatorfortune"               : "fortune-mod fortunes python3-notify2", 
     "indicatorlunar"                 : "python3-notify2",
@@ -92,6 +113,7 @@ def _get_introduction( indicator_name ):
     return comments
 
 
+#TODO Maybe combine this with the tested platforms stuff from below?
 def _get_supported_platforms( indicator_name ):
     return (
         f"Supported Platforms\n"
@@ -136,6 +158,214 @@ def _get_installation_copy_files( indicator_name ):
         f"    ```\n\n" )
 
 
+def _get_operating_system_dependencies_debian( operating_system ):
+    return (
+        f"gir1.2-ayatanaappindicator3-0.1 "
+        f"gir1.2-gtk-3.0 "
+        f"{ 'gnome-shell-extension-appindicator ' if operating_system == Operating_System.Ubuntu else '' }"
+        f"libcairo2-dev "
+        f"libgirepository1.0-dev "
+        f"pkg-config "
+        f"python3-dev "
+        f"python3-gi "
+        f"python3-gi-cairo "
+        f"python3-venv " )
+
+
+def _get_operating_system_dependencies_debian( operating_system ):
+    return (
+        f"gir1.2-ayatanaappindicator3-0.1 "
+        f"gir1.2-gtk-3.0 "
+        f"{ 'gnome-shell-extension-appindicator ' if operating_system == Operating_System.Ubuntu else '' }"
+        f"libcairo2-dev "
+        f"libgirepository1.0-dev "
+        f"pkg-config "
+        f"python3-dev "
+        f"python3-gi "
+        f"python3-gi-cairo "
+        f"python3-venv " )
+
+
+def _get_indicator_dependencies_debian( operating_system, indicator_name ):
+# Ubuntu 20.04
+# fortune-mod
+# python3-notify2
+# wmctrl
+
+
+# Ubuntu 22.04
+# calendar
+# fortune-mod
+# python3-notify2
+# wmctrl
+#
+# Ubuntu - no clipboard, no wmctrl
+# Ubuntu on Xorg 
+
+
+# Debian 11 
+# calendar
+# fortune-mod
+# libnotify-bin
+# python3-notify2
+# wmctrl
+
+
+# Debian 12
+# calendar
+# fortune-mod
+# libnotify-bin
+# python3-notify2
+# wmctrl
+    return (
+        f"gir1.2-ayatanaappindicator3-0.1 "
+        f"gir1.2-gtk-3.0 "
+        f"{ 'gnome-shell-extension-appindicator ' if operating_system == Operating_System.Ubuntu else '' }"
+        f"libcairo2-dev "
+        f"libgirepository1.0-dev "
+        f"pkg-config "
+        f"python3-dev "
+        f"python3-gi "
+        f"python3-gi-cairo "
+        f"python3-venv " )
+
+
+# Ubuntu 20.04
+
+# Ubuntu 22.04
+# Ubuntu - no clipboard, no wmctrl
+# Ubuntu on Xorg 
+
+# Debian 11 
+# GNOME - no clipboard, no wmctrl
+# GNOME on Xorg
+
+# Debian 12
+# GNOME - no clipboard, no wmctrl
+# GNOME on Xorg
+
+
+def _get_dependencies_debian( indicator_name ):
+#TODO
+# https://pycairo.readthedocs.io
+# https://pygobject.readthedocs.io
+# Ubuntu 20.04
+#    sudo apt-get -y install 
+# gir1.2-ayatanaappindicator3-0.1
+# gir1.2-gtk-3.0
+# gnome-shell-extension-appindicator 
+# libcairo2-dev 
+# libgirepository1.0-dev
+# pkg-config 
+# python3-dev 
+# python3-gi 
+# python3-gi-cairo 
+# python3-venv 
+#
+# indicatortest
+# sudo apt-get -y install
+# fortune-mod
+# python3-notify2
+# wmctrl
+
+
+# Ubuntu 22.04
+#    sudo apt-get -y install 
+# gir1.2-ayatanaappindicator3-0.1
+# gir1.2-gtk-3.0
+# gnome-shell-extension-appindicator 
+# libcairo2-dev 
+# libgirepository1.0-dev
+# pkg-config 
+# python3-dev 
+# python3-gi 
+# python3-gi-cairo 
+# python3-venv 
+#
+# indicatortest
+# sudo apt-get -y install
+# calendar
+# fortune-mod
+# python3-notify2
+# wmctrl
+#
+# Ubuntu - no clipboard, no wmctrl
+# Ubuntu on Xorg 
+
+
+
+# Debian 11 
+#    sudo apt-get -y install 
+# gir1.2-ayatanaappindicator3-0.1
+# gir1.2-gtk-3.0
+# libcairo2-dev 
+# libgirepository1.0-dev
+# pkg-config 
+# python3-dev 
+# python3-gi 
+# python3-gi-cairo 
+# python3-venv 
+#
+# indicatortest
+# sudo apt-get -y install
+# calendar
+# fortune-mod
+# libnotify-bin
+# python3-notify2
+# wmctrl
+#
+#     f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+#     f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
+#
+#         gnome-extensions list 
+#             appindicatorsupport@rgcjonas.gmail.com
+#
+# GNOME - no clipboard, no wmctrl
+# GNOME on Xorg
+
+
+
+# Debian 12
+#    sudo apt-get -y install 
+# gir1.2-ayatanaappindicator3-0.1
+# gir1.2-gtk-3.0
+# libcairo2-dev 
+# libgirepository1.0-dev
+# pkg-config 
+# python3-dev 
+# python3-gi 
+# python3-gi-cairo 
+# python3-venv 
+#
+# indicatortest
+# sudo apt-get -y install
+# calendar
+# fortune-mod
+# libnotify-bin
+# python3-notify2
+# wmctrl
+#
+#     f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+#     f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
+#
+#         gnome-extensions list 
+#             appindicatorsupport@rgcjonas.gmail.com
+#
+# GNOME - no clipboard, no wmctrl
+# GNOME on Xorg
+
+
+
+    return (
+        f"gir1.2-ayatanaappindicator3-0.1 "
+        f"libcairo2-dev "
+        f"libgirepository1.0-dev "
+        f"pkg-config "
+        f"python3-dev "
+        f"python3-gi "
+        f"python3-venv " )
+
+
 def _get_installation_debian( indicator_name ):
     return (
         f"<details>"
@@ -144,22 +374,19 @@ def _get_installation_debian( indicator_name ):
         f"1. Install operating system packages:\n\n"
         f"    ```\n"
         f"    sudo apt-get -y install "
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-gi "
-        f"python3-venv "
+        f"{ _get_dependencies_debian( indicator_name ) }"
         f"{ indicator_dependencies_debian[ indicator_name ] }\n"
         f"    ```\n\n"
 
         f"2. Install/enable extension:\n\n"
 
+#TODO Can we instead use apt-get install gnome-shell-extension-appindicator   ???
         f"    **Debian:** "
         f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
         f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
 
+#TODO I think this is only for 20.04
+# For 22.04 need gnome-shell-extension-appindicator which is already installed.
         f"    **Ubuntu:** "
         f"Run `GNOME Tweaks` and enable the `Ubuntu appIndicators` extension.\n\n"
 
@@ -170,6 +397,19 @@ def _get_installation_debian( indicator_name ):
         f"</details>\n\n" )
 
 
+def _get_dependencies_fedora( indicator_name ):
+    return (
+        f"libappindicator-gtk3 "
+        f"cairo-devel "
+        f"pkgconf-pkg-config "
+        f"python3-devel "
+        f"python3-gobject "
+        f"gobject-introspection-devel "
+        f"cairo-gobject-devel "
+        f"gnome-extensions-app "
+        f"gnome-shell-extension-appindicator " )
+
+
 def _get_installation_fedora( indicator_name ):
     return (
         f"<details>"
@@ -178,16 +418,7 @@ def _get_installation_fedora( indicator_name ):
         f"1. Install operating system packages.:\n\n"
         f"    ```\n"
         f"    sudo dnf -y install "
-        f"libappindicator-gtk3 "
-        f"cairo-devel "
-#TODO Check pkgconf-pkg-config on both 38/39
-        f"pkgconf-pkg-config "
-        f"python3-devel "
-        f"python3-gobject "
-        f"gobject-introspection-devel "
-        f"cairo-gobject-devel "
-        f"gnome-extensions-app "
-        f"gnome-shell-extension-appindicator "
+        f"{ _get_dependencies_fedora( indicator_name ) }"
         f"{ indicator_dependencies_fedora[ indicator_name ] }\n"
         f"    ```\n\n"
 
@@ -274,7 +505,7 @@ def _get_distributions_tested():
         f"Distributions/versions with full functionality:\n"
         f"- `Debian 11 / 12 GNOME on Xorg`\n"
         f"- `Fedora 38 / 39 GNOME on Xorg`\n"
-        f"- `Ubuntu 20.04 / 22.04`\n"
+        f"- `Ubuntu 20.04 / 22.04`\n"      #TODO Check the naming of 22.04.  Also check 20.04 if there is a choice on login.
         f"- `Ubuntu Budgie 22.04`\n"
         f"- `Ubuntu Unity 20.04 / 22.04`\n\n"
 
@@ -284,6 +515,7 @@ def _get_distributions_tested():
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
+        f"- `Ubuntu 22.04 Xorg` No clipboard.\n"   #TODO Check the naming
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
         f"- `Ubuntu MATE 22.04` Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.\n"
@@ -309,12 +541,7 @@ def _get_removal_debian( indicator_name ):
         f"1. Remove operating system packages:\n\n"
         f"    ```\n"
         f"    sudo apt-get -y remove "
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-venv \n"
+        f"{ _get_dependencies_debian( indicator_name ) }\n"
         f"    ```\n\n"
 
         f"{ _get_removal_python_virtual_environment( indicator_name ) }"
@@ -330,13 +557,7 @@ def _get_removal_fedora( indicator_name ):
         f"1. Remove operating system packages:\n\n"
         f"    ```\n"
         f"    sudo dnf -y remove "
-        f"libappindicator-gtk3 "
-        f"cairo-devel "
-        f"pkgconf-pkg-config "
-        f"python3-devel "
-        f"python3-gobject "
-        f"gobject-introspection-devel "
-        f"cairo-gobject-devel \n"
+        f"{ _get_dependencies_fedora( indicator_name ) }\n"
         f"    ```\n\n"
 
         f"{ _get_removal_python_virtual_environment( indicator_name ) }"
@@ -410,3 +631,9 @@ if __name__ == "__main__":
             f"The script must be run from the top level directory (one above utils).\n"
             f"For example:\n"
             f"\tpython3 { script_path_and_name } release indicatorfortune" )
+
+
+    print( _get_operating_system_dependencies_debian( Operating_System.Debian ) )
+    print()
+    print( _get_operating_system_dependencies_debian( Operating_System.Ubuntu ) )
+
