@@ -210,14 +210,6 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuExecuteCommand( self, menu ):
         subMenu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "ls" )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand( "ls -la" ) )
-        subMenu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "wmctrl" )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand( "wmctrl -l" ) )
-        subMenu.append( menuItem )
-
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "calendar" )
         menuItem.connect( "activate", lambda widget: self.__executeCommand( "calendar -f /usr/share/calendar/calendar.all -A 3" ) )
         subMenu.append( menuItem )
@@ -226,12 +218,20 @@ class IndicatorTest( IndicatorBase ):
         menuItem.connect( "activate", lambda widget: self.__executeCommand( "fortune" ) )
         subMenu.append( menuItem )
 
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "ls" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "ls -la" ) )
+        subMenu.append( menuItem )
+
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "notify-send" )
         menuItem.connect( "activate", lambda widget: self.__executeCommand( f"notify-send -i { self.getIconFilename() } 'summary' 'body'" ) )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "paplay" )
         menuItem.connect( "activate", lambda widget: self.__executeCommand( "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" ) )
+        subMenu.append( menuItem )
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "wmctrl" )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( "wmctrl -l" ) )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( "Execute Terminal Command" )
