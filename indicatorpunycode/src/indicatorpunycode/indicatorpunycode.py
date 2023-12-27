@@ -55,7 +55,7 @@ class IndicatorPunycode( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Convert domain names between Unicode and ASCII." ),
+            comments = _( "Converts domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
 
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].

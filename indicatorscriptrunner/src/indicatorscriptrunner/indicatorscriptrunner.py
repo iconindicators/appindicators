@@ -95,7 +95,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Run a terminal command or script;\noptionally display results in the icon label." ) )
+            comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
 
     def update( self, menu ):

@@ -19,7 +19,7 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatorpunycode.py:51
-msgid "Convert domain names between Unicode and ASCII."
+msgid "Converts domain names between Unicode and ASCII."
 msgstr "Преобразователь доменных имён, содержащих символы Уникода."
 
 #: indicatorpunycode.py:58

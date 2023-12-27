@@ -56,7 +56,7 @@ class IndicatorTest( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Exercises the full range of functionality available to an indicator." ) )
+            comments = _( "Exercises a range of indicator functionality." ) )
 
         self.requestMouseWheelScrollEvents()
         self.flushCache( IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_MAXIMUM_AGE_HOURS )

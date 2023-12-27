@@ -107,7 +107,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Display the total downloads of PPAs." ) )
+            comments = _( "Displays the total downloads of PPAs." ) )
 
 
     def update( self, menu ):

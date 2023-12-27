@@ -23,7 +23,7 @@ msgstr ""
 
 #: indicatorscriptrunner.py:89
 msgid ""
-"Run a terminal command or script;\n"
+"Runs a terminal command or script;\n"
 "optionally display results in the icon label."
 msgstr ""
 

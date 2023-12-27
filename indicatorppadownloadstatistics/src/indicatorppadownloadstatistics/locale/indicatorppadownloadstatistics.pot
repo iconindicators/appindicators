@@ -34,7 +34,7 @@ msgid "(published binaries completely filtered)"
 msgstr ""
 
 #: indicatorppadownloadstatistics.py:70
-msgid "Display the total downloads of PPAs."
+msgid "Displays the total downloads of PPAs."
 msgstr ""
 
 #: indicatorppadownloadstatistics.py:436

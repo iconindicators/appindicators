@@ -34,7 +34,7 @@ msgid "(published binaries completely filtered)"
 msgstr "(uveřejněné binární soubory jsou zcela vyfiltrovány)"
 
 #: indicatorppadownloadstatistics.py:71
-msgid "Display the total downloads of PPAs."
+msgid "Displays the total downloads of PPAs."
 msgstr "Zobrazuje celkový počet stažení z PPA repozitářů."
 
 #: indicatorppadownloadstatistics.py:395
