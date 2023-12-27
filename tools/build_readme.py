@@ -93,8 +93,8 @@ def _get_introduction( indicator_name ):
             break
 
     return (
-        f"`{ indicator_name }` { ' '.join( comments ) } "
-        f"`{ indicator_name }` runs on Debian, Ubuntu et al, Fedora, openSUSE and theoretically, "
+        f"`{ indicator_name }` { ' '.join( comments )[ 0 : -1 ] } on "
+        f"`Debian`, `Ubuntu`, `Fedora`, `openSUSE` and theoretically, "
         f"any platform which supports the `appindicator` library.\n\n" )
 
 
@@ -233,9 +233,6 @@ def _get_extension( operating_system ):
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
-#TODO Maybe add the stuff below to verify.
-#            f"gnome-extensions list"           <--------is this installed by default (manifest) in 38 / 39?
-#            f"appindicatorsupport@rgcjonas.gmail.com" 
 
     elif operating_system == Operating_System.FEDORA_38_FEDORA_39:
         extension = (
@@ -374,6 +371,11 @@ def _get_usage( indicator_name ):
 
 
 #TODO Waiting on calendar for openSUSE and then need to test indicatortest.
+#
+# If no calendar can be found...then what?
+# That means when building this readme for indicatoronthisday,
+# there should be no mention of opensuse in the introduction, install, remove.
+# How to achieve this...?
 def _get_distributions_tested():
     return (
         f"Distributions Tested\n"
@@ -393,6 +395,8 @@ def _get_distributions_tested():
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
+        f"- `openSUSE Tumbleweed` No clipboard; no `wmctrl`; no `calendar`.\n"
+        f"- `openSUSE Tumbleweed GNOME on Xorg` No `calendar`.\n"
         f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
