@@ -124,17 +124,41 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     # "indicatortide"                  : "python3-notify2",
     # "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
 
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "fortunes" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORLUNAR:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "calendar" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+        dependencies.append( "libnotify-bin" )
+        dependencies.append( "python3-notify2" )
+
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "fortune-mod" )
+        dependencies.append( "fortunes" )
         dependencies.append( "python3-notify2" )
         dependencies.append( "wmctrl" )
 
-        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
+        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+           operating_system == Operating_System.UBUNTU_2204:
             dependencies.append( "calendar" )
-            dependencies.append( "libnotify-bin" )
 
-        if operating_system == Operating_System.UBUNTU_2204:
-            dependencies.append( "calendar" )
+    if indicator_name == Indicator_Name.INDICATORTIDE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
 
@@ -237,7 +261,9 @@ def _get_installation_python_virtual_environment( indicator_name ):
 
 
 def _get_installation_copy_files( indicator_name ):
-    venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
+    venv_indicator_home = \
+        f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
+
     return (
         f"Copy icon, run script and desktop file to `$HOME/.local`:\n"
         f"    ```\n"
@@ -260,7 +286,15 @@ def _get_installation_copy_files( indicator_name ):
         f"    ```\n\n" )
 
 
-def _get_installation_for_operating_system( operating_system, indicator_name, summary, install_command, _get_operating_system_dependencies_function_name ):
+def _get_installation_for_operating_system(
+        operating_system,
+        indicator_name,
+        summary,
+        install_command,
+        _get_operating_system_dependencies_function_name ):
+
+    operating_system_packages = _get_operating_system_dependencies_function_name(
+                                    operating_system, Indicator_Name[ indicator_name.upper() ] )
 
     # Reference on installing some of the operating system packages:    
     #   https://stackoverflow.com/a/61164149/2156453
@@ -270,8 +304,7 @@ def _get_installation_for_operating_system( operating_system, indicator_name, su
 
         f"1. Install operating system packages:\n\n"
         f"    ```\n"
-        f"    { install_command } "
-        f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
+        f"    { install_command } { operating_system_packages }\n"
         f"    ```\n\n" )
 
     n = 1
@@ -292,22 +325,41 @@ def _get_installation_for_operating_system( operating_system, indicator_name, su
 
 def _get_installation( indicator_name ):
     install_command_debian = "sudo apt-get -y install"
-    install_command_fedora = "sudo dnf -y install"
-
-    return (
-        f"Installation\n"
-        f"------------\n"
-
-        f"{ _get_installation_for_operating_system( Operating_System.DEBIAN_11_DEBIAN_12, indicator_name, 'Debian 11 / 12', install_command_debian, _get_operating_system_dependencies_debian ) }"
 
 #TODO Check Fedora
-        f"{ _get_installation_for_operating_system( Operating_System.FEDORA_38_FEDORA_39, indicator_name, 'Fedora 38 / 39', install_command_fedora, _get_operating_system_dependencies_fedora ) }"
-
-        f"{ _get_installation_for_operating_system( Operating_System.UBUNTU_2004, indicator_name, 'Ubuntu 20.04', install_command_debian, _get_operating_system_dependencies_debian ) }"
-
-        f"{ _get_installation_for_operating_system( Operating_System.UBUNTU_2204, indicator_name, 'Ubuntu 22.04', install_command_debian, _get_operating_system_dependencies_debian ) }" )
 
 #TODO Add OpenSUSE
+
+    return (
+        "Installation\n" +
+        "------------\n" +
+
+        _get_installation_for_operating_system(
+            Operating_System.DEBIAN_11_DEBIAN_12,
+            indicator_name,
+            "Debian 11 / 12",
+            install_command_debian,
+            _get_operating_system_dependencies_debian ) +
+
+        _get_installation_for_operating_system(
+            Operating_System.FEDORA_38_FEDORA_39,
+            indicator_name,
+            "Fedora 38 / 39",
+            "sudo dnf -y install",
+            _get_operating_system_dependencies_fedora ) +
+
+        _get_installation_for_operating_system(
+            Operating_System.UBUNTU_2004,
+            indicator_name, "Ubuntu 20.04",
+            install_command_debian,
+            _get_operating_system_dependencies_debian ) +
+
+        _get_installation_for_operating_system(
+            Operating_System.UBUNTU_2204,
+            indicator_name,
+            "Ubuntu 22.04",
+            install_command_debian,
+            _get_operating_system_dependencies_debian ) )
 
 
 def _get_usage( indicator_name ):
@@ -336,12 +388,12 @@ def _get_distributions_tested():
         f"- `Ubuntu Unity 20.04 / 22.04`\n\n"
 
         f"Distributions/versions with limited functionality:\n"
-        f"- `Debian 11 / 12 GNOME` No clipboard; no 'wmctrl'.\n" #TODO Check wmctrl on both 11 and 12.
-        f"- `Fedora 38 / 39 GNOME` No clipboard; no 'wmctrl'.\n"  #TODO Check wmctrl on both 38 and 39.
+        f"- `Debian 11 / 12 GNOME` No clipboard; no `wmctrl`.\n"
+        f"- `Fedora 38 / 39 GNOME` No clipboard; no `wmctrl`.\n"  #TODO Check wmctrl on both 38 and 39.
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
-        f"- `Ubuntu 22.04` No clipboard; no 'wmctrl'.\n"
+        f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
         f"- `Ubuntu MATE 22.04` Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.\n"
@@ -371,23 +423,43 @@ def _get_removal_for_operating_system( operating_system, indicator_name, summary
         f"</details>\n\n" )
 
 
-#TODO Update in the same vein as installation.
 def _get_removal( indicator_name ):
     remove_command_debian = "sudo apt-get -y remove"
-    remove_command_fedora = "sudo dnf -y remove"
+
+#TODO Check Fedora
+#TODO Need opensuse
 
     return (
-        f"Removal\n"
-        f"-------\n"
+        "Removal\n" +
+        "-------\n" +
 
-        f"{_get_removal_for_operating_system( Operating_System.DEBIAN_11_DEBIAN_12, indicator_name, 'Debian 11 / 12', remove_command_debian, _get_operating_system_dependencies_debian ) }"
+        _get_removal_for_operating_system(
+            Operating_System.DEBIAN_11_DEBIAN_12,
+            indicator_name, 
+            "Debian 11 / 12",
+            remove_command_debian,
+            _get_operating_system_dependencies_debian ) +
 
-#TODO Check
-        f"{ _get_removal_for_operating_system( Operating_System.FEDORA_38_FEDORA_39, indicator_name, 'Fedora 38 / 39', remove_command_fedora, _get_operating_system_dependencies_fedora ) }"
+        _get_removal_for_operating_system(
+            Operating_System.FEDORA_38_FEDORA_39,
+            indicator_name,
+            "Fedora 38 / 39",
+            "sudo dnf -y remove",
+            _get_operating_system_dependencies_fedora ) +
 
-        f"{ _get_removal_for_operating_system( Operating_System.UBUNTU_2004, indicator_name, 'Ubuntu 20.04', remove_command_debian, _get_operating_system_dependencies_debian ) }"
+        _get_removal_for_operating_system(
+            Operating_System.UBUNTU_2004,
+            indicator_name, 
+            "Ubuntu 20.04",
+            remove_command_debian,
+            _get_operating_system_dependencies_debian ) +
 
-        f"{ _get_removal_for_operating_system( Operating_System.UBUNTU_2204, indicator_name, 'Ubuntu 22.04', remove_command_debian, _get_operating_system_dependencies_debian ) }" )
+        _get_removal_for_operating_system(
+            Operating_System.UBUNTU_2204,
+            indicator_name, 
+            "Ubuntu 22.04",
+            remove_command_debian,
+            _get_operating_system_dependencies_debian ) )
 
 
 def _get_license( indicator_name ):
