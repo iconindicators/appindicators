@@ -25,11 +25,10 @@
 #   python3 -m pip install --upgrade readme_renderer readme_renderer[md]
 #   python3 tools/build_readme.py release indicatortest
 #   python3 -m readme_renderer release/README.md -o release/README.html
-
-
-#TODO
-# https://pycairo.readthedocs.io
-# https://pygobject.readthedocs.io
+#
+# References
+#   https://pycairo.readthedocs.io
+#   https://pygobject.readthedocs.io
 
 
 import argparse
@@ -54,7 +53,6 @@ class Operating_System( Enum ):
     UBUNTU_2204 = auto()
 
 
-#TODO Can I use the dict below instead of this enum?
 class Indicator_Name( Enum ):
     INDICATORFORTUNE = auto()
     INDICATORLUNAR = auto()
@@ -112,18 +110,6 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
        operating_system == Operating_System.UBUNTU_2204:
         dependencies.append( "gnome-shell-extension-appindicator" )
 
-#TODO Add in these to the IF tests below...
-    # "indicatorfortune"               : "fortune-mod fortunes python3-notify2", 
-    # "indicatorlunar"                 : "python3-notify2",
-    # "indicatoronthisday"             : "calendar python3-notify2",
-    # "indicatorppadownloadstatistics" : "",
-    # "indicatorpunycode"              : "python3-notify2",
-    # "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
-    # "indicatorstardate"              : "",
-    # "indicatortest"                  : "calendar fortune-mod libnotify-bin pulseaudio-utils python3-notify2 wmctrl",
-    # "indicatortide"                  : "python3-notify2",
-    # "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
-
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
@@ -133,8 +119,11 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
-        dependencies.append( "calendar" )
         dependencies.append( "python3-notify2" )
+
+        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+           operating_system == Operating_System.UBUNTU_2204:
+            dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORPUNYCODE:
         dependencies.append( "python3-notify2" )
@@ -163,12 +152,11 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
-#TODO Needs updating
 def _get_operating_system_dependencies_fedora( operating_system, indicator_name ):
     dependencies = [
         "cairo-devel",
         "cairo-gobject-devel",
-        "gnome-extensions-app",
+        "gnome-extensions-app", 
         "gnome-shell-extension-appindicator",
         "gobject-introspection-devel",
         "libappindicator-gtk3",
@@ -176,11 +164,33 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
         "python3-devel",
         "python3-gobject" ]
 
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORLUNAR:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "calendar" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+        dependencies.append( "python3-notify2" )
+
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "calendar" )
         dependencies.append( "fortune-mod" )
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "pulseaudio-utils" )
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
+
+    if indicator_name == Indicator_Name.INDICATORTIDE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
         dependencies.append( "python3-notify2" )
         dependencies.append( "wmctrl" )
 
@@ -234,15 +244,12 @@ def _get_extension( operating_system ):
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
 #TODO Maybe add the stuff below to verify.
-#            f"gnome-extensions list"
+#            f"gnome-extensions list"           <--------is this installed by default (manifest) in 38 / 39?
 #            f"appindicatorsupport@rgcjonas.gmail.com" 
 
     elif operating_system == Operating_System.FEDORA_38_FEDORA_39:
         extension = (
             f"Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n" )
-#TODO Does the below also apply?  If so, maybe also add?
-#            f"gnome-extensions list"
-#            f"appindicatorsupport@rgcjonas.gmail.com" 
 
 #TODO If opensuse TumbleWeed works out...need a section here.
 
@@ -326,8 +333,6 @@ def _get_installation_for_operating_system(
 def _get_installation( indicator_name ):
     install_command_debian = "sudo apt-get -y install"
 
-#TODO Check Fedora
-
 #TODO Add OpenSUSE
 
     return (
@@ -374,6 +379,7 @@ def _get_usage( indicator_name ):
         f"Under the `Preferences` there is an `autostart` option to run `{ indicator_name }` on start up.\n\n" )
 
 
+#TODO Add openSUSE if it works out.
 def _get_distributions_tested():
     return (
         f"Distributions Tested\n"
@@ -389,7 +395,7 @@ def _get_distributions_tested():
 
         f"Distributions/versions with limited functionality:\n"
         f"- `Debian 11 / 12 GNOME` No clipboard; no `wmctrl`.\n"
-        f"- `Fedora 38 / 39 GNOME` No clipboard; no `wmctrl`.\n"  #TODO Check wmctrl on both 38 and 39.
+        f"- `Fedora 38 / 39 GNOME` No clipboard; no `wmctrl`.\n"
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
@@ -426,7 +432,6 @@ def _get_removal_for_operating_system( operating_system, indicator_name, summary
 def _get_removal( indicator_name ):
     remove_command_debian = "sudo apt-get -y remove"
 
-#TODO Check Fedora
 #TODO Need opensuse
 
     return (
