@@ -137,108 +137,6 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             dependencies.append( "calendar" )
 
     return ' '.join( sorted( dependencies ) )
-# Ubuntu 20.04
-#    sudo apt-get -y install 
-# gir1.2-ayatanaappindicator3-0.1
-# gir1.2-gtk-3.0
-# gnome-shell-extension-appindicator 
-# libcairo2-dev 
-# libgirepository1.0-dev
-# pkg-config 
-# python3-dev 
-# python3-gi 
-# python3-gi-cairo 
-# python3-venv 
-#
-# indicatortest
-# sudo apt-get -y install
-# fortune-mod
-# python3-notify2
-# wmctrl
-
-
-# Ubuntu 22.04
-#    sudo apt-get -y install 
-# gir1.2-ayatanaappindicator3-0.1
-# gir1.2-gtk-3.0
-# gnome-shell-extension-appindicator 
-# libcairo2-dev 
-# libgirepository1.0-dev
-# pkg-config 
-# python3-dev 
-# python3-gi 
-# python3-gi-cairo 
-# python3-venv 
-#
-# indicatortest
-# sudo apt-get -y install
-# calendar
-# fortune-mod
-# python3-notify2
-# wmctrl
-#
-# Ubuntu - no clipboard, no wmctrl
-# Ubuntu on Xorg 
-
-
-# Debian 11 
-#    sudo apt-get -y install 
-# gir1.2-ayatanaappindicator3-0.1
-# gir1.2-gtk-3.0
-# libcairo2-dev 
-# libgirepository1.0-dev
-# pkg-config 
-# python3-dev 
-# python3-gi 
-# python3-gi-cairo 
-# python3-venv 
-#
-# indicatortest
-# sudo apt-get -y install
-# calendar
-# fortune-mod
-# libnotify-bin
-# python3-notify2
-# wmctrl
-#
-#     f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-#     f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
-#
-#         gnome-extensions list 
-#             appindicatorsupport@rgcjonas.gmail.com
-#
-# GNOME - no clipboard, no wmctrl
-# GNOME on Xorg
-
-
-# Debian 12
-#    sudo apt-get -y install 
-# gir1.2-ayatanaappindicator3-0.1
-# gir1.2-gtk-3.0
-# libcairo2-dev 
-# libgirepository1.0-dev
-# pkg-config 
-# python3-dev 
-# python3-gi 
-# python3-gi-cairo 
-# python3-venv 
-#
-# indicatortest
-# sudo apt-get -y install
-# calendar
-# fortune-mod
-# libnotify-bin
-# python3-notify2
-# wmctrl
-#
-#     f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-#     f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
-#
-#         gnome-extensions list 
-#             appindicatorsupport@rgcjonas.gmail.com
-#
-# GNOME - no clipboard, no wmctrl
-# GNOME on Xorg
 
 
 #TODO Needs updating
@@ -443,7 +341,7 @@ def _get_distributions_tested():
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
-        f"- `Ubuntu 22.04 Xorg` No clipboard; no 'wmctrl'.\n"
+        f"- `Ubuntu 22.04` No clipboard; no 'wmctrl'.\n"
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
         f"- `Ubuntu MATE 22.04` Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.\n"
