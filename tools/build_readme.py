@@ -31,6 +31,9 @@
 #   https://pygobject.readthedocs.io
 
 
+#TODO Test this on TestPyPI to see how it renders.
+
+
 import argparse
 import datetime
 import re
@@ -49,6 +52,7 @@ except ModuleNotFoundError:
 class Operating_System( Enum ):
     DEBIAN_11_DEBIAN_12 = auto()
     FEDORA_38_FEDORA_39 = auto()
+    OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
 
@@ -90,7 +94,7 @@ def _get_introduction( indicator_name ):
 
     return (
         f"`{ indicator_name }` { ' '.join( comments ) } "
-        f"`{ indicator_name }` runs on Debian, Ubuntu et al, Fedora and theoretically, "
+        f"`{ indicator_name }` runs on Debian, Ubuntu et al, Fedora, openSUSE and theoretically, "
         f"any platform which supports the `appindicator` library.\n\n" )
 
 
@@ -197,49 +201,35 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
-#TODO Needs updating...but first verify indicators work on Tumbleweed!
 def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
-    return (
-        f"<details>"
-        f"<summary><b>OpenSUSE</b></summary>\n\n"
+    dependencies = [
+        "cairo-devel",
+        "gcc",
+        "gobject-introspection-devel",
+        "pkg-config",
+        "python3-devel",
+        "typelib-1_0-AyatanaAppIndicator3-0_1" ]
 
-        f"1. Install operating system packages.:\n\n"
-        f"    ```\n"
-#TODO So far these were installed:
-#   sudo zypper install -y cairo-devel pkg-config python3-devel python3-notify2 wmctrl
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune" )
 
-# According to
-#   https://software.opensuse.org/package/gnome-shell-extension-appindicator
-# there is no extension for 15.5, so hold off for now and
-# don't bother with 15.4 as it is EOL end of 2023.
-# Perhaps instead of using Leap (fixed releases)
-# try Tumbleweed which is a rolling release.
-        f"    sudo dnf -y install "
-        f"libappindicator-gtk3 "
-        f"cairo-devel "
-        f"pkgconf-pkg-config "
-        f"python3-devel "
-        f"python3-gobject "
-        f"gobject-introspection-devel "
-        f"cairo-gobject-devel "
-        f"gnome-extensions-app "
-        f"gnome-shell-extension-appindicator "
-        f"{ indicator_dependencies_fedora[ indicator_name ] }\n"
-        f"    ```\n\n"
+#TODO Sort/fix   
+# Waiting on
+#   https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251 
+    # if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+    #     dependencies.append( "calendar" )
 
-        f"2. Enable extension:\n\n"
-        f"    Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n"
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        # dependencies.append( "calendar" )  #TODO Sort
+        dependencies.append( "fortune" )
 
-        f"{ _get_installation_python_virtual_environment( indicator_name ) }"
-
-        f"{ _get_installation_copy_files( indicator_name ) }"
-
-        f"</details>\n\n" )
+    return ' '.join( sorted( dependencies ) )
 
 
 def _get_extension( operating_system ):
     extension = ""
-    if operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
+    if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+       operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
@@ -250,8 +240,6 @@ def _get_extension( operating_system ):
     elif operating_system == Operating_System.FEDORA_38_FEDORA_39:
         extension = (
             f"Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n" )
-
-#TODO If opensuse TumbleWeed works out...need a section here.
 
     return extension
 
@@ -333,8 +321,6 @@ def _get_installation_for_operating_system(
 def _get_installation( indicator_name ):
     install_command_debian = "sudo apt-get -y install"
 
-#TODO Add OpenSUSE
-
     return (
         "Installation\n" +
         "------------\n" +
@@ -354,8 +340,16 @@ def _get_installation( indicator_name ):
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
+            Operating_System.OPENSUSE_TUMBLEWEED,
+            indicator_name,
+            "openSUSE Tumbleweed",
+            "sudo zypper install -y",
+            _get_operating_system_dependencies_opensuse ) +
+
+        _get_installation_for_operating_system(
             Operating_System.UBUNTU_2004,
-            indicator_name, "Ubuntu 20.04",
+            indicator_name,
+            "Ubuntu 20.04",
             install_command_debian,
             _get_operating_system_dependencies_debian ) +
 
@@ -379,7 +373,7 @@ def _get_usage( indicator_name ):
         f"Under the `Preferences` there is an `autostart` option to run `{ indicator_name }` on start up.\n\n" )
 
 
-#TODO Add openSUSE if it works out.
+#TODO Waiting on calendar for openSUSE and then need to test indicatortest.
 def _get_distributions_tested():
     return (
         f"Distributions Tested\n"
@@ -432,8 +426,6 @@ def _get_removal_for_operating_system( operating_system, indicator_name, summary
 def _get_removal( indicator_name ):
     remove_command_debian = "sudo apt-get -y remove"
 
-#TODO Need opensuse
-
     return (
         "Removal\n" +
         "-------\n" +
@@ -451,6 +443,13 @@ def _get_removal( indicator_name ):
             "Fedora 38 / 39",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
+
+        _get_removal_for_operating_system(
+            Operating_System.OPENSUSE_TUMBLEWEED,
+            indicator_name, 
+            "openSUSE Tumbleweed",
+            "sudo zypper remove -y",
+            _get_operating_system_dependencies_opensuse ) +
 
         _get_removal_for_operating_system(
             Operating_System.UBUNTU_2004,
