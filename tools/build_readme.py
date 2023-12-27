@@ -17,7 +17,7 @@
 
 
 # Create a README.md for an indicator from text common to all indicators and text
-# specific to the indicator, drawn from the indicator's CHANGELOG.md and pyproejct.toml.
+# specific to the indicator, drawn from the indicator's CHANGELOG.md and pyproject.toml.
 #
 #   https://github.github.com/gfm
 #
@@ -37,6 +37,7 @@ import datetime
 import re
 import sys
 
+from enum import auto, Enum
 from pathlib import Path
 
 sys.path.append( "indicatorbase/src" )
@@ -46,13 +47,25 @@ except ModuleNotFoundError:
     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
-
-from enum import Enum
-
 class Operating_System( Enum ):
-    Debian = 1
-    Fedora = 2
-    Ubuntu = 3
+    DEBIAN_11_DEBIAN_12 = auto()
+    FEDORA_38_FEDORA_39 = auto()
+    UBUNTU_2004 = auto()
+    UBUNTU_2204 = auto()
+
+
+#TODO Can I use the dict below instead of this enum?
+class Indicator_Name( Enum ):
+    INDICATORFORTUNE = auto()
+    INDICATORLUNAR = auto()
+    INDICATORONTHISDAY = auto()
+    INDICATORPPADOWNLOADSTATISTICS = auto()
+    INDICATORPUNYCODE = auto()
+    INDICATORSCRIPTRUNNER = auto()
+    INDICATORSTARDATE = auto()
+    INDICATORTEST = auto()
+    INDICATORTIDE = auto()
+    INDICATORVIRTUALBOX = auto()
 
 
 indicator_names = {
@@ -68,187 +81,62 @@ indicator_names = {
     "indicatorvirtualbox"            : "Indicator VirtualBox™" }
 
 
-#TODO
-# Probably should also add gnome-tweaks
-#
-#TODO For Ubuntu 20.04, calendar should be bsdmainutils.
-# Somehow need to include a version number and have a single apt install line just for 20.04 
-# and a line for 22.04+
-# Maybe convert to a function.
-indicator_dependencies_debian = {
-    "indicatorfortune"               : "fortune-mod fortunes python3-notify2", 
-    "indicatorlunar"                 : "python3-notify2",
-    "indicatoronthisday"             : "calendar python3-notify2",
-    "indicatorppadownloadstatistics" : "",
-    "indicatorpunycode"              : "python3-notify2",
-    "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
-    "indicatorstardate"              : "",
-    "indicatortest"                  : "calendar fortune-mod libnotify-bin pulseaudio-utils python3-notify2 wmctrl",
-    "indicatortide"                  : "python3-notify2",
-    "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
-
-
-indicator_dependencies_fedora = {
-    "indicatorfortune"               : "fortune-mod python3-notify2", 
-    "indicatorlunar"                 : "python3-notify2",
-    "indicatoronthisday"             : "calendar python3-notify2",
-    "indicatorppadownloadstatistics" : "",
-    "indicatorpunycode"              : "python3-notify2",
-    "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
-    "indicatorstardate"              : "",
-    "indicatortest"                  : "calendar fortune-mod libnotify-bin pulseaudio-utils python3-notify2 wmctrl",
-    "indicatortide"                  : "python3-notify2",
-    "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
-
-
 def _get_introduction( indicator_name ):
-    comments = ""
     pattern_tag = re.compile( f".*comments = _\(.*" )
     for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py" ).readlines():
         matches = pattern_tag.search( line )
         if matches:
-            comments = matches.group().split( "\"" )[ 1 ] + '\n\n'
+            comments = matches.group().split( "\"" )[ 1 ].split( ' ' )
+            comments[ 0 ] = comments[ 0 ].lower()
             break
 
-    return comments
-
-
-#TODO Maybe combine this with the tested platforms stuff from below?
-def _get_supported_platforms( indicator_name ):
     return (
-        f"Supported Platforms\n"
-        f"-------------------\n"
-
-        f"`{ indicator_name }` runs on Debian,  Ubuntu et al, Fedora and theoretically, "
+        f"`{ indicator_name }` { ' '.join( comments ) } "
+        f"`{ indicator_name }` runs on Debian, Ubuntu et al, Fedora and theoretically, "
         f"any platform which supports the `appindicator` library.\n\n" )
 
 
-def _get_installation_python_virtual_environment( indicator_name ):
-    return (
-        f"3. Create a `Python` virtual environment, activate and install the indicator package:\n"
-        f"    ```\n"
-        f"    python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
-        f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade pip { indicator_name } && \\\n"
-        f"    deactivate\n"
-        f"    ```\n" )
+def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
+    dependencies = [
+        "gir1.2-ayatanaappindicator3-0.1",
+        "gir1.2-gtk-3.0",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "pkg-config",
+        "python3-dev",
+        "python3-gi",
+        "python3-gi-cairo",
+        "python3-venv" ]
 
+    if operating_system == Operating_System.UBUNTU_2004 or \
+       operating_system == Operating_System.UBUNTU_2204:
+        dependencies.append( "gnome-shell-extension-appindicator" )
 
-def _get_installation_copy_files( indicator_name ):
-    venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
-    return (
-        f"4. Copy icon, run script and desktop file to `$HOME/.local`:\n"
-        f"    ```\n"
-        f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+#TODO Add in these to the IF tests below...
+    # "indicatorfortune"               : "fortune-mod fortunes python3-notify2", 
+    # "indicatorlunar"                 : "python3-notify2",
+    # "indicatoronthisday"             : "calendar python3-notify2",
+    # "indicatorppadownloadstatistics" : "",
+    # "indicatorpunycode"              : "python3-notify2",
+    # "indicatorscriptrunner"          : "libnotify-bin python3-notify2 pulseaudio-utils",
+    # "indicatorstardate"              : "",
+    # "indicatortest"                  : "calendar fortune-mod libnotify-bin pulseaudio-utils python3-notify2 wmctrl",
+    # "indicatortide"                  : "python3-notify2",
+    # "indicatorvirtualbox"            : "python3-notify2 wmctrl" }
 
-        f"    cp "
-        f"{ venv_indicator_home }/icons/hicolor/{ indicator_name }.svg "
-        f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
 
-        f"    mkdir -p $HOME/.local/bin && \\\n"
+        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
+            dependencies.append( "calendar" )
+            dependencies.append( "libnotify-bin" )
 
-        f"    cp "
-        f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.sh "
-        f"$HOME/.local/bin && \\\n"
+        if operating_system == Operating_System.UBUNTU_2204:
+            dependencies.append( "calendar" )
 
-        f"    cp "
-        f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.py.desktop "
-        f"$HOME/.local/share/applications\n"
-
-        f"    ```\n\n" )
-
-
-def _get_operating_system_dependencies_debian( operating_system ):
-    return (
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"gir1.2-gtk-3.0 "
-        f"{ 'gnome-shell-extension-appindicator ' if operating_system == Operating_System.Ubuntu else '' }"
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-gi "
-        f"python3-gi-cairo "
-        f"python3-venv " )
-
-
-def _get_operating_system_dependencies_debian( operating_system ):
-    return (
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"gir1.2-gtk-3.0 "
-        f"{ 'gnome-shell-extension-appindicator ' if operating_system == Operating_System.Ubuntu else '' }"
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-gi "
-        f"python3-gi-cairo "
-        f"python3-venv " )
-
-
-def _get_indicator_dependencies_debian( operating_system, indicator_name ):
-# Ubuntu 20.04
-# fortune-mod
-# python3-notify2
-# wmctrl
-
-
-# Ubuntu 22.04
-# calendar
-# fortune-mod
-# python3-notify2
-# wmctrl
-#
-# Ubuntu - no clipboard, no wmctrl
-# Ubuntu on Xorg 
-
-
-# Debian 11 
-# calendar
-# fortune-mod
-# libnotify-bin
-# python3-notify2
-# wmctrl
-
-
-# Debian 12
-# calendar
-# fortune-mod
-# libnotify-bin
-# python3-notify2
-# wmctrl
-    return (
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"gir1.2-gtk-3.0 "
-        f"{ 'gnome-shell-extension-appindicator ' if operating_system == Operating_System.Ubuntu else '' }"
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-gi "
-        f"python3-gi-cairo "
-        f"python3-venv " )
-
-
-# Ubuntu 20.04
-
-# Ubuntu 22.04
-# Ubuntu - no clipboard, no wmctrl
-# Ubuntu on Xorg 
-
-# Debian 11 
-# GNOME - no clipboard, no wmctrl
-# GNOME on Xorg
-
-# Debian 12
-# GNOME - no clipboard, no wmctrl
-# GNOME on Xorg
-
-
-def _get_dependencies_debian( indicator_name ):
-#TODO
-# https://pycairo.readthedocs.io
-# https://pygobject.readthedocs.io
+    return ' '.join( sorted( dependencies ) )
 # Ubuntu 20.04
 #    sudo apt-get -y install 
 # gir1.2-ayatanaappindicator3-0.1
@@ -293,7 +181,6 @@ def _get_dependencies_debian( indicator_name ):
 # Ubuntu on Xorg 
 
 
-
 # Debian 11 
 #    sudo apt-get -y install 
 # gir1.2-ayatanaappindicator3-0.1
@@ -322,7 +209,6 @@ def _get_dependencies_debian( indicator_name ):
 #
 # GNOME - no clipboard, no wmctrl
 # GNOME on Xorg
-
 
 
 # Debian 12
@@ -355,85 +241,32 @@ def _get_dependencies_debian( indicator_name ):
 # GNOME on Xorg
 
 
+#TODO Needs updating
+def _get_operating_system_dependencies_fedora( operating_system, indicator_name ):
+    dependencies = [
+        "cairo-devel",
+        "cairo-gobject-devel",
+        "gnome-extensions-app",
+        "gnome-shell-extension-appindicator",
+        "gobject-introspection-devel",
+        "libappindicator-gtk3",
+        "pkgconf-pkg-config",
+        "python3-devel",
+        "python3-gobject" ]
 
-    return (
-        f"gir1.2-ayatanaappindicator3-0.1 "
-        f"libcairo2-dev "
-        f"libgirepository1.0-dev "
-        f"pkg-config "
-        f"python3-dev "
-        f"python3-gi "
-        f"python3-venv " )
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "calendar" )
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "libnotify-bin" )
+        dependencies.append( "pulseaudio-utils" )
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
 
-
-def _get_installation_debian( indicator_name ):
-    return (
-        f"<details>"
-        f"<summary><b>Debian / Ubuntu</b></summary>\n\n"
-
-        f"1. Install operating system packages:\n\n"
-        f"    ```\n"
-        f"    sudo apt-get -y install "
-        f"{ _get_dependencies_debian( indicator_name ) }"
-        f"{ indicator_dependencies_debian[ indicator_name ] }\n"
-        f"    ```\n\n"
-
-        f"2. Install/enable extension:\n\n"
-
-#TODO Can we instead use apt-get install gnome-shell-extension-appindicator   ???
-        f"    **Debian:** "
-        f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-        f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n"
-
-#TODO I think this is only for 20.04
-# For 22.04 need gnome-shell-extension-appindicator which is already installed.
-        f"    **Ubuntu:** "
-        f"Run `GNOME Tweaks` and enable the `Ubuntu appIndicators` extension.\n\n"
-
-        f"{ _get_installation_python_virtual_environment( indicator_name ) }"
-
-        f"{ _get_installation_copy_files( indicator_name ) }"
-
-        f"</details>\n\n" )
+    return ' '.join( sorted( dependencies ) )
 
 
-def _get_dependencies_fedora( indicator_name ):
-    return (
-        f"libappindicator-gtk3 "
-        f"cairo-devel "
-        f"pkgconf-pkg-config "
-        f"python3-devel "
-        f"python3-gobject "
-        f"gobject-introspection-devel "
-        f"cairo-gobject-devel "
-        f"gnome-extensions-app "
-        f"gnome-shell-extension-appindicator " )
-
-
-def _get_installation_fedora( indicator_name ):
-    return (
-        f"<details>"
-        f"<summary><b>Fedora</b></summary>\n\n"
-
-        f"1. Install operating system packages.:\n\n"
-        f"    ```\n"
-        f"    sudo dnf -y install "
-        f"{ _get_dependencies_fedora( indicator_name ) }"
-        f"{ indicator_dependencies_fedora[ indicator_name ] }\n"
-        f"    ```\n\n"
-
-        f"2. Enable extension:\n\n"
-        f"    Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n"
-
-        f"{ _get_installation_python_virtual_environment( indicator_name ) }"
-
-        f"{ _get_installation_copy_files( indicator_name ) }"
-
-        f"</details>\n\n" )
-
-
-#TODO Need to update for openSUSE
-def _get_installation_opensuse( indicator_name ):
+#TODO Needs updating...but first verify indicators work on Tumbleweed!
+def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
     return (
         f"<details>"
         f"<summary><b>OpenSUSE</b></summary>\n\n"
@@ -472,17 +305,111 @@ def _get_installation_opensuse( indicator_name ):
         f"</details>\n\n" )
 
 
-def _get_installation( indicator_name ):
+def _get_extension( operating_system ):
+    extension = ""
+    if operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
+        extension = (
+            f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+            f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
+#TODO Maybe add the stuff below to verify.
+#            f"gnome-extensions list"
+#            f"appindicatorsupport@rgcjonas.gmail.com" 
+
+    elif operating_system == Operating_System.FEDORA_38_FEDORA_39:
+        extension = (
+            f"Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n" )
+#TODO Does the below also apply?  If so, maybe also add?
+#            f"gnome-extensions list"
+#            f"appindicatorsupport@rgcjonas.gmail.com" 
+
+#TODO If opensuse TumbleWeed works out...need a section here.
+
+    return extension
+
+
+def _get_installation_python_virtual_environment( indicator_name ):
+    return (
+        f"Create a `Python` virtual environment, activate and install the indicator package:\n"
+        f"    ```\n"
+        f"    python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
+        f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade pip { indicator_name } && \\\n"
+        f"    deactivate\n"
+        f"    ```\n" )
+
+
+def _get_installation_copy_files( indicator_name ):
+    venv_indicator_home = f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
+    return (
+        f"Copy icon, run script and desktop file to `$HOME/.local`:\n"
+        f"    ```\n"
+        f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+
+        f"    cp "
+        f"{ venv_indicator_home }/icons/hicolor/{ indicator_name }.svg "
+        f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+
+        f"    mkdir -p $HOME/.local/bin && \\\n"
+
+        f"    cp "
+        f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.sh "
+        f"$HOME/.local/bin && \\\n"
+
+        f"    cp "
+        f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.py.desktop "
+        f"$HOME/.local/share/applications\n"
+
+        f"    ```\n\n" )
+
+
+def _get_installation_for_operating_system( operating_system, indicator_name, summary, install_command, _get_operating_system_dependencies_function_name ):
 
     # Reference on installing some of the operating system packages:    
     #   https://stackoverflow.com/a/61164149/2156453
+    dependencies = (
+        f"<details>"
+        f"<summary><b>{ summary }</b></summary>\n\n"
+
+        f"1. Install operating system packages:\n\n"
+        f"    ```\n"
+        f"    { install_command } "
+        f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
+        f"    ```\n\n" )
+
+    n = 1
+    extension = _get_extension( operating_system )
+    if extension:
+        n += 1
+        dependencies += f"{ str( n ) }. { extension }"
+
+    n += 1
+    dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
+
+    n += 1
+    dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
+
+    dependencies += f"</details>\n\n"
+    return dependencies
+
+
+def _get_installation( indicator_name ):
+    install_command_debian = "sudo apt-get -y install"
+    install_command_fedora = "sudo dnf -y install"
+
     return (
         f"Installation\n"
         f"------------\n"
 
-        f"{ _get_installation_debian( indicator_name ) }"
+        f"{ _get_installation_for_operating_system( Operating_System.DEBIAN_11_DEBIAN_12, indicator_name, 'Debian 11 / 12', install_command_debian, _get_operating_system_dependencies_debian ) }"
 
-        f"{ _get_installation_fedora( indicator_name ) }" )
+#TODO Check Fedora
+        f"{ _get_installation_for_operating_system( Operating_System.FEDORA_38_FEDORA_39, indicator_name, 'Fedora 38 / 39', install_command_fedora, _get_operating_system_dependencies_fedora ) }"
+
+        f"{ _get_installation_for_operating_system( Operating_System.UBUNTU_2004, indicator_name, 'Ubuntu 20.04', install_command_debian, _get_operating_system_dependencies_debian ) }"
+
+        f"{ _get_installation_for_operating_system( Operating_System.UBUNTU_2204, indicator_name, 'Ubuntu 22.04', install_command_debian, _get_operating_system_dependencies_debian ) }" )
+
+#TODO Add OpenSUSE
 
 
 def _get_usage( indicator_name ):
@@ -505,74 +432,64 @@ def _get_distributions_tested():
         f"Distributions/versions with full functionality:\n"
         f"- `Debian 11 / 12 GNOME on Xorg`\n"
         f"- `Fedora 38 / 39 GNOME on Xorg`\n"
-        f"- `Ubuntu 20.04 / 22.04`\n"      #TODO Check the naming of 22.04.  Also check 20.04 if there is a choice on login.
+        f"- `Ubuntu 20.04`\n"
+        f"- `Ubuntu 22.04 on Xorg`\n"
         f"- `Ubuntu Budgie 22.04`\n"
         f"- `Ubuntu Unity 20.04 / 22.04`\n\n"
 
         f"Distributions/versions with limited functionality:\n"
-        f"- `Debian 11 / 12 GNOME` No clipboard.\n"
-        f"- `Fedora 38 / 39 GNOME` No clipboard.\n"
+        f"- `Debian 11 / 12 GNOME` No clipboard; no 'wmctrl'.\n" #TODO Check wmctrl on both 11 and 12.
+        f"- `Fedora 38 / 39 GNOME` No clipboard; no 'wmctrl'.\n"  #TODO Check wmctrl on both 38 and 39.
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
-        f"- `Ubuntu 22.04 Xorg` No clipboard.\n"   #TODO Check the naming
+        f"- `Ubuntu 22.04 Xorg` No clipboard; no 'wmctrl'.\n"
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
         f"- `Ubuntu MATE 22.04` Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.\n"
         f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
 
 
-def _get_removal_python_virtual_environment( indicator_name ):
+def _get_removal_for_operating_system( operating_system, indicator_name, summary, remove_command, _get_operating_system_dependencies_function_name ):
+
     return (
+        f"<details>"
+        f"<summary><b>{ summary }</b></summary>\n\n"
+
+        f"1. Remove operating system packages:\n\n"
+        f"    ```\n"
+        f"    { remove_command } "
+        f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
+        f"    ```\n\n"
+
         f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
         f"    ```\n"
         f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
         f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
         f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
         f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
-        f"    ```\n\n" )
-
-
-def _get_removal_debian( indicator_name ):
-    return (
-        f"<details>"
-        f"<summary><b>Debian / Ubuntu</b></summary>\n\n"
-
-        f"1. Remove operating system packages:\n\n"
-        f"    ```\n"
-        f"    sudo apt-get -y remove "
-        f"{ _get_dependencies_debian( indicator_name ) }\n"
         f"    ```\n\n"
-
-        f"{ _get_removal_python_virtual_environment( indicator_name ) }"
 
         f"</details>\n\n" )
 
 
-def _get_removal_fedora( indicator_name ):
-    return (
-        f"<details>"
-        f"<summary><b>Fedora</b></summary>\n\n"
-
-        f"1. Remove operating system packages:\n\n"
-        f"    ```\n"
-        f"    sudo dnf -y remove "
-        f"{ _get_dependencies_fedora( indicator_name ) }\n"
-        f"    ```\n\n"
-
-        f"{ _get_removal_python_virtual_environment( indicator_name ) }"
-
-        f"</details>\n\n" )
-
-
+#TODO Update in the same vein as installation.
 def _get_removal( indicator_name ):
+    remove_command_debian = "sudo apt-get -y remove"
+    remove_command_fedora = "sudo dnf -y remove"
+
     return (
         f"Removal\n"
         f"-------\n"
 
-        f"{ _get_removal_debian( indicator_name ) }"
+        f"{_get_removal_for_operating_system( Operating_System.DEBIAN_11_DEBIAN_12, indicator_name, 'Debian 11 / 12', remove_command_debian, _get_operating_system_dependencies_debian ) }"
 
-        f"{ _get_removal_fedora( indicator_name ) }" )
+#TODO Check
+        f"{ _get_removal_for_operating_system( Operating_System.FEDORA_38_FEDORA_39, indicator_name, 'Fedora 38 / 39', remove_command_fedora, _get_operating_system_dependencies_fedora ) }"
+
+        f"{ _get_removal_for_operating_system( Operating_System.UBUNTU_2004, indicator_name, 'Ubuntu 20.04', remove_command_debian, _get_operating_system_dependencies_debian ) }"
+
+        f"{ _get_removal_for_operating_system( Operating_System.UBUNTU_2204, indicator_name, 'Ubuntu 22.04', remove_command_debian, _get_operating_system_dependencies_debian ) }" )
 
 
 def _get_license( indicator_name ):
@@ -596,7 +513,6 @@ def _create_readme( directory_out, indicator_name ):
 
     with open( Path( directory_out, "README.md" ), 'w' ) as f:
         f.write( _get_introduction( indicator_name ) )
-        f.write( _get_supported_platforms( indicator_name ) )
         f.write( _get_installation( indicator_name ) )
         f.write( _get_usage( indicator_name ) )
         f.write( _get_distributions_tested() )
@@ -631,9 +547,3 @@ if __name__ == "__main__":
             f"The script must be run from the top level directory (one above utils).\n"
             f"For example:\n"
             f"\tpython3 { script_path_and_name } release indicatorfortune" )
-
-
-    print( _get_operating_system_dependencies_debian( Operating_System.Debian ) )
-    print()
-    print( _get_operating_system_dependencies_debian( Operating_System.Ubuntu ) )
-
