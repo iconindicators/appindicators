@@ -31,9 +31,6 @@
 #   https://pygobject.readthedocs.io
 
 
-#TODO Manjaro.
-
-
 import argparse
 import datetime
 import re
@@ -95,7 +92,6 @@ def _get_introduction( indicator_name ):
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
-    # https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
     introduction = (
         f"`{ indicator_name }` { ' '.join( comments )[ 0 : -1 ] } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
