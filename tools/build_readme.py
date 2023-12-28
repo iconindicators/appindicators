@@ -31,7 +31,7 @@
 #   https://pygobject.readthedocs.io
 
 
-#TODO Test this on TestPyPI to see how it renders.
+#TODO Manjaro.
 
 
 import argparse
@@ -52,6 +52,7 @@ except ModuleNotFoundError:
 class Operating_System( Enum ):
     DEBIAN_11_DEBIAN_12 = auto()
     FEDORA_38_FEDORA_39 = auto()
+    MANJARO_221 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
@@ -92,10 +93,19 @@ def _get_introduction( indicator_name ):
             comments[ 0 ] = comments[ 0 ].lower()
             break
 
-    return (
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    # https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
+    introduction = (
         f"`{ indicator_name }` { ' '.join( comments )[ 0 : -1 ] } on "
-        f"`Debian`, `Ubuntu`, `Fedora`, `openSUSE` and theoretically, "
-        f"any platform which supports the `appindicator` library.\n\n" )
+        f"`Debian`, `Ubuntu`, `Fedora`" )
+
+    if indicator_name.upper() != Indicator_Name.INDICATORONTHISDAY.name:
+        introduction += f", `openSUSE`, `Manjaro` "
+
+    introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
+
+    return introduction
 
 
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
@@ -201,6 +211,27 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
+def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
+    dependencies = [
+        "cairo",
+        "gobject-introspection",
+        "gtk3",
+        "libayatana-appindicator",
+        "pkgconf" ]
+
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "wmctrl" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "wmctrl" )
+
+    return ' '.join( sorted( dependencies ) )
+
+
 def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
     dependencies = [
         "cairo-devel",
@@ -213,30 +244,19 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune" )
 
-#TODO Sort/fix   
-# Waiting on
-#   https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251 
-    # if indicator_name == Indicator_Name.INDICATORONTHISDAY:
-    #     dependencies.append( "calendar" )
-
     if indicator_name == Indicator_Name.INDICATORTEST:
-        # dependencies.append( "calendar" )  #TODO Sort
         dependencies.append( "fortune" )
 
     return ' '.join( sorted( dependencies ) )
 
 
 def _get_extension( operating_system ):
-    extension = ""
+    extension = ''
     if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
        operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
-
-    elif operating_system == Operating_System.FEDORA_38_FEDORA_39:
-        extension = (
-            f"Run `Extensions` and ensure the extension `AppIndicator and KStatusNotifierItem Support` is enabled.\n\n" )
 
     return extension
 
@@ -285,33 +305,44 @@ def _get_installation_for_operating_system(
         install_command,
         _get_operating_system_dependencies_function_name ):
 
-    operating_system_packages = _get_operating_system_dependencies_function_name(
-                                    operating_system, Indicator_Name[ indicator_name.upper() ] )
+    # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE.
+    opensuse_or_manjaro = \
+        operating_system == Operating_System.MANJARO_221 or \
+        operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
-    # Reference on installing some of the operating system packages:    
-    #   https://stackoverflow.com/a/61164149/2156453
-    dependencies = (
-        f"<details>"
-        f"<summary><b>{ summary }</b></summary>\n\n"
+    if opensuse_or_manjaro and indicator_name.upper() == Indicator_Name.INDICATORONTHISDAY.name:
+        dependencies = ''
 
-        f"1. Install operating system packages:\n\n"
-        f"    ```\n"
-        f"    { install_command } { operating_system_packages }\n"
-        f"    ```\n\n" )
+    else:
+        operating_system_packages = _get_operating_system_dependencies_function_name(
+                                        operating_system, Indicator_Name[ indicator_name.upper() ] )
 
-    n = 1
-    extension = _get_extension( operating_system )
-    if extension:
+        # Reference on installing some of the operating system packages:    
+        #   https://stackoverflow.com/a/61164149/2156453
+        dependencies = (
+            f"<details>"
+            f"<summary><b>{ summary }</b></summary>\n\n"
+
+            f"1. Install operating system packages:\n\n"
+            f"    ```\n"
+            f"    { install_command } { operating_system_packages }\n"
+            f"    ```\n\n" )
+
+        n = 1
+        extension = _get_extension( operating_system )
+        if extension:
+            n += 1
+            dependencies += f"{ str( n ) }. { extension }"
+
         n += 1
-        dependencies += f"{ str( n ) }. { extension }"
+        dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
 
-    n += 1
-    dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
+        n += 1
+        dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
 
-    n += 1
-    dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
+        dependencies += f"</details>\n\n"
 
-    dependencies += f"</details>\n\n"
     return dependencies
 
 
@@ -335,6 +366,13 @@ def _get_installation( indicator_name ):
             "Fedora 38 / 39",
             "sudo dnf -y install",
             _get_operating_system_dependencies_fedora ) +
+
+        _get_installation_for_operating_system(
+            Operating_System.MANJARO_221,
+            indicator_name, 
+            "Manjaro 22.1",
+            "sudo pacman -S --noconfirm",
+            _get_operating_system_dependencies_manjaro ) +
 
         _get_installation_for_operating_system(
             Operating_System.OPENSUSE_TUMBLEWEED,
@@ -370,12 +408,6 @@ def _get_usage( indicator_name ):
         f"Under the `Preferences` there is an `autostart` option to run `{ indicator_name }` on start up.\n\n" )
 
 
-#TODO Waiting on calendar for openSUSE and then need to test indicatortest.
-#
-# If no calendar can be found...then what?
-# That means when building this readme for indicatoronthisday,
-# there should be no mention of opensuse in the introduction, install, remove.
-# How to achieve this...?
 def _get_distributions_tested():
     return (
         f"Distributions Tested\n"
@@ -395,6 +427,7 @@ def _get_distributions_tested():
         f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
         f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
         f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
+        f"- `Manjaro 22.1 GNOME` No `calendar`.\n"
         f"- `openSUSE Tumbleweed` No clipboard; no `wmctrl`; no `calendar`.\n"
         f"- `openSUSE Tumbleweed GNOME on Xorg` No `calendar`.\n"
         f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
@@ -404,27 +437,44 @@ def _get_distributions_tested():
         f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
 
 
-def _get_removal_for_operating_system( operating_system, indicator_name, summary, remove_command, _get_operating_system_dependencies_function_name ):
+def _get_removal_for_operating_system(
+        operating_system,
+        indicator_name,
+        summary,
+        remove_command,
+        _get_operating_system_dependencies_function_name ):
 
-    return (
-        f"<details>"
-        f"<summary><b>{ summary }</b></summary>\n\n"
+    # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE.
+    opensuse_or_manjaro = \
+        operating_system == Operating_System.MANJARO_221 or \
+        operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
-        f"1. Remove operating system packages:\n\n"
-        f"    ```\n"
-        f"    { remove_command } "
-        f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
-        f"    ```\n\n"
+    if opensuse_or_manjaro and indicator_name.upper() == Indicator_Name.INDICATORONTHISDAY.name:
+        removal = ''
 
-        f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
-        f"    ```\n"
-        f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
-        f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
-        f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
-        f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
-        f"    ```\n\n"
+    else:
+        removal = (
+            f"<details>"
+            f"<summary><b>{ summary }</b></summary>\n\n"
 
-        f"</details>\n\n" )
+            f"1. Remove operating system packages:\n\n"
+            f"    ```\n"
+            f"    { remove_command } "
+            f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
+            f"    ```\n\n"
+
+            f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
+            f"    ```\n"
+            f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
+            f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
+            f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
+            f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
+            f"    ```\n\n"
+
+            f"</details>\n\n" )
+
+    return removal
 
 
 def _get_removal( indicator_name ):
@@ -447,6 +497,13 @@ def _get_removal( indicator_name ):
             "Fedora 38 / 39",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
+
+        _get_removal_for_operating_system(
+            Operating_System.MANJARO_221,
+            indicator_name, 
+            "Manjaro 22.1",
+            "sudo pacman -R --noconfirm",
+            _get_operating_system_dependencies_manjaro ) +
 
         _get_removal_for_operating_system(
             Operating_System.OPENSUSE_TUMBLEWEED,
