@@ -131,7 +131,7 @@ class IndicatorLunar( IndicatorBase ):
     DATA_INDEX_BODY_NAME = 1
     DATA_INDEX_DATA_NAME = 2
 
-    DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used when displaying the satellite rise notification.
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used in the display of the satellite rise notification.
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M" # Used to display any body's rise/set in the menu.
 
     ICON_CACHE_BASENAME = "icon-"
@@ -219,8 +219,9 @@ class IndicatorLunar( IndicatorBase ):
         self.satelliteGeneralPerturbationData = { } # Key: satellite number; Value: GP object.  Can be empty but never None.
         self.satellitePreviousNotifications = [ ]
 
-        self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None ) - datetime.timedelta( hours = 1 )
+        self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
 
+#TODO Delete these AFTER the utc/timezone changes have been made and committed.
         self.__removeCacheFilesVersion93()
         self.__removeCacheFilesVersion94()
         self.__removeCacheFilesVersion95()
@@ -274,7 +275,7 @@ class IndicatorLunar( IndicatorBase ):
         self.downloadCountMinorPlanet = 0
         self.downloadCountSatellite = 0
 
-        utcNow = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None )
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         self.nextDownloadTimeApparentMagnitude = utcNow
         self.nextDownloadTimeComet = utcNow
         self.nextDownloadTimeMinorPlanet = utcNow
@@ -282,7 +283,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def update( self, menu ):
-        utcNow = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None )
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
 
         # Update comet minor planet and satellite cached data.
         self.updateData( utcNow )
@@ -430,7 +431,6 @@ class IndicatorLunar( IndicatorBase ):
     # The 'process tags' function is passed the text along with optional arguments and
     # must then return the processed text.
     def processTags( self ):
-
         # Handle [ ].
         # There may still be tags left in as a result of say a satellite or comet dropping out.
         # Remaining tags are moped up at the end.
@@ -498,7 +498,7 @@ class IndicatorLunar( IndicatorBase ):
                    dataName == IndicatorLunar.astroBackend.DATA_TAG_THIRD_QUARTER:
                     dateTimes.append( self.data[ key ] )
 
-        utcNow = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None )
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         utcNowPlusOneMinute = utcNow + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         nextUpdateTime = utcNow + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
         nextUpdateInSeconds = int( math.ceil( ( nextUpdateTime - utcNow ).total_seconds() ) )
@@ -540,7 +540,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def notificationFullMoon( self ):
-        utcNow = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None )
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
         illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         phase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
@@ -569,7 +569,7 @@ class IndicatorLunar( IndicatorBase ):
         INDEX_RISE_TIME = 1
         satelliteCurrentNotifications = [ ]
 
-        utcNow = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None )
+        utcNow = datetime.datetime.now( datetime.timezone.utc )
         for number in self.satellites:
             key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, number )
             if ( key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellitePreviousNotifications: # About to rise and no notification already sent.
@@ -1105,18 +1105,23 @@ class IndicatorLunar( IndicatorBase ):
 
     # Converts a UTC date/time to a local date/time string in the given format.
     def toLocalDateTimeString( self, utcDateTime, outputFormat ):
-        return utcDateTime.replace( tzinfo = datetime.timezone.utc ).astimezone( tz = None ).strftime( outputFormat )
+        return utcDateTime.astimezone().strftime( outputFormat )
 
 
     # https://stackoverflow.com/a/64097432/2156453
     # https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
     def convertStartHourAndEndHourToDateTimeInUTC( self, startHour, endHour ):
-        startHourAsDateTimeInUTC = datetime.datetime.now().replace( hour = startHour ).astimezone( datetime.timezone.utc ).replace( tzinfo = None )
-        endHourAsDateTimeInUTC = datetime.datetime.today().replace( hour = endHour ).astimezone( datetime.timezone.utc ).replace( tzinfo = None )
-        if endHourAsDateTimeInUTC < startHourAsDateTimeInUTC:
-            endHourAsDateTimeInUTC = endHourAsDateTimeInUTC + datetime.timedelta( days = 1 )
+        start_hour_as_datetime_in_utc = \
+            datetime.datetime.now().astimezone().replace( hour = startHour ).astimezone( datetime.timezone.utc )
 
-        return startHourAsDateTimeInUTC, endHourAsDateTimeInUTC
+        end_hour_as_datetime_in_utc = \
+            datetime.datetime.now().astimezone().replace( hour = endHour ).astimezone( datetime.timezone.utc )
+
+#TODO Why is this check needed?  What is the scenario?  Are there other scenarios?
+        if end_hour_as_datetime_in_utc < start_hour_as_datetime_in_utc:
+            end_hour_as_datetime_in_utc = end_hour_as_datetime_in_utc + datetime.timedelta( days = 1 )
+
+        return start_hour_as_datetime_in_utc, end_hour_as_datetime_in_utc
 
 
     # Creates the SVG icon text representing the moon given the illumination and bright limb angle.

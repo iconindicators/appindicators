@@ -168,11 +168,14 @@ def __getEclipse( utcNow, eclipses, fieldYear, fieldMonth, fieldDay, fieldTimeUT
         day = fields[ fieldDay ]
         timeUTC = fields[ fieldTimeUTC ]
         deltaT = fields[ fieldDeltaT ]
-        dateString = year + ", " + __months[ month ] + ", " + day + ", " + timeUTC
-        format = "%Y, %m, %d, %H:%M:%S"
-        dateTime = datetime.datetime.strptime( dateString, format ) - datetime.timedelta( seconds = int( deltaT ) ) # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
 
-        if utcNow.timestamp() <= dateTime.timestamp():
+        # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
+        dateString = year + ", " + __months[ month ] + ", " + day + ", " + timeUTC
+        dateTime = \
+            datetime.datetime.strptime( dateString, "%Y, %m, %d, %H:%M:%S" ).replace( tzinfo = datetime.timezone.utc ) - \
+            datetime.timedelta( seconds = int( deltaT ) )
+
+        if utcNow <= dateTime:
             eclipseType = fields[ fieldType ][ 0 ]
             latitude = fields[ fieldLatitude ]
             longitude = fields[ fieldLongitude ]

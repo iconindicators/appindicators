@@ -564,13 +564,22 @@ class AstroBase( ABC ):
         else: # 1 < illuminationPercentage < 99
             betweenNewAndFull = nextNewMoonDate > nextFullMoonDate
             if illuminationPercentage > 51:
-                phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS if betweenNewAndFull else AstroBase.LUNAR_PHASE_WANING_GIBBOUS
+                if betweenNewAndFull:
+                    phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
+                else:
+                    phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
 
             elif illuminationPercentage < 49:
-                phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT if betweenNewAndFull else AstroBase.LUNAR_PHASE_WANING_CRESCENT
+                if betweenNewAndFull:
+                    phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
+                else:
+                    phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
 
             else:
-                phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER if betweenNewAndFull else AstroBase.LUNAR_PHASE_THIRD_QUARTER
+                if betweenNewAndFull:
+                    phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
+                else:
+                    phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
 
         return phase
 
@@ -665,12 +674,12 @@ class AstroBase( ABC ):
         return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
 
 
-    # Take a start/end date/time used to search for a satellite transit
+    # Take a start/end date/time in UTC to define a search window for a satellite transit
     # and determine where a given start/end hour will overlap.
     #
-    # Used to limit satellite passes from say dawn and dusk to just dusk.
+    # Used, for example, to limit satellite passes dusk.
     #
-    # The start hour (as date/time) < end hour (as date/time).
+    # The start hour (as date/time in UTC) < end hour (as date/time UTC).
     @staticmethod
     def getStartEndWindows( startDateTime, endDateTime, startHourAsDateTime, endHourAsDateTime ):
         #   SH            EH
