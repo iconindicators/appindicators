@@ -221,44 +221,8 @@ class IndicatorLunar( IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
 
-#TODO Delete these AFTER the utc/timezone changes have been made and committed.
-        self.__removeCacheFilesVersion93()
-        self.__removeCacheFilesVersion94()
-        self.__removeCacheFilesVersion95()
-
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
-
-
-    def __removeCacheFilesVersion93( self ):
-        # In version 94, cache data filenames changed format.
-        self.flushCache( "comet-oe-astropyephem-", 0 )
-        self.flushCache( "minorplanet-oe-bright-astropyephem-", 0 )
-        self.flushCache( "minorplanet-oe-critical-astropyephem-", 0 )
-        self.flushCache( "minorplanet-oe-distant-astropyephem-", 0 )
-        self.flushCache( "minorplanet-oe-unusual-astropyephem-", 0 )
-        self.flushCache( "satellite-tle-", 0 )
-        self.flushCache( "satellites-tle-", 0 )
-
-        # In version 94, the full moon icon is now a regular, time-stamped icon.
-        self.flushCache( "icon-" + "fullmoon-", 0 )
-        self.removeFileFromCache( "icon-" + "fullmoon-" + ".svg" )
-
-
-    def __removeCacheFilesVersion94( self ):
-        # In version 95, cache data filenames changed format.
-        self.flushCache( "apparentmagnitude-94-", 0 )
-        self.flushCache( "comet-oe-astropyephem-94-", 0 )
-        self.flushCache( "minorplanet-oe-astropyephem-94-", 0 )
-        self.flushCache( "satellite-tle-94-", 0 )
-
-
-    def __removeCacheFilesVersion95( self ):
-        # In version 95, some cache basenames incorrectly had '--'.
-        self.flushCache( "comet-orbitalelement-astropyephem-95-", 0 )
-        self.flushCache( "minorplanet-apparentmagnitude--95-", 0 )
-        self.flushCache( "minorplanet-orbitalelement-astropyephem-95-", 0 )
-        self.flushCache( "satellite-generalperturbation--95-", 0 )
 
 
     def flushTheCache( self ):
