@@ -23,23 +23,6 @@
 #   https://github.com/skyfielders/python-skyfield/issues/919#issuecomment-1835991577
 
 
-#TODO Have had to add in utc stuff (to/from)...
-# need to check all items against Pyephem again.
-# Also, maybe under the debugger, check when the datetime is passed in,
-# does it have a timezone and when does it need it and does not.
-# I suspect within skyfield the timezone is needed.
-# Might be a good idea to document...rename variables and function parameters
-# such that have a timezone mentioned.
-#
-# More thinking...
-# Given the changes to datetime needing utc (or at least a timezone)
-# might be better to carry that all the way through.
-# For astrobase, that should be fine...but of course check.
-# For astroskyfield, that should be fine.
-# For astropyephem, pyephem datetime does not use a timezone.
-# So need to add a timezone (UTC) back in for each call back out to astrobase.
-
-
 #TODO If/when astroskyfield.py is included in the release,
 # put a data directory at
 #   indicatorlunar/src/indicatorlunar/data
