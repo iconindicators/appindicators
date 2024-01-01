@@ -1081,10 +1081,6 @@ class IndicatorLunar( IndicatorBase ):
         end_hour_as_datetime_in_utc = \
             datetime.datetime.now().astimezone().replace( hour = endHour ).astimezone( datetime.timezone.utc )
 
-#TODO Why is this check needed?  What is the scenario?  Are there other scenarios?
-        if end_hour_as_datetime_in_utc < start_hour_as_datetime_in_utc:
-            end_hour_as_datetime_in_utc = end_hour_as_datetime_in_utc + datetime.timedelta( days = 1 )
-
         return start_hour_as_datetime_in_utc, end_hour_as_datetime_in_utc
 
 
