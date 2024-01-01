@@ -19,10 +19,6 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO This might be useful (date_for_calculate) for satellites:
-#   https://github.com/skyfielders/python-skyfield/issues/919#issuecomment-1835991577
-
-
 #TODO If/when astroskyfield.py is included in the release,
 # put a data directory at
 #   indicatorlunar/src/indicatorlunar/data
@@ -577,6 +573,8 @@ class AstroSkyfield( AstroBase ):
 
 #TODO There may (or may not!) be a better way to do all of this...
 # https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-1500973930
+#TODO This might be useful (date_for_calculate) for satellites:
+#   https://github.com/skyfielders/python-skyfield/issues/919#issuecomment-1835991577
     # References:
     #    https://github.com/skyfielders/python-skyfield/issues/327
     #    https://github.com/skyfielders/python-skyfield/issues/558
