@@ -19,6 +19,10 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO This may be interesting when released for moon rise/set:
+#   https://github.com/skyfielders/python-skyfield/commit/3422b2c9696fcdccf3ad9b69364ef933e71214c1
+
+
 #TODO If/when astroskyfield.py is included in the release,
 # put a data directory at
 #   indicatorlunar/src/indicatorlunar/data
