@@ -2,8 +2,8 @@
 
 ## v1.0.44 (2023-12-22)
 
-- Now supports Fedora 39.
 - Fixed PyGObject 3.11 deprecation warnings.
+- Now supports Debian 11/12, Fedora 38/39, Manjaro 22.1 GNOME, openSUSE Tumbleweed.
 
 
 ## v1.0.43 (2023-11-22)

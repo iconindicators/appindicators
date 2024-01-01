@@ -3,6 +3,7 @@
 ## v1.0.16 (2023-12-22)
 
 - Added terminal commands "fortune", "wmctrl", "calendar", "notify-send" and "paplay".
+- Now supports Debian 11/12, Fedora 38/39, Manjaro 22.1 GNOME, openSUSE Tumbleweed.
 
 
 ## v1.0.15 (2023-12-20)
