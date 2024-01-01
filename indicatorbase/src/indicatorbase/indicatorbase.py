@@ -179,7 +179,7 @@ class IndicatorBase( ABC ):
 
         projectMetadata = self._getProjectMetadata()
         if projectMetadata is None:
-            errorMessage = _( "Exiting: unable to locate project metadata!" ) #TODO Translate
+            errorMessage = "Exiting: unable to locate project metadata!"
             self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
             sys.exit()
 
@@ -207,8 +207,15 @@ class IndicatorBase( ABC ):
         self.debug = debug
 
         self.desktopFile = self.indicatorName + ".py.desktop"
-        self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/packaging/linux/" + self.desktopFile
         self.desktopFileUserHome = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
+        self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/packaging/linux/" + self.desktopFile
+        if not Path( self.desktopFileVirtualEnvironment ).exists():
+            # Will only happen in development and when the indicator is not installed in a venv.
+            self.desktopFileVirtualEnvironment = next( Path( "." ).glob( "**/*.desktop" ), None )
+            if self.desktopFileVirtualEnvironment is None:
+                errorMessage = "Expected to find a .desktop file in the indicator directory packaging/linux/, but none was found!"
+                self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
+                sys.exit()
 
         self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         self.secondaryActivateTarget = None
@@ -1029,13 +1036,13 @@ class IndicatorBase( ABC ):
     # and if the timestamp is older than the current date/time
     # plus the maximum age, returns True, otherwise False.
     # If no file can be found, returns True.
-    def isCacheStale( self, utcNowWithoutTimezone, basename, maximumAgeInHours ):
+    def isCacheStale( self, utcNow, basename, maximumAgeInHours ):
         cacheDateTime = self.getCacheDateTime( basename )
         if cacheDateTime is None:
             stale = True
 
         else:
-            stale = ( cacheDateTime + datetime.timedelta( hours = maximumAgeInHours ) ) < utcNowWithoutTimezone
+            stale = ( cacheDateTime + datetime.timedelta( hours = maximumAgeInHours ) ) < utcNow
 
         return stale
 
@@ -1054,7 +1061,9 @@ class IndicatorBase( ABC ):
 
         if theFile: # A value of "" evaluates to False.
             dateTimeComponent = theFile[ len( basename ) : len( basename ) + 14 ]
-            expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) # YYYYMMDDHHMMSS is 14 characters.
+            expiry = datetime.datetime.strptime(
+                        dateTimeComponent,
+                        IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ).replace( tzinfo = datetime.timezone.utc ) # YYYYMMDDHHMMSS is 14 characters.
 
         return expiry
 
