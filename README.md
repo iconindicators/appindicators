@@ -27,45 +27,59 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which will create a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. 
+    which creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. 
 
 2. Upload the wheel to `PyPI`:
 
     `python3 tools/upload_wheel.py release/wheel/dist_indicatortest`
 
-    which prompts for the username (\_\_token\_\_) and password (which starts with 'pypi-') and then uploads the `.whl` and `.tar.gz` to `PyPI`.
+    which (assumes the username \_\_token\_\_ and) prompts for the password (which starts with 'pypi-') and then uploads the `.whl` and `.tar.gz` to `PyPI`.
+
+A directory called `venv` will be created and can be safely deleted or otherwise will be reused on the next build/upload.
 
 
-## Testing on TestPyPI
-A wheel can be uploaded to `TestPyPI` for testing purposes:
+## Release to TestPyPI and then Installing
+For testing purposes, a wheel can be uploaded to `TestPyPI`:
 
 ```
-    python3 utils/buildWheel.py release indicatortest
+    python3 tools/build_wheel.py release indicatortest
     python3 -m venv venv
     . /venv/bin/activate
     python3 -m pip install --upgrade twine
-    python3 -m twine upload --username __token__ --repository testpypi dist_indicatortest/*
+    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest
+    deactivate
 ```
 
-Because the dependencies, listed in `pyproject.toml`, will be unavailable at `TestPyPI`, need to adjust the install command:
+Because the dependencies (listed in `pyproject.toml`) will most likely be unavailable at `TestPyPI`, the install command is slightly modified:
 
 ```
-    python3 -m venv venv
-    . /venv/bin/activate
-    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple/ indicatortest
+    python3 -m venv $HOME/.local/venv_indicator_test
+    . /$HOME/.local/venv_indicator_test/bin/activate
+    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest
+    deactivate
 ```
 
 
 ## Installing a Wheel Directly
-A wheel can be installed directly for testing:
+A wheel can be installed directly:
 
 ```
-    python3 utils/buildWheel.py release indicatortest
-    python3 -m venv venv
-    . /venv/bin/activate
-    python3 -m pip install --upgrade --force-reinstall release/wheel/indicatortest-*-py3-none-any.whl
-    python3 venv/lib/python3.x/site-packages/indicatortest/indicatortest.py
+    python3 -m venv $HOME/.local/venv_indicator_test
+    . /$HOME/.local/venv_indicator_test/bin/activate
+    python3 -m pip install --upgrade --force-reinstall release/wheel/dist_indicatortest/indicatortest-*-py3-none-any.whl
+    deactivate
 ```
+
+
+## Run an Indicator
+
+```
+    . /$HOME/.local/venv_indicator_test/bin/activate
+    python3 $HOME/.local/venv_indicator_test/lib/python3.x/site-packages/indicatortest/indicatortest.py
+    deactivate
+```
+
+noting the `x` in the second line which must be changed to match the currently installed version of `Python`. 
 
 
 ## License
