@@ -296,7 +296,7 @@ def _get_installation_copy_files( indicator_name ):
 
 def _get_installation_indicatorscriptrunner( indicator_name ):
     return (
-        f"If any of your scripts in `{ indicator_name }` are `Python` scripts,\n"
+        f"If you have added any `Python` scripts to `{ indicator_name }`,\n"
         f"you may need to install `Python` modules to the virtual environment.\n"
         f"For example if your `Python` script requires the `requests` module:\n"
         f"    ```\n"
