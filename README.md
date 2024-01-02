@@ -53,8 +53,8 @@ For testing purposes, a wheel can be uploaded to `TestPyPI`:
 Because the dependencies (listed in `pyproject.toml`) will most likely be unavailable at `TestPyPI`, the install command is slightly modified:
 
 ```
-    python3 -m venv $HOME/.local/venv_indicator_test
-    . /$HOME/.local/venv_indicator_test/bin/activate
+    python3 -m venv $HOME/.local/venv_indicatortest
+    . /$HOME/.local/venv_indicatortest/bin/activate
     python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest
     deactivate
 ```
@@ -64,8 +64,8 @@ Because the dependencies (listed in `pyproject.toml`) will most likely be unavai
 A wheel can be installed directly:
 
 ```
-    python3 -m venv $HOME/.local/venv_indicator_test
-    . /$HOME/.local/venv_indicator_test/bin/activate
+    python3 -m venv $HOME/.local/venv_indicatortest
+    . /$HOME/.local/venv_indicatortest/bin/activate
     python3 -m pip install --upgrade --force-reinstall release/wheel/dist_indicatortest/indicatortest-*-py3-none-any.whl
     deactivate
 ```
@@ -74,8 +74,8 @@ A wheel can be installed directly:
 ## Run an Indicator
 
 ```
-    . /$HOME/.local/venv_indicator_test/bin/activate
-    python3 $HOME/.local/venv_indicator_test/lib/python3.x/site-packages/indicatortest/indicatortest.py
+    . /$HOME/.local/venv_indicatortest/bin/activate
+    python3 $HOME/.local/venv_indicatortest/lib/python3.x/site-packages/indicatortest/indicatortest.py
     deactivate
 ```
 
