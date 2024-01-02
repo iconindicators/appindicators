@@ -463,7 +463,7 @@ def _get_distributions_tested():
         f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
         f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
         f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
-        f"- `Ubuntu MATE 22.04` Dynamic icon for NEW MOON does not display.\n"
+        f"- `Ubuntu MATE 22.04` Dynamic icon for NEW MOON is truncated.\n"
         f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
 
 
