@@ -24,8 +24,6 @@
 # Waiting on Jure @ COBS to resolve.
 #
 # When comet data is resolved...
-#    Replace 'comet' in the description in debian/control.
-#
 #    Replace CREDIT_COMETS back into
 #        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
 #    and
@@ -47,8 +45,6 @@
 #
 #    Uncomment/unhide in the Preferences
 #        grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
-#    
-#    Uncomment/unhide in the Preferences
 #        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 #
 #
