@@ -12,7 +12,30 @@
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AppIndicator library.
 - Removed old eclipse information.
-- Now supports Debian 11/12, Fedora 38/39, Manjaro 22.1 GNOME, openSUSE Tumbleweed.
+- Distributions/versions with full functionality:
+  - Debian 11 / 12 GNOME on Xorg
+  - Fedora 38 / 39 GNOME on Xorg
+  - Kubuntu 20.04 / 22.04
+  - Ubuntu 20.04
+  - Ubuntu 22.04 on Xorg
+  - Ubuntu Budgie 22.04
+  - Ubuntu MATE 22.04
+  - Ubuntu Unity 20.04 / 22.04
+  - Xubuntu 20.04 / 22.04
+- Distributions/versions with limited functionality:
+  - Debian 11 / 12 GNOME No clipboard; no wmctrl.
+  - Fedora 38 / 39 GNOME No clipboard; no wmctrl.
+  - Kubuntu 20.04 / 22.04 No mouse wheel scroll; tooltip in lieu of label.
+  - Linux Mint 21 Cinnamon Tooltip in lieu of label.
+  - Lubuntu 20.04 / 22.04 No label; tooltip is not dynamic; icon is not dynamic.
+  - Manjaro 22.1 GNOME No calendar.
+  - openSUSE Tumbleweed No clipboard; no wmctrl; no calendar.
+  - openSUSE Tumbleweed GNOME on Xorg No calendar.
+  - Ubuntu 22.04 No clipboard; no wmctrl.
+  - Ubuntu Budgie 20.04 No mouse middle click.
+  - Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
+  - Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.
+  - Xubuntu 20.04 / 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
 ## v1.0.100 (2023-01-09)
