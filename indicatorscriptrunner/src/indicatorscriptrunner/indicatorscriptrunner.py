@@ -284,18 +284,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeViewColumn.set_expand( True )
         treeView.append_column( treeViewColumn )
 
-#TODO When I used weight_set in indicatortest but using a ListStore (not TreeStore)
-# was getting:
-#  Warning: unable to set property 'weight-set' of type 'gboolean' from value of type '(null)'
-#  dialog.show_all()
-#
-# But I don't get it here...try searching for weight_set and see what it does.
-# Maybe I can omit it from here too?
         rendererText = Gtk.CellRendererText()
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME, weight_set = True )
         treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME )
-#TODO As per above, removed from line above the weight_set = True...seems to make no difference.  Not sure if this should be permanent...
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME, weight_set = True )
         treeViewColumn.set_expand( True )
         treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionNameColumn, copyOfScripts )
         treeView.append_column( treeViewColumn )
