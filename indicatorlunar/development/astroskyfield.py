@@ -439,6 +439,8 @@ class AstroSkyfield( AstroBase ):
 
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
 # https://github.com/skyfielders/python-skyfield/issues/490
+# https://github.com/skyfielders/python-skyfield/pull/532
+# https://github.com/skyfielders/python-skyfield/pull/526
     @staticmethod
     def __calculateCometsMinorPlanets(
             now, nowPlusTwentyFiveHours,
