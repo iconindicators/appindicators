@@ -294,6 +294,18 @@ def _get_installation_copy_files( indicator_name ):
         f"    ```\n\n" )
 
 
+def _get_installation_indicatorscriptrunner( indicator_name ):
+    return (
+        f"If any of your scripts in `{ indicator_name }` are `Python` scripts,\n"
+        f"you may need to install `Python` modules to the virtual environment.\n"
+        f"For example if your `Python` script requires the `requests` module:\n"
+        f"    ```\n"
+        f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade requests && \\\n"
+        f"    deactivate\n"
+        f"    ```\n" )
+
+
 def _get_installation_for_operating_system(
         operating_system,
         indicator_name,
@@ -336,6 +348,10 @@ def _get_installation_for_operating_system(
 
         n += 1
         dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
+
+        n += 1
+        if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
+            dependencies += f"{ str( n ) }. { _get_installation_indicatorscriptrunner( indicator_name) }"
 
         dependencies += f"</details>\n\n"
 
