@@ -3,30 +3,13 @@
 ## v1.0.16 (2023-12-22)
 
 - Added terminal commands "fortune", "wmctrl", "calendar", "notify-send" and "paplay".
-- Distributions/versions with full functionality:
-  - Debian 11 / 12 GNOME on Xorg
-  - Fedora 38 / 39 GNOME on Xorg
-  - Kubuntu 20.04 / 22.04
-  - Ubuntu 20.04
-  - Ubuntu 22.04 on Xorg
-  - Ubuntu Budgie 22.04
-  - Ubuntu MATE 22.04
-  - Ubuntu Unity 20.04 / 22.04
-  - Xubuntu 20.04 / 22.04
-- Distributions/versions with limited functionality:
-  - Debian 11 / 12 GNOME No clipboard; no wmctrl.
-  - Fedora 38 / 39 GNOME No clipboard; no wmctrl.
-  - Kubuntu 20.04 / 22.04 No mouse wheel scroll; tooltip in lieu of label.
-  - Linux Mint 21 Cinnamon Tooltip in lieu of label.
-  - Lubuntu 20.04 / 22.04 No label; tooltip is not dynamic; icon is not dynamic.
+- Now works (full or in part) on the following distributions/versions:
+  - Debian 11 / 12
+  - Fedora 38 / 39
+  - Linux Mint 21 Cinnamon
   - Manjaro 22.1 GNOME No calendar.
   - openSUSE Tumbleweed No clipboard; no wmctrl; no calendar.
   - openSUSE Tumbleweed GNOME on Xorg No calendar.
-  - Ubuntu 22.04 No clipboard; no wmctrl.
-  - Ubuntu Budgie 20.04 No mouse middle click.
-  - Ubuntu MATE 20.04 Dynamic icon is truncated, but fine whilst being clicked.
-  - Ubuntu MATE 22.04 Default icon with colour change does not show up; dynamic icon for NEW MOON does not display.
-  - Xubuntu 20.04 / 22.04 No mouse wheel scroll; tooltip in lieu of label.
 
 
 ## v1.0.15 (2023-12-20)
