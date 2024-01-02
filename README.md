@@ -52,7 +52,7 @@ Because the dependencies, listed in `pyproject.toml`, will be unavailable at `Te
 ```
     python3 -m venv venv
     . /venv/bin/activate
-    python3 -m pip install --upgrade --force-install --extra-index-url https://test.pypi.org/simple/ indicatortest
+    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple/ indicatortest
 ```
 
 
@@ -63,7 +63,7 @@ A wheel can be installed directly for testing:
     python3 utils/buildWheel.py release indicatortest
     python3 -m venv venv
     . /venv/bin/activate
-    python3 -m pip install --force-install release/wheel/indicatortest-x.y.z-py3-none-any.whl
+    python3 -m pip install --upgrade --force-reinstall release/wheel/indicatortest-*-py3-none-any.whl
     python3 venv/lib/python3.x/site-packages/indicatortest/indicatortest.py
 ```
 
