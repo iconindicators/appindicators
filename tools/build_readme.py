@@ -294,16 +294,31 @@ def _get_installation_copy_files( indicator_name ):
         f"    ```\n\n" )
 
 
-def _get_installation_indicatorscriptrunner( indicator_name ):
-    return (
-        f"If you have added any `Python` scripts to `{ indicator_name }`,\n"
-        f"you may need to install `Python` modules to the virtual environment.\n"
-        f"For example if your `Python` script requires the `requests` module:\n"
-        f"    ```\n"
-        f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade requests && \\\n"
-        f"    deactivate\n"
-        f"    ```\n" )
+def _get_installation_additional_python_modules( indicator_name ):
+    message = ''
+
+    common = (
+            f"For example if your `Python` script requires the `requests` module:\n"
+            f"    ```\n"
+            f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
+            f"    python3 -m pip install --upgrade requests && \\\n"
+            f"    deactivate\n" )
+
+    if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
+        message = (
+            f"If you have added any `Python` scripts to `{ indicator_name }`,\n"
+            f"you may need to install `Python` modules to the virtual environment.\n"
+            f"{ common }"
+            f"    ```\n" )
+
+    elif indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+        message = (
+            f"You will need to write a `Python` script to retrieve your tidal data.\n"
+            f"As such, you may need to install additional `Python` modules to the virtual environment.\n"
+            f"{ common }"
+            f"    ```\n" )
+
+    return message
 
 
 def _get_installation_for_operating_system(
@@ -350,8 +365,9 @@ def _get_installation_for_operating_system(
         dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
 
         n += 1
-        if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
-            dependencies += f"{ str( n ) }. { _get_installation_indicatorscriptrunner( indicator_name) }"
+        if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name or \
+           indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+            dependencies += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
 
         dependencies += f"</details>\n\n"
 
