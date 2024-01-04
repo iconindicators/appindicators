@@ -132,7 +132,6 @@ class IndicatorLunar( IndicatorBase ):
 
     ICON_CACHE_BASENAME = "icon-"
     ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
-    ICON_SATELLITE = IndicatorBase.INDICATOR_NAME + "-satellite" # Located in /usr/share/icons
 
     INDICATOR_TEXT_DEFAULT = " [" + astroBackend.NAME_TAG_MOON + " " + astroBackend.DATA_TAG_PHASE + "]"
     INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
@@ -216,6 +215,8 @@ class IndicatorLunar( IndicatorBase ):
         self.satellitePreviousNotifications = [ ]
 
         self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
+
+        self.icon_satellite = self.getIconFilename()[ 0 : -len( IndicatorBase.EXTENSION_SVG ) ] + "satellite" + IndicatorBase.EXTENSION_SVG
 
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
@@ -594,7 +595,7 @@ class IndicatorLunar( IndicatorBase ):
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME, setTime )
 
-        Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
+        Notify.Notification.new( summary, message, self.icon_satellite ).show()
 
 
     def updateMenuMoon( self, menu ):
@@ -1894,7 +1895,7 @@ class IndicatorLunar( IndicatorBase ):
 
             summary = replaceTags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
             message = replaceTags( message )
-            Notify.Notification.new( summary, message, IndicatorLunar.ICON_SATELLITE ).show()
+            Notify.Notification.new( summary, message, self.icon_satellite ).show()
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
