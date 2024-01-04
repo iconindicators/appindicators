@@ -59,8 +59,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
-    COMMAND_NOTIFY_BACKGROUND = "notify-send -i " + IndicatorBase.INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\""
-    COMMAND_NOTIFY_NON_BACKGROUND = "notify-send -i " + IndicatorBase.INDICATOR_NAME + " \"" + COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" \"" + _( "...has completed." ) + "\""
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
     # Data model columns used in the Preferences dialog...
@@ -96,6 +94,16 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
+
+        self.command_nofity_background = \
+            "notify-send -i " + self.getIconFilename() + \
+            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \
+            "\"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\""
+
+        self.command_nofity_nonbackground = \
+            "notify-send -i " + self.getIconFilename() + \
+            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \
+            "\"" + _( "...has completed." ) + "\""
 
 
     def update( self, menu ):
@@ -175,13 +183,13 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += script.getCommand()
 
             if script.getShowNotification():
-                command += "; " + IndicatorScriptRunner.COMMAND_NOTIFY_NON_BACKGROUND.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
+                command += "; " + self.command_nofity_nonbackground.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName() )
 
             if script.getPlaySound():
                 command += "; " + IndicatorScriptRunner.COMMAND_SOUND
 
             if script.getTerminalOpen():
-                command += "; ${SHELL}"
+                command += "; cd $HOME; ${SHELL}"
 
             command += "'"
 
@@ -214,7 +222,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     self.processCall( IndicatorScriptRunner.COMMAND_SOUND )
 
                 if script.getShowNotification() and commandResult:
-                    notificationCommand = IndicatorScriptRunner.COMMAND_NOTIFY_BACKGROUND
+                    notificationCommand = self.command_nofity_background
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.getName().replace( '-', '\\-' ) )
                     notificationCommand = notificationCommand.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT, commandResult.replace( '-', '\\-' ) )
                     self.processCall( notificationCommand )
