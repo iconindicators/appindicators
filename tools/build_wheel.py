@@ -132,7 +132,7 @@ def _process_locale( directory_dist, indicator_name ):
     directoryIndicatorLocale = directoryIndicator + "/src/" + indicator_name + "/locale"
     directoryIndicatorBaseLocale = "indicatorbase/src/indicatorbase/locale"
 
-    # Append translations from indicator-base to POT.
+    # Append translations from indicatorbase to POT.
     command = \
         "msgcat --use-first " + \
         directoryIndicatorLocale + os.sep + indicator_name + ".pot " + \
