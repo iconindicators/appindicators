@@ -22,20 +22,6 @@
 # explaining to go to PyPI.
 
 
-#TODO Not sure if needed in pyproject.toml 'Depends':
-# 	pycairo
-# (and not even sure where I saw this)
-
-
-#TODO
-# Do high level renaming according to standards.
-# Naming of project, naming of modules (files), naming of classes.
-# Then naming of globals, naming of functions, naming of variables.
-#   https://peps.python.org/pep-0008/
-#   https://docs.python-guide.org/writing/style/
-#   https://guicommits.com/organize-python-code-like-a-pro/
-
-
 # Base class for application indicators.
 #
 # References:
@@ -48,6 +34,11 @@
 #   https://twine.readthedocs.io/en/latest/
 #   https://packaging.python.org/en/latest/tutorials/packaging-projects/        
 #   https://github.com/AyatanaIndicators/libayatana-appindicator
+#
+# Python naming standards:
+#   https://peps.python.org/pep-0008/
+#   https://docs.python-guide.org/writing/style/
+#   https://guicommits.com/organize-python-code-like-a-pro/
 
 
 import datetime
