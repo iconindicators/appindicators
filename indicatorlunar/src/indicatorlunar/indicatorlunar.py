@@ -203,7 +203,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key: combination of three tags: body type, body name and data name.
-        # Value: a string, regardless being numerical or not.
+        # Value: a string for all data types, EXCEPT for date/time which is a Python datetime in UTC with timezone.
         # Previous data is used for satellite transits.
         self.data = None
         self.dataPrevious = None
