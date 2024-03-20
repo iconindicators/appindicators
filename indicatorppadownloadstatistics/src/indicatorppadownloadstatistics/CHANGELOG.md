@@ -78,7 +78,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
@@ -393,7 +393,7 @@
 
 ## v1.0.26 (2013-10-23)
 
-- Ubuntu 13.10 requires an icon to be set - now uses a dynamically created 1 pixel SVG icon (resides in the user's HOME directory). 
+- Ubuntu 13.10 requires an icon to be set - now uses a dynamically created 1 pixel SVG icon (resides in the user's HOME directory).
 
 
 ## v1.0.25 (2013-07-05)
@@ -458,7 +458,7 @@
 
 - When PPAs were combined, the "no information" message was shown regardless if the situation was no information or an error in downloading the PPA.
 - Removed natty from the list of PPAs.
-- Changed the sample PPA series to Precise as it's supported for 5 years. 
+- Changed the sample PPA series to Precise as it's supported for 5 years.
 
 
 ## v1.0.15 (2012-11-27)
@@ -485,7 +485,7 @@
 
 - Added python3-gi to debian/control Depends (for Precise support).
 - Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control Depends.
-- Simpler handling for creating the indicator - should hopefully sustain more environments. 
+- Simpler handling for creating the indicator - should hopefully sustain more environments.
 
 
 ## v1.0.10 (2012-10-24)
