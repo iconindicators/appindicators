@@ -76,7 +76,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
@@ -109,13 +109,13 @@
 
 ## v1.0.32 (2020-04-25)
 
-- Fortune history dialog now scrolls to the end. 
+- Fortune history dialog now scrolls to the end.
 
 
 ## v1.0.31 (2020-02-08)
 
 - Can now display the fortune history (for the session) in a dialog.
-- Bug fix: Cache backend generated bad paths with a double slash. 
+- Bug fix: Cache backend generated bad paths with a double slash.
 
 
 ## v1.0.30 (2019-09-23)
@@ -226,7 +226,7 @@
 ## v1.0.15 (2015-02-13)
 
 - Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in this miracle!
-- Added Russian translation.  Thanks to Oleg Moiseichuk. 
+- Added Russian translation.  Thanks to Oleg Moiseichuk.
 - About dialog changed to accept translator information.
 - Overhaul of repository structure and build script.
 

@@ -19,6 +19,9 @@
 # Application indicator which displays fortunes.
 
 
+#TODO Update changelog to reflect changes to icons.
+
+
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
@@ -62,7 +65,7 @@ class IndicatorFortune( IndicatorBase ):
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune, 
+    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune,
                                         # the notification summary should be emitted as a warning
                                         # (rather than a regular fortune).
 
