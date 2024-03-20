@@ -21,7 +21,7 @@
 # Inspired by:
 #    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
 #
-# Lowell format: 
+# Lowell format:
 #    https://asteroid.lowell.edu/main/astorb/
 #
 # XEphem format:

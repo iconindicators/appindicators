@@ -21,7 +21,7 @@
 # Inspired by:
 #    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
 #
-# MPC format: 
+# MPC format:
 #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 #
 # XEphem format:
@@ -112,7 +112,7 @@ def convert( inFile, header, outFile ):
         for line in fIn:
             if endOfHeader:
                 processAndWriteOneLine( line, fOut )
-    
+
             elif line.startswith( "----------" ):
                 endOfHeader = True
 

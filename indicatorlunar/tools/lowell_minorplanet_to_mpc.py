@@ -18,10 +18,10 @@
 
 # Convert minor planet data in Lowell format to MPC format.
 #
-# Lowell format: 
+# Lowell format:
 #    https://asteroid.lowell.edu/main/astorb/
 #
-# MPC format: 
+# MPC format:
 #    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
 
 
@@ -96,7 +96,7 @@ def processAndWriteOneLine( line, outputFile ):
                 getPackedDate( epochDate[ 0 : 4 ], epochDate[ 4 : 6 ], epochDate[ 6 : 8 ] ).rjust( 5 ),
                 ' ', # 26
                 str( round( float( meanAnomalyEpoch ), 5 ) ).rjust( 9 ),
-                ' ' * 2, # 36, 37 
+                ' ' * 2, # 36, 37
                 str( round( float( argumentPerihelion ), 5 ) ).rjust( 9 ),
                 ' ' * 2, # 47, 48
                 str( round( float( longitudeAscendingNode ), 5 ) ).rjust( 9 ),

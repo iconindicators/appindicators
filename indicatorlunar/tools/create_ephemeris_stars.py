@@ -108,7 +108,7 @@ def printEphemerisPyEphem( bspFile , starEphemeris, starsAndHIPs ):
 
         spectralType = starsWithSpectralType.loc[ hip ][ "SpType" ]
         if isinstance( spectralType, str ):
-            spectralType = spectralType[ : 2 ]   
+            spectralType = spectralType[ : 2 ]
 
         else:
             spectralType = "  "  # Is NaN; to fix, set to two blank characters (see _libastro.c).

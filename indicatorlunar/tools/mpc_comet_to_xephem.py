@@ -21,7 +21,7 @@
 # Inspired by:
 #    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
 #
-# MPC format: 
+# MPC format:
 #    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
 #
 # XEphem format:
@@ -91,7 +91,7 @@ def processAndWriteOneLine( line, outFile ):
                     inclination,
                     longitudeAscendingNode,
                     argumentPerihelion,
-                    orbitalEccentricity, 
+                    orbitalEccentricity,
                     perihelionDistance,
                     "2000.0",
                     absoluteMagnitude,
