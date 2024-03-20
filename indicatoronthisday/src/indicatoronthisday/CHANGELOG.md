@@ -71,7 +71,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.

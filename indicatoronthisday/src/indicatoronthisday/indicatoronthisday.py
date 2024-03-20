@@ -21,9 +21,9 @@
 
 #TODO Neither openSUSE nor Manjaro have the 'calendar' package.
 # Possible options...
-# 
-# 1. For those distributions/versions and any others yet to be found, ignore. 
-# 
+#
+# 1. For those distributions/versions and any others yet to be found, ignore.
+#
 # 2. Have posted
 #       https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
 #    and the recommendation is obtain the source code
