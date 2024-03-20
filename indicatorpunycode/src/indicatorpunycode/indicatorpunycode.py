@@ -158,11 +158,11 @@ class IndicatorPunycode( IndicatorBase ):
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
-        
+
         else:
             if self.inputClipboard:
                 Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
-        
+
             else:
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
 

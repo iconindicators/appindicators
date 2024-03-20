@@ -56,7 +56,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
@@ -140,7 +140,7 @@
 
 ## v1.0.1 (2016-06-15)
 
-- If a conversion result already exists in the menu, the result is simply moved to the top of the menu. 
+- If a conversion result already exists in the menu, the result is simply moved to the top of the menu.
 - Removed unnecessary 'Name' translation from .desktop file.
 - Added translation capability to 'Unicode' and 'ASCII'.
 
