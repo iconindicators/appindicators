@@ -280,7 +280,7 @@
 ## v1.0.37 (2015-02-13)
 
 - Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in this miracle!
-- Added Russian translation.  Thanks to Oleg Moiseichuk. 
+- Added Russian translation.  Thanks to Oleg Moiseichuk.
 - About dialog changed to accept translator information.
 - Overhaul of repository structure and build script.
 
@@ -471,7 +471,7 @@
 
 ## v1.0.6 (2012-07-13)
 
-- Hide the menu during refresh (using popdown). 
+- Hide the menu during refresh (using popdown).
 - Renamed menu item 'Frontend' to be 'VirtualBox™'...makes more sense.
 
 
