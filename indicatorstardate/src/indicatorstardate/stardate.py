@@ -278,10 +278,10 @@ def getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFra
     seconds = ( minutes - int( minutes ) ) * 60.0
 
     gregorianDateTime = \
-        datetime.datetime( 
-            __gregorianDates[ index ].year, 
-            __gregorianDates[ index ].month, 
-            __gregorianDates[ index ].day, 
+        datetime.datetime(
+            __gregorianDates[ index ].year,
+            __gregorianDates[ index ].month,
+            __gregorianDates[ index ].day,
             tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) )
 
     gregorianDateTime += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )

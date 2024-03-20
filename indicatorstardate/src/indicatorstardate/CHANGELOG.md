@@ -62,7 +62,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
@@ -175,7 +175,7 @@
 ## v1.0.26 (2015-02-12)
 
 - Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in this miracle!
-- Added Russian translation.  Thanks to Oleg Moiseichuk. 
+- Added Russian translation.  Thanks to Oleg Moiseichuk.
 - About dialog changed to accept translator information.
 - Overhaul of repository structure and build script.
 
@@ -273,7 +273,7 @@
 
 - Added python3-gi to debian/control Depends (for Precise support).
 - Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control Depends.
-- Simpler handling for creating the indicator - should hopefully sustain more environments. 
+- Simpler handling for creating the indicator - should hopefully sustain more environments.
 
 
 ## v1.0.9 (2012-10-25)
@@ -311,7 +311,7 @@
 - Lubuntu/Xubuntu: User needs to manually remove spurious directory
 
         /usr/share/icons/elementary/status/48/untitled
-        
+
     then rebuild the image cache:
 
         sudo gtk-update-icon-cache -f /usr/share/icons/elementary
