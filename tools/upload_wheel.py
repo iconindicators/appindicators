@@ -19,7 +19,7 @@
 # Upload the Python wheel for an indicator to PyPI.
 #
 #   https://twine.readthedocs.io/en/latest/
-#   https://packaging.python.org/en/latest/tutorials/packaging-projects/        
+#   https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 
 import argparse
