@@ -182,11 +182,11 @@ def __getEclipse( utcNow, eclipses, fieldYear, fieldMonth, fieldDay, fieldTimeUT
 
             theLatitude = str( int( float( latitude[ : -1 ] ) ) )
             if latitude.endswith( 'S' ):
-                theLatitude = '-' + theLatitude 
+                theLatitude = '-' + theLatitude
 
             theLongitude = str( int( float( longitude[ : -1 ] ) ) )
             if longitude.endswith( 'E' ):
-                theLongitude = '-' + theLongitude 
+                theLongitude = '-' + theLongitude
 
             eclipseInformation = dateTime, __getEclipseTypeFromTableValue( eclipseType ), theLatitude, theLongitude
             break

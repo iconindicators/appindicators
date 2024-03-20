@@ -496,7 +496,10 @@ class IndicatorLunar( IndicatorBase ):
         illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
         brightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
         svgIconText = self.getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
-        iconFilename = self.writeCacheText( svgIconText, IndicatorLunar.ICON_CACHE_BASENAME, IndicatorBase.EXTENSION_SVG )
+        iconFilename = self.writeCacheText(
+            svgIconText,
+            IndicatorLunar.ICON_CACHE_BASENAME,
+            IndicatorBase.EXTENSION_SVG )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -560,8 +563,8 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
         riseAzimuth = self.formatData(
-            IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, 
-            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ], 
+            IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH,
+            self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
             IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
         setTime = self.formatData(
@@ -687,7 +690,7 @@ class IndicatorLunar( IndicatorBase ):
             self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             url )
 
-        self.createMenuItemAndAppend( 
+        self.createMenuItemAndAppend(
             menu,
             self.getMenuIndent( 2 ) + \
             _( "Type: " ) + \
@@ -1175,7 +1178,7 @@ class IndicatorLunar( IndicatorBase ):
         # Table to show all attributes of selected/checked bodies.
         # If a body's magnitude passes through the magnitude filter,
         # all attributes (rise/set/az/alt) will be displayed in this table,
-        # irrespective of the setting to hide bodies below the horizon. 
+        # irrespective of the setting to hide bodies below the horizon.
         COLUMN_TAG = 0
         COLUMN_TRANSLATED_TAG = 1
         COLUMN_VALUE = 2

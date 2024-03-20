@@ -59,7 +59,7 @@ class GP( object ):
     def __init__( self, xmlFieldsFromOMM ):
         '''
         Take the XML fields from the OMM data and propagate.
-        
+
         Unfortunately, the underlying C++ sgp, which performs the propagation,
         has an upper limit of 339,999 for the NORAD catalog number:
             https://github.com/brandon-rhodes/pyephem/discussions/243

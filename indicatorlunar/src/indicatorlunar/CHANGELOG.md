@@ -94,7 +94,7 @@
 
 - Now uses PyEphem 4.1.2 which should be automatically installed via the PPA process.  If not, the manual instructions are:
 
-            sudo apt-get install -y python3-pip     
+            sudo apt-get install -y python3-pip
             sudo pip3 install --ignore-installed --upgrade ephem
 
 
@@ -146,7 +146,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
@@ -299,7 +299,7 @@
 
 ## v1.0.68 (2016-06-16)
 
-- Fixed tooltip on sort satellite by date/time option to reflect the default value. 
+- Fixed tooltip on sort satellite by date/time option to reflect the default value.
 - Added tooltip to 'group stars by constellation' option.
 
 
@@ -391,7 +391,7 @@
 - Removed redundant functions to convert hours/minutes/seconds and degrees/minutes/seconds to decimal degrees as PyEphem does it for free!
 - Changed some defaults to reduce the amount of data that is displayed. When loading satellites or orbital elements, these are not checked. Stars are not checked on initial run of the indicator.
 - The lookahead period for computing satellite passes has been reduced to two days (previously it was ten days).  This significantly reduces the time to refresh whilst only dropping a handful of satellites.
-- For Saturn, added the earth tilt and sun tilt angles. 
+- For Saturn, added the earth tilt and sun tilt angles.
 
 
 ## v1.0.57 (2015-02-16)
@@ -403,7 +403,7 @@
 - Dynamically created icons (the full moon notification when testing in the preferences; the indicator icon which changes according to the current; lunar illumination percentage) are now saved to the /tmp directory (or equivalent).
 - Eclipse type information uses a class, so no longer reliant on strings.
 - Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in this miracle!
-- Added Russian translation.  Thanks to Oleg Moiseichuk. 
+- Added Russian translation.  Thanks to Oleg Moiseichuk.
 - About dialog changed to accept translator information.
 - Overhaul of repository structure and build script.
 
@@ -667,7 +667,7 @@
 ## v1.0.17 (2012-12-13)
 
 - Ensured all calculations are based from the same date/time.
-- Added constellation/distance information to sun menu item. 
+- Added constellation/distance information to sun menu item.
 - Added spacing to all menu items.
 - Adjusted each SVG such that the image is horizontally centred and has the same left/right margin for each image.
 

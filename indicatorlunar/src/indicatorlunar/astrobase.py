@@ -238,7 +238,7 @@ class AstroBase( ABC ):
     #
     # Several possibilities are available for creating a new list of stars...
     #
-    #    http://fer3.com/arc/imgx/Bowditch-American-Practical-Navigator-2002-(2004).pdf 
+    #    http://fer3.com/arc/imgx/Bowditch-American-Practical-Navigator-2002-(2004).pdf
     #    https://en.wikipedia.org/wiki/List_of_stars_for_navigation
     #        Contains a list of around 58 navigational stars.
     #        Unknown if this is northern hemisphere centric as the source is American.
