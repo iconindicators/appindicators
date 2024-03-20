@@ -19,8 +19,17 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO See
+#    https://github.com/skyfielders/python-skyfield/commit/d1ad1f859518e5cae244f9901eadbc7bb3991bc8
+# Also look over all documentation...may be there are new APIs to call or better/newer ways to do things.
+
+
 #TODO This may be interesting when released for moon rise/set:
 #   https://github.com/skyfielders/python-skyfield/commit/3422b2c9696fcdccf3ad9b69364ef933e71214c1
+
+
+#TODO May be of use for TLEs:
+#   https://github.com/skyfielders/python-skyfield/issues/884
 
 
 #TODO If/when astroskyfield.py is included in the release,
