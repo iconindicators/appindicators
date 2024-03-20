@@ -60,7 +60,7 @@ class Info( ABC ):
         return self.showNotification
 
 
-    def __eq__( self, other ): 
+    def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
             self.getGroup() == other.getGroup() and \

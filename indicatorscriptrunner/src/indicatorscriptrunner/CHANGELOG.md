@@ -75,15 +75,15 @@
 ## v1.0.16 (2021-09-30)
 
 - Background script functionality added.  Existing scripts are now referred to as non-background scripts and remain functionally as they were.
-    
+
     A background script contains a command/script, just as a non-background script.  Rather than direct execution by the user through the menu, a background script is run at a specified interval (in minutes), similarly to cron.  The background script must be added to the icon text for the script to be run.
-    
+
     Example: If a background script computes the amount of free memory, the text output will always be non-empty.  Enabling the sound and notification options for the script are of no value.
-    
+
     Example: If a background script checks for the presence of a log file (the log file representing an exception condition), the script will produce no text output if the log file is absent, yet produce non-empty text output if the log file is present.  Enabling the sound and notification options for the script are of value.
-    
+
     Each background script is updated according to its respective interval and only if the background script has been added to the icon text.  The result of the background script is cached and the icon text is updated.
-    
+
     As background scripts may have different update intervals, one script may update and another script will not.  The icon text will be updated using both the immediate result from the script which updated and the cached result from scripts which did not update (at that time).  If one script updates every five minutes and another script updates hourly, the result shown in the icon text for the hourly script may be stale due to the cached result.  Consequently, a script can be optionally forced to update quicker than its specified interval.  This option would typically be used for a script which reports exception conditions.
 
 
@@ -107,7 +107,7 @@
 
         X-GNOME-Autostart-Delay=120
     in
-   
+
         ~/.config/autostart/indicator-lunar.py.desktop
 
     to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
