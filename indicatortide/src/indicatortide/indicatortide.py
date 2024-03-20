@@ -53,7 +53,7 @@ class IndicatorTide( IndicatorBase ):
 
 
     def update( self, menu ):
-        if self.userScriptPathAndFilename == "" and self.userScriptClassName == "": 
+        if self.userScriptPathAndFilename == "" and self.userScriptClassName == "":
             # First time the indicator is run, or really,
             # when there is no preference/json file,
             # there will be no user script specified,

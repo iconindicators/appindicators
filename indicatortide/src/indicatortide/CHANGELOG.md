@@ -97,7 +97,7 @@
 
 ## v1.0.20 (2020-02-08)
 
-- Bug fix: Cache backend generated bad paths with a double slash. 
+- Bug fix: Cache backend generated bad paths with a double slash.
 
 
 ## v1.0.19 (2019-12-30)
