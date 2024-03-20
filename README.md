@@ -27,7 +27,7 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. 
+    which creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.
 
 2. Upload the wheel to `PyPI`:
 
@@ -79,9 +79,9 @@ A wheel can be installed directly:
     deactivate
 ```
 
-noting the `x` in the second line which must be changed to match the version of `Python` in the `venv`. 
+noting the `x` in the second line which must be changed to match the version of `Python` in the `venv`.
 
 
 ## License
-This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license. 
+This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
 Copyright 2012-2024 Bernard Giannetti.
