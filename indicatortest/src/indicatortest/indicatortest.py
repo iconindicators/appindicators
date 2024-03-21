@@ -144,7 +144,7 @@ class IndicatorTest( IndicatorBase ):
         menuItem.connect(
             "activate",
             lambda widget: (
-                print( "secondary activate target / mouse middle click" ), 
+                print( "secondary activate target / mouse middle click" ),
                 self.setLabel( self.__getCurrentTime() ) ) )
 
         self.secondaryActivateTarget = menuItem
@@ -153,7 +153,7 @@ class IndicatorTest( IndicatorBase ):
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in OSD" )
         menuItem.connect(
             "activate",
-            lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.getIconFilename() ).show() )
+            lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
 
         subMenu.append( menuItem )
 
@@ -223,7 +223,7 @@ class IndicatorTest( IndicatorBase ):
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "notify-send" )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand( f"notify-send -i { self.getIconFilename() } 'summary' 'body'" ) )
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( f"notify-send -i { self.get_icon_name() } 'summary' 'body'" ) )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "paplay" )
@@ -266,7 +266,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __useIconDefault( self ):
-        self.indicator.set_icon_full( self.getIconFilename(), "" )
+        self.indicator.set_icon_full( self.get_icon_name(), "" )
 
 
     def __getCurrentTime( self ):
@@ -277,6 +277,10 @@ class IndicatorTest( IndicatorBase ):
         illuminationPercentage = 35
         brightLimbAngleInDegrees = 65
         svgIconText = self.__getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
+
+#TODO Check to see if this still works...writing an icon to the .cache directory.
+# Does the gtk magic convert the icon according to the theme?
+# The icon should change from #777777 to the same colour as the power/sound/network icons.
         iconFilename = self.writeCacheText( svgIconText, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
         self.indicator.set_icon_full( iconFilename, "" )
 
@@ -290,7 +294,7 @@ class IndicatorTest( IndicatorBase ):
             Notify.Notification.new(
                 "Cannot locate " + iconFile,
                 "Please ensure the file is present.",
-                self.getIconFilename() ).show()
+                self.get_icon_name() ).show()
 
 
     # Virtually a direct copy from Indicator Lunar to test dynamically created SVG icons in the user cache.
@@ -303,7 +307,7 @@ class IndicatorTest( IndicatorBase ):
         width = 100
         height = width
         radius = float( width / 2 )
-        colour = self.getIconThemeColour( defaultColour = "fff200" ) # Default to hicolor.
+        colour = self.getIconThemeColour( defaultColour = "fff200" ) # Default to hicolor.#TODO No longer need this; use #777777 instead.
         if phase == "FULL_MOON" or phase == "NEW_MOON":
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == "NEW_MOON":
@@ -341,17 +345,17 @@ class IndicatorTest( IndicatorBase ):
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
             self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
+            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
 
         elif self.isTerminalQTerminal():
             # As a result of this issue
             #    https://github.com/lxqt/qterminal/issues/335
             # the default terminal in Lubuntu (qterminal) fails to parse argument.
             # Although a fix has been made, it is unlikely the repository will be updated any time soon.
-            # So the quickest/easiest workaround is to install gnome-terminal. 
+            # So the quickest/easiest workaround is to install gnome-terminal.
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
             self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
+            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
 
         else:
             command_ = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
