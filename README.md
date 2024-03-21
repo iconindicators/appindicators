@@ -84,4 +84,5 @@ noting the `x` in the second line which must be changed to match the version of 
 
 ## License
 This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
+
 Copyright 2012-2024 Bernard Giannetti.
