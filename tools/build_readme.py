@@ -99,7 +99,12 @@ def _get_introduction( indicator_name ):
     if indicator_name.upper() != Indicator_Name.INDICATORONTHISDAY.name:
         introduction += f", `openSUSE`, `Manjaro` "
 
-    introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
+    introduction += f" and theoretically, any platform which supports the `appindicator` library. "
+
+    introduction += f"Other indicators in this series are:\n"
+    indicators = ( list( indicator_names.keys() ) )
+    indicators.remove( indicator_name )
+    introduction += "- `" + '`\n- `'.join( indicators ) + "`\n\n"
 
     return introduction
 
@@ -166,7 +171,7 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     dependencies = [
         "cairo-devel",
         "cairo-gobject-devel",
-        "gnome-extensions-app", 
+        "gnome-extensions-app",
         "gnome-shell-extension-appindicator",
         "gobject-introspection-devel",
         "libappindicator-gtk3",
@@ -278,17 +283,17 @@ def _get_installation_copy_files( indicator_name ):
         f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
         f"    cp "
-        f"{ venv_indicator_home }/icons/hicolor/{ indicator_name }.svg "
+        f"{ venv_indicator_home }/icons/*.svg "
         f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
         f"    mkdir -p $HOME/.local/bin && \\\n"
 
         f"    cp "
-        f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.sh "
+        f"{ venv_indicator_home }/platform/linux/{ indicator_name }.sh "
         f"$HOME/.local/bin && \\\n"
 
         f"    cp "
-        f"{ venv_indicator_home }/packaging/linux/{ indicator_name }.py.desktop "
+        f"{ venv_indicator_home }/platform/linux/{ indicator_name }.py.desktop "
         f"$HOME/.local/share/applications\n"
 
         f"    ```\n\n" )
@@ -341,7 +346,7 @@ def _get_installation_for_operating_system(
         operating_system_packages = _get_operating_system_dependencies_function_name(
                                         operating_system, Indicator_Name[ indicator_name.upper() ] )
 
-        # Reference on installing some of the operating system packages:    
+        # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
         dependencies = (
             f"<details>"
@@ -397,7 +402,7 @@ def _get_installation( indicator_name ):
 
         _get_installation_for_operating_system(
             Operating_System.MANJARO_221,
-            indicator_name, 
+            indicator_name,
             "Manjaro 22.1",
             "sudo pacman -S --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
@@ -429,11 +434,10 @@ def _get_usage( indicator_name ):
         f"Usage\n"
         f"-----\n"
 
-        f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay, "
+        f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
         f"type `{ indicator_names[ indicator_name ].split( ' ', 1 )[ 1 ].lower() }` "
         f"into the search bar and the icon should be present for you to click.  "
-        f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
-        f"Under the `Preferences` there is an `autostart` option to run `{ indicator_name }` on start up.\n\n" )
+        f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n" )
 
 
 def _get_distributions_tested():
@@ -497,7 +501,7 @@ def _get_removal_for_operating_system(
             f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
             f"    ```\n"
             f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
-            f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }.svg && \\\n"
+            f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }*.svg && \\\n"
             f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
             f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
             f"    ```\n\n"
@@ -516,7 +520,7 @@ def _get_removal( indicator_name ):
 
         _get_removal_for_operating_system(
             Operating_System.DEBIAN_11_DEBIAN_12,
-            indicator_name, 
+            indicator_name,
             "Debian 11 / 12",
             remove_command_debian,
             _get_operating_system_dependencies_debian ) +
@@ -530,28 +534,28 @@ def _get_removal( indicator_name ):
 
         _get_removal_for_operating_system(
             Operating_System.MANJARO_221,
-            indicator_name, 
+            indicator_name,
             "Manjaro 22.1",
             "sudo pacman -R --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
 
         _get_removal_for_operating_system(
             Operating_System.OPENSUSE_TUMBLEWEED,
-            indicator_name, 
+            indicator_name,
             "openSUSE Tumbleweed",
             "sudo zypper remove -y",
             _get_operating_system_dependencies_opensuse ) +
 
         _get_removal_for_operating_system(
             Operating_System.UBUNTU_2004,
-            indicator_name, 
+            indicator_name,
             "Ubuntu 20.04",
             remove_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_removal_for_operating_system(
             Operating_System.UBUNTU_2204,
-            indicator_name, 
+            indicator_name,
             "Ubuntu 22.04",
             remove_command_debian,
             _get_operating_system_dependencies_debian ) )
