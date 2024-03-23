@@ -16,10 +16,92 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Eventually need to update 
+#TODO Eventually need to update
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 #   https://askubuntu.com/questions/30334/what-application-indicators-are-available
 # explaining to go to PyPI.
+
+
+#TODO Use
+#   sudo touch .local/share/icons/hicolor && sudo gtk-update-icon-cache
+# to update icons.  Not sure where to put this...
+
+
+#TODO Add/commit icons/indicatoronXXX.svg and remove icons/hicolor/indicatorXXX.svg and hicolor for all indicators.
+
+
+#TODO Delete 'packaging' directory for all indicators.
+
+
+#TODO Add/commit indicatorbase 'platform'.
+
+
+#TODO
+#   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
+#   https://developer.gnome.org/documentation/tutorials/themed-icons.html#symbolic-icons
+#   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1/classes/Indicator.html
+#   https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Image.html#Gtk.Image.new_from_icon_name
+#   https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/AboutDialog.html#Gtk.AboutDialog
+#   https://lazka.github.io/pgi-docs/#GdkPixbuf-2.0/classes/Pixbuf.html#GdkPixbuf.Pixbuf
+#   https://discourse.gnome.org/t/how-to-get-pixbuf-from-image-in-gtk4/9881
+#   https://stackoverflow.com/questions/62148118/what-is-the-difference-between-gtkimage-and-gdkpixbuf
+#   https://stackoverflow.com/questions/1649748/how-to-use-gdkpixbuf?rq=3
+#   https://stackoverflow.com/questions/22579508/subtract-one-circle-from-another-in-svg
+#   https://www.w3.org/TR/SVG11/painting.html#FillRuleProperty
+#   https://www.w3.org/TR/SVG11/images/painting/fillrule-nonzero.svg
+#   https://www.w3.org/TR/SVG11/images/painting/fillrule-evenodd.svg
+#   view-source:https://www.w3.org/TR/SVG11/images/painting/fillrule-evenodd.svg
+#   https://jsfiddle.net/86jnkr3L/
+#   https://stackoverflow.com/questions/38654828/how-to-remove-shapes-from-filled-svg-path
+#   https://www.smashingmagazine.com/2019/03/svg-circle-decomposition-paths/
+#   https://stackoverflow.com/questions/8193675/draw-a-hollow-circle-in-svg
+#   https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+#   https://codepen.io/jakob-e/pen/bgBegJ
+#   https://stackoverflow.com/questions/53741166/what-is-the-difference-between-absolute-and-relative-svg-path
+#   https://developer-old.gnome.org/gtk3/unstable/gtk3-demo.html
+#   https://wiki.gnome.org/HowDoI/CreateSymbolicIconsThatChangeColorAccordingToTheme
+#   https://developer.gnome.org/documentation/tutorials/themed-icons.html
+#   https://discourse.gnome.org/t/how-to-use-my-own-symbolic-icon/7480
+
+
+#TODO Run any indicator under Debian 12 and open About dialog.
+# Then hit ESCAPE to close dialog; about/preferences/quite are still greyed out.
+# Does this happen on Ubuntu 20.04 or elsewhere?  Does not happen on Ubuntu 20.04.
+# Does this happen in Preferences?  Does not happen on Ubuntu 20.04.
+
+
+#TODO For indicatorlunar, check in the final README.md what the
+# copy command looks like for both icons.
+
+
+#TODO Check to see how indicatorlunar dynamic icon is rendered out
+# on Debian 12.
+# Does the filename need to have -symbolic added?
+# Does using the .cache directory still work?
+# Might have to write to .local/share/icons/hicolor/...
+# Depending on how the icon for indicator lunar is rendered,
+# either the current moon phase icon or the satellite / full moon icons when testing,
+# might have to change things...
+# If the dynamic icons are rendered now in .local/share/icons/...,
+# need to remove these icons (perhaps containing a timestamp) on each run of the indicator
+# but also do a sweep of .local/share/icons/...
+
+
+#TODO See what the satellite icon looks like in the osd for lunar.
+
+
+#TODO See what the full moon icon looks like in the osd for lunar.
+
+
+#TODO Test icon is themed on Lubuntu 22.04 under Arc-Darker
+
+
+#TODO Test icon is themed on Xubuntu 22.04 under Greybird
+
+
+#TODO Update changelog for both indicatortest and indicatorfortune
+# in regards to icons are now rendered correctly to support themes.
+# For indicatortest, perhaps also add reorganisation of test/information options.
 
 
 # Base class for application indicators.
@@ -32,8 +114,9 @@
 #   https://lazka.github.io/pgi-docs/Gtk-3.0
 #   https://pygobject.readthedocs.io/en/latest/getting_started.html
 #   https://twine.readthedocs.io/en/latest/
-#   https://packaging.python.org/en/latest/tutorials/packaging-projects/        
+#   https://packaging.python.org/en/latest/tutorials/packaging-projects/
 #   https://github.com/AyatanaIndicators/libayatana-appindicator
+#   https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
 #
 # Python naming standards:
 #   https://peps.python.org/pep-0008/
@@ -70,7 +153,7 @@ except:
         sys.exit( 1 )
 
 gi.require_version("GdkPixbuf", "2.0" )
-from gi.repository import GdkPixbuf
+from gi.repository import GdkPixbuf  #TODO Check if this is needed.
 
 gi.require_version( "GLib", "2.0" )
 from gi.repository import GLib
@@ -106,9 +189,6 @@ class IndicatorBase( ABC ):
 
     __EXTENSION_JSON = ".json"
 
-    __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
-    __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
-
     __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS list first so as to be the "default".
     __TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
@@ -118,7 +198,11 @@ class IndicatorBase( ABC ):
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ] )
 
+    __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
+    __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
+
     EXTENSION_SVG = ".svg"
+    EXTENSION_SVG_SYMBOLIC = "-symbolic.svg"  #TODO Not sure if this stays.
     EXTENSION_TEXT = ".txt"
 
 #TODO Need to check all of these values!
@@ -126,6 +210,17 @@ class IndicatorBase( ABC ):
 # The Adwaita icons on Debian 12 are darker than those for network/volume.
 # How can a theme have varying colours?
 # https://johndecember.com/html/spec/colorsvghex.html
+#
+# If the -symbolic methodology holds true,
+# that is, only need a grey (or similar) icon with -symbolic in the filename suffix
+# and the desktop will replace the grey colour with the proper colour for the desktop,
+# will not need this table any more.
+#
+# What happens on a platform like Manjaro (or anything else really other than Ubuntu/Debian)
+# with the -symbolic way now?
+# Test on these other platforms and see if the icon colour is automatically shaded.
+# If not...then what happens?
+# Is there a way to switch to the hicolor icon...or even bother?
     ICON_THEMES = {
         "Adwaita"                   : "bebebe",
         "Ambiant-MATE"              : "dfdbd2",
@@ -199,12 +294,11 @@ class IndicatorBase( ABC ):
 
         self.desktopFile = self.indicatorName + ".py.desktop"
         self.desktopFileUserHome = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
-        self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/packaging/linux/" + self.desktopFile
-        if not Path( self.desktopFileVirtualEnvironment ).exists():
-            # Will only happen in development and when the indicator is not installed in a venv.
+        self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/platform/linux/" + self.desktopFile #TODO Should this be platform or packaging?
+        if not Path( self.desktopFileVirtualEnvironment ).exists(): # Only occurs in development when the indicator is not installed in a venv.
             self.desktopFileVirtualEnvironment = next( Path( "." ).glob( "**/*.desktop" ), None )
             if self.desktopFileVirtualEnvironment is None:
-                errorMessage = "Expected to find a .desktop file in the indicator directory packaging/linux/, but none was found!"
+                errorMessage = "Expected to find a .desktop file in the indicator directory platform/linux/, but none was found!"  #TODO Is the path here, platform/linux, specific enough?  Does it need to be absolute?
                 self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
                 sys.exit()
 
@@ -222,10 +316,36 @@ class IndicatorBase( ABC ):
         menu = Gtk.Menu()
         menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         menu.show_all()
+
+#TODO Original but no longer used.
+#        self.indicator = AppIndicator.Indicator.new(
+#            self.indicatorName, #ID
+#            self.getIconFilename(), # Icon name
+#            AppIndicator.IndicatorCategory.APPLICATION_STATUS )
+
+#TODO This should be used for all cases except when running under Eclipse.
+#...or perhaps not.  Use this for all cases...
+# if there is no icon found, that means the indicator has not been installed.
+# So be it...perhaps.
         self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
-            self.getIconFilename(), # Icon name
+            self.get_icon_name(), # Icon name
             AppIndicator.IndicatorCategory.APPLICATION_STATUS )
+
+#TODO I think this will work only for Eclipse, but likely need to point to a path to the icon.
+#
+# Not sure if this code is needed in reality...
+# The code will run and indicator launches.
+# The only issue under Eclipse say is the icon may not be found.
+# So maybe instead, in the above code/section,
+# have a comment about setting the icon path parameter and call instead new_with_path()
+# Maybe need a similar comment for when setting the icon in the About dialog.
+        # self.indicator = AppIndicator.Indicator.new_with_path(
+        #     self.indicatorName, #ID
+        #     self.get_icon_name(), # Icon name
+        #     AppIndicator.IndicatorCategory.APPLICATION_STATUS,
+        #     "/home/bernard/.local/share/icons/hicolor" ) # Icon theme path
+        #     # self.get_icon_theme_path() ) #TODO Not sure if we keep the above hard coded path or use a function to find the icon path relative.
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
@@ -241,11 +361,8 @@ class IndicatorBase( ABC ):
             projectMetadata = metadata.metadata( self.indicatorName ) # Obtain pyproject.toml information from pip.
 
         except metadata.PackageNotFoundError:
-            # If the indicator is run in testing/development, there will be no pip information.
-            projectMetadata = None
-
-        # Used only for development/testing when the .whl file is in the indicator's directory.
-        if projectMetadata is None:
+            # No pip information found, so likely in development/testing.
+            # Assume a .whl file is in the indicator's development directory (indicator_name/src/indicator_name).
             firstWheel = next( Path( "." ).glob( "*.whl" ), None )
             if firstWheel is None:
                 print( "Expected to find a .whl in the same directory as the indicator, but none was found!" )
@@ -263,7 +380,7 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_value_for_single_line_tag_from_pyproject_toml( pyproject_toml, tag ):
-        # Would like to use 
+        # Would like to use
         #   https://docs.python.org/3/library/tomllib.html
         # but it is only in 3.11 which is unavailable for Ubuntu 20.04.
         value = ""
@@ -286,7 +403,7 @@ class IndicatorBase( ABC ):
 
             else:
                 lines = f.readlines()
-            
+
             for line in lines:
                 if line.startswith( "## v" ):
                     left_parenthesis = line.find( '(' )
@@ -407,7 +524,7 @@ class IndicatorBase( ABC ):
         aboutDialog.set_comments( self.comments )
 
         copyright_start_year = \
-            IndicatorBase.get_first_year_or_last_year_in_changelog_markdown( 
+            IndicatorBase.get_first_year_or_last_year_in_changelog_markdown(
                     IndicatorBase.get_changelog_markdown_path( self.indicatorName ) )
 
         copyrightText = \
@@ -417,7 +534,20 @@ class IndicatorBase( ABC ):
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-        aboutDialog.set_logo( GdkPixbuf.Pixbuf.new_from_file( self.getIconFilename() ) )
+
+#        image = Gtk.Image.new_from_icon_name( self.getIconFilename(), Gtk.IconSize( 4 ) ) #TODO Testing
+
+#        print( self.get_icon_theme_path() + self.getIconFilename() ) #TODO
+
+#        image = Gtk.Image.new_from_file( self.get_icon_theme_path() + self.getIconFilename() + ".svg" ) #TODO Testing
+
+#        aboutDialog.set_logo( image.get_pixbuf() )
+
+        aboutDialog.set_logo_icon_name( self.get_icon_name() )
+        
+#        aboutDialog.set_logo( GdkPixbuf.Pixbuf.new_from_file( self.get_icon_theme_path() + self.getIconFilename() + ".svg" ) )
+#        aboutDialog.set_logo_icon_name( self.getIconFilename() + ".svg" )#TODO Testing
+
         aboutDialog.set_program_name( self.indicatorName )
         aboutDialog.set_translator_credits( _( "translator-credits" ) )
         aboutDialog.set_version( self.version )
@@ -487,7 +617,7 @@ class IndicatorBase( ABC ):
 
         else:
             menuItems = self.indicator.get_menu().get_children()
-            if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item. 
+            if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
                 menuItems[ -1 ].set_sensitive( toggle ) # Quit
                 menuItems[ -2 ].set_sensitive( toggle ) # About
                 menuItems[ -3 ].set_sensitive( toggle ) # Preferences
@@ -732,6 +862,7 @@ class IndicatorBase( ABC ):
 
     # Get the colour (in hexadecimal) for the current theme.
     # The defaultColour will be returned if the current theme has no colour defined.
+#TODO May not be needed.
     def getIconThemeColour( self, defaultColour ):
         iconThemeName = self.getIconThemeName()
         iconThemeColour = defaultColour
@@ -740,14 +871,34 @@ class IndicatorBase( ABC ):
 
         return iconThemeColour
 
-
+#TODO Have modified indicatortest Yaru icon to show different colours,
+# but the colour change does not show up (always grey).
+# Why...?
+# Surely the icon colour being changed should show up...
+# Maybe send a message to the Yaru people, or better yet,
+# Adwaita (Yaru inherits Adwaita) asking about icons.
+#
+# If needing to post to a forum use:
+#  https://discourse.gnome.org/tag/theme
+#
+# To run:
+# . ./.local/venv_indicatortest/bin/activate && python3 .local/venv_indicatortest/lib/python3.8/site-packages/indicatortest/indicatortest.py && deactivate
     def getIconFilename( self ):
         themeName = self.getIconThemeName()
+#        print( themeName )#TODO Testing
         if themeName not in IndicatorBase.ICON_THEMES:
             themeName = "hicolor"
 
+#TODO Testing
+#        themeName = "hicolor"
+
+#        iconFilename = \
+#            str( Path( __file__ ).parent ) + "/icons/" + themeName + "/" + self.indicatorName + #IndicatorBase.EXTENSION_SVG
+
         iconFilename = \
-            str( Path( __file__ ).parent ) + "/icons/" + themeName + "/" + self.indicatorName + IndicatorBase.EXTENSION_SVG
+            str( Path( __file__ ).parent ) + "/icons/" + self.indicatorName + IndicatorBase.EXTENSION_SVG
+
+#        print( iconFilename ) #TODO Testing
 
         # If running outside of a venv/wheel, say under development/IDE,
         # substitute in the hicolor icon just so an icon is at least displayed.
@@ -755,7 +906,54 @@ class IndicatorBase( ABC ):
             parents = Path( __file__ ).parents
             iconFilename = str( parents[ 3 ] ) + '/' + self.indicatorName + "/src/" + self.indicatorName + "/icons/hicolor/" + self.indicatorName + IndicatorBase.EXTENSION_SVG
 
-        return iconFilename
+#TODO Check this gives a correct result (and icon shows) when running under IDE.
+#            print( iconFilename )#TODO Testing
+#            print()#TODO Testing
+
+#        return iconFilename
+#        return self.indicatorName + "-symbolic.svg"
+
+#        return "/home/bernard/.local/venv_indicatortest/lib/python3.8/site-packages/indicatortest/icons/" + self.indicatorName + "-symbolic.svg"
+        print( self.indicatorName + "-symbolic" )
+        return self.indicatorName + "-symbolic"
+
+
+# https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
+#
+#
+# See also
+#  https://unix.stackexchange.com/a/346000/80583
+# for updating icon cache when playing with icons.
+    def get_icon_name( self ):
+#        icon_name = self.indicatorName + "-symbolic"
+
+#        icon_name = "indicatorfortune"
+#        icon_name = "indicatorlunar"
+#        icon_name = "indicatorlunarsatellite"
+#        icon_name = "indicatoronthisday"
+#        icon_name = "indicatorppadownloadstatistics"
+#        icon_name = "indicatorpunycode"
+#        icon_name = "indicatorscriptrunner"
+#        icon_name = "indicatorstardate"
+#        icon_name = "indicatortest"
+#        icon_name = "indicatortide"
+#        icon_name = "indicatorvirtualbox"
+
+        # icon_name += "-symbolic"
+        icon_name = "1-symbolic"
+        icon_name = self.indicatorName + "-symbolic"
+        # icon_name = self.indicatorName
+#        icon_name = "indicator-test-symbolic"  # MUST SPECIFY (OR APPEND) THE SYMBOLIC!!!
+        icon_name = self.indicatorName + "-symbolic"     # MUST SPECIFY (OR APPEND) THE SYMBOLIC!!!
+        # icon_name = "8-symbolic"
+        print( "Icon name: " + icon_name )
+        return icon_name
+
+
+#TODO Is this needed any more...?
+    def get_icon_theme_path( self ):
+        print( "Icon theme path: " + str( Path( __file__ ).parent ) + "/icons" )
+        return str( Path( __file__ ).parent ) + "/icons"
 
 
     def getAutostartAndDelay( self ):
@@ -904,9 +1102,9 @@ class IndicatorBase( ABC ):
         return terminal, executionFlag
 
 
-    # Converts a list of inner lists to a GTK ListStore.
+    # Converts a list of lists to a GTK ListStore.
     #
-    # If the list of inner lists is of the form below,
+    # If the list of lists is of the form below,
     # each inner list must be of the same length.
     #
     #    [
@@ -992,7 +1190,7 @@ class IndicatorBase( ABC ):
                 logging.error( "Error reading configuration: " + configFile )
 
         self.loadConfig( config ) # Call to implementation in indicator.
-    
+
 
     # Write a dictionary of user configuration to a JSON text file.
     #
