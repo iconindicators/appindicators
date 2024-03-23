@@ -42,6 +42,65 @@ except ModuleNotFoundError:
     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
+# Create the .desktop file dynanamically...
+# ...these are the entries for the Name (and any translations) for each indicator.
+indicator_name_to_desktop_file_names = {
+    "indicatorfortune" :
+        [ "Name=Indicator Fortune",
+          "Name[ru]=Индикатор изречений" ],
+
+    "indicatorlunar" :
+        [ "Name=Indicator Lunar",
+          "Name[ru]=Лунный индикатор" ],
+
+    "indicatoronthisday" :
+        [ "Name=Indicator On This Day",
+          "Name[ru]=Индикатор событий дня" ],
+
+    "indicatorppadownloadstatistics" :
+        [ "Name=Indicator PPA Download Statistics",
+          "Name[cs]=PPA indikátor statisktik stahování",
+          "Name[ru]=Индикатор статистики закачек из PPA" ],
+
+    "indicatorpunycode" :
+        [ "Name=Indicator Punycode",
+          "Name[ru]=Индикатор Punycode-конвертер" ],
+
+    "indicatorscriptrunner" :
+        [ "Name=Indicator Script Runner",
+          "Name[ru]=Индикатор запуска сценариев" ],
+
+    "indicatorstardate" :
+        [ "Name=Indicator Stardate",
+          "Name[ru]=Индикатор звёздной даты" ],
+
+    "indicatortest" :
+        [ "Name=Indicator Test" ],
+
+    "indicatortide" :
+        [ "Name=Indicator Tide",
+          "Name[ru]=Индикатор приливов" ],
+
+    "indicatorvirtualbox" :
+        [ "Name=Indicator VirtualBox™",
+          "Name[ru]=Индикатор VirtualBox™" ] }
+
+
+# Create the .desktop file dynanamically...
+# ...these are the entries for the Categories for each indicator.
+indicator_name_to_desktop_file_categories = {
+    "indicatorfortune" : "Categories=Utility;Amusement",
+    "indicatorlunar" : "Categories=Science;Astronomy",
+    "indicatoronthisday" : "Categories=Utility;Amusement",
+    "indicatorppadownloadstatistics" : "Categories=Utility",
+    "indicatorpunycode" : "Categories=Utility",
+    "indicatorscriptrunner" : "Categories=Utility",
+    "indicatorstardate" : "Categories=Utility;Amusement",
+    "indicatortest" : "Categories=Utility",
+    "indicatortide" : "Categories=Utility",
+    "indicatorvirtualbox" : "Categories=Utility" }
+
+
 def _intialise_virtual_environment():
     if not Path( "venv" ).is_dir():
         command = \
@@ -79,52 +138,198 @@ def _run_checks_specific_to_indicator( indicator_name ):
     return message
 
 
-def _create_run_script( directory_dist, indicator_name ):
-    run_script_path = \
-        str( directory_dist ) + "/" + \
-        indicator_name + \
-        "/src/" + \
-        indicator_name + \
-        "/packaging/linux/" + \
-        indicator_name + ".sh"
+#TODO Remove eventually
+def _create_dot_desktopOLD( directory_packaging_linux, indicator_name ):
+    dot_desktop_path = str( directory_packaging_linux ) + "/" + indicator_name + ".py.desktop"
+
+    name_entries = ""
+    for name_entry in indicator_name_to_desktop_file_names[ indicator_name ]:
+        name_entries += name_entry + "\n"
+
+    name_entries = name_entries[ 0 : -1 ] # Drop last newline.
+
+    dot_desktop_contents = (
+        f"# To validate this file:\n"
+        f"#   desktop-file-validate { indicator_name }.py.desktop\n"
+        f"#\n"
+        f"# To install or update this file, although the\n"
+        f"# operating system should update by default and\n"
+        f"# certainly will update on a logout/login or restart:\n"
+        f"#   xdg-desktop-menu install --novendor { indicator_name }.py.desktop\n"
+        f"[Desktop Entry]\n"
+        f"Type=Application\n"
+        f"{ name_entries }\n"
+        f"Icon={ indicator_name }\n"
+        f"Exec=sh -c \"\$HOME/.local/bin/{ indicator_name }.sh\"\n"
+        f"{ indicator_name_to_desktop_file_categories[ indicator_name ] }\n"
+        f"X-GNOME-Autostart-enabled=true\n"
+        f"X-GNOME-Autostart-Delay=0\n"
+        f"\n" )
+
+    with open( dot_desktop_path, 'w' ) as f:
+        f.write( dot_desktop_contents )
+
+    os.chmod(
+        dot_desktop_path,
+        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
+        stat.S_IWUSR | stat.S_IWGRP |
+        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+
+
+def _create_dot_desktop( directory_platform_linux, indicator_name ):
+    indicatorbase_dot_desktop_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.py.desktop"
+    with open( indicatorbase_dot_desktop_path, 'r' ) as f:
+        dot_desktop_text = f.read()
+
+    dot_desktop_text = dot_desktop_text.format(
+                        indicator_name = indicator_name,
+                        categories = indicator_name_to_desktop_file_categories[ indicator_name ],
+                        names = '\n'.join( indicator_name_to_desktop_file_names[ indicator_name ] ) )
+
+    indicator_dot_desktop_path = str( directory_platform_linux ) + "/" + indicator_name + ".py.desktop"
+    with open( indicator_dot_desktop_path, 'w' ) as f:
+        f.write( dot_desktop_text )
+
+    os.chmod(
+        indicator_dot_desktop_path,
+        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
+        stat.S_IWUSR | stat.S_IWGRP |
+        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+
+
+#TODO Delete eventually
+def _create_run_scriptOLD( directory_packaging_linux, indicator_name ):
+    run_script_path = str( directory_packaging_linux ) + "/" + indicator_name + ".sh"
 
     run_script_contents = (
         f"#!/bin/sh\n\n"
-        f"cd $HOME/.local && \\\n"
-        f". venv_{ indicator_name }/bin/activate && \\\n"
-        f"cd $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name } && \\\n"
-        f"python3 { indicator_name }.py\n" )
+        f"cd $HOME && \\\n"
+        f". .local/venv_{ indicator_name }/bin/activate && \\\n"
+        f"python3 $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/ { indicator_name }.py && \\\n"
+        f"deactivate\n" )
 
     with open( run_script_path, 'w' ) as f:
         f.write( run_script_contents )
 
     os.chmod(
-        run_script_path, 
+        run_script_path,
+        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
+        stat.S_IWUSR | stat.S_IWGRP |
+        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+
+
+def _create_run_script( directory_platform_linux, indicator_name ):
+    indicatorbase_run_script_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.sh"
+    with open( indicatorbase_run_script_path, 'r' ) as f:
+        run_script_text = f.read()
+
+    run_script_text = run_script_text.format( indicator_name = indicator_name )
+
+    indicator_run_script_path = str( directory_platform_linux ) + "/" + indicator_name + ".sh"
+    with open( indicator_run_script_path, 'w' ) as f:
+        f.write( run_script_text )
+
+    os.chmod(
+        indicator_run_script_path,
+        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
+        stat.S_IWUSR | stat.S_IWGRP |
+        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+
+
+def _create_pyproject_dot_toml( directory_dist, indicator_name ):
+    classifiers = ""
+    dependencies = ""
+    description = ""
+    version = ""
+    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/" + "pyproject.toml"
+    with open( indicator_pyproject_toml_path, 'r' ) as f:
+        for line in f:
+            if line.startswith( "description" ):
+                description = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
+
+            elif line.startswith( "version" ):
+                version = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
+
+            elif line.startswith( "classifiers" ):
+                next_line = next( f )
+                while not next_line.startswith( ']' ):
+                    classifiers += next_line
+                    next_line = next( f )
+
+                if classifiers:
+                    classifiers = ',\n' + classifiers.rstrip()
+
+            elif line.startswith( "dependencies" ):
+                next_line = next( f )
+                while not next_line.startswith( ']' ):
+                    dependencies += next_line
+                    next_line = next( f )
+
+                if dependencies:
+                    dependencies = ',\n' + dependencies.rstrip()
+
+    indicatorbase_pyproject_toml_path = "indicatorbase/pyprojectbase.toml"
+    with open( indicatorbase_pyproject_toml_path, 'r' ) as f:
+        indicatorbase_pyproject_toml_text = f.read()
+
+    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
+                                            "{classifiers}", classifiers )
+
+    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
+                                            "{dependencies}", dependencies )
+
+    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
+                                            "{indicator_name}", indicator_name )
+
+    project_name_version_description = \
+        "[project]\n" + \
+        "name = \'" + indicator_name + '\'\n' + \
+        "version = \'" + version + '\'\n' + \
+        "description = \'" + description + '\''
+
+    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
+                                            "[project]", project_name_version_description )
+
+    with open( indicator_pyproject_toml_path, 'w' ) as f:
+        f.write( indicatorbase_pyproject_toml_text )
+
+    os.chmod(
+        indicator_pyproject_toml_path,
         stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
         stat.S_IWUSR | stat.S_IWGRP |
         stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
 
 
 def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
+
+    # By using copytree, the ENTIRE project is copied across...
+    # ...however the pyproject.toml explicitly defines what files/folders
+    # are included in the build (and conversely what is excluded).
     directory_indicator = str( directory_dist ) + os.sep + indicator_name
     shutil.copytree( indicator_name, directory_indicator )
 
-    # Remove any .whl 
+    # Remove any .whl
     for item in Path( directory_indicator + "/src/" + indicator_name ).glob( "*.whl" ):
         os.remove( item )
 
-    # Remove any __pycache__ 
+    # Remove any __pycache__
     for item in Path( directory_indicator + "/src/" + indicator_name ).glob( "__pycache__" ):
         shutil.rmtree( item )
-
-    command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
-    subprocess.call( command, shell = True )
 
     shutil.copy(
         "indicatorbase/src/indicatorbase/indicatorbase.py",
         directory_indicator + "/src/" + indicator_name )
 
-    _create_run_script( directory_dist, indicator_name )
+    _create_pyproject_dot_toml( directory_dist, indicator_name )
+
+    command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
+    subprocess.call( command, shell = True )
+
+    directory_platform_linux = Path( str( directory_dist ) + "/" + indicator_name + "/src/" + indicator_name + "/platform/linux" )
+    directory_platform_linux.mkdir( parents = True )
+
+    _create_dot_desktop( directory_platform_linux, indicator_name )
+    _create_run_script( directory_platform_linux, indicator_name )
 
 
 def _process_locale( directory_dist, indicator_name ):
@@ -162,42 +367,24 @@ def _process_locale( directory_dist, indicator_name ):
         subprocess.call( command, shell = True )
 
 
-def _get_colours_in_hicolor_icon( hicolorIcon ):
-    coloursInHicolorIcon = [ ]
-    with open( hicolorIcon, 'r' ) as f:
-        svgText = f.read()
-        for m in re.finditer( r"fill:#", svgText ):
-            colour = svgText[ m.start() + 6 : m.start() + 6 + 6 ]
-            if colour not in coloursInHicolorIcon:
-                coloursInHicolorIcon.append( colour )
+#TODO Given this function, does this mean we only need the hicolor icon
+# and the symbolic icon will be created here?
+def _create_symbolic_icons( directoryWheel, indicatorName ):
+    directoryIcons = str( directoryWheel ) + "/" + indicatorName + "/src/" + indicatorName + "/icons"
+    print( directoryIcons )
+    for hicolorIcon in list( Path( directoryIcons ).glob( "*.svg" ) ):
+        symbolic_icon = directoryIcons + "/" + str( hicolorIcon.name )[ 0 : -4 ] + "-symbolic.svg"
+        shutil.copy( hicolorIcon, symbolic_icon )
+        with open( symbolic_icon, 'r' ) as f:
+            svgText = f.read()
+            for m in re.finditer( r"fill:#", svgText ):
+                svgText = svgText[ 0 : m.start() + 6 ] + "777777" + svgText[ m.start() + 6 + 6 : ]
 
-    return coloursInHicolorIcon
+            for m in re.finditer( r"stroke:#", svgText ):
+                svgText = svgText[ 0 : m.start() + 6 ] + "777777" + svgText[ m.start() + 6 + 6 : ]
 
-
-def _process_icons( directoryWheel, indicatorName ):
-    directoryIndicator = str( directoryWheel ) + os.sep + indicatorName
-    directoryIndicatorIcons = directoryIndicator + "/src" + os.sep + indicatorName + "/icons"
-    directoryIndicatorIconsHicolor = directoryIndicatorIcons + "/hicolor"
-
-    for hicolorIcon in list( Path( directoryIndicatorIconsHicolor ).rglob( "*.svg" ) ):
-        coloursInHicolorIcon = _get_colours_in_hicolor_icon( hicolorIcon )
-        for themeName in indicatorbase.IndicatorBase.ICON_THEMES:
-            directoryIndicatorIconsThemeName = Path( directoryIndicatorIcons + os.sep + themeName )
-            if not directoryIndicatorIconsThemeName.exists(): # Must check as will have been created if there is more than one icon.
-                directoryIndicatorIconsThemeName.mkdir( parents = True )
-
-            shutil.copy( hicolorIcon, directoryIndicatorIconsThemeName )
-
-            for colour in coloursInHicolorIcon:
-                icon = Path( str( directoryIndicatorIconsThemeName ) + os.sep + hicolorIcon.name )
-                with open( icon, 'r' ) as f:
-                    fileData = f.read()
-
-                with open( icon, 'w' ) as f:
-                    f.write( 
-                        fileData.replace(
-                            '#' + colour + ';',
-                            '#' + indicatorbase.IndicatorBase.ICON_THEMES[ themeName ] + ';' ) )
+        with open( symbolic_icon, 'w' ) as f:
+            f.write( svgText )
 
 
 def _build_wheel_for_indicator( directory_release, indicator_name ):
@@ -208,7 +395,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
             "version" )
 
     version_from_changelog_markdown = \
-        indicatorbase.IndicatorBase.get_version_in_changelog_markdown( 
+        indicatorbase.IndicatorBase.get_version_in_changelog_markdown(
                 indicator_name + "/src/" + indicator_name + "/CHANGELOG.md" )
 
     if version_from_pyproject_toml == version_from_changelog_markdown:
@@ -222,7 +409,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             _copy_indicator_directory_and_files( directory_dist, indicator_name )
             _process_locale( directory_dist, indicator_name )
-            _process_icons( directory_dist, indicator_name )
+            _create_symbolic_icons( directory_dist, indicator_name )
 
             _intialise_virtual_environment()
 
@@ -231,9 +418,11 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
                 "cd " + str( directory_dist ) + os.sep + indicator_name + " && " + \
                 "python3 -m build --outdir ../"
 
-            subprocess.call( command, shell = True )
+#TODO Put back
+#            subprocess.call( command, shell = True )
 
-            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
+#TODO Put back
+#            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
 
     else:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
