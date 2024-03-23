@@ -24,7 +24,7 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 import datetime
 import gi
 import os
-import random
+# import random
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
@@ -47,8 +47,8 @@ from threading import Thread
 
 class IndicatorTest( IndicatorBase ):
 
-    CACHE_ICON_BASENAME = "-icon"
-    CACHE_ICON_EXTENSION = ".svg"
+    CACHE_ICON_BASENAME = "icon"  #TODO This used to start with a '-`...why?
+    CACHE_ICON_EXTENSION = "-symbolic.svg"
     CACHE_ICON_MAXIMUM_AGE_HOURS = 0
 
     CONFIG_X = "x"
@@ -88,13 +88,23 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuDesktop( self, menu ):
         subMenu = Gtk.Menu()
 
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + self.getIconThemeName() ) )
+        text = \
+            self.getMenuIndent() + \
+            "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + \
+            self.getIconThemeName()
+
+        subMenu.append( Gtk.MenuItem.new_with_label( text ) )
 
         command = "gsettings get org.gnome.desktop.interface "
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + command + "icon-theme: " + self.processGet( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + command + "gtk-theme: " + self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip() ) )
 
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.getDesktopEnvironment() ) )
+        result = self.processGet( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + command + "icon-theme: " + result  ) )
+
+        result = self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + command + "gtk-theme: " + result ) )
+
+        text = self.getMenuIndent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.getDesktopEnvironment()
+        subMenu.append( Gtk.MenuItem.new_with_label( text ) )
 
         menuItem = Gtk.MenuItem.new_with_label( "Desktop" )
         menuItem.set_submenu( subMenu )
@@ -108,9 +118,10 @@ class IndicatorTest( IndicatorBase ):
         menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
         subMenu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon copied to user cache with colour change" )
-        menuItem.connect( "activate", lambda widget: self.__useIconCopiedFromDefault() )
-        subMenu.append( menuItem )
+#TODO Probably not needed.
+        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon copied to user cache with colour change" )
+        # menuItem.connect( "activate", lambda widget: self.__useIconCopiedFromDefault() )
+        # subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( "Icon (default)" )
         menuItem.set_submenu( subMenu )
@@ -127,7 +138,9 @@ class IndicatorTest( IndicatorBase ):
                   "WAXING_CRESCENT" ]
 
         for icon in icons:
-            menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory )
+            menuItem = Gtk.MenuItem.new_with_label(
+                self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory )
+
             menuItem.set_name( icon )
             menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( widget.props.name ) )
             subMenu.append( menuItem )
@@ -153,7 +166,8 @@ class IndicatorTest( IndicatorBase ):
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in OSD" )
         menuItem.connect(
             "activate",
-            lambda widget: Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
+            lambda widget: Notify.Notification.new(
+                "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
 
         subMenu.append( menuItem )
 
@@ -166,7 +180,9 @@ class IndicatorTest( IndicatorBase ):
         subMenu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem.new_with_label( _( "Copy current time to clipboard" ) )
-        menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
+        menuItem.connect( "activate", lambda widget:
+                          Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
+
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( "Clipboard" )
@@ -199,8 +215,11 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuLabelIconUpdating( self, menu ):
         subMenu = Gtk.Menu()
 
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Icon: " + str( self.isIconUpdateSupported() ) ) )
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Label / Tooltip: " + str( self.isLabelUpdateSupported() ) ) )
+        text = self.getMenuIndent() + "Icon: " + str( self.isIconUpdateSupported() )
+        subMenu.append( Gtk.MenuItem.new_with_label( text ) )
+
+        text = self.getMenuIndent() + "Label / Tooltip: " + str( self.isLabelUpdateSupported() )
+        subMenu.append( Gtk.MenuItem.new_with_label( text ) )
 
         menuItem = Gtk.MenuItem.new_with_label( "Label / Tooltip / Icon Updating" )
         menuItem.set_submenu( subMenu )
@@ -211,7 +230,8 @@ class IndicatorTest( IndicatorBase ):
         subMenu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "calendar" )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand( "calendar -f /usr/share/calendar/calendar.all -A 3" ) )
+        command = "calendar -f /usr/share/calendar/calendar.all -A 3"
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( command ) )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "fortune" )
@@ -223,11 +243,13 @@ class IndicatorTest( IndicatorBase ):
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "notify-send" )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand( f"notify-send -i { self.get_icon_name() } 'summary' 'body'" ) )
+        command = f"notify-send -i { self.get_icon_name() } 'summary' 'body'"
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( command ) )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "paplay" )
-        menuItem.connect( "activate", lambda widget: self.__executeCommand( "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" ) )
+        command = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+        menuItem.connect( "activate", lambda widget: self.__executeCommand( command ) )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "wmctrl" )
@@ -242,7 +264,8 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuUbuntuVariant( self, menu ):
         subMenu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Is Ubuntu variant 20.04: " + str( self.isUbuntuVariant2004() ) )
+        text = self.getMenuIndent() + "Is Ubuntu variant 20.04: " + str( self.isUbuntuVariant2004() )
+        menuItem = Gtk.MenuItem.new_with_label( text )
         subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( "Ubuntu Variant" )
@@ -250,19 +273,20 @@ class IndicatorTest( IndicatorBase ):
         menu.append( menuItem )
 
 
-    def __useIconCopiedFromDefault( self ):
-        if self.isIconUpdateSupported():
-            with open( str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + IndicatorBase.EXTENSION_SVG, 'r' ) as fIn:
-                svg = fIn.read()
-
-            randomColour = \
-                "{:02x}".format( random.randint( 0, 255 ) ) + \
-                "{:02x}".format( random.randint( 0, 255 ) ) + \
-                "{:02x}".format( random.randint( 0, 255 ) )
-
-            svg = svg.replace( "6496dc", randomColour )
-            fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
-            self.indicator.set_icon_full( fOut, "" )
+#TODO I don't see the point of this...
+    # def __useIconCopiedFromDefault( self ):
+    #     if self.isIconUpdateSupported():
+    #         with open( str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + IndicatorBase.EXTENSION_SVG, 'r' ) as fIn:
+    #             svg = fIn.read()
+    #
+    #         randomColour = \
+    #             "{:02x}".format( random.randint( 0, 255 ) ) + \
+    #             "{:02x}".format( random.randint( 0, 255 ) ) + \
+    #             "{:02x}".format( random.randint( 0, 255 ) )
+    #
+    #         svg = svg.replace( "6496dc", randomColour )
+    #         fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
+    #         self.indicator.set_icon_full( fOut, "" )
 
 
     def __useIconDefault( self ):
@@ -281,20 +305,25 @@ class IndicatorTest( IndicatorBase ):
 #TODO Check to see if this still works...writing an icon to the .cache directory.
 # Does the gtk magic convert the icon according to the theme?
 # The icon should change from #777777 to the same colour as the power/sound/network icons.
-        iconFilename = self.writeCacheText( svgIconText, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
+        iconFilename = self.writeCacheText(
+            svgIconText,
+            IndicatorTest.CACHE_ICON_BASENAME,
+            IndicatorTest.CACHE_ICON_EXTENSION )
+
         self.indicator.set_icon_full( iconFilename, "" )
 
 
-    def __useIconInHomeDirectory( self, iconName ):
-        iconFile = os.getenv( "HOME" ) + '/' + iconName
-        if Path( iconFile ).is_file():
-            self.indicator.set_icon_full( iconFile, "" )
-
-        else:
-            Notify.Notification.new(
-                "Cannot locate " + iconFile,
-                "Please ensure the file is present.",
-                self.get_icon_name() ).show()
+#TODO Not used...why?
+    # def __useIconInHomeDirectory( self, iconName ):
+    #     iconFile = os.getenv( "HOME" ) + '/' + iconName
+    #     if Path( iconFile ).is_file():
+    #         self.indicator.set_icon_full( iconFile, "" )
+    #
+    #     else:
+    #         Notify.Notification.new(
+    #             "Cannot locate " + iconFile,
+    #             "Please ensure the file is present.",
+    #             self.get_icon_name() ).show()
 
 
     # Virtually a direct copy from Indicator Lunar to test dynamically created SVG icons in the user cache.
@@ -303,16 +332,30 @@ class IndicatorTest( IndicatorBase ):
     #                        Ignored when phase is full/new or first/third quarter.
     # brightLimbAngleInDegrees Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
     #                          Ignored when phase is full/new.
+#TODO Once the new moon is sorted out,
+# see how this function matches with indicatorlunar
+# and also how there is writes out the dynamic icon to the cache (compare with function above).
     def __getSVGIconText( self, phase, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
         height = width
         radius = float( width / 2 )
         colour = self.getIconThemeColour( defaultColour = "fff200" ) # Default to hicolor.#TODO No longer need this; use #777777 instead.
+        colour = "777777"
         if phase == "FULL_MOON" or phase == "NEW_MOON":
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == "NEW_MOON":
-                body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
-
+                # body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
+                body += '" fill="#' + colour + '" fill-opacity="0.0" />'  #TODO I think this is what should be used for NEW MOON...
+                # no actual colour due to transparency and so we just see nothing but the background.
+#TODO Check if the new moon icon which does not show in the toolbar as an icon,
+# appears in the About dialog...
+# Using in the ~/.local/share/icons/hicolor/moon-symbolic.svg which is a new moon ring 
+# the About dialog shows the ring but with a black centre...so not quite right.
+# Maybe not a problem as we never show this icon in the About dialog.
+#
+#TODO How does the new moon shape differ from a capital O?  
+# Possible to try just an icon with the text O, converted to paths?
+# Fonts: Small o....FreeMono.
             else: # Full
                 body += '" fill="#' + colour + '" />'
 
