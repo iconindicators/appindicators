@@ -19,14 +19,15 @@
 # Application indicator which displays calendar events.
 
 
-#TODO Neither openSUSE nor Manjaro have the 'calendar' package.
+# Neither openSUSE nor Manjaro have the 'calendar' package.
 # Possible options...
 #
-# 1. For those distributions/versions and any others yet to be found, ignore.
+# 1. For openSUSE/Manjaro (and any others yet to be found),
+#    this indicator is unsupported.
 #
-# 2. Have posted
+# 2. From the post
 #       https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
-#    and the recommendation is obtain the source code
+#    the recommendation is obtain the source code
 #       https://github.com/openbsd/src/tree/master/usr.bin/calendar
 #       https://salsa.debian.org/meskes/bsdmainutils/-/tree/master/usr.bin/calendar
 #    and include the source code/calendars as part of the pip installation,
@@ -34,9 +35,9 @@
 #
 # 3. Have found
 #       https://pypi.org/project/bsd-calendar/
-#    which covers some of the original calendar program, but also modifies date formats
-#    and other features.  This code could be used as a basis create a standalone Python
-#    calendar module, ultimately releasing to PyPI.
+#    which covers some of the original calendar program, but modifies date formats.
+#    This code could be used as a basis create a standalone Python calendar module,
+#    ultimately releasing to PyPI.
 #    Alternatively, incorporate some version of this implementation into the indicator,
 #    along with calendar files.
 
