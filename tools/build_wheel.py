@@ -42,7 +42,7 @@ except ModuleNotFoundError:
     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
-# Create the .desktop file dynanamically...
+# Create the .desktop file dynamically...
 # ...these are the entries for the Name (and any translations) for each indicator.
 indicator_name_to_desktop_file_names = {
     "indicatorfortune" :
@@ -86,7 +86,7 @@ indicator_name_to_desktop_file_names = {
           "Name[ru]=Индикатор VirtualBox™" ] }
 
 
-# Create the .desktop file dynanamically...
+# Create the .desktop file dynamically...
 # ...these are the entries for the Categories for each indicator.
 indicator_name_to_desktop_file_categories = {
     "indicatorfortune" : "Categories=Utility;Amusement",
@@ -138,44 +138,6 @@ def _run_checks_specific_to_indicator( indicator_name ):
     return message
 
 
-#TODO Remove eventually
-def _create_dot_desktopOLD( directory_packaging_linux, indicator_name ):
-    dot_desktop_path = str( directory_packaging_linux ) + "/" + indicator_name + ".py.desktop"
-
-    name_entries = ""
-    for name_entry in indicator_name_to_desktop_file_names[ indicator_name ]:
-        name_entries += name_entry + "\n"
-
-    name_entries = name_entries[ 0 : -1 ] # Drop last newline.
-
-    dot_desktop_contents = (
-        f"# To validate this file:\n"
-        f"#   desktop-file-validate { indicator_name }.py.desktop\n"
-        f"#\n"
-        f"# To install or update this file, although the\n"
-        f"# operating system should update by default and\n"
-        f"# certainly will update on a logout/login or restart:\n"
-        f"#   xdg-desktop-menu install --novendor { indicator_name }.py.desktop\n"
-        f"[Desktop Entry]\n"
-        f"Type=Application\n"
-        f"{ name_entries }\n"
-        f"Icon={ indicator_name }\n"
-        f"Exec=sh -c \"\$HOME/.local/bin/{ indicator_name }.sh\"\n"
-        f"{ indicator_name_to_desktop_file_categories[ indicator_name ] }\n"
-        f"X-GNOME-Autostart-enabled=true\n"
-        f"X-GNOME-Autostart-Delay=0\n"
-        f"\n" )
-
-    with open( dot_desktop_path, 'w' ) as f:
-        f.write( dot_desktop_contents )
-
-    os.chmod(
-        dot_desktop_path,
-        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-        stat.S_IWUSR | stat.S_IWGRP |
-        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
-
-
 def _create_dot_desktop( directory_platform_linux, indicator_name ):
     indicatorbase_dot_desktop_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.py.desktop"
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
@@ -192,27 +154,6 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
 
     os.chmod(
         indicator_dot_desktop_path,
-        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-        stat.S_IWUSR | stat.S_IWGRP |
-        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
-
-
-#TODO Delete eventually
-def _create_run_scriptOLD( directory_packaging_linux, indicator_name ):
-    run_script_path = str( directory_packaging_linux ) + "/" + indicator_name + ".sh"
-
-    run_script_contents = (
-        f"#!/bin/sh\n\n"
-        f"cd $HOME && \\\n"
-        f". .local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"python3 $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/ { indicator_name }.py && \\\n"
-        f"deactivate\n" )
-
-    with open( run_script_path, 'w' ) as f:
-        f.write( run_script_contents )
-
-    os.chmod(
-        run_script_path,
         stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
         stat.S_IWUSR | stat.S_IWGRP |
         stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
@@ -304,7 +245,6 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
 
 
 def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
-
     # By using copytree, the ENTIRE project is copied across...
     # ...however the pyproject.toml explicitly defines what files/folders
     # are included in the build (and conversely what is excluded).
