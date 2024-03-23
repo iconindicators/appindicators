@@ -1,46 +1,7 @@
-[build-system]
-requires = [ "setuptools >= 61.0" ]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "indicatortide"
+# THIS IS AN INCOMPLETE PYPROJECT.TOML USED BY THE BUILD WHEEL SCRIPT TO CREATE A COMPLETE PYPROJECT.TOML.
 version = "1.0.30"
-authors = [
-  { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
-]
-maintainers = [
-  { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" }
-]
 description = "Application indicator which displays tidal information."
-dependencies = [
-  "PyGObject"
-]
-readme = "README.md"
-requires-python = ">=3.8"
 classifiers = [
-  "Development Status :: 6 - Mature",
-  "Environment :: X11 Applications :: GTK",
-  "Intended Audience :: End Users/Desktop",
-  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-  "Natural Language :: English",
-  "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3.8",
-  "Topic :: Games/Entertainment"
+  "Topic :: Utilities"
 ]
 
-[project.urls]
-homepage = "https://pypi.org/project/indicatortide"
-
-[tool.setuptools.packages.find]
-where = [ "src" ]
-
-[tool.setuptools.package-data]
-indicatortide = [
-  "CHANGELOG.md",
-  "icons/*/*.svg",
-  "locale/*.pot",
-  "locale/*/LC_MESSAGES/*.mo",
-  "locale/*/LC_MESSAGES/*.po",
-  "packaging/linux/*.desktop",
-  "packaging/linux/*.sh"
-]

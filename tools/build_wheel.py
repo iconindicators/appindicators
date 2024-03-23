@@ -269,8 +269,11 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
                     dependencies = ',\n' + dependencies.rstrip()
 
     indicatorbase_pyproject_toml_path = "indicatorbase/pyprojectbase.toml"
-    with open( indicatorbase_pyproject_toml_path, 'r' ) as f:
-        indicatorbase_pyproject_toml_text = f.read()
+    indicatorbase_pyproject_toml_text = ""
+    with open( indicatorbase_pyproject_toml_path ) as f:
+        for line in f:
+            if not line.startswith( '#' ):
+                indicatorbase_pyproject_toml_text += line
 
     indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
                                             "{classifiers}", classifiers )
