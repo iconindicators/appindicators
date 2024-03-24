@@ -85,7 +85,7 @@ class IndicatorPunycode( IndicatorBase ):
         if self.inputClipboard:
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
             if text is None:
-                Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.getIconFilename() ).show()
+                Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.get_icon_name() ).show()
 
             else:
                 self.__doConversion( text )
@@ -94,7 +94,7 @@ class IndicatorPunycode( IndicatorBase ):
             # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
             def clipboardTextReceivedFunc( clipboard, text, data ):
                 if text is None:
-                    Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.getIconFilename() ).show()
+                    Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.get_icon_name() ).show()
 
                 else:
                     self.__doConversion( text )
@@ -146,7 +146,7 @@ class IndicatorPunycode( IndicatorBase ):
         except Exception as e:
             self.getLogging().exception( e )
             self.getLogging().error( "Error converting '" + protocol + text + pathQuery + "'." )
-            Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.getIconFilename() ).show()
+            Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.get_icon_name() ).show()
 
 
     def cullResults( self ):

@@ -107,7 +107,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     Notify.Notification.new(
                         _( "On this day..." ),
                         event.getDescription(),
-                        self.getIconFilename() ).show()
+                        self.get_icon_name() ).show()
 
 
     def buildMenu( self, menu, events ):

@@ -192,7 +192,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         result = self.processGet( "VBoxManage list vms | grep " + uuid )
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
-            Notify.Notification.new( _( "Error" ), message, self.getIconFilename() ).show()
+            Notify.Notification.new( _( "Error" ), message, self.get_icon_name() ).show()
 
         else:
             self.processCall( self.getStartCommand( uuid ).replace( "%VM%", uuid ) + " &" )
@@ -222,7 +222,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     # Prevent notifications from appearing until a set time has elapsed since the previous notification.
     def sendNotificationWithDelay( self, summary, message, delayInSeconds = 0 ):
         if( self.dateTimeOfLastNotification + datetime.timedelta( seconds = delayInSeconds ) < datetime.datetime.now() ):
-            Notify.Notification.new( summary, message, self.getIconFilename() ).show()
+            Notify.Notification.new( summary, message, self.get_icon_name() ).show()
             self.dateTimeOfLastNotification = datetime.datetime.now()
 
 

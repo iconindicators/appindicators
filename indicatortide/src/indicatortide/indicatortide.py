@@ -63,7 +63,7 @@ class IndicatorTide( IndicatorBase ):
             summary = _( "No user script specified!" )
             message = _( "Please specify a user script and class name in the preferences." )
             menu.append( Gtk.MenuItem.new_with_label( label ) )
-            Notify.Notification.new( summary, message, self.getIconFilename() ).show()
+            Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         else:
             tidalReadings = [ ]
@@ -95,7 +95,7 @@ class IndicatorTide( IndicatorBase ):
 
             if not tidalReadings:
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
-                Notify.Notification.new( summary, message, self.getIconFilename() ).show()
+                Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
         today = datetime.datetime.now()

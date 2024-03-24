@@ -194,7 +194,7 @@ class IndicatorFortune( IndicatorBase ):
         Notify.Notification.new(
             notificationSummary,
             self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ),
-            self.getIconFilename() ).show()
+            self.get_icon_name() ).show()
 
 
     def refreshAndShowFortune( self ):

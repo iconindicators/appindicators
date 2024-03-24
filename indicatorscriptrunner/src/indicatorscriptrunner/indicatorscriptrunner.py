@@ -96,12 +96,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
         self.command_nofity_background = \
-            "notify-send -i " + self.getIconFilename() + \
+            "notify-send -i " + self.get_icon_name() + \
             " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \
             "\"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\""
 
         self.command_nofity_nonbackground = \
-            "notify-send -i " + self.getIconFilename() + \
+            "notify-send -i " + self.get_icon_name() + \
             " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \
             "\"" + _( "...has completed." ) + "\""
 
@@ -166,7 +166,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
             self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
+            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
 
         elif self.isTerminalQTerminal():
             # As a result of this issue
@@ -176,7 +176,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             # So the quickest/easiest workaround is to install gnome-terminal.
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
             self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.getIconFilename() ).show()
+            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
 
         else:
             command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
@@ -1174,8 +1174,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             # Example non-background scripts.
             self.scripts.append( NonBackground( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False ) )
-            self.scripts.append( NonBackground( "Network", "Public IP address", "notify-send -i " + self.getIconFilename() + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False ) )
-            self.scripts.append( NonBackground( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.getIconFilename() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, True ) )
+            self.scripts.append( NonBackground( "Network", "Public IP address", "notify-send -i " + self.get_icon_name() + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False ) )
+            self.scripts.append( NonBackground( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.get_icon_name() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, True ) )
             self.scripts.append( NonBackground( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False ) )
 
             # Example background scripts.
