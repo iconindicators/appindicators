@@ -3,6 +3,7 @@
 ## v1.0.16 (2023-12-22)
 
 - Added terminal commands "fortune", "wmctrl", "calendar", "notify-send" and "paplay".
+- Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Now works (full or in part) on the following distributions/versions:
   - Debian 11 / 12
   - Fedora 38 / 39

@@ -3,6 +3,7 @@
 ## v1.0.17 (2023-11-22)
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
+- Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AppIndicator library.
 - Fixed PyGObject 3.11 deprecation warnings.
 - Now works (full or in part) on the following distributions/versions:

@@ -34,11 +34,6 @@
 #TODO Test icon is themed on Xubuntu 22.04 under Greybird
 
 
-#TODO Update changelog for both indicatortest and indicatorfortune
-# in regards to icons are now rendered correctly to support themes.
-# Maybe also mention for all indicators about now have symbolic supported.
-
-
 # Base class for application indicators.
 #
 # References:
