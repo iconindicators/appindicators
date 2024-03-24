@@ -30,12 +30,6 @@
 #TODO Add/commit icons/indicatoronXXX.svg and remove icons/hicolor/indicatorXXX.svg and hicolor for all indicators.
 
 
-#TODO Delete 'packaging' directory for all indicators.
-
-
-#TODO Add/commit indicatorbase 'platform'.
-
-
 #TODO
 #   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
 #   https://developer.gnome.org/documentation/tutorials/themed-icons.html#symbolic-icons
