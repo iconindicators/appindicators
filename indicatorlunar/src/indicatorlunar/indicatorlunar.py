@@ -19,6 +19,15 @@
 # Application indicator for the home astronomer.
 
 
+#TODO During startup, the hicolor yellow icon is shown...why isn't the symbolic shown?
+
+
+#TODO After started, the icon (a full moon) is shown but is grey, not changed to white-ish.
+
+
+#TODO In the preferences the satellite icon does not display on hitting the test button.
+
+
 #TODO The comet data from COBS does not contain updated absolute magnitude data.
 # Also, the data contains spurious data (easier to see in the MPC format).
 # Waiting on Jure @ COBS to resolve.
