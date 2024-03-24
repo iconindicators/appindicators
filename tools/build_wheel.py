@@ -312,6 +312,9 @@ def _process_locale( directory_dist, indicator_name ):
 
 #TODO Given this function, does this mean we only need the hicolor icon
 # and the symbolic icon will be created here?
+#
+# Create the wheel for each indicator 
+# and check the hicolor icon (two for lunar) matches the created -symbolic icon only differing by colour. 
 def _create_symbolic_icons( directoryWheel, indicatorName ):
     directoryIcons = str( directoryWheel ) + "/" + indicatorName + "/src/" + indicatorName + "/icons"
     print( directoryIcons )
