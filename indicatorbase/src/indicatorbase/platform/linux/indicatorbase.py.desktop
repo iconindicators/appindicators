@@ -1,0 +1,16 @@
+# To validate this file:
+#   desktop-file-validate {indicator_name}.py.desktop
+#
+# To install or update this file, although the
+# operating system should update by default and
+# certainly will update on a logout/login or restart:
+#   xdg-desktop-menu install --novendor {indicator_name}.py.desktop
+[Desktop Entry]
+Type=Application
+{names}
+Icon={indicator_name}
+Exec=sh -c "\$HOME/.local/bin/{indicator_name}.sh"
+{categories}
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay=0
+
