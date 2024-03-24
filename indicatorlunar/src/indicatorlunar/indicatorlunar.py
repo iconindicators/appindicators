@@ -19,13 +19,8 @@
 # Application indicator for the home astronomer.
 
 
-#TODO During startup, the hicolor yellow icon is shown...why isn't the symbolic shown?
-
-
-#TODO After started, the icon (a full moon) is shown but is grey, not changed to white-ish.
-
-
 #TODO In the preferences the satellite icon does not display on hitting the test button.
+# Don't know what happens during an actual satellite rise notification.
 
 
 #TODO The comet data from COBS does not contain updated absolute magnitude data.
@@ -225,7 +220,8 @@ class IndicatorLunar( IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
 
-        self.icon_satellite = self.getIconFilename()[ 0 : -len( IndicatorBase.EXTENSION_SVG ) ] + "satellite" + IndicatorBase.EXTENSION_SVG
+        self.icon_satellite = self.getIconFilename()[ 0 : -len( IndicatorBase.EXTENSION_SVG_SYMBOLIC ) ] + "satellite" + IndicatorBase.EXTENSION_SVG_SYMBOLIC
+        print( self.icon_satellite )
 
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
@@ -508,7 +504,7 @@ class IndicatorLunar( IndicatorBase ):
         iconFilename = self.writeCacheText(
             svgIconText,
             IndicatorLunar.ICON_CACHE_BASENAME,
-            IndicatorBase.EXTENSION_SVG )
+            IndicatorBase.EXTENSION_SVG_SYMBOLIC )
         self.indicator.set_icon_full( iconFilename, "" )
 
 
@@ -534,7 +530,7 @@ class IndicatorLunar( IndicatorBase ):
         return self.writeCacheText(
             self.getSVGIconText( IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON, None, None ),
             IndicatorLunar.ICON_CACHE_BASENAME,
-            IndicatorBase.EXTENSION_SVG )
+            IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
 
     def notificationSatellites( self ):
