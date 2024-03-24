@@ -28,10 +28,6 @@
 # Does this happen in Preferences?  Does not happen on Ubuntu 20.04.
 
 
-#TODO Check to see how indicatorlunar and indicatortest
-# dynamic icons are rendered out on Debian 12.
-
-
 #TODO Test icon is themed on Lubuntu 22.04 under Arc-Darker
 
 
