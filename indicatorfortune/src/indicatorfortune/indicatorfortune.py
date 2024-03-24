@@ -19,9 +19,6 @@
 # Application indicator which displays fortunes.
 
 
-#TODO Update changelog to reflect changes to icons.
-
-
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
