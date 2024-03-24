@@ -220,8 +220,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.lastFullMoonNotfication = datetime.datetime.now( datetime.timezone.utc ) - datetime.timedelta( hours = 1 )
 
-        self.icon_satellite = self.getIconFilename()[ 0 : -len( IndicatorBase.EXTENSION_SVG_SYMBOLIC ) ] + "satellite" + IndicatorBase.EXTENSION_SVG_SYMBOLIC
-        print( self.icon_satellite )
+        self.icon_satellite = self.get_icon_name().replace( "-symbolic", "satellite-symbolic" )
 
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
