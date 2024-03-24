@@ -28,17 +28,8 @@
 # Does this happen in Preferences?  Does not happen on Ubuntu 20.04.
 
 
-#TODO Check to see how indicatorlunar dynamic icon is rendered out
-# on Debian 12.
-# Does the filename need to have -symbolic added?
-# Does using the .cache directory still work?
-# Might have to write to .local/share/icons/hicolor/...
-# Depending on how the icon for indicator lunar is rendered,
-# either the current moon phase icon or the satellite / full moon icons when testing,
-# might have to change things...
-# If the dynamic icons are rendered now in .local/share/icons/...,
-# need to remove these icons (perhaps containing a timestamp) on each run of the indicator
-# but also do a sweep of .local/share/icons/...
+#TODO Check to see how indicatorlunar and indicatortest
+# dynamic icons are rendered out on Debian 12.
 
 
 #TODO Test icon is themed on Lubuntu 22.04 under Arc-Darker
