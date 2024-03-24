@@ -70,6 +70,8 @@ A wheel can be installed directly:
     deactivate
 ```
 
+Files (icons, run script and .desktop) must be copied from the wheel `venv` directory, to within the `.local` directory.  Open the file `indicatortest-1.0.xyz.tar.gz` (will have been created with the corresponding `indicatortext-1.0.xyz-py3-none-any.whl`) and find `README.md`.  Navigate to the "**Installation**" section and execute the instructions for "**Copy icon, run script and desktop file to `$HOME/.local`**" (for any distribution).
+
 
 ## Run an Indicator
 
