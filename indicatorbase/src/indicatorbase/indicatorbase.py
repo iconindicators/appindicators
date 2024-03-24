@@ -27,34 +27,6 @@
 # to update icons.  Not sure where to put this...
 
 
-#TODO
-#   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
-#   https://developer.gnome.org/documentation/tutorials/themed-icons.html#symbolic-icons
-#   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1/classes/Indicator.html
-#   https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Image.html#Gtk.Image.new_from_icon_name
-#   https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/AboutDialog.html#Gtk.AboutDialog
-#   https://lazka.github.io/pgi-docs/#GdkPixbuf-2.0/classes/Pixbuf.html#GdkPixbuf.Pixbuf
-#   https://discourse.gnome.org/t/how-to-get-pixbuf-from-image-in-gtk4/9881
-#   https://stackoverflow.com/questions/62148118/what-is-the-difference-between-gtkimage-and-gdkpixbuf
-#   https://stackoverflow.com/questions/1649748/how-to-use-gdkpixbuf?rq=3
-#   https://stackoverflow.com/questions/22579508/subtract-one-circle-from-another-in-svg
-#   https://www.w3.org/TR/SVG11/painting.html#FillRuleProperty
-#   https://www.w3.org/TR/SVG11/images/painting/fillrule-nonzero.svg
-#   https://www.w3.org/TR/SVG11/images/painting/fillrule-evenodd.svg
-#   view-source:https://www.w3.org/TR/SVG11/images/painting/fillrule-evenodd.svg
-#   https://jsfiddle.net/86jnkr3L/
-#   https://stackoverflow.com/questions/38654828/how-to-remove-shapes-from-filled-svg-path
-#   https://www.smashingmagazine.com/2019/03/svg-circle-decomposition-paths/
-#   https://stackoverflow.com/questions/8193675/draw-a-hollow-circle-in-svg
-#   https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
-#   https://codepen.io/jakob-e/pen/bgBegJ
-#   https://stackoverflow.com/questions/53741166/what-is-the-difference-between-absolute-and-relative-svg-path
-#   https://developer-old.gnome.org/gtk3/unstable/gtk3-demo.html
-#   https://wiki.gnome.org/HowDoI/CreateSymbolicIconsThatChangeColorAccordingToTheme
-#   https://developer.gnome.org/documentation/tutorials/themed-icons.html
-#   https://discourse.gnome.org/t/how-to-use-my-own-symbolic-icon/7480
-
-
 #TODO Run any indicator under Debian 12 and open About dialog.
 # Then hit ESCAPE to close dialog; about/preferences/quite are still greyed out.
 # Does this happen on Ubuntu 20.04 or elsewhere?  Does not happen on Ubuntu 20.04.
