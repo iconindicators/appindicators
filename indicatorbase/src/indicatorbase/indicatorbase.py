@@ -33,10 +33,6 @@
 # Does this happen in Preferences?  Does not happen on Ubuntu 20.04.
 
 
-#TODO For indicatorlunar, check in the final README.md what the
-# copy command looks like for both icons.
-
-
 #TODO Check to see how indicatorlunar dynamic icon is rendered out
 # on Debian 12.
 # Does the filename need to have -symbolic added?
