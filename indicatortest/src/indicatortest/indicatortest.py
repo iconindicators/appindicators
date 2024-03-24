@@ -23,8 +23,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
 import gi
-import os
-# import random
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
@@ -41,13 +39,12 @@ from gi.repository import Notify
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-from pathlib import Path
 from threading import Thread
 
 
 class IndicatorTest( IndicatorBase ):
 
-    CACHE_ICON_BASENAME = "icon"  #TODO This used to start with a '-`...why?
+    CACHE_ICON_BASENAME = "icon-"
     CACHE_ICON_EXTENSION = "-symbolic.svg"
     CACHE_ICON_MAXIMUM_AGE_HOURS = 0
 
@@ -55,9 +52,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __init__( self ):
-        super().__init__(
-            comments = _( "Exercises a range of indicator functionality." ) )
-
+        super().__init__( comments = _( "Exercises a range of indicator functionality." ) )
         self.requestMouseWheelScrollEvents()
         self.flushCache( IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_MAXIMUM_AGE_HOURS )
 
@@ -82,7 +77,6 @@ class IndicatorTest( IndicatorBase ):
         self.__buildMenuPreferences( menu )
         self.__buildMenuLabelIconUpdating( menu )
         self.__buildMenuExecuteCommand( menu )
-        self.__buildMenuUbuntuVariant( menu )
 
 
     def __buildMenuDesktop( self, menu ):
@@ -117,11 +111,6 @@ class IndicatorTest( IndicatorBase ):
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon" )
         menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
         subMenu.append( menuItem )
-
-#TODO Probably not needed.
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon copied to user cache with colour change" )
-        # menuItem.connect( "activate", lambda widget: self.__useIconCopiedFromDefault() )
-        # subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( "Icon (default)" )
         menuItem.set_submenu( subMenu )
@@ -261,34 +250,6 @@ class IndicatorTest( IndicatorBase ):
         menu.append( menuItem )
 
 
-    def __buildMenuUbuntuVariant( self, menu ):
-        subMenu = Gtk.Menu()
-
-        text = self.getMenuIndent() + "Is Ubuntu variant 20.04: " + str( self.isUbuntuVariant2004() )
-        menuItem = Gtk.MenuItem.new_with_label( text )
-        subMenu.append( menuItem )
-
-        menuItem = Gtk.MenuItem.new_with_label( "Ubuntu Variant" )
-        menuItem.set_submenu( subMenu )
-        menu.append( menuItem )
-
-
-#TODO I don't see the point of this...
-    # def __useIconCopiedFromDefault( self ):
-    #     if self.isIconUpdateSupported():
-    #         with open( str( Path( __file__ ).parent ) + os.sep + "icons/hicolor/" + self.indicatorName + IndicatorBase.EXTENSION_SVG, 'r' ) as fIn:
-    #             svg = fIn.read()
-    #
-    #         randomColour = \
-    #             "{:02x}".format( random.randint( 0, 255 ) ) + \
-    #             "{:02x}".format( random.randint( 0, 255 ) ) + \
-    #             "{:02x}".format( random.randint( 0, 255 ) )
-    #
-    #         svg = svg.replace( "6496dc", randomColour )
-    #         fOut = self.writeCacheText( svg, IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_EXTENSION )
-    #         self.indicator.set_icon_full( fOut, "" )
-
-
     def __useIconDefault( self ):
         self.indicator.set_icon_full( self.get_icon_name(), "" )
 
@@ -302,9 +263,6 @@ class IndicatorTest( IndicatorBase ):
         brightLimbAngleInDegrees = 65
         svgIconText = self.__getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
 
-#TODO Check to see if this still works...writing an icon to the .cache directory.
-# Does the gtk magic convert the icon according to the theme?
-# The icon should change from #777777 to the same colour as the power/sound/network icons.
         iconFilename = self.writeCacheText(
             svgIconText,
             IndicatorTest.CACHE_ICON_BASENAME,
@@ -313,49 +271,24 @@ class IndicatorTest( IndicatorBase ):
         self.indicator.set_icon_full( iconFilename, "" )
 
 
-#TODO Not used...why?
-    # def __useIconInHomeDirectory( self, iconName ):
-    #     iconFile = os.getenv( "HOME" ) + '/' + iconName
-    #     if Path( iconFile ).is_file():
-    #         self.indicator.set_icon_full( iconFile, "" )
+    # A direct copy from Indicator Lunar to test
+    # dynamically created SVG icons in the user cache.
     #
-    #     else:
-    #         Notify.Notification.new(
-    #             "Cannot locate " + iconFile,
-    #             "Please ensure the file is present.",
-    #             self.get_icon_name() ).show()
-
-
-    # Virtually a direct copy from Indicator Lunar to test dynamically created SVG icons in the user cache.
     # phase The current phase of the moon.
     # illuminationPercentage The brightness ranging from 0 to 100 inclusive.
     #                        Ignored when phase is full/new or first/third quarter.
     # brightLimbAngleInDegrees Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
     #                          Ignored when phase is full/new.
-#TODO Once the new moon is sorted out,
-# see how this function matches with indicatorlunar
-# and also how there is writes out the dynamic icon to the cache (compare with function above).
     def __getSVGIconText( self, phase, illuminationPercentage, brightLimbAngleInDegrees ):
         width = 100
         height = width
         radius = float( width / 2 )
-        colour = self.getIconThemeColour( defaultColour = "fff200" ) # Default to hicolor.#TODO No longer need this; use #777777 instead.
         colour = "777777"
         if phase == "FULL_MOON" or phase == "NEW_MOON":
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == "NEW_MOON":
-                # body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
-                body += '" fill="#' + colour + '" fill-opacity="0.0" />'  #TODO I think this is what should be used for NEW MOON...
-                # no actual colour due to transparency and so we just see nothing but the background.
-#TODO Check if the new moon icon which does not show in the toolbar as an icon,
-# appears in the About dialog...
-# Using in the ~/.local/share/icons/hicolor/moon-symbolic.svg which is a new moon ring 
-# the About dialog shows the ring but with a black centre...so not quite right.
-# Maybe not a problem as we never show this icon in the About dialog.
-#
-#TODO How does the new moon shape differ from a capital O?  
-# Possible to try just an icon with the text O, converted to paths?
-# Fonts: Small o....FreeMono.
+                body += '" fill="#' + colour + '" fill-opacity="0.0" />'
+
             else: # Full
                 body += '" fill="#' + colour + '" />'
 
