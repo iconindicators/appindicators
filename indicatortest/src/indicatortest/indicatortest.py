@@ -45,7 +45,6 @@ from threading import Thread
 class IndicatorTest( IndicatorBase ):
 
     CACHE_ICON_BASENAME = "icon-"
-    CACHE_ICON_EXTENSION = "-symbolic.svg"
     CACHE_ICON_MAXIMUM_AGE_HOURS = 0
 
     CONFIG_X = "x"
@@ -266,7 +265,7 @@ class IndicatorTest( IndicatorBase ):
         iconFilename = self.writeCacheText(
             svgIconText,
             IndicatorTest.CACHE_ICON_BASENAME,
-            IndicatorTest.CACHE_ICON_EXTENSION )
+            IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
         self.indicator.set_icon_full( iconFilename, "" )
 
