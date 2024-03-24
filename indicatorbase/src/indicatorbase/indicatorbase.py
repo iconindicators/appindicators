@@ -22,11 +22,6 @@
 # explaining to go to PyPI.
 
 
-#TODO Use
-#   sudo touch .local/share/icons/hicolor && sudo gtk-update-icon-cache
-# to update icons.  Not sure where to put this...
-
-
 #TODO Run any indicator under Debian 12 and open About dialog.
 # Then hit ESCAPE to close dialog; about/preferences/quite are still greyed out.
 # Does this happen on Ubuntu 20.04 or elsewhere?  Does not happen on Ubuntu 20.04.
@@ -44,12 +39,6 @@
 # If the dynamic icons are rendered now in .local/share/icons/...,
 # need to remove these icons (perhaps containing a timestamp) on each run of the indicator
 # but also do a sweep of .local/share/icons/...
-
-
-#TODO See what the satellite icon looks like in the osd for lunar.
-
-
-#TODO See what the full moon icon looks like in the osd for lunar.
 
 
 #TODO Test icon is themed on Lubuntu 22.04 under Arc-Darker
@@ -111,9 +100,6 @@ except:
         print( "Unable to find either AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
 
-gi.require_version("GdkPixbuf", "2.0" )
-from gi.repository import GdkPixbuf  #TODO Check if this is needed.
-
 gi.require_version( "GLib", "2.0" )
 from gi.repository import GLib
 
@@ -161,43 +147,8 @@ class IndicatorBase( ABC ):
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
     EXTENSION_SVG = ".svg"
-    EXTENSION_SVG_SYMBOLIC = "-symbolic.svg"  #TODO Not sure if this stays.
+    EXTENSION_SVG_SYMBOLIC = "-symbolic.svg"
     EXTENSION_TEXT = ".txt"
-
-#TODO Need to check all of these values!
-# Is it possible to download the icon themes on their own rather than run up each VM/OS?
-# The Adwaita icons on Debian 12 are darker than those for network/volume.
-# How can a theme have varying colours?
-# https://johndecember.com/html/spec/colorsvghex.html
-#
-# If the -symbolic methodology holds true,
-# that is, only need a grey (or similar) icon with -symbolic in the filename suffix
-# and the desktop will replace the grey colour with the proper colour for the desktop,
-# will not need this table any more.
-#
-# What happens on a platform like Manjaro (or anything else really other than Ubuntu/Debian)
-# with the -symbolic way now?
-# Test on these other platforms and see if the icon colour is automatically shaded.
-# If not...then what happens?
-# Is there a way to switch to the hicolor icon...or even bother?
-    ICON_THEMES = {
-        "Adwaita"                   : "bebebe",
-        "Ambiant-MATE"              : "dfdbd2",
-        "breeze"                    : "232629",
-        "breeze-dark"               : "eff0f1",
-        "elementary-xfce-darker"    : "f3f3f3",
-        "ePapirus"                  : "ffffff",
-        "Lubuntu"                   : "4c4c4c",
-        "Papirus"                   : "dfdfdf",
-        "Papirus-Light"             : "444444",
-        "Pocillo"                   : "ffffff",
-        "ubuntu-mono-dark"          : "dfdbd2",
-        "ubuntu-mono-light"         : "3c3c3c",
-        "Yaru"                      : "dbdbdb",
-        "Yaru-MATE-dark"            : "f9f9f9",
-        "Yaru-MATE-light"           : "808080",
-        "Yaru-unity-dark"           : "dfdbd2",
-        "Yaru-unity-light"          : "3c3c3c" }
 
     INDENT_WIDGET_LEFT = 25
 
@@ -251,9 +202,15 @@ class IndicatorBase( ABC ):
         self.creditz = creditz
         self.debug = debug
 
+#TODO Test this stuff when running in the venv via a terminal
+# and also (somehow maybe with a message box) when running from the icon selection in the show applications
+# and under eclipse.
         self.desktopFile = self.indicatorName + ".py.desktop"
+        IndicatorBase.showMessageStatic( "self.desktopFile = " + self.desktopFile ) #TODO Testing
         self.desktopFileUserHome = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
+        IndicatorBase.showMessageStatic( "self.desktopFileUserHome = " + self.desktopFileUserHome ) #TODO Testing
         self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/platform/linux/" + self.desktopFile #TODO Should this be platform or packaging?
+        IndicatorBase.showMessageStatic( "self.desktopFileVirtualEnvironment = " + self.desktopFileVirtualEnvironment ) #TODO Testing
         if not Path( self.desktopFileVirtualEnvironment ).exists(): # Only occurs in development when the indicator is not installed in a venv.
             self.desktopFileVirtualEnvironment = next( Path( "." ).glob( "**/*.desktop" ), None )
             if self.desktopFileVirtualEnvironment is None:
@@ -276,35 +233,10 @@ class IndicatorBase( ABC ):
         menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         menu.show_all()
 
-#TODO Original but no longer used.
-#        self.indicator = AppIndicator.Indicator.new(
-#            self.indicatorName, #ID
-#            self.getIconFilename(), # Icon name
-#            AppIndicator.IndicatorCategory.APPLICATION_STATUS )
-
-#TODO This should be used for all cases except when running under Eclipse.
-#...or perhaps not.  Use this for all cases...
-# if there is no icon found, that means the indicator has not been installed.
-# So be it...perhaps.
         self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
             self.get_icon_name(), # Icon name
             AppIndicator.IndicatorCategory.APPLICATION_STATUS )
-
-#TODO I think this will work only for Eclipse, but likely need to point to a path to the icon.
-#
-# Not sure if this code is needed in reality...
-# The code will run and indicator launches.
-# The only issue under Eclipse say is the icon may not be found.
-# So maybe instead, in the above code/section,
-# have a comment about setting the icon path parameter and call instead new_with_path()
-# Maybe need a similar comment for when setting the icon in the About dialog.
-        # self.indicator = AppIndicator.Indicator.new_with_path(
-        #     self.indicatorName, #ID
-        #     self.get_icon_name(), # Icon name
-        #     AppIndicator.IndicatorCategory.APPLICATION_STATUS,
-        #     "/home/bernard/.local/share/icons/hicolor" ) # Icon theme path
-        #     # self.get_icon_theme_path() ) #TODO Not sure if we keep the above hard coded path or use a function to find the icon path relative.
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
         self.indicator.set_menu( menu )
@@ -493,20 +425,7 @@ class IndicatorBase( ABC ):
 
         aboutDialog.set_copyright( copyrightText )
         aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-
-#        image = Gtk.Image.new_from_icon_name( self.getIconFilename(), Gtk.IconSize( 4 ) ) #TODO Testing
-
-#        print( self.get_icon_theme_path() + self.getIconFilename() ) #TODO
-
-#        image = Gtk.Image.new_from_file( self.get_icon_theme_path() + self.getIconFilename() + ".svg" ) #TODO Testing
-
-#        aboutDialog.set_logo( image.get_pixbuf() )
-
         aboutDialog.set_logo_icon_name( self.get_icon_name() )
-        
-#        aboutDialog.set_logo( GdkPixbuf.Pixbuf.new_from_file( self.get_icon_theme_path() + self.getIconFilename() + ".svg" ) )
-#        aboutDialog.set_logo_icon_name( self.getIconFilename() + ".svg" )#TODO Testing
-
         aboutDialog.set_program_name( self.indicatorName )
         aboutDialog.set_translator_credits( _( "translator-credits" ) )
         aboutDialog.set_version( self.version )
@@ -815,104 +734,26 @@ class IndicatorBase( ABC ):
         return indentAmount
 
 
-    def getIconThemeName( self ):
-        return Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
-
-
-    # Get the colour (in hexadecimal) for the current theme.
-    # The defaultColour will be returned if the current theme has no colour defined.
-#TODO May not be needed.
-    def getIconThemeColour( self, defaultColour ):
-        iconThemeName = self.getIconThemeName()
-        iconThemeColour = defaultColour
-        if iconThemeName in IndicatorBase.ICON_THEMES:
-            iconThemeColour = IndicatorBase.ICON_THEMES[ iconThemeName ]
-
-        return iconThemeColour
-
-#TODO Have modified indicatortest Yaru icon to show different colours,
-# but the colour change does not show up (always grey).
-# Why...?
-# Surely the icon colour being changed should show up...
-# Maybe send a message to the Yaru people, or better yet,
-# Adwaita (Yaru inherits Adwaita) asking about icons.
-#
-# If needing to post to a forum use:
-#  https://discourse.gnome.org/tag/theme
-#
-# To run:
-# . ./.local/venv_indicatortest/bin/activate && python3 .local/venv_indicatortest/lib/python3.8/site-packages/indicatortest/indicatortest.py && deactivate
-    def getIconFilename( self ):
-        themeName = self.getIconThemeName()
-#        print( themeName )#TODO Testing
-        if themeName not in IndicatorBase.ICON_THEMES:
-            themeName = "hicolor"
-
-#TODO Testing
-#        themeName = "hicolor"
-
-#        iconFilename = \
-#            str( Path( __file__ ).parent ) + "/icons/" + themeName + "/" + self.indicatorName + #IndicatorBase.EXTENSION_SVG
-
-        iconFilename = \
-            str( Path( __file__ ).parent ) + "/icons/" + self.indicatorName + IndicatorBase.EXTENSION_SVG
-
-#        print( iconFilename ) #TODO Testing
-
-        # If running outside of a venv/wheel, say under development/IDE,
-        # substitute in the hicolor icon just so an icon is at least displayed.
-        if not Path( iconFilename ).exists():
-            parents = Path( __file__ ).parents
-            iconFilename = str( parents[ 3 ] ) + '/' + self.indicatorName + "/src/" + self.indicatorName + "/icons/hicolor/" + self.indicatorName + IndicatorBase.EXTENSION_SVG
-
-#TODO Check this gives a correct result (and icon shows) when running under IDE.
-#            print( iconFilename )#TODO Testing
-#            print()#TODO Testing
-
-#        return iconFilename
-#        return self.indicatorName + "-symbolic.svg"
-
-#        return "/home/bernard/.local/venv_indicatortest/lib/python3.8/site-packages/indicatortest/icons/" + self.indicatorName + "-symbolic.svg"
-        print( self.indicatorName + "-symbolic" )
-        return self.indicatorName + "-symbolic"
-
-
-# https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
-#
-#
-# See also
-#  https://unix.stackexchange.com/a/346000/80583
-# for updating icon cache when playing with icons.
+    # Get the name of the icon for the indicator to be passed
+    # to the operating system (really the desktop environment) for display.
+    #
+    # GTK will take an icon and display it as expected.
+    #
+    # The exception is if the icon filename ends with "-symbolic" (before the extension).
+    # In this case, GTK will take the colour in the icon (say a generic flat #777777)
+    # and replace it with a suitable colour to make the current theme/background/colour.
+    # Refer to this discussion:
+    #   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
+    #
+    # If the icon with "-symbolic" cannot be found, it appears the desktop environment as
+    # a fallback will look for the icon name without the "-symbolic" which is the hicolor.
+    #
+    # When updating/replacing an icon, the desktop environment appears to cache.
+    # So perhaps first try:
+    #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
+    # and if that fails, either log out/in or restart.
     def get_icon_name( self ):
-#        icon_name = self.indicatorName + "-symbolic"
-
-#        icon_name = "indicatorfortune"
-#        icon_name = "indicatorlunar"
-#        icon_name = "indicatorlunarsatellite"
-#        icon_name = "indicatoronthisday"
-#        icon_name = "indicatorppadownloadstatistics"
-#        icon_name = "indicatorpunycode"
-#        icon_name = "indicatorscriptrunner"
-#        icon_name = "indicatorstardate"
-#        icon_name = "indicatortest"
-#        icon_name = "indicatortide"
-#        icon_name = "indicatorvirtualbox"
-
-        # icon_name += "-symbolic"
-        icon_name = "1-symbolic"
-        icon_name = self.indicatorName + "-symbolic"
-        # icon_name = self.indicatorName
-#        icon_name = "indicator-test-symbolic"  # MUST SPECIFY (OR APPEND) THE SYMBOLIC!!!
-        icon_name = self.indicatorName + "-symbolic"     # MUST SPECIFY (OR APPEND) THE SYMBOLIC!!!
-        # icon_name = "8-symbolic"
-        print( "Icon name: " + icon_name )
-        return icon_name
-
-
-#TODO Is this needed any more...?
-    def get_icon_theme_path( self ):
-        print( "Icon theme path: " + str( Path( __file__ ).parent ) + "/icons" )
-        return str( Path( __file__ ).parent ) + "/icons"
+        return self.indicatorName + "-symbolic"
 
 
     def getAutostartAndDelay( self ):
