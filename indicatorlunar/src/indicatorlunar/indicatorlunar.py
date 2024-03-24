@@ -19,10 +19,6 @@
 # Application indicator for the home astronomer.
 
 
-#TODO In the preferences the satellite icon does not display on hitting the test button.
-# Don't know what happens during an actual satellite rise notification.
-
-
 #TODO The comet data from COBS does not contain updated absolute magnitude data.
 # Also, the data contains spurious data (easier to see in the MPC format).
 # Waiting on Jure @ COBS to resolve.
