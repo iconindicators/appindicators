@@ -59,29 +59,33 @@ Because the dependencies (listed in `pyproject.toml`) will most likely be unavai
     deactivate
 ```
 
-
 ## Installing a Wheel Directly
-A wheel can be installed directly:
+Install the wheel:
 
 ```
     python3 -m venv $HOME/.local/venv_indicatortest && \
     . /$HOME/.local/venv_indicatortest/bin/activate && \
-    python3 -m pip install --upgrade --force-reinstall release/wheel/dist_indicatortest/indicatortest-*-py3-none-any.whl && \
+    python3 -m pip install --upgrade --force-reinstall $(ls -d release/wheel/dist_indicatortest/indicatortest*.whl | head -1) && \
     deactivate
 ```
 
-Files (icons, run script and .desktop) must be copied from the wheel `venv` directory, to within the `.local` directory.  Open the file `indicatortest-1.0.xyz.tar.gz` (will have been created with the corresponding `indicatortext-1.0.xyz-py3-none-any.whl`) and find `README.md`.  Navigate to the "**Installation**" section and execute the instructions for "**Copy icon, run script and desktop file to `$HOME/.local`**" (for any distribution).
+Copy icon, run script and desktop file to `$HOME/.local`:
+```
+    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \
+    cp $(ls -d $HOME/.local/indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps && \
+    mkdir -p $HOME/.local/bin && \
+    cp $(ls -d $HOME/.local/indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin && \
+    cp $(ls -d $HOME/.local/indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
+```
 
 
 ## Run an Indicator
 
 ```
     . /$HOME/.local/venv_indicatortest/bin/activate && \
-    python3 $HOME/.local/venv_indicatortest/lib/python3.x/site-packages/indicatortest/indicatortest.py && \
+    python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/indicatortest.py && \
     deactivate
 ```
-
-noting the `x` in the second line which must be changed to match the version of `Python` in the `venv`.
 
 
 ## License
