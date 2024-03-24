@@ -356,11 +356,9 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
                 "cd " + str( directory_dist ) + os.sep + indicator_name + " && " + \
                 "python3 -m build --outdir ../"
 
-#TODO Put back
-#            subprocess.call( command, shell = True )
+            subprocess.call( command, shell = True )
 
-#TODO Put back
-#            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
+            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
 
     else:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
