@@ -1095,11 +1095,11 @@ class IndicatorLunar( IndicatorBase ):
         width = 100
         height = width
         radius = float( width / 2 )
-        colour = self.getIconThemeColour( defaultColour = "fff200" ) # Default to hicolor.
+        colour = "777777"
         if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_FULL_MOON or phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == IndicatorLunar.astroBackend.LUNAR_PHASE_NEW_MOON:
-                body += '" fill="none" stroke="#' + colour + '" stroke-width="2" />'
+                body += '" fill="#' + colour + '" fill-opacity="0.0" />'
 
             else: # Full
                 body += '" fill="#' + colour + '" />'
