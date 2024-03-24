@@ -138,6 +138,15 @@ def _run_checks_specific_to_indicator( indicator_name ):
     return message
 
 
+def _chmod(
+        file,
+        mode = \
+            stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
+            stat.S_IWUSR | stat.S_IWGRP |
+            stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH ):
+    os.chmod( file, mode )
+
+
 def _create_dot_desktop( directory_platform_linux, indicator_name ):
     indicatorbase_dot_desktop_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.py.desktop"
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
@@ -152,11 +161,7 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
     with open( indicator_dot_desktop_path, 'w' ) as f:
         f.write( dot_desktop_text )
 
-    os.chmod(
-        indicator_dot_desktop_path,
-        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-        stat.S_IWUSR | stat.S_IWGRP |
-        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+    _chmod( indicator_dot_desktop_path )
 
 
 def _create_run_script( directory_platform_linux, indicator_name ):
@@ -170,11 +175,7 @@ def _create_run_script( directory_platform_linux, indicator_name ):
     with open( indicator_run_script_path, 'w' ) as f:
         f.write( run_script_text )
 
-    os.chmod(
-        indicator_run_script_path,
-        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-        stat.S_IWUSR | stat.S_IWGRP |
-        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+    _chmod( indicator_run_script_path )
 
 
 def _create_pyproject_dot_toml( directory_dist, indicator_name ):
@@ -237,11 +238,7 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
     with open( indicator_pyproject_toml_path, 'w' ) as f:
         f.write( indicatorbase_pyproject_toml_text )
 
-    os.chmod(
-        indicator_pyproject_toml_path,
-        stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-        stat.S_IWUSR | stat.S_IWGRP |
-        stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH )
+    _chmod( indicator_pyproject_toml_path )
 
 
 def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
