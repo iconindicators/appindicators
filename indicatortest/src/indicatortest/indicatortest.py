@@ -84,7 +84,7 @@ class IndicatorTest( IndicatorBase ):
         text = \
             self.getMenuIndent() + \
             "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + \
-            self.getIconThemeName()
+            Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
         subMenu.append( Gtk.MenuItem.new_with_label( text ) )
 
