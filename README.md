@@ -59,6 +59,9 @@ Because the dependencies (listed in `pyproject.toml`) will most likely be unavai
     deactivate
 ```
 
+****************TODO What about OS (apt-get) dependencies?
+
+
 ## Installing a Wheel Directly
 Install the wheel:
 
@@ -77,6 +80,8 @@ Copy icon, run script and desktop file to `$HOME/.local`:
     cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin && \
     cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
 ```
+
+****************TODO What about OS (apt-get) dependencies?
 
 
 ## Run an Indicator
