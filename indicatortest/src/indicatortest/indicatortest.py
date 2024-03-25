@@ -49,6 +49,7 @@ class IndicatorTest( IndicatorBase ):
 
     CONFIG_X = "x"
 
+    LABEL = "Test Indicator"
 
     def __init__( self ):
         super().__init__( comments = _( "Exercises a range of indicator functionality." ) )
@@ -58,7 +59,7 @@ class IndicatorTest( IndicatorBase ):
 
     def update( self, menu ):
         self.__buildMenu( menu )
-        self.setLabel( "Test Indicator" )
+        self.setLabel( IndicatorTest.LABEL )
 
 
     def onMouseWheelScroll( self, indicator, delta, scrollDirection ):
@@ -68,13 +69,10 @@ class IndicatorTest( IndicatorBase ):
 
     def __buildMenu( self, menu ):
         self.__buildMenuDesktop( menu )
-        self.__buildMenuIconDefault( menu )
-        self.__buildMenuIconDynamic( menu )
+        self.__buildMenuIcon( menu )
         self.__buildMenuLabelTooltipOSD( menu )
         self.__buildMenuClipboard( menu )
         self.__buildMenuTerminal( menu )
-        self.__buildMenuPreferences( menu )
-        self.__buildMenuLabelIconUpdating( menu )
         self.__buildMenuExecuteCommand( menu )
 
 
@@ -104,20 +102,13 @@ class IndicatorTest( IndicatorBase ):
         menu.append( menuItem )
 
 
-    def __buildMenuIconDefault( self, menu ):
+    def __buildMenuIcon( self, menu ):
         subMenu = Gtk.Menu()
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon" )
         menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
         subMenu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Icon (default)" )
-        menuItem.set_submenu( subMenu )
-        menu.append( menuItem )
-
-
-    def __buildMenuIconDynamic( self, menu ):
-        subMenu = Gtk.Menu()
         cacheDirectory = self.getCacheDirectory()
         icons = [ "FULL_MOON",
                   "WANING_GIBBOUS",
@@ -133,13 +124,21 @@ class IndicatorTest( IndicatorBase ):
             menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( widget.props.name ) )
             subMenu.append( menuItem )
 
-        menuItem = Gtk.MenuItem.new_with_label( "Icon (dynamic)" )
+        menuItem = Gtk.MenuItem.new_with_label( "Icon" )
         menuItem.set_submenu( subMenu )
         menu.append( menuItem )
 
 
     def __buildMenuLabelTooltipOSD( self, menu ):
         subMenu = Gtk.Menu()
+
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Reset label" )
+        menuItem.connect(
+            "activate",
+            lambda widget: (
+                self.setLabel( IndicatorTest.LABEL ) ) )
+
+        subMenu.append( menuItem )
 
         menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in label" )
         menuItem.connect(
@@ -167,7 +166,7 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuClipboard( self, menu ):
         subMenu = Gtk.Menu()
 
-        menuItem = Gtk.MenuItem.new_with_label( _( "Copy current time to clipboard" ) )
+        menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + _( "Copy current time to clipboard" ) )
         menuItem.connect( "activate", lambda widget:
                           Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
 
@@ -186,30 +185,6 @@ class IndicatorTest( IndicatorBase ):
         subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Execution flag: " + str( executionFlag ) ) )
 
         menuItem = Gtk.MenuItem.new_with_label( "Terminal" )
-        menuItem.set_submenu( subMenu )
-        menu.append( menuItem )
-
-
-    def __buildMenuPreferences( self, menu ):
-        subMenu = Gtk.Menu()
-
-        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "X: " + str( self.X ) ) )
-
-        menuItem = Gtk.MenuItem.new_with_label( "Preferences" )
-        menuItem.set_submenu( subMenu )
-        menu.append( menuItem )
-
-
-    def __buildMenuLabelIconUpdating( self, menu ):
-        subMenu = Gtk.Menu()
-
-        text = self.getMenuIndent() + "Icon: " + str( self.isIconUpdateSupported() )
-        subMenu.append( Gtk.MenuItem.new_with_label( text ) )
-
-        text = self.getMenuIndent() + "Label / Tooltip: " + str( self.isLabelUpdateSupported() )
-        subMenu.append( Gtk.MenuItem.new_with_label( text ) )
-
-        menuItem = Gtk.MenuItem.new_with_label( "Label / Tooltip / Icon Updating" )
         menuItem.set_submenu( subMenu )
         menu.append( menuItem )
 
