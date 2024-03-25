@@ -99,7 +99,7 @@ def _get_introduction( indicator_name ):
     if indicator_name.upper() != Indicator_Name.INDICATORONTHISDAY.name:
         introduction += f", `openSUSE`, `Manjaro` "
 
-    introduction += f" and theoretically, any platform which supports the `appindicator` library. "
+    introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
 
     introduction += f"Other indicators in this series are:\n"
     indicators = ( list( indicator_names.keys() ) )
@@ -437,7 +437,7 @@ def _get_usage( indicator_name ):
         f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
         f"type `{ indicator_names[ indicator_name ].split( ' ', 1 )[ 1 ].lower() }` "
         f"into the search bar and the icon should be present for you to click.  "
-        f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n"
+        f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
         f"```\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
