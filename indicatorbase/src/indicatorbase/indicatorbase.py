@@ -28,12 +28,6 @@
 # Does this happen in Preferences?  Does not happen on Ubuntu 20.04.
 
 
-#TODO Found on Lubuntu 22.04 and Xubuntu 22.04 that need to run
-# 	sudo apt-get update --fix-missing
-# and then run again the install command
-#        sudo apt-get -y install fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv
-
-
 # Base class for application indicators.
 #
 # References:
