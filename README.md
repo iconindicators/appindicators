@@ -50,7 +50,7 @@ For testing purposes, a wheel can be uploaded to `TestPyPI`:
     deactivate
 ```
 
-Because the dependencies (listed in `pyproject.toml`) will most likely be unavailable at `TestPyPI`, the install command is slightly modified:
+Because the `Python` dependencies (listed in `pyproject.toml`) will most likely be unavailable at `TestPyPI`, the install command is slightly modified:
 
 ```
     python3 -m venv $HOME/.local/venv_indicatortest
@@ -59,7 +59,7 @@ Because the dependencies (listed in `pyproject.toml`) will most likely be unavai
     deactivate
 ```
 
-****************TODO What about OS (apt-get) dependencies?
+You will likely need to also install various operating system packages; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
 
 ## Installing a Wheel Directly
@@ -81,7 +81,7 @@ Copy icon, run script and desktop file to `$HOME/.local`:
     cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
 ```
 
-****************TODO What about OS (apt-get) dependencies?
+You will likely need to also install various operating system packages; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
 
 ## Run an Indicator
