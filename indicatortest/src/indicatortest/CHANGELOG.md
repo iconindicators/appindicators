@@ -1,5 +1,11 @@
 # Indicator Test changelog
 
+## v1.0.17 (2024-03-26)
+
+- Consolidated menu options.
+- Updated README.md.
+
+
 ## v1.0.16 (2023-12-22)
 
 - Added terminal commands "fortune", "wmctrl", "calendar", "notify-send" and "paplay".
