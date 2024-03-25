@@ -91,6 +91,7 @@ from gi.repository import Notify
 from importlib import metadata
 from pathlib import Path
 from urllib.request import urlopen
+from zipfile import ZipFile
 
 
 class IndicatorBase( ABC ):
@@ -178,34 +179,18 @@ class IndicatorBase( ABC ):
         self.creditz = creditz
         self.debug = debug
 
-#TODO Test this stuff when running in the venv via a terminal
-# and also (somehow maybe with a message box) when running from the icon selection in the show applications
-# and under eclipse.
         # Ensure the .desktop file is present, taking into account running from a terminal or Eclipse.
         self.desktopFile = self.indicatorName + ".py.desktop"
-        print( "self.desktopFile = " + self.desktopFile ) #TODO Testing
-        # IndicatorBase.showMessageStatic( "self.desktopFile = " + self.desktopFile ) #TODO Testing
         self.desktopFileUserHome = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
-        print( "self.desktopFileUserHome = " + self.desktopFileUserHome ) #TODO Testing
-        # IndicatorBase.showMessageStatic( "self.desktopFileUserHome = " + self.desktopFileUserHome ) #TODO Testing
         self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/platform/linux/" + self.desktopFile
-        print( "self.desktopFileVirtualEnvironment = " + self.desktopFileVirtualEnvironment ) #TODO Testing
-        # IndicatorBase.showMessageStatic( "self.desktopFileVirtualEnvironment = " + self.desktopFileVirtualEnvironment ) #TODO Testing
-        print( ". = " + str( Path( __file__ ).parent.parent.parent.parent.absolute() ) )
         if not Path( self.desktopFileVirtualEnvironment ).exists(): # Occurs when running from a terminal or in Eclipse.
-            from zipfile import ZipFile
-            desktop_file_in_wheel = "indicatortest/platform/linux/indicatortest.py.desktop"
-            with ZipFile( next( Path( "." ).glob( "*.whl" ), None ), 'r' ) as z: # Extract the .desktop from the .whl to /tmp.
+            desktop_file_in_wheel = self.indicatorName + "/platform/linux/" + self.indicatorName + ".py.desktop"
+            with ZipFile( next( Path( "." ).glob( "*.whl" ), None ), 'r' ) as z:
                 z.extract( desktop_file_in_wheel, path = "/tmp" )
 
             z.close()
 
             self.desktopFileVirtualEnvironment = str( Path( "/tmp/" + desktop_file_in_wheel ) )
-            # print( "***********  " + self.desktopFileVirtualEnvironment )
-
-
-            # print( Path( "." ).absolute() )
-            # self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent.parent.parent.parent ) + '/' + self.indicatorName + "/platform/linux/" + self.desktopFile
             if not Path( self.desktopFileVirtualEnvironment ).exists():
                 errorMessage = f"Expected to find a .desktop file in { self.desktopFileVirtualEnvironment } but none was found!"
                 self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
