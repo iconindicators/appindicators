@@ -54,7 +54,7 @@ Because the `Python` dependencies (listed in `pyproject.toml`) will most likely 
 
 ```
     python3 -m venv $HOME/.local/venv_indicatortest
-    . /$HOME/.local/venv_indicatortest/bin/activate
+    . $HOME/.local/venv_indicatortest/bin/activate
     python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest
     deactivate
 ```
@@ -67,7 +67,7 @@ Install the wheel:
 
 ```
     python3 -m venv $HOME/.local/venv_indicatortest && \
-    . /$HOME/.local/venv_indicatortest/bin/activate && \
+    . $HOME/.local/venv_indicatortest/bin/activate && \
     python3 -m pip install --upgrade --force-reinstall $(ls -d release/wheel/dist_indicatortest/indicatortest*.whl | head -1) && \
     deactivate
 ```
@@ -87,7 +87,7 @@ You will likely need to also install various operating system packages; refer to
 ## Run an Indicator
 
 ```
-    . /$HOME/.local/venv_indicatortest/bin/activate && \
+    . $HOME/.local/venv_indicatortest/bin/activate && \
     python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/indicatortest.py && \
     deactivate
 ```
