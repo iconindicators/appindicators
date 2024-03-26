@@ -44,9 +44,9 @@ For testing purposes, a wheel can be uploaded to `TestPyPI`:
 ```
     python3 tools/build_wheel.py release indicatortest
     python3 -m venv venv
-    . /venv/bin/activate
+    . ./venv/bin/activate
     python3 -m pip install --upgrade twine
-    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest
+    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/*
     deactivate
 ```
 
