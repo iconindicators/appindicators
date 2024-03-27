@@ -383,8 +383,8 @@ def _get_installation( indicator_name ):
     install_command_debian = "sudo apt-get -y install"
 
     return (
-        "Installation\n" +
-        "------------\n" +
+        "Installation / Upgrading\n" +
+        "------------------------\n" +
 
         _get_installation_for_operating_system(
             Operating_System.DEBIAN_11_DEBIAN_12,
