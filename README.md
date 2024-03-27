@@ -42,20 +42,20 @@ A directory called `venv` will be created and can be safely deleted or otherwise
 For testing purposes, a wheel can be uploaded to `TestPyPI`:
 
 ```
-    python3 tools/build_wheel.py release indicatortest
-    python3 -m venv venv
-    . ./venv/bin/activate
-    python3 -m pip install --upgrade twine
-    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/*
+    python3 tools/build_wheel.py release indicatortest && \
+    python3 -m venv venv && \
+    . ./venv/bin/activate && \
+    python3 -m pip install --upgrade twine && \
+    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/* && \
     deactivate
 ```
 
 Because the `Python` dependencies (listed in `pyproject.toml`) will most likely be unavailable at `TestPyPI`, the install command is slightly modified:
 
 ```
-    python3 -m venv $HOME/.local/venv_indicatortest
-    . $HOME/.local/venv_indicatortest/bin/activate
-    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest
+    python3 -m venv $HOME/.local/venv_indicatortest && \
+    . $HOME/.local/venv_indicatortest/bin/activate && \
+    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest && \
     deactivate
 ```
 
