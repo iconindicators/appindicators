@@ -20,12 +20,15 @@
 
 
 #TODO See
-#    https://github.com/skyfielders/python-skyfield/commit/d1ad1f859518e5cae244f9901eadbc7bb3991bc8
-# Also look over all documentation...may be there are new APIs to call or better/newer ways to do things.
-
-
-#TODO This may be interesting when released for moon rise/set:
-#   https://github.com/skyfielders/python-skyfield/commit/3422b2c9696fcdccf3ad9b69364ef933e71214c1
+# https://github.com/skyfielders/python-skyfield/commit/d1ad1f859518e5cae244f9901eadbc7bb3991bc8
+# https://rhodesmill.org/skyfield/almanac.html
+# Look for find_risings and find_settings...seems to be a lot faster.
+# First test the time to compute moon, sun, all planets and all stars.
+# Then implement new method (in a common function) and run the test again...should be better
+# but check results for accuracy against PyEphem.
+#
+# Also not sure what happens at the poles; how to tell when we are
+# (do we get nonsense results and if so, maybe use the polar stuff...see the polar section same page)
 
 
 #TODO May be of use for TLEs:
@@ -60,6 +63,7 @@
 #  "packaging/linux/*.desktop",
 #  "packaging/linux/*.sh"
 #]
+
 
 import datetime
 import importlib
