@@ -16,7 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory apparent magnitude for comets and minor planets.
+# Download from URL, load from file and hold in memory,
+# apparent magnitude for comets and minor planets.
 
 
 import datetime
