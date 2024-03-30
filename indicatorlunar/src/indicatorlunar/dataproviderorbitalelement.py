@@ -16,7 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory orbital elements for comets and minor planets.
+# Download from URL, load from file and hold in memory,
+# orbital elements for comets and minor planets.
 
 
 import datetime
@@ -235,12 +236,12 @@ class DataProviderOrbitalElement( DataProvider ):
     # Download orbital element data for comets from Comet Observation Database and save to the given filename.
     @staticmethod
     def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType ):
-        url = "https://cobs.si/api/elements.api"
+        url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true"
         if orbitalElementDataType == OE.DataType.SKYFIELD_COMET:
-            url += "?format=mpc"
+            url += "&format=mpc"
 
         else: # Assume to be OE.DataType.PYEPHEM_COMET
-            url += "?format=ephem"
+            url += "&format=ephem"
 
         return IndicatorBase.download( url, filename, logging )
 

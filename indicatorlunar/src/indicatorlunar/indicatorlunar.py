@@ -19,39 +19,6 @@
 # Application indicator for the home astronomer.
 
 
-#TODO The comet data from COBS does not contain updated absolute magnitude data.
-# Also, the data contains spurious data (easier to see in the MPC format).
-# Waiting on Jure @ COBS to resolve.
-#
-# When comet data is resolved...
-#    Replace CREDIT_COMETS back into
-#        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSES, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
-#    and
-#        CREDIT = [ astroBackend.getCredit(), CREDIT_COMETS, CREDIT_ECLIPSE_SOLAR_ONLY, CREDIT_MINOR_PLANETS, CREDIT_SATELLITES ]
-#
-#    Replace 'comet' back into
-#        comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
-#
-#
-# Uncomment
-#        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-#            utcNow, self.cometOrbitalElementData,
-#            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-#            self.downloadCountComet, self.nextDownloadTimeComet,
-#            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
-#            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
-#
-#    Check the call to IndicatorLunar.astroBackend.getDesignationComet( name ) still works.
-#
-#    Uncomment/unhide in the Preferences
-#        grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
-#        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
-#
-#
-# In dataproviderorbitalelement, __downloadFromCometObservationDatabase(),
-# Waiting on Jure to figure out final API.
-
-
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
@@ -199,8 +166,6 @@ class IndicatorLunar( IndicatorBase ):
             comments = _( "Displays lunar, solar, planetary, minor planet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
-        self.debug = True #TODO Testing
-
         # Dictionary to hold currently calculated (and previously calculated) astronomical data.
         # Key: combination of three tags: body type, body name and data name.
         # Value: a string for all data types, EXCEPT for date/time which is a Python datetime in UTC with timezone.
@@ -287,12 +252,12 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateData( self, utcNow ):
         # Update comet data.
-        # self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
-        #     utcNow, self.cometOrbitalElementData,
-        #     IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-        #     self.downloadCountComet, self.nextDownloadTimeComet,
-        #     DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
-        #     DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
+        self.cometOrbitalElementData, self.downloadCountComet, self.nextDownloadTimeComet= self.__updateData(
+            utcNow, self.cometOrbitalElementData,
+            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME, IndicatorBase.EXTENSION_TEXT, IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
+            self.downloadCountComet, self.nextDownloadTimeComet,
+            DataProviderOrbitalElement.download, [ IndicatorLunar.COMET_DATA_TYPE, None ],
+            DataProviderOrbitalElement.load, [ IndicatorLunar.COMET_DATA_TYPE ] )
 
         if self.cometsAddNew:
             self.addNewBodies( self.cometOrbitalElementData, self.comets )
@@ -1257,7 +1222,7 @@ class IndicatorLunar( IndicatorBase ):
         cometsAddNewCheckbutton.set_margin_top( 5 )
         cometsAddNewCheckbutton.set_active( self.cometsAddNew )
         cometsAddNewCheckbutton.set_tooltip_text( _( "All comets are automatically added." ) )
-        # grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
+        grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
 
         satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
         satellitesAddNewCheckbox.set_margin_top( 5 )
@@ -1349,7 +1314,7 @@ class IndicatorLunar( IndicatorBase ):
                 "available from the source, or the data\n" + \
                 "was completely filtered by magnitude." )
 
-        # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
+        box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
         for starName in IndicatorLunar.astroBackend.getStarNames():
