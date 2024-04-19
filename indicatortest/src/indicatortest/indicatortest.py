@@ -39,6 +39,7 @@ from gi.repository import Notify
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
+import platform
 from threading import Thread
 
 
@@ -68,12 +69,29 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __buildMenu( self, menu ):
+        self.__buildMenuPlatformUname( menu )
         self.__buildMenuDesktop( menu )
         self.__buildMenuIcon( menu )
         self.__buildMenuLabelTooltipOSD( menu )
         self.__buildMenuClipboard( menu )
         self.__buildMenuTerminal( menu )
         self.__buildMenuExecuteCommand( menu )
+
+
+    def __buildMenuPlatformUname( self, menu ):
+        subMenu = Gtk.Menu()
+
+        uname = platform.uname()
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Machine: " + str( uname.machine ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Node: " + str( uname.node ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Processor: " + str( uname.processor ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Release: " + str( uname.release ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "System: " + str( uname.system ) ) )
+        subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Version: " + str( uname.version ) ) )
+
+        menuItem = Gtk.MenuItem.new_with_label( "Platform | Uname" )
+        menuItem.set_submenu( subMenu )
+        menu.append( menuItem )
 
 
     def __buildMenuDesktop( self, menu ):
