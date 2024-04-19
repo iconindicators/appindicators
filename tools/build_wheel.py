@@ -144,6 +144,7 @@ def _chmod(
             stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
             stat.S_IWUSR | stat.S_IWGRP |
             stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH ):
+
     os.chmod( file, mode )
 
 
@@ -183,7 +184,7 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
     dependencies = ""
     description = ""
     version = ""
-    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/" + "pyproject.toml"
+    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
     with open( indicator_pyproject_toml_path, 'r' ) as f:
         for line in f:
             if line.startswith( "description" ):
@@ -242,8 +243,8 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
 
 
 def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
-    # By using copytree, the ENTIRE project is copied across...
-    # ...however the pyproject.toml explicitly defines what files/folders
+    # By using copytree, the ENTIRE project is copied across;
+    # however, the pyproject.toml explicitly defines what files/folders
     # are included in the build (and conversely what is excluded).
     directory_indicator = str( directory_dist ) + os.sep + indicator_name
     shutil.copytree( indicator_name, directory_indicator )
