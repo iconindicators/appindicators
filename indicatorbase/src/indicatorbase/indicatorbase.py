@@ -16,6 +16,82 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Is it possible to create an install script within the venv installation,
+# say located under a directory called scripts?
+# Could even just be located at the root of the indicator directory,
+# along with an uninstall script.
+#
+# Then the install instructions reduce to something like:
+#
+#	python3 -m venv $HOME/.local/venv_indicatortest && \
+#	. $HOME/.local/venv_indicatortest/bin/activate && \
+#	python3 -m pip install --upgrade pip indicatortest && \
+#	deactivate
+#
+# which is the same as current, but then only need to invoke the install script:
+#
+#	sudo $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/install.sh
+#
+# which would do the apt-get install and then the icon/desktop/etc copying.
+#
+#	https://stackoverflow.com/questions/77144665/how-can-i-run-python-as-root-or-sudo-while-still-using-my-local-pip
+#
+#
+# The uinstall script would be similar, without the need to create the venv.
+# Perhaps running the uninstall script command would first run the uninstall script
+# and then remove the venv_indicatortest directory too.
+#
+# Also, for the install command, can we avoid the activate/deactive of the venv?
+# Perhaps then combine the venv creation and pip install with running the install script.
+# That would be a threee command installation.
+#
+# Refer to 
+#	https://pypi.org/project/indicatortest/
+# for the install/uninstall commands/process.
+#
+# Will need to determine the distribution and version.
+# Can /etc/os-release be used?
+#	https://www.cyberciti.biz/faq/how-to-check-os-version-in-linux-command-line/
+# Check if available on all supported platforms.
+#
+# Ubuntu 20.04
+'''	
+	NAME="Ubuntu"
+	VERSION="20.04.6 LTS (Focal Fossa)"
+	ID=ubuntu
+	ID_LIKE=debian
+	PRETTY_NAME="Ubuntu 20.04.6 LTS"
+	VERSION_ID="20.04"
+	HOME_URL="https://www.ubuntu.com/"
+	SUPPORT_URL="https://help.ubuntu.com/"
+	BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+	PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+	VERSION_CODENAME=focal
+	UBUNTU_CODENAME=focal
+'''
+# Refer to indicatortest and the platform module for obtaining the above information
+# and use that to discriminate the os/platform/distribution.
+#
+# What about a script to run the indicator too?
+#
+# What about upgrading?  Is this the same as install?
+# If so, add this to the instructions (regardless if sticking with current 
+# install instructions or going with new one).
+#
+#	https://test.pypi.org/project/indicatortest/
+#
+# On more thinking, packages such as python3-venv and python3-dev
+# (at least for Ubuntu/Debian) may not be installed by default and
+# are required to install the Python virtual environment.
+# If those packages are not installed by default, the 
+# venv cannot be created.
+# So the risk is that if just one distro does not have the necessary
+# packages installed by default to create the venv (and then run pip
+# to copy down the indicator) then any install script will be inaccessible.
+#
+# This idea is likely dead in the water :-(
+
+
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 # with the following:
