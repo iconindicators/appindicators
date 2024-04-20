@@ -90,6 +90,13 @@
 # to copy down the indicator) then any install script will be inaccessible.
 #
 # This idea is likely dead in the water :-(
+#
+# An issue to consider (if this actually was implemented)...
+# If a user creates the virtual environment and installs the indicator via pip
+# but the installation script fails because os is not supported
+# then need to tell the user exactly this and perhaps Echo that command
+# to uninstall everything.
+# Or can the user use the removal script?
 
 
 #TODO Update the PPA description at
