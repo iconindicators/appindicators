@@ -97,6 +97,17 @@
 # then need to tell the user exactly this and perhaps Echo that command
 # to uninstall everything.
 # Or can the user use the removal script?
+#
+# Have tried using Ubuntu 20.04 Live CD to run a test.
+# Tried to create a venv:
+#	python3 -m venv .local/venv_indicatortest
+# and the OS package python3-venv is needed.
+# This is likely true for all other OS/distributions.
+# So at the very least, if an installation script is created,
+# still need the first line in the install instructions to be 
+#	sudo apt install -y python3-venv
+# or similar and then can create the venv,
+# install the indicator via pip and then kick off the installation script.
 
 
 #TODO Update the PPA description at
