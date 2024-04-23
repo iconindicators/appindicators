@@ -39,6 +39,8 @@ class DataProviderOrbitalElement( DataProvider ):
         downloaded = False
         if orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET or orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
             downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
+#TODO Data from lowell for minor planets in xephem format seem to be missing the name of each object.
+#TODO Data from lowell for minor planets in mpc format seem to be missing the name of each object.
 
         elif orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.XEPHEM_COMET:
             downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType )
@@ -99,8 +101,16 @@ class DataProviderOrbitalElement( DataProvider ):
             json = { "query": query, "variables": variables }
             response = requests.post( url, None, json )
             data = response.json()
+#TODO When this fails (because Lowell is down say)
+# and so there is also no ephemerides data,
+# why is it there is a list of minor planets in the preferences?
+# I assumed if there is no data, there should be no list of minor planets
+# (or comets if that fails).            
+#
+# What about a similar situation to satellites?
             minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
 
+#TODO Check the logic below!
             with open( filename, 'w' ) as f:
                 for minorPlanet in minorPlanets:
                     primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
@@ -146,6 +156,8 @@ class DataProviderOrbitalElement( DataProvider ):
                         f.write( ','.join( components )  + '\n' )
 
                     else: #OE.DataType.SKYFIELD_MINOR_PLANET
+#TODO Change to elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET:
+# and add an else: with a log to warning/error.
                         components = [
                             ' ' * 7, # number or designation packed
                             ' ', # 8
