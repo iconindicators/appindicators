@@ -192,12 +192,14 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem.__calculateCometsMinorPlanets(
             observer, data,
             AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
-            apparentMagnitudeMaximum )
+            apparentMagnitudeMaximum,
+            logging )
 
         AstroPyEphem.__calculateCometsMinorPlanets(
             observer, data,
             AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
-            apparentMagnitudeMaximum )
+            apparentMagnitudeMaximum,
+            logging )
 
         AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
 
@@ -319,7 +321,15 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateCometsMinorPlanets( observer, data, bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData, apparentMagnitudeMaximum ):
+    def __calculateCometsMinorPlanets(
+            observer,
+            data,
+            bodyType,
+            cometsMinorPlanets,
+            orbitalElementData,
+            apparentMagnitudeData,
+            apparentMagnitudeMaximum,
+            logging ):
 
         def computeBody( observer, orbitalElementData ):
             body = ephem.readdb( orbitalElementData )
@@ -343,14 +353,36 @@ class AstroPyEphem( AstroBase ):
             return bad
 
 
-        if apparentMagnitudeData is None:
+        if bodyType == AstroBase.BodyType.COMET:
             for key in cometsMinorPlanets:
                 if key in orbitalElementData:
-                    body = computeBody( observer, orbitalElementData[ key ].getData() )
-                    if not isBad( body ) and body.mag <= apparentMagnitudeMaximum:
-                        AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
+#TODO Confirm with Jure @ COBS that the absolute magnitude g/H is now the apparent magnitude.                     
+                    # The absolute magnitude component of g/H has been over-written with the apparent magnitude by COBS.
+                    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+                    fields = orbitalElementData[ key ].getData().split( ',' )
+                    object_type = fields[ 2 - 1 ]
+                    if object_type == 'e':
+                        apparent_magnitude = fields[ 12 - 1 ]
+                        if apparent_magnitude.startswith( 'H' ) or apparent_magnitude.startswith( 'g' ): 
+                            apparent_magnitude = apparent_magnitude[ 1 : ].strip()
 
-        else:
+                    elif object_type == 'h':
+                        apparent_magnitude = fields[ 10 - 1 ]
+
+                    elif object_type == 'p':
+                        apparent_magnitude = fields[ 9 - 1 ]
+
+                    else:
+                        logging.warning( "Found unknown object type " + object_type + " for comet " + key ) #TODO Test
+                        continue
+
+                    if float( apparent_magnitude ) <= apparentMagnitudeMaximum:
+                        body = computeBody( observer, orbitalElementData[ key ].getData() )
+                        if not isBad( body ):
+                            AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
+
+#TODO Got an issue with missing names and other data from Lowell.  Sent an email 20240423.
+        else: # bodyType == AstroBase.BodyType.MINOR_PLANET
             for key in cometsMinorPlanets:
                 if key in orbitalElementData and \
                    key in apparentMagnitudeData and \
