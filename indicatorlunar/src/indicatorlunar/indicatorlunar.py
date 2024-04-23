@@ -19,6 +19,16 @@
 # Application indicator for the home astronomer.
 
 
+#TODO Seems to be an issue with the apparent magnitude data with comets
+# in which many comets have an apparent magnitude less than 6 but should not.
+# Have created comettest and will send to Jure.
+
+
+#TODO There is an issue with the minor planet data from Lowell.
+# The data is missing data, including the name of each minor planet.
+# Have sent an email to Lowell 20240423.
+
+
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
@@ -185,6 +195,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
+        self.debug = True # TODO Remove
 
 
     def flushTheCache( self ):
