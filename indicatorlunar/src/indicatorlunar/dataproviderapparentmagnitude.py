@@ -28,21 +28,24 @@ from dataprovider import DataProvider
 
 class DataProviderApparentMagnitude( DataProvider ):
 
-    # Download apparent magnitude data for comets and minor planets and save to the given filename.
+    # Download apparent magnitude data for comets and minor planets
+    # and save to the given filename.
     @staticmethod
-    def download( filename, logging, isComet, apparentMagnitudeMaximum = None ):
+    def download( filename, logging, isComet, apparentMagnitudeMaximum ):
         logging.getLogger( "urllib3" ).propagate = False
-        downloaded = False
         if isComet:
-            pass # Nothing to do as comet data from COBS contains updated/corrected absolute magnitude data in the ephemerides.
+            # Comet data from COBS contains updated absolute magnitude data in the ephemerides.
+            downloaded = False
 
         else:
-            downloaded = DataProviderApparentMagnitude.__downloadFromLowellMinorPlanetServices( filename, logging, apparentMagnitudeMaximum )
+            downloaded = DataProviderApparentMagnitude.__downloadFromLowellMinorPlanetServices(
+                filename, logging, apparentMagnitudeMaximum )
 
         return downloaded
 
 
-    # Downloads apparent magnitude data for minor planets from Lowell Minor Planet Services and saves to the given filename.
+    # Download apparent magnitude data for minor planets from Lowell Minor Planet Services
+    # and saves to the given filename.
     @staticmethod
     def __downloadFromLowellMinorPlanetServices( filename, logging, apparentMagnitudeMaximum ):
         try:
@@ -68,6 +71,7 @@ class DataProviderApparentMagnitude( DataProvider ):
                     {
                         ast_number
                         designameByIdDesignationPrimary { str_designame }
+                        designameByIdDesignationName { str_designame }
                         ephemeris
                         (
                             where:
@@ -97,9 +101,25 @@ class DataProviderApparentMagnitude( DataProvider ):
 
             with open( filename, 'w' ) as f:
                 for minorPlanet in minorPlanets:
-                    primaryDesignation = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
+                    asteroid_number = minorPlanet[ "ast_number" ]
+                    if asteroid_number is None:
+                        continue # Not all asteroids / minor planets have a number. 
+                        #TODO Need to see what happens when a minor planet has no ast_number; maybe set the magnitude limit to 1000?
+
+                    #TODO Likely not needed.
+                    # designationPrimary = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ]
+
+                    if minorPlanet[ "designameByIdDesignationName" ] is None:
+                        continue # Not all asteroids / minor planets have names.
+
+                    designationName = minorPlanet[ "designameByIdDesignationName" ][ "str_designame" ]
+
+                    #TODO Likely not needed.
+                    # designationNumber = minorPlanet[ "designameByIdDesignationNumber" ][ "str_designame" ]
+
                     apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
-                    f.write( primaryDesignation + ',' + apparentMagnitude  + '\n' )
+                    # f.write( primaryDesignation + ',' + apparentMagnitude  + '\n' )#TODO Likely not needed.
+                    f.write( str( asteroid_number ) + ' ' + designationName + ',' + apparentMagnitude + '\n' )
 
             downloaded = True
 

@@ -21,9 +21,8 @@
 
 
 import datetime
-import requests
-
 from enum import Enum
+import requests
 
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase
@@ -32,21 +31,23 @@ from indicatorbase import IndicatorBase
 class DataProviderOrbitalElement( DataProvider ):
 
     # Download orbital element data and save to the given filename.
-    # If the maximum apparent magnitude does not apply for the given data type, set to None.
     @staticmethod
     def download( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         logging.getLogger( "urllib3" ).propagate = False
-        downloaded = False
-        if orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET or orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
-            downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
-#TODO Data from lowell for minor planets in xephem format seem to be missing the name of each object.
-#TODO Data from lowell for minor planets in mpc format seem to be missing the name of each object.
 
-        elif orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.XEPHEM_COMET:
-            downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType )
+        if orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET or \
+           orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
+            downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices(
+                filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
+
+        elif orbitalElementDataType == OE.DataType.SKYFIELD_COMET or \
+             orbitalElementDataType == OE.DataType.XEPHEM_COMET:
+            downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase(
+                filename, logging, orbitalElementDataType )
 
         else:
             logging.error( "Unknown data type: " + str( orbitalElementDataType ) )
+            downloaded = False
 
         return downloaded
 
@@ -83,6 +84,7 @@ class DataProviderOrbitalElement( DataProvider ):
                         {
                             ast_number
                             designameByIdDesignationPrimary { str_designame }
+                            designameByIdDesignationName { str_designame }
                             h # Absolute magnitude
                             ephemeris( where: { eph_date: { _eq: $date } } ) { v_mag }
                         }
@@ -113,7 +115,19 @@ class DataProviderOrbitalElement( DataProvider ):
 #TODO Check the logic below!
             with open( filename, 'w' ) as f:
                 for minorPlanet in minorPlanets:
-                    primaryDesignation = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()
+                    asteroid_number = minorPlanet[ "minorplanet" ][ "ast_number" ]
+                    if asteroid_number is None:
+                        continue # Not all asteroids / minor planets have a number. 
+                        #TODO Need to see what happens when a minor planet has no ast_number; maybe set the magnitude limit to 1000?
+
+                    if minorPlanet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
+                        continue # Not all asteroids / minor planets have names.
+
+                    designationName = minorPlanet[ "minorplanet" ][ "designameByIdDesignationName" ][ "str_designame" ]
+
+                    designation = str( asteroid_number ) + ' ' + designationName
+
+                    # designationPrimary = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()  #TODO Not needed
                     absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
                     slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
                     meanAnomalyEpoch = str( minorPlanet[ 'm' ] )
@@ -139,7 +153,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
                     if orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
                         components = [
-                            primaryDesignation,
+                            designation,
                             'e',
                             inclinationToEcliptic,
                             longitudeAscendingNode,
@@ -155,9 +169,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
                         f.write( ','.join( components )  + '\n' )
 
-                    else: #OE.DataType.SKYFIELD_MINOR_PLANET
-#TODO Change to elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-# and add an else: with a log to warning/error.
+                    else: # OE.DataType.SKYFIELD_MINOR_PLANET
                         components = [
                             ' ' * 7, # number or designation packed
                             ' ', # 8
@@ -201,7 +213,7 @@ class DataProviderOrbitalElement( DataProvider ):
                             ' ', # 161
                             ' ' * 4, # hexdigit flags
                             ' ', # 166
-                            primaryDesignation.ljust( 194 - 167 + 1 ),
+                            designation.ljust( 194 - 167 + 1 ),
                             ' ' * 8 ] # date last observation
 
                         f.write( ''.join( components )  + '\n' )
