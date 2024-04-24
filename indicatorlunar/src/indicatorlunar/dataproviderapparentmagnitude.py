@@ -106,19 +106,12 @@ class DataProviderApparentMagnitude( DataProvider ):
                         continue # Not all asteroids / minor planets have a number. 
                         #TODO Need to see what happens when a minor planet has no ast_number; maybe set the magnitude limit to 1000?
 
-                    #TODO Likely not needed.
-                    # designationPrimary = minorPlanet[ "designameByIdDesignationPrimary" ][ "str_designame" ]
-
                     if minorPlanet[ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.
 
                     designationName = minorPlanet[ "designameByIdDesignationName" ][ "str_designame" ]
 
-                    #TODO Likely not needed.
-                    # designationNumber = minorPlanet[ "designameByIdDesignationNumber" ][ "str_designame" ]
-
                     apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
-                    # f.write( primaryDesignation + ',' + apparentMagnitude  + '\n' )#TODO Likely not needed.
                     f.write( str( asteroid_number ) + ' ' + designationName + ',' + apparentMagnitude + '\n' )
 
             downloaded = True

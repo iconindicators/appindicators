@@ -52,7 +52,8 @@ class DataProviderOrbitalElement( DataProvider ):
         return downloaded
 
 
-    # Download orbital element data for minor planets from Lowell Minor Planet Services and save to the given filename.
+    # Download orbital element data for minor planets from Lowell Minor Planet Services
+    # and save to the given filename.
     @staticmethod
     def __downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         try:
@@ -112,7 +113,6 @@ class DataProviderOrbitalElement( DataProvider ):
 # What about a similar situation to satellites?
             minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
 
-#TODO Check the logic below!
             with open( filename, 'w' ) as f:
                 for minorPlanet in minorPlanets:
                     asteroid_number = minorPlanet[ "minorplanet" ][ "ast_number" ]
@@ -127,7 +127,6 @@ class DataProviderOrbitalElement( DataProvider ):
 
                     designation = str( asteroid_number ) + ' ' + designationName
 
-                    # designationPrimary = minorPlanet[ "minorplanet" ][ "designameByIdDesignationPrimary" ][ "str_designame" ].strip()  #TODO Not needed
                     absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
                     slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
                     meanAnomalyEpoch = str( minorPlanet[ 'm' ] )
@@ -137,9 +136,9 @@ class DataProviderOrbitalElement( DataProvider ):
                     orbitalEccentricity = str( minorPlanet[ 'e' ] )
                     semimajorAxis = str( minorPlanet[ 'a' ] )
 
-                    # Whilst Skyfield has one format for minor planets,
-                    # XEphem has three body based on the value of the eccentricity: < 1, == 1, > 1:
-                    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+                    # XEphem has three formats for minor planets
+                    # based on the value of the eccentricity ( < 1, == 1, > 1 ):
+                    #   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
                     # When the eccentricity is >= 1, the format is the same and requires date of epoch of perihelion,
                     # which does not appear to be present in the Lowell data.
                     # After checking both the Minor Planet Center's MPCORB.DAT and Lowell's astorb.dat,
@@ -257,7 +256,8 @@ class DataProviderOrbitalElement( DataProvider ):
         return packedYear + packedMonth + packedDay
 
 
-    # Download orbital element data for comets from Comet Observation Database and save to the given filename.
+    # Download orbital element data for comets from Comet Observation Database
+    # and save to the given filename.
     @staticmethod
     def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType ):
         url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true"
@@ -281,11 +281,11 @@ class DataProviderOrbitalElement( DataProvider ):
     def load( filename, logging, orbitalElementDataType ):
         oeData = { }
         if orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-            if orbitalElementDataType == OE.DataType.SKYFIELD_COMET: # Format: https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+            if orbitalElementDataType == OE.DataType.SKYFIELD_COMET: # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 nameStart = 103 - 1
                 nameEnd = 158 - 1
 
-            elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET: # Format: https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+            elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET: # https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
                 nameStart = 167 - 1
                 nameEnd = 194 - 1
 
