@@ -104,13 +104,6 @@ class DataProviderOrbitalElement( DataProvider ):
             json = { "query": query, "variables": variables }
             response = requests.post( url, None, json )
             data = response.json()
-#TODO When this fails (because Lowell is down say)
-# and so there is also no ephemerides data,
-# why is it there is a list of minor planets in the preferences?
-# I assumed if there is no data, there should be no list of minor planets
-# (or comets if that fails).            
-#
-# What about a similar situation to satellites?
             minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
 
             with open( filename, 'w' ) as f:

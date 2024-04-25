@@ -21,7 +21,11 @@
 
 #TODO Seems to be an issue with the apparent magnitude data with comets
 # in which many comets have an apparent magnitude less than 6 but should not.
-# Have created comettest and will send to Jure.
+# Have created comettest and sent to Jure.
+#
+# Jure tells me that the absolute magnitude value he inserts into the orbital element data
+# should not be treated as apparent magnitude.
+# He will send me a script to show how he converts from absolute to apparent.
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -1285,10 +1289,11 @@ class IndicatorLunar( IndicatorBase ):
         MINOR_PLANET_STORE_INDEX_NAME = 1
         MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME = 2
         minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-        for minorPlanet in sorted( self.minorPlanetOrbitalElementData.keys() ):
-            minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetOrbitalElementData[ minorPlanet ].getName() ] )
+        if self.minorPlanetApparentMagnitudeData:
+            for minorPlanet in sorted( self.minorPlanetOrbitalElementData.keys() ):
+                minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetOrbitalElementData[ minorPlanet ].getName() ] )
 
-        if self.minorPlanetOrbitalElementData:
+        if self.minorPlanetOrbitalElementData and self.minorPlanetApparentMagnitudeData:
             toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
                           _( "Clicking the header of the first column\n" + \
                              "will toggle all checkboxes." )

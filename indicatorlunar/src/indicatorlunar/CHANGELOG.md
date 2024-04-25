@@ -2,6 +2,7 @@
 
 ## v1.0.101 (2023-11-22)
 
+- Bug fix: Minor planets would display in the preferences despite missing apparent magnitude data.
 - Now uses
 
         datetime.datetime.now( datetime.timezone.utc )
