@@ -294,7 +294,8 @@ class AstroSkyfield( AstroBase ):
         # locationAtNow = ( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )#TODO Might no longer be needed.
 
         latitude_longitude_elevation = wgs84.latlon( latitude, longitude, elevation )
-        location = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + wgs84.latlon( latitude, longitude, elevation )
+        location = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + \
+                   wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = location.at( now )
 
         AstroSkyfield.__calculateMoon(
@@ -495,7 +496,7 @@ class AstroSkyfield( AstroBase ):
         for planetName in planets:
             planet = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_MAPPINGS[ planetName ] ]
             apparentMagnitude = planetary_magnitude( earthAtNow.observe( planet ) )
-            if planetName == AstroBase.PLANET_SATURN and math.isnan( apparentMagnitude ):  # Saturn can return NaN...
+            if planetName == AstroBase.PLANET_SATURN and math.isnan( apparentMagnitude ): # Saturn can return NaN...
                 apparentMagnitude = 0.46 # Set the mean apparent magnitude (as per Wikipedia).
 
             if apparentMagnitude <= apparentMagnitudeMaximum:
@@ -561,7 +562,6 @@ class AstroSkyfield( AstroBase ):
                         if float( apparent_magnitude ) <= apparentMagnitudeMaximum:
                             f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
 
-#TODO Got an issue with missing names and other data from Lowell.  Sent an email 20240423.
             else: # bodyType == AstroBase.BodyType.MINOR_PLANET
                 for key in cometsMinorPlanets:
                     if key in orbitalElementData and \
