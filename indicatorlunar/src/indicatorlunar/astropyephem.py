@@ -381,7 +381,6 @@ class AstroPyEphem( AstroBase ):
                         if not isBad( body ):
                             AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
 
-#TODO Got an issue with missing names and other data from Lowell.  Sent an email 20240423.
         else: # bodyType == AstroBase.BodyType.MINOR_PLANET
             for key in cometsMinorPlanets:
                 if key in orbitalElementData and \
