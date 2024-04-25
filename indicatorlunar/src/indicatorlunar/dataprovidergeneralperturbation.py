@@ -29,7 +29,8 @@ from indicatorbase import IndicatorBase
 
 class DataProviderGeneralPerturbation( DataProvider ):
 
-    # Download general perturbation data from Celestrak and save to the given filename.
+    # Download general perturbation data from Celestrak
+    # and save to the given filename.
     @staticmethod
     def download( filename, logging ):
         url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
