@@ -97,7 +97,6 @@ class DataProviderApparentMagnitude( DataProvider ):
                     asteroid_number = minorPlanet[ "ast_number" ]
                     if asteroid_number is None:
                         continue # Not all asteroids / minor planets have a number. 
-                        #TODO Need to see what happens when a minor planet has no ast_number; maybe set the magnitude limit to 1000?
 
                     if minorPlanet[ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.

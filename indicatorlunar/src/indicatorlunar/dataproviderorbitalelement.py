@@ -111,7 +111,6 @@ class DataProviderOrbitalElement( DataProvider ):
                     asteroid_number = minorPlanet[ "minorplanet" ][ "ast_number" ]
                     if asteroid_number is None:
                         continue # Not all asteroids / minor planets have a number. 
-                        #TODO Need to see what happens when a minor planet has no ast_number; maybe set the magnitude limit to 1000?
 
                     if minorPlanet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.
