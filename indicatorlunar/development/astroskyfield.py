@@ -242,30 +242,102 @@ class AstroSkyfield( AstroBase ):
 #    https://rhodesmill.org/skyfield/almanac.html#risings-and-settings
     @staticmethod
     def __calculateCommonNEW( now, nowPlusWhatever, location, locationAtNow, data, key, body ):
-
-        # if key == ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ):
+        neverUp = False
         rise_date_time, rises = almanac.find_risings( location, body, now, nowPlusWhatever )
-        print(t1.utc_iso(' '))
-        print(y1)
-
-        print( "----------")
-
         set_date_time, sets = almanac.find_settings( location, body, now, nowPlusWhatever )
-        print(t2.utc_iso(' '))
-        print(y2)
 
-        if rises and sets:
-            print( "Rises and sets:" )
-            print( rise_date_time.utc_datetime() )
-            print( set_date_time.utc_datetime() )
+        # print( rise_date_time.utc_datetime() )
+        # print( rises )
+        # print( set_date_time.utc_datetime() )
+        # print( sets )
 
-            # data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = riseDateTime.utc_datetime()
-            # data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = setDateTime.utc_datetime()
-            #
-            # alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-            # data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            # data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+        if rises.item( 0 ) and sets.item( 0 ):
+            print( "Rises and sets" )
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = rise_date_time.utc_datetime()
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = set_date_time.utc_datetime()
 
+            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+
+        elif not sets.item( 0 ):
+            print( "always up" )
+            # Never sets (always up).
+            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+
+        else: # not rises.item( 0 )
+            print( "never up" )
+            neverUp = True # Never rises (never up).  Note that it is impossible to be never up and always up.
+
+        return neverUp
+
+
+        # from skyfield import almanac
+        # from skyfield.api import N, S, E, W, load, wgs84
+        # harra_sweden = wgs84.latlon(67.4066 * N, 20.0997 * E)
+        # harra_observer = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + harra_sweden
+        #
+        # timeScale = load.timescale( builtin = True )
+        # t0 = timeScale.utc(2022, 12, 18)
+        # t1 = timeScale.utc(2022, 12, 26)
+        # t, y = almanac.find_risings(harra_observer, AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ], t0, t1)
+        #
+        # if not y.item( 0 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 1 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 2 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 3 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 4 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 5 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 6 ): print( True )
+        # else: print( False )
+        #
+        # if not y.item( 7 ): print( True )
+        # else: print( False )
+        #
+        # alt, az, dist = harra_observer.at( t ).observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
+        #
+        # for ti, yi, alti in zip(t.utc_iso(' '), y, alt.degrees):
+        #     print('{} {:5} {:.4f}°'.format(ti, str(yi), alti))
+
+
+
+        # print( rise_date_time.utc_datetime() )
+        # print( rises )
+        # print( set_date_time.utc_datetime() )
+        # print( sets )
+
+        # if rises and sets:
+        #     print( "Rises and sets:" )
+        #     print( rise_date_time.utc_datetime() )
+        #     print( rises )
+        #     print( set_date_time.utc_datetime() )
+        #     print( sets )
+        #
+        #     # data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = riseDateTime.utc_datetime()
+        #     # data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = setDateTime.utc_datetime()
+        #     #
+        #     # alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
+        #     # data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+        #     # data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+        #
+        # else:
+        #     print( "never up or always up" )
+        #     print( rises )
+        #     print( sets )
 
 
     @staticmethod
@@ -284,6 +356,7 @@ class AstroSkyfield( AstroBase ):
 
         timeScale = load.timescale( builtin = True )
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
+        now = timeScale.utc( 2023, 6, 21, 10, 28, 55 )
         nowPlusTwentyFiveHours = now + datetime.timedelta( hours = 25 ) # Rise/set window for most bodies.
         # nowPlusThirtySixHours = now + datetime.timedelta( hours = 36 ) # Rise/set window for the moon.
         # nowPlusThirtyOneDays = now + datetime.timedelta( days = 31 ) # Moon phases search window.
@@ -294,13 +367,14 @@ class AstroSkyfield( AstroBase ):
         # locationAtNow = ( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )#TODO Might no longer be needed.
 
         latitude_longitude_elevation = wgs84.latlon( latitude, longitude, elevation )
+        latitude_longitude_elevation = wgs84.latlon( 71, -156 )
         location = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + \
                    wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = location.at( now )
 
         AstroSkyfield.__calculateMoon(
             now,
-            locationAtNow, location,
+            location, locationAtNow,
             data )
 
         AstroSkyfield.__calculateSun(
@@ -310,19 +384,19 @@ class AstroSkyfield( AstroBase ):
         
         AstroSkyfield.__calculatePlanets(
             now, nowPlusTwentyFiveHours,
-            locationAtNow, locationAtNow,
+            location, locationAtNow,
             data,
             planets, apparentMagnitudeMaximum )
         
         AstroSkyfield.__calculateStars(
             now, nowPlusTwentyFiveHours,
-            locationAtNow, locationAtNow,
+            location, locationAtNow,
             data,
             stars, apparentMagnitudeMaximum )
 
         AstroSkyfield.__calculateCometsMinorPlanets(
             now, nowPlusTwentyFiveHours, timeScale,
-            locationAtNow, locationAtNow,
+            location, locationAtNow,
             data,
             AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
             apparentMagnitudeMaximum,
@@ -330,7 +404,7 @@ class AstroSkyfield( AstroBase ):
 
         AstroSkyfield.__calculateCometsMinorPlanets(
             now, nowPlusTwentyFiveHours, timeScale,
-            locationAtNow, locationAtNow,
+            location, locationAtNow,
             data,
             AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
             apparentMagnitudeMaximum,
@@ -374,7 +448,8 @@ class AstroSkyfield( AstroBase ):
     def __calculateMoon( now, location, locationAtNow, data ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
 
-        moonAtNowApparent = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] ).apparent()
+        moonAtNow = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] )
+        moonAtNowApparent = moonAtNow.apparent()
 
         illumination = moonAtNowApparent.fraction_illuminated( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ) * 100
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
