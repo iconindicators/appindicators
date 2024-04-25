@@ -253,12 +253,18 @@ class AstroSkyfield( AstroBase ):
 
         if rises.item( 0 ) and sets.item( 0 ):
             print( "Rises and sets" )
-            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = rise_date_time.utc_datetime()
-            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = set_date_time.utc_datetime()
+            # data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = rise_date_time.utc_datetime()
+            # data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = set_date_time.utc_datetime()
 
             alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+            # data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            # data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+
+            print( rise_date_time.utc_datetime() )
+            print( set_date_time.utc_datetime() )
+            print( str( az.radians ) )
+            print( str( alt.radians ) )
+
 
         elif not sets.item( 0 ):
             print( "always up" )
@@ -356,7 +362,7 @@ class AstroSkyfield( AstroBase ):
 
         timeScale = load.timescale( builtin = True )
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        now = timeScale.utc( 2023, 6, 21, 10, 28, 55 )
+        # now = timeScale.utc( 2023, 6, 21, 10, 28, 55 )
         nowPlusTwentyFiveHours = now + datetime.timedelta( hours = 25 ) # Rise/set window for most bodies.
         # nowPlusThirtySixHours = now + datetime.timedelta( hours = 36 ) # Rise/set window for the moon.
         # nowPlusThirtyOneDays = now + datetime.timedelta( days = 31 ) # Moon phases search window.
@@ -367,7 +373,7 @@ class AstroSkyfield( AstroBase ):
         # locationAtNow = ( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )#TODO Might no longer be needed.
 
         latitude_longitude_elevation = wgs84.latlon( latitude, longitude, elevation )
-        latitude_longitude_elevation = wgs84.latlon( 71, -156 )
+        # latitude_longitude_elevation = wgs84.latlon( 71, -156 )
         location = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + \
                    wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = location.at( now )
@@ -686,9 +692,13 @@ class AstroSkyfield( AstroBase ):
                 data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
                 if key == ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ): #TODO Testing
-                    print( "Original calculate common" )
+                    print( "Original calculate common for sun:" )
                     print( riseDateTime.utc_datetime() )
                     print( setDateTime.utc_datetime() )
+                    print( str( az.radians ) )
+                    print( str( alt.radians ) )
+                    print()
+
 
         else:
             # There is one rise OR one set OR no rises/sets.
