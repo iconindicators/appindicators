@@ -19,18 +19,6 @@
 # Calculate astronomical information using Skyfield.
 
 
-#TODO See
-# https://github.com/skyfielders/python-skyfield/commit/d1ad1f859518e5cae244f9901eadbc7bb3991bc8
-# https://rhodesmill.org/skyfield/almanac.html
-# Look for find_risings and find_settings...seems to be a lot faster.
-# First test the time to compute moon, sun, all planets and all stars.
-# Then implement new method (in a common function) and run the test again...should be better
-# but check results for accuracy against PyEphem.
-#
-# Also not sure what happens at the poles; how to tell when we are
-# (do we get nonsense results and if so, maybe use the polar stuff...see the polar section same page)
-
-
 #TODO If/when astroskyfield.py is included in the release,
 # put a data directory at
 #   indicatorlunar/src/indicatorlunar/data
@@ -238,114 +226,6 @@ class AstroSkyfield( AstroBase ):
         "Zurich"            :   ( 47.3833333, 8.5333333, 405.500916 ) }
 
 
-#TODO Testing out the new risings/settings code.
-#    https://rhodesmill.org/skyfield/almanac.html#risings-and-settings
-    @staticmethod
-    def __calculateCommonNEW( now, nowPlusWhatever, location, locationAtNow, data, key, body ):
-        neverUp = False
-        rise_date_time, rises = almanac.find_risings( location, body, now, nowPlusWhatever )
-        set_date_time, sets = almanac.find_settings( location, body, now, nowPlusWhatever )
-
-        # print( rise_date_time.utc_datetime() )
-        # print( rises )
-        # print( set_date_time.utc_datetime() )
-        # print( sets )
-
-        if rises.item( 0 ) and sets.item( 0 ):
-            print( "Rises and sets" )
-            # data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = rise_date_time.utc_datetime()
-            # data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = set_date_time.utc_datetime()
-
-            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-            # data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            # data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
-
-            print( rise_date_time.utc_datetime() )
-            print( set_date_time.utc_datetime() )
-            print( str( az.radians ) )
-            print( str( alt.radians ) )
-
-
-        elif not sets.item( 0 ):
-            print( "always up" )
-            # Never sets (always up).
-            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
-
-        else: # not rises.item( 0 )
-            print( "never up" )
-            neverUp = True # Never rises (never up).  Note that it is impossible to be never up and always up.
-
-        return neverUp
-
-
-        # from skyfield import almanac
-        # from skyfield.api import N, S, E, W, load, wgs84
-        # harra_sweden = wgs84.latlon(67.4066 * N, 20.0997 * E)
-        # harra_observer = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + harra_sweden
-        #
-        # timeScale = load.timescale( builtin = True )
-        # t0 = timeScale.utc(2022, 12, 18)
-        # t1 = timeScale.utc(2022, 12, 26)
-        # t, y = almanac.find_risings(harra_observer, AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ], t0, t1)
-        #
-        # if not y.item( 0 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 1 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 2 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 3 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 4 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 5 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 6 ): print( True )
-        # else: print( False )
-        #
-        # if not y.item( 7 ): print( True )
-        # else: print( False )
-        #
-        # alt, az, dist = harra_observer.at( t ).observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
-        #
-        # for ti, yi, alti in zip(t.utc_iso(' '), y, alt.degrees):
-        #     print('{} {:5} {:.4f}°'.format(ti, str(yi), alti))
-
-
-
-        # print( rise_date_time.utc_datetime() )
-        # print( rises )
-        # print( set_date_time.utc_datetime() )
-        # print( sets )
-
-        # if rises and sets:
-        #     print( "Rises and sets:" )
-        #     print( rise_date_time.utc_datetime() )
-        #     print( rises )
-        #     print( set_date_time.utc_datetime() )
-        #     print( sets )
-        #
-        #     # data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = riseDateTime.utc_datetime()
-        #     # data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = setDateTime.utc_datetime()
-        #     #
-        #     # alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-        #     # data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-        #     # data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
-        #
-        # else:
-        #     print( "never up or always up" )
-        #     print( rises )
-        #     print( sets )
-
-
     @staticmethod
     def calculate(
             utcNow,
@@ -362,18 +242,9 @@ class AstroSkyfield( AstroBase ):
 
         timeScale = load.timescale( builtin = True )
         now = timeScale.utc( utcNow.year, utcNow.month, utcNow.day, utcNow.hour, utcNow.minute, utcNow.second )
-        # now = timeScale.utc( 2023, 6, 21, 10, 28, 55 )
         nowPlusTwentyFiveHours = now + datetime.timedelta( hours = 25 ) # Rise/set window for most bodies.
-        # nowPlusThirtySixHours = now + datetime.timedelta( hours = 36 ) # Rise/set window for the moon.
-        # nowPlusThirtyOneDays = now + datetime.timedelta( days = 31 ) # Moon phases search window.
-        # nowPlusSevenMonths = now + datetime.timedelta( days = 366 / 12 * 7 ) # Solstice/equinox search window.
-        # nowPlusOneYear = now + datetime.timedelta( days = 366 ) # Eclipse search window.
-
-        # location = wgs84.latlon( latitude, longitude, elevation )
-        # locationAtNow = ( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + location ).at( now )#TODO Might no longer be needed.
 
         latitude_longitude_elevation = wgs84.latlon( latitude, longitude, elevation )
-        # latitude_longitude_elevation = wgs84.latlon( 71, -156 )
         location = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ] + \
                    wgs84.latlon( latitude, longitude, elevation )
         locationAtNow = location.at( now )
@@ -473,9 +344,9 @@ class AstroSkyfield( AstroBase ):
         sunAltAz = locationAtNow.observe( AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] ).apparent().altaz()
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( position_angle_of( moonAtNowApparent.altaz(), sunAltAz ).radians ) # Needed for icon.
 
-        nowPlusThirtySixHours = now + datetime.timedelta( hours = 36 ) # Rise/set window for the moon.
         neverUp = AstroSkyfield.__calculateCommon(
-            now, nowPlusThirtySixHours,
+            now,
+            now + datetime.timedelta( hours = 36 ), # Rise/set window for the moon.
             location, locationAtNow,
             data, key, AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__MOON ] )
 
@@ -491,20 +362,17 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateSun( now, nowPlusTwentyFiveHours, location, locationAtNow, data ):
         key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
+
         neverUp = AstroSkyfield.__calculateCommon(
             now, nowPlusTwentyFiveHours,
             location, locationAtNow,
             data, key, AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] )
 
-#TODO Testing
-        AstroSkyfield.__calculateCommonNEW(
-            now, nowPlusTwentyFiveHours,
-            location, locationAtNow,
-            data, key, AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] )
-
         if not neverUp:
-            nowPlusSevenMonths = now + datetime.timedelta( days = 366 / 12 * 7 ) # Solstice/equinox search window.
-            dateTimes, events = almanac.find_discrete( now, nowPlusSevenMonths, almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
+            dateTimes, events = almanac.find_discrete(
+                now,
+                now + datetime.timedelta( days = 366 / 12 * 7 ), # Solstice/equinox search window.
+                almanac.seasons( AstroSkyfield.__EPHEMERIS_PLANETS ) )
             eventsToDateTimes = dict( zip( events[ : 2 ], dateTimes[ : 2 ].utc_datetime() ) ) # Take first two events to avoid an unforeseen edge case!
 
             if almanac.SEASON_EVENTS_NEUTRAL.index( "March Equinox" ) in eventsToDateTimes:
@@ -656,11 +524,8 @@ class AstroSkyfield( AstroBase ):
             if bodyType == AstroBase.BodyType.COMET:
                 dataframe = mpc.load_comets_dataframe( f )
 
-            elif bodyType == AstroBase.BodyType.MINOR_PLANET:
+            else: # bodyType == AstroBase.BodyType.MINOR_PLANET
                 dataframe = mpc.load_mpcorb_dataframe( f )
-
-            else:
-                pass #TODO Maybe log a warning?
 
         dataframe = dataframe.set_index( "designation", drop = False )
         return dataframe
@@ -669,55 +534,26 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def __calculateCommon( now, nowPlusWhatever, location, locationAtNow, data, key, body ):
         neverUp = False
-        dateTimes, events = almanac.find_discrete( now, nowPlusWhatever, almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target ) ) # Using 'target' is safe: https://github.com/skyfielders/python-skyfield/issues/567
-        if len( events ) >= 2:
-            foundRiseSet = True
-            if events[ 0 ] == 1 and events[ 1 ] == 0: # Rise = 1, set = 0, https://rhodesmill.org/skyfield/almanac.html
-                riseDateTime = dateTimes[ 0 ]
-                setDateTime = dateTimes[ 1 ]
 
-            elif events[ 0 ] == 0 and events[ 1 ] == 1: # Rise = 1, set = 0, https://rhodesmill.org/skyfield/almanac.html
-                riseDateTime = dateTimes[ 1 ]
-                setDateTime = dateTimes[ 0 ]
+        # https://rhodesmill.org/skyfield/almanac.html#risings-and-settings
+        rise_date_time, rises = almanac.find_risings( location, body, now, nowPlusWhatever )
+        set_date_time, sets = almanac.find_settings( location, body, now, nowPlusWhatever )
 
-            else:
-                foundRiseSet = False
+        if rises.item( 0 ) and sets.item( 0 ): # Rises and sets.
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = rise_date_time[ 0 ].utc_datetime()
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = set_date_time[ 0 ].utc_datetime()
 
-            if foundRiseSet:
-                data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = riseDateTime.utc_datetime()
-                data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = setDateTime.utc_datetime()
+            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
-                alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-                data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-                data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
+        elif not sets.item( 0 ): # Never sets (always up).
+            alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
+            data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
+            data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
-                if key == ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ): #TODO Testing
-                    print( "Original calculate common for sun:" )
-                    print( riseDateTime.utc_datetime() )
-                    print( setDateTime.utc_datetime() )
-                    print( str( az.radians ) )
-                    print( str( alt.radians ) )
-                    print()
-
-
-        else:
-            # There is one rise OR one set OR no rises/sets.
-            #
-            # If there are no rises/sets, the body is either 'always up' or 'never up'.
-            #
-            # If there is one rise or one set, this would occur say close to the poles.
-            # A body which has been below the horizon for weeks/months and is due to rise,
-            # will result in a single value (the rise) and there will be no set.
-            # Similarly for a body above the horizon.
-            # Treat these single rise/set events as 'always up' or 'never up'
-            # until the body actually rises or sets.
-            if almanac.risings_and_settings( AstroSkyfield.__EPHEMERIS_PLANETS, body, locationAtNow.target )( now ): # Body is up (and so always up).
-                alt, az, earthBodyDistance = locationAtNow.observe( body ).apparent().altaz()
-                data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = str( az.radians )
-                data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
-
-            else:
-                neverUp = True # Body is down (and so never up).
+        else: # not rises.item( 0 )
+            neverUp = True # Never rises (never up).  It is impossible to be never up AND always up.
 
         return neverUp
 
