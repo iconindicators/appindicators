@@ -354,31 +354,48 @@ class AstroPyEphem( AstroBase ):
 
 
         if bodyType == AstroBase.BodyType.COMET:
+            sun = ephem.Sun()
+            sun.compute( observer )
             for key in cometsMinorPlanets:
                 if key in orbitalElementData:
-#TODO Confirm with Jure @ COBS that the absolute magnitude g/H is now the apparent magnitude.                     
-                    # The absolute magnitude component of g/H has been over-written with the apparent magnitude by COBS.
-                    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
                     fields = orbitalElementData[ key ].getData().split( ',' )
                     object_type = fields[ 2 - 1 ]
+                    is_gk = True
                     if object_type == 'e':
-                        apparent_magnitude = fields[ 12 - 1 ]
-                        if apparent_magnitude.startswith( 'H' ) or apparent_magnitude.startswith( 'g' ): 
-                            apparent_magnitude = apparent_magnitude[ 1 : ].strip()
+                        absolute_magnitude = fields[ 12 - 1 ]
+                        slope_parameter = fields[ 13 - 1 ]
+                        if absolute_magnitude.startswith( 'H' ):
+                            is_gk = False
+                            absolute_magnitude = absolute_magnitude[ 1 : ].strip()
+
+                        elif absolute_magnitude.startswith( 'g' ):
+                            absolute_magnitude = absolute_magnitude[ 1 : ].strip()
 
                     elif object_type == 'h':
-                        apparent_magnitude = fields[ 10 - 1 ]
+                        absolute_magnitude = fields[ 10 - 1 ]
+                        slope_parameter = fields[ 11 - 1 ]
 
                     elif object_type == 'p':
-                        apparent_magnitude = fields[ 9 - 1 ]
+                        absolute_magnitude = fields[ 9 - 1 ]
+                        slope_parameter = fields[ 10 - 1 ]
 
                     else:
-                        logging.warning( "Found unknown object type " + object_type + " for comet " + key ) #TODO Test
+                        logging.warning( "Found unknown object type " + object_type + " for comet " + key )
                         continue
 
-                    if float( apparent_magnitude ) <= apparentMagnitudeMaximum:
-                        body = computeBody( observer, orbitalElementData[ key ].getData() )
-                        if not isBad( body ):
+                    body = computeBody( observer, orbitalElementData[ key ].getData() )
+                    if not isBad( body ):
+                        if is_gk:
+                            apparent_magnitude = AstroBase.getApparentMagnitude_gk(
+                                float( absolute_magnitude ), float( slope_parameter ),
+                                body.earth_distance, body.sun_distance )
+
+                        else:
+                            apparent_magnitude = AstroBase.getApparentMagnitude_HG(
+                                float( absolute_magnitude ), float( slope_parameter ),
+                                body.earth_distance, body.sun_distance, sun.earth_distance )
+
+                        if apparent_magnitude <= apparentMagnitudeMaximum:
                             AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
 
         else: # bodyType == AstroBase.BodyType.MINOR_PLANET
