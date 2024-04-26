@@ -274,19 +274,29 @@ class DataProviderOrbitalElement( DataProvider ):
         oeData = { }
         if orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET:
             if orbitalElementDataType == OE.DataType.SKYFIELD_COMET: # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-                nameStart = 103 - 1
-                nameEnd = 158 - 1
+                nameStart = 103
+                nameEnd = 158
+                valid_indices = [ 13, 14, 19, 22, 30, 40, 41, 50, 51, 60, 61, 70, 71, 80, 81, 90, 91, 96, 101, 102, 159 ]
 
             elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET: # https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                nameStart = 167 - 1
-                nameEnd = 194 - 1
+                nameStart = 167
+                nameEnd = 194
+                valid_indices = [ 8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
             try:
                 with open( filename, 'r' ) as f:
                     for line in f.read().splitlines():
-                        name = line[ nameStart : nameEnd + 1 ].strip()
-                        oe = OE( name, line, orbitalElementDataType )
-                        oeData[ oe.getName().upper() ] = oe
+                        keep = True
+                        for i in valid_indices:
+                            if len( line [ i - 1 ].strip() ) > 0:
+                                keep = False
+                                print( line )
+                                break
+
+                        if keep:
+                            name = line[ nameStart - 1 : nameEnd - 1 + 1 ].strip()
+                            oe = OE( name, line, orbitalElementDataType )
+                            oeData[ oe.getName().upper() ] = oe
 
             except Exception as e:
                 oeData = { }
