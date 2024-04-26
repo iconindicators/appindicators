@@ -290,7 +290,6 @@ class DataProviderOrbitalElement( DataProvider ):
                         for i in valid_indices:
                             if len( line [ i - 1 ].strip() ) > 0:
                                 keep = False
-                                print( line )
                                 break
 
                         if keep:
