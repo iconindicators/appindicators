@@ -71,6 +71,7 @@ from astrobase import AstroBase
 
 class AstroSkyfield( AstroBase ):
 
+#TODO Is there a way to check when the planets ephemeris is going to be out of date and warn the user?
     # Planets ephemeris must be created using create_ephemeris_planets.py.
     __EPHEMERIS_PLANETS = load( str( Path( __file__ ).parent ) + "/data/planets.bsp" )
 
@@ -273,6 +274,7 @@ class AstroSkyfield( AstroBase ):
             stars,
             apparentMagnitudeMaximum )
 
+#TODO Remove eventually
         # AstroSkyfield.__calculateCometsMinorPlanets(
         #     now, nowPlusTwentyFiveHours, timeScale,
         #     location, locationAtNow,
@@ -289,12 +291,12 @@ class AstroSkyfield( AstroBase ):
         #     apparentMagnitudeMaximum,
         #     logging )
 
-        # AstroSkyfield.__calculateComets(
-        #     now, nowPlusTwentyFiveHours, timeScale,
-        #     location, locationAtNow,
-        #     data,
-        #     comets, cometData,
-        #     apparentMagnitudeMaximum )
+        AstroSkyfield.__calculateComets(
+            now, timeScale,
+            location, locationAtNow,
+            data,
+            comets, cometData,
+            apparentMagnitudeMaximum )
 
         AstroSkyfield.__calculateMinorPlanets(
             now, timeScale,
@@ -439,7 +441,9 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
-#TODO When solar eclipses are implemented, swap the code above with the code below and update the eclipse credit in the indicator.
+#TODO When solar eclipses are implemented,
+# swap the code above with the code below and
+# update the eclipse credit in the indicator.
 # https://github.com/skyfielders/python-skyfield/issues/445
             # dateTimes, events, details = eclipselib.solar_eclipses( now, nowPlusOneYear, AstroSkyfield.__EPHEMERIS_PLANETS )
             # data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = dateTimes[ 0 ].utc_datetime()
@@ -563,7 +567,7 @@ class AstroSkyfield( AstroBase ):
 # https://github.com/skyfielders/python-skyfield/pull/526
     @staticmethod
     def __calculateComets(
-            now, nowPlusTwentyFiveHours, timeScale,
+            now, timeScale,
             location, locationAtNow,
             data,
             comets, orbitalElementData,
@@ -579,15 +583,32 @@ class AstroSkyfield( AstroBase ):
             dataframe = mpc.load_comets_dataframe( f )
 
         dataframe = dataframe.set_index( "designation", drop = False )
+
         sun = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ]
-        alt, az, earthSunDistance = locationAtNow.observe( sun ).apparent().altaz()
+        sunAtNow = sun.at( now )
+
+        # Found that using 25 hours throws a ValueError, so using 48.
+        # https://github.com/skyfielders/python-skyfield/issues/959
+        nowPlusFortyEightHours = now + datetime.timedelta( hours = 48 )
+
         for name, row in dataframe.iterrows():
             key = ( AstroBase.BodyType.COMET, name.upper() )
             body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            apparent_magnitude = None #TODO Calculate apparent magnitude and if less than max, calculate common.
-            apparent_magnitude = 5.0 #TODO Test
+
+            ra, dec, earthBodyDistance = locationAtNow.observe( body ).radec()
+            ra, dec, sunBodyDistance = sunAtNow.observe( body ).radec()
+
+            # According to MPC, always use the gk model.
+            #   https://github.com/skyfielders/python-skyfield/issues/416
+            apparent_magnitude = AstroBase.getApparentMagnitude_gk(
+                row[ "magnitude_g" ], row[ "magnitude_k" ],
+                earthBodyDistance.au, sunBodyDistance.au )
+
             if apparent_magnitude < apparentMagnitudeMaximum:
-                AstroSkyfield.__calculateCommon( now, nowPlusTwentyFiveHours, location, locationAtNow, data, key, body )
+                AstroSkyfield.__calculateCommon(
+                    now, nowPlusFortyEightHours,
+                    location, locationAtNow,
+                    data, key, body )
 
 
 #TODO Issue logged with regard to slow speed of processing comets / minor planets:
@@ -615,61 +636,16 @@ class AstroSkyfield( AstroBase ):
         dataframe = dataframe.set_index( "designation", drop = False )
         sun = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ]
         for name, row in dataframe.iterrows():
-            if "Ceres" not in name: continue
             key = ( AstroBase.BodyType.MINOR_PLANET, name.upper() )
             body = sun + mpc.mpcorb_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
-            # ra, dec, distance = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ].at( now ).observe( body ).radec()
-            # print(ra)
-            # print(dec)
 
-            print( "----" )
-            print( location )
-            print( "----" )
-            print( row )
-            print( "----" )
-            print( body )
-            print( "----" )
-
-# ----
-# Sum of 3 vectors:
-#  '/home/bernard/Programming/Indicators/indicatorlunar/src/indicatorlunar/data/planets.bsp' segment 0 SOLAR SYSTEM BARYCENTER -> 3 EARTH BARYCENTER
-#  '/home/bernard/Programming/Indicators/indicatorlunar/src/indicatorlunar/data/planets.bsp' segment 3 EARTH BARYCENTER -> 399 EARTH
-#  Geodetic 399 EARTH -> WGS84 latitude -33.8600 N longitude 151.2111 E elevation 3.3 m
-# ----
-# designation_packed                           NaN
-# magnitude_H                                 3.34
-# magnitude_G                                 0.15
-# epoch_packed                               K243V
-# mean_anomaly_degrees                   102.95093
-# argument_of_perihelion_degrees          73.36059
-# longitude_of_ascending_node_degrees     80.25359
-# inclination_degrees                     10.58758
-# eccentricity                            0.079027
-# mean_daily_motion_degrees                    NaN
-# semimajor_axis_au                       2.767078
-# uncertainty                                  NaN
-# reference                                    NaN
-# observations                                 NaN
-# oppositions                                  NaN
-# observation_period                           NaN
-# rms_residual_arcseconds                      NaN
-# coarse_perturbers                            NaN
-# precise_perturbers                           NaN
-# computer_name                                NaN
-# hex_flags                                    NaN
-# designation                              1 Ceres
-# last_observation_date                        NaN
-# Name: 1 Ceres, dtype: object
-# ----
-# Sum of 2 vectors:
-#  '/home/bernard/Programming/Indicators/indicatorlunar/src/indicatorlunar/data/planets.bsp' segment 0 SOLAR SYSTEM BARYCENTER -> 10 SUN
-#  _KeplerOrbit 10 SUN -> str
-# ----
-
-# https://github.com/skyfielders/python-skyfield/issues/959
-# Found that using 25 hours throws a ValueError, so using 48.
-            nowPlusFortyEightHours =  now + datetime.timedelta( hours = 48 )
-            AstroSkyfield.__calculateCommon( now, nowPlusFortyEightHours, location, locationAtNow, data, key, body )
+            # Found that using 25 hours throws a ValueError, so using 48.
+            # https://github.com/skyfielders/python-skyfield/issues/959
+            nowPlusFortyEightHours = now + datetime.timedelta( hours = 48 )
+            AstroSkyfield.__calculateCommon(
+                now, nowPlusFortyEightHours,
+                location, locationAtNow,
+                data, key, body )
 
 
     @staticmethod
