@@ -320,6 +320,7 @@ class AstroPyEphem( AstroBase ):
                 AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.STAR, star ), observer, body )
 
 
+#TODO Too big...consider splitting.
     @staticmethod
     def __calculateCometsMinorPlanets(
             observer,
