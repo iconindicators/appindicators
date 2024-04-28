@@ -320,101 +320,11 @@ class AstroPyEphem( AstroBase ):
                 AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.STAR, star ), observer, body )
 
 
-#TODO Too big...consider splitting.
-    @staticmethod
-    def __calculateCometsMinorPlanets(
-            observer,
-            data,
-            bodyType,
-            cometsMinorPlanets,
-            orbitalElementData,
-            apparentMagnitudeData,
-            apparentMagnitudeMaximum,
-            logging ):
-
-        def computeBody( observer, orbitalElementData ):
-            body = ephem.readdb( orbitalElementData )
-            body.compute( observer )
-            return body
-
-
-        def isBad( body ):
-            try:
-                bad = \
-                    math.isnan( body.earth_distance ) or \
-                    math.isnan( body.phase ) or \
-                    math.isnan( body.size ) or \
-                    math.isnan( body.sun_distance ) # Have found MPC data may contain ***** in lieu of actual data!
-
-            except Exception:
-                # Some comets with a near-parabolic orbit will trigger an error...
-                # https://github.com/brandon-rhodes/pyephem/issues/239
-                bad = True
-
-            return bad
-
-
-        if bodyType == AstroBase.BodyType.COMET:
-            sun = ephem.Sun()
-            sun.compute( observer )
-            for key in cometsMinorPlanets:
-                if key in orbitalElementData:
-                    fields = orbitalElementData[ key ].getData().split( ',' )
-                    object_type = fields[ 2 - 1 ]
-                    is_gk = True
-                    if object_type == 'e':
-                        absolute_magnitude = fields[ 12 - 1 ]
-                        slope_parameter = fields[ 13 - 1 ]
-                        if absolute_magnitude.startswith( 'H' ):
-                            is_gk = False
-                            absolute_magnitude = absolute_magnitude[ 1 : ].strip()
-
-                        elif absolute_magnitude.startswith( 'g' ):
-                            absolute_magnitude = absolute_magnitude[ 1 : ].strip()
-
-                    elif object_type == 'h':
-                        absolute_magnitude = fields[ 10 - 1 ]
-                        slope_parameter = fields[ 11 - 1 ]
-
-                    elif object_type == 'p':
-                        absolute_magnitude = fields[ 9 - 1 ]
-                        slope_parameter = fields[ 10 - 1 ]
-
-                    else:
-                        logging.warning( "Found unknown object type " + object_type + " for comet " + key )
-                        continue
-
-                    body = computeBody( observer, orbitalElementData[ key ].getData() )
-                    if not isBad( body ):
-                        if is_gk:
-                            apparent_magnitude = AstroBase.getApparentMagnitude_gk(
-                                float( absolute_magnitude ), float( slope_parameter ),
-                                body.earth_distance, body.sun_distance )
-
-                        else:
-                            apparent_magnitude = AstroBase.getApparentMagnitude_HG(
-                                float( absolute_magnitude ), float( slope_parameter ),
-                                body.earth_distance, body.sun_distance, sun.earth_distance )
-
-                        if apparent_magnitude <= apparentMagnitudeMaximum:
-                            AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
-
-        else: # bodyType == AstroBase.BodyType.MINOR_PLANET
-            for key in cometsMinorPlanets:
-                if key in orbitalElementData and \
-                   key in apparentMagnitudeData and \
-                   float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
-                    body = computeBody( observer, orbitalElementData[ key ].getData() )
-                    if not isBad( body ):
-                        AstroPyEphem.__calculateCommon( data, ( bodyType, key ), observer, body )
-
-
     @staticmethod
     def __calculateComets(
             observer,
             data,
-            comets,
-            orbitalElementData,
+            comets, orbitalElementData,
             apparentMagnitudeMaximum,
             logging ):
 
@@ -467,10 +377,8 @@ class AstroPyEphem( AstroBase ):
     def __calculateMinorPlanets(
             observer,
             data,
-            minorPlanets,
-            orbitalElementData,
-            apparentMagnitudeData,
-            apparentMagnitudeMaximum ):
+            minorPlanets, orbitalElementData,
+            apparentMagnitudeData, apparentMagnitudeMaximum ):
 
         for key in minorPlanets:
             if key in orbitalElementData and \
