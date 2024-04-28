@@ -253,7 +253,7 @@ class AstroSkyfield( AstroBase ):
             now,
             location, locationAtNow,
             data )
-
+        
         AstroSkyfield.__calculateSun(
             now, nowPlusTwentyFiveHours,
             location, locationAtNow,
@@ -263,29 +263,45 @@ class AstroSkyfield( AstroBase ):
             now, nowPlusTwentyFiveHours,
             location, locationAtNow,
             data,
-            planets, apparentMagnitudeMaximum )
+            planets,
+            apparentMagnitudeMaximum )
         
         AstroSkyfield.__calculateStars(
             now, nowPlusTwentyFiveHours,
             location, locationAtNow,
             data,
-            stars, apparentMagnitudeMaximum )
+            stars,
+            apparentMagnitudeMaximum )
 
-        AstroSkyfield.__calculateCometsMinorPlanets(
-            now, nowPlusTwentyFiveHours, timeScale,
+        # AstroSkyfield.__calculateCometsMinorPlanets(
+        #     now, nowPlusTwentyFiveHours, timeScale,
+        #     location, locationAtNow,
+        #     data,
+        #     AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
+        #     apparentMagnitudeMaximum,
+        #     logging )
+        #
+        # AstroSkyfield.__calculateCometsMinorPlanets(
+        #     now, nowPlusTwentyFiveHours, timeScale,
+        #     location, locationAtNow,
+        #     data,
+        #     AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
+        #     apparentMagnitudeMaximum,
+        #     logging )
+
+        # AstroSkyfield.__calculateComets(
+        #     now, nowPlusTwentyFiveHours, timeScale,
+        #     location, locationAtNow,
+        #     data,
+        #     comets, cometData,
+        #     apparentMagnitudeMaximum )
+
+        AstroSkyfield.__calculateMinorPlanets(
+            now, timeScale,
             location, locationAtNow,
             data,
-            AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
-            apparentMagnitudeMaximum,
-            logging )
-
-        AstroSkyfield.__calculateCometsMinorPlanets(
-            now, nowPlusTwentyFiveHours, timeScale,
-            location, locationAtNow,
-            data,
-            AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
-            apparentMagnitudeMaximum,
-            logging )
+            minorPlanets, minorPlanetData,
+            apparentMagnitudeMaximum, minorPlanetApparentMagnitudeData )
 
         AstroSkyfield.__calculateSatellites(
             now, timeScale,
@@ -472,7 +488,7 @@ class AstroSkyfield( AstroBase ):
 # https://github.com/skyfielders/python-skyfield/pull/532
 # https://github.com/skyfielders/python-skyfield/pull/526
     @staticmethod
-    def __calculateCometsMinorPlanets(
+    def __calculateCometsMinorPlanets(  #TODO Likely will go.
             now, nowPlusTwentyFiveHours, timeScale,
             location, locationAtNow,
             data,
@@ -496,6 +512,7 @@ class AstroSkyfield( AstroBase ):
             AstroSkyfield.__calculateCommon( now, nowPlusTwentyFiveHours, location, locationAtNow, data, key, body )
 
 
+#TODO Likely will go.
     @staticmethod
     def __convertOrbitalElementsToDataframe( bodyType, cometsMinorPlanets, orbitalElementData, apparentMagnitudeData, apparentMagnitudeMaximum ):
         # Skyfield loads orbital element data into a dataframe from a file;
@@ -506,9 +523,18 @@ class AstroSkyfield( AstroBase ):
                 for key in cometsMinorPlanets:
                     if key in orbitalElementData:
 #TODO Confirm with Jure @ COBS that the absolute magnitude g/H is now the apparent magnitude.                     
-                        # The absolute magnitude component of g/H has been over-written with the apparent magnitude by COBS.
-                        apparent_magnitude = orbitalElementData[ key ].getData()[ 92 - 1 : 95 - 1 + 1 ].strip()
-                        if float( apparent_magnitude ) <= apparentMagnitudeMaximum:
+                        absolute_magnitude = orbitalElementData[ key ].getData()[ 92 - 1 : 95 - 1 + 1 ].strip()
+                        slope_parameter = orbitalElementData[ key ].getData()[ 97 - 1 : 100 - 1 + 1 ].strip()
+
+#TODO Need to compute the comet body to get distance stuff.
+# Also, noticed some bad data in the comet mpc data file...waiting on Jure.
+# Not sure if the comet should be computed here or in the caller (and then do the apparent mag calc).
+# Might end up combining back into one function (but calls a comet specific and minor planet specific function).
+                        apparent_magnitude = AstroBase.getApparentMagnitude_HG(
+                            float( absolute_magnitude ), float( slope_parameter ),
+                            body.earth_distance, body.sun_distance, sun.earth_distance )
+
+                        if apparent_magnitude <= apparentMagnitudeMaximum:
                             f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
 
             else: # bodyType == AstroBase.BodyType.MINOR_PLANET
@@ -529,6 +555,121 @@ class AstroSkyfield( AstroBase ):
 
         dataframe = dataframe.set_index( "designation", drop = False )
         return dataframe
+
+
+#TODO Issue logged with regard to slow speed of processing comets / minor planets:
+# https://github.com/skyfielders/python-skyfield/issues/490
+# https://github.com/skyfielders/python-skyfield/pull/532
+# https://github.com/skyfielders/python-skyfield/pull/526
+    @staticmethod
+    def __calculateComets(
+            now, nowPlusTwentyFiveHours, timeScale,
+            location, locationAtNow,
+            data,
+            comets, orbitalElementData,
+            apparentMagnitudeMaximum ):
+
+        with io.BytesIO() as f:
+            for key in comets:
+                if key in orbitalElementData:
+                    f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+
+            f.seek( 0 )
+
+            dataframe = mpc.load_comets_dataframe( f )
+
+        dataframe = dataframe.set_index( "designation", drop = False )
+        sun = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ]
+        alt, az, earthSunDistance = locationAtNow.observe( sun ).apparent().altaz()
+        for name, row in dataframe.iterrows():
+            key = ( AstroBase.BodyType.COMET, name.upper() )
+            body = sun + mpc.comet_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            apparent_magnitude = None #TODO Calculate apparent magnitude and if less than max, calculate common.
+            apparent_magnitude = 5.0 #TODO Test
+            if apparent_magnitude < apparentMagnitudeMaximum:
+                AstroSkyfield.__calculateCommon( now, nowPlusTwentyFiveHours, location, locationAtNow, data, key, body )
+
+
+#TODO Issue logged with regard to slow speed of processing comets / minor planets:
+# https://github.com/skyfielders/python-skyfield/issues/490
+# https://github.com/skyfielders/python-skyfield/pull/532
+# https://github.com/skyfielders/python-skyfield/pull/526
+    @staticmethod
+    def __calculateMinorPlanets(
+            now, timeScale,
+            location, locationAtNow,
+            data,
+            minorPlanets, orbitalElementData,
+            apparentMagnitudeMaximum, apparentMagnitudeData ):
+
+        with io.BytesIO() as f:
+            for key in minorPlanets:
+                if key in orbitalElementData and \
+                   key in apparentMagnitudeData and \
+                   float( apparentMagnitudeData[ key ].getApparentMagnitude() ) <= apparentMagnitudeMaximum:
+                    f.write( ( orbitalElementData[ key ].getData() + '\n' ).encode() )
+
+            f.seek( 0 )
+            dataframe = mpc.load_mpcorb_dataframe( f )
+
+        dataframe = dataframe.set_index( "designation", drop = False )
+        sun = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ]
+        for name, row in dataframe.iterrows():
+            if "Ceres" not in name: continue
+            key = ( AstroBase.BodyType.MINOR_PLANET, name.upper() )
+            body = sun + mpc.mpcorb_orbit( row, timeScale, constants.GM_SUN_Pitjeva_2005_km3_s2 )
+            # ra, dec, distance = AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__PLANET_EARTH ].at( now ).observe( body ).radec()
+            # print(ra)
+            # print(dec)
+
+            print( "----" )
+            print( location )
+            print( "----" )
+            print( row )
+            print( "----" )
+            print( body )
+            print( "----" )
+
+# ----
+# Sum of 3 vectors:
+#  '/home/bernard/Programming/Indicators/indicatorlunar/src/indicatorlunar/data/planets.bsp' segment 0 SOLAR SYSTEM BARYCENTER -> 3 EARTH BARYCENTER
+#  '/home/bernard/Programming/Indicators/indicatorlunar/src/indicatorlunar/data/planets.bsp' segment 3 EARTH BARYCENTER -> 399 EARTH
+#  Geodetic 399 EARTH -> WGS84 latitude -33.8600 N longitude 151.2111 E elevation 3.3 m
+# ----
+# designation_packed                           NaN
+# magnitude_H                                 3.34
+# magnitude_G                                 0.15
+# epoch_packed                               K243V
+# mean_anomaly_degrees                   102.95093
+# argument_of_perihelion_degrees          73.36059
+# longitude_of_ascending_node_degrees     80.25359
+# inclination_degrees                     10.58758
+# eccentricity                            0.079027
+# mean_daily_motion_degrees                    NaN
+# semimajor_axis_au                       2.767078
+# uncertainty                                  NaN
+# reference                                    NaN
+# observations                                 NaN
+# oppositions                                  NaN
+# observation_period                           NaN
+# rms_residual_arcseconds                      NaN
+# coarse_perturbers                            NaN
+# precise_perturbers                           NaN
+# computer_name                                NaN
+# hex_flags                                    NaN
+# designation                              1 Ceres
+# last_observation_date                        NaN
+# Name: 1 Ceres, dtype: object
+# ----
+# Sum of 2 vectors:
+#  '/home/bernard/Programming/Indicators/indicatorlunar/src/indicatorlunar/data/planets.bsp' segment 0 SOLAR SYSTEM BARYCENTER -> 10 SUN
+#  _KeplerOrbit 10 SUN -> str
+# ----
+
+# https://github.com/skyfielders/python-skyfield/issues/959
+# Found that using 25 hours throws a ValueError, so using 48.
+            nowPlusFortyEightHours =  now + datetime.timedelta( hours = 48 )
+            AstroSkyfield.__calculateCommon( now, nowPlusFortyEightHours, location, locationAtNow, data, key, body )
 
 
     @staticmethod
