@@ -446,13 +446,21 @@ class IndicatorBase( ABC ):
 
 
     def __updateInternal( self ):
+        if self.debug:
+            update_start = datetime.datetime.now()
+
         menu = Gtk.Menu()
         self.secondaryActivateTarget = None
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.debug:
-            nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
+            now = datetime.datetime.now()
+
+            nextUpdateDateTime = now + datetime.timedelta( seconds = nextUpdateInSeconds )
             label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] # Remove fractional seconds.
+            menu.prepend( Gtk.MenuItem.new_with_label( label ) )
+
+            label = "Time to update: " + str( now - update_start )
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
         if len( menu.get_children() ) > 0:
