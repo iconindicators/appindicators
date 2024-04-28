@@ -274,23 +274,6 @@ class AstroSkyfield( AstroBase ):
             stars,
             apparentMagnitudeMaximum )
 
-#TODO Remove eventually
-        # AstroSkyfield.__calculateCometsMinorPlanets(
-        #     now, nowPlusTwentyFiveHours, timeScale,
-        #     location, locationAtNow,
-        #     data,
-        #     AstroBase.BodyType.COMET, comets, cometData, cometApparentMagnitudeData,
-        #     apparentMagnitudeMaximum,
-        #     logging )
-        #
-        # AstroSkyfield.__calculateCometsMinorPlanets(
-        #     now, nowPlusTwentyFiveHours, timeScale,
-        #     location, locationAtNow,
-        #     data,
-        #     AstroBase.BodyType.MINOR_PLANET, minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
-        #     apparentMagnitudeMaximum,
-        #     logging )
-
         AstroSkyfield.__calculateComets(
             now, timeScale,
             location, locationAtNow,
