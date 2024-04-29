@@ -149,7 +149,8 @@ class IndicatorLunar( IndicatorBase ):
     SATELLITE_MENU_AZIMUTH = 2
     SATELLITE_MENU_ALTITUDE = 3
 
-    SEARCH_URL_COMET = "https://www.minorplanetcenter.net/db_search/show_object?utf8=%E2%9C%93&object_id="
+    SEARCH_URL_COMET_DATABASE = "https://cobs.si/api/comet.api?des="
+    SEARCH_URL_COMET_ID = "https://cobs.si/comet/"
     SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
     SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
     SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
@@ -186,6 +187,23 @@ class IndicatorLunar( IndicatorBase ):
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
         self.debug = True # TODO Remove
+
+
+        #TODO Remove
+        # name = "12P/Pons-Brooks"
+        # url = IndicatorLunar.SEARCH_URL_COMET_DATABASE + \
+        #       IndicatorLunar.astroBackend.getCometDesignationForCOBSLookup( name )
+
+        # import json
+        # import requests
+        #
+        # id = requests.get( url ).json()[ "object" ][ "id" ]
+        # print( id )
+        #
+        # import sys
+        # sys.exit()
+
+
 
 
     def flushTheCache( self ):
@@ -680,11 +698,31 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateMenuPlanetsMinorPlanetsCometsStars( self, menu, menuLabel, bodies, bodiesData, bodyType ):
 
-        def getURLPlanet( name ): return IndicatorLunar.SEARCH_URL_PLANET + name.lower()
-        def getURLMinorPlanet( name ): return IndicatorLunar.SEARCH_URL_MINOR_PLANET + name
-        def getURLComet( name ): return IndicatorLunar.SEARCH_URL_COMET + IndicatorLunar.astroBackend.getDesignationComet( name )
-        def getURLStar( name ): return IndicatorLunar.SEARCH_URL_STAR + str( IndicatorLunar.astroBackend.getStarHIP( name ) )
+        def getURLPlanet( name ):
+            return IndicatorLunar.SEARCH_URL_PLANET + name.lower()
 
+        def getURLMinorPlanet( name ):
+            return IndicatorLunar.SEARCH_URL_MINOR_PLANET + \
+                   IndicatorLunar.__getMinorPlanetDesignationForLowellLookup( name )
+
+        def getURLComet( name ):
+            # TODO Move to top
+            # import json
+            import requests
+
+            url = IndicatorLunar.SEARCH_URL_COMET_DATABASE + \
+                  IndicatorLunar.__getCometDesignationForCOBSLookup( name )
+
+            # return IndicatorLunar.SEARCH_URL_COMET_ID + \
+            #        str( requests.get( url ).json()[ "object" ][ "id" ] )
+            # print(callable( url ) )
+            # print( callable( getURLStar))
+            return url
+
+
+        def getURLStar( name ):
+            return IndicatorLunar.SEARCH_URL_STAR + \
+                   str( IndicatorLunar.astroBackend.getStarHIP( name ) )
 
         def getURLFunction():
             if bodyType == IndicatorLunar.astroBackend.BodyType.PLANET: urlFunction = getURLPlanet
@@ -725,7 +763,66 @@ class IndicatorLunar( IndicatorBase ):
             self.createMenuItemAndAppend( menu, menuLabel, "" ).set_submenu( subMenu )
 
 
-    # For the given body, creates the menu items relating to rise/set/aziumth/altitude.
+    # Retrieve a comet's designation for lookup at the Comet Observation Database.
+    #
+    # https://minorplanetcenter.net//iau/lists/CometResolution.html
+    # https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
+    # http://www.icq.eps.harvard.edu/cometnames.html
+    # https://en.wikipedia.org/wiki/Naming_of_comets
+    # https://slate.com/technology/2013/11/comet-naming-a-quick-guide.html
+    @staticmethod
+    def __getCometDesignationForCOBSLookup( name ):
+        if name[ 0 ].isnumeric():
+            # Examples:
+                # 1P/Halley
+                # 332P/Ikeya-Murakami
+                # 332P-B/Ikeya-Murakami
+                # 332P-C/Ikeya-Murakami
+                # 1I/`Oumuamua
+                # 282P
+            slash = name.find( '/' )
+            if slash == -1:
+                designation = name
+
+            else:
+                designation = name.split( '/' )[ 0 ]
+
+        elif name[ 0 ].isalpha():
+            # Examples:
+                # C/1995 O1 (Hale-Bopp)
+                # P/1998 VS24 (LINEAR)
+                # P/2011 UA134 (Spacewatch-PANSTARRS)
+                # C/2019 Y4-D (ATLAS)
+                # A/2018 V3
+                # P/2020 M2
+            if '(' in name:
+                designation = name.split( '(' )[ 0 ]
+
+            else:
+                designation = name
+
+        else:
+            designation = -1
+            #TODO Maybe log?
+
+        return designation
+
+
+    # Retrieve a minor planet's designation for lookup at the Lowell Minor Planet Services.
+    #
+    # https://www.iau.org/public/themes/naming/
+    # https://minorplanetcenter.net/iau/info/DesDoc.html
+    # https://minorplanetcenter.net/iau/info/PackedDes.html
+    @staticmethod
+    def __getMinorPlanetDesignationForLowellLookup( name ):
+        # Examples:
+        #   55 Pandora
+        #   84 Klio
+        #   311 Claudia
+        return name.split()[ 1 ]
+
+
+    # For the given body, creates the menu items relating to rise/set/azimuth/altitude.
     def __updateMenuCommon( self, menu, bodyType, nameTag, indent, onClickURL = "" ):
         key = ( bodyType, nameTag )
         appended = False
