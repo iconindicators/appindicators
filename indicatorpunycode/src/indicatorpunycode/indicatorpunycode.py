@@ -19,12 +19,6 @@
 # Application indicator which converts domain names between Unicode and ASCII.
 
 
-#TODO Look at the examples in the table in
-#   https://en.wikipedia.org/wiki/Punycode
-# Converting from non ASCII to punycode works,
-# but going the other way does not...even if I add in the xn-.
-
-
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import encodings.idna
