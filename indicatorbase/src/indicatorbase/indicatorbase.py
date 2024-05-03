@@ -335,7 +335,6 @@ class IndicatorBase( ABC ):
         Notify.init( self.indicatorName )
 
         menu = Gtk.Menu()
-        # menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
         self.createAndAppendMenuItem( menu, _( "Initialising..." ) )
         menu.show_all()
 
