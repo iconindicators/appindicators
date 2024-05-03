@@ -571,12 +571,12 @@ class IndicatorBase( ABC ):
 
 
 #TODO Work out where this is used and if so, replace with call above.
-    def createAndInsertMenuItemWithOnClickURL( self, menu, label, index, onClickURL ):
-        menuItem = Gtk.MenuItem.new_with_label( label )
-        menuItem.set_name( onClickURL )
-        menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
-        menu.insert( menuItem, index )
-        return menuItem
+    # def createAndInsertMenuItemWithOnClickURL( self, menu, label, index, onClickURL ):
+    #     menuItem = Gtk.MenuItem.new_with_label( label )
+    #     menuItem.set_name( onClickURL )
+    #     menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
+    #     menu.insert( menuItem, index )
+    #     return menuItem
 
 
     # def __createMenuItemORIG( self, label, onClickURL ):#TODO Delete????

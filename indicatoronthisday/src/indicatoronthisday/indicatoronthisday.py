@@ -117,37 +117,12 @@ class IndicatorOnThisDay( IndicatorBase ):
         for event in events:
             if event.getDate() != lastDate:
                 if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and an event menu item.
-                    # menu.append( Gtk.MenuItem.new_with_label( self.removeLeadingZeroFromDate( event.getDate() ) ) )#TODO Delete
                     self.createAndAppendMenuItem( menu, self.removeLeadingZeroFromDate( event.getDate() ) )
                     lastDate = event.getDate()
                     menuItemCount += 1
 
                 else:
                     break # Don't add the menu item for the new date and don't add a subsequent event.
-
-#TODO Delete
-            # menuItem = Gtk.MenuItem.new_with_label( "    " + event.getDescription() )
-            # menuItem.props.name = self.removeLeadingZeroFromDate( event.getDate() ) # Allows the month/day to be passed to the copy/search functions below.
-            # menu.append( menuItem )
-            # menuItemCount += 1
-            #
-            # if self.copyToClipboard:
-            #     menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + " " + widget.props.label.strip(), -1 ) )
-            #
-            # elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
-            #     menuItem.connect( "activate", lambda widget: webbrowser.open( self.searchURL.replace( IndicatorOnThisDay.TAG_EVENT, ( widget.props.name + " " + widget.props.label ).replace( " ", "+" ) ) ) )
-
-            # if self.copyToClipboard:
-            #     f = lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + " " + widget.props.label.strip(), -1 )
-            #
-            # elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
-            #     f = lambda widget: webbrowser.open( self.searchURL.replace( IndicatorOnThisDay.TAG_EVENT, ( widget.props.name + " " + widget.props.label ).replace( " ", "+" ) ) )
-            #
-            # self.createAndAppendMenuItem(
-            #     menu,
-            #     "    " + event.getDescription(),
-            #     name = self.removeLeadingZeroFromDate( event.getDate() ), # Allows the month/day to be passed to the copy/search functions below.
-            #     onClickFunction = f )
 
             if self.copyToClipboard:
                 f = lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + ' ' + widget.props.label.strip(), -1 )
@@ -162,10 +137,6 @@ class IndicatorOnThisDay( IndicatorBase ):
                         IndicatorOnThisDay.TAG_EVENT,
                         ( self.removeLeadingZeroFromDate( event.getDate() ) + ' ' + event.getDescription() ).replace( ' ', '+' ) )
 
-                # self.createAndAppendMenuItemWithOnClickURL(
-                #     menu,
-                #     self.getMenuIndent() + event.getDescription(),
-                #     url )
                 self.createAndAppendMenuItem(
                     menu,
                     self.getMenuIndent() + event.getDescription(),

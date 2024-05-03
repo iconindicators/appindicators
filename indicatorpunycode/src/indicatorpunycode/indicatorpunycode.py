@@ -78,7 +78,7 @@ class IndicatorPunycode( IndicatorBase ):
             onClickFunction = lambda widget: self.onConvert(),
             isSecondaryActivateTarget = True )
 
-        indent = "    "
+        indent = self.getMenuIndent()
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 

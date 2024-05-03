@@ -97,10 +97,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             menu.append( Gtk.SeparatorMenuItem() )
 
-            # menuItem = Gtk.MenuItem.new_with_label( _( "Launch VirtualBox™ Manager" ) )#TODO Delete
-            # menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
-            # menu.append( menuItem )
-            # self.secondaryActivateTarget = menuItem
             self.createAndAppendMenuItem(
                 menu,
                 _( "Launch VirtualBox™ Manager" ),

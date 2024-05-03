@@ -25,7 +25,6 @@ import datetime
 import gi
 import importlib.util
 import sys
-# import webbrowser#TODO Delete
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -62,7 +61,7 @@ class IndicatorTide( IndicatorBase ):
             label = _( "No user script specified!" )
             summary = _( "No user script specified!" )
             message = _( "Please specify a user script and class name in the preferences." )
-            menu.append( Gtk.MenuItem.new_with_label( label ) ) #TODO Use version in indicatorbase?
+            menu.append( Gtk.MenuItem.new_with_label( label ) )
             Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         else:
@@ -94,7 +93,7 @@ class IndicatorTide( IndicatorBase ):
                 self.getLogging().exception( e )
 
             if not tidalReadings:
-                menu.append( Gtk.MenuItem.new_with_label( label ) ) #TODO Use versin in indicatorbase?
+                menu.append( Gtk.MenuItem.new_with_label( label ) )
                 Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
@@ -113,10 +112,11 @@ class IndicatorTide( IndicatorBase ):
             #     self.portName,
             #     name = tidalReadings[ 0 ].getURL(),
             #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
-            self.createAndAppendMenuItemWithOnClickURL(
+            self.createAndAppendMenuItem(
                 menu,
                 self.portName,
-                tidalReadings[ 0 ].getURL() )
+                name = tidalReadings[ 0 ].getURL(),
+                onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             indent = self.getMenuIndent()
 
@@ -153,10 +153,11 @@ class IndicatorTide( IndicatorBase ):
                 #     menuText,
                 #     name = tidalReading.getURL(),
                 #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
-                self.createAndAppendMenuItemWithOnClickURL(
+                self.createAndAppendMenuItem(
                     menu,
                     menuText,
-                    tidalReading.getURL() )
+                    name = tidalReading.getURL(),
+                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             else:
                 # self.__createAndAppendMenuItem( menu, indent + tidalReading.getDate(), tidalReading.getURL() )#TODO Delete
@@ -165,10 +166,11 @@ class IndicatorTide( IndicatorBase ):
                 #     indent + tidalReading.getDate(),
                 #     name = tidalReading.getURL(),
                 #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
-                self.createAndAppendMenuItemWithOnClickURL(
+                self.createAndAppendMenuItem(
                     menu,
                     indent + tidalReading.getDate(),
-                    tidalReading.getURL() )
+                    name = tidalReading.getURL(),
+                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
                 # self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )#TODO Delete
                 # self.createAndAppendMenuItem(
@@ -176,10 +178,11 @@ class IndicatorTide( IndicatorBase ):
                 #     menuText,
                 #     name = tidalReading.getURL(),
                 #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
-                self.createAndAppendMenuItemWithOnClickURL(
+                self.createAndAppendMenuItem(
                     menu,
                     menuText,
-                    tidalReading.getURL() )
+                    name = tidalReading.getURL(),
+                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
@@ -205,10 +208,11 @@ class IndicatorTide( IndicatorBase ):
                 #     menuText,
                 #     name = tidalReading.getURL(),
                 #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
-                self.createAndAppendMenuItemWithOnClickURL(
+                self.createAndAppendMenuItem(
                     subMenu,
                     menuText,
-                    tidalReading.getURL() )
+                    name = tidalReading.getURL(),
+                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             else:
                 subMenu = Gtk.Menu()
@@ -223,10 +227,11 @@ class IndicatorTide( IndicatorBase ):
                 #     menuText,
                 #     name = tidalReading.getURL(),
                 #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
-                self.createAndAppendMenuItemWithOnClickURL(
+                self.createAndAppendMenuItem(
                     subMenu,
                     menuText,
-                    tidalReading.getURL() )
+                    name = tidalReading.getURL(),
+                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
