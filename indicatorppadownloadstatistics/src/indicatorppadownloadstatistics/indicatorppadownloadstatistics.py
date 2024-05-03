@@ -129,8 +129,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if self.showSubmenu:
             indent = self.getMenuIndent()
             for ppa in ppas:
-                # menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )#TODO Delete
-                # menu.append( menuItem )
                 menuItem = self.createAndAppendMenuItem( menu, ppa.getDescriptor() )
 
                 subMenu = Gtk.Menu()
@@ -147,10 +145,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             indent = self.getMenuIndent()
             for ppa in ppas:
-                # menuItem = Gtk.MenuItem.new_with_label( ppa.getDescriptor() )#TODO Delete
-                # menu.append( menuItem )
-                # menuItem.set_name( ppa.getDescriptor() )
-                # menuItem.connect( "activate", self.onPPA )
                 menuItem = self.createAndAppendMenuItem(
                     menu,
                     ppa.getDescriptor(),
@@ -178,10 +172,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
-        # menuItem = Gtk.MenuItem.new_with_label( label ) #TODO Delete
-        # menuItem.set_name( ppa.getDescriptor() )
-        # menuItem.connect( "activate", self.onPPA )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem(
             menu,
             label,
@@ -202,8 +192,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
-        # menuItem = Gtk.MenuItem.new_with_label( indent + message )#TODO Delete
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, indent + message )
 
 

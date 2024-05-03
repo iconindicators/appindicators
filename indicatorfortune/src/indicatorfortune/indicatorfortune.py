@@ -85,35 +85,17 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def buildMenu( self, menu ):
-        # menuItem = Gtk.MenuItem.new_with_label( _( "New Fortune" ) )#TODO Delete
-        # menuItem.connect( "activate", lambda widget: self.refreshAndShowFortune() )
-        # menu.append( menuItem )
-        # if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW:
-        #     self.secondaryActivateTarget = menuItem
-
         self.createAndAppendMenuItem(
             menu,
             _( "New Fortune" ),
             onClickFunction = lambda widget: self.refreshAndShowFortune(),
             secondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
-        # menuItem = Gtk.MenuItem.new_with_label( _( "Copy Last Fortune" ) ) #TODO Delete
-        # menuItem.connect( "activate", lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ) )
-        # menu.append( menuItem )
-        # if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST:
-        #     self.secondaryActivateTarget = menuItem
-
         self.createAndAppendMenuItem(
             menu,
             _( "Copy Last Fortune" ),
             onClickFunction = lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ),
             secondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
-
-        # menuItem = Gtk.MenuItem.new_with_label( _( "Show Last Fortune" ) ) #TODO Delete
-        # menuItem.connect( "activate", lambda widget: self.showFortune() )
-        # menu.append( menuItem )
-        # if self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST:
-        #     self.secondaryActivateTarget = menuItem
 
         self.createAndAppendMenuItem(
             menu,
@@ -122,10 +104,6 @@ class IndicatorFortune( IndicatorBase ):
             secondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
-
-        # menuItem = Gtk.MenuItem.new_with_label( _( "History" ) ) #TODO Delete
-        # menuItem.connect( "activate", lambda widget: self.showHistory( widget ) )
-        # menu.append( menuItem )
 
         self.createAndAppendMenuItem(
             menu,

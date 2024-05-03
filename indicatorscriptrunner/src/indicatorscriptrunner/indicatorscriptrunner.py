@@ -131,11 +131,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
             indent = self.getMenuIndent()
             for group in sorted( scriptsByGroup.keys(), key = str.lower ):
-                # menuItem = Gtk.MenuItem.new_with_label( group )#TODO Delete
-                # menu.append( menuItem )
-                menuItem = self.createAndAppendMenuItem( menu, group )
                 subMenu = Gtk.Menu()
-                menuItem.set_submenu( subMenu )
+                self.createAndAppendMenuItem( menu, group ).set_submenu( subMenu )
                 self.addScriptsToMenu( scriptsByGroup[ group ], subMenu, indent )
 
         else:
@@ -148,7 +145,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
                 indent = self.getMenuIndent()
                 for group in sorted( scriptsByGroup.keys(), key = str.lower ):
-                    # menu.append( Gtk.MenuItem.new_with_label( group + "..." ) )#TODO Delete
                     self.createAndAppendMenuItem( menu, group + "..." )
                     self.addScriptsToMenu( scriptsByGroup[ group ], menu, indent )
 
@@ -156,9 +152,6 @@ class IndicatorScriptRunner( IndicatorBase ):
     def addScriptsToMenu( self, scripts, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
         for script in scripts:
-            # menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )#TODO Delete
-            # menuItem.connect( "activate", self.onScriptMenuItem, script )
-            # menu.append( menuItem )
             menuItem = self.createAndAppendMenuItem(
                 menu,
                 indent + script.getName(),

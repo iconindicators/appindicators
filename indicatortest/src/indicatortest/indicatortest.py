@@ -89,9 +89,6 @@ class IndicatorTest( IndicatorBase ):
         self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "System: " + str( uname.system ) )
         self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Version: " + str( uname.version ) )
 
-        # menuItem = Gtk.MenuItem.new_with_label( "Platform | Uname" )  #TODO What about things like this?  Use the new createandappend?
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Platform | Uname" ).set_submenu( subMenu )
 
 
@@ -116,27 +113,12 @@ class IndicatorTest( IndicatorBase ):
         text = self.getMenuIndent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.getDesktopEnvironment()
         self.createAndAppendMenuItem( subMenu, text )
 
-        # menuItem = Gtk.MenuItem.new_with_label( "Desktop" )
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Desktop" ).set_submenu( subMenu )
 
 
     def __buildMenuIcon( self, menu ):
         subMenu = Gtk.Menu()
 
-#TODO Remove
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Use default icon" )
-        # menuItem.connect( "activate", lambda widget: self.__useIconDefault() )
-        # subMenu.append( menuItem )
-
-#TODO Keeping?  Not if we keep the one below.
-        # self.createAndAppendMenuItem(
-        #     self.getMenuIndent() + "Use default icon",
-        #     subMenu,
-        #     onClickFunction = self.__useIconDefault )
-
-#TODO Keeping?
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Use default icon",
@@ -150,53 +132,23 @@ class IndicatorTest( IndicatorBase ):
                   "WAXING_CRESCENT" ]
 
         for icon in icons:
-            #TODO Remove
-            # menuItem = Gtk.MenuItem.new_with_label(
-            #     self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory )
-            #
-            # menuItem.set_name( icon )
-            # menuItem.connect( "activate", lambda widget: self.__useIconDynamicallyCreated( widget.props.name ) )
-            # subMenu.append( menuItem )
-
-#TODO Keep?
             self.createAndAppendMenuItem(
                 subMenu,
                 self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory,
                 name = icon,
                 onClickFunction = self.__useIconDynamicallyCreated )
 
-        # menuItem = Gtk.MenuItem.new_with_label( "Icon" )
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Icon" ).set_submenu( subMenu )
 
 
     def __buildMenuLabelTooltipOSD( self, menu ):
         subMenu = Gtk.Menu()
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Reset label" )
-        # menuItem.connect(
-        #     "activate",
-        #     lambda widget: (
-        #         self.setLabel( IndicatorTest.LABEL ) ) )
-        #
-        # subMenu.append( menuItem )
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Reset label",
             onClickFunction = lambda widget: self.setLabel( IndicatorTest.LABEL ) )
 
-#TOOO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in label" )
-        # menuItem.connect(
-        #     "activate",
-        #     lambda widget: (
-        #         print( "secondary activate target / mouse middle click" ),
-        #         self.setLabel( self.__getCurrentTime() ) ) )
-        #
-        # self.secondaryActivateTarget = menuItem
-        # subMenu.append( menuItem )
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Show current time in label",
@@ -205,44 +157,24 @@ class IndicatorTest( IndicatorBase ):
                 self.setLabel( self.__getCurrentTime() ) ),
             isSecondaryActivateTarget = True )
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Show current time in OSD" )
-        # menuItem.connect(
-        #     "activate",
-        #     lambda widget: Notify.Notification.new(
-        #         "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
-        #
-        # subMenu.append( menuItem )
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Show current time in OSD",
             onClickFunction = lambda widget:
                 Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
 
-        # menuItem = Gtk.MenuItem.new_with_label( "Label / Tooltip / OSD" )
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Label / Tooltip / OSD" ).set_submenu( subMenu )
 
 
     def __buildMenuClipboard( self, menu ):
         subMenu = Gtk.Menu()
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + _( "Copy current time to clipboard" ) )
-        # menuItem.connect( "activate", lambda widget:
-        #                   Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
-        #
-        # subMenu.append( menuItem )
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + _( "Copy current time to clipboard" ),
             onClickFunction = lambda widget:
                 Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
 
-        # menuItem = Gtk.MenuItem.new_with_label( "Clipboard" )
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Clipboard" ).set_submenu( subMenu )
 
 
@@ -250,88 +182,38 @@ class IndicatorTest( IndicatorBase ):
         subMenu = Gtk.Menu()
 
         terminal, executionFlag = self.getTerminalAndExecutionFlag()
-        # subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Terminal: " + str( terminal ) ) ) #TODO Delete?
         self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Terminal: " + str( terminal ) )
-        # subMenu.append( Gtk.MenuItem.new_with_label( self.getMenuIndent() + "Execution flag: " + str( executionFlag ) ) ) #TODO Delete?
         self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Execution flag: " + str( executionFlag ) )
 
-        # menuItem = Gtk.MenuItem.new_with_label( "Terminal" )
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Terminal" ).set_submenu( subMenu )
 
 
     def __buildMenuExecuteCommand( self, menu ):
         subMenu = Gtk.Menu()
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "calendar" )
-        # command = "calendar -f /usr/share/calendar/calendar.all -A 3"
-        # menuItem.connect( "activate", lambda widget: self.__executeCommand( command ) )
-        # subMenu.append( menuItem )
-        self.createAndAppendMenuItem(
-            subMenu,
-            self.getMenuIndent() + "calendar",
-            onClickFunction = lambda widget: self.__executeCommand( "calendar -f /usr/share/calendar/calendar.all -A 3" ) )
+        labels = [
+            "calendar",
+            "fortune",
+            "ls",
+            "notify-send",
+            "paplay",
+            "wmctrl" ]
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "fortune" )
-        # menuItem.connect( "activate", lambda widget: self.__executeCommand( "fortune" ) )
-        # subMenu.append( menuItem )
-        self.createAndAppendMenuItem(
-            subMenu,
-            self.getMenuIndent() + "fortune",
-            onClickFunction = lambda widget: self.__executeCommand( "fortune" ) )
+        commands = [
+            "calendar -f /usr/share/calendar/calendar.all -A 3",
+            "fortune",
+            "ls -la",
+            f"notify-send -i { self.get_icon_name() } 'summary' 'body'",
+            "paplay /usr/share/sounds/freedesktop/stereo/complete.oga",
+            "wmctrl -l" ]
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "ls" )
-        # menuItem.connect( "activate", lambda widget: self.__executeCommand( "ls -la" ) )
-        # subMenu.append( menuItem )
-        self.createAndAppendMenuItem(
-            subMenu,
-            self.getMenuIndent() + "ls",
-            onClickFunction = lambda widget: self.__executeCommand( "ls -la" ) )
+        for label, command in zip( labels, commands ):
+            self.createAndAppendMenuItem(
+                subMenu,
+                self.getMenuIndent() + label,
+                onClickFunction = lambda widget, command = command: self.__executeCommand( command ) ) # Note command = command to handle lambda late binding.
 
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "notify-send" )
-        # command = f"notify-send -i { self.get_icon_name() } 'summary' 'body'"
-        # menuItem.connect( "activate", lambda widget: self.__executeCommand( command ) )
-        # subMenu.append( menuItem )
-        self.createAndAppendMenuItem(
-            subMenu,
-            self.getMenuIndent() + "notify-send",
-            onClickFunction = lambda widget:
-                self.__executeCommand( f"notify-send -i { self.get_icon_name() } 'summary' 'body'" ) )
-
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "paplay" )
-        # command = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
-        # menuItem.connect( "activate", lambda widget: self.__executeCommand( command ) )
-        # subMenu.append( menuItem )
-        self.createAndAppendMenuItem(
-            subMenu,
-            self.getMenuIndent() + "paplay",
-            onClickFunction = lambda widget:
-                self.__executeCommand( "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" ) )
-
-#TODO Delete
-        # menuItem = Gtk.MenuItem.new_with_label( self.getMenuIndent() + "wmctrl" )
-        # menuItem.connect( "activate", lambda widget: self.__executeCommand( "wmctrl -l" ) )
-        # subMenu.append( menuItem )
-        self.createAndAppendMenuItem(
-            subMenu,
-            self.getMenuIndent() + "wmctrl",
-            onClickFunction = lambda widget: self.__executeCommand( "wmctrl -l" ) )
-
-        # menuItem = Gtk.MenuItem.new_with_label( "Execute Terminal Command" )
-        # menuItem.set_submenu( subMenu )
-        # menu.append( menuItem )
         self.createAndAppendMenuItem( menu, "Execute Terminal Command" ).set_submenu( subMenu )
-
-
-#TODO Probabaly can delete.
-    # def __useIconDefault( self, widget ):
-    #     self.indicator.set_icon_full( self.get_icon_name(), "" )
 
 
     def __getCurrentTime( self ):

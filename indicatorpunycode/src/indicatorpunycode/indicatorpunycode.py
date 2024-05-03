@@ -68,10 +68,6 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def update( self, menu ):
-        # menuItem = Gtk.MenuItem.new_with_label( _( "Convert" ) )#TODO Delete
-        # menu.append( menuItem )
-        # menuItem.connect( "activate", self.onConvert )
-        # self.secondaryActivateTarget = menuItem
         self.createAndAppendMenuItem(
             menu,
             _( "Convert" ),
@@ -82,17 +78,11 @@ class IndicatorPunycode( IndicatorBase ):
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            # menuItem = Gtk.MenuItem.new_with_label( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] ) #TODO Delete
-            # menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_UNICODE ] )
-            # menu.append( menuItem )
             self.createAndAppendMenuItem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
                 onClickFunction = lambda widget: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) )
 
-            # menuItem = Gtk.MenuItem.new_with_label( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
-            # menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_ASCII ] )
-            # menu.append( menuItem )
             self.createAndAppendMenuItem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
@@ -159,9 +149,6 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.cullResults()
 
-            #TODO Test if we can execute this code without the None passed in...
-            # which means can remove the menuItem from sendResultsToOutput.
-            # If so, then amend the calls above to createandappendmentuitem and use lambda.
             GLib.idle_add( self.sendResultsToOutput, protocol + convertedText + pathQuery )
             self.requestUpdate()
 
