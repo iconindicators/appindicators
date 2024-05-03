@@ -131,8 +131,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
             indent = self.getMenuIndent()
             for group in sorted( scriptsByGroup.keys(), key = str.lower ):
-                menuItem = Gtk.MenuItem.new_with_label( group )
-                menu.append( menuItem )
+                # menuItem = Gtk.MenuItem.new_with_label( group )#TODO Delete
+                # menu.append( menuItem )
+                menuItem = self.createAndAppendMenuItem( menu, group )
                 subMenu = Gtk.Menu()
                 menuItem.set_submenu( subMenu )
                 self.addScriptsToMenu( scriptsByGroup[ group ], subMenu, indent )
@@ -147,21 +148,27 @@ class IndicatorScriptRunner( IndicatorBase ):
                 scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
                 indent = self.getMenuIndent()
                 for group in sorted( scriptsByGroup.keys(), key = str.lower ):
-                    menu.append( Gtk.MenuItem.new_with_label( group + "..." ) )
+                    # menu.append( Gtk.MenuItem.new_with_label( group + "..." ) )#TODO Delete
+                    self.createAndAppendMenuItem( menu, group + "..." )
                     self.addScriptsToMenu( scriptsByGroup[ group ], menu, indent )
 
 
     def addScriptsToMenu( self, scripts, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
         for script in scripts:
-            menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )
-            menuItem.connect( "activate", self.onScriptMenuItem, script )
-            menu.append( menuItem )
+            # menuItem = Gtk.MenuItem.new_with_label( indent + script.getName() )#TODO Delete
+            # menuItem.connect( "activate", self.onScriptMenuItem, script )
+            # menu.append( menuItem )
+            menuItem = self.createAndAppendMenuItem(
+                menu,
+                indent + script.getName(),
+                onClickFunction = lambda widget: self.onScriptMenuItem( script ) )
+
             if script.getDefault():
                 self.secondaryActivateTarget = menuItem
 
 
-    def onScriptMenuItem( self, menuItem, script ):
+    def onScriptMenuItem( self, script ):
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )

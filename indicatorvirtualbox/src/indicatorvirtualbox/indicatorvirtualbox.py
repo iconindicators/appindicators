@@ -97,10 +97,15 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             menu.append( Gtk.SeparatorMenuItem() )
 
-            menuItem = Gtk.MenuItem.new_with_label( _( "Launch VirtualBox™ Manager" ) )
-            menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
-            menu.append( menuItem )
-            self.secondaryActivateTarget = menuItem
+            # menuItem = Gtk.MenuItem.new_with_label( _( "Launch VirtualBox™ Manager" ) )#TODO Delete
+            # menuItem.connect( "activate", self.onLaunchVirtualBoxManager )
+            # menu.append( menuItem )
+            # self.secondaryActivateTarget = menuItem
+            self.createAndAppendMenuItem(
+                menu,
+                _( "Launch VirtualBox™ Manager" ),
+                onClickFunction = lambda widget: self.onLaunchVirtualBoxManager(),
+                isSecondaryActivateTarget = True )
 
         else:
             menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
@@ -129,7 +134,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         indent = level * self.getMenuIndent()
         menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
         menu.append( menuItem )
-
         if self.showSubmenu:
             menu = Gtk.Menu()
             menuItem.set_submenu( menu )
@@ -246,7 +250,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.bringWindowToFront( runningNames[ runningUUIDs.index( self.scrollUUID ) ], 10 )
 
 
-    def onLaunchVirtualBoxManager( self, menuItem ):
+    def onLaunchVirtualBoxManager( self ):
         # The executable VirtualBox may exist in different locations, depending on how it was installed.
         # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
         virtualBoxExecutable = self.processGet( "which VirtualBox" ).strip()

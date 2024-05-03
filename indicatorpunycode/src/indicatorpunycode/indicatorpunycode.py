@@ -19,6 +19,12 @@
 # Application indicator which converts domain names between Unicode and ASCII.
 
 
+#TODO Look at the examples in the table in
+#   https://en.wikipedia.org/wiki/Punycode
+# Converting from non ASCII to punycode works,
+# but going the other way does not...even if I add in the xn-.
+
+
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import encodings.idna
@@ -62,25 +68,38 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def update( self, menu ):
-        menuItem = Gtk.MenuItem.new_with_label( _( "Convert" ) )
-        menu.append( menuItem )
-        menuItem.connect( "activate", self.onConvert )
-        self.secondaryActivateTarget = menuItem
+        # menuItem = Gtk.MenuItem.new_with_label( _( "Convert" ) )#TODO Delete
+        # menu.append( menuItem )
+        # menuItem.connect( "activate", self.onConvert )
+        # self.secondaryActivateTarget = menuItem
+        self.createAndAppendMenuItem(
+            menu,
+            _( "Convert" ),
+            onClickFunction = lambda widget: self.onConvert(),
+            isSecondaryActivateTarget = True )
 
         indent = "    "
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            menuItem = Gtk.MenuItem.new_with_label( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] )
-            menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_UNICODE ] )
-            menu.append( menuItem )
+            # menuItem = Gtk.MenuItem.new_with_label( indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ] ) #TODO Delete
+            # menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_UNICODE ] )
+            # menu.append( menuItem )
+            self.createAndAppendMenuItem(
+                menu,
+                indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
+                onClickFunction = lambda widget: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) )
 
-            menuItem = Gtk.MenuItem.new_with_label( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
-            menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_ASCII ] )
-            menu.append( menuItem )
+            # menuItem = Gtk.MenuItem.new_with_label( indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ] )
+            # menuItem.connect( "activate", self.sendResultsToOutput, result[ IndicatorPunycode.RESULTS_ASCII ] )
+            # menu.append( menuItem )
+            self.createAndAppendMenuItem(
+                menu,
+                indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
+                onClickFunction = lambda widget: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) )
 
 
-    def onConvert( self, menuItem ):
+    def onConvert( self ):
         summary =_( "Nothing to convert..." )
         if self.inputClipboard:
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
@@ -140,7 +159,10 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.cullResults()
 
-            GLib.idle_add( self.sendResultsToOutput, None, protocol + convertedText + pathQuery )
+            #TODO Test if we can execute this code without the None passed in...
+            # which means can remove the menuItem from sendResultsToOutput.
+            # If so, then amend the calls above to createandappendmentuitem and use lambda.
+            GLib.idle_add( self.sendResultsToOutput, protocol + convertedText + pathQuery )
             self.requestUpdate()
 
         except Exception as e:
@@ -154,7 +176,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.results = self.results[ : self.resultHistoryLength ]
 
 
-    def sendResultsToOutput( self, menuItem, text ):
+    def sendResultsToOutput( self, text ):
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )

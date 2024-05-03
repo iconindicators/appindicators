@@ -25,7 +25,7 @@ import datetime
 import gi
 import importlib.util
 import sys
-import webbrowser
+# import webbrowser#TODO Delete
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -62,7 +62,7 @@ class IndicatorTide( IndicatorBase ):
             label = _( "No user script specified!" )
             summary = _( "No user script specified!" )
             message = _( "Please specify a user script and class name in the preferences." )
-            menu.append( Gtk.MenuItem.new_with_label( label ) )
+            menu.append( Gtk.MenuItem.new_with_label( label ) ) #TODO Use version in indicatorbase?
             Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         else:
@@ -94,7 +94,7 @@ class IndicatorTide( IndicatorBase ):
                 self.getLogging().exception( e )
 
             if not tidalReadings:
-                menu.append( Gtk.MenuItem.new_with_label( label ) )
+                menu.append( Gtk.MenuItem.new_with_label( label ) ) #TODO Use versin in indicatorbase?
                 Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
@@ -107,7 +107,17 @@ class IndicatorTide( IndicatorBase ):
         indent = ""
         self.portName = tidalReadings[ 0 ].getLocation()
         if self.portName:
-            self.__createAndAppendMenuItem( menu, self.portName, tidalReadings[ 0 ].getURL() )
+            # self.__createAndAppendMenuItem( menu, self.portName, tidalReadings[ 0 ].getURL() )#TODO Delete
+            # self.createAndAppendMenuItem(
+            #     menu,
+            #     self.portName,
+            #     name = tidalReadings[ 0 ].getURL(),
+            #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+            self.createAndAppendMenuItemWithOnClickURL(
+                menu,
+                self.portName,
+                tidalReadings[ 0 ].getURL() )
+
             indent = self.getMenuIndent()
 
         if self.showAsSubMenus:
@@ -137,11 +147,40 @@ class IndicatorTide( IndicatorBase ):
                 tidalReading.getTime() + "  " + tidalReading.getLevel()
 
             if shownToday:
-                self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )
+                # self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )#TODO Delete
+                # self.createAndAppendMenuItem(
+                #     menu,
+                #     menuText,
+                #     name = tidalReading.getURL(),
+                #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+                self.createAndAppendMenuItemWithOnClickURL(
+                    menu,
+                    menuText,
+                    tidalReading.getURL() )
 
             else:
-                self.__createAndAppendMenuItem( menu, indent + tidalReading.getDate(), tidalReading.getURL() )
-                self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )
+                # self.__createAndAppendMenuItem( menu, indent + tidalReading.getDate(), tidalReading.getURL() )#TODO Delete
+                # self.createAndAppendMenuItem(
+                #     menu,
+                #     indent + tidalReading.getDate(),
+                #     name = tidalReading.getURL(),
+                #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+                self.createAndAppendMenuItemWithOnClickURL(
+                    menu,
+                    indent + tidalReading.getDate(),
+                    tidalReading.getURL() )
+
+                # self.__createAndAppendMenuItem( menu, menuText, tidalReading.getURL() )#TODO Delete
+                # self.createAndAppendMenuItem(
+                #     menu,
+                #     menuText,
+                #     name = tidalReading.getURL(),
+                #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+                self.createAndAppendMenuItemWithOnClickURL(
+                    menu,
+                    menuText,
+                    tidalReading.getURL() )
+
                 todayDate = tidalReading.getDate()
                 shownToday = True
 
@@ -160,24 +199,47 @@ class IndicatorTide( IndicatorBase ):
                 tidalReading.getTime() + "  " + tidalReading.getLevel()
 
             if shownToday:
-                self.__createAndAppendMenuItem( subMenu, menuText, tidalReading.getURL() )
+                # self.__createAndAppendMenuItem( subMenu, menuText, tidalReading.getURL() )#TODO Delete
+                # self.createAndAppendMenuItem(
+                #     subMenu,
+                #     menuText,
+                #     name = tidalReading.getURL(),
+                #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+                self.createAndAppendMenuItemWithOnClickURL(
+                    subMenu,
+                    menuText,
+                    tidalReading.getURL() )
 
             else:
                 subMenu = Gtk.Menu()
-                self.__createAndAppendMenuItem( menu, indent + tidalReading.getDate(), None ).set_submenu( subMenu )
-                self.__createAndAppendMenuItem( subMenu, menuText, tidalReading.getURL() )
+                # self.__createAndAppendMenuItem( menu, indent + tidalReading.getDate(), None ).set_submenu( subMenu )#TODO Delete
+                self.createAndAppendMenuItem(
+                    menu,
+                    indent + tidalReading.getDate() ).set_submenu( subMenu )
+
+                # self.__createAndAppendMenuItem( subMenu, menuText, tidalReading.getURL() )#TODO Delete
+                # self.createAndAppendMenuItem(
+                #     subMenu,
+                #     menuText,
+                #     name = tidalReading.getURL(),
+                #     onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+                self.createAndAppendMenuItemWithOnClickURL(
+                    subMenu,
+                    menuText,
+                    tidalReading.getURL() )
+
                 todayDate = tidalReading.getDate()
                 shownToday = True
 
-
-    def __createAndAppendMenuItem( self, menu, menuItemText, url ):
-        menuItem = Gtk.MenuItem.new_with_label( menuItemText )
-        menu.append( menuItem )
-        if url is not None:
-            menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
-            menuItem.set_name( url )
-
-        return menuItem
+#TODO Delete
+    # def __createAndAppendMenuItem( self, menu, menuItemText, url ):
+    #     menuItem = Gtk.MenuItem.new_with_label( menuItemText )
+    #     menu.append( menuItem )
+    #     if url is not None:
+    #         menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
+    #         menuItem.set_name( url )
+    #
+    #     return menuItem
 
 
     def __splitTidalReadingsAfterFirstDate( self, tidalReadings ):

@@ -74,7 +74,8 @@ class IndicatorStardate( IndicatorBase ):
             self.setLabel( stardateString )
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( stardateString ) )
+            # menu.append( Gtk.MenuItem.new_with_label( stardateString ) )#TODO Delete
+            self.createAndAppendMenuItem( menu, stardateString )
             menu.append( Gtk.SeparatorMenuItem() )
 
         return numberOfSecondsToNextUpdate

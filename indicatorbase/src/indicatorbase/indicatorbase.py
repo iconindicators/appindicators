@@ -187,6 +187,7 @@ import re
 import shutil
 import subprocess
 import sys
+import webbrowser
 
 from abc import ABC
 from bisect import bisect_right
@@ -334,7 +335,8 @@ class IndicatorBase( ABC ):
         Notify.init( self.indicatorName )
 
         menu = Gtk.Menu()
-        menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
+        # menu.append( Gtk.MenuItem.new_with_label( _( "Initialising..." ) ) )
+        self.createAndAppendMenuItem( menu, _( "Initialising..." ) )
         menu.show_all()
 
         self.indicator = AppIndicator.Indicator.new(
@@ -467,17 +469,29 @@ class IndicatorBase( ABC ):
             menu.append( Gtk.SeparatorMenuItem() )
 
         # Add in common menu items.
-        menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) )
-        menuItem.connect( "activate", self.__onPreferences )
-        menu.append( menuItem )
+        # menuItem = Gtk.MenuItem.new_with_label( _( "Preferences" ) ) #TODO delete
+        # menuItem.connect( "activate", self.__onPreferences )
+        # menu.append( menuItem )
+        self.createAndAppendMenuItem(
+            menu,
+            _( "Preferences" ),
+            onClickFunction = self.__onPreferences )
 
-        menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )
-        menuItem.connect( "activate", self.__onAbout )
-        menu.append( menuItem )
+        # menuItem = Gtk.MenuItem.new_with_label( _( "About" ) )#TODO delete
+        # menuItem.connect( "activate", self.__onAbout )
+        # menu.append( menuItem )
+        self.createAndAppendMenuItem(
+            menu,
+            _( "About" ),
+            onClickFunction = self.__onAbout )
 
-        menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )
-        menuItem.connect( "activate", Gtk.main_quit )
-        menu.append( menuItem )
+        # menuItem = Gtk.MenuItem.new_with_label( _( "Quit" ) )#TODO delete
+        # menuItem.connect( "activate", Gtk.main_quit )
+        # menu.append( menuItem )
+        self.createAndAppendMenuItem(
+            menu,
+            _( "Quit" ),
+            onClickFunction = Gtk.main_quit )
 
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -491,6 +505,88 @@ class IndicatorBase( ABC ):
 
         else:
             self.nextUpdateTime = None
+
+
+    def createAndAppendMenuItem(
+            self,
+            menu,
+            label,
+            name = None,
+            onClickFunction = None, # TODO Think I need a comment that the onclickfunctino must have as the first arg 'widget'...IS THIS STILL TRUE?
+            onClickFunctionArguments = None, # Ensure arguments are passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            isSecondaryActivateTarget = False ):
+
+        menuItem = Gtk.MenuItem.new_with_label( label )
+
+        if name:
+            menuItem.set_name( name )
+
+        if onClickFunction:
+            if onClickFunctionArguments:
+                menuItem.connect( "activate", onClickFunction, *onClickFunctionArguments )
+
+            else:
+                menuItem.connect( "activate", onClickFunction )
+
+        if isSecondaryActivateTarget:
+            self.secondaryActivateTarget = menuItem
+
+        menu.append( menuItem )
+        return menuItem
+
+
+    def createAndInsertMenuItem(
+            self,
+            menu,
+            label,
+            index,
+            name = None,
+            onClickFunction = None, # TODO Think I need a comment that the onclickfunctino must have as the first arg 'widget'...IS THIS STILL TRUE?
+            onClickFunctionArguments = None, # Ensure arguments are passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            isSecondaryActivateTarget = False ):
+
+        menuItem = self.createAndAppendMenuItem(
+            menu,
+            label,
+            name,
+            onClickFunction, # TODO Think I need a comment that the onclickfunctino must have as the first arg 'widget'...IS THIS STILL TRUE?
+            onClickFunctionArguments, # Ensure arguments are passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            isSecondaryActivateTarget )
+
+        menu.reorder_child( menuItem, index )
+        return menuItem
+
+
+#TODO Work out where this is used and if so, replace with call above.
+    def createAndAppendMenuItemWithOnClickURL( self, menu, label, url ):
+        return self.createAndAppendMenuItem(
+            menu,
+            label,
+            name = url,
+            onClickFunction = lambda widget: webbrowser.open( widget.props.name ) )
+
+
+    def getOnClickMenuItemOpenBrowserFunction( self ):
+        return lambda widget: webbrowser.open( widget.props.name )
+
+
+#TODO Work out where this is used and if so, replace with call above.
+    def createAndInsertMenuItemWithOnClickURL( self, menu, label, index, onClickURL ):
+        menuItem = Gtk.MenuItem.new_with_label( label )
+        menuItem.set_name( onClickURL )
+        menuItem.connect( "activate", lambda widget: webbrowser.open( widget.props.name ) )
+        menu.insert( menuItem, index )
+        return menuItem
+
+
+    # def __createMenuItemORIG( self, label, onClickURL ):#TODO Delete????
+    #     menuItem = Gtk.MenuItem.new_with_label( label )
+    #     if onClickURL:
+    #         menuItem.set_name( onClickURL )
+    #         menuItem.connect( "activate", self.onMenuItemClick )
+    #
+    #     return menuItem
+
 
 
     def requestUpdate( self, delay = 0 ):
