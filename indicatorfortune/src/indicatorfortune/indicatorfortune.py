@@ -195,7 +195,7 @@ class IndicatorFortune( IndicatorBase ):
             self.get_icon_name() ).show()
 
 
-    def refreshAndShowFortune( self ): #TODO Find who calls this...is is possible just to call refresh() then call show()?
+    def refreshAndShowFortune( self ):
         self.refreshFortune()
         self.showFortune()
 
