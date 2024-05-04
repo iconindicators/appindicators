@@ -50,7 +50,6 @@
 
 
 import datetime
-import importlib
 import io
 import locale
 import math
@@ -71,7 +70,6 @@ from astrobase import AstroBase
 
 class AstroSkyfield( AstroBase ):
 
-#TODO Is there a way to check when the planets ephemeris is going to be out of date and warn the user?
     # Planets ephemeris must be created using create_ephemeris_planets.py.
     __EPHEMERIS_PLANETS = load( str( Path( __file__ ).parent ) + "/data/planets.bsp" )
 
@@ -296,6 +294,37 @@ class AstroSkyfield( AstroBase ):
             startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
 
         return data
+
+
+#TODO If/when astroskyfield is activated, uncomment the function below.
+# Should be called at the top of indicatorlunar before running the __init()__
+# to abort if the planet ephemeris is out of date
+# and send the message to alert the user.
+# Check old versions of indicatorlunar on how to do this.
+# Might need to make check_planet_ephemeris_dates() an abstract function in astrobase
+# and so also a dummy function in astropyephem.
+#   message = check_planet_ephemeris_dates( load( str( Path( __file__ ).parent ) + "/data/planets.bsp" ) )
+    # @staticmethod
+    # def check_planet_ephemeris_dates( planet_ephemeris ):
+    #     message = ""
+    #     segment = planet_ephemeris.segments[ 0 ]
+    #     start, end = segment.time_range( load.timescale( builtin = True ) )
+    #     start = datetime.datetime.strptime( start.tdb_strftime()[ 0 : 10 ], "%Y-%m-%d" ).replace( tzinfo = datetime.timezone.utc )
+    #     end = datetime.datetime.strptime( end.tdb_strftime()[ 0 : 10 ], "%Y-%m-%d" ).replace( tzinfo = datetime.timezone.utc )
+    #     utcNow = datetime.datetime.now( datetime.timezone.utc )
+    #     if start > ( utcNow - datetime.timedelta( days = 31 * 3 ) ):
+    #         message = f"The ephemeris start date {start.date()} must be at least three months before today's date."
+    #
+    #     if end < ( utcNow + datetime.timedelta( days = 31 * 18 ) ):
+    #         if len( message ) > 0:
+    #             message += "\n"
+    #
+    #         message += f"The ephemeris end date {end.date()} must be at least eighteen months after today's date."
+    #
+    #     if len( message ) == 0:
+    #         message = None
+    #
+    #     return message
 
 
     @staticmethod
