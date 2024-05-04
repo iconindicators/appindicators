@@ -88,19 +88,19 @@ class IndicatorFortune( IndicatorBase ):
         self.createAndAppendMenuItem(
             menu,
             _( "New Fortune" ),
-            onClickFunction = lambda widget: self.refreshAndShowFortune(),
+            onClickFunction = lambda menuItem: self.refreshAndShowFortune(),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
         self.createAndAppendMenuItem(
             menu,
             _( "Copy Last Fortune" ),
-            onClickFunction = lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ),
+            onClickFunction = lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
         self.createAndAppendMenuItem(
             menu,
             _( "Show Last Fortune" ),
-            onClickFunction = lambda widget: self.showFortune(),
+            onClickFunction = lambda menuItem: self.showFortune(),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -108,7 +108,7 @@ class IndicatorFortune( IndicatorBase ):
         self.createAndAppendMenuItem(
             menu,
             _( "History" ),
-            onClickFunction = lambda widget: self.showHistory() )
+            onClickFunction = lambda menuItem: self.showHistory() )
 
 
     def showHistory( self ):
@@ -132,7 +132,7 @@ class IndicatorFortune( IndicatorBase ):
         box = Gtk.Box()
         box.pack_start( scrolledWindow, True, True, 0 )
 
-        self.createDialogExternalToAboutOrPreferences( widget, _( "Fortune History for Session" ), box, True )
+        self.createDialogExternalToAboutOrPreferences( None, _( "Fortune History for Session" ), box, True )
 
 
     def refreshFortune( self ):

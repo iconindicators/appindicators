@@ -100,7 +100,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.createAndAppendMenuItem(
                 menu,
                 _( "Launch VirtualBox™ Manager" ),
-                onClickFunction = lambda widget: self.onLaunchVirtualBoxManager(),
+                onClickFunction = lambda menuItem: self.onLaunchVirtualBoxManager(),
                 isSecondaryActivateTarget = True )
 
         else:
@@ -150,7 +150,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu.append( menuItem )
 
 
-    def _onVirtualMachine( self, widget, virtualMachine ):
+    def _onVirtualMachine( self, menuItem, virtualMachine ):
         if self.isVirtualMachineRunning( virtualMachine.getUUID() ):
             self.bringWindowToFront( virtualMachine.getName() )
             self.requestUpdate( 1 )

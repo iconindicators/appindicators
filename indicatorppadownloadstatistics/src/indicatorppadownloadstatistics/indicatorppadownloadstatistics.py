@@ -274,28 +274,28 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return ppas
 
 
-    def onPPA( self, widget ):
+    def onPPA( self, menuItem ):
         url = "https://launchpad.net/~"
-        firstPipe = str.find( widget.props.name, "|" )
-        ppaUser = widget.props.name[ 0 : firstPipe ].strip()
-        secondPipe = str.find( widget.props.name, "|", firstPipe + 1 )
+        firstPipe = str.find( menuItem.props.name, "|" )
+        ppaUser = menuItem.props.name[ 0 : firstPipe ].strip()
+        secondPipe = str.find( menuItem.props.name, "|", firstPipe + 1 )
         if secondPipe == -1:
             # This is a combined PPA...
-            ppaName = widget.props.name[ firstPipe + 1 : ].strip()
+            ppaName = menuItem.props.name[ firstPipe + 1 : ].strip()
             url += ppaUser + "/+archive/ubuntu/" + ppaName
-            if widget.props.name != widget.get_label(): # Use the menu item label to specify the package name.
-                url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter="
+            if menuItem.props.name != menuItem.get_label(): # Use the menu item label to specify the package name.
+                url += "/+packages?field.name_filter=" + menuItem.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter="
 
         else:
-            ppaName = widget.props.name[ firstPipe + 1 : secondPipe ].strip()
-            thirdPipe = str.find( widget.props.name, "|", secondPipe + 1 )
-            series = widget.props.name[ secondPipe + 1 : thirdPipe ].strip()
+            ppaName = menuItem.props.name[ firstPipe + 1 : secondPipe ].strip()
+            thirdPipe = str.find( menuItem.props.name, "|", secondPipe + 1 )
+            series = menuItem.props.name[ secondPipe + 1 : thirdPipe ].strip()
             url += ppaUser + "/+archive/ubuntu/" + ppaName
-            if widget.props.name == widget.get_label():
+            if menuItem.props.name == menuItem.get_label():
                 url += "?field.series_filter=" + series
 
             else: # Use the menu item label to specify the package name.
-                url += "/+packages?field.name_filter=" + widget.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter=" + series
+                url += "/+packages?field.name_filter=" + menuItem.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter=" + series
 
         webbrowser.open( url )
 

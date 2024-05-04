@@ -122,7 +122,7 @@ class IndicatorTest( IndicatorBase ):
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Use default icon",
-            onClickFunction = lambda widget: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
+            onClickFunction = lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
 
         cacheDirectory = self.getCacheDirectory()
         icons = [ "FULL_MOON",
@@ -147,12 +147,12 @@ class IndicatorTest( IndicatorBase ):
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Reset label",
-            onClickFunction = lambda widget: self.setLabel( IndicatorTest.LABEL ) )
+            onClickFunction = lambda menuItem: self.setLabel( IndicatorTest.LABEL ) )
 
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Show current time in label",
-            onClickFunction = lambda widget: (
+            onClickFunction = lambda menuItem: (
                 print( "secondary activate target / mouse middle click" ),
                 self.setLabel( self.__getCurrentTime() ) ),
             isSecondaryActivateTarget = True )
@@ -160,7 +160,7 @@ class IndicatorTest( IndicatorBase ):
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + "Show current time in OSD",
-            onClickFunction = lambda widget:
+            onClickFunction = lambda menuItem:
                 Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
 
         self.createAndAppendMenuItem( menu, "Label / Tooltip / OSD" ).set_submenu( subMenu )
@@ -172,7 +172,7 @@ class IndicatorTest( IndicatorBase ):
         self.createAndAppendMenuItem(
             subMenu,
             self.getMenuIndent() + _( "Copy current time to clipboard" ),
-            onClickFunction = lambda widget:
+            onClickFunction = lambda menuItem:
                 Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
 
         self.createAndAppendMenuItem( menu, "Clipboard" ).set_submenu( subMenu )
@@ -211,7 +211,7 @@ class IndicatorTest( IndicatorBase ):
             self.createAndAppendMenuItem(
                 subMenu,
                 self.getMenuIndent() + label,
-                onClickFunction = lambda widget, command = command: self.__executeCommand( command ) ) # Note command = command to handle lambda late binding.
+                onClickFunction = lambda menuItem, command = command: self.__executeCommand( command ) ) # Note command = command to handle lambda late binding.
 
         self.createAndAppendMenuItem( menu, "Execute Terminal Command" ).set_submenu( subMenu )
 
@@ -220,10 +220,10 @@ class IndicatorTest( IndicatorBase ):
         return datetime.datetime.now().strftime( "%H:%M:%S" )
 
 
-    def __useIconDynamicallyCreated( self, widget ):
+    def __useIconDynamicallyCreated( self, menuItem ):
         illuminationPercentage = 35
         brightLimbAngleInDegrees = 65
-        svgIconText = self.__getSVGIconText( widget.props.name, illuminationPercentage, brightLimbAngleInDegrees )
+        svgIconText = self.__getSVGIconText( menuItem.props.name, illuminationPercentage, brightLimbAngleInDegrees )
 
         iconFilename = self.writeCacheText(
             svgIconText,

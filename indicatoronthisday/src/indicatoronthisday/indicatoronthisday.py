@@ -125,7 +125,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     break # Don't add the menu item for the new date and don't add a subsequent event.
 
             if self.copyToClipboard:
-                f = lambda widget: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( widget.props.name + ' ' + widget.props.label.strip(), -1 )
+                f = lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( menuItem.props.name + ' ' + menuItem.props.label.strip(), -1 )
                 self.createAndAppendMenuItem(
                     menu,
                     self.getMenuIndent() + event.getDescription(),

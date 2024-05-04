@@ -65,7 +65,7 @@ class IndicatorPunycode( IndicatorBase ):
         self.createAndAppendMenuItem(
             menu,
             _( "Convert" ),
-            onClickFunction = lambda widget: self.onConvert(),
+            onClickFunction = lambda menuItem: self.onConvert(),
             isSecondaryActivateTarget = True )
 
         indent = self.getMenuIndent()
@@ -75,12 +75,12 @@ class IndicatorPunycode( IndicatorBase ):
             self.createAndAppendMenuItem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
-                onClickFunction = lambda widget: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) )
+                onClickFunction = lambda menuItem: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) )
 
             self.createAndAppendMenuItem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                onClickFunction = lambda widget: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) )
+                onClickFunction = lambda menuItem: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) )
 
 
     def onConvert( self ):

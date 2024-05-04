@@ -545,7 +545,7 @@ class IndicatorBase( ABC ):
 
 
     def getOnClickMenuItemOpenBrowserFunction( self ):
-        return lambda widget: webbrowser.open( widget.props.name )
+        return lambda menuItem: webbrowser.open( menuItem.props.name )
 
 
     def requestUpdate( self, delay = 0 ):
@@ -569,14 +569,14 @@ class IndicatorBase( ABC ):
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
-    def __onAbout( self, widget ):
+    def __onAbout( self, menuItem ):
         self.__setMenuSensitivity( False )
-        GLib.idle_add( self.__onAboutInternal, widget )
+        GLib.idle_add( self.__onAboutInternal, menuItem )
 
 
-    def __onAboutInternal( self, widget ):
+    def __onAboutInternal( self, menuItem ):
         aboutDialog = Gtk.AboutDialog()
-        aboutDialog.set_transient_for( widget.get_parent().get_parent() )
+        aboutDialog.set_transient_for( menuItem.get_parent().get_parent() )
         aboutDialog.set_artists( self.artwork )
         aboutDialog.set_authors( self.authors )
         aboutDialog.set_comments( self.comments )
@@ -627,17 +627,17 @@ class IndicatorBase( ABC ):
         aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-    def __onPreferences( self, widget ):
+    def __onPreferences( self, menuItem ):
         if self.updateTimerID:
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
         self.__setMenuSensitivity( False )
-        GLib.idle_add( self.__onPreferencesInternal, widget )
+        GLib.idle_add( self.__onPreferencesInternal, menuItem )
 
 
-    def __onPreferencesInternal( self, widget ):
-        dialog = self.createDialog( widget, _( "Preferences" ) )
+    def __onPreferencesInternal( self, menuItem ):
+        dialog = self.createDialog( menuItem, _( "Preferences" ) )
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
         self.__setMenuSensitivity( True )
@@ -809,7 +809,7 @@ class IndicatorBase( ABC ):
         return response
 
 
-    def __getParent( self, widget ):
+    def __getParent( self, widget ):#What is the widget here?
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
