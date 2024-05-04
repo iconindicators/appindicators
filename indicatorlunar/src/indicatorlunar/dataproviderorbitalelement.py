@@ -102,7 +102,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
             url = "https://astorbdb.lowell.edu/v1/graphql"
             json = { "query": query, "variables": variables }
-            response = requests.post( url, None, json )
+            response = requests.post( url, None, json, timeout = 5 )
             data = response.json()
             minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
 
