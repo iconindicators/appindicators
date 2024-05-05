@@ -187,6 +187,7 @@ class IndicatorLunar( IndicatorBase ):
 
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
+        self.getLogging().getLogger( "urllib3" ).propagate = False # On comet lookup, an unnecessary log message is created. 
         self.debug = True # TODO Remove
 
 
