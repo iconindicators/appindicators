@@ -613,10 +613,9 @@ class AstroSkyfield( AstroBase ):
         return neverUp
 
 
-#TODO There may (or may not!) be a better way to do all of this...
-# https://github.com/skyfielders/python-skyfield/issues/327#issuecomment-1500973930
-#TODO This might be useful (date_for_calculate) for satellites:
-#   https://github.com/skyfielders/python-skyfield/issues/919#issuecomment-1835991577
+#TODO Read
+#    https://rhodesmill.org/skyfield/earth-satellites.html
+# and ensure the code below follows the example as best practise.
     # References:
     #    https://github.com/skyfielders/python-skyfield/issues/327
     #    https://github.com/skyfielders/python-skyfield/issues/558
