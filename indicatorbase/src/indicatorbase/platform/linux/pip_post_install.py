@@ -64,6 +64,78 @@ print( sorted( python_directories, key = LooseVersion ) )
 # The install will use the default python3, say python3.8.
 # Then the upgrade will use the default python3...but what if that python3 is now python3.12?
 # So need to check the version number and get the highest because an upgrade might break.
+#
+# Additionally, if Python3.8 was used to do the install,
+# and now the user does an upgrade/update and uses the same instructions/commands
+# as the first time around but now has Python3.11 installed.
+# The 'ls -d ... | head -1' stuff will find Python3.11 rather than 3.8.
+# This will now create two installs...not good.
+#
+# Can upgrade be done with a script instead?
+# Only use PIP page for a clean install?
 
 
-
+#TODO Noticed for Ubuntu on the testpypi page that in the apt-get install line
+# there is no python3-pip...ensure this gets installed, presumably via python3-venv.
+#
+# Looking at
+    #
+    # $ apt rdepends python3-pip
+    # python3-pip
+    # Reverse Depends:
+    #   python3.8-venv
+    #   python3.11-venv
+    #   indicator-lunar
+    #   python3.9-venv
+    #   python3.8-venv
+    #   thonny
+    #   sagemath
+    #   duplicity
+    #   python3-ryu
+    #   python3-pypandoc
+    #   python3-pipdeptree
+    #   python3-jupyter-core
+    #   pipenv
+    #   parsero
+    #   lektor
+    #   gnumed-client
+    #   elpa-elpy
+    #   dhcpcanon
+    #
+    # $ apt rdepends python3-venv
+    # python3-venv
+    # Reverse Depends:
+    #   python3.8
+    #   python3.9
+    #   python3.8
+    #   xonsh
+    #   thonny
+    #   python3
+    #
+    # $ apt depends python3-pip
+    # python3-pip
+    #   Depends: ca-certificates
+    #   Depends: python3-distutils
+    #   Depends: python3-setuptools
+    #   Depends: python3-wheel
+    #   Depends: python-pip-whl
+    #   Depends: <python3:any>
+    #     python3:i386
+    #     python3
+    #   Breaks: <python-pip>
+    #   Recommends: build-essential
+    #   Recommends: python3-dev
+    #   Replaces: <python-pip>
+    #
+    # $ apt depends python3-venv
+    # python3-venv
+    #   Depends: python3.8-venv
+    #   Depends: python3
+    #   Depends: python3-distutils
+#
+# not sure which depends on which!
+#
+# I think best to just include both python3-venv and python3-pip for Debian/Ubuntu.
+# Check all other distros too!
+# Maybe can Google how to create a venv on Manjaro, etc, etc and see what package they install and use that.
+# Ditto for installing/running pip.
