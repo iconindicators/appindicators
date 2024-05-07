@@ -155,7 +155,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             menuItem = self.createAndAppendMenuItem(
                 menu,
                 indent + script.getName(),
-                onClickFunction = lambda menuItem: self.onScriptMenuItem( script ) )
+                onClickFunction = lambda menuItem, script = script: self.onScriptMenuItem( script ) ) # Note script = script to handle lambda late binding.
 
             if script.getDefault():
                 self.secondaryActivateTarget = menuItem

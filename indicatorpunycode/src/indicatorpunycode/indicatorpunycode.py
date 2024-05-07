@@ -75,12 +75,12 @@ class IndicatorPunycode( IndicatorBase ):
             self.createAndAppendMenuItem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
-                onClickFunction = lambda menuItem: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) )
+                onClickFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) ) # Note result = result to handle lambda late binding.
 
             self.createAndAppendMenuItem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                onClickFunction = lambda menuItem: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) )
+                onClickFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) ) # Note result = result to handle lambda late binding.
 
 
     def onConvert( self ):
