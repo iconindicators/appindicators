@@ -20,6 +20,11 @@
 # the icon(s), .desktop and run script to the .local directory.
 
 
+#TODO For an upgrade, consider a whole new script
+# which is used to do full upgrade, rather than running any 
+# of the original install instructions.
+
+
 import argparse
 from pathlib import Path
 
@@ -46,7 +51,16 @@ icon_directory.mkdir( parents = True, exist_ok = True )
 python_venv_directory = Path( dot_local_directory, "venv_" + args.indicator, "lib" )
 print( python_venv_directory )
 
-python_directories = [ str( x ) for x in python_venv_directory.iterdir() if x.is_dir() ]
+import os
+indicator_directory = Path( os.path.realpath( __file__ ) ).parents[ 2 ]
+print( indicator_directory )
+
+import shutil
+shutil.copytree( indicator_directory, directory_indicator )
+
+
+
+# python_directories = [ str( x ) for x in python_venv_directory.iterdir() if x.is_dir() ]
 
 # distutils is deprecated and removed in python 3.12
 # and need to use packaging.version instead.
@@ -55,9 +69,14 @@ python_directories = [ str( x ) for x in python_venv_directory.iterdir() if x.is
 # and import packaging.
 #  https://stackoverflow.com/a/1875267/2156453
 #  https://snyk.io/advisor/python/packaging/functions/packaging.version
-from distutils.version import LooseVersion
-versions = ["1.7.0", "1.7.0rc0", "1.11.0"]
-print( sorted( python_directories, key = LooseVersion ) )
+#from distutils.version import LooseVersion
+#versions = ["1.7.0", "1.7.0rc0", "1.11.0"]
+#print( sorted( python_directories, key = LooseVersion ) )
+
+# This selects the correct version of python...at least on Debian 12.
+# Guess need to check/test on all other supported distros!
+# ls -d $HOME/.local/venv_indicatortest/lib/python3.* | sort --version-sort | tail -1
+
 
 
 #TODO What happens when we do the install...and then want to do an upgrade?
