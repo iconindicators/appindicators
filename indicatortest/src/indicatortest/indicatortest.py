@@ -312,9 +312,6 @@ class IndicatorTest( IndicatorBase ):
         xCheckbutton.set_tooltip_text( _( "Enable/disable X" ) )
         grid.attach( xCheckbutton, 0, 0, 1, 1 )
 
-        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
-        grid.attach( box, 0, 1, 1, 1 )
-
         store = Gtk.ListStore( str )
         store.append( [ "Monday" ] )
         store.append( [ "Tuesday" ] )
@@ -340,7 +337,10 @@ class IndicatorTest( IndicatorBase ):
         scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledWindow.add( treeView )
 
-        grid.attach( scrolledWindow, 0, 2, 1, 10 )
+        grid.attach( scrolledWindow, 0, 1, 1, 10 )
+
+        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        grid.attach( box, 0, 11, 1, 1 )
 
         dialog.vbox.pack_start( grid, True, True, 0 )
         dialog.show_all()
