@@ -25,38 +25,64 @@
 # of the original install instructions.
 
 
-import argparse
+#TODO TO RUN FROM TERMINAL:
+#   python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/pip_post_install.py
+
+
+# import argparse
+import os
 from pathlib import Path
+import shutil
 
 
-'''
-mkdir -p $HOME/.local/bin
+# parser = argparse.ArgumentParser()
+# parser.add_argument( "indicator" )
+# args = parser.parse_args()
 
-cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin
 
-cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
-'''
+indicator_directory = Path( os.path.realpath( __file__ ) ).parents[ 2 ]
+# print( indicator_directory )
 
-parser = argparse.ArgumentParser()
-parser.add_argument( "indicator" )
-args = parser.parse_args()
+indicator_name = indicator_directory.name
+# print( indicator_name )
 
 dot_local_directory = Path( Path.home(), ".local" )
+# print( dot_local_directory )
 
 # mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps
-icon_directory = Path( dot_local_directory, "share/icons/hicolor/scalable/apps" )
-icon_directory.mkdir( parents = True, exist_ok = True )
+dot_local_icon_directory = Path( dot_local_directory, "share/icons/hicolor/scalable/apps" )
+dot_local_icon_directory.mkdir( parents = True, exist_ok = True )
+
+indicator_icon_directory = Path( indicator_directory, "icons" )
 
 # cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps
-python_venv_directory = Path( dot_local_directory, "venv_" + args.indicator, "lib" )
-print( python_venv_directory )
+shutil.copytree( indicator_icon_directory, dot_local_icon_directory, dirs_exist_ok = True )
 
-import os
-indicator_directory = Path( os.path.realpath( __file__ ) ).parents[ 2 ]
-print( indicator_directory )
+# mkdir -p $HOME/.local/bin
+dot_local_bin_directory = Path( dot_local_directory, "bin" )
+dot_local_bin_directory.mkdir( parents = True, exist_ok = True )
 
-import shutil
-shutil.copytree( indicator_directory, directory_indicator )
+# cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin
+if not Path( dot_local_bin_directory, indicator_name + ".sh" ).is_file():
+    # print( Path( indicator_directory, "platform/linux/" + indicator_name + ".sh" ) )
+    shutil.copyfile(
+        str( Path( indicator_directory, "platform/linux/" + indicator_name + ".sh" ) ),
+        str( Path( dot_local_bin_directory, indicator_name + ".sh" ) ) )
+
+# mkdir -p $HOME/.local/bin
+dot_local_applications_directory = Path( dot_local_directory, "share/applications" )
+dot_local_applications_directory.mkdir( parents = True, exist_ok = True )
+
+# cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
+if not Path( dot_local_applications_directory, indicator_name + ".py.desktop" ).is_file():
+    shutil.copyfile(
+        str( Path( indicator_directory, "platform/linux/" + indicator_name + ".py.desktop" ) ),
+        str( Path( dot_local_applications_directory, indicator_name + ".py.desktop" ) ) )
+
+
+
+# python_venv_directory = Path( dot_local_directory, "venv_" + args.indicator, "lib" )
+# print( python_venv_directory )
 
 
 
