@@ -20,6 +20,11 @@
 # the icon(s), .desktop and run script to the .local directory.
 
 
+#TODO If this script method of install works,
+# need to amend the readme such that the OS packages of python3-venv and python3-pip
+# (or equivalent for each distro/version) are installed by the user up front.
+
+
 #TODO For an upgrade, consider a whole new script
 # which is used to do full upgrade, rather than running any 
 # of the original install instructions.
@@ -38,6 +43,7 @@
 # import argparse
 import os
 from pathlib import Path
+import platform
 import shutil
 
 
@@ -100,13 +106,48 @@ def copy_files():
             str( Path( dot_local_applications_directory, indicator_name + ".py.desktop" ) ) )
 
 
+
+#TODO This needs to take into account the indicator too...
+# See the build_readme script.
+# Either use that code to determine packages for each distro/version/indicator combination
+# or come up with something else.
+distribution_names_and_versions_to_operating_sytem_packages = {
+    "ubuntu2004" : "sudo apt-get -y install fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 wmctrl"
+}
+
+
 def install_operating_system_packages():
+#TODO Need to work out what OS distro/version we're on and then run something like:
+#   sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
+    uname = platform.uname()
+    print( str( uname.node ) )  #TODO Node seems to work...use that and test across all distros/versions.
     pass
 
+    node = uname.node
+    # if 
 
-copy_files()
+
+
+#copy_files()
 install_operating_system_packages()
 
+
+
+
+#   https://stackoverflow.com/questions/4256107/running-bash-commands-in-python
+# To run as sudo:
+#   sudo python3 pip_post_install.py
+# import subprocess
+# cmd = "sudo apt update"
+# results = subprocess.run( cmd, shell = True, universal_newlines = True, check = True )
+# print( results.stdout )
+
+
+
+
+
+
+#OLD STUFF BELOW....NOT SURE IF ANY IS VALID BUT CHECK ANYWAY.
 
 
 # python_venv_directory = Path( dot_local_directory, "venv_" + args.indicator, "lib" )
