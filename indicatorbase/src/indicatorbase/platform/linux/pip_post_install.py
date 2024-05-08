@@ -36,20 +36,42 @@
 # that does an update that wants to update the script itself).
 
 
+#TODO What about a removal script too...?
+
+
 #TODO TO RUN FROM TERMINAL:
 #   python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/pip_post_install.py
 
 
 # import argparse
+from enum import auto, Enum
 import os
 from pathlib import Path
 import platform
 import shutil
+import subprocess
 
 
-# parser = argparse.ArgumentParser()
-# parser.add_argument( "indicator" )
-# args = parser.parse_args()
+class Operating_System( Enum ):
+    DEBIAN_11_DEBIAN_12 = auto()
+    FEDORA_38_FEDORA_39 = auto()
+    MANJARO_221 = auto()
+    OPENSUSE_TUMBLEWEED = auto()
+    UBUNTU_2004 = auto()
+    UBUNTU_2204 = auto()
+
+
+indicator_names = [
+    "indicatorfortune",
+    "indicatorlunar",
+    "indicatoronthisday",
+    "indicatorppadownloadstatistics",
+    "indicatorpunycode",
+    "indicatorscriptrunner",
+    "indicatorstardate",
+    "indicatortest",
+    "indicatortide",
+    "indicatorvirtualbox" ]
 
 
 #TODO Have to kick off an OS package install...
@@ -106,7 +128,6 @@ def copy_files():
             str( Path( dot_local_applications_directory, indicator_name + ".py.desktop" ) ) )
 
 
-
 #TODO This needs to take into account the indicator too...
 # See the build_readme script.
 # Either use that code to determine packages for each distro/version/indicator combination
@@ -116,20 +137,73 @@ distribution_names_and_versions_to_operating_sytem_packages = {
 }
 
 
-def install_operating_system_packages():
-#TODO Need to work out what OS distro/version we're on and then run something like:
+def install_operating_system_packages( operating_system, indicator_name ):
+#TODO For each distro/version run something like:
 #   sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
-    uname = platform.uname()
-    print( str( uname.node ) )  #TODO Node seems to work...use that and test across all distros/versions.
-    pass
+    command = "cat /etc/os-release"
+    '''
+    result = subprocess.run(
+                command,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE,
+                shell = True ).stdout.decode()
+    '''
 
-    node = uname.node
-    # if 
+    if operating_system == Operating_System.UBUNTU_2004:
+        print( "TODO Return apt get install for ubuntu 20.04 and relevent indicator" )
+
+    elif operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
+        print( "TODO Return apt get install for debian 11/12 and relevent indicator" )
 
 
+# https://www.freedesktop.org/software/systemd/man/latest/os-release.html
+# https://github.com/stejskalleos/os_release
+def get_operating_system():
+    operating_system = None
+    command = "cat /etc/os-release"
+    result = subprocess.run(
+                command,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE,
+                shell = True ).stdout.decode()
 
+    if "ID=debian" in result and ( "VERSION_ID=\"11\"" in result or "VERSION_ID=\"12\"" in result ):
+        operating_system = Operating_System.DEBIAN_11_DEBIAN_12
+
+    elif "ID=ubuntu" in result and "VERSION_ID=\"20.04\"" in result:
+        operating_system = Operating_System.UBUNTU_2004
+
+    return operating_system
+
+
+def get_indicator_directory():
+    return Path( os.path.realpath( __file__ ) ).parents[ 2 ]
+
+
+def get_indicator_name():
+    return get_indicator_directory().name
+
+
+indicator_name = get_indicator_name()
+operating_system = get_operating_system()
+if indicator_name not in indicator_names:
+    print( f"TODO Indicator { indicator_name } is invalid.  Please contact the author." )
+
+elif operating_system is None:
+    print( f"TODO Unknown/unsupported distribution/version.  Please contact the author." )
+
+else:
+    print( indicator_name )
+    print( operating_system )
+    print( "Good to install...!" )
+    install_operating_system_packages( operating_system, indicator_name )
+    pass #TODO Run the script!
+
+
+#TODO First get the os distro/version and if we don't match, tell the user (to email me) and exit.
+#TODO Ensure the indicator name is valid.  If not, let user know (to email me) and exit.  What else to do?
 #copy_files()
-install_operating_system_packages()
+#install_operating_system_packages()
 
 
 
