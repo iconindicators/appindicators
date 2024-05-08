@@ -24,6 +24,11 @@
 # which is used to do full upgrade, rather than running any 
 # of the original install instructions.
 # How much of this post_install script can be reused?
+#
+# I think the upgrade needs to be a combination of kick off a pip upgrade
+# and then run a post-upgrade script
+# (the post-upgrade script could be updated so not a good idea to run a script 
+# that does an update that wants to update the script itself).
 
 
 #TODO TO RUN FROM TERMINAL:
@@ -51,24 +56,19 @@ import shutil
 
 def copy_files():
     indicator_directory = Path( os.path.realpath( __file__ ) ).parents[ 2 ]
-    # print( indicator_directory )
-
     indicator_name = indicator_directory.name
-    # print( indicator_name )
 
     dot_local_directory = Path( Path.home(), ".local" )
-    # print( dot_local_directory )
 
     # mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps
     # Create the icons directory.
     dot_local_icon_directory = Path( dot_local_directory, "share/icons/hicolor/scalable/apps" )
     dot_local_icon_directory.mkdir( parents = True, exist_ok = True )
 
-
     # cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps
     # Copy icons from indicator installation to icons directory.
     indicator_icon_directory = Path( indicator_directory, "icons" )
-    shutil.copytree( indicator_icon_directory, dot_local_icon_directory, dirs_exist_ok = True )
+    shutil.copytree( indicator_icon_directory, dot_local_icon_directory, dirs_exist_ok = True ) #TODO Need to overwrite if already there?  
 
     # mkdir -p $HOME/.local/bin
     # Create the bin directory.
@@ -77,8 +77,12 @@ def copy_files():
 
     # cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin
     # Copy indicator run script from indicator installation to bin directory.
+#TODO Why check for the existence of the run script (and also the .desktop below)
+# but we don't check for the existence of the icons?
+# If this is a fresh install, no need to check.
+# If there is a pre-existing install, this script will work (except for the icons already existing and not checking first).
+# Maybe also check for the icons and then this script (or in part) can be used for the upgrade.
     if not Path( dot_local_bin_directory, indicator_name + ".sh" ).is_file():
-        # print( Path( indicator_directory, "platform/linux/" + indicator_name + ".sh" ) )
         shutil.copyfile(
             str( Path( indicator_directory, "platform/linux/" + indicator_name + ".sh" ) ),
             str( Path( dot_local_bin_directory, indicator_name + ".sh" ) ) )
