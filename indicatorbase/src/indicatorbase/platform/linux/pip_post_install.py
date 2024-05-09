@@ -36,8 +36,45 @@
 # that does an update that wants to update the script itself).
 
 
-#TODO What about a removal script too...?
 
+#TODO What is the difference between install and upgrade and removal:
+#
+# INSTALL
+#   sudo apt-get -y install fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
+#
+#   python3 -m venv $HOME/.local/venv_indicatortest && \
+#   . $HOME/.local/venv_indicatortest/bin/activate && \
+#   python3 -m pip install --upgrade pip indicatortest && \
+#   deactivate
+#
+#   mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \
+#   cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps && \
+#   mkdir -p $HOME/.local/bin && \
+#   cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin && \
+#   cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
+#
+# UPGRADE
+#   sudo apt-get -y install <a new package required by a change to an indicator; remove a package no longer used>
+#
+#   . $HOME/.local/venv_indicatortest/bin/activate && \       <no need to create the venv>
+#   python3 -m pip install --upgrade pip indicatortest && \
+#   deactivate
+#
+#   mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \   <new/upgraded icons or a change to the .desktop.sh>
+#   cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps && \
+#   mkdir -p $HOME/.local/bin && \
+#   cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin && \
+#   cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
+#
+# REMOVE
+#   sudo apt-get -y remove fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
+#
+#   rm $HOME/.local/share/icons/hicolor/scalable/apps/<icons for the indicator...maybe get that list from the indicator directory>
+#   rm $HOME/.local/bin/indicatortest.sh
+#   rm $HOME/.local/share/applications/indicatortest.py.desktop
+#   rm -r $HOME/.local/venv_indicatortest
+# What about .cache, .config and any log files?
+   
 
 #TODO TO RUN FROM TERMINAL:
 #   python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/pip_post_install.py
@@ -62,6 +99,7 @@ class Operating_System( Enum ):
 
 
 indicator_names = [
+    "indicatorbase", #TODO Remove...only used for testing.
     "indicatorfortune",
     "indicatorlunar",
     "indicatoronthisday",
@@ -72,14 +110,6 @@ indicator_names = [
     "indicatortest",
     "indicatortide",
     "indicatorvirtualbox" ]
-
-
-#TODO Have to kick off an OS package install...
-# Need to work out what the OS is...see the build_readme/build_wheel in tools.
-# Maybe need argparse to pass in the OS/distro.
-#
-# For Ubuntu 22.04:
-    # sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
 
 
 def copy_files():
@@ -138,6 +168,7 @@ distribution_names_and_versions_to_operating_sytem_packages = {
 
 
 def install_operating_system_packages( operating_system, indicator_name ):
+    print( f"Installing operating system packages for { indicator_name } on { operating_system.name }...")
 #TODO For each distro/version run something like:
 #   sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
     command = "cat /etc/os-release"
@@ -173,6 +204,8 @@ def get_operating_system():
     elif "ID=ubuntu" in result and "VERSION_ID=\"20.04\"" in result:
         operating_system = Operating_System.UBUNTU_2004
 
+#TODO Add rest of supported distributions/versions.
+
     return operating_system
 
 
@@ -193,17 +226,13 @@ elif operating_system is None:
     print( f"TODO Unknown/unsupported distribution/version.  Please contact the author." )
 
 else:
-    print( indicator_name )
-    print( operating_system )
-    print( "Good to install...!" )
+    # print( indicator_name )
+    # print( operating_system )
+    # print( "Good to install...!" )
     install_operating_system_packages( operating_system, indicator_name )
-    pass #TODO Run the script!
+#TODO Is there a way to see if the packages were installed and if so, continue; if not, message user?
+    # copy_files()
 
-
-#TODO First get the os distro/version and if we don't match, tell the user (to email me) and exit.
-#TODO Ensure the indicator name is valid.  If not, let user know (to email me) and exit.  What else to do?
-#copy_files()
-#install_operating_system_packages()
 
 
 
