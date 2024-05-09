@@ -16,6 +16,83 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO For the distributions tested and work or partially work,
+# such as Kubuntu, Ubuntu Budgie, Xubuntu, Linux Mint Cinnamon, Ubuntu Unity, Lubuntu, Ubuntu MATE, 
+# should these be explicitly listed along with Ubuntu?
+
+#TODO For install, maybe remove the activate/deactivate stuff.
+
+#TODO Remove upgrade from install and make a new section for upgrade.
+# Upgrade section is same as install, but only need in the second step the pip install --upgrade (one liner).
+
+#TODO Usage: can we remove the activate/deactivate so it is one line?
+
+#TODO Noticed for Ubuntu on the testpypi page that in the apt-get install line
+# there is no python3-pip...ensure this gets installed, presumably via python3-venv.
+#
+# Looking at
+    #
+    # $ apt rdepends python3-pip
+    # python3-pip
+    # Reverse Depends:
+    #   python3.8-venv
+    #   python3.11-venv
+    #   indicator-lunar
+    #   python3.9-venv
+    #   python3.8-venv
+    #   thonny
+    #   sagemath
+    #   duplicity
+    #   python3-ryu
+    #   python3-pypandoc
+    #   python3-pipdeptree
+    #   python3-jupyter-core
+    #   pipenv
+    #   parsero
+    #   lektor
+    #   gnumed-client
+    #   elpa-elpy
+    #   dhcpcanon
+    #
+    # $ apt rdepends python3-venv
+    # python3-venv
+    # Reverse Depends:
+    #   python3.8
+    #   python3.9
+    #   python3.8
+    #   xonsh
+    #   thonny
+    #   python3
+    #
+    # $ apt depends python3-pip
+    # python3-pip
+    #   Depends: ca-certificates
+    #   Depends: python3-distutils
+    #   Depends: python3-setuptools
+    #   Depends: python3-wheel
+    #   Depends: python-pip-whl
+    #   Depends: <python3:any>
+    #     python3:i386
+    #     python3
+    #   Breaks: <python-pip>
+    #   Recommends: build-essential
+    #   Recommends: python3-dev
+    #   Replaces: <python-pip>
+    #
+    # $ apt depends python3-venv
+    # python3-venv
+    #   Depends: python3.8-venv
+    #   Depends: python3
+    #   Depends: python3-distutils
+#
+# not sure which depends on which!
+#
+# I think best to just include both python3-venv and python3-pip for Debian/Ubuntu.
+# Check all other distros too!
+# Maybe can Google how to create a venv on Manjaro, etc, etc and see what package they install and use that.
+# Ditto for installing/running pip.
+
+
 # Create a README.md for an indicator from text common to all indicators and text
 # specific to the indicator, drawn from the indicator's CHANGELOG.md and pyproject.toml.
 #
@@ -280,11 +357,6 @@ def _get_installation_copy_files( indicator_name ):
     return (
         f"Copy icon, run script and desktop file to `$HOME/.local`:\n"
         f"    ```\n"
-        f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
-
-        f"    cp "
-        f"{ venv_indicator_home }/icons/*.svg "
-        f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
         f"    mkdir -p $HOME/.local/bin && \\\n"
 
@@ -292,9 +364,17 @@ def _get_installation_copy_files( indicator_name ):
         f"{ venv_indicator_home }/platform/linux/{ indicator_name }.sh "
         f"$HOME/.local/bin && \\\n"
 
+        f"    mkdir -p $HOME/.local/share/applications && \\\n"
+
         f"    cp "
         f"{ venv_indicator_home }/platform/linux/{ indicator_name }.py.desktop "
         f"$HOME/.local/share/applications\n"
+
+        f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+
+        f"    cp "
+        f"{ venv_indicator_home }/icons/*.svg "
+        f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
         f"    ```\n\n" )
 
@@ -505,12 +585,14 @@ def _get_removal_for_operating_system(
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
-            f"2. Remove `Python` virtual environment and files from `$HOME/.local`:\n"
+            f"2. Remove `Python` virtual environment and support files:\n"
             f"    ```\n"
-            f"    rm -r $HOME/.local/venv_{ indicator_name } && \\\n"
-            f"    rm $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }*.svg && \\\n"
-            f"    rm $HOME/.local/bin/{ indicator_name }.sh && \\\n"
-            f"    rm $HOME/.local/share/applications/{ indicator_name }.py.desktop\n"
+            f"    rm -f -r $HOME/.local/venv_{ indicator_name } && \\\n"
+            f"    rm -f -r $HOME/.cache/{ indicator_name } && \\\n"
+            f"    rm -f -r $HOME/.config/{ indicator_name } && \\\n"
+            f"    rm -f $HOME/.local/bin/{ indicator_name }.sh && \\\n"
+            f"    rm -f $HOME/.local/share/applications/{ indicator_name }.py.desktop && \\\n"
+            f"    rm -f $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }*.svg\n"
             f"    ```\n\n"
 
             f"</details>\n\n" )
