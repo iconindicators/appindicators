@@ -2,6 +2,13 @@
 # -*- coding: utf-8 -*-
 
 
+#TODO Not sure if this script is actually a good idea.
+# When doing the apt-get install, firstly the user cannot see the command being executed.
+# Secondly, if something goes wrong, how do I figure that out and how does the user fix it?
+# Better I think to get the user to execute the apt-get themselves and they can fix that.
+# So revert back to the current system of apt-get, vevn create / pip install, copy files.
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -34,7 +41,6 @@
 # and then run a post-upgrade script
 # (the post-upgrade script could be updated so not a good idea to run a script 
 # that does an update that wants to update the script itself).
-
 
 
 #TODO What is the difference between install and upgrade and removal:
@@ -80,7 +86,6 @@
 #   python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/pip_post_install.py
 
 
-# import argparse
 from enum import auto, Enum
 import os
 from pathlib import Path
@@ -98,6 +103,19 @@ class Operating_System( Enum ):
     UBUNTU_2204 = auto()
 
 
+class Indicator_Name( Enum ):
+    INDICATORFORTUNE = auto()
+    INDICATORLUNAR = auto()
+    INDICATORONTHISDAY = auto()
+    INDICATORPPADOWNLOADSTATISTICS = auto()
+    INDICATORPUNYCODE = auto()
+    INDICATORSCRIPTRUNNER = auto()
+    INDICATORSTARDATE = auto()
+    INDICATORTEST = auto()
+    INDICATORTIDE = auto()
+    INDICATORVIRTUALBOX = auto()
+
+
 indicator_names = [
     "indicatorbase", #TODO Remove...only used for testing.
     "indicatorfortune",
@@ -112,10 +130,23 @@ indicator_names = [
     "indicatorvirtualbox" ]
 
 
-def copy_files():
-    indicator_directory = Path( os.path.realpath( __file__ ) ).parents[ 2 ]
-    indicator_name = indicator_directory.name
+def get_indicator_directory():
+    return Path( os.path.realpath( __file__ ) ).parents[ 2 ]
 
+
+def get_indicator_name():
+    return get_indicator_directory().name
+
+
+def copy_and_replace( source_path, destination_path ):
+    copied = True
+    if os.path.exists( destination_path ):
+        os.remove( destination_path )#TODO Catch FileNotFoundError and return
+    shutil.copy2( source_path, destination_path )
+    return copied
+
+
+def copy_icon_desktop_run_script( indicator_directory, indicator_name ):
     dot_local_directory = Path( Path.home(), ".local" )
 
     # mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps
@@ -135,15 +166,9 @@ def copy_files():
 
     # cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin
     # Copy indicator run script from indicator installation to bin directory.
-#TODO Why check for the existence of the run script (and also the .desktop below)
-# but we don't check for the existence of the icons?
-# If this is a fresh install, no need to check.
-# If there is a pre-existing install, this script will work (except for the icons already existing and not checking first).
-# Maybe also check for the icons and then this script (or in part) can be used for the upgrade.
-    if not Path( dot_local_bin_directory, indicator_name + ".sh" ).is_file():
-        shutil.copyfile(
-            str( Path( indicator_directory, "platform/linux/" + indicator_name + ".sh" ) ),
-            str( Path( dot_local_bin_directory, indicator_name + ".sh" ) ) )
+    copy_and_replace(
+        str( Path( indicator_directory, "platform/linux/" + indicator_name + ".sh" ) ),
+        str( Path( dot_local_bin_directory, indicator_name + ".sh" ) ) ) #TODO Check return
 
     # mkdir -p $HOME/.local/share/applications
     dot_local_applications_directory = Path( dot_local_directory, "share/applications" )
@@ -152,39 +177,170 @@ def copy_files():
 
     # cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
     # Copy indicator .desktop from indicator installation to applications directory.
-    if not Path( dot_local_applications_directory, indicator_name + ".py.desktop" ).is_file():
-        shutil.copyfile(
-            str( Path( indicator_directory, "platform/linux/" + indicator_name + ".py.desktop" ) ),
-            str( Path( dot_local_applications_directory, indicator_name + ".py.desktop" ) ) )
+    copy_and_replace(
+        str( Path( indicator_directory, "platform/linux/" + indicator_name + ".py.desktop" ) ),
+        str( Path( dot_local_applications_directory, indicator_name + ".py.desktop" ) ) ) #TODO Check return
 
 
-#TODO This needs to take into account the indicator too...
-# See the build_readme script.
-# Either use that code to determine packages for each distro/version/indicator combination
-# or come up with something else.
-distribution_names_and_versions_to_operating_sytem_packages = {
-    "ubuntu2004" : "sudo apt-get -y install fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 wmctrl"
-}
+def __get_operating_system_install_command_debian_ubuntu( operating_system, indicator_name ):
+    command = "sudo apt-get -y install "
+    packages = [
+        "gir1.2-ayatanaappindicator3-0.1",
+        "gir1.2-gtk-3.0",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "pkg-config",
+        "python3-dev",
+        "python3-gi",
+        "python3-gi-cairo" ]
+
+    if operating_system == Operating_System.UBUNTU_2004 or \
+       operating_system == Operating_System.UBUNTU_2204:
+        dependencies.append( "gnome-shell-extension-appindicator" )
+
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "fortunes" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORLUNAR:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "python3-notify2" )
+
+        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+           operating_system == Operating_System.UBUNTU_2204:
+            dependencies.append( "calendar" )
+
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+        dependencies.append( "libnotify-bin" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "fortunes" )
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
+
+        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+           operating_system == Operating_System.UBUNTU_2204:
+            dependencies.append( "calendar" )
+
+    if indicator_name == Indicator_Name.INDICATORTIDE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
+
+    return command + ' '.join( sorted( packages ) )
+
+
+def __get_operating_system_install_command_fedora( operating_system, indicator_name ):
+    command = "sudo dnf -y install "
+    packages = [
+        "cairo-devel",
+        "cairo-gobject-devel",
+        "gnome-extensions-app",
+        "gnome-shell-extension-appindicator",
+        "gobject-introspection-devel",
+        "libappindicator-gtk3",
+        "pkgconf-pkg-config",
+        "python3-devel",
+        "python3-gobject" ]
+
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORLUNAR:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "calendar" )
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "calendar" )
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
+
+    if indicator_name == Indicator_Name.INDICATORTIDE:
+        dependencies.append( "python3-notify2" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "python3-notify2" )
+        dependencies.append( "wmctrl" )
+
+    return command + ' '.join( sorted( packages ) )
+
+
+def __get_operating_system_install_command_manjaro( operating_system, indicator_name ):
+    command = "sudo pacman -S --noconfirm "
+    packages = [
+        "cairo",
+        "gobject-introspection",
+        "gtk3",
+        "libayatana-appindicator",
+        "pkgconf" ]
+
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "wmctrl" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "wmctrl" )
+
+    return command + ' '.join( sorted( packages ) )
+
+
+def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
+    command = "sudo zypper install -y "
+    packages = [
+        "cairo-devel",
+        "gcc",
+        "gobject-introspection-devel",
+        "pkg-config",
+        "python3-devel",
+        "typelib-1_0-AyatanaAppIndicator3-0_1" ]
+
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune" )
+
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "fortune" )
+
+    return command + ' '.join( sorted( packages ) )
 
 
 def install_operating_system_packages( operating_system, indicator_name ):
     print( f"Installing operating system packages for { indicator_name } on { operating_system.name }...")
-#TODO For each distro/version run something like:
-#   sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gir1.2-gtk-3.0 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev pkg-config python3-dev python3-gi python3-gi-cairo python3-notify2 python3-venv wmctrl
-    command = "cat /etc/os-release"
-    '''
+
+    if operating_system == Operating_System.UBUNTU_2004 or \
+       operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
+        command = __get_operating_system_install_command_debian_ubuntu( operating_system, indicator_name )
+
     result = subprocess.run(
                 command,
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,
                 shell = True ).stdout.decode()
-    '''
-
-    if operating_system == Operating_System.UBUNTU_2004:
-        print( "TODO Return apt get install for ubuntu 20.04 and relevent indicator" )
-
-    elif operating_system == Operating_System.DEBIAN_11_DEBIAN_12:
-        print( "TODO Return apt get install for debian 11/12 and relevent indicator" )
+#TODO Somehow test here if things worked/installed?
+#TODO Possible to catch any error...and then what to do?
 
 
 # https://www.freedesktop.org/software/systemd/man/latest/os-release.html
@@ -209,14 +365,6 @@ def get_operating_system():
     return operating_system
 
 
-def get_indicator_directory():
-    return Path( os.path.realpath( __file__ ) ).parents[ 2 ]
-
-
-def get_indicator_name():
-    return get_indicator_directory().name
-
-
 indicator_name = get_indicator_name()
 operating_system = get_operating_system()
 if indicator_name not in indicator_names:
@@ -231,31 +379,12 @@ else:
     # print( "Good to install...!" )
     install_operating_system_packages( operating_system, indicator_name )
 #TODO Is there a way to see if the packages were installed and if so, continue; if not, message user?
-    # copy_files()
-
-
-
-
-
-#   https://stackoverflow.com/questions/4256107/running-bash-commands-in-python
-# To run as sudo:
-#   sudo python3 pip_post_install.py
-# import subprocess
-# cmd = "sudo apt update"
-# results = subprocess.run( cmd, shell = True, universal_newlines = True, check = True )
-# print( results.stdout )
-
-
+    # copy_icon_desktop_run_script( indicator_directory, indicator_name )
 
 
 
 
 #OLD STUFF BELOW....NOT SURE IF ANY IS VALID BUT CHECK ANYWAY.
-
-
-# python_venv_directory = Path( dot_local_directory, "venv_" + args.indicator, "lib" )
-# print( python_venv_directory )
-
 
 
 # python_directories = [ str( x ) for x in python_venv_directory.iterdir() if x.is_dir() ]
@@ -290,69 +419,3 @@ else:
 #
 # Can upgrade be done with a script instead?
 # Only use PIP page for a clean install?
-
-
-#TODO Noticed for Ubuntu on the testpypi page that in the apt-get install line
-# there is no python3-pip...ensure this gets installed, presumably via python3-venv.
-#
-# Looking at
-    #
-    # $ apt rdepends python3-pip
-    # python3-pip
-    # Reverse Depends:
-    #   python3.8-venv
-    #   python3.11-venv
-    #   indicator-lunar
-    #   python3.9-venv
-    #   python3.8-venv
-    #   thonny
-    #   sagemath
-    #   duplicity
-    #   python3-ryu
-    #   python3-pypandoc
-    #   python3-pipdeptree
-    #   python3-jupyter-core
-    #   pipenv
-    #   parsero
-    #   lektor
-    #   gnumed-client
-    #   elpa-elpy
-    #   dhcpcanon
-    #
-    # $ apt rdepends python3-venv
-    # python3-venv
-    # Reverse Depends:
-    #   python3.8
-    #   python3.9
-    #   python3.8
-    #   xonsh
-    #   thonny
-    #   python3
-    #
-    # $ apt depends python3-pip
-    # python3-pip
-    #   Depends: ca-certificates
-    #   Depends: python3-distutils
-    #   Depends: python3-setuptools
-    #   Depends: python3-wheel
-    #   Depends: python-pip-whl
-    #   Depends: <python3:any>
-    #     python3:i386
-    #     python3
-    #   Breaks: <python-pip>
-    #   Recommends: build-essential
-    #   Recommends: python3-dev
-    #   Replaces: <python-pip>
-    #
-    # $ apt depends python3-venv
-    # python3-venv
-    #   Depends: python3.8-venv
-    #   Depends: python3
-    #   Depends: python3-distutils
-#
-# not sure which depends on which!
-#
-# I think best to just include both python3-venv and python3-pip for Debian/Ubuntu.
-# Check all other distros too!
-# Maybe can Google how to create a venv on Manjaro, etc, etc and see what package they install and use that.
-# Ditto for installing/running pip.
