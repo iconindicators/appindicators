@@ -28,6 +28,18 @@ import subprocess
 from pathlib import Path
 
 
+def _intialise_virtual_environment( *modules_to_install ):
+    if not Path( "venv" ).is_dir():
+        command = "python3 -m venv venv"
+        subprocess.call( command, shell = True )
+    
+    command = \
+        ". ./venv/bin/activate && " + \
+        f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
+    
+    subprocess.call( command, shell = True )
+
+
 def _initialise_parser():
     parser = argparse.ArgumentParser(
         description = "Upload to PyPI a Python .whl/.tar.gz for an indicator." )
@@ -44,12 +56,7 @@ if __name__ == "__main__":
     script_path_and_name = "tools/upload_wheel.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
-        command = \
-            "python3 -m venv venv && " + \
-            ". ./venv/bin/activate && " + \
-            "python3 -m pip install --upgrade pip twine"
-
-        subprocess.call( command, shell = True )
+        _intialise_virtual_environment( "pip", "twine" )
 
         print( "(the password starts with 'pypi-')" )
         command = \

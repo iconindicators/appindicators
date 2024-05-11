@@ -101,14 +101,16 @@ indicator_name_to_desktop_file_categories = {
     "indicatorvirtualbox" : "Categories=Utility" }
 
 
-def _intialise_virtual_environment():
+def _intialise_virtual_environment( *modules_to_install ):
     if not Path( "venv" ).is_dir():
-        command = \
-            "python3 -m venv venv && " + \
-            ". ./venv/bin/activate && " + \
-            "python3 -m pip install --upgrade build pip PyGObject"
-
+        command = "python3 -m venv venv"
         subprocess.call( command, shell = True )
+    
+    command = \
+        f". ./venv/bin/activate && " + \
+        f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
+
+    subprocess.call( command, shell = True )
 
 
 def _run_checks_specific_to_indicator( indicator_name ):
@@ -350,12 +352,11 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
             _process_locale( directory_dist, indicator_name )
             _create_symbolic_icons( directory_dist, indicator_name )
 
-            _intialise_virtual_environment()
+            _intialise_virtual_environment( "build", "pip", "PyGObject" )
 
             command = \
-                ". ./venv/bin/activate && " + \
-                "cd " + str( directory_dist ) + os.sep + indicator_name + " && " + \
-                "python3 -m build --outdir ../"
+                f". ./venv/bin/activate && " + \
+                f"python3 -m build --outdir { str( directory_dist ) } { indicator_name }"
 
             subprocess.call( command, shell = True )
 
