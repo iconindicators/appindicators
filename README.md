@@ -23,37 +23,42 @@ Each indicator shares the common code base `indicatorbase`.
 
 ## Release Procedure
 A release involves building a `Python` wheel and uploading to `PyPI`.
-1. To build a wheel for one or more indicators:
+1. To build a wheel for `indicatortest`:
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.
+    which creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.  Multiple indicators may be specified and will be built sequentially:
+
+    `python3 tools/build_wheel.py release indicatortest indicatorfortune indicatorlunar`
+
 
 2. Upload the wheel to `PyPI`:
 
     `python3 tools/upload_wheel.py release/wheel/dist_indicatortest`
 
-    which (assumes the username \_\_token\_\_ and) prompts for the password (which starts with 'pypi-') and then uploads the `.whl` and `.tar.gz` to `PyPI`.
+    which (assumes the username \_\_token\_\_ and) prompts for the password (which starts with 'pypi-') and uploads the `.whl` and `.tar.gz` to `PyPI`.
 
-A directory called `venv` will be created and can be safely deleted or otherwise will be reused on the next build/upload.
+A directory called `venv` will be created and may be deleted, or otherwise will be reused on the next build/upload.
 
 
 ## Release to TestPyPI (and then Installing)
-For testing purposes, a wheel can be uploaded to `TestPyPI`:
+For testing purposes, a wheel may be uploaded to `TestPyPI`:
 
 ```
     python3 tools/build_wheel.py release indicatortest && \
-    python3 -m venv venv && \
+    if [ ! -d venv ]; then python3 -m venv venv; fi && \
     . ./venv/bin/activate && \
     python3 -m pip install --upgrade twine && \
     python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/* && \
     deactivate
 ```
 
-Because the `Python` dependencies (listed in `pyproject.toml`) will most likely be unavailable at `TestPyPI`, the install command is slightly modified:
+As this is a compound command, only one indicator may be built and uploaded at a time. Replace `indicatortest` with the indicator to be build/uploaded.
+
+Because the `Python` dependencies (listed in `pyproject.toml`) will be likely unavailable at `TestPyPI`, the install command is slightly modified:
 
 ```
-    python3 -m venv $HOME/.local/venv_indicatortest && \
+    if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
     . $HOME/.local/venv_indicatortest/bin/activate && \
     python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest && \
     deactivate
@@ -63,10 +68,10 @@ You will likely need to also install various operating system packages; refer to
 
 
 ## Installing a Wheel Directly
-Install the wheel:
+Rather than install via `PyPI` or `TestPyPI`, you may install a wheel from the local file system:
 
 ```
-    python3 -m venv $HOME/.local/venv_indicatortest && \
+    if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
     . $HOME/.local/venv_indicatortest/bin/activate && \
     python3 -m pip install --upgrade --force-reinstall $(ls -d release/wheel/dist_indicatortest/indicatortest*.whl | head -1) && \
     deactivate
