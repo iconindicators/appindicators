@@ -56,8 +56,8 @@
 
 #TODO Run any indicator under Debian 12 and open About dialog.
 # Then hit ESCAPE to close dialog; about/preferences/quite are still greyed out.
-# Does this happen on Ubuntu 20.04 or elsewhere?  Does not happen on Ubuntu 20.04.
-# Does this happen in Preferences?  Does not happen on Ubuntu 20.04.
+# Where else does this happen?
+# Does not occur on Ubuntu 20.04/22.04.
 
 
 # Base class for application indicators.
