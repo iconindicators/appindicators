@@ -86,6 +86,7 @@ import datetime
 import email.policy
 import gettext
 import gi
+import os
 import sys
 
 try:
@@ -263,12 +264,16 @@ class IndicatorBase( ABC ):
 
         except metadata.PackageNotFoundError:
             # No pip information found, so likely in development/testing.
-            # Assume a .whl file is in the indicator's development directory (indicator_name/src/indicator_name).
+            # Look for a .whl file in the same directory as the indicator in developement
+            # (indicator_name/src/indicator_name/indicator_name.py)...
             firstWheel = next( Path( "." ).glob( "*.whl" ), None )
             if firstWheel is None:
-                print( "Expected to find a .whl in the same directory as the indicator, but none was found!" )
+                # No .whl found, so try the current directory...
+                firstWheel = next( Path( os.path.realpath( __file__ ) ).parent.glob( "*.whl" ), None )
+                if firstWheel is None:
+                    print( "Expected to find a .whl in the same directory as the indicator or the current directory, but none was found!" )
 
-            else:
+            if firstWheel is not None:
                 firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
                 if firstMetadata is None:
                     print( f"No metadata was found in { firstWheel.absolute() }" )
