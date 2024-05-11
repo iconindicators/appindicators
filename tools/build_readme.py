@@ -16,16 +16,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO For the distributions tested and work or partially work,
-# such as Kubuntu, Ubuntu Budgie, Xubuntu, Linux Mint Cinnamon, Ubuntu Unity, Lubuntu, Ubuntu MATE, 
-# should these be explicitly listed along with Ubuntu?
-
 #TODO For install, maybe remove the activate/deactivate stuff.
+
 
 #TODO Remove upgrade from install and make a new section for upgrade.
 # Upgrade section is same as install, but only need in the second step the pip install --upgrade (one liner).
+# Actually, if the packages have not changed and icons/desktop/.sh have not changed, only need the pip install --upgrade command.
+# Really only need additional OS packages or copy files if those changed.
+# Would need to keep an eye on this; if there are several releases and only code changes have been made,
+# this is fine.  If an icon changes, or .desktop file, or run.sh file or OS package is added/removed,
+# need to incorporate that into the upgrade (and that stays that way forever).
+
 
 #TODO Usage: can we remove the activate/deactivate so it is one line?
+
 
 #TODO Noticed for Ubuntu on the testpypi page that in the apt-get install line
 # there is no python3-pip...ensure this gets installed, presumably via python3-venv.
