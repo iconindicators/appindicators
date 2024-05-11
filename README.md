@@ -38,7 +38,7 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 A directory called `venv` will be created and can be safely deleted or otherwise will be reused on the next build/upload.
 
 
-## Release to TestPyPI and then Installing
+## Release to TestPyPI (and then Installing)
 For testing purposes, a wheel can be uploaded to `TestPyPI`:
 
 ```
@@ -74,11 +74,12 @@ Install the wheel:
 
 Copy icon, run script and desktop file to `$HOME/.local`:
 ```
-    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \
-    cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps && \
     mkdir -p $HOME/.local/bin && \
     cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin && \
+    mkdir -p $HOME/.local/share/applications && \
     cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications
+    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \
+    cp $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps && \
 ```
 
 You will likely need to also install various operating system packages; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
