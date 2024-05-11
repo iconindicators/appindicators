@@ -16,21 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO For install, maybe remove the activate/deactivate stuff.
-
-
-#TODO Remove upgrade from install and make a new section for upgrade.
-# Upgrade section is same as install, but only need in the second step the pip install --upgrade (one liner).
-# Actually, if the packages have not changed and icons/desktop/.sh have not changed, only need the pip install --upgrade command.
-# Really only need additional OS packages or copy files if those changed.
-# Would need to keep an eye on this; if there are several releases and only code changes have been made,
-# this is fine.  If an icon changes, or .desktop file, or run.sh file or OS package is added/removed,
-# need to incorporate that into the upgrade (and that stays that way forever).
-
-
-#TODO Usage: can we remove the activate/deactivate so it is one line?
-
-
 #TODO Noticed for Ubuntu on the testpypi page that in the apt-get install line
 # there is no python3-pip...ensure this gets installed, presumably via python3-venv.
 #
@@ -347,7 +332,7 @@ def _get_installation_python_virtual_environment( indicator_name ):
     return (
         f"Create a `Python` virtual environment, activate and install the indicator package:\n"
         f"    ```\n"
-        f"    python3 -m venv $HOME/.local/venv_{ indicator_name } && \\\n"
+        f"    if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade pip { indicator_name } && \\\n"
         f"    deactivate\n"
@@ -591,12 +576,12 @@ def _get_removal_for_operating_system(
 
             f"2. Remove `Python` virtual environment and support files:\n"
             f"    ```\n"
-            f"    rm -f -r $HOME/.local/venv_{ indicator_name } && \\\n"
-            f"    rm -f -r $HOME/.cache/{ indicator_name } && \\\n"
-            f"    rm -f -r $HOME/.config/{ indicator_name } && \\\n"
             f"    rm -f $HOME/.local/bin/{ indicator_name }.sh && \\\n"
             f"    rm -f $HOME/.local/share/applications/{ indicator_name }.py.desktop && \\\n"
-            f"    rm -f $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }*.svg\n"
+            f"    rm -f $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }*.svg && \\\n"
+            f"    rm -f -r $HOME/.local/venv_{ indicator_name } && \\\n"
+            f"    rm -f -r $HOME/.cache/{ indicator_name } && \\\n"
+            f"    rm -f -r $HOME/.config/{ indicator_name }\n"
             f"    ```\n\n"
 
             f"</details>\n\n" )
