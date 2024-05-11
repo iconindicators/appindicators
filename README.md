@@ -46,7 +46,6 @@ For testing purposes, a wheel may be uploaded to `TestPyPI`:
 
 ```
     python3 tools/build_wheel.py release indicatortest && \
-    if [ ! -d venv ]; then python3 -m venv venv; fi && \
     . ./venv/bin/activate && \
     python3 -m pip install --upgrade twine && \
     python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/* && \
@@ -68,7 +67,7 @@ You will likely need to also install various operating system packages; refer to
 
 
 ## Installing a Wheel Directly
-Rather than install via `PyPI` or `TestPyPI`, you may install a wheel from the local file system:
+Rather than install via `PyPI` or `TestPyPI`, you may install a wheel in the local file system:
 
 ```
     if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
@@ -95,6 +94,16 @@ You will likely need to also install various operating system packages; refer to
 ```
     . $HOME/.local/venv_indicatortest/bin/activate && \
     python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/indicatortest.py && \
+    deactivate
+```
+
+
+## Convert this Document to HTML
+```
+    if [ ! -d venv ]; then python3 -m venv venv; fi && \
+    . ./venv/bin/activate && \
+    python3 -m pip install --upgrade readme_renderer readme_renderer[md] && \
+    python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
 
