@@ -356,7 +356,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             command = \
                 f". ./venv/bin/activate && " + \
-                f"python3 -m build --outdir { str( directory_dist ) } { indicator_name }"
+                f"python3 -m build --outdir { str( directory_dist ) } { str( directory_dist ) }/{ indicator_name }"
 
             subprocess.call( command, shell = True )
 
