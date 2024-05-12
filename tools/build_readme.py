@@ -293,13 +293,13 @@ def _get_installation_copy_files( indicator_name ):
 
         f"    cp "
         f"{ venv_indicator_home }/platform/linux/{ indicator_name }.py.desktop "
-        f"$HOME/.local/share/applications\n"
+        f"$HOME/.local/share/applications && \\\n"
 
         f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
         f"    cp "
         f"{ venv_indicator_home }/icons/*.svg "
-        f"$HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
+        f"$HOME/.local/share/icons/hicolor/scalable/apps\n"
 
         f"    ```\n\n" )
 
