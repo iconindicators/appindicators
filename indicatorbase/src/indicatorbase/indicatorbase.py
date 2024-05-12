@@ -86,7 +86,6 @@ import datetime
 import email.policy
 import gettext
 import gi
-import os
 import sys
 
 try:
