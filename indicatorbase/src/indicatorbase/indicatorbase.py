@@ -55,9 +55,11 @@
 
 
 #TODO Run any indicator under Debian 12 and open About dialog.
-# Then hit ESCAPE to close dialog; about/preferences/quite are still greyed out.
-# Where else does this happen?
-# Does not occur on Ubuntu 20.04/22.04.
+# If you click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
+# Clicking the red X on the About dialog (or hitting the escape key)
+# closes the dialog but the About/Preferences/Quit items are remain greyed out.
+# Does not occur on Ubuntu 20.04.
+# Check on Ubuntu 22.04 and other distros.
 
 
 # Base class for application indicators.
