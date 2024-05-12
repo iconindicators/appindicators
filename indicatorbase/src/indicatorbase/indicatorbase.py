@@ -58,7 +58,9 @@
 # If you click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
 # Clicking the red X on the About dialog (or hitting the escape key)
 # closes the dialog but the About/Preferences/Quit items are remain greyed out.
-# Does not occur on Ubuntu 20.04.
+# Does not occur on Ubuntu 20.04 / 22.04.
+# Occurs on Debian 11 on all graphics variants.
+# Occurs on Debian 12 on GNOME, presumably all other graphics variants.
 # Check on Ubuntu 22.04 and other distros.
 
 
