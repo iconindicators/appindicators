@@ -49,6 +49,7 @@ except ModuleNotFoundError:
 class Operating_System( Enum ):
     DEBIAN_11_DEBIAN_12 = auto()
     FEDORA_38_FEDORA_39 = auto()
+    FEDORA_40 = auto()
     MANJARO_221 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
@@ -260,6 +261,7 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
 def _get_extension( operating_system ):
     extension = ''
     if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+       operating_system == Operating_System.FEDORA_40 or \
        operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
@@ -414,6 +416,13 @@ def _get_installation( indicator_name ):
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
+            Operating_System.FEDORA_40,
+            indicator_name,
+            "Fedora 40",
+            "sudo dnf -y install",
+            _get_operating_system_dependencies_fedora ) +
+
+        _get_installation_for_operating_system(
             Operating_System.MANJARO_221,
             indicator_name,
             "Manjaro 22.1",
@@ -551,6 +560,13 @@ def _get_removal( indicator_name ):
             Operating_System.FEDORA_38_FEDORA_39,
             indicator_name,
             "Fedora 38 / 39",
+            "sudo dnf -y remove",
+            _get_operating_system_dependencies_fedora ) +
+
+        _get_removal_for_operating_system(
+            Operating_System.FEDORA_40,
+            indicator_name,
+            "Fedora 40",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
 
