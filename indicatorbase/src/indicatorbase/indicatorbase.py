@@ -58,7 +58,7 @@
 # Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
 # Clicking the red X on the About dialog (or hitting the escape key)
 # closes the dialog but the About/Preferences/Quit items remain greyed out.
-# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al.
+# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al and NOT on Fedora 40.
 # Occurs on Debian 11 on all graphics variants;
 # Debian 12 on GNOME, presumably all other graphics variants;
 # Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
@@ -68,10 +68,28 @@
 #TODO Is it feasible for an indicator to check, say weekly,
 # if there is an update available at its respective PyPI page?
 # Can we use 'pip list -o' or something via pip to do the check?
+#
+# Could use either a list of outdated or uptodate packages:
+# https://pip.pypa.io/en/stable/cli/pip_list/
+# (see other formatting options too)
+#
+#	. $HOME/.local/venv_indicatortest/bin/activate && python3 -m pip list -o && deactivate
+#	Package    Version Latest Type
+#	---------- ------- ------ -----
+#	setuptools 44.0.0  69.5.1 wheel
+#
+#	. $HOME/.local/venv_indicatortest/bin/activate && python3 -m pip list -u && deactivate
+#	Package       Version
+#	------------- -------
+#	indicatortest 1.0.16
+#	pip           24.0
+#	pycairo       1.26.0
+#	PyGObject     3.48.2
+#
 
 
-#TODO Before release, check if there are new versions of distros...Ubuntu 24.04 and equivalent,
-# Manjaro, openSUSE, Fedora, ...
+#TODO Before release, perhaps check out:
+# Xubuntu, Ubuntu Unity, Ubuntu Budgie, Kubuntu 24.04
 
 
 #TODO For Kubuntu 22.04, the symbolic icon is dark grey rather than white.  Why?
