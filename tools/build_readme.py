@@ -53,6 +53,7 @@ class Operating_System( Enum ):
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
+    UBUNTU_2404 = auto()
 
 
 class Indicator_Name( Enum ):
@@ -125,6 +126,9 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     if operating_system == Operating_System.UBUNTU_2004 or \
        operating_system == Operating_System.UBUNTU_2204:
         dependencies.append( "gnome-shell-extension-appindicator" )
+
+    if operating_system == Operating_System.UBUNTU_2404:
+        dependencies.append( "gnome-shell-extension-manager" )
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
@@ -261,6 +265,10 @@ def _get_extension( operating_system ):
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
 
+    if operating_system == Operating_System.UBUNTU_2404:
+        extension = (
+            f"Run the `Extension Manager` and browse for the `AppIndicator and KStatusNotifierItem Support` extension and then enable/install.  You may have to log out/in or reboot for the extension to take effect.\n\n" )
+
     return extension
 
 
@@ -285,19 +293,19 @@ def _get_installation_copy_files( indicator_name ):
 
         f"    mkdir -p $HOME/.local/bin && \\\n"
 
-        f"    cp "
+        f"    cp -f "
         f"{ venv_indicator_home }/platform/linux/{ indicator_name }.sh "
         f"$HOME/.local/bin && \\\n"
 
         f"    mkdir -p $HOME/.local/share/applications && \\\n"
 
-        f"    cp "
+        f"    cp -f "
         f"{ venv_indicator_home }/platform/linux/{ indicator_name }.py.desktop "
         f"$HOME/.local/share/applications && \\\n"
 
         f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
 
-        f"    cp "
+        f"    cp -f "
         f"{ venv_indicator_home }/icons/*.svg "
         f"$HOME/.local/share/icons/hicolor/scalable/apps\n"
 
