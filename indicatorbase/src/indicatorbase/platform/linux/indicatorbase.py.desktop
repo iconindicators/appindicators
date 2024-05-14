@@ -9,7 +9,7 @@
 Type=Application
 {names}
 Icon={indicator_name}
-Exec=sh -c "\$HOME/.local/bin/{indicator_name}.sh"
+Exec=sh -c "$HOME/.local/bin/{indicator_name}.sh"
 {categories}
 X-GNOME-Autostart-enabled=true
 X-GNOME-Autostart-Delay=0
