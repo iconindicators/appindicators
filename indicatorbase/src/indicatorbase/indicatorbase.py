@@ -55,13 +55,34 @@
 
 
 #TODO Run any indicator under Debian 12 and open About dialog.
-# If you click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
+# Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
 # Clicking the red X on the About dialog (or hitting the escape key)
-# closes the dialog but the About/Preferences/Quit items are remain greyed out.
-# Does not occur on Ubuntu 20.04 / 22.04.
-# Occurs on Debian 11 on all graphics variants.
-# Occurs on Debian 12 on GNOME, presumably all other graphics variants.
-# Check on Ubuntu 22.04 and other distros.
+# closes the dialog but the About/Preferences/Quit items remain greyed out.
+# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al.
+# Occurs on Debian 11 on all graphics variants;
+# Debian 12 on GNOME, presumably all other graphics variants;
+# Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
+# Check on other distros.
+
+
+#TODO Is it feasible for an indicator to check, say weekly,
+# if there is an update available at its respective PyPI page?
+# Can we use 'pip list -o' or something via pip to do the check?
+
+
+#TODO Before release, check if there are new versions of distros...Ubuntu 24.04 and equivalent,
+# Manjaro, openSUSE, Fedora, ...
+
+
+#TODO For Kubuntu 22.04, the symbolic icon is dark grey rather than white.  Why?
+# Does symbolic not work for Kubuntu?
+# Maybe check the hicolor icon is present...otherwise ignore.
+# Same for Ubuntu Unity 22.04 and Xubuntu 22.04.
+
+
+#TODO Can we add in the readme next to say Ubuntu 22.04 also
+# Linux Mint 21, Kubuntu 22.04, etc, etc?
+# Is this necessary?
 
 
 # Base class for application indicators.
