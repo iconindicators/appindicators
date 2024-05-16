@@ -306,9 +306,19 @@ class DataProviderOrbitalElement( DataProvider ):
             try:
                 with open( filename, 'r' ) as f:
                     for line in f.read().splitlines():
-                        name = line[ : line.find( ',' ) ].strip()
-                        oe = OE( name, line, orbitalElementDataType )
-                        oeData[ oe.getName().upper() ] = oe
+                        if not line.startswith( '{' ):
+                            # Sometimes the COBS download emits an error message of the form:
+                            #   {"code": "400",
+                            #    "message": "Invalid integer value provided in the parameter.", 
+                            #    "moreInfo": "invalid literal for int() with base 10: 'false'", 
+                            #    "signature": {"source": "COBS Query API", "version": "1.3", "date": "2024 May"}}
+                            # In this event, keep the download file as is for bug tracking if needed,
+                            # but skip loading the data (there is no data to load).
+                            # When the cache becomes stale,
+                            # a fresh (and hopefully successful) download will occur.
+                            name = line[ : line.find( ',' ) ].strip()
+                            oe = OE( name, line, orbitalElementDataType )
+                            oeData[ oe.getName().upper() ] = oe
 
             except Exception as e:
                 oeData = { }
