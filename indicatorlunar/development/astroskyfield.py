@@ -22,7 +22,9 @@
 #TODO COBS now has a parameter cur-mag to filter the comet downloads by observed magnitude.
 # When cur-mag=15 the number of comets is around 22,
 # which now, may not be too much to calculate in Skyfield.
-# Perhaps do some timing tests...
+# Perhaps do some timing tests...to see how long it takes to process comets (of around 22)
+# and whatever the minor planets currently sits at with a maximum apparent magnitude of 15.
+# Minor planets is around 560...maybe too much to switch over to Skyfield.
 
 
 #TODO If/when astroskyfield.py is included in the release,
