@@ -33,8 +33,7 @@ class DataProviderApparentMagnitude( DataProvider ):
     @staticmethod
     def download( filename, logging, isComet, apparentMagnitudeMaximum ):
         if isComet:
-            # Comet data from COBS contains updated absolute magnitude data in the ephemerides.
-            downloaded = False
+            downloaded = False # COBS does not directly provide apparent magnitude data.
 
         else:
             downloaded = DataProviderApparentMagnitude.__downloadFromLowellMinorPlanetServices(
