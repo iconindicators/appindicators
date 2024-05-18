@@ -188,7 +188,7 @@ class IndicatorLunar( IndicatorBase ):
         self.flushTheCache()
         self.initialiseDownloadCountsAndCacheDateTimes()
 
-        # On comet lookup and download of data comet / minor planet data,
+        # On comet lookup and download of comet / minor planet data,
         # an unnecessary log message is created, so ignore.
         self.getLogging().getLogger( "urllib3" ).propagate = False
 
