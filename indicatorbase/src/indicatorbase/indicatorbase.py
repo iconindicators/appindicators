@@ -92,17 +92,6 @@
 # Xubuntu, Ubuntu Unity, Ubuntu Budgie, Kubuntu 24.04
 
 
-#TODO For Kubuntu 22.04, the symbolic icon is dark grey rather than white.  Why?
-# Does symbolic not work for Kubuntu?
-# Maybe check the hicolor icon is present...otherwise ignore.
-# Same for Ubuntu Unity 22.04 and Xubuntu 22.04.
-
-
-#TODO Can we add in the readme next to say Ubuntu 22.04 also
-# Linux Mint 21, Kubuntu 22.04, etc, etc?
-# Is this necessary?
-
-
 # Base class for application indicators.
 #
 # References:
