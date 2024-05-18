@@ -32,7 +32,6 @@ class DataProviderApparentMagnitude( DataProvider ):
     # and save to the given filename.
     @staticmethod
     def download( filename, logging, isComet, apparentMagnitudeMaximum ):
-        logging.getLogger( "urllib3" ).propagate = False
         if isComet:
             # Comet data from COBS contains updated absolute magnitude data in the ephemerides.
             downloaded = False
@@ -49,7 +48,9 @@ class DataProviderApparentMagnitude( DataProvider ):
     @staticmethod
     def __downloadFromLowellMinorPlanetServices( filename, logging, apparentMagnitudeMaximum ):
         try:
-            variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
+            variables = {
+                "date": datetime.date.today().isoformat(),
+                "apparentMagnitude": apparentMagnitudeMaximum }
 
             query = """
                 query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )

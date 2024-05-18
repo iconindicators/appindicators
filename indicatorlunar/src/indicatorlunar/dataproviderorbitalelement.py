@@ -33,8 +33,6 @@ class DataProviderOrbitalElement( DataProvider ):
     # Download orbital element data and save to the given filename.
     @staticmethod
     def download( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
-        logging.getLogger( "urllib3" ).propagate = False
-
         if orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET or \
            orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
             downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices(
@@ -57,7 +55,9 @@ class DataProviderOrbitalElement( DataProvider ):
     @staticmethod
     def __downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         try:
-            variables = { "date": datetime.date.today().isoformat(), "apparentMagnitude": apparentMagnitudeMaximum }
+            variables = {
+                "date": datetime.date.today().isoformat(),
+                "apparentMagnitude": apparentMagnitudeMaximum }
 
             query = """
                 query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
@@ -253,7 +253,7 @@ class DataProviderOrbitalElement( DataProvider ):
     @staticmethod
     def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag=" + \
-              str( apparentMagnitudeMaximum )
+              str( int( apparentMagnitudeMaximum ) )
 
         if orbitalElementDataType == OE.DataType.SKYFIELD_COMET:
             url += "&format=mpc"
