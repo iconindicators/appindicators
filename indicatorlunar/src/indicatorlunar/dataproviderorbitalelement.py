@@ -43,7 +43,7 @@ class DataProviderOrbitalElement( DataProvider ):
         elif orbitalElementDataType == OE.DataType.SKYFIELD_COMET or \
              orbitalElementDataType == OE.DataType.XEPHEM_COMET:
             downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase(
-                filename, logging, orbitalElementDataType )
+                filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
 
         else:
             logging.error( "Unknown data type: " + str( orbitalElementDataType ) )
@@ -52,8 +52,8 @@ class DataProviderOrbitalElement( DataProvider ):
         return downloaded
 
 
-    # Download orbital element data for minor planets from Lowell Minor Planet Services
-    # and save to the given filename.
+    # Download orbital element data for minor planets from
+    # Lowell Minor Planet Services and save to the given filename.
     @staticmethod
     def __downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
         try:
@@ -248,19 +248,13 @@ class DataProviderOrbitalElement( DataProvider ):
         return packedYear + packedMonth + packedDay
 
 
-    # Download orbital element data for comets from Comet Observation Database
-    # and save to the given filename.
+    # Download orbital element data for comets from
+    # Comet Observation Database and save to the given filename.
     @staticmethod
-    def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType ):
-        url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true"
-# TODO COBS now has a parameter 'cur-mag'.
-# By using that, I effectively get comets of up to apparent magnitude of 15 or less when using cur-mag=15.
-# Would need to adjust the function header to take in apparentMagnitudeMaximum.
-# The list of comets from COBS without the cur-mag parameter is around 1500.
-# The list of comets from COBS with the cur-mag paramter is around 25.
-# Consider switching over to Skyfield if the time to process 25 comets
-# (and whatever the number of minor planets are for a maximum magnitude of 15) is reasonable.
-#         url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag=15"
+    def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
+        url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag=" + \
+              str( apparentMagnitudeMaximum )
+
         if orbitalElementDataType == OE.DataType.SKYFIELD_COMET:
             url += "&format=mpc"
 
