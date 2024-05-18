@@ -19,6 +19,12 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO COBS now has a parameter cur-mag to filter the comet downloads by observed magnitude.
+# When cur-mag=15 the number of comets is around 22,
+# which now, may not be too much to calculate in Skyfield.
+# Perhaps do some timing tests...
+
+
 #TODO If/when astroskyfield.py is included in the release,
 # put a data directory at
 #   indicatorlunar/src/indicatorlunar/data
