@@ -137,7 +137,7 @@ try:
 except:
     try:
         gi.require_version( "AppIndicator3", "0.1" )
-        from gi.repository import AppIndicator3 as AppIndicator
+        from gi.repository import AppIndicator3 as AppIndicator # Needed for Fedora.
     except:
         print( "Unable to find either AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
@@ -391,6 +391,15 @@ class IndicatorBase( ABC ):
 
 
     def __update( self ):
+#TODO The comment below (and the code) seems strange to me now.
+# If the About or Preferences is open, the A/P/Q menu items will be disabled.
+# The A/P/Q menu items are disabled and then the A/P dialog is displayed,
+# so there should be no race condition.
+# If the About dialog is displayed and an update occurs, 
+# what happens if the update takes a while 
+# and the user then clicks the A/P?  Is that an issue?
+# Should the update be ignored when the A/P is open?
+# By ignoring the scheduled update, is that bad?
         # If the About/Preferences menu items are disabled as the update kicks off,
         # the user interface will not reflect the change until the update completes.
         # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
@@ -454,7 +463,7 @@ class IndicatorBase( ABC ):
             menu,
             label,
             name = None,
-            onClickFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item referece; or just use lambda.
+            onClickFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
             onClickFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
             isSecondaryActivateTarget = False ):
 
@@ -483,7 +492,7 @@ class IndicatorBase( ABC ):
             label,
             index,
             name = None,
-            onClickFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item referece; or just use lambda.
+            onClickFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
             onClickFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
             isSecondaryActivateTarget = False ):
 
@@ -607,6 +616,9 @@ class IndicatorBase( ABC ):
                 GLib.idle_add( self.__update )
 
 
+#TODO Wonder if this should be a wrapper to a function that does the work and be called as:
+#   GLib.idle_add( self.__setMenuSensitivityInternal )
+# Do some reading about when to use GLib.idle* 
     def __setMenuSensitivity( self, toggle, allMenuItems = False ):
         if allMenuItems:
             for menuItem in self.indicator.get_menu().get_children():
