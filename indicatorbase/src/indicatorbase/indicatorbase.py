@@ -95,16 +95,20 @@
 # Base class for application indicators.
 #
 # References:
+#   https://lazka.github.io/pgi-docs/AyatanaAppIndicator3-0.1
+#   https://github.com/AyatanaIndicators/libayatana-appindicator
+#   https://wiki.ayatana-indicators.org/AyatanaIndicatorApplication
+#   https://wiki.ubuntu.com/DesktopExperienceTeam/ApplicationIndicators
+#   https://askubuntu.com/questions/108035/writing-indicators-with-python-gir-and-gtk3
 #   https://python-gtk-3-tutorial.readthedocs.org
-#   https://wiki.gnome.org/Projects/PyGObject/Threading
+#   https://pygobject.gnome.org/guide/threading.html
 #   https://wiki.ubuntu.com/NotifyOSD
-#   https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
 #   https://lazka.github.io/pgi-docs/Gtk-3.0
 #   https://pygobject.readthedocs.io/en/latest/getting_started.html
 #   https://twine.readthedocs.io/en/latest/
 #   https://packaging.python.org/en/latest/tutorials/packaging-projects/
-#   https://github.com/AyatanaIndicators/libayatana-appindicator
 #   https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+#   https://pypi.org/project/pystray/
 #
 # Python naming standards:
 #   https://peps.python.org/pep-0008/
