@@ -618,9 +618,6 @@ class IndicatorBase( ABC ):
                 self.__update()
 
 
-#TODO Wonder if this should be a wrapper to a function that does the work and be called as:
-#   GLib.idle_add( self.__setMenuSensitivityInternal )
-# Do some reading about when to use GLib.idle* 
     def __setMenuSensitivity( self, toggle, allMenuItems = False ):
         if allMenuItems:
             for menuItem in self.indicator.get_menu().get_children():
