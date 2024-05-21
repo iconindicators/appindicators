@@ -92,18 +92,6 @@
 # Xubuntu, Ubuntu Unity, Ubuntu Budgie, Kubuntu 24.04
 
 
-
-#TODO 
-#   http://candidtim.github.io/appindicator/2014/09/13/ubuntu-appindicator-step-by-step.html
-# Find the part with 
-#   import signal
-#   signal.signal(signal.SIGINT, signal.SIG_DFL)
-# apparently makes the CTRL+C work when running in the terminal.
-# Need to add this?  Maybe test out what happens without it and hitting CTRL+C.
-# Another example:
-#   https://gist.github.com/jmarroyave/a24bf173092a3b0943402f6554a2094d
-
-
 # Base class for application indicators.
 #
 # References:
