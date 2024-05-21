@@ -593,23 +593,21 @@ class IndicatorBase( ABC ):
 
 
     def __onPreferences( self, menuItem ):
+        self.__setMenuSensitivity( False )
+
         if self.updateTimerID:
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
-        self.__setMenuSensitivity( False )
-        GLib.idle_add( self.__onPreferencesInternal, menuItem ) #TODO Can this be removed and just call the internal version?
-
-
-    def __onPreferencesInternal( self, menuItem ):
         dialog = self.createDialog( menuItem, _( "Preferences" ) )
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
+
         self.__setMenuSensitivity( True )
 
         if responseType == Gtk.ResponseType.OK:
             self.__saveConfig()
-            GLib.idle_add( self.__update )
+            self.__update()
 
         elif self.nextUpdateTime: # User cancelled and there is a next update time present...
             secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.now() ).total_seconds()
@@ -617,7 +615,7 @@ class IndicatorBase( ABC ):
                 GLib.timeout_add_seconds( int( secondsToNextUpdate ), self.__update )
 
             else: # Scheduled update would have already happened, so kick one off now.
-                GLib.idle_add( self.__update )
+                self.__update()
 
 
 #TODO Wonder if this should be a wrapper to a function that does the work and be called as:
