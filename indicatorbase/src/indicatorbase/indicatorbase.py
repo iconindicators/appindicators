@@ -659,11 +659,7 @@ class IndicatorBase( ABC ):
 
     def createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
         self.__setMenuSensitivity( False, True )
-        GLib.idle_add( self.__createDialogExternalToAboutOrPreferences, parentWidget, title, contentWidget, setDefaultSize )
-#TODO Need this idle_add?  Why not call the internal directly?
 
-
-    def __createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
         dialog = Gtk.Dialog(
             title,
             self.__getParent( parentWidget ),
@@ -678,6 +674,7 @@ class IndicatorBase( ABC ):
         dialog.show_all()
         dialog.run()
         dialog.destroy()
+
         self.__setMenuSensitivity( True, True )
 
 
