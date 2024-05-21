@@ -143,8 +143,7 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.cullResults()
 
-#TODO Remove the GLib.idle_add and test to see if still good.        
-            GLib.idle_add( self.sendResultsToOutput, protocol + convertedText + pathQuery )
+            self.sendResultsToOutput( protocol + convertedText + pathQuery )
             self.requestUpdate()
 
         except Exception as e:
