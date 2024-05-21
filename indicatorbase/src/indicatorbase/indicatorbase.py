@@ -504,7 +504,7 @@ class IndicatorBase( ABC ):
 
 
     def requestUpdate( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__update )  #TODO Who calls this and with what amount of delay other than 0?
+        GLib.timeout_add_seconds( delay, self.__update )
 
 
     def setLabel( self, text ):
