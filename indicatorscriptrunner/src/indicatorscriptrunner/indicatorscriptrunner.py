@@ -545,6 +545,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
     #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
     def onSwitchPage( self, notebook, page, pageNumber ):
+#TODO Remove the GLib.idle_add and test to see if still good.        
         GLib.idle_add( self.__setFocusOnTab, notebook )
 
 

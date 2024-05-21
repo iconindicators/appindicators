@@ -92,6 +92,18 @@
 # Xubuntu, Ubuntu Unity, Ubuntu Budgie, Kubuntu 24.04
 
 
+
+#TODO 
+#   http://candidtim.github.io/appindicator/2014/09/13/ubuntu-appindicator-step-by-step.html
+# Find the part with 
+#   import signal
+#   signal.signal(signal.SIGINT, signal.SIG_DFL)
+# apparently makes the CTRL+C work when running in the terminal.
+# Need to add this?  Maybe test out what happens without it and hitting CTRL+C.
+# Another example:
+#   https://gist.github.com/jmarroyave/a24bf173092a3b0943402f6554a2094d
+
+
 # Base class for application indicators.
 #
 # References:
@@ -379,6 +391,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
+#TODO Remove the GLib.idle_add and test to see if still good.        
         GLib.idle_add( self.__update )
         Gtk.main()
 
@@ -397,7 +410,7 @@ class IndicatorBase( ABC ):
         # the user interface will not reflect the change until the update completes.
         # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
         self.__setMenuSensitivity( False )
-        GLib.timeout_add_seconds( 1, self.__updateInternal )
+        GLib.timeout_add_seconds( 1, self.__updateInternal )  #TODO Maybe this could be GLib.idle_add?
 
 
     def __updateInternal( self ):
@@ -503,7 +516,7 @@ class IndicatorBase( ABC ):
 
 
     def requestUpdate( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__update )
+        GLib.timeout_add_seconds( delay, self.__update )  #TODO Who calls this and with what amount of delay other than 0?
 
 
     def setLabel( self, text ):
@@ -525,7 +538,7 @@ class IndicatorBase( ABC ):
 
     def __onAbout( self, menuItem ):
         self.__setMenuSensitivity( False )
-        GLib.idle_add( self.__onAboutInternal, menuItem )
+        GLib.idle_add( self.__onAboutInternal, menuItem ) #TODO Can this be removed and just call the internal version?
 
 
     def __onAboutInternal( self, menuItem ):
@@ -587,7 +600,7 @@ class IndicatorBase( ABC ):
             self.updateTimerID = None
 
         self.__setMenuSensitivity( False )
-        GLib.idle_add( self.__onPreferencesInternal, menuItem )
+        GLib.idle_add( self.__onPreferencesInternal, menuItem ) #TODO Can this be removed and just call the internal version?
 
 
     def __onPreferencesInternal( self, menuItem ):
@@ -651,6 +664,7 @@ class IndicatorBase( ABC ):
     def createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
         self.__setMenuSensitivity( False, True )
         GLib.idle_add( self.__createDialogExternalToAboutOrPreferences, parentWidget, title, contentWidget, setDefaultSize )
+#TODO Need this idle_add?  Why not call the internal directly?
 
 
     def __createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
