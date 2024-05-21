@@ -169,6 +169,7 @@ from pathlib import Path
 import pickle
 import re
 import shutil
+import signal
 import subprocess
 from urllib.request import urlopen
 import webbrowser
@@ -392,6 +393,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
+        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
         GLib.idle_add( self.__update )
         Gtk.main()
 
