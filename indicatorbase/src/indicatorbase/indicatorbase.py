@@ -397,20 +397,8 @@ class IndicatorBase( ABC ):
 
 
     def __update( self ):
-#TODO The comment below (and the code) seems strange to me now.
-# If the About or Preferences is open, the A/P/Q menu items will be disabled.
-# The A/P/Q menu items are disabled and then the A/P dialog is displayed,
-# so there should be no race condition.
-# If the About dialog is displayed and an update occurs, 
-# what happens if the update takes a while 
-# and the user then clicks the A/P?  Is that an issue?
-# Should the update be ignored when the A/P is open?
-# By ignoring the scheduled update, is that bad?
-        # If the About/Preferences menu items are disabled as the update kicks off,
-        # the user interface will not reflect the change until the update completes.
-        # Therefore, disable the About/Preferences menu items and run the remaining update in a new and delayed thread.
-        self.__setMenuSensitivity( False )
-        GLib.timeout_add_seconds( 1, self.__updateInternal )  #TODO Maybe this could be GLib.idle_add?
+        self.__setMenuSensitivity( False ) # The menu will be rebuilt below in __updateInternal().
+        GLib.idle_add( self.__updateInternal )
 
 
     def __updateInternal( self ):
