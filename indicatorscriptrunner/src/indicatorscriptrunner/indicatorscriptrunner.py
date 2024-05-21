@@ -514,7 +514,14 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
-        notebook.connect( "switch-page", self.onSwitchPage )
+        # Workaround for odd focus behaviour; in the Preferences dialog, when
+        # switching tabs, the TextEntry on the third tab would have the focus and
+        # highlight the text.  If the user hits the space bar (or any regular key),
+        # the text would be overwritten.
+        # Refer to:
+        #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
+        #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
+        notebook.connect( "switch-page", lambda notebook, page, page_number: notebook.grab_focus() )
         dialog.vbox.pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
@@ -530,23 +537,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType
-
-
-    def __setFocusOnTab( self, notebook ):
-        notebook.grab_focus()
-        return False
-
-
-    # Workaround for odd focus behaviour; in the Preferences dialog, when
-    # switching tabs, the TextEntry on the third tab would have the focus and
-    # highlight the text.  If the user hits the space bar (or any regular key),
-    # the text would be overwritten.
-    # Refer to:
-    #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
-    #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
-    def onSwitchPage( self, notebook, page, pageNumber ):
-#TODO Remove the GLib.idle_add and test to see if still good.        
-        GLib.idle_add( self.__setFocusOnTab, notebook )
 
 
     # Renders the script name bold when the (non-background) script is default.
