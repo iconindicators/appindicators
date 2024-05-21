@@ -114,6 +114,7 @@
 #   https://askubuntu.com/questions/108035/writing-indicators-with-python-gir-and-gtk3
 #   https://python-gtk-3-tutorial.readthedocs.org
 #   https://pygobject.gnome.org/guide/threading.html
+#   https://stackoverflow.com/q/73665239/2156453
 #   https://wiki.ubuntu.com/NotifyOSD
 #   https://lazka.github.io/pgi-docs/Gtk-3.0
 #   https://pygobject.readthedocs.io/en/latest/getting_started.html
@@ -391,7 +392,6 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-#TODO Remove the GLib.idle_add and test to see if still good.        
         GLib.idle_add( self.__update )
         Gtk.main()
 
@@ -538,10 +538,7 @@ class IndicatorBase( ABC ):
 
     def __onAbout( self, menuItem ):
         self.__setMenuSensitivity( False )
-        GLib.idle_add( self.__onAboutInternal, menuItem ) #TODO Can this be removed and just call the internal version?
 
-
-    def __onAboutInternal( self, menuItem ):
         aboutDialog = Gtk.AboutDialog()
         aboutDialog.set_transient_for( menuItem.get_parent().get_parent() )
         aboutDialog.set_artists( self.artwork )
@@ -582,6 +579,7 @@ class IndicatorBase( ABC ):
 
         aboutDialog.run()
         aboutDialog.destroy()
+
         self.__setMenuSensitivity( True )
 
 
