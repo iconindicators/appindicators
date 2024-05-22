@@ -159,6 +159,7 @@ import re
 import shutil
 import signal
 import subprocess
+from threading import Lock
 from urllib.request import urlopen
 import webbrowser
 from zipfile import ZipFile
@@ -269,8 +270,9 @@ class IndicatorBase( ABC ):
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
         self.debug = debug
+        self.debug = True # TODO Testing
 
-        # Ensure the .desktop file is present, taking into account running from a terminal or Eclipse.
+        # Ensure the .desktop file is present, taking into account running from a terminal or an IDE.
         self.desktopFile = self.indicatorName + ".py.desktop"
         self.desktopFileUserHome = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
         self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/platform/linux/" + self.desktopFile
@@ -311,6 +313,8 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
+        self.lock = Lock()
+        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
 
     def _getProjectMetadata( self ):
@@ -402,59 +406,46 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
         GLib.idle_add( self.__update )
         Gtk.main()
 
 
     def __update( self ):
-        self.__setMenuSensitivity( False ) # The menu will be rebuilt below in __updateInternal().
-        GLib.idle_add( self.__updateInternal )
+        if self.lock.acquire( blocking = False ):
+            self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
+#            self.__setMenuSensitivity( False ) # The menu will be rebuilt below in __updateInternal().
+            GLib.idle_add( self.__update_internal )
+
+        else:
+            GLib.timeout_add_seconds( 60, self.__update )
+            #TODO Make the 60 a constant.
+            #TODO This call returns an ID...need to keep it?
+            #TODO Keep the About/Prefernces open and see if we keep trying to do an update every 60 seconds.
 
 
-    def __updateInternal( self ):
-        if self.debug:
-            update_start = datetime.datetime.now()
-
-        menu = Gtk.Menu()
+    def __update_internal( self ):
+        update_start = datetime.datetime.now()
         self.secondaryActivateTarget = None
+        menu = Gtk.Menu()
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.debug:
-            now = datetime.datetime.now()
+            if nextUpdateInSeconds:
+                nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
+                label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ]
+                menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
-            nextUpdateDateTime = now + datetime.timedelta( seconds = nextUpdateInSeconds )
-            label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ] # Remove fractional seconds.
-            menu.prepend( Gtk.MenuItem.new_with_label( label ) )
-
-            label = "Time to update: " + str( now - update_start )
+            label = "Time to update: " + str( datetime.datetime.now() - update_start )
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
-        # Add in common menu items.
-        self.createAndAppendMenuItem(
-            menu,
-            _( "Preferences" ),
-            onClickFunction = self.__onPreferences )
-
-        self.createAndAppendMenuItem(
-            menu,
-            _( "About" ),
-            onClickFunction = self.__onAbout )
-
-        self.createAndAppendMenuItem(
-            menu,
-            _( "Quit" ),
-            onClickFunction = Gtk.main_quit )
-
+        self.createAndAppendMenuItem( menu, _( "Preferences" ), onClickFunction = self.__onPreferences )
+        self.createAndAppendMenuItem( menu, _( "About" ), onClickFunction = self.__onAbout )
+        self.createAndAppendMenuItem( menu, _( "Quit" ), onClickFunction = Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
-#TODO Maybe here can check to see if about/prefs are showing...
-# so if an update happens during the about/prefs showing,
-# let the update happen, but now have to disable all menu items
-# and let about/prefs re-enable when closed.
 
         if self.secondaryActivateTarget:
             self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
@@ -465,6 +456,8 @@ class IndicatorBase( ABC ):
 
         else:
             self.nextUpdateTime = None
+
+        self.lock.release()
 
 
     def createAndAppendMenuItem(
@@ -535,12 +528,28 @@ class IndicatorBase( ABC ):
         # Need to ignore events when Preferences is open or an update is underway.
         # Do so by checking the sensitivity of the Preferences menu item.
         # A side effect is the event will be ignored when About is showing...oh well.
-        if self.__getMenuSensitivity():
+#        if self.__getMenuSensitivity():
+#            self.onMouseWheelScroll( indicator, delta, scrollDirection )
+        if not self.lock.locked():
             self.onMouseWheelScroll( indicator, delta, scrollDirection )
 
 
     def __onAbout( self, menuItem ):
-        self.__setMenuSensitivity( False )
+        if self.lock.acquire( blocking = False ):
+            self.__on_about_internal( menuItem )
+
+        else:
+            pass #TODO Show notification to user?  How to tell if we're blocked due to update or Preferences?
+
+
+    def __on_about_internal( self, menuItem ):
+        print( "About start" )
+
+        self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
+#        self.__setMenuSensitivity( False )
+
+        if self.secondaryActivateTarget:
+            self.indicator.set_secondary_activate_target( None )
 
         aboutDialog = Gtk.AboutDialog()
         aboutDialog.set_transient_for( menuItem.get_parent().get_parent() )
@@ -583,7 +592,15 @@ class IndicatorBase( ABC ):
         aboutDialog.run()
         aboutDialog.destroy()
 
-        self.__setMenuSensitivity( True )
+        self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
+#        self.__setMenuSensitivity( True )
+        if self.secondaryActivateTarget:
+            self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
+
+        self.lock.release()
+
+        self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
+        print( "About end" )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -596,9 +613,23 @@ class IndicatorBase( ABC ):
 
 
     def __onPreferences( self, menuItem ):
-        self.__setMenuSensitivity( False )
+        if self.lock.acquire( blocking = False ):
+            self.__on_preferences_internal( menuItem )
 
-        if self.updateTimerID:
+        else:
+            pass #TODO Show notification to user?  How to tell if we're blocked due to update or About?
+
+
+    def __on_preferences_internal( self, menuItem ):
+        print( "Preferences start" )
+
+        self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
+#        self.__setMenuSensitivity( False )
+
+        if self.secondaryActivateTarget:
+            self.indicator.set_secondary_activate_target( None )
+
+        if self.updateTimerID: #TODO If the mutex works...maybe can dispense with the ID stuff.
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
@@ -606,12 +637,18 @@ class IndicatorBase( ABC ):
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
 
-        self.__setMenuSensitivity( True )
+#TODO Don't think I need this here...if we OK the Preferences,
+# then an update will be kicked off and will disable the menu, 
+# so no need to enable the menu.
+# If we cancel the Preferences, then enable the menu.
+#        self.__setMenuSensitivity( True )
 
         if responseType == Gtk.ResponseType.OK:
             self.__saveConfig()
-            self.__update()
+            GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release and so the update will proceed.
 
+        #TODO May not need this...If the update keeps trying every minute, then no need for the code below.
+        '''
         elif self.nextUpdateTime: # User cancelled and there is a next update time present...
             secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.now() ).total_seconds()
             if secondsToNextUpdate > 10: # Scheduled update is still in the future (10 seconds or more), so reschedule...
@@ -619,8 +656,19 @@ class IndicatorBase( ABC ):
 
             else: # Scheduled update would have already happened, so kick one off now.
                 self.__update()
+        '''
+        self.__set_menu_sensitivity( True )
+        if self.secondaryActivateTarget:
+            self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
+
+        self.lock.release()
+
+#        self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.   But...only do this "if responseType != Gtk.ResponseType.OK" because when OK, an update is kicked off any way.
+
+        print( "Preferences end" )
 
 
+#TODO Hopefully not needed.
     def __setMenuSensitivity( self, toggle, allMenuItems = False ):
         if allMenuItems:
             for menuItem in self.indicator.get_menu().get_children():
@@ -634,6 +682,15 @@ class IndicatorBase( ABC ):
                 menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
+    def __set_menu_sensitivity( self, toggle ):
+        menu_items = self.indicator.get_menu().get_children()
+        if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item.
+            print( "set menu to" + str( toggle ) )
+            for menuItem in self.indicator.get_menu().get_children():
+                menuItem.set_sensitive( toggle )
+
+
+#TODO Probably not needed.
     def __getMenuSensitivity( self ):
         sensitive = False
         menuItems = self.indicator.get_menu().get_children()
