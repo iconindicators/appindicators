@@ -48,7 +48,7 @@ class IndicatorStardate( IndicatorBase ):
                 _( "Wikipedia::Stardate" "https://en.wikipedia.org/wiki/Stardate" ) ] )
 
         self.requestMouseWheelScrollEvents()
-        self.saveConfigTimerID = None
+        self.saveConfigTimerID = None #TODO What is this?  Put in a good comment!!!
 
 
     def update( self, menu ):
