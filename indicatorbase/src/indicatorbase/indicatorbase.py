@@ -212,6 +212,27 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
 
+#TODO Check the flow of code, from init to update loops,
+# to about/preferences,
+# to interupting an update (if possible)
+# to stopping an update and then kicking off later.
+#
+#TODO Check that when About/Preferences is showing,
+# is it possible to click anything else in the indicator menu?
+# If not, may need to go back to using GLib.idle_add()
+# or maybe just disable entire menu?
+# 
+# On Ubuntu 20.04, does not block when About/Prefs open.
+# 
+# What about Debian 12?
+#
+# Run punycode.  Open About dialog.
+# Highlight some punycode on a browser page.
+# Click convert.  Menu is rebuilt!!!  Not good.
+# So maybe have to disable menu...also the secondary menu item and mouse wheel scroll.
+#
+#Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
+# and also to prevent an update from happening.
     def __init__( self,
                   comments,
                   artwork = None,
@@ -430,6 +451,10 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_menu( menu )
         menu.show_all()
+#TODO Maybe here can check to see if about/prefs are showing...
+# so if an update happens during the about/prefs showing,
+# let the update happen, but now have to disable all menu items
+# and let about/prefs re-enable when closed.
 
         if self.secondaryActivateTarget:
             self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
