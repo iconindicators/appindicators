@@ -63,6 +63,8 @@
 # Debian 12 on GNOME, presumably all other graphics variants;
 # Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
 # Check on other distros.
+#
+# Double check Manjaro 22.1; openSUSE Tumbleweed.
 
 
 #TODO Is it feasible for an indicator to check, say weekly,
@@ -270,7 +272,6 @@ class IndicatorBase( ABC ):
         self.artwork = artwork if artwork else self.authors
         self.creditz = creditz
         self.debug = debug
-        self.debug = True # TODO Testing
 
         # Ensure the .desktop file is present, taking into account running from a terminal or an IDE.
         self.desktopFile = self.indicatorName + ".py.desktop"
@@ -292,6 +293,8 @@ class IndicatorBase( ABC ):
         self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         self.secondaryActivateTarget = None
         self.updateTimerID = None
+        self.lock = Lock()
+        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
         logging.basicConfig(
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -300,21 +303,19 @@ class IndicatorBase( ABC ):
 
         Notify.init( self.indicatorName )
 
-        menu = Gtk.Menu()
-        self.createAndAppendMenuItem( menu, _( "Initialising..." ) )
-        menu.show_all()
-
         self.indicator = AppIndicator.Indicator.new(
             self.indicatorName, #ID
             self.get_icon_name(), # Icon name
             AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
+
+        menu = Gtk.Menu()
+        self.createAndAppendMenuItem( menu, _( "Initialising..." ) )
+        menu.show_all()
         self.indicator.set_menu( menu )
 
         self.__loadConfig()
-        self.lock = Lock()
-        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
 
     def _getProjectMetadata( self ):
@@ -663,7 +664,11 @@ class IndicatorBase( ABC ):
 
         self.lock.release()
 
-#        self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.   But...only do this "if responseType != Gtk.ResponseType.OK" because when OK, an update is kicked off any way.
+#        self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue
+# when clicking the icon when the About/Preferences are open. 
+# Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
+# But...only do this "if responseType != Gtk.ResponseType.OK" because when OK,
+# an update is kicked off any way.
 
         print( "Preferences end" )
 
@@ -684,8 +689,8 @@ class IndicatorBase( ABC ):
 
     def __set_menu_sensitivity( self, toggle ):
         menu_items = self.indicator.get_menu().get_children()
-        if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item.
-            print( "set menu to" + str( toggle ) )
+        if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
+            print( "set menu to " + str( toggle ) )#TODO Test
             for menuItem in self.indicator.get_menu().get_children():
                 menuItem.set_sensitive( toggle )
 
@@ -715,7 +720,8 @@ class IndicatorBase( ABC ):
 
 
     def createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
-        self.__setMenuSensitivity( False, True )
+        self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
+        # self.__setMenuSensitivity( False, True )
 
         dialog = Gtk.Dialog(
             title,
@@ -732,7 +738,8 @@ class IndicatorBase( ABC ):
         dialog.run()
         dialog.destroy()
 
-        self.__setMenuSensitivity( True, True )
+        self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
+        # self.__setMenuSensitivity( True, True )
 
 
     def createAutostartCheckboxAndDelaySpinner( self ):
