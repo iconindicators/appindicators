@@ -453,10 +453,12 @@ class IndicatorBase( ABC ):
 
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-            self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
+            datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) #TODO Hopefully no longer need self.nextUpdateTime 
+            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
 
-        else:
-            self.nextUpdateTime = None
+        #TODO Hopefully no longer need self.nextUpdateTime
+        # else:
+        #     self.nextUpdateTime = None
 
         self.lock.release()
 
