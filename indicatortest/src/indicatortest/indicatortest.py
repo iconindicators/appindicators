@@ -119,10 +119,11 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuIcon( self, menu ):
         subMenu = Gtk.Menu()
 
-        self.createAndAppendMenuItem(
+        self.createAndAppendMenuItemNEW(
             subMenu,
             self.getMenuIndent() + "Use default icon",
-            onClickFunction = lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
+            activate_function_and_arguments = ( self.indicator.set_icon_full, self.get_icon_name(), "" ) ) 
+            # onClickFunction = lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
 
         cacheDirectory = self.getCacheDirectory()
         icons = [ "FULL_MOON",
@@ -132,11 +133,12 @@ class IndicatorTest( IndicatorBase ):
                   "WAXING_CRESCENT" ]
 
         for icon in icons:
-            self.createAndAppendMenuItem(
+            self.createAndAppendMenuItemNEW(
                 subMenu,
                 self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory,
                 name = icon,
-                onClickFunction = self.__useIconDynamicallyCreated )
+                activate_function_and_arguments = ( self.__useIconDynamicallyCreated, ) )
+                # onClickFunction = self.__useIconDynamicallyCreated )
 
         self.createAndAppendMenuItem( menu, "Icon" ).set_submenu( subMenu )
 
@@ -305,11 +307,17 @@ class IndicatorTest( IndicatorBase ):
 
 
     def onPreferences( self, dialog ):
-        grid = self.createGrid()
+        grid = self.create_grid()
 
-        xCheckbutton = Gtk.CheckButton.new_with_label( _( "Enable/disable X" ) )
-        xCheckbutton.set_active( self.X )
-        xCheckbutton.set_tooltip_text( _( "Enable/disable X" ) )
+        xCheckbutton = \
+            self.create_checkbutton(
+                _( "Enable/disable X" ),
+                _( "Enable/disable X" ),
+                active = self.X )
+#TODO Make sure this is converted okay
+        # xCheckbutton = Gtk.CheckButton.new_with_label( _( "Enable/disable X" ) )
+        # xCheckbutton.set_active( self.X )
+        # xCheckbutton.set_tooltip_text( _( "Enable/disable X" ) )
         grid.attach( xCheckbutton, 0, 0, 1, 1 )
 
         store = Gtk.ListStore( str )
@@ -342,7 +350,7 @@ class IndicatorTest( IndicatorBase ):
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
         grid.attach( box, 0, 11, 1, 1 )
 
-        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()

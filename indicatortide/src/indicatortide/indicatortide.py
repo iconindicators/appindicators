@@ -214,20 +214,20 @@ class IndicatorTide( IndicatorBase ):
 
 
     def onPreferences( self, dialog ):
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         label = Gtk.Label.new( _( "User Script" ) )
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
+        box.set_hexpand( True ) # Only need to set this once and all objects will expand.
         box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
 
         box.pack_start( Gtk.Label.new( _( "Path and filename" ) ), False, False, 0 )
 
         userScriptPathAndFilename = Gtk.Entry()
         userScriptPathAndFilename.set_text( self.userScriptPathAndFilename )
-        userScriptPathAndFilename.set_hexpand( True )
         userScriptPathAndFilename.set_tooltip_text( _( "Full path and filename\nof user's Python3 script." ) )
 
         box.pack_start( userScriptPathAndFilename, True, True, 0 )
@@ -241,7 +241,6 @@ class IndicatorTide( IndicatorBase ):
 
         userScriptClassName = Gtk.Entry()
         userScriptClassName.set_text( self.userScriptClassName )
-        userScriptClassName.set_hexpand( True )
         userScriptClassName.set_tooltip_text( _(
             "Class name within the user script\n" + \
             "which must contain the function\n\n" + \
@@ -255,18 +254,30 @@ class IndicatorTide( IndicatorBase ):
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
-        showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
-        showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
-
+        showAsSubmenusCheckbutton = \
+            self.create_checkbutton(
+                _( "Show as submenus" ),
+                _( "Show each day's tides in a submenu." ),
+                active = self.showAsSubMenus )
+#TODO Make sure this is converted okay
+        # showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
+        # showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
+        # showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
         grid.attach( showAsSubmenusCheckbutton, 0, 3, 1, 1 )
 
-        showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
-        showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
-        showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
-        showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
-
+        showAsSubmenusExceptFirstDayCheckbutton = \
+            self.create_checkbutton(
+                _( "Except first day" ),
+                _( "Show the first day's tide in full." ),
+                showAsSubmenusCheckbutton.get_active(),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = self.showAsSubMenusExceptFirstDay )
+#TODO Make sure this is converted okay
+        # showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
+        # showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
+        # showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
+        # showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
         grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 4, 1, 1 )
 
         showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
@@ -274,7 +285,7 @@ class IndicatorTide( IndicatorBase ):
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
         grid.attach( box, 0, 5, 1, 1 )
 
-        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         while True:

@@ -476,7 +476,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         notebook = Gtk.Notebook()
 
         # PPAs.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         ppaStore = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
         for ppa in self.ppas:
@@ -504,22 +504,40 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.set_homogeneous( True )
         box.set_halign( Gtk.Align.CENTER )
 
-        addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        addButton.set_tooltip_text( _( "Add a new PPA." ) )
-        addButton.connect( "clicked", self.onPPAAdd, ppaTree )
-        box.pack_start( addButton, True, True, 0 )
+        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
+        # addButton.set_tooltip_text( _( "Add a new PPA." ) )
+        # addButton.connect( "clicked", self.onPPAAdd, ppaTree )
+        # box.pack_start( addButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Add" ),
+                _( "Add a new PPA." ),
+                connect_function_and_arguments = ( self.onPPAAdd, ppaTree ) ),
+            True,
+            True,
+            0 )
 
-        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        removeButton.set_tooltip_text( _( "Remove the selected PPA." ) )
-        removeButton.connect( "clicked", self.onPPARemove, ppaTree )
-        box.pack_start( removeButton, True, True, 0 )
+        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
+        # removeButton.set_tooltip_text( _( "Remove the selected PPA." ) )
+        # removeButton.connect( "clicked", self.onPPARemove, ppaTree )
+        # box.pack_start( removeButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Remove" ),
+                _( "Remove the selected PPA." ),
+                connect_function_and_arguments = ( self.onPPARemove, ppaTree ) ),
+            True,
+            True,
+            0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
         # Filters.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         filterStore = Gtk.ListStore( str, str, str, str, str ) # PPA user, name, series, architecture, filter text.
         for user, name, series, architecture in self.filters.getUserNameSeriesArchitecture():
@@ -549,84 +567,164 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.set_homogeneous( True )
         box.set_halign( Gtk.Align.CENTER )
 
-        addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        addButton.set_tooltip_text( _( "Add a new filter." ) )
-        addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
-        box.pack_start( addButton, True, True, 0 )
+        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
+        # addButton.set_tooltip_text( _( "Add a new filter." ) )
+        # addButton.connect( "clicked", self.onFilterAdd, filterTree, ppaTree )
+        # box.pack_start( addButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Add" ),
+                _( "Add a new filter." ),
+                connect_function_and_arguments = ( self.onFilterAdd, filterTree, ppaTree ) ),
+            True,
+            True,
+            0 )
 
-        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        removeButton.set_tooltip_text( _( "Remove the selected filter." ) )
-        removeButton.connect( "clicked", self.onFilterRemove, filterTree )
-        box.pack_start( removeButton, True, True, 0 )
+        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
+        # removeButton.set_tooltip_text( _( "Remove the selected filter." ) )
+        # removeButton.connect( "clicked", self.onFilterRemove, filterTree )
+        # box.pack_start( removeButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Remove" ),
+                _( "Remove the selected filter." ),
+                connect_function_and_arguments = ( self.onFilterRemove, filterTree ) ),
+            True,
+            True,
+            0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Filters" ) ) )
 
         # General settings.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
-        showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
-        showAsSubmenusCheckbutton.set_tooltip_text( _(
-            "The download statistics for each PPA\n" + \
-            "are shown in a separate submenu." ) )
-        showAsSubmenusCheckbutton.set_active( self.showSubmenu )
+        showAsSubmenusCheckbutton = \
+            self.create_checkbutton(
+                _( "Show PPAs as submenus" ),
+                _( "The download statistics for each PPA\n" + \
+                   "are shown in a separate submenu." ),
+                active = self.showSubmenu )
+#TODO Make sure this is converted okay
+        # showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
+        # showAsSubmenusCheckbutton.set_tooltip_text( _(
+        #     "The download statistics for each PPA\n" + \
+        #     "are shown in a separate submenu." ) )
+        # showAsSubmenusCheckbutton.set_active( self.showSubmenu )
         grid.attach( showAsSubmenusCheckbutton, 0, 0, 1, 1 )
 
-        combinePPAsCheckbutton = Gtk.CheckButton.new_with_label( _( "Combine PPAs" ) )
-        combinePPAsCheckbutton.set_tooltip_text( _(
-            "Combine the statistics of binary\n" + \
-            "packages when the PPA user/name\n" + \
-            "are the same.\n\n" + \
-            "Non-architecture specific packages:\n" + \
-            "If the package names and version\n" + \
-            "numbers of two binary packages are\n" + \
-            "identical, the packages are treated\n" + \
-            "as the same package and the\n" + \
-            "download counts are NOT summed.\n" + \
-            "Packages such as Python fall into\n" + \
-            "this category.\n\n" + \
-            "Architecture specific packages:\n" + \
-            "If the package names and version\n" + \
-            "numbers of two binary packages are\n" + \
-            "identical, the packages are treated\n" + \
-            "as the same package and the download\n" + \
-            "counts ARE summed.\n" + \
-            "Packages such as compiled C fall into\n" + \
-            "this category." ) )
-        combinePPAsCheckbutton.set_active( self.combinePPAs )
-        combinePPAsCheckbutton.set_margin_top( 10 )
+        combinePPAsCheckbutton = \
+            self.create_checkbutton(
+                _( "Combine PPAs" ),
+                _( "Combine the statistics of binary\n" + \
+                   "packages when the PPA user/name\n" + \
+                   "are the same.\n\n" + \
+                   "Non-architecture specific packages:\n" + \
+                   "If the package names and version\n" + \
+                   "numbers of two binary packages are\n" + \
+                   "identical, the packages are treated\n" + \
+                   "as the same package and the\n" + \
+                   "download counts are NOT summed.\n" + \
+                   "Packages such as Python fall into\n" + \
+                   "this category.\n\n" + \
+                   "Architecture specific packages:\n" + \
+                   "If the package names and version\n" + \
+                   "numbers of two binary packages are\n" + \
+                   "identical, the packages are treated\n" + \
+                   "as the same package and the download\n" + \
+                   "counts ARE summed.\n" + \
+                   "Packages such as compiled C fall into\n" + \
+                   "this category." ),
+                margin_top = 10,
+                active = self.combinePPAs )
+#TODO Make sure this is converted okay
+        # combinePPAsCheckbutton = Gtk.CheckButton.new_with_label( _( "Combine PPAs" ) )
+        # combinePPAsCheckbutton.set_tooltip_text( _(
+        #     "Combine the statistics of binary\n" + \
+        #     "packages when the PPA user/name\n" + \
+        #     "are the same.\n\n" + \
+        #     "Non-architecture specific packages:\n" + \
+        #     "If the package names and version\n" + \
+        #     "numbers of two binary packages are\n" + \
+        #     "identical, the packages are treated\n" + \
+        #     "as the same package and the\n" + \
+        #     "download counts are NOT summed.\n" + \
+        #     "Packages such as Python fall into\n" + \
+        #     "this category.\n\n" + \
+        #     "Architecture specific packages:\n" + \
+        #     "If the package names and version\n" + \
+        #     "numbers of two binary packages are\n" + \
+        #     "identical, the packages are treated\n" + \
+        #     "as the same package and the download\n" + \
+        #     "counts ARE summed.\n" + \
+        #     "Packages such as compiled C fall into\n" + \
+        #     "this category." ) )
+        # combinePPAsCheckbutton.set_active( self.combinePPAs )
+        # combinePPAsCheckbutton.set_margin_top( 10 )
         grid.attach( combinePPAsCheckbutton, 0, 1, 1, 1 )
 
-        ignoreVersionArchitectureSpecificCheckbutton = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
-        ignoreVersionArchitectureSpecificCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        ignoreVersionArchitectureSpecificCheckbutton.set_tooltip_text( _(
-            "Sometimes architecture specific\n" + \
-            "packages with the same package\n" + \
-            "name but different version 'number'\n" + \
-            "are logically the SAME package.\n\n" + \
-            "For example, a C source package for\n" + \
-            "both Ubuntu Saucy and Ubuntu Trusty\n" + \
-            "will be compiled twice, each with a\n" + \
-            "different 'number', despite being\n" + \
-            "the SAME release.\n\n" + \
-            "Checking this option will ignore the\n" + \
-            "version number when determining if\n" + \
-            "two architecture specific packages\n" + \
-            "are identical.\n\n" + \
-            "The version number is retained only\n" + \
-            "if it is identical across ALL\n" + \
-            "instances of a published binary." ) )
-        ignoreVersionArchitectureSpecificCheckbutton.set_active( self.ignoreVersionArchitectureSpecific )
-        ignoreVersionArchitectureSpecificCheckbutton.set_sensitive( combinePPAsCheckbutton.get_active() )
+        ignoreVersionArchitectureSpecificCheckbutton = \
+            self.create_checkbutton(
+                _( "Ignore version for architecture specific" ),
+                _( "Sometimes architecture specific\n" + \
+                   "packages with the same package\n" + \
+                   "name but different version 'number'\n" + \
+                   "are logically the SAME package.\n\n" + \
+                   "For example, a C source package for\n" + \
+                   "both Ubuntu Saucy and Ubuntu Trusty\n" + \
+                   "will be compiled twice, each with a\n" + \
+                   "different 'number', despite being\n" + \
+                   "the SAME release.\n\n" + \
+                   "Checking this option will ignore the\n" + \
+                   "version number when determining if\n" + \
+                   "two architecture specific packages\n" + \
+                   "are identical.\n\n" + \
+                   "The version number is retained only\n" + \
+                   "if it is identical across ALL\n" + \
+                   "instances of a published binary." ),
+                combinePPAsCheckbutton.get_active(),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = self.ignoreVersionArchitectureSpecific )
+#TODO Make sure this is converted okay
+        # ignoreVersionArchitectureSpecificCheckbutton = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
+        # ignoreVersionArchitectureSpecificCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # ignoreVersionArchitectureSpecificCheckbutton.set_tooltip_text( _(
+        #     "Sometimes architecture specific\n" + \
+        #     "packages with the same package\n" + \
+        #     "name but different version 'number'\n" + \
+        #     "are logically the SAME package.\n\n" + \
+        #     "For example, a C source package for\n" + \
+        #     "both Ubuntu Saucy and Ubuntu Trusty\n" + \
+        #     "will be compiled twice, each with a\n" + \
+        #     "different 'number', despite being\n" + \
+        #     "the SAME release.\n\n" + \
+        #     "Checking this option will ignore the\n" + \
+        #     "version number when determining if\n" + \
+        #     "two architecture specific packages\n" + \
+        #     "are identical.\n\n" + \
+        #     "The version number is retained only\n" + \
+        #     "if it is identical across ALL\n" + \
+        #     "instances of a published binary." ) )
+        # ignoreVersionArchitectureSpecificCheckbutton.set_active( self.ignoreVersionArchitectureSpecific )
+        # ignoreVersionArchitectureSpecificCheckbutton.set_sensitive( combinePPAsCheckbutton.get_active() )
         grid.attach( ignoreVersionArchitectureSpecificCheckbutton, 0, 2, 1, 1 )
 
         combinePPAsCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, ignoreVersionArchitectureSpecificCheckbutton )
 
-        sortByDownloadCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
-        sortByDownloadCheckbutton.set_tooltip_text( _( "Sort by download count within each PPA." ) )
-        sortByDownloadCheckbutton.set_active( self.sortByDownload )
-        sortByDownloadCheckbutton.set_margin_top( 10 )
+        sortByDownloadCheckbutton = \
+            self.create_checkbutton(
+                _( "Sort by download" ),
+                _( "Sort by download count within each PPA." ),
+                margin_top = 10,
+                active = self.sortByDownload )
+#TODO Make sure this is converted okay
+        # sortByDownloadCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
+        # sortByDownloadCheckbutton.set_tooltip_text( _( "Sort by download count within each PPA." ) )
+        # sortByDownloadCheckbutton.set_active( self.sortByDownload )
+        # sortByDownloadCheckbutton.set_margin_top( 10 )
         grid.attach( sortByDownloadCheckbutton, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -636,27 +734,35 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
         box.pack_start( label, False, False, 0 )
 
-        spinner = self.createSpinButton(
-            self.sortByDownloadAmount,
-            0,
-            10000,
-            1,
-            100,
-            _( "Limit the number of entries\n" + \
-               "when sorting by download.\n\n" + \
-               "A value of zero will not clip." ) )
+        spinner = \
+            self.create_spinbutton(
+                self.sortByDownloadAmount,
+                0,
+                10000,
+                page_increment = 100,
+                tooltip_text = _( "Limit the number of entries\n" + \
+                                  "when sorting by download.\n\n" + \
+                                  "A value of zero will not clip." ),
+                sensitive = sortByDownloadCheckbutton.get_active() )
 
-        spinner.set_sensitive( sortByDownloadCheckbutton.get_active() )
+        # spinner.set_sensitive( sortByDownloadCheckbutton.get_active() ) #TODO Check above was converted correctly.
         box.pack_start( spinner, False, False, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
 
         sortByDownloadCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, label, spinner )
 
-        lowBandwidthCheckbutton = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
-        lowBandwidthCheckbutton.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
-        lowBandwidthCheckbutton.set_active( self.lowBandwidth )
-        lowBandwidthCheckbutton.set_margin_top( 10 )
+        lowBandwidthCheckbutton = \
+            self.create_checkbutton(
+                _( "Low bandwidth" ),
+                _( "Enable if your internet connection is slow." ),
+                margin_top = 10,
+                active = self.lowBandwidth )
+#TODO Make sure this is converted okay
+        # lowBandwidthCheckbutton = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
+        # lowBandwidthCheckbutton.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
+        # lowBandwidthCheckbutton.set_active( self.lowBandwidth )
+        # lowBandwidthCheckbutton.set_margin_top( 10 )
         grid.attach( lowBandwidthCheckbutton, 0, 5, 1, 1 )
 
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
@@ -664,7 +770,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
-        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()
@@ -722,7 +828,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def onPPADoubleClick( self, tree, rowNumber, treeViewColumn ):
         model, treeiter = tree.get_selection().get_selected()
 
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         label = Gtk.Label.new( _( "PPA User" ) )
         label.set_halign( Gtk.Align.START )
@@ -909,7 +1015,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         filterTreeModel, filterTreeIter = filterTree.get_selection().get_selected()
         ppaTreeModel, ppaTreeIter = ppaTree.get_selection().get_selected()
 
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         label = Gtk.Label.new( _( "PPA User/Name" ) )
         label.set_halign( Gtk.Align.START )

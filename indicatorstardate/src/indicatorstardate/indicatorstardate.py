@@ -130,29 +130,54 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def onPreferences( self, dialog ):
-        grid = self.createGrid()
+        grid = self.create_grid()
 
-        showClassicCheckbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
-        showClassicCheckbutton.set_active( self.showClassic )
-        showClassicCheckbutton.set_tooltip_text( _(
-            "If checked, show stardate 'classic' based on\n\n" + \
-            "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
-            "Otherwise, show stardate '2009 revised' based on\n\n" + \
-            "\thttps://en.wikipedia.org/wiki/Stardate" ) )
+        showClassicCheckbutton = \
+            self.create_checkbutton(
+                _( "Show stardate 'classic'" ),
+                _( "If checked, show stardate 'classic' based on\n\n" + \
+                   "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
+                   "Otherwise, show stardate '2009 revised' based on\n\n" + \
+                   "\thttps://en.wikipedia.org/wiki/Stardate" ),
+                active = self.showClassic )
+#TODO Make sure this is converted okay
+        # showClassicCheckbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
+        # showClassicCheckbutton.set_active( self.showClassic )
+        # showClassicCheckbutton.set_tooltip_text( _(
+        #     "If checked, show stardate 'classic' based on\n\n" + \
+        #     "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
+        #     "Otherwise, show stardate '2009 revised' based on\n\n" + \
+        #     "\thttps://en.wikipedia.org/wiki/Stardate" ) )
         grid.attach( showClassicCheckbutton, 0, 0, 1, 1 )
 
-        showIssueCheckbutton = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
-        showIssueCheckbutton.set_active( self.showIssue )
-        showIssueCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
-        showIssueCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        showIssueCheckbutton.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
+        showIssueCheckbutton = \
+            self.create_checkbutton(
+                _( "Show ISSUE" ),
+                _( "Show the ISSUE of the stardate 'classic'." ),
+                showClassicCheckbutton.get_active(),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = self.showIssue )
+#TODO Make sure this is converted okay
+        # showIssueCheckbutton = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
+        # showIssueCheckbutton.set_active( self.showIssue )
+        # showIssueCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
+        # showIssueCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # showIssueCheckbutton.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
         grid.attach( showIssueCheckbutton, 0, 1, 1, 1 )
 
-        padIntegerCheckbutton = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
-        padIntegerCheckbutton.set_active( self.padInteger )
-        padIntegerCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
-        padIntegerCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        padIntegerCheckbutton.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
+        padIntegerCheckbutton = \
+            self.create_checkbutton(
+                _( "Pad INTEGER" ),
+                _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ),
+                showClassicCheckbutton.get_active(),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = self.padInteger )
+#TODO Make sure this is converted okay
+        # padIntegerCheckbutton = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
+        # padIntegerCheckbutton.set_active( self.padInteger )
+        # padIntegerCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
+        # padIntegerCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # padIntegerCheckbutton.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
         grid.attach( padIntegerCheckbutton, 0, 2, 1, 1 )
 
         showClassicCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showIssueCheckbutton, padIntegerCheckbutton )
@@ -160,7 +185,7 @@ class IndicatorStardate( IndicatorBase ):
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
         grid.attach( box, 0, 3, 1, 1 )
 
-        dialog.vbox.pack_start( grid, True, True, 0 )
+        dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()

@@ -269,7 +269,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         notebook = Gtk.Notebook()
 
         # Scripts.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         # Define these here so that widgets can connect to handle events.
         # Contains extra/redundant columns, but allows the reuse of the column definitions.
@@ -372,59 +372,137 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.set_margin_top( 10 )
         box.set_homogeneous( True )
 
-        addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        addButton.set_tooltip_text( _( "Add a new script." ) )
-        addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView, backgroundScriptsTreeView )
-        box.pack_start( addButton, True, True, 0 )
+        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
+        # addButton.set_tooltip_text( _( "Add a new script." ) )
+        # addButton.connect( "clicked", self.onScriptAdd, copyOfScripts, treeView, backgroundScriptsTreeView )
+        # box.pack_start( addButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Add" ),
+                _( "Add a new script." ),
+                connect_function_and_arguments = (
+                    self.onScriptAdd,
+                    copyOfScripts, treeView, backgroundScriptsTreeView ) ),
+            True,
+            True,
+            0 )
 
-        editButton = Gtk.Button.new_with_label( _( "Edit" ) )
-        editButton.set_tooltip_text( _( "Edit the selected script." ) )
-        editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView, backgroundScriptsTreeView, indicatorTextEntry )
-        box.pack_start( editButton, True, True, 0 )
+        # editButton = Gtk.Button.new_with_label( _( "Edit" ) )
+        # editButton.set_tooltip_text( _( "Edit the selected script." ) )
+        # editButton.connect( "clicked", self.onScriptEdit, copyOfScripts, treeView, backgroundScriptsTreeView, indicatorTextEntry )
+        # box.pack_start( editButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Edit" ),
+                _( "Edit the selected script." ),
+                connect_function_and_arguments = (
+                    self.onScriptEdit,
+                    copyOfScripts, treeView, backgroundScriptsTreeView, indicatorTextEntry ) ),
+            True,
+            True,
+            0 )
 
-        copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
-        copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
-        copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, treeView, backgroundScriptsTreeView )
-        box.pack_start( copyButton, True, True, 0 )
+        # copyButton = Gtk.Button.new_with_label( _( "Copy" ) )
+        # copyButton.set_tooltip_text( _( "Duplicate the selected script." ) )
+        # copyButton.connect( "clicked", self.onScriptCopy, copyOfScripts, treeView, backgroundScriptsTreeView )
+        # box.pack_start( copyButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Copy" ),
+                _( "Duplicate the selected script." ),
+                connect_function_and_arguments = (
+                    self.onScriptCopy,
+                    copyOfScripts, treeView, backgroundScriptsTreeView ) ),
+            True,
+            True,
+            0 )
 
-        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        removeButton.set_tooltip_text( _( "Remove the selected script." ) )
-        removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView, indicatorTextEntry )
-        box.pack_start( removeButton, True, True, 0 )
+        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
+        # removeButton.set_tooltip_text( _( "Remove the selected script." ) )
+        # removeButton.connect( "clicked", self.onScriptRemove, copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView, indicatorTextEntry )
+        # box.pack_start( removeButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Remove" ),
+                _( "Remove the selected script." ),
+                connect_function_and_arguments = (
+                    self.onScriptRemove,
+                    copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView, indicatorTextEntry ) ),
+            True,
+            True,
+            0 )
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 30, 1, 1 )
 
-        sendCommandToLogCheckbutton = Gtk.CheckButton.new_with_label( _( "Send command to log" ) )
-        sendCommandToLogCheckbutton.set_active( self.sendCommandToLog )
-        sendCommandToLogCheckbutton.set_tooltip_text( _(
-            "When a script is run,\n" + \
-            "send the command to the log\n" + \
-            "(located in your home directory)." ) )
+        sendCommandToLogCheckbutton = \
+            self.create_checkbutton(
+                _( "Send command to log" ),
+                _( "When a script is run,\n" + \
+                   "send the command to the log\n" + \
+                   "(located in your home directory)." ),
+                active = self.sendCommandToLog )
+#TODO Make sure this is converted okay
+        # sendCommandToLogCheckbutton = Gtk.CheckButton.new_with_label( _( "Send command to log" ) )
+        # sendCommandToLogCheckbutton.set_active( self.sendCommandToLog )
+        # sendCommandToLogCheckbutton.set_tooltip_text( _(
+        #     "When a script is run,\n" + \
+        #     "send the command to the log\n" + \
+        #     "(located in your home directory)." ) )
 
         grid.attach( sendCommandToLogCheckbutton, 0, 31, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Scripts" ) ) )
 
         # Menu settings.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
-        radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show non-background scripts in sub-menus" ) )
-        radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
+        # radioShowScriptsSubmenu = Gtk.RadioButton.new_with_label_from_widget( None, _( "Show non-background scripts in sub-menus" ) )
+        # radioShowScriptsSubmenu.set_active( self.showScriptsInSubmenus )
+        # grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
+#TODO Check above.
+        radioShowScriptsSubmenu = \
+            self.create_radiobutton(
+                None,
+                _( "Show non-background scripts in sub-menus" ),
+                active = self.showScriptsInSubmenus )
+
         grid.attach( radioShowScriptsSubmenu, 0, 0, 1, 1 )
 
-        radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show non-background scripts indented by group" ) )
-        radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
+        # radioShowScriptsIndented = Gtk.RadioButton.new_with_label_from_widget( radioShowScriptsSubmenu, _( "Show non-background scripts indented by group" ) )
+        # radioShowScriptsIndented.set_active( not self.showScriptsInSubmenus )
+        # grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
+#TODO Check above.
+        radioShowScriptsIndented = \
+            self.create_radiobutton(
+                radioShowScriptsSubmenu,
+                _( "Show non-background scripts indented by group" ),
+                active = not self.showScriptsInSubmenus )
+
         grid.attach( radioShowScriptsIndented, 0, 1, 1, 1 )
 
-        hideGroupsCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide groups" ) )
-        hideGroupsCheckbutton.set_active( self.hideGroups )
-        hideGroupsCheckbutton.set_sensitive( not self.showScriptsInSubmenus )
-        hideGroupsCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        hideGroupsCheckbutton.set_tooltip_text( _(
-            "If checked, only script names are displayed.\n" + \
-            "Otherwise, script names are indented\n" + \
-            "within their respective group." ) )
+        hideGroupsCheckbutton = \
+            self.create_checkbutton(
+                _( "Hide groups" ),
+                _( "If checked, only script names are displayed.\n" + \
+                   "Otherwise, script names are indented\n" + \
+                   "within their respective group." ),
+                not self.showScriptsInSubmenus,
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = self.hideGroups )
+#TODO Make sure this is converted okay
+        # hideGroupsCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide groups" ) )
+        # hideGroupsCheckbutton.set_active( self.hideGroups )
+        # hideGroupsCheckbutton.set_sensitive( not self.showScriptsInSubmenus )
+        # hideGroupsCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # hideGroupsCheckbutton.set_tooltip_text( _(
+        #     "If checked, only script names are displayed.\n" + \
+        #     "Otherwise, script names are indented\n" + \
+        #     "within their respective group." ) )
 
         radioShowScriptsIndented.connect( "toggled", self.onRadioOrCheckbox, True, hideGroupsCheckbutton )
 
@@ -437,7 +515,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Icon text settings.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -522,7 +600,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
         #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
         notebook.connect( "switch-page", lambda notebook, page, page_number: notebook.grab_focus() )
-        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()
@@ -683,14 +761,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         if group and name:
             script = self.getScript( scripts, group, name )
 
-            grid = self.createGrid()
+            grid = self.create_grid()
 
             box = Gtk.Box( spacing = 6 )
+            box.set_hexpand( True ) # Only need to set this once and all objects will expand.
 
             box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
 
             scriptGroupCombo = Gtk.ComboBoxText.new_with_entry()
-            scriptGroupCombo.set_hexpand( True ) # Only need to set this once and all objects will expand.
             scriptGroupCombo.set_tooltip_text( _(
                 "The group to which the script belongs.\n\n" + \
                 "Choose an existing group or enter a new one." ) )
@@ -816,7 +894,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __addEditScript( self, script, scripts, scriptsTreeView, backgroundScriptsTreeView ):
         add = True if script is None else False
 
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -880,60 +958,123 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.pack_start( scrolledWindow, True, True, 0 )
         grid.attach( box, 0, 2, 1, 10 )
 
-        soundCheckbutton = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
-        soundCheckbutton.set_tooltip_text( _(
-            "For non-background scripts, play a sound\n" + \
-            "on script completion.\n\n" + \
-            "For background scripts, play a sound\n" + \
-            "only if the script returns non-empty text." ) )
-        soundCheckbutton.set_active( False if add else script.getPlaySound() )
+        soundCheckbutton = \
+            self.create_checkbutton(
+                _( "Play sound" ),
+                _( "For non-background scripts, play a sound\n" + \
+                   "on script completion.\n\n" + \
+                   "For background scripts, play a sound\n" + \
+                   "only if the script returns non-empty text." ),
+                active = False if add else script.getPlaySound() )
+#TODO Make sure this is converted okay
+        # soundCheckbutton = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
+        # soundCheckbutton.set_tooltip_text( _(
+        #     "For non-background scripts, play a sound\n" + \
+        #     "on script completion.\n\n" + \
+        #     "For background scripts, play a sound\n" + \
+        #     "only if the script returns non-empty text." ) )
+        # soundCheckbutton.set_active( False if add else script.getPlaySound() )
         grid.attach( soundCheckbutton, 0, 12, 1, 1 )
 
-        notificationCheckbutton = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
-        notificationCheckbutton.set_tooltip_text( _(
-            "For non-background scripts, show a\n" + \
-            "notification on script completion.\n\n" + \
-            "For background scripts, show a notification\n" + \
-            "only if the script returns non-empty text." ) )
-        notificationCheckbutton.set_active( False if add else script.getShowNotification() )
+        notificationCheckbutton = \
+            self.create_checkbutton(
+                _( "Show notification" ),
+                _( "For non-background scripts, show a\n" + \
+                   "notification on script completion.\n\n" + \
+                   "For background scripts, show a notification\n" + \
+                   "only if the script returns non-empty text." ),
+                active = False if add else script.getShowNotification() )
+#TODO Make sure this is converted okay
+        # notificationCheckbutton = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
+        # notificationCheckbutton.set_tooltip_text( _(
+        #     "For non-background scripts, show a\n" + \
+        #     "notification on script completion.\n\n" + \
+        #     "For background scripts, show a notification\n" + \
+        #     "only if the script returns non-empty text." ) )
+        # notificationCheckbutton.set_active( False if add else script.getShowNotification() )
         grid.attach( notificationCheckbutton, 0, 13, 1, 1 )
 
-        scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
-        scriptNonBackgroundRadio.set_active( True if add else type( script ) is NonBackground )
-        scriptNonBackgroundRadio.set_tooltip_text(
-            "Non-background scripts are displayed\n" + \
-            "in the menu and run when the user\n" + \
-            "clicks on the corresponding menu item." )
+        # scriptNonBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Non-background" ) )
+        # scriptNonBackgroundRadio.set_active( True if add else type( script ) is NonBackground )
+        # scriptNonBackgroundRadio.set_tooltip_text(
+        #     "Non-background scripts are displayed\n" + \
+        #     "in the menu and run when the user\n" + \
+        #     "clicks on the corresponding menu item." )
+        # grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
+#TODO Check above.
+        scriptNonBackgroundRadio = \
+            self.create_radiobutton(
+                None,
+                _( "Non-background" ),
+                tooltip_text = _( "Non-background scripts are displayed\n" + \
+                                  "in the menu and run when the user\n" + \
+                                  "clicks on the corresponding menu item." ),
+                active = True if add else type( script ) is NonBackground )
+
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
 
-        terminalCheckbutton = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
-        terminalCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        terminalCheckbutton.set_tooltip_text( _( "Leave the terminal open on script completion." ) )
-        terminalCheckbutton.set_active( False if add else type( script ) is NonBackground and script.getTerminalOpen() )
-        terminalCheckbutton.set_sensitive( True if add else type( script ) is NonBackground )
+        terminalCheckbutton = \
+            self.create_checkbutton(
+                _( "Leave terminal open" ),
+                _( "Leave the terminal open on script completion." ),
+                True if add else type( script ) is NonBackground,
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = False if add else type( script ) is NonBackground and script.getTerminalOpen() )
+#TODO Make sure this is converted okay
+        # terminalCheckbutton = Gtk.CheckButton.new_with_label( _( "Leave terminal open" ) )
+        # terminalCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # terminalCheckbutton.set_tooltip_text( _( "Leave the terminal open on script completion." ) )
+        # terminalCheckbutton.set_active( False if add else type( script ) is NonBackground and script.getTerminalOpen() )
+        # terminalCheckbutton.set_sensitive( True if add else type( script ) is NonBackground )
         grid.attach( terminalCheckbutton, 0, 15, 1, 1 )
 
-        defaultScriptCheckbutton = Gtk.CheckButton.new_with_label( _( "Default script" ) )
-        defaultScriptCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        defaultScriptCheckbutton.set_active( False if add else type( script ) is NonBackground and script.getDefault() )
-        defaultScriptCheckbutton.set_sensitive( True if add else type( script ) is NonBackground )
-        defaultScriptCheckbutton.set_tooltip_text( _(
-            "One script may be set as default\n" + \
-            "which is run on a middle mouse\n" + \
-            "click of the indicator icon.\n\n" + \
-            "Not supported on all desktops." ) )
+        defaultScriptCheckbutton = \
+            self.create_checkbutton(
+                _( "Default script" ),
+                _( "One script may be set as default\n" + \
+                   "which is run on a middle mouse\n" + \
+                   "click of the indicator icon.\n\n" + \
+                   "Not supported on all desktops." ),
+                True if add else type( script ) is NonBackground,
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = False if add else type( script ) is NonBackground and script.getDefault() )
+#TODO Make sure this is converted okay
+        # defaultScriptCheckbutton = Gtk.CheckButton.new_with_label( _( "Default script" ) )
+        # defaultScriptCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # defaultScriptCheckbutton.set_active( False if add else type( script ) is NonBackground and script.getDefault() )
+        # defaultScriptCheckbutton.set_sensitive( True if add else type( script ) is NonBackground )
+        # defaultScriptCheckbutton.set_tooltip_text( _(
+        #     "One script may be set as default\n" + \
+        #     "which is run on a middle mouse\n" + \
+        #     "click of the indicator icon.\n\n" + \
+        #     "Not supported on all desktops." ) )
         grid.attach( defaultScriptCheckbutton, 0, 16, 1, 1 )
 
-        scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
-        scriptBackgroundRadio.set_active( False if add else type( script ) is Background )
-        scriptBackgroundRadio.set_tooltip_text(
-            "Background scripts automatically run\n" + \
-            "at the interval specified, but only if\n" + \
-            "added to the icon text.\n\n" + \
-            "Any exception which occurs during script\n" + \
-            "execution will be logged to a file in the\n" + \
-            "user's home directory and the script tag\n" + \
-            "will remain in the icon text." )
+        # scriptBackgroundRadio = Gtk.RadioButton.new_with_label_from_widget( scriptNonBackgroundRadio, _( "Background" ) )
+        # scriptBackgroundRadio.set_active( False if add else type( script ) is Background )
+        # scriptBackgroundRadio.set_tooltip_text(
+        #     "Background scripts automatically run\n" + \
+        #     "at the interval specified, but only if\n" + \
+        #     "added to the icon text.\n\n" + \
+        #     "Any exception which occurs during script\n" + \
+        #     "execution will be logged to a file in the\n" + \
+        #     "user's home directory and the script tag\n" + \
+        #     "will remain in the icon text." )
+        #
+        # grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
+#TODO Check above.
+        scriptBackgroundRadio = \
+            self.create_radiobutton(
+                scriptNonBackgroundRadio,
+                _( "Background" ),
+                tooltip_text = _( "Background scripts automatically run\n" + \
+                                  "at the interval specified, but only if\n" + \
+                                  "added to the icon text.\n\n" + \
+                                  "Any exception which occurs during script\n" + \
+                                  "execution will be logged to a file in the\n" + \
+                                  "user's home directory and the script tag\n" + \
+                                  "will remain in the icon text." ),
+                active = False if add else type( script ) is Background )
 
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
 
@@ -944,27 +1085,39 @@ class IndicatorScriptRunner( IndicatorBase ):
         label.set_sensitive( False if add else type( script ) is Background )
         box.pack_start( label, False, False, 0 )
 
-        intervalSpinner = self.createSpinButton(
-            script.getIntervalInMinutes() if type( script ) is Background else 60,
-            1,
-            10000,
-            pageIncrement = 100,
-            toolTip = _( "Interval, in minutes, between runs." ) )
+        intervalSpinner = \
+            self.create_spinbutton(
+                script.getIntervalInMinutes() if type( script ) is Background else 60,
+                1,
+                10000,
+                page_increment = 100,
+                tooltip_text = _( "Interval, in minutes, between runs." ),
+                sensitive = False if add else type( script ) is Background )
 
-        intervalSpinner.set_sensitive( False if add else type( script ) is Background )
+        # intervalSpinner.set_sensitive( False if add else type( script ) is Background )#TODO Check above is okay.
 
         box.pack_start( intervalSpinner, False, False, 0 )
 
         grid.attach( box, 0, 18, 1, 1 )
 
-        forceUpdateCheckbutton = Gtk.CheckButton.new_with_label( _( "Force update" ) )
-        forceUpdateCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        forceUpdateCheckbutton.set_active( False if add else type( script ) is Background and script.getForceUpdate() )
-        forceUpdateCheckbutton.set_sensitive( True if add else type( script ) is Background )
-        forceUpdateCheckbutton.set_tooltip_text( _(
-            "If the script returns non-empty text\n" + \
-            "on its update, the script will run\n" + \
-            "on the next update of ANY script." ) )
+        forceUpdateCheckbutton = \
+            self.create_checkbutton(
+                _( "Force update" ),
+                _( "If the script returns non-empty text\n" + \
+                   "on its update, the script will run\n" + \
+                   "on the next update of ANY script." ),
+                True if add else type( script ) is Background,
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = False if add else type( script ) is Background and script.getForceUpdate() )
+#TODO Make sure this is converted okay
+        # forceUpdateCheckbutton = Gtk.CheckButton.new_with_label( _( "Force update" ) )
+        # forceUpdateCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # forceUpdateCheckbutton.set_active( False if add else type( script ) is Background and script.getForceUpdate() )
+        # forceUpdateCheckbutton.set_sensitive( True if add else type( script ) is Background )
+        # forceUpdateCheckbutton.set_tooltip_text( _(
+        #     "If the script returns non-empty text\n" + \
+        #     "on its update, the script will run\n" + \
+        #     "on the next update of ANY script." ) )
         grid.attach( forceUpdateCheckbutton, 0, 19, 1, 1 )
 
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbutton, defaultScriptCheckbutton )

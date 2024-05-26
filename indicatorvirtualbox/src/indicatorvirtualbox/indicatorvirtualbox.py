@@ -380,7 +380,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         notebook.append_page( scrolledWindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
 
         # General settings.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
@@ -398,21 +398,36 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         grid.attach( box, 0, 0, 1, 1 )
 
-        sortGroupsAndVirtualMachinesEquallyCheckbox = Gtk.CheckButton.new_with_label( _( "Sort groups and virtual machines equally" ) )
-        sortGroupsAndVirtualMachinesEquallyCheckbox.set_tooltip_text( _(
-            "If checked, groups and virtual machines\n" + \
-            "are sorted without distinction.\n\n" + \
-            "Otherwise, groups are sorted first,\n" + \
-            "followed by virtual machines." ) )
-        sortGroupsAndVirtualMachinesEquallyCheckbox.set_active( self.sortGroupsAndVirtualMachinesEqually )
-
+        sortGroupsAndVirtualMachinesEquallyCheckbox = \
+            self.create_checkbutton(
+                _( "Sort groups and virtual machines equally" ),
+                _( "If checked, groups and virtual machines\n" + \
+                   "are sorted without distinction.\n\n" + \
+                   "Otherwise, groups are sorted first,\n" + \
+                   "followed by virtual machines." ),
+                active = self.sortGroupsAndVirtualMachinesEqually )
+#TODO Make sure this is converted okay
+        # sortGroupsAndVirtualMachinesEquallyCheckbox = Gtk.CheckButton.new_with_label( _( "Sort groups and virtual machines equally" ) )
+        # sortGroupsAndVirtualMachinesEquallyCheckbox.set_tooltip_text( _(
+        #     "If checked, groups and virtual machines\n" + \
+        #     "are sorted without distinction.\n\n" + \
+        #     "Otherwise, groups are sorted first,\n" + \
+        #     "followed by virtual machines." ) )
+        # sortGroupsAndVirtualMachinesEquallyCheckbox.set_active( self.sortGroupsAndVirtualMachinesEqually )
         grid.attach( sortGroupsAndVirtualMachinesEquallyCheckbox, 0, 1, 1, 1 )
 
-        showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show groups as submenus" ) )
-        showAsSubmenusCheckbox.set_tooltip_text( _(
-            "If checked, groups are shown using submenus.\n\n" + \
-            "Otherwise, groups are shown as an indented list." ) )
-        showAsSubmenusCheckbox.set_active( self.showSubmenu )
+        showAsSubmenusCheckbox = \
+            self.create_checkbutton(
+                _( "Show groups as submenus" ),
+                _( "If checked, groups are shown using submenus.\n\n" + \
+                   "Otherwise, groups are shown as an indented list." ),
+                active = self.showSubmenu )
+#TODO Make sure this is converted okay
+        # showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show groups as submenus" ) )
+        # showAsSubmenusCheckbox.set_tooltip_text( _(
+        #     "If checked, groups are shown using submenus.\n\n" + \
+        #     "Otherwise, groups are shown as an indented list." ) )
+        # showAsSubmenusCheckbox.set_active( self.showSubmenu )
 
         row = 2
         if groupsExist:
@@ -424,14 +439,14 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
 
-        spinnerRefreshInterval = self.createSpinButton(
-            self.refreshIntervalInMinutes,
-            1,
-            60,
-            pageIncrement = 5,
-            toolTip = _(
-                "How often the list of virtual machines\n" + \
-                "and their running status are updated." ) )
+        spinnerRefreshInterval = \
+            self.create_spinbutton(
+                self.refreshIntervalInMinutes,
+                1,
+                60,
+                page_increment = 5,
+                tooltip_text = _( "How often the list of virtual machines\n" + \
+                                  "and their running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
@@ -443,14 +458,14 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
-        spinnerDelay = self.createSpinButton(
-            self.delayBetweenAutoStartInSeconds,
-            1,
-            300,
-            pageIncrement = 30,
-            toolTip = _(
-                "Amount of time to wait from automatically\n" + \
-                "starting one virtual machine to the next." ) )
+        spinnerDelay = \
+            self.create_spinbutton(
+                self.delayBetweenAutoStartInSeconds,
+                1,
+                300,
+                page_increment = 30,
+                tooltip_text = _( "Amount of time to wait from automatically\n" + \
+                                  "starting one virtual machine to the next." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
 
@@ -463,7 +478,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
-        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()
@@ -531,7 +546,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def editVirtualMachine( self, tree, model, treeiter ):
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         label = Gtk.Label.new( _( "Start Command" ) )
         label.set_halign( Gtk.Align.START )
@@ -551,11 +566,19 @@ class IndicatorVirtualBox( IndicatorBase ):
         startCommand.set_hexpand( True ) # Only need to set this once and all objects will expand.
         grid.attach( startCommand, 1, 0, 1, 1 )
 
-        autostartCheckbutton = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
-        autostartCheckbutton.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
-        autostartCheckbutton.set_active(
-            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
-            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
+        autostartCheckbutton = \
+            self.create_checkbutton(
+                _( "Autostart" ),
+                _( "Run the virtual machine when the indicator starts." ),
+                active = \
+                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
+                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
+#TODO Make sure this is converted okay
+        # autostartCheckbutton = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
+        # autostartCheckbutton.set_tooltip_text( _( "Run the virtual machine when the indicator starts." ) )
+        # autostartCheckbutton.set_active(
+        #     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
+        #     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
         grid.attach( autostartCheckbutton, 0, 1, 2, 1 )
 
         dialog = self.createDialog( tree, _( "Virtual Machine Properties" ), grid )

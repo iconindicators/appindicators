@@ -407,7 +407,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-        GLib.idle_add( self.__update )
+        GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that the Gtk main executes to show initialisation.
         Gtk.main()
 
 
@@ -463,6 +463,8 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
+#TODO Look at the create_button functions and how they take an onclick function and argument...
+# Maybe use this instead and can dispense with all the lambda crap for the callers.
     def createAndAppendMenuItem(
             self,
             menu,
@@ -491,6 +493,44 @@ class IndicatorBase( ABC ):
         return menuItem
 
 
+
+
+
+    def createAndAppendMenuItemNEW(
+            self,
+            menu,
+            label,
+            name = None,
+            activate_function_and_arguments = None, # Function name (and any arguments) must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453   #TODO Check if this is correct if just a function name and NO arguments.
+            isSecondaryActivateTarget = False ):
+
+        menuItem = Gtk.MenuItem.new_with_label( label )
+
+        if name:
+            menuItem.set_name( name )
+
+# <class 'tuple'>
+# <class 'method'>
+
+        # print( type( activate_function_and_arguments ) )
+        # print( len( activate_function_and_arguments ) )
+        if activate_function_and_arguments:
+            menuItem.connect( "activate", *activate_function_and_arguments )
+            # if len( activate_function_and_arguments ) == 1:
+            #     menuItem.connect( "activate", activate_function_and_arguments )
+            #
+            # else:
+            #     menuItem.connect( "activate", *activate_function_and_arguments )
+
+        if isSecondaryActivateTarget:
+            self.secondaryActivateTarget = menuItem
+
+        menu.append( menuItem )
+        return menuItem
+
+
+#TODO Look at the create_button functions and how they take an onclick function and argument...
+# Maybe use this instead and can dispense with all the lambda crap for the callers.
     def createAndInsertMenuItem(
             self,
             menu,
@@ -510,6 +550,7 @@ class IndicatorBase( ABC ):
         return menuItem
 
 
+#TODO See where this is used..if we change the above functions such that the lambda is gone, do we need this function?
     def getOnClickMenuItemOpenBrowserFunction( self ):
         return lambda menuItem: webbrowser.open( menuItem.props.name )
 
@@ -716,7 +757,7 @@ class IndicatorBase( ABC ):
 
         dialog.set_border_width( 5 )
         if grid:
-            dialog.vbox.pack_start( grid, True, True, 0 )
+            dialog.get_content_area().pack_start( grid, True, True, 0 )
 
         return dialog
 
@@ -735,7 +776,7 @@ class IndicatorBase( ABC ):
             dialog.set_default_size( IndicatorBase.__DIALOG_DEFAULT_WIDTH, IndicatorBase.__DIALOG_DEFAULT_HEIGHT )
 
         dialog.set_border_width( 5 )
-        dialog.vbox.pack_start( contentWidget, True, True, 0 )
+        dialog.get_content_area().pack_start( contentWidget, True, True, 0 )
         dialog.show_all()
         dialog.run()
         dialog.destroy()
@@ -747,18 +788,26 @@ class IndicatorBase( ABC ):
     def createAutostartCheckboxAndDelaySpinner( self ):
         autostart, delay = self.getAutostartAndDelay()
 
-        autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
-        autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        autostartCheckbox.set_active( autostart )
+#TODO Check this was converted okay...
+        # autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
+        # autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        # autostartCheckbox.set_active( autostart )
+
+        autostartCheckbox = \
+            self.create_checkbutton(
+                _( "Autostart" ),
+                _( "Run the indicator automatically." ),
+                active = autostart )
 
         autostartSpinner = \
-            self.createSpinButton(
+            self.create_spinbutton(
                 delay,
                 0,
                 1000,
-                toolTip = _( "Start up delay (seconds)." ) )
+                tooltip_text = _( "Start up delay (seconds)." ),
+                sensitive = autostartCheckbox.get_active() )
 
-        autostartSpinner.set_sensitive( autostartCheckbox.get_active() )
+        # autostartSpinner.set_sensitive( autostartCheckbox.get_active() )
 
         autostartCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, autostartSpinner )
 
@@ -902,7 +951,7 @@ class IndicatorBase( ABC ):
         return y
 
 
-    def createGrid( self ):
+    def create_grid( self ):
         spacing = 10
         grid = Gtk.Grid()
         grid.set_column_spacing( spacing )
@@ -914,13 +963,151 @@ class IndicatorBase( ABC ):
         return grid
 
 
-    def createSpinButton( self, initialValue, minimumValue, maximumValue, stepIncrement = 1, pageIncrement = 10, toolTip = "" ):
+#TODO Delete eventually.
+    # def createSpinButton( self, initialValue, minimumValue, maximumValue, stepIncrement = 1, pageIncrement = 10, toolTip = "" ):
+    #     spinner = Gtk.SpinButton()
+    #     spinner.set_adjustment( Gtk.Adjustment.new( initialValue, minimumValue, maximumValue, stepIncrement, pageIncrement, 0 ) )
+    #     spinner.set_numeric( True )
+    #     spinner.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
+    #     spinner.set_tooltip_text( toolTip )
+    #     return spinner
+
+
+    def create_spinbutton(
+            self,
+            value,
+            lower,
+            upper,
+            step_increment = 1,
+            page_increment = 10,
+            tooltip_text = "",
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0 ):
+
         spinner = Gtk.SpinButton()
-        spinner.set_adjustment( Gtk.Adjustment.new( initialValue, minimumValue, maximumValue, stepIncrement, pageIncrement, 0 ) )
+        self.__set_widget_common_attributes( spinner, tooltip_text, sensitive, margin_top, margin_left )
+        spinner.set_adjustment( Gtk.Adjustment.new( value, lower, upper, step_increment, page_increment, 0 ) )
         spinner.set_numeric( True )
         spinner.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
-        spinner.set_tooltip_text( toolTip )
         return spinner
+
+
+    def create_button(
+            self,
+            label,
+            tooltip_text = "",
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0,
+            connect_function_and_arguments = None ):  #TODO Rename here and in callers, connect -> clicked
+
+        button = Gtk.Button.new_with_label( label )
+        self.__set_widget_common_attributes( button, tooltip_text, sensitive, margin_top, margin_left )
+
+        if connect_function_and_arguments:
+            button.connect( "clicked", *connect_function_and_arguments )
+
+        return button
+
+
+    def create_checkbutton(
+            self,
+            label,
+            tooltip_text = "",
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0,
+            active = True ):
+
+        checkbutton = Gtk.CheckButton.new_with_label( label )
+        self.__set_widget_common_attributes( checkbutton, tooltip_text, sensitive, margin_top, margin_left )
+        checkbutton.set_active( active )
+        return checkbutton
+
+
+    def create_radiobutton(
+            self,
+            radio_group_member,
+            label,
+            tooltip_text = "",
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0,
+            active = True ):
+
+        radiobutton = Gtk.RadioButton.new_with_label_from_widget( radio_group_member, label )
+        self.__set_widget_common_attributes( radiobutton, tooltip_text, sensitive, margin_top, margin_left )
+        radiobutton.set_active( active )
+        return radiobutton
+
+
+    def __set_widget_common_attributes(
+            self,
+            widget,
+            tooltip_text = "",
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0 ):
+
+        widget.set_tooltip_text( tooltip_text )
+        widget.set_sensitive( sensitive )
+        widget.set_margin_top( margin_top )
+        widget.set_margin_left( margin_left )
+
+
+#TODO Look at all pack_start calls.
+# What should the parameters be, given buttons, labels, etc are added.
+# Some have True and some have False.
+
+
+#TODO Implement these...?
+# Maybe count the number of occurrences?
+        '''
+        21
+        notificationSummary = Gtk.Entry()
+        notificationSummary.set_text( self.notificationSummary )
+        notificationSummary.set_tooltip_text( _( "The summary text for the notification." ) )
+        Vast majority have only the text/tooltip_text.
+
+        18
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_hexpand( True )
+        scrolledWindow.set_vexpand( True )
+        scrolledWindow.add( textView )
+
+        scrolledWindow = Gtk.ScrolledWindow()
+        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledWindow.add( tree )
+
+        Mix of the above two types....check to see if the second type works by defaulting the hexpand/vexpand to True.
+        Not sure about the hexpand/vexpand: maybe should be associated with the treeview...see below.
+        Also, have seen treeview.expand_all()
+
+
+        12
+        tree = Gtk.TreeView.new_with_model( displayTagsStoreSort )
+
+        7
+        textView = Gtk.TextView()
+
+        7
+        city = Gtk.ComboBoxText.new_with_entry()
+
+        What about 
+        treeViewColumn = \
+            Gtk.TreeViewColumn(
+                _( "Fortune File/Directory" ),
+                Gtk.CellRendererText(),
+                text = IndicatorFortune.COLUMN_FILE_OR_DIRECTORY )
+
+        treeViewColumn.set_sort_column_id( 0 )
+        treeViewColumn.set_expand( True )
+        tree.append_column( treeViewColumn )
+
+
+        '''
 
 
     def getMenuIndent( self, indent = 1 ):

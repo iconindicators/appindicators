@@ -210,7 +210,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         notebook = Gtk.Notebook()
 
         # Calendar file settings.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         store = Gtk.ListStore( str, str ) # Path to calendar file; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for calendar in self.getCalendars():
@@ -256,20 +256,47 @@ class IndicatorOnThisDay( IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
 
-        addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        addButton.set_tooltip_text( _( "Add a new calendar." ) )
-        addButton.connect( "clicked", self.onCalendarAdd, tree )
-        box.pack_start( addButton, True, True, 0 )
+        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
+        # addButton.set_tooltip_text( _( "Add a new calendar." ) )
+        # addButton.connect( "clicked", self.onCalendarAdd, tree )
+        # box.pack_start( addButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Add" ),
+                _( "Add a new calendar." ),
+                connect_function_and_arguments = ( self.onCalendarAdd, tree ) ),
+            True,
+            True,
+            0 )
 
-        removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        removeButton.set_tooltip_text( _( "Remove the selected calendar." ) )
-        removeButton.connect( "clicked", self.onCalendarRemove, tree )
-        box.pack_start( removeButton, True, True, 0 )
+        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
+        # removeButton.set_tooltip_text( _( "Remove the selected calendar." ) )
+        # removeButton.connect( "clicked", self.onCalendarRemove, tree )
+        # box.pack_start( removeButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Remove" ),
+                _( "Remove the selected calendar." ),
+                connect_function_and_arguments = ( self.onCalendarRemove, tree ) ),
+            True,
+            True,
+            0 )
 
-        resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
-        resetButton.set_tooltip_text( _( "Reset to factory default." ) )
-        resetButton.connect( "clicked", self.onCalendarReset, tree )
-        box.pack_start( resetButton, True, True, 0 )
+        # resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
+        # resetButton.set_tooltip_text( _( "Reset to factory default." ) )
+        # resetButton.connect( "clicked", self.onCalendarReset, tree )
+        # box.pack_start( resetButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Reset" ),
+                _( "Reset to factory default." ),
+                connect_function_and_arguments = ( self.onCalendarReset, tree ) ),
+            True,
+            True,
+            0 )
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 26, 1, 1 )
@@ -277,13 +304,18 @@ class IndicatorOnThisDay( IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
 
         # General settings.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
 
         box.pack_start( Gtk.Label.new( _( "Lines" ) ), False, False, 0 )
 
-        spinner = self.createSpinButton( self.lines, 1, 1000, toolTip = _( "The number of menu items available for display." ) )
+        spinner = \
+            self.create_spinbutton(
+                self.lines,
+                1,
+                1000,
+                tooltip_text = _( "The number of menu items available for display." ) )
 
         box.pack_start( spinner, False, False, 0 )
 
@@ -294,16 +326,36 @@ class IndicatorOnThisDay( IndicatorBase ):
         label.set_margin_top( 10 )
         grid.attach( label, 0, 1, 1, 1 )
 
-        radioCopyToClipboard = Gtk.RadioButton.new_with_label_from_widget( None, _( "Copy event to clipboard" ) )
-        radioCopyToClipboard.set_tooltip_text( _( "Copy the event text and date to the clipboard." ) )
-        radioCopyToClipboard.set_active( self.copyToClipboard )
-        radioCopyToClipboard.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # radioCopyToClipboard = Gtk.RadioButton.new_with_label_from_widget( None, _( "Copy event to clipboard" ) )
+        # radioCopyToClipboard.set_tooltip_text( _( "Copy the event text and date to the clipboard." ) )
+        # radioCopyToClipboard.set_active( self.copyToClipboard )
+        # radioCopyToClipboard.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # grid.attach( radioCopyToClipboard, 0, 2, 1, 1 )
+#TODO Check above.
+        radioCopyToClipboard = \
+            self.create_radiobutton(
+                None,
+                _( "Copy event to clipboard" ),
+                tooltip_text = _( "Copy the event text and date to the clipboard." ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = self.copyToClipboard )
+
         grid.attach( radioCopyToClipboard, 0, 2, 1, 1 )
 
-        radioInternetSearch = Gtk.RadioButton.new_with_label_from_widget( radioCopyToClipboard, _( "Search event on the internet" ) )
-        radioInternetSearch.set_tooltip_text( _( "Open the default web browser and search for the event." ) )
-        radioInternetSearch.set_active( not self.copyToClipboard )
-        radioInternetSearch.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # radioInternetSearch = Gtk.RadioButton.new_with_label_from_widget( radioCopyToClipboard, _( "Search event on the internet" ) )
+        # radioInternetSearch.set_tooltip_text( _( "Open the default web browser and search for the event." ) )
+        # radioInternetSearch.set_active( not self.copyToClipboard )
+        # radioInternetSearch.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # grid.attach( radioInternetSearch, 0, 3, 1, 1 )
+#TODO Check above.
+        radioInternetSearch = \
+            self.create_radiobutton(
+                radioCopyToClipboard,
+                _( "Search event on the internet" ),
+                tooltip_text = _( "Open the default web browser and search for the event." ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                active = not self.copyToClipboard )
+
         grid.attach( radioInternetSearch, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -332,12 +384,20 @@ class IndicatorOnThisDay( IndicatorBase ):
         radioCopyToClipboard.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
         radioInternetSearch.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
 
-        notifyCheckbutton = Gtk.CheckButton.new_with_label( _( "Notify" ) )
-        notifyCheckbutton.set_tooltip_text( _(
-            "On startup or when saving preferences,\n" + \
-            "show a notification for each of today's events." ) )
-        notifyCheckbutton.set_active( self.notify )
-        notifyCheckbutton.set_margin_top( 10 )
+        notifyCheckbutton = \
+            self.create_checkbutton(
+                _( "Notify" ),
+                _( "On startup or when saving preferences,\n" + \
+                   "show a notification for each of today's events." ),
+                margin_top = 10,
+                active = self.notify )
+#TODO Make sure this is converted okay
+        # notifyCheckbutton = Gtk.CheckButton.new_with_label( _( "Notify" ) )
+        # notifyCheckbutton.set_tooltip_text( _(
+        #     "On startup or when saving preferences,\n" + \
+        #     "show a notification for each of today's events." ) )
+        # notifyCheckbutton.set_active( self.notify )
+        # notifyCheckbutton.set_margin_top( 10 )
         grid.attach( notifyCheckbutton, 0, 5, 1, 1 )
 
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
@@ -345,7 +405,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
-        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
         responseType = dialog.run()
@@ -421,7 +481,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         else: # This is an edit.
             isSystemCalendar = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.getCalendars()
 
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -437,24 +497,40 @@ class IndicatorOnThisDay( IndicatorBase ):
         fileEntry.set_tooltip_text( _( "The path to a calendar file." ) )
         box.pack_start( fileEntry, True, True, 0 )
 
-        browseButton = Gtk.Button.new_with_label( _( "Browse" ) )
-        browseButton.set_sensitive( not isSystemCalendar )
-        if isSystemCalendar:
-            browseButton.set_tooltip_text( _(
-                "This calendar is part of your\n" + \
-                "system and cannot be modified." ) )
-
-        else:
-            browseButton.set_tooltip_text( _(
-                "Choose a calendar file.\n\n" + \
-                "Ensure the calendar file is\n" + \
-                "valid by running through\n" + \
-                "'calendar' in a terminal." ) )
+        # browseButton = Gtk.Button.new_with_label( _( "Browse" ) )
+        # browseButton.set_sensitive( not isSystemCalendar )
+        # if isSystemCalendar:
+        #     browseButton.set_tooltip_text( _(
+        #         "This calendar is part of your\n" + \
+        #         "system and cannot be modified." ) )
+        #
+        # else:
+        #     browseButton.set_tooltip_text( _(
+        #         "Choose a calendar file.\n\n" + \
+        #         "Ensure the calendar file is\n" + \
+        #         "valid by running through\n" + \
+        #         "'calendar' in a terminal." ) )
+        #
+        # box.pack_start( browseButton, False, False, 0 )
+#TODO Ensure this was converted correctly.
+        browseButton = \
+            self.create_button(
+                _( "Browse" ),
+                _( "This calendar is part of your\n" + \
+                   "system and cannot be modified." ) \
+                if isSystemCalendar else
+                _( "Choose a calendar file.\n\n" + \
+                   "Ensure the calendar file is\n" + \
+                   "valid by running through\n" + \
+                   "'calendar' in a terminal." ),
+                not isSystemCalendar )
 
         box.pack_start( browseButton, False, False, 0 )
         grid.attach( box, 0, 0, 1, 1 )
 
-        enabledCheckbutton = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
+        enabledCheckbutton = self.create_checkbutton( _( "Enabled" ) )
+#TODO Make sure this is converted okay
+        # enabledCheckbutton = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
         if rowNumber is None: # This is an add.
             enabledCheckbutton.set_active( True )
 

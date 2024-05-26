@@ -1253,7 +1253,7 @@ class IndicatorLunar( IndicatorBase ):
         PAGE_GENERAL = 6
 
         # Icon text.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
 
@@ -1328,21 +1328,36 @@ class IndicatorLunar( IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
 
         # Menu.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
-        showRiseWhenSetBeforeSunsetCheckbutton = Gtk.CheckButton.new_with_label( _( "Show rise when set is before sunset" ) )
-        showRiseWhenSetBeforeSunsetCheckbutton.set_active( self.showRiseWhenSetBeforeSunset )
-        showRiseWhenSetBeforeSunsetCheckbutton.set_tooltip_text( _(
-            "If a body sets before sunset,\n" + \
-            "show the body's next rise instead\n" + \
-            "(excludes satellites)." ) )
+        showRiseWhenSetBeforeSunsetCheckbutton = \
+            self.create_checkbutton(
+                _( "Show rise when set is before sunset" ),
+                _( "If a body sets before sunset,\n" + \
+                   "show the body's next rise instead\n" + \
+                   "(excludes satellites)." ),
+                active = self.showRiseWhenSetBeforeSunset )
+#TODO Make sure this is converted okay
+        # showRiseWhenSetBeforeSunsetCheckbutton = Gtk.CheckButton.new_with_label( _( "Show rise when set is before sunset" ) )
+        # showRiseWhenSetBeforeSunsetCheckbutton.set_active( self.showRiseWhenSetBeforeSunset )
+        # showRiseWhenSetBeforeSunsetCheckbutton.set_tooltip_text( _(
+        #     "If a body sets before sunset,\n" + \
+        #     "show the body's next rise instead\n" + \
+        #     "(excludes satellites)." ) )
         grid.attach( showRiseWhenSetBeforeSunsetCheckbutton, 0, 0, 1, 1 )
 
-        hideBodiesBelowTheHorizonCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
-        hideBodiesBelowTheHorizonCheckbutton.set_active( self.hideBodiesBelowHorizon )
-        hideBodiesBelowTheHorizonCheckbutton.set_tooltip_text( _(
-            "Hide a body if it is yet to rise\n" + \
-            "(excludes satellites)." ) )
+        hideBodiesBelowTheHorizonCheckbutton = \
+            self.create_checkbutton(
+                _( "Hide bodies below the horizon" ),
+                _( "Hide a body if it is yet to rise\n" + \
+                   "(excludes satellites)." ),
+                active = self.hideBodiesBelowHorizon )
+#TODO Make sure this is converted okay
+        # hideBodiesBelowTheHorizonCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
+        # hideBodiesBelowTheHorizonCheckbutton.set_active( self.hideBodiesBelowHorizon )
+        # hideBodiesBelowTheHorizonCheckbutton.set_tooltip_text( _(
+        #     "Hide a body if it is yet to rise\n" + \
+        #     "(excludes satellites)." ) )
         grid.attach( hideBodiesBelowTheHorizonCheckbutton, 0, 1, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1353,38 +1368,75 @@ class IndicatorLunar( IndicatorBase ):
         toolTip = _(
             "A body with a fainter magnitude will be hidden\n" + \
             "(excludes satellites)." )
-        spinnerMagnitude = self.createSpinButton(
-            self.magnitude, int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ), int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ), 1, 5, toolTip )
+        spinnerMagnitude = \
+            self.create_spinbutton(
+                self.magnitude,
+                int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ),
+                int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ),
+                page_increment = 5,
+                tooltip_text = _( "A body with a fainter magnitude will be hidden\n" + \
+                                  "(excludes satellites)." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 2, 1, 1 )
 
-        minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
-        minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
-        minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
-        minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "All minor planets are automatically added." ) )
+        minorPlanetsAddNewCheckbutton = \
+            self.create_checkbutton(
+                _( "Add new minor planets" ),
+                _( "All minor planets are automatically added." ),
+                margin_top = 5,
+                active = self.minorPlanetsAddNew )
+#TODO Make sure this is converted okay
+        # minorPlanetsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new minor planets" ) )
+        # minorPlanetsAddNewCheckbutton.set_margin_top( 5 )
+        # minorPlanetsAddNewCheckbutton.set_active( self.minorPlanetsAddNew )
+        # minorPlanetsAddNewCheckbutton.set_tooltip_text( _( "All minor planets are automatically added." ) )
         grid.attach( minorPlanetsAddNewCheckbutton, 0, 3, 1, 1 )
 
-        cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
-        cometsAddNewCheckbutton.set_margin_top( 5 )
-        cometsAddNewCheckbutton.set_active( self.cometsAddNew )
-        cometsAddNewCheckbutton.set_tooltip_text( _( "All comets are automatically added." ) )
+        cometsAddNewCheckbutton = \
+            self.create_checkbutton(
+                _( "Add new comets" ),
+                _( "All comets are automatically added." ),
+                margin_top = 5,
+                active = self.cometsAddNew )
+#TODO Make sure this is converted okay
+        # cometsAddNewCheckbutton = Gtk.CheckButton.new_with_label( _( "Add new comets" ) )
+        # cometsAddNewCheckbutton.set_margin_top( 5 )
+        # cometsAddNewCheckbutton.set_active( self.cometsAddNew )
+        # cometsAddNewCheckbutton.set_tooltip_text( _( "All comets are automatically added." ) )
         grid.attach( cometsAddNewCheckbutton, 0, 4, 1, 1 )
 
-        satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
-        satellitesAddNewCheckbox.set_margin_top( 5 )
-        satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
-        satellitesAddNewCheckbox.set_tooltip_text( _( "All satellites are automatically added." ) )
+        satellitesAddNewCheckbox = \
+            self.create_checkbutton(
+                _( "Add new satellites" ),
+                _( "All satellites are automatically added." ),
+                margin_top = 5,
+                active = self.satellitesAddNew )
+#TODO Make sure this is converted okay
+        # satellitesAddNewCheckbox = Gtk.CheckButton.new_with_label( _( "Add new satellites" ) )
+        # satellitesAddNewCheckbox.set_margin_top( 5 )
+        # satellitesAddNewCheckbox.set_active( self.satellitesAddNew )
+        # satellitesAddNewCheckbox.set_tooltip_text( _( "All satellites are automatically added." ) )
         grid.attach( satellitesAddNewCheckbox, 0, 5, 1, 1 )
 
-        sortSatellitesByDateTimeCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
-        sortSatellitesByDateTimeCheckbutton.set_margin_top( 5 )
-        sortSatellitesByDateTimeCheckbutton.set_active( self.satellitesSortByDateTime )
-        sortSatellitesByDateTimeCheckbutton.set_tooltip_text( _(
-            "If checked, satellites are sorted\n" + \
-            "by rise date/time.\n\n" + \
-            "Otherwise, satellites are sorted\n" + \
-            "by Name then Number." ) )
+        sortSatellitesByDateTimeCheckbutton = \
+            self.create_checkbutton(
+                _( "Sort satellites by rise date/time" ),
+                _( "If checked, satellites are sorted\n" + \
+                   "by rise date/time.\n\n" + \
+                   "Otherwise, satellites are sorted\n" + \
+                   "by Name then Number." ),
+                margin_top = 5,
+                active = self.satellitesSortByDateTime )
+#TODO Make sure this is converted okay
+        # sortSatellitesByDateTimeCheckbutton = Gtk.CheckButton.new_with_label( _( "Sort satellites by rise date/time" ) )
+        # sortSatellitesByDateTimeCheckbutton.set_margin_top( 5 )
+        # sortSatellitesByDateTimeCheckbutton.set_active( self.satellitesSortByDateTime )
+        # sortSatellitesByDateTimeCheckbutton.set_tooltip_text( _(
+        #     "If checked, satellites are sorted\n" + \
+        #     "by rise date/time.\n\n" + \
+        #     "Otherwise, satellites are sorted\n" + \
+        #     "by Name then Number." ) )
         grid.attach( sortSatellitesByDateTimeCheckbutton, 0, 6, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1393,12 +1445,26 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Show satellites passes from" ) ), False, False, 0 )
 
-        spinnerSatelliteLimitStart = self.createSpinButton( self.satelliteLimitStart, 0, 23, 1, 4, _( "Show satellite passes after this hour (inclusive)" ) )
+        spinnerSatelliteLimitStart = \
+            self.create_spinbutton(
+                self.satelliteLimitStart,
+                0,
+                23,
+                page_increment = 4,
+                tooltip_text = _( "Show satellite passes after this hour (inclusive)" ) )
+
         box.pack_start( spinnerSatelliteLimitStart, False, False, 0 )
 
         box.pack_start( Gtk.Label.new( _( "to" ) ), False, False, 0 )
 
-        spinnerSatelliteLimitEnd = self.createSpinButton( self.satelliteLimitEnd, 0, 23, 1, 4, _( "Show satellite passes before this hour (inclusive)" ) )
+        spinnerSatelliteLimitEnd = \
+            self.create_spinbutton(
+                self.satelliteLimitEnd,
+                0,
+                23,
+                page_increment = 4,
+                tooltip_text = _( "Show satellite passes before this hour (inclusive)" ) )
+
         box.pack_start( spinnerSatelliteLimitEnd, False, False, 0 )
 
         grid.attach( box, 0, 7, 1, 1 )
@@ -1545,7 +1611,7 @@ class IndicatorLunar( IndicatorBase ):
         # Notifications (satellite and full moon).
         notifyOSDInformation = _( "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         satelliteTagTranslations = self.listOfListsToListStore( IndicatorLunar.astroBackend.SATELLITE_TAG_TRANSLATIONS )
         messageText = self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationMessage )
@@ -1584,7 +1650,7 @@ class IndicatorLunar( IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Notifications" ) ) )
 
         # Location.
-        grid = self.createGrid()
+        grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 5 )
@@ -1650,7 +1716,7 @@ class IndicatorLunar( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Location" ) ) )
 
-        dialog.vbox.pack_start( notebook, True, True, 0 )
+        dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
         while True:
@@ -1937,9 +2003,11 @@ class IndicatorLunar( IndicatorBase ):
             testButtonText, testButtonTooltip,
             isMoonNotification ):
 
-        checkbutton = Gtk.CheckButton.new_with_label( checkboxLabel )
-        checkbutton.set_active( checkboxIsActive )
-        checkbutton.set_tooltip_text( checkboxTooltip )
+        checkbutton = self.create_checkbutton( checkboxLabel, checkboxTooltip, active = checkboxIsActive )
+#TODO Make sure this is converted okay
+        # checkbutton = Gtk.CheckButton.new_with_label( checkboxLabel )
+        # checkbutton.set_active( checkboxIsActive )
+        # checkbutton.set_tooltip_text( checkboxTooltip )
         grid.attach( checkbutton, 0, gridStartIndex, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1955,7 +2023,7 @@ class IndicatorLunar( IndicatorBase ):
         box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, gridStartIndex + 1, 1, 1 )
 
-        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
+        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box ) #TODO This checkbutton has 3 .connects()...does that make sense?  Check!!!!
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
@@ -1978,11 +2046,23 @@ class IndicatorLunar( IndicatorBase ):
 
         checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
 
-        test = Gtk.Button.new_with_label( testButtonText )
-        test.set_halign( Gtk.Align.END )
-        test.set_sensitive( checkbutton.get_active() )
-        test.connect( "clicked", self.onTestNotificationClicked, summaryTextEntry, messageTextView, isMoonNotification )
-        test.set_tooltip_text( testButtonTooltip )
+        # test = Gtk.Button.new_with_label( testButtonText )
+        # test.set_halign( Gtk.Align.END )
+        # test.set_sensitive( checkbutton.get_active() )
+        # test.connect( "clicked", self.onTestNotificationClicked, summaryTextEntry, messageTextView, isMoonNotification )
+        # test.set_tooltip_text( testButtonTooltip )
+        # grid.attach( test, 0, gridStartIndex + 3, 1, 1 )
+#TODO Ensure this was converted correctly.
+        test = \
+            self.create_button(
+                testButtonText,
+                testButtonTooltip,
+                checkbutton.get_active(),
+                connect_function_and_arguments = (
+                    self.onTestNotificationClicked,
+                    summaryTextEntry, messageTextView, isMoonNotification ) )
+
+        test.set_halign( Gtk.Align.END )       
         grid.attach( test, 0, gridStartIndex + 3, 1, 1 )
 
         checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, test )
