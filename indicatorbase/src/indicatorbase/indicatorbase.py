@@ -311,7 +311,7 @@ class IndicatorBase( ABC ):
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
 
         menu = Gtk.Menu()
-        self.createAndAppendMenuItem( menu, _( "Initialising..." ) )
+        self.create_and_append_menuitem( menu, _( "Initialising..." ) )
         menu.show_all()
         self.indicator.set_menu( menu )
 
@@ -442,9 +442,9 @@ class IndicatorBase( ABC ):
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
-        self.createAndAppendMenuItem( menu, _( "Preferences" ), onClickFunction = self.__onPreferences )
-        self.createAndAppendMenuItem( menu, _( "About" ), onClickFunction = self.__onAbout )
-        self.createAndAppendMenuItem( menu, _( "Quit" ), onClickFunction = Gtk.main_quit )
+        self.create_and_append_menuitem( menu, _( "Preferences" ), activateFunction = self.__onPreferences )
+        self.create_and_append_menuitem( menu, _( "About" ), activateFunction = self.__onAbout )
+        self.create_and_append_menuitem( menu, _( "Quit" ), activateFunction = Gtk.main_quit )
         self.indicator.set_menu( menu )
         menu.show_all()
 
@@ -463,15 +463,13 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
-#TODO Look at the create_button functions and how they take an onclick function and argument...
-# Maybe use this instead and can dispense with all the lambda crap for the callers.
-    def createAndAppendMenuItem(
+    def create_and_append_menuitem(
             self,
             menu,
             label,
             name = None,
-            onClickFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
-            onClickFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            activateFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
+            activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
             isSecondaryActivateTarget = False ):
 
         menuItem = Gtk.MenuItem.new_with_label( label )
@@ -479,12 +477,12 @@ class IndicatorBase( ABC ):
         if name:
             menuItem.set_name( name )
 
-        if onClickFunction:
-            if onClickFunctionArguments:
-                menuItem.connect( "activate", onClickFunction, *onClickFunctionArguments )
+        if activateFunction:
+            if activateFunctionArguments:
+                menuItem.connect( "activate", activateFunction, *activateFunctionArguments )
 
             else:
-                menuItem.connect( "activate", onClickFunction )
+                menuItem.connect( "activate", activateFunction )
 
         if isSecondaryActivateTarget:
             self.secondaryActivateTarget = menuItem
@@ -493,57 +491,19 @@ class IndicatorBase( ABC ):
         return menuItem
 
 
-
-
-
-    def createAndAppendMenuItemNEW(
-            self,
-            menu,
-            label,
-            name = None,
-            activate_function_and_arguments = None, # Function name (and any arguments) must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453   #TODO Check if this is correct if just a function name and NO arguments.
-            isSecondaryActivateTarget = False ):
-
-        menuItem = Gtk.MenuItem.new_with_label( label )
-
-        if name:
-            menuItem.set_name( name )
-
-# <class 'tuple'>
-# <class 'method'>
-
-        # print( type( activate_function_and_arguments ) )
-        # print( len( activate_function_and_arguments ) )
-        if activate_function_and_arguments:
-            menuItem.connect( "activate", *activate_function_and_arguments )
-            # if len( activate_function_and_arguments ) == 1:
-            #     menuItem.connect( "activate", activate_function_and_arguments )
-            #
-            # else:
-            #     menuItem.connect( "activate", *activate_function_and_arguments )
-
-        if isSecondaryActivateTarget:
-            self.secondaryActivateTarget = menuItem
-
-        menu.append( menuItem )
-        return menuItem
-
-
-#TODO Look at the create_button functions and how they take an onclick function and argument...
-# Maybe use this instead and can dispense with all the lambda crap for the callers.
-    def createAndInsertMenuItem(
+    def create_and_insert_menuitem(
             self,
             menu,
             label,
             index,
             name = None,
-            onClickFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
-            onClickFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            activateFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
+            activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
             isSecondaryActivateTarget = False ):
 
-        menuItem = self.createAndAppendMenuItem(
+        menuItem = self.create_and_append_menuitem(
             menu, label, name,
-            onClickFunction, onClickFunctionArguments,
+            activateFunction, activateFunctionArguments,
             isSecondaryActivateTarget )
 
         menu.reorder_child( menuItem, index )

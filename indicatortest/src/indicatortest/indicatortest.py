@@ -82,14 +82,14 @@ class IndicatorTest( IndicatorBase ):
         subMenu = Gtk.Menu()
 
         uname = platform.uname()
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Machine: " + str( uname.machine ),  )
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Node: " + str( uname.node ) )
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Processor: " + str( uname.processor ) )
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Release: " + str( uname.release ) )
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "System: " + str( uname.system ) )
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Version: " + str( uname.version ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Machine: " + str( uname.machine ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Node: " + str( uname.node ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Processor: " + str( uname.processor ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Release: " + str( uname.release ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "System: " + str( uname.system ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Version: " + str( uname.version ) )
 
-        self.createAndAppendMenuItem( menu, "Platform | Uname" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Platform | Uname" ).set_submenu( subMenu )
 
 
     def __buildMenuDesktop( self, menu ):
@@ -100,30 +100,29 @@ class IndicatorTest( IndicatorBase ):
             "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + \
             Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
-        self.createAndAppendMenuItem( subMenu, text )
+        self.create_and_append_menuitem( subMenu, text )
 
         command = "gsettings get org.gnome.desktop.interface "
 
         result = self.processGet( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + command + "icon-theme: " + result )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + command + "icon-theme: " + result )
 
         result = self.processGet( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + command + "gtk-theme: " + result )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + command + "gtk-theme: " + result )
 
         text = self.getMenuIndent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.getDesktopEnvironment()
-        self.createAndAppendMenuItem( subMenu, text )
+        self.create_and_append_menuitem( subMenu, text )
 
-        self.createAndAppendMenuItem( menu, "Desktop" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Desktop" ).set_submenu( subMenu )
 
 
     def __buildMenuIcon( self, menu ):
         subMenu = Gtk.Menu()
 
-        self.createAndAppendMenuItemNEW(
+        self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Use default icon",
-            activate_function_and_arguments = ( self.indicator.set_icon_full, self.get_icon_name(), "" ) ) 
-            # onClickFunction = lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
+            activateFunction = lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
 
         cacheDirectory = self.getCacheDirectory()
         icons = [ "FULL_MOON",
@@ -133,61 +132,63 @@ class IndicatorTest( IndicatorBase ):
                   "WAXING_CRESCENT" ]
 
         for icon in icons:
-            self.createAndAppendMenuItemNEW(
+            self.create_and_append_menuitem(
                 subMenu,
                 self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory,
                 name = icon,
-                activate_function_and_arguments = ( self.__useIconDynamicallyCreated, ) )
-                # onClickFunction = self.__useIconDynamicallyCreated )
+                activateFunction = self.__useIconDynamicallyCreated )
 
-        self.createAndAppendMenuItem( menu, "Icon" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Icon" ).set_submenu( subMenu )
 
 
     def __buildMenuLabelTooltipOSD( self, menu ):
         subMenu = Gtk.Menu()
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Reset label",
-            onClickFunction = lambda menuItem: self.setLabel( IndicatorTest.LABEL ) )
+            activateFunction = lambda menuItem: self.setLabel( IndicatorTest.LABEL ) )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Show current time in label",
-            onClickFunction = lambda menuItem: (
+            activateFunction = lambda menuItem: (
                 print( "secondary activate target / mouse middle click" ),
                 self.setLabel( self.__getCurrentTime() ) ),
             isSecondaryActivateTarget = True )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Show current time in OSD",
-            onClickFunction = lambda menuItem:
+            activateFunction = lambda menuItem:
                 Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
 
-        self.createAndAppendMenuItem( menu, "Label / Tooltip / OSD" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Label / Tooltip / OSD" ).set_submenu( subMenu )
 
 
     def __buildMenuClipboard( self, menu ):
         subMenu = Gtk.Menu()
 
-        self.createAndAppendMenuItem(
+#TODO This menu item does not add actually add to the clipboard when clicked in Debian 12.
+# What about other distros/versions?
+        self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + _( "Copy current time to clipboard" ),
-            onClickFunction = lambda menuItem:
-                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) )
+            activateFunction = lambda menuItem: ( 
+                print( "clipboard" ),
+                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) ) )
 
-        self.createAndAppendMenuItem( menu, "Clipboard" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Clipboard" ).set_submenu( subMenu )
 
 
     def __buildMenuTerminal( self, menu ):
         subMenu = Gtk.Menu()
 
         terminal, executionFlag = self.getTerminalAndExecutionFlag()
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Terminal: " + str( terminal ) )
-        self.createAndAppendMenuItem( subMenu, self.getMenuIndent() + "Execution flag: " + str( executionFlag ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Terminal: " + str( terminal ) )
+        self.create_and_append_menuitem( subMenu, self.getMenuIndent() + "Execution flag: " + str( executionFlag ) )
 
-        self.createAndAppendMenuItem( menu, "Terminal" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Terminal" ).set_submenu( subMenu )
 
 
     def __buildMenuExecuteCommand( self, menu ):
@@ -210,12 +211,12 @@ class IndicatorTest( IndicatorBase ):
             "wmctrl -l" ]
 
         for label, command in zip( labels, commands ):
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 subMenu,
                 self.getMenuIndent() + label,
-                onClickFunction = lambda menuItem, command = command: self.__executeCommand( command ) ) # Note command = command to handle lambda late binding.
+                activateFunction = lambda menuItem, command = command: self.__executeCommand( command ) ) # Note command = command to handle lambda late binding.
 
-        self.createAndAppendMenuItem( menu, "Execute Terminal Command" ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, "Execute Terminal Command" ).set_submenu( subMenu )
 
 
     def __getCurrentTime( self ):

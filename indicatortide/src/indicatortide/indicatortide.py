@@ -106,11 +106,11 @@ class IndicatorTide( IndicatorBase ):
         indent = ""
         self.portName = tidalReadings[ 0 ].getLocation()
         if self.portName:
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 self.portName,
                 name = tidalReadings[ 0 ].getURL(),
-                onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             indent = self.getMenuIndent()
 
@@ -141,24 +141,24 @@ class IndicatorTide( IndicatorBase ):
                 tidalReading.getTime() + "  " + tidalReading.getLevel()
 
             if shownToday:
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     menuText,
                     name = tidalReading.getURL(),
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             else:
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     indent + tidalReading.getDate(),
                     name = tidalReading.getURL(),
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     menuText,
                     name = tidalReading.getURL(),
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
@@ -178,11 +178,11 @@ class IndicatorTide( IndicatorBase ):
                 tidalReading.getTime() + "  " + tidalReading.getLevel()
 
             if shownToday:
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     menuText,
                     name = tidalReading.getURL(),
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             else:
                 subMenu = Gtk.Menu()
@@ -190,11 +190,11 @@ class IndicatorTide( IndicatorBase ):
                     menu,
                     indent + tidalReading.getDate() ).set_submenu( subMenu )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     menuText,
                     name = tidalReading.getURL(),
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
@@ -257,7 +257,7 @@ class IndicatorTide( IndicatorBase ):
         showAsSubmenusCheckbutton = \
             self.create_checkbutton(
                 _( "Show as submenus" ),
-                _( "Show each day's tides in a submenu." ),
+                tooltip_text = _( "Show each day's tides in a submenu." ),
                 active = self.showAsSubMenus )
 #TODO Make sure this is converted okay
         # showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
@@ -268,8 +268,8 @@ class IndicatorTide( IndicatorBase ):
         showAsSubmenusExceptFirstDayCheckbutton = \
             self.create_checkbutton(
                 _( "Except first day" ),
-                _( "Show the first day's tide in full." ),
-                showAsSubmenusCheckbutton.get_active(),
+                tooltip_text = _( "Show the first day's tide in full." ),
+                sensitive = showAsSubmenusCheckbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.showAsSubMenusExceptFirstDay )
 #TODO Make sure this is converted okay

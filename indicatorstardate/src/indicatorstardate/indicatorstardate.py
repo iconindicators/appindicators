@@ -135,10 +135,11 @@ class IndicatorStardate( IndicatorBase ):
         showClassicCheckbutton = \
             self.create_checkbutton(
                 _( "Show stardate 'classic'" ),
-                _( "If checked, show stardate 'classic' based on\n\n" + \
-                   "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
-                   "Otherwise, show stardate '2009 revised' based on\n\n" + \
-                   "\thttps://en.wikipedia.org/wiki/Stardate" ),
+                tooltip_text = _(
+                    "If checked, show stardate 'classic' based on\n\n" + \
+                    "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
+                    "Otherwise, show stardate '2009 revised' based on\n\n" + \
+                    "\thttps://en.wikipedia.org/wiki/Stardate" ),
                 active = self.showClassic )
 #TODO Make sure this is converted okay
         # showClassicCheckbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
@@ -153,8 +154,8 @@ class IndicatorStardate( IndicatorBase ):
         showIssueCheckbutton = \
             self.create_checkbutton(
                 _( "Show ISSUE" ),
-                _( "Show the ISSUE of the stardate 'classic'." ),
-                showClassicCheckbutton.get_active(),
+                tooltip_text = _( "Show the ISSUE of the stardate 'classic'." ),
+                sensitive = showClassicCheckbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.showIssue )
 #TODO Make sure this is converted okay
@@ -168,8 +169,8 @@ class IndicatorStardate( IndicatorBase ):
         padIntegerCheckbutton = \
             self.create_checkbutton(
                 _( "Pad INTEGER" ),
-                _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ),
-                showClassicCheckbutton.get_active(),
+                tooltip_text = _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ),
+                sensitive = showClassicCheckbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.padInteger )
 #TODO Make sure this is converted okay

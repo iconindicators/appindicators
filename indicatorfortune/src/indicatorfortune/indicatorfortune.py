@@ -80,36 +80,36 @@ class IndicatorFortune( IndicatorBase ):
 
     def update( self, menu ):
         self.buildMenu( menu )
-        # self.refreshAndShowFortune()
+        self.refreshAndShowFortune()
         print( "update")#TODO Remove and uncomment above
         return int( self.refreshIntervalInMinutes ) * 60
 
 
     def buildMenu( self, menu ):
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             _( "New Fortune" ),
-            onClickFunction = lambda menuItem: self.refreshAndShowFortune(),
+            activateFunction = lambda menuItem: self.refreshAndShowFortune(),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
-            onClickFunction = lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ),
+            activateFunction = lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             _( "Show Last Fortune" ),
-            onClickFunction = lambda menuItem: self.showFortune(),
+            activateFunction = lambda menuItem: self.showFortune(),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             _( "History" ),
-            onClickFunction = lambda menuItem: self.showHistory() )
+            activateFunction = lambda menuItem: self.showHistory() )
 
 
     def showHistory( self ):
@@ -266,7 +266,7 @@ class IndicatorFortune( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Add" ),
-                _( "Add a new fortune location." ),
+                tooltip_text = _( "Add a new fortune location." ),
                 connect_function_and_arguments = ( self.onFortuneAdd, tree ) ),
             True,
             True,
@@ -280,7 +280,7 @@ class IndicatorFortune( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
-                _( "Remove the selected fortune location." ),
+                tooltip_text = _( "Remove the selected fortune location." ),
                 connect_function_and_arguments = ( self.onFortuneRemove, tree ) ),
             True,
             True,
@@ -294,7 +294,7 @@ class IndicatorFortune( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Reset" ),
-                _( "Reset to factory default." ),
+                tooltip_text = _( "Reset to factory default." ),
                 connect_function_and_arguments = ( self.onFortuneReset, tree ) ),
             True,
             True,
@@ -346,12 +346,13 @@ class IndicatorFortune( IndicatorBase ):
                 self.skipFortuneCharacterCount,
                 1,
                 1000,
-                tooltip_text = _( "If the fortune exceeds the limit,\n" + \
-                                  "a new fortune is created.\n\n" + \
-                                  "Do not set too low (below 50) as\n" + \
-                                  "many fortunes may be dropped,\n" + \
-                                  "resulting in excessive calls to the\n" + \
-                                  "'fortune' program." ) )
+                tooltip_text = _(
+                    "If the fortune exceeds the limit,\n" +                                  
+                    "a new fortune is created.\n\n" + \
+                    "Do not set too low (below 50) as\n" + \
+                    "many fortunes may be dropped,\n" + \
+                    "resulting in excessive calls to the\n" + \
+                    "'fortune' program." ) )
 
         box.pack_start( spinnerCharacterCount, False, False, 0 )
 
@@ -373,7 +374,7 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickNewFortune = \
             self.create_radiobutton(
                 None,
-                _( "Show a new fortune" ),
+                tooltip_text = _( "Show a new fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
@@ -393,7 +394,7 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickCopyLastFortune = \
             self.create_radiobutton(
                 radioMiddleMouseClickNewFortune,
-                _( "Copy current fortune to clipboard" ),
+                tooltip_text = _( "Copy current fortune to clipboard" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
 
@@ -413,7 +414,7 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickShowLastFortune = \
             self.create_radiobutton(
                 radioMiddleMouseClickNewFortune,
-                _( "Copy current fortune to clipboard" ),
+                tooltip_text = _( "Copy current fortune to clipboard" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
 
@@ -535,13 +536,14 @@ class IndicatorFortune( IndicatorBase ):
         browseFileButton = \
             self.create_button(
                 _( "File" ),
-                _( "This fortune is part of your\n" + \
-                   "system and cannot be modified." ) \
-                if isSystemFortune else
-                _( "Choose a fortune .dat file.\n\n" + \
+                tootip_text = _(
+                    "This fortune is part of your\n" + \
+                    "system and cannot be modified." ) \
+                    if isSystemFortune else
+                   _( "Choose a fortune .dat file.\n\n" + \
                    "Ensure the corresponding text\n" + \
                    "file is present." ),
-                isSystemFortune )
+                sensitive = not isSystemFortune )
 
         box.pack_start( browseFileButton, True, True, 0 )
 
@@ -562,13 +564,14 @@ class IndicatorFortune( IndicatorBase ):
         browseDirectoryButton = \
             self.create_button(
                 _( "Directory" ),
-                _( "This fortune is part of your\n" + \
-                   "system and cannot be modified." ) \
-                if isSystemFortune else
-                _( "Choose a directory containing\n" + \
-                   "a fortune .dat file(s).\n\n" + \
-                   "Ensure the corresponding text\n" + \
-                   "file is present." ),
+                tooltip_text = _( 
+                    "This fortune is part of your\n" + \
+                    "system and cannot be modified." ) \
+                    if isSystemFortune else
+                    _( "Choose a directory containing\n" + \
+                    "a fortune .dat file(s).\n\n" + \
+                    "Ensure the corresponding text\n" + \
+                    "file is present." ),
                 not isSystemFortune )
 
         box.pack_start( browseDirectoryButton, True, True, 0 )
@@ -580,10 +583,10 @@ class IndicatorFortune( IndicatorBase ):
         enabledCheckbox = \
             self.create_checkbutton(
                 _( "Enabled" ),
-                _( "Ensure the fortune file/directory\n" + \
-                   "works by running through 'fortune'\n" + \
-                   "in a terminal." ),
-                active = True )
+                tooltip_text = _(
+                    "Ensure the fortune file/directory\n" + \
+                    "works by running through 'fortune'\n" + \
+                    "in a terminal." ) )
 #TODO Ensure above converted correctly.
         # enabledCheckbox = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
         # enabledCheckbox.set_tooltip_text( _(

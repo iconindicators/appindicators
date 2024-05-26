@@ -117,7 +117,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         for event in events:
             if event.getDate() != lastDate:
                 if ( menuItemCount + 2 ) <= menuItemMaximum: # Ensure there is room for the date menu item and an event menu item.
-                    self.createAndAppendMenuItem( menu, self.removeLeadingZeroFromDate( event.getDate() ) )
+                    self.create_and_append_menuitem( menu, self.removeLeadingZeroFromDate( event.getDate() ) )
                     lastDate = event.getDate()
                     menuItemCount += 1
 
@@ -126,22 +126,22 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             if self.copyToClipboard:
                 f = lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( menuItem.props.name + ' ' + menuItem.props.label.strip(), -1 )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = self.removeLeadingZeroFromDate( event.getDate() ), # Allows the month/day to be passed to the copy/search functions below.
-                    onClickFunction = f )
+                    activateFunction = f )
 
             elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 url = self.searchURL.replace(
                         IndicatorOnThisDay.TAG_EVENT,
                         ( self.removeLeadingZeroFromDate( event.getDate() ) + ' ' + event.getDescription() ).replace( ' ', '+' ) )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
 
             menuItemCount += 1
             if menuItemCount == menuItemMaximum:
@@ -264,7 +264,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Add" ),
-                _( "Add a new calendar." ),
+                tooltip_text = _( "Add a new calendar." ),
                 connect_function_and_arguments = ( self.onCalendarAdd, tree ) ),
             True,
             True,
@@ -278,7 +278,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
-                _( "Remove the selected calendar." ),
+                tooltip_text = _( "Remove the selected calendar." ),
                 connect_function_and_arguments = ( self.onCalendarRemove, tree ) ),
             True,
             True,
@@ -292,7 +292,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Reset" ),
-                _( "Reset to factory default." ),
+                tooltip_text = _( "Reset to factory default." ),
                 connect_function_and_arguments = ( self.onCalendarReset, tree ) ),
             True,
             True,
@@ -387,8 +387,9 @@ class IndicatorOnThisDay( IndicatorBase ):
         notifyCheckbutton = \
             self.create_checkbutton(
                 _( "Notify" ),
-                _( "On startup or when saving preferences,\n" + \
-                   "show a notification for each of today's events." ),
+                tooltip_text = _(
+                    "On startup or when saving preferences,\n" + \
+                    "show a notification for each of today's events." ),
                 margin_top = 10,
                 active = self.notify )
 #TODO Make sure this is converted okay
@@ -516,14 +517,15 @@ class IndicatorOnThisDay( IndicatorBase ):
         browseButton = \
             self.create_button(
                 _( "Browse" ),
-                _( "This calendar is part of your\n" + \
-                   "system and cannot be modified." ) \
-                if isSystemCalendar else
-                _( "Choose a calendar file.\n\n" + \
-                   "Ensure the calendar file is\n" + \
-                   "valid by running through\n" + \
-                   "'calendar' in a terminal." ),
-                not isSystemCalendar )
+                tooltip_text _(
+                    "This calendar is part of your\n" + \
+                    "system and cannot be modified." ) \
+                    if isSystemCalendar else
+                    _( "Choose a calendar file.\n\n" + \
+                    "Ensure the calendar file is\n" + \
+                    "valid by running through\n" + \
+                    "'calendar' in a terminal." ),
+                    sensitive = not isSystemCalendar )
 
         box.pack_start( browseButton, False, False, 0 )
         grid.attach( box, 0, 0, 1, 1 )

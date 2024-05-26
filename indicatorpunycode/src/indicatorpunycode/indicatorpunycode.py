@@ -59,25 +59,25 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def update( self, menu ):
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
-            onClickFunction = lambda menuItem: self.onConvert(),
+            activateFunction = lambda menuItem: self.onConvert(),
             isSecondaryActivateTarget = True )
 
         indent = self.getMenuIndent()
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
-                onClickFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) ) # Note result = result to handle lambda late binding.
+                activateFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) ) # Note result = result to handle lambda late binding.
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                onClickFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) ) # Note result = result to handle lambda late binding.
+                activateFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) ) # Note result = result to handle lambda late binding.
 
 
     def onConvert( self ):
@@ -209,10 +209,11 @@ class IndicatorPunycode( IndicatorBase ):
         outputBothCheckbutton = \
             self.create_checkbutton(
                 _( "Output to clipboard and primary" ),
-                _( "If checked, the converted text is sent\n" + \
-                   "to both the clipboard and primary.\n\n" + \
-                   "Otherwise the converted text is sent\n" + \
-                   "only to the input source." ),
+                tooltip_text = _(
+                    "If checked, the converted text is sent\n" + \
+                    "to both the clipboard and primary.\n\n" + \
+                    "Otherwise the converted text is sent\n" + \
+                    "only to the input source." ),
                 margin_top = 10,
                 active = self.outputBoth )
 #TODO Make sure this is converted okay
@@ -229,8 +230,9 @@ class IndicatorPunycode( IndicatorBase ):
         dropPathQueryCheckbutton = \
             self.create_checkbutton(
                 _( "Drop path/query in output" ),
-                _( "If checked, the output text will not\n" + \
-                   "contain any path/query (if present)." ),
+                tooltip_text = _(
+                    "If checked, the output text will not\n" + \
+                    "contain any path/query (if present)." ),
                 margin_top = 10,
                 active = self.dropPathQuery )
 #TODO Make sure this is converted okay
@@ -265,10 +267,6 @@ class IndicatorPunycode( IndicatorBase ):
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
         grid.attach( box, 0, 6, 1, 1 )
 
-        # dialog.vbox.pack_start( grid, True, True, 0 )#TODO What is vbox?  It is present on all indicators...what is it?
-        # I think I can use get_content_area() instead after reading
-        # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/Dialog.html#Gtk.Dialog.get_content_area
-        # If true, roll out to all vbox calls.
         dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
 

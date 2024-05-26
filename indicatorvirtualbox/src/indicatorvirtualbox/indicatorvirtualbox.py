@@ -97,14 +97,14 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             menu.append( Gtk.SeparatorMenuItem() )
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 _( "Launch VirtualBox™ Manager" ),
-                onClickFunction = lambda menuItem: self.onLaunchVirtualBoxManager(),
+                activateFunction = lambda menuItem: self.onLaunchVirtualBoxManager(),
                 isSecondaryActivateTarget = True )
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) )
+            menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) ) #TODO Convert to use function as above.
 
 
     def __buildMenu( self, menu, items, indent, runningUUIDs ):
@@ -128,7 +128,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __addGroupToMenu( self, menu, group, level ):
         indent = level * self.getMenuIndent()
-        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() )
+        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() ) #TODO Use the new method as above?
         menu.append( menuItem )
         if self.showSubmenu:
             menu = Gtk.Menu()
@@ -140,11 +140,11 @@ class IndicatorVirtualBox( IndicatorBase ):
     def __addVirtualMachineToMenu( self, menu, virtualMachine, level, isRunning ):
         indent = level * self.getMenuIndent()
         if isRunning:
-            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
+            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() ) #TODO Use method as above?
             menuItem.set_active( True )
 
         else:
-            menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )
+            menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )#TODO Use method as above?
 
         menuItem.connect( "activate", self._onVirtualMachine, virtualMachine )
         menu.append( menuItem )
@@ -401,10 +401,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         sortGroupsAndVirtualMachinesEquallyCheckbox = \
             self.create_checkbutton(
                 _( "Sort groups and virtual machines equally" ),
-                _( "If checked, groups and virtual machines\n" + \
-                   "are sorted without distinction.\n\n" + \
-                   "Otherwise, groups are sorted first,\n" + \
-                   "followed by virtual machines." ),
+                tooltip_text = _(
+                    "If checked, groups and virtual machines\n" + \
+                    "are sorted without distinction.\n\n" + \
+                    "Otherwise, groups are sorted first,\n" + \
+                    "followed by virtual machines." ),
                 active = self.sortGroupsAndVirtualMachinesEqually )
 #TODO Make sure this is converted okay
         # sortGroupsAndVirtualMachinesEquallyCheckbox = Gtk.CheckButton.new_with_label( _( "Sort groups and virtual machines equally" ) )
@@ -419,8 +420,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         showAsSubmenusCheckbox = \
             self.create_checkbutton(
                 _( "Show groups as submenus" ),
-                _( "If checked, groups are shown using submenus.\n\n" + \
-                   "Otherwise, groups are shown as an indented list." ),
+                tooltip_text = _(
+                    "If checked, groups are shown using submenus.\n\n" + \
+                    "Otherwise, groups are shown as an indented list." ),
                 active = self.showSubmenu )
 #TODO Make sure this is converted okay
         # showAsSubmenusCheckbox = Gtk.CheckButton.new_with_label( _( "Show groups as submenus" ) )
@@ -445,8 +447,9 @@ class IndicatorVirtualBox( IndicatorBase ):
                 1,
                 60,
                 page_increment = 5,
-                tooltip_text = _( "How often the list of virtual machines\n" + \
-                                  "and their running status are updated." ) )
+                tooltip_text = _(
+                    "How often the list of virtual machines\n" + \
+                    "and their running status are updated." ) )
 
         box.pack_start( spinnerRefreshInterval, False, False, 0 )
 
@@ -464,8 +467,9 @@ class IndicatorVirtualBox( IndicatorBase ):
                 1,
                 300,
                 page_increment = 30,
-                tooltip_text = _( "Amount of time to wait from automatically\n" + \
-                                  "starting one virtual machine to the next." ) )
+                tooltip_text = _(
+                    "Amount of time to wait from automatically\n" + \
+                    "starting one virtual machine to the next." ) )
 
         box.pack_start( spinnerDelay, False, False, 0 )
 
@@ -569,7 +573,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         autostartCheckbutton = \
             self.create_checkbutton(
                 _( "Autostart" ),
-                _( "Run the virtual machine when the indicator starts." ),
+                tooltip_text = _( "Run the virtual machine when the indicator starts." ),
                 active = \
                     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
                     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
