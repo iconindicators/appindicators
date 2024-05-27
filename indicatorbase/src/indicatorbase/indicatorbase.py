@@ -768,11 +768,10 @@ class IndicatorBase( ABC ):
         # autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
         # autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
         # autostartCheckbox.set_active( autostart )
-
         autostartCheckbox = \
             self.create_checkbutton(
                 _( "Autostart" ),
-                _( "Run the indicator automatically." ),
+                tooltip_text = _( "Run the indicator automatically." ),
                 active = autostart )
 
         autostartSpinner = \
@@ -782,8 +781,7 @@ class IndicatorBase( ABC ):
                 1000,
                 tooltip_text = _( "Start up delay (seconds)." ),
                 sensitive = autostartCheckbox.get_active() )
-
-        # autostartSpinner.set_sensitive( autostartCheckbox.get_active() )
+        # autostartSpinner.set_sensitive( autostartCheckbox.get_active() )#TODO Check is converted above ok.
 
         autostartCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, autostartSpinner )
 
@@ -797,7 +795,11 @@ class IndicatorBase( ABC ):
 
     # Show a message dialog.
     #
-    #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
+    #    messageType: One of Gtk.MessageType.INFO
+    #                        Gtk.MessageType.ERROR
+    #                        Gtk.MessageType.WARNING
+    #                        Gtk.MessageType.QUESTION.
+    #
     #    title: If None, will default to the indicator name.
     def showMessage( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
         IndicatorBase.__showMessageInternal(
@@ -809,7 +811,10 @@ class IndicatorBase( ABC ):
 
     # Show a message dialog.
     #
-    #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
+    #    messageType: One of Gtk.MessageType.INFO
+    #                        Gtk.MessageType.ERROR
+    #                        Gtk.MessageType.WARNING
+    #                        Gtk.MessageType.QUESTION.
     @staticmethod
     def showMessageStatic( message, messageType = Gtk.MessageType.ERROR, title = None ):
         IndicatorBase.__showMessageInternal(
@@ -821,7 +826,10 @@ class IndicatorBase( ABC ):
 
     # Show a message dialog.
     #
-    #    messageType: One of Gtk.MessageType.INFO, Gtk.MessageType.ERROR, Gtk.MessageType.WARNING, Gtk.MessageType.QUESTION.
+    #    messageType: One of Gtk.MessageType.INFO
+    #                        Gtk.MessageType.ERROR
+    #                        Gtk.MessageType.WARNING
+    #                        Gtk.MessageType.QUESTION.
     @staticmethod
     def __showMessageInternal( parentWidget, message, messageType, title ):
         dialog = Gtk.MessageDialog(
@@ -1032,6 +1040,40 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
+    def create_tree(
+        self,
+        treemodel,
+        treeviewcolumn_titles_renderers_attributes_columns,
+        tooltip_text = "",
+        rowactivaed_function_and_arguments = None ):
+
+        tree = Gtk.TreeView.new_with_model( treemodel )
+
+        for title, renderer, attribute, column in treeviewcolumn_titles_renderers_attributes_columns:
+#            print( title, renderer, attribute, column )
+            treeviewcolumn = Gtk.TreeViewColumn( title )
+            treeviewcolumn.pack_start( renderer, True )
+            treeviewcolumn.add_attribute( renderer, attribute, column )
+            treeviewcolumn.set_sort_column_id( column ) #TODO Do for all columns/tables?
+            treeviewcolumn.set_expand( True ) #TODO Do for all columns/tables?
+            treeviewcolumn.set_alignment( 0.5 ) #TODO Do for all columns/tables?  No, only for specific columns.
+            tree.append_column( treeviewcolumn )
+
+        tree.set_tooltip_text( tooltip_text )
+        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE ) #TODO Do for all tables?  No...other types are used for other trees.
+        tree.expand_all() #TODO Do for all trees?
+#        tree.set_hexpand( True ) #TODO Can these be added to the scrolledWindow instead?
+#        tree.set_vexpand( True )
+
+        if rowactivaed_function_and_arguments:
+            tree.connect( "row-activated", *rowactivaed_function_and_arguments )
+
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        scrolledwindow.add( tree )
+        return scrolledwindow
+
+
 #TODO Look at all pack_start calls.
 # What should the parameters be, given buttons, labels, etc are added.
 # Some have True and some have False.
@@ -1081,8 +1123,6 @@ class IndicatorBase( ABC ):
         treeViewColumn.set_sort_column_id( 0 )
         treeViewColumn.set_expand( True )
         tree.append_column( treeViewColumn )
-
-
         '''
 
 
