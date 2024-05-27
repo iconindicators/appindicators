@@ -62,7 +62,7 @@ class IndicatorPunycode( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
-            activateFunction = lambda menuItem: self.onConvert(),
+            activate_function_and_arguments = ( lambda menuItem: self.onConvert(), ),
             isSecondaryActivateTarget = True )
 
         indent = self.getMenuIndent()
@@ -72,12 +72,16 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
-                activateFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ) ) # Note result = result to handle lambda late binding.
+                activate_function_and_arguments =
+                    ( lambda menuItem, result = result:
+                        self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) ) # Note result = result to handle lambda late binding.
 
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                activateFunction = lambda menuItem, result = result: self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ) ) # Note result = result to handle lambda late binding.
+                activate_function_and_arguments =
+                    ( lambda menuItem, result = result:
+                        self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) ) # Note result = result to handle lambda late binding.
 
 
     def onConvert( self ):
@@ -254,11 +258,12 @@ class IndicatorPunycode( IndicatorBase ):
                 self.resultHistoryLength,
                 0,
                 1000,
-                tooltip_text = _( "The number of most recent\n" + \
-                                  "results to show in the menu.\n\n" + \
-                                  "Selecting a menu item which\n" + \
-                                  "contains a result will copy\n" + \
-                                  "the result to the output." ) )
+                tooltip_text = _(
+                    "The number of most recent\n" + \
+                    "results to show in the menu.\n\n" + \
+                    "Selecting a menu item which\n" + \
+                    "contains a result will copy\n" + \
+                    "the result to the output." ) )
 
         box.pack_start( resultsAmountSpinner, False, False, 0 )
 

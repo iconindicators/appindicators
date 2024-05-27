@@ -442,9 +442,9 @@ class IndicatorBase( ABC ):
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
-        self.create_and_append_menuitem( menu, _( "Preferences" ), activateFunction = self.__onPreferences )
-        self.create_and_append_menuitem( menu, _( "About" ), activateFunction = self.__onAbout )
-        self.create_and_append_menuitem( menu, _( "Quit" ), activateFunction = Gtk.main_quit )
+        self.create_and_append_menuitem( menu, _( "Preferences" ), activate_function_and_arguments = ( self.__onPreferences, ) )
+        self.create_and_append_menuitem( menu, _( "About" ), activate_function_and_arguments = ( self.__onAbout, ) )
+        self.create_and_append_menuitem( menu, _( "Quit" ), activate_function_and_arguments = ( Gtk.main_quit, ) )
         self.indicator.set_menu( menu )
         menu.show_all()
 
@@ -468,8 +468,7 @@ class IndicatorBase( ABC ):
             menu,
             label,
             name = None,
-            activateFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
-            activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
             isSecondaryActivateTarget = False ):
 
         menuItem = Gtk.MenuItem.new_with_label( label )
@@ -477,12 +476,8 @@ class IndicatorBase( ABC ):
         if name:
             menuItem.set_name( name )
 
-        if activateFunction:
-            if activateFunctionArguments:
-                menuItem.connect( "activate", activateFunction, *activateFunctionArguments )
-
-            else:
-                menuItem.connect( "activate", activateFunction )
+        if activate_function_and_arguments:
+            menuItem.connect( "activate", *activate_function_and_arguments )
 
         if isSecondaryActivateTarget:
             self.secondaryActivateTarget = menuItem
@@ -491,28 +486,57 @@ class IndicatorBase( ABC ):
         return menuItem
 
 
+#TODO Delete eventually.
+    # def create_and_append_menuitemORIG(
+    #         self,
+    #         menu,
+    #         label,
+    #         name = None,
+    #         activateFunction = None, # The activate function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
+    #         activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+    #         isSecondaryActivateTarget = False ):
+    #
+    #     menuItem = Gtk.MenuItem.new_with_label( label )
+    #
+    #     if name:
+    #         menuItem.set_name( name )
+    #
+    #     if activateFunction:
+    #         if activateFunctionArguments:
+    #             menuItem.connect( "activate", activateFunction, *activateFunctionArguments )
+    #
+    #         else:
+    #             menuItem.connect( "activate", activateFunction )
+    #
+    #     if isSecondaryActivateTarget:
+    #         self.secondaryActivateTarget = menuItem
+    #
+    #     menu.append( menuItem )
+    #     return menuItem
+
+
     def create_and_insert_menuitem(
             self,
             menu,
             label,
             index,
             name = None,
-            activateFunction = None, # The on-click function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
-            activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+            activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
             isSecondaryActivateTarget = False ):
 
         menuItem = self.create_and_append_menuitem(
-            menu, label, name,
-            activateFunction, activateFunctionArguments,
+            menu,
+            label,
+            name,
+            activate_function_and_arguments,
             isSecondaryActivateTarget )
 
         menu.reorder_child( menuItem, index )
         return menuItem
 
 
-#TODO See where this is used..if we change the above functions such that the lambda is gone, do we need this function?
     def getOnClickMenuItemOpenBrowserFunction( self ):
-        return lambda menuItem: webbrowser.open( menuItem.props.name )
+        return lambda menuItem: webbrowser.open( menuItem.props.name ) #TODO Use the get_name()?
 
 
     def requestUpdate( self, delay = 0 ):
@@ -547,8 +571,6 @@ class IndicatorBase( ABC ):
 
 
     def __on_about_internal( self, menuItem ):
-        print( "About start" )
-
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
@@ -604,7 +626,6 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
         self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
-        print( "About end" )
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -625,8 +646,6 @@ class IndicatorBase( ABC ):
 
 
     def __on_preferences_internal( self, menuItem ):
-        print( "Preferences start" )
-
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
@@ -673,8 +692,6 @@ class IndicatorBase( ABC ):
 # But...only do this "if responseType != Gtk.ResponseType.OK" because when OK,
 # an update is kicked off any way.
 
-        print( "Preferences end" )
-
 
 #TODO Hopefully not needed.
     def __setMenuSensitivity( self, toggle, allMenuItems = False ):
@@ -693,7 +710,6 @@ class IndicatorBase( ABC ):
     def __set_menu_sensitivity( self, toggle ):
         menu_items = self.indicator.get_menu().get_children()
         if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
-            print( "set menu to " + str( toggle ) )#TODO Test
             for menuItem in self.indicator.get_menu().get_children():
                 menuItem.set_sensitive( toggle )
 
@@ -923,6 +939,24 @@ class IndicatorBase( ABC ):
         return grid
 
 
+    def create_button(
+            self,
+            label,
+            tooltip_text = "",
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0,
+            clicked_function_and_arguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+
+        button = Gtk.Button.new_with_label( label )
+        self.__set_widget_common_attributes( button, tooltip_text, sensitive, margin_top, margin_left )
+
+        if clicked_function_and_arguments:
+            button.connect( "clicked", *clicked_function_and_arguments )
+
+        return button
+
+
 #TODO Delete eventually.
     # def createSpinButton( self, initialValue, minimumValue, maximumValue, stepIncrement = 1, pageIncrement = 10, toolTip = "" ):
     #     spinner = Gtk.SpinButton()
@@ -951,24 +985,6 @@ class IndicatorBase( ABC ):
         spinner.set_numeric( True )
         spinner.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
         return spinner
-
-
-    def create_button(
-            self,
-            label,
-            tooltip_text = "",
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0,
-            connect_function_and_arguments = None ):  #TODO Rename here and in callers, connect -> clicked
-
-        button = Gtk.Button.new_with_label( label )
-        self.__set_widget_common_attributes( button, tooltip_text, sensitive, margin_top, margin_left )
-
-        if connect_function_and_arguments:
-            button.connect( "clicked", *connect_function_and_arguments )
-
-        return button
 
 
     def create_checkbutton(

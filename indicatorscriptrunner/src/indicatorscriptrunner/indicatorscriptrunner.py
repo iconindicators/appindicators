@@ -132,7 +132,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             indent = self.getMenuIndent()
             for group in sorted( scriptsByGroup.keys(), key = str.lower ):
                 subMenu = Gtk.Menu()
-                self.createAndAppendMenuItem( menu, group ).set_submenu( subMenu )
+                self.create_and_append_menuitem( menu, group ).set_submenu( subMenu )
                 self.addScriptsToMenu( scriptsByGroup[ group ], subMenu, indent )
 
         else:
@@ -145,17 +145,17 @@ class IndicatorScriptRunner( IndicatorBase ):
                 scriptsByGroup = self.getScriptsByGroup( self.scripts, True, False )
                 indent = self.getMenuIndent()
                 for group in sorted( scriptsByGroup.keys(), key = str.lower ):
-                    self.createAndAppendMenuItem( menu, group + "..." )
+                    self.create_and_append_menuitem( menu, group + "..." )
                     self.addScriptsToMenu( scriptsByGroup[ group ], menu, indent )
 
 
     def addScriptsToMenu( self, scripts, menu, indent ):
         scripts.sort( key = lambda script: script.getName().lower() )
         for script in scripts:
-            menuItem = self.createAndAppendMenuItem(
+            menuItem = self.create_and_append_menuitem(
                 menu,
                 indent + script.getName(),
-                onClickFunction = lambda menuItem, script = script: self.onScriptMenuItem( script ) ) # Note script = script to handle lambda late binding.
+                activate_function_and_arguments = ( lambda menuItem, script = script: self.onScriptMenuItem( script ), ) ) # Note script = script to handle lambda late binding.
 
             if script.getDefault():
                 self.secondaryActivateTarget = menuItem
@@ -380,8 +380,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Add" ),
-                _( "Add a new script." ),
-                connect_function_and_arguments = (
+                tooltip_text = _( "Add a new script." ),
+                clicked_function_and_arguments = (
                     self.onScriptAdd,
                     copyOfScripts, treeView, backgroundScriptsTreeView ) ),
             True,
@@ -396,8 +396,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Edit" ),
-                _( "Edit the selected script." ),
-                connect_function_and_arguments = (
+                tooltip_text = _( "Edit the selected script." ),
+                clicked_function_and_arguments = (
                     self.onScriptEdit,
                     copyOfScripts, treeView, backgroundScriptsTreeView, indicatorTextEntry ) ),
             True,
@@ -412,8 +412,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Copy" ),
-                _( "Duplicate the selected script." ),
-                connect_function_and_arguments = (
+                tooltip_text = _( "Duplicate the selected script." ),
+                clicked_function_and_arguments = (
                     self.onScriptCopy,
                     copyOfScripts, treeView, backgroundScriptsTreeView ) ),
             True,
@@ -428,8 +428,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
-                _( "Remove the selected script." ),
-                connect_function_and_arguments = (
+                tooltip_text = _( "Remove the selected script." ),
+                clicked_function_and_arguments = (
                     self.onScriptRemove,
                     copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView, indicatorTextEntry ) ),
             True,
@@ -442,9 +442,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         sendCommandToLogCheckbutton = \
             self.create_checkbutton(
                 _( "Send command to log" ),
-                _( "When a script is run,\n" + \
-                   "send the command to the log\n" + \
-                   "(located in your home directory)." ),
+                tooltip_text = _(
+                    "When a script is run,\n" + \
+                    "send the command to the log\n" + \
+                    "(located in your home directory)." ),
                 active = self.sendCommandToLog )
 #TODO Make sure this is converted okay
         # sendCommandToLogCheckbutton = Gtk.CheckButton.new_with_label( _( "Send command to log" ) )
@@ -488,10 +489,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         hideGroupsCheckbutton = \
             self.create_checkbutton(
                 _( "Hide groups" ),
-                _( "If checked, only script names are displayed.\n" + \
-                   "Otherwise, script names are indented\n" + \
-                   "within their respective group." ),
-                not self.showScriptsInSubmenus,
+                tooltip_text = _(
+                    "If checked, only script names are displayed.\n" + \
+                    "Otherwise, script names are indented\n" + \
+                    "within their respective group." ),
+                sensitive = not self.showScriptsInSubmenus,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.hideGroups )
 #TODO Make sure this is converted okay
@@ -961,10 +963,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         soundCheckbutton = \
             self.create_checkbutton(
                 _( "Play sound" ),
-                _( "For non-background scripts, play a sound\n" + \
-                   "on script completion.\n\n" + \
-                   "For background scripts, play a sound\n" + \
-                   "only if the script returns non-empty text." ),
+                tooltip_text = _(
+                    "For non-background scripts, play a sound\n" + \
+                    "on script completion.\n\n" + \
+                    "For background scripts, play a sound\n" + \
+                    "only if the script returns non-empty text." ),
                 active = False if add else script.getPlaySound() )
 #TODO Make sure this is converted okay
         # soundCheckbutton = Gtk.CheckButton.new_with_label( _( "Play sound" ) )
@@ -979,10 +982,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         notificationCheckbutton = \
             self.create_checkbutton(
                 _( "Show notification" ),
-                _( "For non-background scripts, show a\n" + \
-                   "notification on script completion.\n\n" + \
-                   "For background scripts, show a notification\n" + \
-                   "only if the script returns non-empty text." ),
+                tooltip_text = _(
+                    "For non-background scripts, show a\n" + \
+                    "notification on script completion.\n\n" + \
+                    "For background scripts, show a notification\n" + \
+                    "only if the script returns non-empty text." ),
                 active = False if add else script.getShowNotification() )
 #TODO Make sure this is converted okay
         # notificationCheckbutton = Gtk.CheckButton.new_with_label( _( "Show notification" ) )
@@ -1006,9 +1010,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_radiobutton(
                 None,
                 _( "Non-background" ),
-                tooltip_text = _( "Non-background scripts are displayed\n" + \
-                                  "in the menu and run when the user\n" + \
-                                  "clicks on the corresponding menu item." ),
+                tooltip_text = _(
+                    "Non-background scripts are displayed\n" + \
+                    "in the menu and run when the user\n" + \
+                    "clicks on the corresponding menu item." ),
                 active = True if add else type( script ) is NonBackground )
 
         grid.attach( scriptNonBackgroundRadio, 0, 14, 1, 1 )
@@ -1016,8 +1021,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         terminalCheckbutton = \
             self.create_checkbutton(
                 _( "Leave terminal open" ),
-                _( "Leave the terminal open on script completion." ),
-                True if add else type( script ) is NonBackground,
+                tooltip_text = _( "Leave the terminal open on script completion." ),
+                sensitive = True if add else type( script ) is NonBackground,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else type( script ) is NonBackground and script.getTerminalOpen() )
 #TODO Make sure this is converted okay
@@ -1031,11 +1036,12 @@ class IndicatorScriptRunner( IndicatorBase ):
         defaultScriptCheckbutton = \
             self.create_checkbutton(
                 _( "Default script" ),
-                _( "One script may be set as default\n" + \
-                   "which is run on a middle mouse\n" + \
-                   "click of the indicator icon.\n\n" + \
-                   "Not supported on all desktops." ),
-                True if add else type( script ) is NonBackground,
+                tooltip_text = _(
+                    "One script may be set as default\n" + \
+                    "which is run on a middle mouse\n" + \
+                    "click of the indicator icon.\n\n" + \
+                    "Not supported on all desktops." ),
+                sensitive = True if add else type( script ) is NonBackground,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else type( script ) is NonBackground and script.getDefault() )
 #TODO Make sure this is converted okay
@@ -1067,13 +1073,14 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_radiobutton(
                 scriptNonBackgroundRadio,
                 _( "Background" ),
-                tooltip_text = _( "Background scripts automatically run\n" + \
-                                  "at the interval specified, but only if\n" + \
-                                  "added to the icon text.\n\n" + \
-                                  "Any exception which occurs during script\n" + \
-                                  "execution will be logged to a file in the\n" + \
-                                  "user's home directory and the script tag\n" + \
-                                  "will remain in the icon text." ),
+                tooltip_text = _(
+                    "Background scripts automatically run\n" + \
+                    "at the interval specified, but only if\n" + \
+                    "added to the icon text.\n\n" + \
+                    "Any exception which occurs during script\n" + \
+                    "execution will be logged to a file in the\n" + \
+                    "user's home directory and the script tag\n" + \
+                    "will remain in the icon text." ),
                 active = False if add else type( script ) is Background )
 
         grid.attach( scriptBackgroundRadio, 0, 17, 1, 1 )
@@ -1093,7 +1100,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 page_increment = 100,
                 tooltip_text = _( "Interval, in minutes, between runs." ),
                 sensitive = False if add else type( script ) is Background )
-
         # intervalSpinner.set_sensitive( False if add else type( script ) is Background )#TODO Check above is okay.
 
         box.pack_start( intervalSpinner, False, False, 0 )
@@ -1103,10 +1109,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         forceUpdateCheckbutton = \
             self.create_checkbutton(
                 _( "Force update" ),
-                _( "If the script returns non-empty text\n" + \
-                   "on its update, the script will run\n" + \
-                   "on the next update of ANY script." ),
-                True if add else type( script ) is Background,
+                tooltip_text = _(
+                    "If the script returns non-empty text\n" + \
+                    "on its update, the script will run\n" + \
+                    "on the next update of ANY script." ),
+                sensitive = True if add else type( script ) is Background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else type( script ) is Background and script.getForceUpdate() )
 #TODO Make sure this is converted okay
@@ -1120,6 +1127,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         #     "on the next update of ANY script." ) )
         grid.attach( forceUpdateCheckbutton, 0, 19, 1, 1 )
 
+#TODO Worthwhile adding these to the general function?
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, terminalCheckbutton, defaultScriptCheckbutton )
         scriptNonBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, False, label, intervalSpinner, forceUpdateCheckbutton )
         scriptBackgroundRadio.connect( "toggled", self.onRadioOrCheckbox, True, label, intervalSpinner, forceUpdateCheckbutton )

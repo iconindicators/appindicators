@@ -110,7 +110,7 @@ class IndicatorTide( IndicatorBase ):
                 menu,
                 self.portName,
                 name = tidalReadings[ 0 ].getURL(),
-                activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             indent = self.getMenuIndent()
 
@@ -145,20 +145,20 @@ class IndicatorTide( IndicatorBase ):
                     menu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             else:
                 self.create_and_append_menuitem(
                     menu,
                     indent + tidalReading.getDate(),
                     name = tidalReading.getURL(),
-                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 self.create_and_append_menuitem(
                     menu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
@@ -182,11 +182,11 @@ class IndicatorTide( IndicatorBase ):
                     subMenu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             else:
                 subMenu = Gtk.Menu()
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     indent + tidalReading.getDate() ).set_submenu( subMenu )
 
@@ -194,7 +194,7 @@ class IndicatorTide( IndicatorBase ):
                     subMenu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True

@@ -47,7 +47,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 import fnmatch
 import gi
 import os
-import webbrowser
 
 from datetime import date, datetime, timedelta
 
@@ -104,10 +103,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             todayInShortDateFormat = today.strftime( '%b %d' ) # It is assumed/hoped the dates in the calendar result are always short date format irrespective of locale.
             for event in events:
                 if todayInShortDateFormat == event.getDate():
-                    Notify.Notification.new(
-                        _( "On this day..." ),
-                        event.getDescription(),
-                        self.get_icon_name() ).show()
+                    Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.get_icon_name() ).show()
 
 
     def buildMenu( self, menu, events ):
@@ -130,7 +126,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = self.removeLeadingZeroFromDate( event.getDate() ), # Allows the month/day to be passed to the copy/search functions below.
-                    activateFunction = f )
+                    activate_function_and_arguments = ( f, ) ) #TODO Ensure this function 'f' gets called.
 
             elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 url = self.searchURL.replace(
@@ -141,7 +137,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = url,
-                    activateFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             menuItemCount += 1
             if menuItemCount == menuItemMaximum:
@@ -265,7 +261,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new calendar." ),
-                connect_function_and_arguments = ( self.onCalendarAdd, tree ) ),
+                clicked_function_and_arguments = ( self.onCalendarAdd, tree ) ),
             True,
             True,
             0 )
@@ -279,7 +275,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected calendar." ),
-                connect_function_and_arguments = ( self.onCalendarRemove, tree ) ),
+                clicked_function_and_arguments = ( self.onCalendarRemove, tree ) ),
             True,
             True,
             0 )
@@ -293,7 +289,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Reset" ),
                 tooltip_text = _( "Reset to factory default." ),
-                connect_function_and_arguments = ( self.onCalendarReset, tree ) ),
+                clicked_function_and_arguments = ( self.onCalendarReset, tree ) ),
             True,
             True,
             0 )
@@ -484,6 +480,12 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         grid = self.create_grid()
 
+        title = _( "Add Calendar" )
+        if rowNumber:
+            title = _( "Edit Calendar" )
+
+        dialog = self.createDialog( treeView, title, grid )
+
         box = Gtk.Box( spacing = 6 )
 
         box.pack_start( Gtk.Label.new( _( "Calendar file" ) ), False, False, 0 )
@@ -513,19 +515,21 @@ class IndicatorOnThisDay( IndicatorBase ):
         #         "'calendar' in a terminal." ) )
         #
         # box.pack_start( browseButton, False, False, 0 )
+        # browseButton.connect( "clicked", self.onBrowseCalendar, dialog, fileEntry )
 #TODO Ensure this was converted correctly.
         browseButton = \
             self.create_button(
                 _( "Browse" ),
-                tooltip_text _(
+                tooltip_text = _(
                     "This calendar is part of your\n" + \
                     "system and cannot be modified." ) \
-                    if isSystemCalendar else
-                    _( "Choose a calendar file.\n\n" + \
+                    if isSystemCalendar else _(
+                    "Choose a calendar file.\n\n" + \
                     "Ensure the calendar file is\n" + \
                     "valid by running through\n" + \
                     "'calendar' in a terminal." ),
-                    sensitive = not isSystemCalendar )
+                    sensitive = not isSystemCalendar,
+                    clicked_function_and_arguments = ( self.onBrowseCalendar, dialog, fileEntry ) )
 
         box.pack_start( browseButton, False, False, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -540,15 +544,6 @@ class IndicatorOnThisDay( IndicatorBase ):
             enabledCheckbutton.set_active( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbutton, 0, 1, 1, 1 )
-
-        title = _( "Add Calendar" )
-        if rowNumber:
-            title = _( "Edit Calendar" )
-
-        dialog = self.createDialog( treeView, title, grid )
-
-        # Need to set these here as the dialog had not been created at the point the buttons were defined.
-        browseButton.connect( "clicked", self.onBrowseCalendar, dialog, fileEntry )
 
         while True:
             dialog.show_all()

@@ -81,7 +81,6 @@ class IndicatorFortune( IndicatorBase ):
     def update( self, menu ):
         self.buildMenu( menu )
         self.refreshAndShowFortune()
-        print( "update")#TODO Remove and uncomment above
         return int( self.refreshIntervalInMinutes ) * 60
 
 
@@ -89,19 +88,19 @@ class IndicatorFortune( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "New Fortune" ),
-            activateFunction = lambda menuItem: self.refreshAndShowFortune(),
+            activate_function_and_arguments = ( lambda menuItem: self.refreshAndShowFortune(), ),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
-            activateFunction = lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ),
+            activate_function_and_arguments = ( lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ), ),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
         self.create_and_append_menuitem(
             menu,
             _( "Show Last Fortune" ),
-            activateFunction = lambda menuItem: self.showFortune(),
+            activate_function_and_arguments = ( lambda menuItem: self.showFortune(), ),
             isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
@@ -109,7 +108,7 @@ class IndicatorFortune( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "History" ),
-            activateFunction = lambda menuItem: self.showHistory() )
+            activate_function_and_arguments = ( lambda menuItem: self.showHistory(), ) )
 
 
     def showHistory( self ):
@@ -267,7 +266,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new fortune location." ),
-                connect_function_and_arguments = ( self.onFortuneAdd, tree ) ),
+                clicked_function_and_arguments = ( self.onFortuneAdd, tree ) ),
             True,
             True,
             0 )
@@ -281,7 +280,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected fortune location." ),
-                connect_function_and_arguments = ( self.onFortuneRemove, tree ) ),
+                clicked_function_and_arguments = ( self.onFortuneRemove, tree ) ),
             True,
             True,
             0 )
@@ -295,7 +294,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Reset" ),
                 tooltip_text = _( "Reset to factory default." ),
-                connect_function_and_arguments = ( self.onFortuneReset, tree ) ),
+                clicked_function_and_arguments = ( self.onFortuneReset, tree ) ),
             True,
             True,
             0 )
@@ -374,7 +373,7 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickNewFortune = \
             self.create_radiobutton(
                 None,
-                tooltip_text = _( "Show a new fortune" ),
+                _( "Show a new fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
@@ -394,7 +393,7 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickCopyLastFortune = \
             self.create_radiobutton(
                 radioMiddleMouseClickNewFortune,
-                tooltip_text = _( "Copy current fortune to clipboard" ),
+                _( "Copy current fortune to clipboard" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
 
@@ -414,7 +413,7 @@ class IndicatorFortune( IndicatorBase ):
         radioMiddleMouseClickShowLastFortune = \
             self.create_radiobutton(
                 radioMiddleMouseClickNewFortune,
-                tooltip_text = _( "Copy current fortune to clipboard" ),
+                _( "Show current fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
 
@@ -487,6 +486,12 @@ class IndicatorFortune( IndicatorBase ):
 
         grid = self.create_grid()
 
+        title = _( "Add Fortune" )
+        if rowNumber:
+            title = _( "Edit Fortune" )
+
+        dialog = self.createDialog( treeView, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
+
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
 
@@ -536,14 +541,15 @@ class IndicatorFortune( IndicatorBase ):
         browseFileButton = \
             self.create_button(
                 _( "File" ),
-                tootip_text = _(
+                tooltip_text = _(
                     "This fortune is part of your\n" + \
                     "system and cannot be modified." ) \
-                    if isSystemFortune else
-                   _( "Choose a fortune .dat file.\n\n" + \
-                   "Ensure the corresponding text\n" + \
-                   "file is present." ),
-                sensitive = not isSystemFortune )
+                    if isSystemFortune else _(
+                    "Choose a fortune .dat file.\n\n" + \
+                    "Ensure the corresponding text\n" + \
+                    "file is present." ),
+                sensitive = not isSystemFortune,
+                clicked_function_and_arguments = ( self.onBrowseFortune, dialog, fortuneFileDirectory, True ) )
 
         box.pack_start( browseFileButton, True, True, 0 )
 
@@ -567,12 +573,13 @@ class IndicatorFortune( IndicatorBase ):
                 tooltip_text = _( 
                     "This fortune is part of your\n" + \
                     "system and cannot be modified." ) \
-                    if isSystemFortune else
-                    _( "Choose a directory containing\n" + \
+                    if isSystemFortune else _(
+                    "Choose a directory containing\n" + \
                     "a fortune .dat file(s).\n\n" + \
                     "Ensure the corresponding text\n" + \
                     "file is present." ),
-                not isSystemFortune )
+                sensitive = not isSystemFortune,
+                clicked_function_and_arguments = ( self.onBrowseFortune, dialog, fortuneFileDirectory, False ) )
 
         box.pack_start( browseDirectoryButton, True, True, 0 )
 
@@ -588,7 +595,7 @@ class IndicatorFortune( IndicatorBase ):
                     "works by running through 'fortune'\n" + \
                     "in a terminal." ) )
 #TODO Ensure above converted correctly.
-        # enabledCheckbox = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
+        # enabledCheckbox = Gtk.CheckButton.new_with_label( _( "Enabled" ) )True
         # enabledCheckbox.set_tooltip_text( _(
         #     "Ensure the fortune file/directory\n" + \
         #     "works by running through 'fortune'\n" + \
@@ -600,14 +607,15 @@ class IndicatorFortune( IndicatorBase ):
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
-        title = _( "Add Fortune" )
-        if rowNumber:
-            title = _( "Edit Fortune" )
+#TODO Moved to top to see if buttons can have the connect in their definitions rather than external.
+        # title = _( "Add Fortune" )
+        # if rowNumber:
+        #     title = _( "Edit Fortune" )
+        #
+        # dialog = self.createDialog( treeView, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
 
-        dialog = self.createDialog( treeView, title, grid )
-
-        browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
-        browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
+        # browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
+        # browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
 
         while True:
             dialog.show_all()
@@ -637,10 +645,11 @@ class IndicatorFortune( IndicatorBase ):
             title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
 
-        dialog = Gtk.FileChooserDialog(
-                    title = title,
-                    parent = addEditDialog,
-                    action = action )
+        dialog = \
+            Gtk.FileChooserDialog(
+                title = title,
+                parent = addEditDialog,
+                action = action )
 
         dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
 

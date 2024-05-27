@@ -130,7 +130,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if self.showSubmenu:
             indent = self.getMenuIndent()
             for ppa in ppas:
-                menuItem = self.createAndAppendMenuItem( menu, ppa.getDescriptor() )
+                menuItem = self.create_and_append_menuitem( menu, ppa.getDescriptor() )
 
                 subMenu = Gtk.Menu()
                 if ppa.getStatus() == PPA.Status.OK:
@@ -146,11 +146,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             indent = self.getMenuIndent()
             for ppa in ppas:
-                menuItem = self.createAndAppendMenuItem(
+                menuItem = self.create_and_append_menuitem(
                     menu,
                     ppa.getDescriptor(),
                     name = ppa.getDescriptor(),
-                    onClickFunction = self.onPPA )
+                    activate_function_and_arguments = ( self.onPPA, ) )
 
                 if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries( True )
@@ -173,11 +173,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             label += " " + publishedBinary.getPackageVersion() + ":  " + str( publishedBinary.getDownloadCount() )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             label,
             name = ppa.getDescriptor(),
-            onClickFunction = self.onPPA )
+            activate_function_and_arguments = ( self.onPPA, ) )
 
 
     def createMenuItemForStatusMessage( self, menu, indent, ppa ):
@@ -193,7 +193,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.getStatus() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
-        self.createAndAppendMenuItem( menu, indent + message )
+        self.create_and_append_menuitem( menu, indent + message )
 
 
     def combine( self, ppas ):
@@ -277,7 +277,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def onPPA( self, menuItem ):
         url = "https://launchpad.net/~"
-        firstPipe = str.find( menuItem.props.name, "|" )
+        firstPipe = str.find( menuItem.props.name, "|" )  #TODO Instead of props.name, can we use menuItem.get.name()?
         ppaUser = menuItem.props.name[ 0 : firstPipe ].strip()
         secondPipe = str.find( menuItem.props.name, "|", firstPipe + 1 )
         if secondPipe == -1:
@@ -512,8 +512,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Add" ),
-                _( "Add a new PPA." ),
-                connect_function_and_arguments = ( self.onPPAAdd, ppaTree ) ),
+                tooltip_text = _( "Add a new PPA." ),
+                clicked_function_and_arguments = ( self.onPPAAdd, ppaTree ) ),
             True,
             True,
             0 )
@@ -526,8 +526,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
-                _( "Remove the selected PPA." ),
-                connect_function_and_arguments = ( self.onPPARemove, ppaTree ) ),
+                tooltip_text = _( "Remove the selected PPA." ),
+                clicked_function_and_arguments = ( self.onPPARemove, ppaTree ) ),
             True,
             True,
             0 )
@@ -575,8 +575,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Add" ),
-                _( "Add a new filter." ),
-                connect_function_and_arguments = ( self.onFilterAdd, filterTree, ppaTree ) ),
+                tooltip_text = _( "Add a new filter." ),
+                clicked_function_and_arguments = ( self.onFilterAdd, filterTree, ppaTree ) ),
             True,
             True,
             0 )
@@ -589,8 +589,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
-                _( "Remove the selected filter." ),
-                connect_function_and_arguments = ( self.onFilterRemove, filterTree ) ),
+                tooltip_text = _( "Remove the selected filter." ),
+                clicked_function_and_arguments = ( self.onFilterRemove, filterTree ) ),
             True,
             True,
             0 )
@@ -605,8 +605,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         showAsSubmenusCheckbutton = \
             self.create_checkbutton(
                 _( "Show PPAs as submenus" ),
-                _( "The download statistics for each PPA\n" + \
-                   "are shown in a separate submenu." ),
+                tooltip_text = _(
+                    "The download statistics for each PPA\n" + \
+                    "are shown in a separate submenu." ),
                 active = self.showSubmenu )
 #TODO Make sure this is converted okay
         # showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
@@ -619,25 +620,26 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         combinePPAsCheckbutton = \
             self.create_checkbutton(
                 _( "Combine PPAs" ),
-                _( "Combine the statistics of binary\n" + \
-                   "packages when the PPA user/name\n" + \
-                   "are the same.\n\n" + \
-                   "Non-architecture specific packages:\n" + \
-                   "If the package names and version\n" + \
-                   "numbers of two binary packages are\n" + \
-                   "identical, the packages are treated\n" + \
-                   "as the same package and the\n" + \
-                   "download counts are NOT summed.\n" + \
-                   "Packages such as Python fall into\n" + \
-                   "this category.\n\n" + \
-                   "Architecture specific packages:\n" + \
-                   "If the package names and version\n" + \
-                   "numbers of two binary packages are\n" + \
-                   "identical, the packages are treated\n" + \
-                   "as the same package and the download\n" + \
-                   "counts ARE summed.\n" + \
-                   "Packages such as compiled C fall into\n" + \
-                   "this category." ),
+                tooltip_text = _(
+                    "Combine the statistics of binary\n" + \
+                    "packages when the PPA user/name\n" + \
+                    "are the same.\n\n" + \
+                    "Non-architecture specific packages:\n" + \
+                    "If the package names and version\n" + \
+                    "numbers of two binary packages are\n" + \
+                    "identical, the packages are treated\n" + \
+                    "as the same package and the\n" + \
+                    "download counts are NOT summed.\n" + \
+                    "Packages such as Python fall into\n" + \
+                    "this category.\n\n" + \
+                    "Architecture specific packages:\n" + \
+                    "If the package names and version\n" + \
+                    "numbers of two binary packages are\n" + \
+                    "identical, the packages are treated\n" + \
+                    "as the same package and the download\n" + \
+                    "counts ARE summed.\n" + \
+                    "Packages such as compiled C fall into\n" + \
+                    "this category." ),
                 margin_top = 10,
                 active = self.combinePPAs )
 #TODO Make sure this is converted okay
@@ -669,23 +671,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         ignoreVersionArchitectureSpecificCheckbutton = \
             self.create_checkbutton(
                 _( "Ignore version for architecture specific" ),
-                _( "Sometimes architecture specific\n" + \
-                   "packages with the same package\n" + \
-                   "name but different version 'number'\n" + \
-                   "are logically the SAME package.\n\n" + \
-                   "For example, a C source package for\n" + \
-                   "both Ubuntu Saucy and Ubuntu Trusty\n" + \
-                   "will be compiled twice, each with a\n" + \
-                   "different 'number', despite being\n" + \
-                   "the SAME release.\n\n" + \
-                   "Checking this option will ignore the\n" + \
-                   "version number when determining if\n" + \
-                   "two architecture specific packages\n" + \
-                   "are identical.\n\n" + \
-                   "The version number is retained only\n" + \
-                   "if it is identical across ALL\n" + \
-                   "instances of a published binary." ),
-                combinePPAsCheckbutton.get_active(),
+                tooltip_text = _(
+                    "Sometimes architecture specific\n" + \
+                    "packages with the same package\n" + \
+                    "name but different version 'number'\n" + \
+                    "are logically the SAME package.\n\n" + \
+                    "For example, a C source package for\n" + \
+                    "both Ubuntu Saucy and Ubuntu Trusty\n" + \
+                    "will be compiled twice, each with a\n" + \
+                    "different 'number', despite being\n" + \
+                    "the SAME release.\n\n" + \
+                    "Checking this option will ignore the\n" + \
+                    "version number when determining if\n" + \
+                    "two architecture specific packages\n" + \
+                    "are identical.\n\n" + \
+                    "The version number is retained only\n" + \
+                    "if it is identical across ALL\n" + \
+                    "instances of a published binary." ),
+                sensitive = combinePPAsCheckbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.ignoreVersionArchitectureSpecific )
 #TODO Make sure this is converted okay
@@ -717,7 +720,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         sortByDownloadCheckbutton = \
             self.create_checkbutton(
                 _( "Sort by download" ),
-                _( "Sort by download count within each PPA." ),
+                tooltip_text = _( "Sort by download count within each PPA." ),
                 margin_top = 10,
                 active = self.sortByDownload )
 #TODO Make sure this is converted okay
@@ -740,11 +743,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 0,
                 10000,
                 page_increment = 100,
-                tooltip_text = _( "Limit the number of entries\n" + \
-                                  "when sorting by download.\n\n" + \
-                                  "A value of zero will not clip." ),
+                tooltip_text = _(
+                    "Limit the number of entries\n" + \
+                    "when sorting by download.\n\n" + \
+                    "A value of zero will not clip." ),
                 sensitive = sortByDownloadCheckbutton.get_active() )
-
         # spinner.set_sensitive( sortByDownloadCheckbutton.get_active() ) #TODO Check above was converted correctly.
         box.pack_start( spinner, False, False, 0 )
 
@@ -755,7 +758,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         lowBandwidthCheckbutton = \
             self.create_checkbutton(
                 _( "Low bandwidth" ),
-                _( "Enable if your internet connection is slow." ),
+                tooltip_text = _( "Enable if your internet connection is slow." ),
                 margin_top = 10,
                 active = self.lowBandwidth )
 #TODO Make sure this is converted okay

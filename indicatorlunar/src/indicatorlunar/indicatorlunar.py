@@ -241,7 +241,9 @@ class IndicatorLunar( IndicatorBase ):
 
         # Update frontend.
         if self.debug:
-            self.createAndAppendMenuItem( menu, IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() )
+            self.create_and_append_menuitem(
+                menu,
+                IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() )
 
         self.updateMenu( menu, utcNow )
         self.setLabel( self.processTags() )
@@ -576,24 +578,24 @@ class IndicatorLunar( IndicatorBase ):
 
     def updateMenuMoon( self, menu ):
         subMenu = Gtk.Menu()
-        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, self.getMenuIndent(), IndicatorLunar.SEARCH_URL_MOON, self.getOnClickMenuItemOpenBrowserFunction(), None ):
-            self.createAndAppendMenuItem( menu, _( "Moon" ) ).set_submenu( subMenu )
+        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, self.getMenuIndent(), IndicatorLunar.SEARCH_URL_MOON, ( self.getOnClickMenuItemOpenBrowserFunction(), ) ):
+            self.create_and_append_menuitem( menu, _( "Moon" ) ).set_submenu( subMenu )
             subMenu.append( Gtk.SeparatorMenuItem() )
             key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 subMenu,
                 self.getMenuIndent() + \
                 _( "Phase: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_PHASE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ] ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
-                onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 subMenu,
                 self.getMenuIndent() + _( "Next Phases" ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
-                onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             # The phase (illumination) is rounded and so a given phase is entered earlier than what occurs in reality.
             nextPhases = [ ]
@@ -619,19 +621,19 @@ class IndicatorLunar( IndicatorBase ):
                     displayText + \
                     self.formatData( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     label,
                     name = IndicatorLunar.SEARCH_URL_MOON,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON, IndicatorLunar.SEARCH_URL_MOON )
 
 
     def updateMenuSun( self, menu ):
         subMenu = Gtk.Menu()
-        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, self.getMenuIndent(), IndicatorLunar.SEARCH_URL_SUN, self.getOnClickMenuItemOpenBrowserFunction(), None ):
-            self.createAndAppendMenuItem( menu, _( "Sun" ) ).set_submenu( subMenu )
+        if self.__updateMenuCommon( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, self.getMenuIndent(), IndicatorLunar.SEARCH_URL_SUN, ( self.getOnClickMenuItemOpenBrowserFunction(), ) ):
+            self.create_and_append_menuitem( menu, _( "Sun" ) ).set_submenu( subMenu )
             subMenu.append( Gtk.SeparatorMenuItem() )
             key = ( IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN )
 
@@ -646,30 +648,30 @@ class IndicatorLunar( IndicatorBase ):
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ] )
 
             if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_EQUINOX, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SOLSTICE, ) ]:
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     equinoxLabel,
                     name = IndicatorLunar.SEARCH_URL_SUN,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     solsticeLabel,
                     name = IndicatorLunar.SEARCH_URL_SUN,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             else:
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     solsticeLabel,
                     name = IndicatorLunar.SEARCH_URL_SUN,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     equinoxLabel,
                     name = IndicatorLunar.SEARCH_URL_SUN,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             self.__updateMenuEclipse( subMenu, IndicatorLunar.astroBackend.BodyType.SUN, IndicatorLunar.astroBackend.NAME_TAG_SUN, IndicatorLunar.SEARCH_URL_SUN )
 
@@ -678,27 +680,27 @@ class IndicatorLunar( IndicatorBase ):
         menu.append( Gtk.SeparatorMenuItem() )
         key = ( bodyType, nameTag )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             self.getMenuIndent() + _( "Eclipse" ),
             name = url,
-            onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+            activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             self.getMenuIndent( 2 ) + \
             _( "Date/Time: " ) + \
             self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             name = url,
-            onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+            activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
-        self.createAndAppendMenuItem(
+        self.create_and_append_menuitem(
             menu,
             self.getMenuIndent( 2 ) + \
             _( "Type: " ) + \
             self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
             name = url,
-            onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+            activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
             latitude = self.formatData(
@@ -709,11 +711,22 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE,
                 self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] )
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 self.getMenuIndent( 2 ) + _( "Latitude/Longitude: " ) + latitude + " " + longitude,
                 name = url,
-                onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+
+
+
+#TODO Not sure if needed for comets...see below.
+    # def __getOnClickFunctionComet( self, menuItem ):
+    #     try:
+    #         objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
+    #         webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
+    #
+    #     except Exception:
+    #         pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
 
 
     def updateMenuPlanetsMinorPlanetsCometsStars( self, menu, menuLabel, bodies, bodiesData, bodyType ):
@@ -736,24 +749,25 @@ class IndicatorLunar( IndicatorBase ):
 
             return menuItemNameFunction
 
-
-        def __getOnClickFunctionComet( menuItem ):
-            try:
-                objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )
-                webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
-
-            except Exception:
-                pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
+#TODO Sort out for comets
+        # def __getOnClickFunctionComet( self, menuItem ):
+        #     try:
+        #         objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
+        #         webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
+        #
+        #     except Exception:
+        #         pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
 
 
         def getOnClickFunction():
-            onClickFunction = self.getOnClickMenuItemOpenBrowserFunction()
-            if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-                onClickFunction = __getOnClickFunctionComet
+            onClickFunction = ( self.getOnClickMenuItemOpenBrowserFunction(), )
+            # if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
+            #     onClickFunction = ( self.__getOnClickFunctionComet(), )
 
             return onClickFunction
 
 
+#TODO Why are there commented out if/elif?
         def getDisplayNameFunction():
             # if bodyType == IndicatorLunar.astroBackend.BodyType.PLANET: displayNameFunction = getDisplayNamePlanet
             if bodyType == IndicatorLunar.astroBackend.BodyType.PLANET:
@@ -783,13 +797,19 @@ class IndicatorLunar( IndicatorBase ):
         for name in bodies:
             current = len( subMenu )
             menuItemName = menuItemNameFunction( name )
-            if self.__updateMenuCommon( subMenu, bodyType, name, indentDouble, menuItemName, onClickFunction, None ):
+            if self.__updateMenuCommon( subMenu, bodyType, name, indentDouble, menuItemName, onClickFunction ):
                 displayName = displayNameFunction( name )
-                self.createAndInsertMenuItem( subMenu, indent + displayName, current, name = menuItemName, onClickFunction = onClickFunction )
+                self.create_and_insert_menuitem(
+                    subMenu,
+                    indent + displayName,
+                    current,
+                    name = menuItemName,
+                    activate_function_and_arguments = onClickFunction )
+
                 subMenu.append( Gtk.SeparatorMenuItem() )
 
         if len( subMenu.get_children() ) > 0:
-            self.createAndAppendMenuItem( menu, menuLabel ).set_submenu( subMenu )
+            self.create_and_append_menuitem( menu, menuLabel ).set_submenu( subMenu )
 
 
     # Retrieve a comet's designation for lookup at the Comet Observation Database.
@@ -852,13 +872,21 @@ class IndicatorLunar( IndicatorBase ):
 
 
     # For the given body, creates the menu items relating to rise/set/azimuth/altitude.
-    def __updateMenuCommon( self, menu, bodyType, nameTag, indent, menuItemName, onClickFunction, onClickFunctionArguments ):
+    def __updateMenuCommon(
+            self,
+            menu,
+            bodyType,
+            nameTag,
+            indent,
+            menuItemName,
+            onClickFunctionAndArguments ):
+
         key = ( bodyType, nameTag )
         appended = False
         if key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # This body rises/sets.
             if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]: # Body will rise.
                 if not self.hideBodiesBelowHorizon:
-                    self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunction, onClickFunctionArguments, True, False )
+                    self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunctionAndArguments, True, False )
                     appended = True
 
             else: # Body will set.
@@ -873,19 +901,19 @@ class IndicatorLunar( IndicatorBase ):
                     sunSet = self.data[ keySun + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ]
                     if targetBodyType and sunSet < sunRise and self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] < sunSet:
                         if not self.hideBodiesBelowHorizon:
-                            self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunction, onClickFunctionArguments, True, False )
+                            self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunctionAndArguments, True, False )
                             appended = True
 
                     else:
-                        self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunction, onClickFunctionArguments, False, True )
+                        self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunctionAndArguments, False, True )
                         appended = True
 
                 else:
-                    self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunction, onClickFunctionArguments, False, True )
+                    self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunctionAndArguments, False, True )
                     appended = True
 
         elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Body is 'always up'.
-            self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunction, onClickFunctionArguments, False, False )
+            self.__updateMenuItemsRiseAzimuthAltitudeSet( menu, key, indent, menuItemName, onClickFunctionAndArguments, False, False )
             appended = True
 
         return appended
@@ -893,39 +921,47 @@ class IndicatorLunar( IndicatorBase ):
 
     def __updateMenuItemsRiseAzimuthAltitudeSet(
             self,
-            menu, key, indent,
-            menuItemName, onClickFunction, onClickFunctionArguments,
+            menu,
+            key,
+            indent,
+            menuItemName,
+            onClickFunctionAndArguments,
             isRise, isSet ):
+
         if isRise:
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 indent + \
                 _( "Rise: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ),
-                menuItemName, onClickFunction, onClickFunctionArguments )
+                name = menuItemName,
+                activate_function_and_arguments = onClickFunctionAndArguments )
 
         else:
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 indent + \
                 _( "Azimuth: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ] ),
-                menuItemName, onClickFunction, onClickFunctionArguments )
+                name = menuItemName,
+                activate_function_and_arguments = onClickFunctionAndArguments )
 
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 menu,
                 indent + \
                 _( "Altitude: " ) + \
                 self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ),
-                menuItemName, onClickFunction, onClickFunctionArguments )
+                name = menuItemName,
+                activate_function_and_arguments = onClickFunctionAndArguments )
 
             if isSet:
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     menu,
                     indent + \
                     _( "Set: " ) + \
                     self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ] ),
-                menuItemName, onClickFunction, onClickFunctionArguments )
+                name = menuItemName,
+                activate_function_and_arguments = onClickFunctionAndArguments )
 
 
     # Display the rise/set information for each satellite.
@@ -1035,7 +1071,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def __updateMenuSatellites( self, menu, label, satellites ):
         subMenu = Gtk.Menu()
-        self.createAndAppendMenuItem( menu, label ).set_submenu( subMenu )
+        self.create_and_append_menuitem( menu, label ).set_submenu( subMenu )
         indent = self.getMenuIndent()
         indentDouble = self.getMenuIndent( 2 )
         indentTriple = self.getMenuIndent( 3 )
@@ -1044,75 +1080,75 @@ class IndicatorLunar( IndicatorBase ):
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
             label = indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator()
-            self.createAndAppendMenuItem(
+            self.create_and_append_menuitem(
                 subMenu,
                 label,
                 name = url,
-                onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             if len( info ) == 3: # Satellite yet to rise.
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentDouble + _( "Rise Date/Time: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             elif len( info ) == 4: # Circumpolar (always up).
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_AZIMUTH ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentDouble + _( "Azimuth: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, info[ IndicatorLunar.SATELLITE_MENU_ALTITUDE ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentDouble + _( "Altitude: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             else: # Satellite is in transit.
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentDouble + _( "Rise" ),
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentTriple + _( "Date/Time: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_RISE_AZIMUTH ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentTriple + _( "Azimuth: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentDouble + _( "Set" ),
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, info[ IndicatorLunar.SATELLITE_MENU_SET_DATE_TIME ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentTriple + _( "Date/Time: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 data = self.formatData( IndicatorLunar.astroBackend.DATA_TAG_SET_AZIMUTH, info[ IndicatorLunar.SATELLITE_MENU_SET_AZIMUTH ] )
-                self.createAndAppendMenuItem(
+                self.create_and_append_menuitem(
                     subMenu,
                     indentTriple + _( "Azimuth: " ) + data,
                     name = url,
-                    onClickFunction = self.getOnClickMenuItemOpenBrowserFunction() )
+                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             separator = Gtk.SeparatorMenuItem()
             subMenu.append( separator )
@@ -2058,7 +2094,7 @@ class IndicatorLunar( IndicatorBase ):
                 testButtonText,
                 testButtonTooltip,
                 checkbutton.get_active(),
-                connect_function_and_arguments = (
+                clicked_function_and_arguments = (
                     self.onTestNotificationClicked,
                     summaryTextEntry, messageTextView, isMoonNotification ) )
 

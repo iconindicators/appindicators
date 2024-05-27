@@ -121,8 +121,9 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             subMenu,
-            self.getMenuIndent() + "Use default icon",
-            activateFunction = lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ) )
+            self.getMenuIndent() + "Reset icon",
+            activate_function_and_arguments =
+                ( lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ), ) )
 
         cacheDirectory = self.getCacheDirectory()
         icons = [ "FULL_MOON",
@@ -136,7 +137,7 @@ class IndicatorTest( IndicatorBase ):
                 subMenu,
                 self.getMenuIndent() + "Use " + icon + " dynamically created in " + cacheDirectory,
                 name = icon,
-                activateFunction = self.__useIconDynamicallyCreated )
+                activate_function_and_arguments = ( self.__useIconDynamicallyCreated, ) )
 
         self.create_and_append_menuitem( menu, "Icon" ).set_submenu( subMenu )
 
@@ -147,21 +148,23 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Reset label",
-            activateFunction = lambda menuItem: self.setLabel( IndicatorTest.LABEL ) )
+            activate_function_and_arguments = ( lambda menuItem: self.setLabel( IndicatorTest.LABEL ), ) )
 
         self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Show current time in label",
-            activateFunction = lambda menuItem: (
-                print( "secondary activate target / mouse middle click" ),
-                self.setLabel( self.__getCurrentTime() ) ),
+            activate_function_and_arguments = 
+                ( lambda menuItem: (
+                    print( "secondary activate target / mouse middle click" ),
+                    self.setLabel( self.__getCurrentTime() ) ), ),
             isSecondaryActivateTarget = True )
 
         self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + "Show current time in OSD",
-            activateFunction = lambda menuItem:
-                Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show() )
+            activate_function_and_arguments =
+                ( lambda menuItem:
+                    Notify.Notification.new( "Current time...", self.__getCurrentTime(), self.get_icon_name() ).show(), ) )
 
         self.create_and_append_menuitem( menu, "Label / Tooltip / OSD" ).set_submenu( subMenu )
 
@@ -169,14 +172,13 @@ class IndicatorTest( IndicatorBase ):
     def __buildMenuClipboard( self, menu ):
         subMenu = Gtk.Menu()
 
-#TODO This menu item does not add actually add to the clipboard when clicked in Debian 12.
-# What about other distros/versions?
         self.create_and_append_menuitem(
             subMenu,
             self.getMenuIndent() + _( "Copy current time to clipboard" ),
-            activateFunction = lambda menuItem: ( 
-                print( "clipboard" ),
-                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) ) )
+            activate_function_and_arguments =
+                ( lambda menuItem: ( 
+                    print( "clipboard" ),
+                    Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__getCurrentTime(), -1 ) ), ) )
 
         self.create_and_append_menuitem( menu, "Clipboard" ).set_submenu( subMenu )
 
@@ -214,7 +216,8 @@ class IndicatorTest( IndicatorBase ):
             self.create_and_append_menuitem(
                 subMenu,
                 self.getMenuIndent() + label,
-                activateFunction = lambda menuItem, command = command: self.__executeCommand( command ) ) # Note command = command to handle lambda late binding.
+                activate_function_and_arguments =
+                    ( lambda menuItem, command = command: self.__executeCommand( command ), ) ) # Note command = command to handle lambda late binding.
 
         self.create_and_append_menuitem( menu, "Execute Terminal Command" ).set_submenu( subMenu )
 

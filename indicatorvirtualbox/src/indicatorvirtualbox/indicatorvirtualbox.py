@@ -100,11 +100,11 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 _( "Launch VirtualBox™ Manager" ),
-                activateFunction = lambda menuItem: self.onLaunchVirtualBoxManager(),
+                activate_function_and_arguments = ( lambda menuItem: self.onLaunchVirtualBoxManager(), ),
                 isSecondaryActivateTarget = True )
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( _( "(VirtualBox™ is not installed)" ) ) ) #TODO Convert to use function as above.
+            self.create_and_append_menuitem( menu, _( "(VirtualBox™ is not installed)" ) )
 
 
     def __buildMenu( self, menu, items, indent, runningUUIDs ):
@@ -128,8 +128,10 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __addGroupToMenu( self, menu, group, level ):
         indent = level * self.getMenuIndent()
-        menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() ) #TODO Use the new method as above?
-        menu.append( menuItem )
+        # menuItem = Gtk.MenuItem.new_with_label( indent + group.getName() ) #TODO Use the new method as above?
+        # menu.append( menuItem ) #TODO Check the below is converted correctly.
+        menuItem = self.create_and_append_menuitem( menu, indent + group.getName() )
+
         if self.showSubmenu:
             menu = Gtk.Menu()
             menuItem.set_submenu( menu )
@@ -140,14 +142,14 @@ class IndicatorVirtualBox( IndicatorBase ):
     def __addVirtualMachineToMenu( self, menu, virtualMachine, level, isRunning ):
         indent = level * self.getMenuIndent()
         if isRunning:
-            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() ) #TODO Use method as above?
+            menuItem = Gtk.RadioMenuItem.new_with_label( [ ], indent + virtualMachine.getName() )
             menuItem.set_active( True )
+            menuItem.connect( "activate", self._onVirtualMachine, virtualMachine )
+            menu.append( menuItem )
 
         else:
-            menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )#TODO Use method as above?
-
-        menuItem.connect( "activate", self._onVirtualMachine, virtualMachine )
-        menu.append( menuItem )
+            menuItem = self.create_and_append_menuitem( menu, indent + virtualMachine.getName() )
+            # menuItem = Gtk.MenuItem.new_with_label( indent + virtualMachine.getName() )#TODO Is above correctly converted?
 
 
     def _onVirtualMachine( self, menuItem, virtualMachine ):
