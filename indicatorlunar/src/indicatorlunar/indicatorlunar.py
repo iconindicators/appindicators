@@ -720,13 +720,12 @@ class IndicatorLunar( IndicatorBase ):
 
 
 #TODO Not sure if needed for comets...see below.
-    # def __getOnClickFunctionComet( self, menuItem ):
-    #     try:
-    #         objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
-    #         webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
-    #
-    #     except Exception:
-    #         pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
+    def getOnClickFunctionComet( self, menuItem ):
+        try:
+            objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
+            webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
+        except Exception:
+            pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
 
 
     def updateMenuPlanetsMinorPlanetsCometsStars( self, menu, menuLabel, bodies, bodiesData, bodyType ):
@@ -761,8 +760,9 @@ class IndicatorLunar( IndicatorBase ):
 
         def getOnClickFunction():
             onClickFunction = ( self.getOnClickMenuItemOpenBrowserFunction(), )
-            # if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
-            #     onClickFunction = ( self.__getOnClickFunctionComet(), )
+#TODO Need to test this...            
+            if bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
+                onClickFunction = ( self.getOnClickFunctionComet(), )
 
             return onClickFunction
 
