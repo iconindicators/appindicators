@@ -58,17 +58,6 @@ class IndicatorTest( IndicatorBase ):
         self.flushCache( IndicatorTest.CACHE_ICON_BASENAME, IndicatorTest.CACHE_ICON_MAXIMUM_AGE_HOURS )
 
 
-#TODO Testing tree.
-        treemodel = None
-        treeviewcolumn_titles_renderers_attributes_columns = (
-            ( _( "Fortune File/Directory" ), Gtk.CellRendererText(), "text", 0 ),
-            ( _( "Enabled" ), Gtk.CellRendererPixbuf(), "stock_id", 1 ), )
-
-        self.create_tree( treemodel, treeviewcolumn_titles_renderers_attributes_columns )
-
-
-
-
     def update( self, menu ):
         self.__buildMenu( menu )
         self.setLabel( IndicatorTest.LABEL )

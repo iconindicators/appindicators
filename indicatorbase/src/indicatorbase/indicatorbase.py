@@ -1040,38 +1040,51 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-    def create_tree(
+#TODO Indicator Test needs
+#            treeViewColumn.set_cell_data_func( rendererText, self.dataFunction, "" )
+#
+#TODO Indicator Virtual Box needs
+#            # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+# Maybe not...seems to work fine with SINGLE.
+    def create_treeview_within_scrolledwindow(
         self,
         treemodel,
-        treeviewcolumn_titles_renderers_attributes_columns,
+        treeviewcolumn_titles_renderers_attributes_columns_alignments,
         tooltip_text = "",
-        rowactivaed_function_and_arguments = None ):
+        rowactivated_function_and_arguments = None ):
 
-        tree = Gtk.TreeView.new_with_model( treemodel )
+        treeview = Gtk.TreeView.new_with_model( treemodel )
 
-        for title, renderer, attribute, column in treeviewcolumn_titles_renderers_attributes_columns:
-#            print( title, renderer, attribute, column )
+        for title, renderer, attribute, column, alignment in \
+            treeviewcolumn_titles_renderers_attributes_columns_alignments:
+
             treeviewcolumn = Gtk.TreeViewColumn( title )
             treeviewcolumn.pack_start( renderer, True )
             treeviewcolumn.add_attribute( renderer, attribute, column )
-            treeviewcolumn.set_sort_column_id( column ) #TODO Do for all columns/tables?
+            treeviewcolumn.set_sort_column_id( column ) #TODO Do for all columns/tables?  Maybe use a -1 to not sort?  Need another argument for the sort column as column is used above in add_attribute.
             treeviewcolumn.set_expand( True ) #TODO Do for all columns/tables?
-            treeviewcolumn.set_alignment( 0.5 ) #TODO Do for all columns/tables?  No, only for specific columns.
-            tree.append_column( treeviewcolumn )
+            treeviewcolumn.set_alignment( alignment ) #TODO Do for all columns/tables?  No, only for specific columns.
+            treeview.append_column( treeviewcolumn )
 
-        tree.set_tooltip_text( tooltip_text )
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE ) #TODO Do for all tables?  No...other types are used for other trees.
-        tree.expand_all() #TODO Do for all trees?
-#        tree.set_hexpand( True ) #TODO Can these be added to the scrolledWindow instead?
-#        tree.set_vexpand( True )
+#TODO For the sorting above, perhaps have a boolean called sort.  
+# If True, all columns sort, according to the given id.
+# If False, NO columns sort.
+# So this means sorting for all or sorting for none.
+# Does this keep all tables in all indicator's happy?
 
-        if rowactivaed_function_and_arguments:
-            tree.connect( "row-activated", *rowactivaed_function_and_arguments )
+        treeview.set_tooltip_text( tooltip_text )
+        treeview.get_selection().set_mode( Gtk.SelectionMode.SINGLE ) #TODO Either use single or browse...not sure yet if one can be used for all tables.
+        treeview.expand_all() #TODO Do for all trees?
+        treeview.set_hexpand( True )
+        treeview.set_vexpand( True )
+
+        if rowactivated_function_and_arguments:
+            treeview.connect( "row-activated", *rowactivated_function_and_arguments )
 
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledwindow.add( tree )
-        return scrolledwindow
+        scrolledwindow.add( treeview )
+        return treeview, scrolledwindow
 
 
 #TODO Look at all pack_start calls.

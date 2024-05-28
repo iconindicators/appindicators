@@ -221,33 +221,45 @@ class IndicatorOnThisDay( IndicatorBase ):
                 store.append( [ calendar, Gtk.STOCK_DIALOG_ERROR ] )
 
         storeSort = Gtk.TreeModelSort( model = store )
-        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
+        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Should the 0 be IndicatorOnThisDay.COLUMN_CALENDAR_FILE??? 
 
-        tree = Gtk.TreeView.new_with_model( storeSort )
-        tree.expand_all()
-        tree.set_hexpand( True )
-        tree.set_vexpand( True )
+        treeviewcolumn_titles_renderers_attributes_columns = (
+            ( _( "Calendar" ), Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_FILE, 0.0 ),
+            ( _( "Enabled" ), Gtk.CellRendererPixbuf(), "stock_id", IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED, 0.5 ) )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Calendar" ), Gtk.CellRendererText(), text = IndicatorOnThisDay.COLUMN_CALENDAR_FILE )
-        treeViewColumn.set_sort_column_id( 0 )
-        treeViewColumn.set_expand( True )
-        tree.append_column( treeViewColumn )
+        treeview, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow(
+                storeSort,
+                treeviewcolumn_titles_renderers_attributes_columns,
+                tooltip_text = _( "Double click to edit a calendar." ),
+                rowactivated_function_and_arguments= ( self.onCalendarDoubleClick, ) )
 
-        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
-        treeViewColumn.set_sort_column_id( 1 )
-        treeViewColumn.set_expand( True )
-        treeViewColumn.set_alignment( 0.5 )
-        tree.append_column( treeViewColumn )
+        # tree = Gtk.TreeView.new_with_model( storeSort )
+        # tree.expand_all()
+        # tree.set_hexpand( True )
+        # tree.set_vexpand( True )
 
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onCalendarDoubleClick )
-        tree.set_tooltip_text( _( "Double click to edit a calendar." ) )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Calendar" ), Gtk.CellRendererText(), text = IndicatorOnThisDay.COLUMN_CALENDAR_FILE )
+        # treeViewColumn.set_sort_column_id( 0 )
+        # treeViewColumn.set_expand( True )
+        # tree.append_column( treeViewColumn )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( tree )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
+        # treeViewColumn.set_sort_column_id( 1 )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # tree.append_column( treeViewColumn )
 
-        grid.attach( scrolledWindow, 0, 0, 1, 25 )
+        # tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        # tree.connect( "row-activated", self.onCalendarDoubleClick )
+        # tree.set_tooltip_text( _( "Double click to edit a calendar." ) )
+
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # scrolledWindow.add( tree )
+
+        # grid.attach( scrolledWindow, 0, 0, 1, 25 )
+        grid.attach( scrolledwindow, 0, 0, 1, 25 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
@@ -261,7 +273,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new calendar." ),
-                clicked_function_and_arguments = ( self.onCalendarAdd, tree ) ),
+                clicked_function_and_arguments = ( self.onCalendarAdd, treeview ) ),
             True,
             True,
             0 )
@@ -275,7 +287,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected calendar." ),
-                clicked_function_and_arguments = ( self.onCalendarRemove, tree ) ),
+                clicked_function_and_arguments = ( self.onCalendarRemove, treeview ) ),
             True,
             True,
             0 )
@@ -289,7 +301,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Reset" ),
                 tooltip_text = _( "Reset to factory default." ),
-                clicked_function_and_arguments = ( self.onCalendarReset, tree ) ),
+                clicked_function_and_arguments = ( self.onCalendarReset, treeview ) ),
             True,
             True,
             0 )

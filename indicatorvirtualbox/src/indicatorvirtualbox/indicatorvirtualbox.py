@@ -360,26 +360,39 @@ class IndicatorVirtualBox( IndicatorBase ):
         treeStore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
         groupsExist = self.__addItemsToStore( treeStore, None, self.getVirtualMachines() if self.isVBoxManageInstalled() else [ ] )
 
-        treeView = Gtk.TreeView.new_with_model( treeStore )
-        treeView.expand_all()
-        treeView.set_hexpand( True )
-        treeView.set_vexpand( True )
-        treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ) )
-        treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorVirtualBox.COLUMN_AUTOSTART ) ) # Column 1
-        treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_START_COMMAND ) )
-        treeView.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
-        treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-        treeView.connect( "row-activated", self.onVirtualMachineDoubleClick )
-        for column in treeView.get_columns():
-            column.set_expand( True )
+        treeviewcolumn_titles_renderers_attributes_columns = (
+            ( _( "Virtual Machine" ), Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME, 0.0 ),
+            ( _( "Autostart" ), Gtk.CellRendererPixbuf(), "stock_id", IndicatorVirtualBox.COLUMN_AUTOSTART, 0.5 ), # Column 1
+            ( _( "Start Command" ), Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_START_COMMAND, 0.0 ) )
 
-        treeView.get_column( 1 ).set_alignment( 0.5 ) # Autostart.
+        treeview, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow(
+                treeStore,
+                treeviewcolumn_titles_renderers_attributes_columns,
+                tooltip_text = _( "Double click to edit a virtual machine's properties." ),
+                rowactivated_function_and_arguments= ( self.onVirtualMachineDoubleClick, ) )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( treeView )
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # treeView = Gtk.TreeView.new_with_model( treeStore )
+        # treeView.expand_all()
+        # treeView.set_hexpand( True )
+        # treeView.set_vexpand( True )
+        # treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ) )
+        # treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorVirtualBox.COLUMN_AUTOSTART ) ) # Column 1
+        # treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_START_COMMAND ) )
+        # treeView.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )
+        # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+        # treeView.connect( "row-activated", self.onVirtualMachineDoubleClick )
+        # for column in treeView.get_columns():
+        #     column.set_expand( True )
 
-        notebook.append_page( scrolledWindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
+        # treeView.get_column( 1 ).set_alignment( 0.5 ) # Autostart.
+
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.add( treeView )
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+
+        # notebook.append_page( scrolledWindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
+        notebook.append_page( scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
 
         # General settings.
         grid = self.create_grid()
@@ -495,7 +508,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.sortGroupsAndVirtualMachinesEqually = sortGroupsAndVirtualMachinesEquallyCheckbox.get_active()
             self.refreshIntervalInMinutes = spinnerRefreshInterval.get_value_as_int()
             self.virtualMachinePreferences.clear()
-            self.__updateVirtualMachinePreferences( treeStore, treeView.get_model().get_iter_first() )
+            # self.__updateVirtualMachinePreferences( treeStore, treeView.get_model().get_iter_first() )#TODO Remove
+            self.__updateVirtualMachinePreferences( treeStore, treeview.get_model().get_iter_first() )
             self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
 
         return responseType

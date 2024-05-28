@@ -482,23 +482,37 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         for ppa in self.ppas:
             ppaStore.append( [ ppa.getUser(), ppa.getName(), ppa.getSeries(), ppa.getArchitecture() ] )
 
-        ppaTree = Gtk.TreeView.new_with_model( ppaStore )
-        ppaTree.set_hexpand( True )
-        ppaTree.set_vexpand( True )
-        ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
-        ppaTree.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
-        ppaTree.set_tooltip_text( _( "Double click to edit a PPA." ) )
-        ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        ppaTree.connect( "row-activated", self.onPPADoubleClick )
-        for column in ppaTree.get_columns():
-            column.set_expand( True )
+        treeviewcolumn_titles_renderers_attributes_columns = (
+            ( _( "PPA User" ), Gtk.CellRendererText(), "text", 0, 0.0 ),
+            ( _( "PPA Name" ), Gtk.CellRendererText(), "text", 1, 0.0 ),
+            ( _( "Series" ), Gtk.CellRendererText(), "text", 2, 0.0 ),
+            ( _( "Architecture" ), Gtk.CellRendererText(), "text", 3, 0.0 ) )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( ppaTree )
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+        ppaTree, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow(
+                ppaStore,
+                treeviewcolumn_titles_renderers_attributes_columns,
+                tooltip_text = _( "Double click to edit a PPA." ),
+                rowactivated_function_and_arguments= ( self.onPPADoubleClick, ) )
+
+        # ppaTree = Gtk.TreeView.new_with_model( ppaStore )
+        # ppaTree.set_hexpand( True )
+        # ppaTree.set_vexpand( True )
+        # ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
+        # ppaTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
+        # ppaTree.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
+        # ppaTree.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
+        # ppaTree.set_tooltip_text( _( "Double click to edit a PPA." ) )
+        # ppaTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        # ppaTree.connect( "row-activated", self.onPPADoubleClick )
+        # for column in ppaTree.get_columns():
+        #     column.set_expand( True )
+
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # scrolledWindow.add( ppaTree )
+        # grid.attach( scrolledWindow, 0, 0, 1, 1 )
+        grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
@@ -544,24 +558,39 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             filterText = self.filters.getFilterText( user, name, series, architecture )
             filterStore.append( [ user, name, series, architecture, "\n".join( filterText ) ] )
 
-        filterTree = Gtk.TreeView.new_with_model( filterStore )
-        filterTree.set_hexpand( True )
-        filterTree.set_vexpand( True )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
-        filterTree.append_column( Gtk.TreeViewColumn( _( "Filter" ), Gtk.CellRendererText(), text = 4 ) )
-        filterTree.set_tooltip_text( _( "Double click to edit a filter." ) )
-        filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
-        for column in filterTree.get_columns():
-            column.set_expand( True )
+        treeviewcolumn_titles_renderers_attributes_columns = (
+            ( _( "PPA User" ), Gtk.CellRendererText(), "text", 0, 0.0 ),
+            ( _( "PPA Name" ), Gtk.CellRendererText(), "text", 1, 0.0 ),
+            ( _( "Series" ), Gtk.CellRendererText(), "text", 2, 0.0 ),
+            ( _( "Architecture" ), Gtk.CellRendererText(), "text", 3, 0.0 ),
+            ( _( "Filter" ), Gtk.CellRendererText(), "text", 4, 0.0 ) )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( filterTree )
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
+        filterTree, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow(
+                filterStore,
+                treeviewcolumn_titles_renderers_attributes_columns,
+                tooltip_text = _( "Double click to edit a filter." ),
+                rowactivated_function_and_arguments= ( self.onFilterDoubleClick, ppaTree ) )
+
+        # filterTree = Gtk.TreeView.new_with_model( filterStore )
+        # filterTree.set_hexpand( True )
+        # filterTree.set_vexpand( True )
+        # filterTree.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
+        # filterTree.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
+        # filterTree.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
+        # filterTree.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
+        # filterTree.append_column( Gtk.TreeViewColumn( _( "Filter" ), Gtk.CellRendererText(), text = 4 ) )
+        # filterTree.set_tooltip_text( _( "Double click to edit a filter." ) )
+        # filterTree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        # filterTree.connect( "row-activated", self.onFilterDoubleClick, ppaTree )
+        # for column in filterTree.get_columns():
+        #     column.set_expand( True )
+
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # scrolledWindow.add( filterTree )
+        # grid.attach( scrolledWindow, 0, 0, 1, 1 )
+        grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )

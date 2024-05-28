@@ -80,7 +80,7 @@ class IndicatorFortune( IndicatorBase ):
 
     def update( self, menu ):
         self.buildMenu( menu )
-        self.refreshAndShowFortune()
+        # self.refreshAndShowFortune()#TODO Put back
         return int( self.refreshIntervalInMinutes ) * 60
 
 
@@ -215,6 +215,125 @@ class IndicatorFortune( IndicatorBase ):
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
         storeSort = Gtk.TreeModelSort( model = store )
+        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )  #TODO Should the 0 be IndicatorFortune.COLUMN_FILE_OR_DIRECTORY??? 
+
+        treeviewcolumn_titles_renderers_attributes_columns = (
+            ( _( "Fortune File/Directory" ), Gtk.CellRendererText(), "text", IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, 0.0 ),
+            ( _( "Enabled" ), Gtk.CellRendererPixbuf(), "stock_id", IndicatorFortune.COLUMN_ENABLED, 0.5 ) )
+
+        treeview, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow(
+                storeSort,
+                treeviewcolumn_titles_renderers_attributes_columns,
+                tooltip_text = _(
+                    "Double click to edit a fortune.\n\n" + \
+                    "English language fortunes are\n" + \
+                    "installed by default.\n\n" + \
+                    "There may be other fortune\n" + \
+                    "packages available in your\n" + \
+                    "native language." ),
+                rowactivated_function_and_arguments= ( self.onFortuneDoubleClick, ) )
+
+        # tree = Gtk.TreeView.new_with_model( storeSort )
+        # tree.expand_all()
+        # tree.set_hexpand( True ) #TODO Can these be added to the scrolledWindow instead?
+        # tree.set_vexpand( True )
+
+        # treeViewColumn = \
+        #     Gtk.TreeViewColumn(
+        #         _( "Fortune File/Directory" ),
+        #         Gtk.CellRendererText(),
+        #         text = IndicatorFortune.COLUMN_FILE_OR_DIRECTORY )
+
+        # treeViewColumn.set_sort_column_id( 0 )
+        # treeViewColumn.set_expand( True )
+        # tree.append_column( treeViewColumn )
+
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorFortune.COLUMN_ENABLED )
+        # treeViewColumn.set_sort_column_id( 1 )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # tree.append_column( treeViewColumn )
+
+        # tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+        # tree.connect( "row-activated", self.onFortuneDoubleClick )
+        # tree.set_tooltip_text( _(
+        #     "Double click to edit a fortune.\n\n" + \
+        #     "English language fortunes are\n" + \
+        #     "installed by default.\n\n" + \
+        #     "There may be other fortune\n" + \
+        #     "packages available in your\n" + \
+        #     "native language." ) )
+
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # scrolledWindow.add( tree )
+
+        grid.attach( scrolledwindow, 0, 0, 1, 1 )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_homogeneous( True ) #TODO What does homogeneous mean?
+
+        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
+        # addButton.set_tooltip_text( _( "Add a new fortune location." ) )
+        # addButton.connect( "clicked", self.onFortuneAdd, tree )
+        # box.pack_start( addButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Add" ),
+                tooltip_text = _( "Add a new fortune location." ),
+                clicked_function_and_arguments = ( self.onFortuneAdd, treeview ) ),
+            True,
+            True,
+            0 )
+
+        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
+        # removeButton.set_tooltip_text( _( "Remove the selected fortune location." ) )
+        # removeButton.connect( "clicked", self.onFortuneRemove, tree )
+        # box.pack_start( removeButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Remove" ),
+                tooltip_text = _( "Remove the selected fortune location." ),
+                clicked_function_and_arguments = ( self.onFortuneRemove, treeview ) ),
+            True,
+            True,
+            0 )
+
+        # resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
+        # resetButton.set_tooltip_text( _( "Reset to factory default." ) )
+        # resetButton.connect( "clicked", self.onFortuneReset, tree )
+        # box.pack_start( resetButton, True, True, 0 )
+#TODO Ensure this was converted correctly.
+        box.pack_start(
+            self.create_button(
+                _( "Reset" ),
+                tooltip_text = _( "Reset to factory default." ),
+                clicked_function_and_arguments = ( self.onFortuneReset, treeview ) ),
+            True,
+            True,
+            0 )
+
+        box.set_halign( Gtk.Align.CENTER )
+        grid.attach( box, 0, 1, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
+
+#TODO Below this can go...I hope!
+        # Fortune file  ORIGINAL.
+        grid = self.create_grid()
+
+        store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
+        for location, enabled in self.fortunes:
+            if os.path.isfile( location ) or os.path.isdir( location ):
+                store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
+
+            else:
+                store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
+
+        storeSort = Gtk.TreeModelSort( model = store )
         storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
 
         tree = Gtk.TreeView.new_with_model( storeSort )
@@ -303,6 +422,8 @@ class IndicatorFortune( IndicatorBase ):
         grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
+#TODO Above this can go...I hope!
+
 
         # General.
         grid = self.create_grid()
