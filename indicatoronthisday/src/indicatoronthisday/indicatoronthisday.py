@@ -220,17 +220,20 @@ class IndicatorOnThisDay( IndicatorBase ):
             else:
                 store.append( [ calendar, Gtk.STOCK_DIALOG_ERROR ] )
 
-        storeSort = Gtk.TreeModelSort( model = store )
-        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Should the 0 be IndicatorOnThisDay.COLUMN_CALENDAR_FILE??? 
-
-        treeviewcolumn_titles_renderers_attributes_columns = (
-            ( _( "Calendar" ), Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_FILE, 0.0 ),
-            ( _( "Enabled" ), Gtk.CellRendererPixbuf(), "stock_id", IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED, 0.5 ) )
+        # storeSort = Gtk.TreeModelSort( model = store )
+        # storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING ) #TODO Should the 0 be IndicatorOnThisDay.COLUMN_CALENDAR_FILE??? 
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                storeSort,
-                treeviewcolumn_titles_renderers_attributes_columns,
+                Gtk.TreeModelSort( model = store ),
+                ( _( "Calendar" ), _( "Enabled" ) ),
+                (
+                    ( Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
+                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
+                alignments_columnviewids = ( ( 0.5, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ), ),
+                sortcolumnviewids_columnmodelids = (
+                    ( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
+                    ( IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivated_function_and_arguments= ( self.onCalendarDoubleClick, ) )
 

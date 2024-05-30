@@ -491,7 +491,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         ppaTree, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 ppaStore,
-                treeviewcolumn_titles_renderers_attributes_columns,
+                (
+                    ( _( "PPA User" ), Gtk.CellRendererText(), "text", 0 ),
+                    ( _( "PPA Name" ), Gtk.CellRendererText(), "text", 1 ),
+                    ( _( "Series" ), Gtk.CellRendererText(), "text", 2 ),
+                    ( _( "Architecture" ), Gtk.CellRendererText(), "text", 3 ) ),
                 tooltip_text = _( "Double click to edit a PPA." ),
                 rowactivated_function_and_arguments= ( self.onPPADoubleClick, ) )
 
@@ -568,7 +572,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         filterTree, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 filterStore,
-                treeviewcolumn_titles_renderers_attributes_columns,
+                (
+                    ( _( "PPA User" ), Gtk.CellRendererText(), "text", 0 ),
+                    ( _( "PPA Name" ), Gtk.CellRendererText(), "text", 1 ),
+                    ( _( "Series" ), Gtk.CellRendererText(), "text", 2 ),
+                    ( _( "Architecture" ), Gtk.CellRendererText(), "text", 3 ),
+                    ( _( "Filter" ), Gtk.CellRendererText(), "text", 4 ) ),
                 tooltip_text = _( "Double click to edit a filter." ),
                 rowactivated_function_and_arguments= ( self.onFilterDoubleClick, ppaTree ) )
 

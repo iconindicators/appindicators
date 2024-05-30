@@ -333,23 +333,34 @@ class IndicatorTest( IndicatorBase ):
         store.append( [ "Saturday" ] )
         store.append( [ "Sunday" ] )
 
-        treeView = Gtk.TreeView.new_with_model( store )
-        treeView.expand_all()
-        treeView.set_hexpand( True )
-        treeView.set_vexpand( True )
-        treeView.set_tooltip_text( "Days of week containing an 'n' are bold." )
+        renderer_text_for_column_dayofweek = Gtk.CellRendererText()
+        treeview, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow(
+                store,
+                ( _( "Day of Week" ), ),
+                ( ( renderer_text_for_column_dayofweek, "text", 0 ), ),
+                datafunctionandarguments_renderers_columnviewids = (
+                    ( ( self.dataFunction, "" ), renderer_text_for_column_dayofweek, 0 ), ),
+                tooltip_text = "Days of week containing an 'n' are bold." )
 
-        rendererText = Gtk.CellRendererText()
-        treeViewColumn = Gtk.TreeViewColumn( _( "Day of Week" ), rendererText, text = 0 )
-        treeViewColumn.set_expand( True )
-        treeViewColumn.set_cell_data_func( rendererText, self.dataFunction, "" )
-        treeView.append_column( treeViewColumn )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( treeView )
-
-        grid.attach( scrolledWindow, 0, 1, 1, 10 )
+        # treeView = Gtk.TreeView.new_with_model( store )
+        # treeView.expand_all()
+        # treeView.set_hexpand( True )
+        # treeView.set_vexpand( True )
+        # treeView.set_tooltip_text( "Days of week containing an 'n' are bold." )
+        #
+        # rendererText = Gtk.CellRendererText()
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Day of Week" ), rendererText, text = 0 )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunction, "" )
+        # treeView.append_column( treeViewColumn )
+        #
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # scrolledWindow.add( treeView )
+        #
+        # grid.attach( scrolledWindow, 0, 1, 1, 10 )
+        grid.attach( scrolledwindow, 0, 22, 1, 10 )
 
         autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
         grid.attach( box, 0, 11, 1, 1 )

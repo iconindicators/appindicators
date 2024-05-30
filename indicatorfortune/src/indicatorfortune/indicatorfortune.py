@@ -214,17 +214,20 @@ class IndicatorFortune( IndicatorBase ):
             else:
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
-        storeSort = Gtk.TreeModelSort( model = store )
-        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )  #TODO Should the 0 be IndicatorFortune.COLUMN_FILE_OR_DIRECTORY??? 
-
-        treeviewcolumn_titles_renderers_attributes_columns = (
-            ( _( "Fortune File/Directory" ), Gtk.CellRendererText(), "text", IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, 0.0 ),
-            ( _( "Enabled" ), Gtk.CellRendererPixbuf(), "stock_id", IndicatorFortune.COLUMN_ENABLED, 0.5 ) )
+        # storeSort = Gtk.TreeModelSort( model = store )
+        # storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )  #TODO Should the 0 be IndicatorFortune.COLUMN_FILE_OR_DIRECTORY??? 
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                storeSort,
-                treeviewcolumn_titles_renderers_attributes_columns,
+                Gtk.TreeModelSort( model = store ),
+                ( _( "Fortune File/Directory" ), _( "Enabled" ) ),
+                (
+                    ( Gtk.CellRendererText(), "text", IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
+                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorFortune.COLUMN_ENABLED ) ),
+                alignments_columnviewids = ( ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
+                sortcolumnviewids_columnmodelids = (
+                    ( IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
+                    ( IndicatorFortune.COLUMN_ENABLED, IndicatorFortune.COLUMN_ENABLED ) ),
                 tooltip_text = _(
                     "Double click to edit a fortune.\n\n" + \
                     "English language fortunes are\n" + \
@@ -232,7 +235,7 @@ class IndicatorFortune( IndicatorBase ):
                     "There may be other fortune\n" + \
                     "packages available in your\n" + \
                     "native language." ),
-                rowactivated_function_and_arguments= ( self.onFortuneDoubleClick, ) )
+                rowactivated_function_and_arguments = ( self.onFortuneDoubleClick, ) )
 
         # tree = Gtk.TreeView.new_with_model( storeSort )
         # tree.expand_all()
@@ -421,7 +424,7 @@ class IndicatorFortune( IndicatorBase ):
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 1, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
+        # notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
 #TODO Above this can go...I hope!
 
 

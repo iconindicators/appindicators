@@ -52,7 +52,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
     # Data model columns used in the Preferences dialog.
-    COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME = 0 # Either the group or name of the virtual machine.
+    COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME = 0 # Either the group or name of the virtual machine.
     COLUMN_AUTOSTART = 1 # Icon name for the APPLY icon when the virtual machine is to autostart; None otherwise.
     COLUMN_START_COMMAND = 2 # Start command for the virtual machine.
     COLUMN_UUID = 3 # The UUID for the virtual machine (used to identify; not displayed).
@@ -360,15 +360,15 @@ class IndicatorVirtualBox( IndicatorBase ):
         treeStore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
         groupsExist = self.__addItemsToStore( treeStore, None, self.getVirtualMachines() if self.isVBoxManageInstalled() else [ ] )
 
-        treeviewcolumn_titles_renderers_attributes_columns = (
-            ( _( "Virtual Machine" ), Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME, 0.0 ),
-            ( _( "Autostart" ), Gtk.CellRendererPixbuf(), "stock_id", IndicatorVirtualBox.COLUMN_AUTOSTART, 0.5 ), # Column 1
-            ( _( "Start Command" ), Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_START_COMMAND, 0.0 ) )
-
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 treeStore,
-                treeviewcolumn_titles_renderers_attributes_columns,
+                ( _( "Virtual Machine" ), _( "Autostart" ), _( "Start Command" ) ),
+                (
+                    ( Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
+                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorVirtualBox.COLUMN_AUTOSTART ),
+                    ( Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
+                alignments_columnviewids = ( ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
                 tooltip_text = _( "Double click to edit a virtual machine's properties." ),
                 rowactivated_function_and_arguments= ( self.onVirtualMachineDoubleClick, ) )
 
@@ -376,7 +376,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         # treeView.expand_all()
         # treeView.set_hexpand( True )
         # treeView.set_vexpand( True )
-        # treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHNINE_NAME ) )
+        # treeView.append_column( Gtk.TreeViewColumn( _( "Virtual Machine" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ) )
         # treeView.append_column( Gtk.TreeViewColumn( _( "Autostart" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorVirtualBox.COLUMN_AUTOSTART ) ) # Column 1
         # treeView.append_column( Gtk.TreeViewColumn( _( "Start Command" ), Gtk.CellRendererText(), text = IndicatorVirtualBox.COLUMN_START_COMMAND ) )
         # treeView.set_tooltip_text( _( "Double click to edit a virtual machine's properties." ) )

@@ -626,6 +626,16 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
         self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
+#TODO May be able to use this to determine the os/platform/distro:
+# desktop_environment = os.environ.get('DESKTOP_SESSION')
+#         if desktop_environment:
+#             if desktop_environment.lower()[:8] == 'cinnamon':
+#                 svg = indicator_icon
+#             if desktop_environment.lower()[:7] == 'xubuntu':
+#                 svg = indicator_icon
+#             if desktop_environment.lower()[:4] == 'xfce':
+#                 svg = indicator_icon
+
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -1046,31 +1056,74 @@ class IndicatorBase( ABC ):
 #TODO Indicator Virtual Box needs
 #            # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
 # Maybe not...seems to work fine with SINGLE.
+# Test both BROWSE and SINGLE when NO items are in the treeview.
+#
+#TODO Indicator Script Runner needs multiple renderers for one column.
+#This is done by calling the add_attribute.
+# So maybe need an additional argument for additional attributes to take renders beyond the first?
     def create_treeview_within_scrolledwindow(
         self,
-        treemodel,
-        treeviewcolumn_titles_renderers_attributes_columns_alignments,
+        treemodel, # Must be a sorted store for sorting of columns.
+        titles,
+        renderers_attributes_columnmodelids, # Columns will not be expanded: treeviewcolumn.pack_start( renderer, False )
+        alignments_columnviewids = None,
+        sortcolumnviewids_columnmodelids = None, # First column will be set as default sorted ascendingly.
+        datafunctionandarguments_renderers_columnviewids = None, #TODO Rename to celldatafun...?
         tooltip_text = "",
+        clickable_columnviewids = None, #TODO Is this related to the argument below?  If so, can they be combined?
+        clicked_column_function_and_arguments = None,
         rowactivated_function_and_arguments = None ):
 
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
-        for title, renderer, attribute, column, alignment in \
-            treeviewcolumn_titles_renderers_attributes_columns_alignments:
-
+        for title, renderer_attribute_columnmodelid in zip( titles, renderers_attributes_columnmodelids ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
-            treeviewcolumn.pack_start( renderer, True )
-            treeviewcolumn.add_attribute( renderer, attribute, column )
-            treeviewcolumn.set_sort_column_id( column ) #TODO Do for all columns/tables?  Maybe use a -1 to not sort?  Need another argument for the sort column as column is used above in add_attribute.
             treeviewcolumn.set_expand( True ) #TODO Do for all columns/tables?
-            treeviewcolumn.set_alignment( alignment ) #TODO Do for all columns/tables?  No, only for specific columns.
+
+            # Add the renderer / attribute / column model id for each column.
+            if type( renderer_attribute_columnmodelid[ 2 ] ) is int: # This is a tuple of renderer, attribute, column model id.
+                treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
+                treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
+
+            else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
+#TODO Test out this clause with Indicator Script Runner (the Interval column has two cell renderers).
+                for renderer_attribute_columnmodelid in renderers_attributes_columnmodelids:
+                    treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
+                    treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
+
             treeview.append_column( treeviewcolumn )
 
-#TODO For the sorting above, perhaps have a boolean called sort.  
-# If True, all columns sort, according to the given id.
-# If False, NO columns sort.
-# So this means sorting for all or sorting for none.
-# Does this keep all tables in all indicator's happy?
+        if alignments_columnviewids:
+            for alignment, columnviewid in alignments_columnviewids:
+                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid == index:
+                        treeviewcolumn.set_alignment( alignment )
+
+        if sortcolumnviewids_columnmodelids:
+            for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
+                for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid == indexcolumn:
+                        treeviewcolumn.set_sort_column_id( columnmodelid )
+                        if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
+                            treemodel.set_sort_column_id( columnmodelid, Gtk.SortType.ASCENDING ) # Set first sorted column as default ascending.
+
+        if datafunctionandarguments_renderers_columnviewids:
+            for data_function_and_arguments, renderer, columnviewid in datafunctionandarguments_renderers_columnviewids:
+                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid == index:
+                        treeviewcolumn.set_cell_data_func( renderer, *data_function_and_arguments )
+
+        if clickable_columnviewids:
+            for columnviewid in clickable_columnviewids:
+                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid == index:
+                        treeviewcolumn.set_clickable( True )
+
+        if clicked_column_function_and_arguments:
+            for columnviewid_function_and_arguments in clicked_column_function_and_arguments:
+                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid_function_and_arguments[ 0 ] == index:
+                        treeviewcolumn.connect( "clicked", *columnviewid_function_and_arguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
         treeview.get_selection().set_mode( Gtk.SelectionMode.SINGLE ) #TODO Either use single or browse...not sure yet if one can be used for all tables.
