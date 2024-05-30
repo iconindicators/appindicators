@@ -464,12 +464,12 @@ class IndicatorBase( ABC ):
 
 
     def create_and_append_menuitem(
-            self,
-            menu,
-            label,
-            name = None,
-            activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
-            isSecondaryActivateTarget = False ):
+        self,
+        menu,
+        label,
+        name = None,
+        activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        isSecondaryActivateTarget = False ):
 
         menuItem = Gtk.MenuItem.new_with_label( label )
 
@@ -516,13 +516,13 @@ class IndicatorBase( ABC ):
 
 
     def create_and_insert_menuitem(
-            self,
-            menu,
-            label,
-            index,
-            name = None,
-            activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
-            isSecondaryActivateTarget = False ):
+        self,
+        menu,
+        label,
+        index,
+        name = None,
+        activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        isSecondaryActivateTarget = False ):
 
         menuItem = self.create_and_append_menuitem(
             menu,
@@ -635,7 +635,6 @@ class IndicatorBase( ABC ):
 #                 svg = indicator_icon
 #             if desktop_environment.lower()[:4] == 'xfce':
 #                 svg = indicator_icon
-
 
 
     def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
@@ -958,13 +957,13 @@ class IndicatorBase( ABC ):
 
 
     def create_button(
-            self,
-            label,
-            tooltip_text = "",
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0,
-            clicked_function_and_arguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        self,
+        label,
+        tooltip_text = "",
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0,
+        clicked_function_and_arguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
 
         button = Gtk.Button.new_with_label( label )
         self.__set_widget_common_attributes( button, tooltip_text, sensitive, margin_top, margin_left )
@@ -986,16 +985,16 @@ class IndicatorBase( ABC ):
 
 
     def create_spinbutton(
-            self,
-            value,
-            lower,
-            upper,
-            step_increment = 1,
-            page_increment = 10,
-            tooltip_text = "",
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0 ):
+        self,
+        value,
+        lower,
+        upper,
+        step_increment = 1,
+        page_increment = 10,
+        tooltip_text = "",
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0 ):
 
         spinner = Gtk.SpinButton()
         self.__set_widget_common_attributes( spinner, tooltip_text, sensitive, margin_top, margin_left )
@@ -1006,13 +1005,13 @@ class IndicatorBase( ABC ):
 
 
     def create_checkbutton(
-            self,
-            label,
-            tooltip_text = "",
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0,
-            active = True ):
+        self,
+        label,
+        tooltip_text = "",
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0,
+        active = True ):
 
         checkbutton = Gtk.CheckButton.new_with_label( label )
         self.__set_widget_common_attributes( checkbutton, tooltip_text, sensitive, margin_top, margin_left )
@@ -1021,14 +1020,14 @@ class IndicatorBase( ABC ):
 
 
     def create_radiobutton(
-            self,
-            radio_group_member,
-            label,
-            tooltip_text = "",
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0,
-            active = True ):
+        self,
+        radio_group_member,
+        label,
+        tooltip_text = "",
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0,
+        active = True ):
 
         radiobutton = Gtk.RadioButton.new_with_label_from_widget( radio_group_member, label )
         self.__set_widget_common_attributes( radiobutton, tooltip_text, sensitive, margin_top, margin_left )
@@ -1037,12 +1036,12 @@ class IndicatorBase( ABC ):
 
 
     def __set_widget_common_attributes(
-            self,
-            widget,
-            tooltip_text = "",
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0 ):
+        self,
+        widget,
+        tooltip_text = "",
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0 ):
 
         widget.set_tooltip_text( tooltip_text )
         widget.set_sensitive( sensitive )
@@ -1169,26 +1168,11 @@ class IndicatorBase( ABC ):
         Not sure about the hexpand/vexpand: maybe should be associated with the treeview...see below.
         Also, have seen treeview.expand_all()
 
-
-        12
-        tree = Gtk.TreeView.new_with_model( displayTagsStoreSort )
-
         7
         textView = Gtk.TextView()
 
         7
         city = Gtk.ComboBoxText.new_with_entry()
-
-        What about 
-        treeViewColumn = \
-            Gtk.TreeViewColumn(
-                _( "Fortune File/Directory" ),
-                Gtk.CellRendererText(),
-                text = IndicatorFortune.COLUMN_FILE_OR_DIRECTORY )
-
-        treeViewColumn.set_sort_column_id( 0 )
-        treeViewColumn.set_expand( True )
-        tree.append_column( treeViewColumn )
         '''
 
 
