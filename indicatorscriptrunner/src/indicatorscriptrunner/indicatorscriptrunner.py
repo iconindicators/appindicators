@@ -276,26 +276,26 @@ class IndicatorScriptRunner( IndicatorBase ):
         backgroundScriptsTreeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) )
         indicatorTextEntry = Gtk.Entry()
 
-
+#TODO Need to check the whole conversion below!!!
         renderer_pixbuf_column_remove = Gtk.CellRendererPixbuf()
         renderer_text_column_interval = Gtk.CellRendererText()
         renderer_text_column_name = Gtk.CellRendererText()
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                Gtk.TreeModelSort( model = store ),
+                None, #TODO The model is defined later...so not sure what/how to handle this.
                 (
                     _( "Group" ),
                     _( "Name" ),
                     _( "Sound" ),
                     _( "Notification" ),
                     _( "Background" ),
-                    _( "Terminal" )
-                    _( "Interval" )
+                    _( "Terminal" ),
+                    _( "Interval" ),
                     _( "Force Update" ) ),
                 (
                     ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_GROUP ),
-                    ( renderer_text_column_name, text = IndicatorScriptRunner.COLUMN_NAME ),
+                    ( renderer_text_column_name, "text", IndicatorScriptRunner.COLUMN_NAME ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_SOUND ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_NOTIFICATION ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_BACKGROUND ),
