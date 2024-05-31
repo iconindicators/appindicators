@@ -1349,7 +1349,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( COLUMN_TRANSLATED_TAG - 1, COLUMN_TRANSLATED_TAG ), # Note the offset by one for the view column!
                     ( COLUMN_VALUE - 1, COLUMN_VALUE ) ), # Note the offset by one for the view column!
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
-                rowactivated_function_and_arguments= ( self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText ) )
+                rowactivatedfunctionandarguments= ( self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText ) )
 
         # tree = Gtk.TreeView.new_with_model( displayTagsStoreSort )
         # tree.set_hexpand( True )
@@ -1560,9 +1560,8 @@ class IndicatorLunar( IndicatorBase ):
                     "Check a planet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." ),
-                clickable_columnviewids = ( PLANET_STORE_INDEX_HIDE_SHOW, ),
-                clicked_column_function_and_arguments = \
-                    ( ( PLANET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, planetStore ) ), ) )
+                clickablecolumnviewids_functionsandarguments = \
+                    ( ( PLANET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, planetStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planets" ), PLANET_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
@@ -1606,9 +1605,8 @@ class IndicatorLunar( IndicatorBase ):
                     "the source could not be reached,\n" + \
                     "or no data was available, or the data\n" + \
                     "was completely filtered by magnitude." ),
-                clickable_columnviewids = ( MINOR_PLANET_STORE_INDEX_HIDE_SHOW, ),
-                clicked_column_function_and_arguments = \
-                    ( ( MINOR_PLANET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, minorPlanetStore ) ), ) )
+                clickablecolumnviewids_functionsandarguments = \
+                    ( ( MINOR_PLANET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, minorPlanetStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planets" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
@@ -1651,9 +1649,8 @@ class IndicatorLunar( IndicatorBase ):
                     "could not be reached, or no data was\n" + \
                     "available from the source, or the data\n" + \
                     "was completely filtered by magnitude." ),
-                clickable_columnviewids = ( COMET_STORE_INDEX_HIDE_SHOW, ),
-                clicked_column_function_and_arguments = \
-                    ( ( COMET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, cometStore ) ), ) )
+                clickablecolumnviewids_functionsandarguments = \
+                    ( ( COMET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, cometStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
@@ -1687,9 +1684,8 @@ class IndicatorLunar( IndicatorBase ):
                     "Check a star to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." ),
-                clickable_columnviewids = ( STAR_STORE_INDEX_HIDE_SHOW, ),
-                clicked_column_function_and_arguments = \
-                    ( ( STAR_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, starStore ) ), ) )
+                clickablecolumnviewids_functionsandarguments = \
+                    ( ( STAR_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, starStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( starStore, toolTipText, _( "Stars" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
@@ -1737,9 +1733,8 @@ class IndicatorLunar( IndicatorBase ):
                                     "Satellite data is unavailable;\n" + \
                                     "the source could not be reached,\n" + \
                                     "or data was available." ),
-                clickable_columnviewids = ( SATELLITE_STORE_INDEX_HIDE_SHOW, ),
-                clicked_column_function_and_arguments = \
-                    ( ( SATELLITE_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, satelliteStore ) ), ) )
+                clickablecolumnviewids_functionsandarguments = \
+                    ( ( SATELLITE_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, satelliteStore ), ), ) )
 
         # tree = Gtk.TreeView.new_with_model( satelliteStoreSort )
         # tree.set_hexpand( True )

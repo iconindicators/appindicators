@@ -370,7 +370,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
                 alignments_columnviewids = ( ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
                 tooltip_text = _( "Double click to edit a virtual machine's properties." ),
-                rowactivated_function_and_arguments= ( self.onVirtualMachineDoubleClick, ) )
+                rowactivatedfunctionandarguments = ( self.onVirtualMachineDoubleClick, ) )
 
         # treeView = Gtk.TreeView.new_with_model( treeStore )
         # treeView.expand_all()

@@ -310,14 +310,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( 0.5, IndicatorScriptRunner.COLUMN_BACKGROUND ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_TERMINAL ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_FORCE_UPDATE ) ),
-                datafunctionandarguments_renderers_columnviewids = ( self.dataFunctionNameColumn, copyOfScripts, IndicatorScriptRunner.COLUMN_NAME ),
+                celldatafunctionandarguments_renderers_columnviewids = ( self.dataFunctionNameColumn, copyOfScripts, IndicatorScriptRunner.COLUMN_NAME ),
                 tooltip_text = _(
                     "Double-click to edit a script.\n\n" + \
                     "If an attribute does not apply to a script,\n" + \
                     "a dash is displayed.\n\n" + \
                     "If a non-background script is checked as\n" + \
                     "default, the name will appear in bold." ),
-                rowactivated_function_and_arguments = (
+                rowactivatedfunctionandarguments = (
                     ( renderer_text_column_name, self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts, ),
                     ( renderer_text_column_interval, self.dataFunctionIntervalColumn ),
                     ( renderer_pixbuf_column_remove, self.dataFunctionIntervalColumn ) ) )

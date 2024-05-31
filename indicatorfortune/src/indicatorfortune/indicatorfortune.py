@@ -235,7 +235,7 @@ class IndicatorFortune( IndicatorBase ):
                     "There may be other fortune\n" + \
                     "packages available in your\n" + \
                     "native language." ),
-                rowactivated_function_and_arguments = ( self.onFortuneDoubleClick, ) )
+                rowactivatedfunctionandarguments = ( self.onFortuneDoubleClick, ) )
 
         # tree = Gtk.TreeView.new_with_model( storeSort )
         # tree.expand_all()

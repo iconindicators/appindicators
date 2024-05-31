@@ -236,11 +236,12 @@ class IndicatorBase( ABC ):
 #
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
-    def __init__( self,
-                  comments,
-                  artwork = None,
-                  creditz = None,
-                  debug = False ):
+    def __init__(
+        self,
+        comments,
+        artwork = None,
+        creditz = None,
+        debug = False ):
 
         self.indicatorName = IndicatorBase.INDICATOR_NAME
 
@@ -1049,9 +1050,6 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-#TODO Indicator Test needs
-#            treeViewColumn.set_cell_data_func( rendererText, self.dataFunction, "" )
-#
 #TODO Indicator Virtual Box needs
 #            # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
 # Maybe not...seems to work fine with SINGLE.
@@ -1067,11 +1065,10 @@ class IndicatorBase( ABC ):
         renderers_attributes_columnmodelids, # Columns will not be expanded: treeviewcolumn.pack_start( renderer, False )
         alignments_columnviewids = None,
         sortcolumnviewids_columnmodelids = None, # First column will be set as default sorted ascendingly.
-        datafunctionandarguments_renderers_columnviewids = None, #TODO Rename to celldatafun...?
+        celldatafunctionandarguments_renderers_columnviewids = None,
+        clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
-        clickable_columnviewids = None, #TODO Is this related to the argument below?  If so, can they be combined?
-        clicked_column_function_and_arguments = None,
-        rowactivated_function_and_arguments = None ):
+        rowactivatedfunctionandarguments = None ):
 
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
@@ -1106,23 +1103,18 @@ class IndicatorBase( ABC ):
                         if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
                             treemodel.set_sort_column_id( columnmodelid, Gtk.SortType.ASCENDING ) # Set first sorted column as default ascending.
 
-        if datafunctionandarguments_renderers_columnviewids:
-            for data_function_and_arguments, renderer, columnviewid in datafunctionandarguments_renderers_columnviewids:
+        if celldatafunctionandarguments_renderers_columnviewids:
+            for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == index:
                         treeviewcolumn.set_cell_data_func( renderer, *data_function_and_arguments )
 
-        if clickable_columnviewids:
-            for columnviewid in clickable_columnviewids:
+        if clickablecolumnviewids_functionsandarguments:
+            for columnviewid_functionandarguments in clickablecolumnviewids_functionsandarguments:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
-                    if columnviewid == index:
+                    if columnviewid_functionandarguments[ 0 ] == index:
                         treeviewcolumn.set_clickable( True )
-
-        if clicked_column_function_and_arguments:
-            for columnviewid_function_and_arguments in clicked_column_function_and_arguments:
-                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
-                    if columnviewid_function_and_arguments[ 0 ] == index:
-                        treeviewcolumn.connect( "clicked", *columnviewid_function_and_arguments[ 1 ] )
+                        treeviewcolumn.connect( "clicked", *columnviewid_functionandarguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
         treeview.get_selection().set_mode( Gtk.SelectionMode.SINGLE ) #TODO Either use single or browse...not sure yet if one can be used for all tables.
@@ -1130,8 +1122,8 @@ class IndicatorBase( ABC ):
         treeview.set_hexpand( True )
         treeview.set_vexpand( True )
 
-        if rowactivated_function_and_arguments:
-            treeview.connect( "row-activated", *rowactivated_function_and_arguments )
+        if rowactivatedfunctionandarguments:
+            treeview.connect( "row-activated", *rowactivatedfunctionandarguments )
 
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1500,19 +1492,21 @@ class IndicatorBase( ABC ):
 
         if theFile: # A value of "" evaluates to False.
             dateTimeComponent = theFile[ len( basename ) : len( basename ) + 14 ]
-            expiry = datetime.datetime.strptime(
-                        dateTimeComponent,
-                        IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ).replace( tzinfo = datetime.timezone.utc ) # YYYYMMDDHHMMSS is 14 characters.
+
+            # YYYYMMDDHHMMSS is 14 characters.
+            expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            expiry = expiry.replace( tzinfo = datetime.timezone.utc )
 
         return expiry
 
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
     def getCacheFilenameWithTimestamp( self, basename, extension = EXTENSION_TEXT ):
-        return self.__getCacheDirectory() + \
-               basename + \
-               datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
-               extension
+        return \
+            self.__getCacheDirectory() + \
+            basename + \
+            datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            extension
 
 
     # Search through the cache for all files matching the basename.

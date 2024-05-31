@@ -235,7 +235,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
                     ( IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
-                rowactivated_function_and_arguments= ( self.onCalendarDoubleClick, ) )
+                rowactivatedfunctionandarguments= ( self.onCalendarDoubleClick, ) )
 
         # tree = Gtk.TreeView.new_with_model( storeSort )
         # tree.expand_all()

@@ -497,7 +497,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( _( "Series" ), Gtk.CellRendererText(), "text", 2 ),
                     ( _( "Architecture" ), Gtk.CellRendererText(), "text", 3 ) ),
                 tooltip_text = _( "Double click to edit a PPA." ),
-                rowactivated_function_and_arguments= ( self.onPPADoubleClick, ) )
+                rowactivatedfunctionandarguments= ( self.onPPADoubleClick, ) )
 
         # ppaTree = Gtk.TreeView.new_with_model( ppaStore )
         # ppaTree.set_hexpand( True )
@@ -579,7 +579,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( _( "Architecture" ), Gtk.CellRendererText(), "text", 3 ),
                     ( _( "Filter" ), Gtk.CellRendererText(), "text", 4 ) ),
                 tooltip_text = _( "Double click to edit a filter." ),
-                rowactivated_function_and_arguments= ( self.onFilterDoubleClick, ppaTree ) )
+                rowactivatedfunctionandarguments= ( self.onFilterDoubleClick, ppaTree ) )
 
         # filterTree = Gtk.TreeView.new_with_model( filterStore )
         # filterTree.set_hexpand( True )
