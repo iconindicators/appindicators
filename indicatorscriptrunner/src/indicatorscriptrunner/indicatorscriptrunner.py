@@ -282,14 +282,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         renderer_text_column_interval = Gtk.CellRendererText()
         renderer_text_column_name = Gtk.CellRendererText()
 
-#TODO I think the Terminal column should come before the Background column.
-# Tried swapping and the view did not change except for column headers...why?
-#TODO The bitcoin row is thick...why?
-#
-#Both these seem to be okay now...but
-#the Terminal and Background column values are around the wrong way.
-# So for all treeviews, best to define the model columns and view columns, 
-# even if they are the same values.
+#TODO The Terminal and Background column values are around the wrong way.
+# So define the model columns and view columns for both trees.
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ),

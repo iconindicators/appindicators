@@ -1323,13 +1323,17 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        # Table to show all attributes of selected/checked bodies.
+        # Treeview showing all attributes of selected/checked bodies.
         # If a body's magnitude passes through the magnitude filter,
         # all attributes (rise/set/az/alt) will be displayed in this table,
         # irrespective of the setting to hide bodies below the horizon.
-        COLUMN_TAG = 0
-        COLUMN_TRANSLATED_TAG = 1
-        COLUMN_VALUE = 2
+        COLUMN_MODEL_TAG = 0
+        COLUMN_MODEL_TRANSLATED_TAG = 1
+        COLUMN_MODEL_VALUE = 2
+
+        COLUMN_VIEW_TRANSLATED_TAG = 1
+        COLUMN_VIEW_VALUE = 2
+
         displayTagsStore = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialiseDisplayTagsStore( displayTagsStore )
 
@@ -1343,11 +1347,11 @@ class IndicatorLunar( IndicatorBase ):
                 Gtk.TreeModelSort( model = displayTagsStore ),
                 ( _( "Tag" ), _( "Value" ) ),
                 (
-                    ( Gtk.CellRendererText(), "text", COLUMN_TRANSLATED_TAG ),
-                    ( Gtk.CellRendererText(), "text", COLUMN_VALUE ) ),
+                    ( Gtk.CellRendererText(), "text", COLUMN_MODEL_TRANSLATED_TAG ),
+                    ( Gtk.CellRendererText(), "text", COLUMN_MODEL_VALUE ) ),
                 sortcolumnviewids_columnmodelids = (
-                    ( COLUMN_TRANSLATED_TAG - 1, COLUMN_TRANSLATED_TAG ), # Note the offset by one for the view column!
-                    ( COLUMN_VALUE - 1, COLUMN_VALUE ) ), # Note the offset by one for the view column!
+                    ( COLUMN_VIEW_TRANSLATED_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
+                    ( COLUMN_VIEW_VALUE, COLUMN_MODEL_VALUE ) ),
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
                 rowactivatedfunctionandarguments= ( self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText ) )
 
@@ -1524,55 +1528,59 @@ class IndicatorLunar( IndicatorBase ):
         # Planets / minor planets / comets / stars.
         box = Gtk.Box( spacing = 20 )
 
-
-#TODO These are somewhat repeated for each of planet, mp, comet and star...
+#TODO Only the 0 is used in the three toggle functions later on.
+# Keep this here with a big comment?
+# Where else to put it?
         COLUMN_INDEX_TOGGLE = 0
-        COLUMN_INDEX_DATA = 1 
+#        COLUMN_INDEX_DATA = 1 
 
-#TODO Can/should this be moved into the base class?
-#TODO Can this be safely left here as an inner function?
-        def toggleCheckbox( cellRendererToggle, row, listStore ):
-            listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
+        NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW = 0
+        NATURAL_BODY_MODEL_COLUMN_NAME = 1
+        NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME = 2
 
+        NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW = 0
+        NATURAL_BODY_VIEW_COLUMN_TRANSLATED_NAME = 1
 
-        PLANET_STORE_INDEX_HIDE_SHOW = 0
-        PLANET_STORE_INDEX_NAME = 1
-        PLANET_STORE_INDEX_TRANSLATED_NAME = 2
         planetStore = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planetName in IndicatorLunar.astroBackend.PLANETS:
-            planetStore.append( [ planetName in self.planets, planetName, IndicatorLunar.astroBackend.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
+            planetStore.append( [
+                planetName in self.planets,
+                planetName,
+                IndicatorLunar.astroBackend.PLANET_NAMES_TRANSLATIONS[ planetName ] ] )
 
         # toolTipText = _( "Check a planet to display in the menu." ) + "\n\n" + \
         #               _( "Clicking the header of the first column\n" + \
         #                  "will toggle all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckbox, planetStore )
+        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, planetStore )
 
+#TODO What about a 0.5 alignment for each of the first checkbox columns
+# for planets, minor planets, comets, stars and satellites?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 planetStore,
                 ( "", _( "Planets" ), ),
                 (
-                    ( renderer_toggle, "active", COLUMN_INDEX_TOGGLE ),
-                    ( Gtk.CellRendererText(), "text", PLANET_STORE_INDEX_TRANSLATED_NAME ) ),
+                    ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
+                    ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 tooltip_text = _(
                     "Check a planet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( PLANET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, planetStore ), ), ) )
+                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, planetStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planets" ), PLANET_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
 
-        MINOR_PLANET_STORE_INDEX_HIDE_SHOW = 0
-        MINOR_PLANET_STORE_INDEX_NAME = 1
-        MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME = 2
         minorPlanetStore = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-        if self.minorPlanetApparentMagnitudeData:
+        if self.minorPlanetApparentMagnitudeData: # No need to also check for orbital element data; either have both or neither.   #TODO Is this comment/check valid...?  Why have the full check for the tooltip below?
             for minorPlanet in sorted( self.minorPlanetOrbitalElementData.keys() ):
-                minorPlanetStore.append( [ minorPlanet in self.minorPlanets, minorPlanet, self.minorPlanetOrbitalElementData[ minorPlanet ].getName() ] )
+                minorPlanetStore.append( [
+                    minorPlanet in self.minorPlanets,
+                    minorPlanet,
+                    self.minorPlanetOrbitalElementData[ minorPlanet ].getName() ] )
 
         # if self.minorPlanetOrbitalElementData and self.minorPlanetApparentMagnitudeData:
         #     toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
@@ -1587,15 +1595,15 @@ class IndicatorLunar( IndicatorBase ):
         #         "was completely filtered by magnitude." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckbox, minorPlanetStore )
+        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, minorPlanetStore )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 minorPlanetStore,
                 ( "", _( "Minor Planets" ), ),
                 (
-                    ( renderer_toggle, "active", COLUMN_INDEX_TOGGLE ),
-                    ( Gtk.CellRendererText(), "text", MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ) ),
+                    ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
+                    ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 tooltip_text = _(
                     "Check a minor planet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
@@ -1606,17 +1614,18 @@ class IndicatorLunar( IndicatorBase ):
                     "or no data was available, or the data\n" + \
                     "was completely filtered by magnitude." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( MINOR_PLANET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, minorPlanetStore ), ), ) )
+                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, minorPlanetStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planets" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
-        COMET_STORE_INDEX_HIDE_SHOW = 0
-        COMET_STORE_INDEX_NAME = 1
-        COMET_STORE_INDEX_HUMAN_READABLE_NAME = 2
         cometStore = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
+#TODO Check for data present as minor planets above?        
         for comet in sorted( self.cometOrbitalElementData.keys() ):
-            cometStore.append( [ comet in self.comets, comet, self.cometOrbitalElementData[ comet ].getName() ] )
+            cometStore.append( [
+                comet in self.comets,
+                comet,
+                self.cometOrbitalElementData[ comet ].getName() ] )
 
         # if self.cometOrbitalElementData:
         #     toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
@@ -1631,38 +1640,38 @@ class IndicatorLunar( IndicatorBase ):
         #         "was completely filtered by magnitude." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckbox, cometStore )
+        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, cometStore )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 cometStore,
-                ( "", _( "Minor Planets" ), ),
+                ( "", _( "Comets" ), ),
                 (
-                    ( renderer_toggle, "active", COLUMN_INDEX_TOGGLE ),
-                    ( Gtk.CellRendererText(), "text", COMET_STORE_INDEX_HUMAN_READABLE_NAME ) ),
+                    ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
+                    ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 tooltip_text = _(
                     "Check a comet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." )
-                    if self.minorPlanetOrbitalElementData and self.minorPlanetApparentMagnitudeData else _(
+                    if self.cometOrbitalElementData else _(
                     "Comet data is unavailable; the source\n" + \
                     "could not be reached, or no data was\n" + \
                     "available from the source, or the data\n" + \
                     "was completely filtered by magnitude." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( COMET_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, cometStore ), ), ) )
+                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, cometStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
-        stars = [ ] # List of lists, each sublist containing star is checked flag, star name, star translated name.
+        stars = [ ]
         for starName in IndicatorLunar.astroBackend.getStarNames():
-            stars.append( [ starName in self.stars, starName, IndicatorLunar.astroBackend.getStarNameTranslation( starName ) ] )
+            stars.append( [
+                starName in self.stars,
+                starName,
+                IndicatorLunar.astroBackend.getStarNameTranslation( starName ) ] )
 
-        STAR_STORE_INDEX_HIDE_SHOW = 0
-        STAR_STORE_INDEX_NAME = 1
-        STAR_STORE_INDEX_TRANSLATED_NAME = 2
-        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name (not displayed), star translated name.
+        starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name, star translated name.
         for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
             starStore.append( star )
 
@@ -1671,21 +1680,21 @@ class IndicatorLunar( IndicatorBase ):
         #                  "will toggle all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckbox, minorPlanetStore )
+        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, starStore )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 starStore,
                 ( "", _( "Stars" ), ),
                 (
-                    ( renderer_toggle, "active", COLUMN_INDEX_TOGGLE ),
-                    ( Gtk.CellRendererText(), "text", STAR_STORE_INDEX_TRANSLATED_NAME ) ),
+                    ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
+                    ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 tooltip_text = _(
                     "Check a star to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( STAR_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, starStore ), ), ) )
+                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, starStore ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( starStore, toolTipText, _( "Stars" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
@@ -1695,15 +1704,18 @@ class IndicatorLunar( IndicatorBase ):
         # Satellites.
         box = Gtk.Box()
 
-        SATELLITE_STORE_INDEX_HIDE_SHOW = 0
-        SATELLITE_STORE_INDEX_NAME = 1
-        SATELLITE_STORE_INDEX_NUMBER = 2
-        SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR = 3
+        SATELLITE_STORE_COLUMN_HIDE_SHOW = 0
+        SATELLITE_STORE_COLUMN_NAME = 1
+        SATELLITE_STORE_COLUMN_NUMBER = 2
+        SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR = 3
+
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satelliteGeneralPerturbationData:
-            satelliteStore.append( [ satellite in self.satellites,
-                                     self.satelliteGeneralPerturbationData[ satellite ].getName(),
-                                     satellite, self.satelliteGeneralPerturbationData[ satellite ].getInternationalDesignator() ] )
+            satelliteStore.append( [
+                satellite in self.satellites,
+                self.satelliteGeneralPerturbationData[ satellite ].getName(),
+                satellite,
+                self.satelliteGeneralPerturbationData[ satellite ].getInternationalDesignator() ] )
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         # satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -1716,25 +1728,24 @@ class IndicatorLunar( IndicatorBase ):
                 satelliteStoreSort,
                 ( "", _( "Name" ), _( "Number" ), _( "International Designator" ) ),
                 (
-                    ( renderer_toggle, "active", SATELLITE_STORE_INDEX_HIDE_SHOW ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_INDEX_NAME ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_INDEX_NUMBER ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR ) ),
+                    ( renderer_toggle, "active", SATELLITE_STORE_COLUMN_HIDE_SHOW ),
+                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_COLUMN_NAME ),
+                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_COLUMN_NUMBER ),
+                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
                 sortcolumnviewids_columnmodelids = (
-                    ( SATELLITE_STORE_INDEX_NAME, SATELLITE_STORE_INDEX_NAME ),
-                    ( SATELLITE_STORE_INDEX_NUMBER, SATELLITE_STORE_INDEX_NUMBER ),
-                    ( SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR, SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR ) ),
+                    ( SATELLITE_STORE_COLUMN_NAME, SATELLITE_STORE_COLUMN_NAME ),
+                    ( SATELLITE_STORE_COLUMN_NUMBER, SATELLITE_STORE_COLUMN_NUMBER ),
+                    ( SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR, SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
                 tooltip_text = _(
-                                    "Check a satellite to display in the menu.\n\n" + \
-                                    "Clicking the header of the first column\n" + \
-                                    "will toggle all checkboxes." )
-                                if self.satelliteGeneralPerturbationData else
-                                _(
-                                    "Satellite data is unavailable;\n" + \
-                                    "the source could not be reached,\n" + \
-                                    "or data was available." ),
+                    "Check a satellite to display in the menu.\n\n" + \
+                    "Clicking the header of the first column\n" + \
+                    "will toggle all checkboxes." )
+                    if self.satelliteGeneralPerturbationData else _(
+                    "Satellite data is unavailable;\n" + \
+                    "the source could not be reached,\n" + \
+                    "or data was available." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( SATELLITE_STORE_INDEX_HIDE_SHOW, ( self.onColumnHeaderClick, satelliteStore ), ), ) )
+                    ( ( SATELLITE_STORE_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, satelliteStore ), ), ) )
 
         # tree = Gtk.TreeView.new_with_model( satelliteStoreSort )
         # tree.set_hexpand( True )
@@ -1752,22 +1763,22 @@ class IndicatorLunar( IndicatorBase ):
 
         # renderer_toggle = Gtk.CellRendererToggle()
         # renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
-        # treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = SATELLITE_STORE_INDEX_HIDE_SHOW )
+        # treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = SATELLITE_STORE_COLUMN_HIDE_SHOW )
         # treeViewColumn.set_clickable( True )
         # treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore )
         # tree.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_NAME )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = SATELLITE_STORE_COLUMN_NAME )
         # treeViewColumn.set_sort_column_id( 1 )
         # treeViewColumn.set_expand( True )
         # tree.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_NUMBER )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = SATELLITE_STORE_COLUMN_NUMBER )
         # treeViewColumn.set_sort_column_id( 2 )
         # treeViewColumn.set_expand( True )
         # tree.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = SATELLITE_STORE_INDEX_INTERNATIONAL_DESIGNATOR )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR )
         # treeViewColumn.set_sort_column_id( 3 )
         # treeViewColumn.set_expand( True )
         # tree.append_column( treeViewColumn )
@@ -1788,14 +1799,15 @@ class IndicatorLunar( IndicatorBase ):
         satelliteTagTranslations = self.listOfListsToListStore( IndicatorLunar.astroBackend.SATELLITE_TAG_TRANSLATIONS )
         messageText = self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationMessage )
         summaryText = self.translateTags( satelliteTagTranslations, True, self.satelliteNotificationSummary )
-        toolTipCommon = IndicatorLunar.astroBackend.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
-                        IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
-                        IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
-                        IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
-                        IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
-                        IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
-                        IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
-                        _( notifyOSDInformation )
+        toolTipCommon = \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" + \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" + \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" + \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" + \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
+            IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
+            _( notifyOSDInformation )
         summaryTooltip = _( "The summary for the satellite rise notification.\n\n" +  "Available tags:\n\t" ) + toolTipCommon
         messageTooltip = _( "The message for the satellite rise notification.\n\n" + "Available tags:\n\t" ) + toolTipCommon
 
@@ -1953,33 +1965,33 @@ class IndicatorLunar( IndicatorBase ):
 
             self.planets = [ ]
             for row in planetStore:
-                if row[ PLANET_STORE_INDEX_HIDE_SHOW ]:
-                    self.planets.append( row[ PLANET_STORE_INDEX_NAME ] )
+                if row[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
+                    self.planets.append( row[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
 
             self.stars = [ ]
             for row in starStore:
-                if row[ STAR_STORE_INDEX_HIDE_SHOW ]:
-                    self.stars.append( row[ STAR_STORE_INDEX_NAME ] )
+                if row[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
+                    self.stars.append( row[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
 
             # If the option to add new comets is checked, this will be handled out in the main update loop.
             # Otherwise, update the list of checked comets (ditto for minor planets and satellites).
             self.comets = [ ]
             if not self.cometsAddNew:
                 for comet in cometStore:
-                    if comet[ COMET_STORE_INDEX_HIDE_SHOW ]:
-                        self.comets.append( comet[ COMET_STORE_INDEX_NAME ] )
+                    if comet[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
+                        self.comets.append( comet[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
 
             self.minorPlanets = [ ]
             if not self.minorPlanetsAddNew:
                 for minorPlanet in minorPlanetStore:
-                    if minorPlanet[ MINOR_PLANET_STORE_INDEX_HIDE_SHOW ]:
-                        self.minorPlanets.append( minorPlanet[ MINOR_PLANET_STORE_INDEX_NAME ] )
+                    if minorPlanet[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
+                        self.minorPlanets.append( minorPlanet[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
 
             self.satellites = [ ]
             if not self.satellitesAddNew:
                 for satellite in satelliteStore:
-                    if satellite[ SATELLITE_STORE_INDEX_HIDE_SHOW ]:
-                        self.satellites.append( satellite[ SATELLITE_STORE_INDEX_NUMBER ] )
+                    if satellite[ SATELLITE_STORE_COLUMN_HIDE_SHOW ]:
+                        self.satellites.append( satellite[ SATELLITE_STORE_COLUMN_NUMBER ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             if not showSatelliteNotificationCheckbox.get_active(): self.satellitePreviousNotifications = { }
@@ -2110,7 +2122,7 @@ class IndicatorLunar( IndicatorBase ):
     #     COLUMN_INDEX_TOGGLE = 0
     #     COLUMN_INDEX_DATA = 1
     #
-    #     def toggleCheckbox( cellRendererToggle, row, listStore ):
+    #     def toggleCheckboxNaturalBody( cellRendererToggle, row, listStore ):
     #         listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
     #
     #
@@ -2121,7 +2133,7 @@ class IndicatorLunar( IndicatorBase ):
     #     tree.set_vexpand( True )
     #
     #     renderer_toggle = Gtk.CellRendererToggle()
-    #     renderer_toggle.connect( "toggled", toggleCheckbox, listStore )
+    #     renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, listStore )
     #     treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = COLUMN_INDEX_TOGGLE )
     #     treeViewColumn.set_clickable( True )
     #     treeViewColumn.connect( "clicked", self.onColumnHeaderClick, listStore )
@@ -2137,12 +2149,22 @@ class IndicatorLunar( IndicatorBase ):
     #     return scrolledWindow
 
 
+#TODO I think these three functions need better/consistent names...
+# onToggleNaturalBodyCheckbox
+    def toggleCheckboxNaturalBody( self, cellRendererToggle, row, listStore ):
+        listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
+
+
+#TODO Rename to...?
+# onToggleSatelliteCheckbox
     def onSatelliteCheckbox( self, cellRendererToggle, row, dataStore, sortStore ):
         actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         COLUMN_INDEX_TOGGLE = 0
         dataStore[ actualRow ][ COLUMN_INDEX_TOGGLE ] = not dataStore[ actualRow ][ COLUMN_INDEX_TOGGLE ]
 
 
+#TODO Rename to...?
+# onClickColumnHeader
     def onColumnHeaderClick( self, treeviewColumn, dataStore ):
         COLUMN_INDEX_TOGGLE = 0
         atLeastOneItemChecked = False
