@@ -324,109 +324,6 @@ class IndicatorFortune( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
 
-#TODO Below this can go...I hope!
-        # Fortune file  ORIGINAL.
-        grid = self.create_grid()
-
-        store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
-        for location, enabled in self.fortunes:
-            if os.path.isfile( location ) or os.path.isdir( location ):
-                store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
-
-            else:
-                store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
-
-        storeSort = Gtk.TreeModelSort( model = store )
-        storeSort.set_sort_column_id( 0, Gtk.SortType.ASCENDING )
-
-        tree = Gtk.TreeView.new_with_model( storeSort )
-        tree.expand_all()
-        tree.set_hexpand( True ) #TODO Can these be added to the scrolledWindow instead?
-        tree.set_vexpand( True )
-
-        treeViewColumn = \
-            Gtk.TreeViewColumn(
-                _( "Fortune File/Directory" ),
-                Gtk.CellRendererText(),
-                text = IndicatorFortune.COLUMN_FILE_OR_DIRECTORY )
-
-        treeViewColumn.set_sort_column_id( 0 )
-        treeViewColumn.set_expand( True )
-        tree.append_column( treeViewColumn )
-
-        treeViewColumn = Gtk.TreeViewColumn( _( "Enabled" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorFortune.COLUMN_ENABLED )
-        treeViewColumn.set_sort_column_id( 1 )
-        treeViewColumn.set_expand( True )
-        treeViewColumn.set_alignment( 0.5 )
-        tree.append_column( treeViewColumn )
-
-        tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        tree.connect( "row-activated", self.onFortuneDoubleClick )
-        tree.set_tooltip_text( _(
-            "Double click to edit a fortune.\n\n" + \
-            "English language fortunes are\n" + \
-            "installed by default.\n\n" + \
-            "There may be other fortune\n" + \
-            "packages available in your\n" + \
-            "native language." ) )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( tree )
-
-        grid.attach( scrolledWindow, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True ) #TODO What does homogeneous mean?
-
-        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        # addButton.set_tooltip_text( _( "Add a new fortune location." ) )
-        # addButton.connect( "clicked", self.onFortuneAdd, tree )
-        # box.pack_start( addButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
-        box.pack_start(
-            self.create_button(
-                _( "Add" ),
-                tooltip_text = _( "Add a new fortune location." ),
-                clicked_function_and_arguments = ( self.onFortuneAdd, tree ) ),
-            True,
-            True,
-            0 )
-
-        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        # removeButton.set_tooltip_text( _( "Remove the selected fortune location." ) )
-        # removeButton.connect( "clicked", self.onFortuneRemove, tree )
-        # box.pack_start( removeButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
-        box.pack_start(
-            self.create_button(
-                _( "Remove" ),
-                tooltip_text = _( "Remove the selected fortune location." ),
-                clicked_function_and_arguments = ( self.onFortuneRemove, tree ) ),
-            True,
-            True,
-            0 )
-
-        # resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
-        # resetButton.set_tooltip_text( _( "Reset to factory default." ) )
-        # resetButton.connect( "clicked", self.onFortuneReset, tree )
-        # box.pack_start( resetButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
-        box.pack_start(
-            self.create_button(
-                _( "Reset" ),
-                tooltip_text = _( "Reset to factory default." ),
-                clicked_function_and_arguments = ( self.onFortuneReset, tree ) ),
-            True,
-            True,
-            0 )
-
-        box.set_halign( Gtk.Align.CENTER )
-        grid.attach( box, 0, 1, 1, 1 )
-
-        # notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
-#TODO Above this can go...I hope!
-
 
         # General.
         grid = self.create_grid()
@@ -592,7 +489,7 @@ class IndicatorFortune( IndicatorBase ):
     def onFortuneRemove( self, button, treeView ):
         model, treeiter = treeView.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( treeView, _( "No fortune has been selected for removal." ) )
+            self.showMessage( treeView, _( "No fortune has been selected for removal." ) ) #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
 
         elif model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE:
             self.showMessage( treeView, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )

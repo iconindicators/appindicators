@@ -1065,7 +1065,7 @@ class IndicatorBase( ABC ):
         renderers_attributes_columnmodelids, # Columns will not be expanded: treeviewcolumn.pack_start( renderer, False )
         alignments_columnviewids = None,
         sortcolumnviewids_columnmodelids = None, # First column will be set as default sorted ascendingly.
-        celldatafunctionandarguments_renderers_columnviewids = None,
+        celldatafunctionandarguments_renderers_columnviewids = None, # Function and arguments must be a nested tuple.
         clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
         rowactivatedfunctionandarguments = None ):
@@ -1077,15 +1077,17 @@ class IndicatorBase( ABC ):
             treeviewcolumn.set_expand( True ) #TODO Do for all columns/tables?
 
             # Add the renderer / attribute / column model id for each column.
-            if type( renderer_attribute_columnmodelid[ 2 ] ) is int: # This is a tuple of renderer, attribute, column model id.
+            is_single_tuple = not type( renderer_attribute_columnmodelid[ 0 ] ) is tuple
+            if is_single_tuple:
+            # if type( renderer_attribute_columnmodelid[ 2 ] ) is int: # This is a tuple of renderer, attribute, column model id. #TODO Should be safe to delete
                 treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
             else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
 #TODO Test out this clause with Indicator Script Runner (the Interval column has two cell renderers).
-                for renderer_attribute_columnmodelid in renderers_attributes_columnmodelids:
-                    treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
-                    treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
+                for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
+                    treeviewcolumn.pack_start( renderer, False )
+                    treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
 
             treeview.append_column( treeviewcolumn )
 
@@ -1117,7 +1119,9 @@ class IndicatorBase( ABC ):
                         treeviewcolumn.connect( "clicked", *columnviewid_functionandarguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
-        treeview.get_selection().set_mode( Gtk.SelectionMode.SINGLE ) #TODO Either use single or browse...not sure yet if one can be used for all tables.
+#TODO For Script RUnner, bitcoin in the scripts table is a thick row...is this because that table uses BROWSE? 
+# Makes no difference to row thickness!
+        treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Either use single or browse...not sure yet if one can be used for all tables.
         treeview.expand_all() #TODO Do for all trees?
         treeview.set_hexpand( True )
         treeview.set_vexpand( True )
@@ -1136,36 +1140,12 @@ class IndicatorBase( ABC ):
 # Some have True and some have False.
 
 
-#TODO Implement these...?
-# Maybe count the number of occurrences?
-        '''
-        21
-        notificationSummary = Gtk.Entry()
-        notificationSummary.set_text( self.notificationSummary )
-        notificationSummary.set_tooltip_text( _( "The summary text for the notification." ) )
-        Vast majority have only the text/tooltip_text.
-
-        18
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( textView )
-
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        scrolledWindow.add( tree )
-
-        Mix of the above two types....check to see if the second type works by defaulting the hexpand/vexpand to True.
-        Not sure about the hexpand/vexpand: maybe should be associated with the treeview...see below.
-        Also, have seen treeview.expand_all()
-
-        7
-        textView = Gtk.TextView()
-
-        7
-        city = Gtk.ComboBoxText.new_with_entry()
-        '''
+#TODO Implement functions to encapsulate these...?
+    # 20
+    # notificationSummary = Gtk.Entry()
+    #
+    # 4
+    # scrolledWindow = Gtk.ScrolledWindow()
 
 
     def getMenuIndent( self, indent = 1 ):

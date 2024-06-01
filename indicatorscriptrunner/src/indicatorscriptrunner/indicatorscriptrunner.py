@@ -69,8 +69,8 @@ class IndicatorScriptRunner( IndicatorBase ):
     COLUMN_NAME = 2 # Script name.
     COLUMN_SOUND = 3 # Icon name for the APPLY icon; None otherwise.
     COLUMN_NOTIFICATION = 4 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_BACKGROUND = 5 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_TERMINAL = 6 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_TERMINAL = 5 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_BACKGROUND = 6 # Icon name for the APPLY icon; None otherwise.
     COLUMN_INTERVAL = 7 # Numeric amount as a string.
     COLUMN_FORCE_UPDATE = 8 # Icon name for the APPLY icon; None otherwise.
     COLUMN_REMOVE = 9 # Icon name for the REMOVE icon; None otherwise.
@@ -200,6 +200,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def updateBackgroundScripts( self, now ):
+        if True: return # TODO Remove
         backgroundScriptsToExecute = [ ]
         for script in self.scripts:
             if type( script ) is Background and self.isBackgroundScriptInIndicatorText( script ):
@@ -281,16 +282,24 @@ class IndicatorScriptRunner( IndicatorBase ):
         renderer_text_column_interval = Gtk.CellRendererText()
         renderer_text_column_name = Gtk.CellRendererText()
 
+#TODO I think the Terminal column should come before the Background column.
+# Tried swapping and the view did not change except for column headers...why?
+#TODO The bitcoin row is thick...why?
+#
+#Both these seem to be okay now...but
+#the Terminal and Background column values are around the wrong way.
+# So for all treeviews, best to define the model columns and view columns, 
+# even if they are the same values.
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                None, #TODO The model is defined later...so not sure what/how to handle this.
+                Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ),
                 (
                     _( "Group" ),
                     _( "Name" ),
                     _( "Sound" ),
                     _( "Notification" ),
-                    _( "Background" ),
                     _( "Terminal" ),
+                    _( "Background" ),
                     _( "Interval" ),
                     _( "Force Update" ) ),
                 (
@@ -298,19 +307,23 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( renderer_text_column_name, "text", IndicatorScriptRunner.COLUMN_NAME ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_SOUND ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_NOTIFICATION ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_BACKGROUND ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_TERMINAL ),
+                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_BACKGROUND ),
                     (
                         ( renderer_text_column_interval, "text", IndicatorScriptRunner.COLUMN_INTERVAL ),
-                        ( renderer_pixbuf_column_remove, "stock_id", IndicatorScriptRunner.COLUMN_REMOVE ) )
+                        ( renderer_pixbuf_column_remove, "icon_name", IndicatorScriptRunner.COLUMN_REMOVE ) ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_FORCE_UPDATE ) ),
                 alignments_columnviewids = (
-                    ( 0.5, IndicatorScriptRunner.COLUMN_SOUND ),
-                    ( 0.5, IndicatorScriptRunner.COLUMN_NOTIFICATION ),
-                    ( 0.5, IndicatorScriptRunner.COLUMN_BACKGROUND ),
-                    ( 0.5, IndicatorScriptRunner.COLUMN_TERMINAL ),
-                    ( 0.5, IndicatorScriptRunner.COLUMN_FORCE_UPDATE ) ),
-                celldatafunctionandarguments_renderers_columnviewids = ( self.dataFunctionNameColumn, copyOfScripts, IndicatorScriptRunner.COLUMN_NAME ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_SOUND - 1 ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_NOTIFICATION - 1 ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_TERMINAL - 1 ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_BACKGROUND - 1 ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_INTERVAL - 1 ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_FORCE_UPDATE - 1 ) ),
+                celldatafunctionandarguments_renderers_columnviewids = (
+                    ( ( self.dataFunctionNameColumn, copyOfScripts ), renderer_text_column_name, IndicatorScriptRunner.COLUMN_NAME - 1 ),
+                    ( ( self.dataFunctionIntervalColumn, ), renderer_text_column_interval, IndicatorScriptRunner.COLUMN_INTERVAL - 1 ),
+                    ( ( self.dataFunctionIntervalColumn, ), renderer_pixbuf_column_remove, IndicatorScriptRunner.COLUMN_INTERVAL - 1 ) ),
                 tooltip_text = _(
                     "Double-click to edit a script.\n\n" + \
                     "If an attribute does not apply to a script,\n" + \
@@ -318,77 +331,74 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "If a non-background script is checked as\n" + \
                     "default, the name will appear in bold." ),
                 rowactivatedfunctionandarguments = (
-                    ( renderer_text_column_name, self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts, ),
-                    ( renderer_text_column_interval, self.dataFunctionIntervalColumn ),
-                    ( renderer_pixbuf_column_remove, self.dataFunctionIntervalColumn ) ) )
+                    self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts ), )
 
+        # treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ) )
+        # treeView.set_hexpand( True )
+        # treeView.set_vexpand( True )
+        # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+        # treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts )
+        # treeView.set_tooltip_text( _(
+        #     "Double-click to edit a script.\n\n" + \
+        #     "If an attribute does not apply to a script,\n" + \
+        #     "a dash is displayed.\n\n" + \
+        #     "If a non-background script is checked as\n" + \
+        #     "default, the name will appear in bold." ) )
 
-#        treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ) )
-#        treeView.set_hexpand( True )
-#        treeView.set_vexpand( True )
-#        treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-#        treeView.connect( "row-activated", self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts )
-#        treeView.set_tooltip_text( _(
-#            "Double-click to edit a script.\n\n" + \
-#            "If an attribute does not apply to a script,\n" + \
-#            "a dash is displayed.\n\n" + \
-#            "If a non-background script is checked as\n" + \
-#            "default, the name will appear in bold." ) )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
+        # treeViewColumn.set_expand( True )
+        # treeView.append_column( treeViewColumn )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Group" ), Gtk.CellRendererText(), text = IndicatorScriptRunner.COLUMN_GROUP )
-#        treeViewColumn.set_expand( True )
-#        treeView.append_column( treeViewColumn )
+        # rendererText = Gtk.CellRendererText()
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionNameColumn, copyOfScripts )
+        # treeView.append_column( treeViewColumn )
 
-#        rendererText = Gtk.CellRendererText()
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), rendererText, text = IndicatorScriptRunner.COLUMN_NAME )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionNameColumn, copyOfScripts )
-#        treeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_SOUND )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # treeView.append_column( treeViewColumn )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Sound" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_SOUND )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_alignment( 0.5 )
-#        treeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_NOTIFICATION )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # treeView.append_column( treeViewColumn )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Notification" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_NOTIFICATION )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_alignment( 0.5 )
-#        treeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_BACKGROUND )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # treeView.append_column( treeViewColumn )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Background" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_BACKGROUND )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_alignment( 0.5 )
-#        treeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TERMINAL )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # treeView.append_column( treeViewColumn )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Terminal" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_TERMINAL )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_alignment( 0.5 )
-#        treeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Interval" ) )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_alignment( 0.5 )
+        # rendererText = Gtk.CellRendererText()
+        # treeViewColumn.pack_start( rendererText, False )
+        # treeViewColumn.add_attribute( rendererText, "text", IndicatorScriptRunner.COLUMN_INTERVAL )
+        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionIntervalColumn )
 
-#        rendererText = Gtk.CellRendererText()
-#        treeViewColumn.pack_start( rendererText, False )
-#        treeViewColumn.add_attribute( rendererText, "text", IndicatorScriptRunner.COLUMN_INTERVAL )
-#        treeViewColumn.set_cell_data_func( rendererText, self.dataFunctionIntervalColumn )
+        # rendererPixbuf = Gtk.CellRendererPixbuf()
+        # treeViewColumn.pack_start( rendererPixbuf, False )
+        # treeViewColumn.add_attribute( rendererPixbuf, "icon_name", IndicatorScriptRunner.COLUMN_REMOVE )
+        # treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionIntervalColumn )
 
-#        rendererPixbuf = Gtk.CellRendererPixbuf()
-#        treeViewColumn.pack_start( rendererPixbuf, False )
-#        treeViewColumn.add_attribute( rendererPixbuf, "icon_name", IndicatorScriptRunner.COLUMN_REMOVE )
-#        treeViewColumn.set_cell_data_func( rendererPixbuf, self.dataFunctionIntervalColumn )
+        # treeView.append_column( treeViewColumn )
 
-#        treeView.append_column( treeViewColumn )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Force Update" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_FORCE_UPDATE )
+        # treeViewColumn.set_expand( True )
+        # treeViewColumn.set_alignment( 0.5 )
+        # treeView.append_column( treeViewColumn )
 
-#        treeViewColumn = Gtk.TreeViewColumn( _( "Force Update" ), Gtk.CellRendererPixbuf(), stock_id = IndicatorScriptRunner.COLUMN_FORCE_UPDATE )
-#        treeViewColumn.set_expand( True )
-#        treeViewColumn.set_alignment( 0.5 )
-#        treeView.append_column( treeViewColumn )
-
-#        scrolledWindow = Gtk.ScrolledWindow()
-#        scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-#        scrolledWindow.add( treeView )
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
+        # scrolledWindow.add( treeView )
 
 #        grid.attach( scrolledWindow, 0, 0, 1, 20 )
         grid.attach( scrolledwindow, 0, 0, 1, 20 )
@@ -405,8 +415,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-        treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
-        self.populateScriptsTreeStore( copyOfScripts, treeView, "", "" )
+#TOD Can this be simplified?
+        # treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
+        # self.populateScriptsTreeStore( copyOfScripts, treeView, "", "" )
+        treeview.connect( "cursor-changed", self.onScriptSelection, treeview, commandTextView, copyOfScripts )
+        self.populateScriptsTreeStore( copyOfScripts, treeview, "", "" )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -431,7 +444,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "Add a new script." ),
                 clicked_function_and_arguments = (
                     self.onScriptAdd,
-                    copyOfScripts, treeView, backgroundScriptsTreeView ) ),
+                    copyOfScripts, treeview, backgroundScriptsTreeView ) ),
             True,
             True,
             0 )
@@ -447,7 +460,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "Edit the selected script." ),
                 clicked_function_and_arguments = (
                     self.onScriptEdit,
-                    copyOfScripts, treeView, backgroundScriptsTreeView, indicatorTextEntry ) ),
+                    copyOfScripts, treeview, backgroundScriptsTreeView, indicatorTextEntry ) ),
             True,
             True,
             0 )
@@ -463,7 +476,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "Duplicate the selected script." ),
                 clicked_function_and_arguments = (
                     self.onScriptCopy,
-                    copyOfScripts, treeView, backgroundScriptsTreeView ) ),
+                    copyOfScripts, treeview, backgroundScriptsTreeView ) ),
             True,
             True,
             0 )
@@ -479,7 +492,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "Remove the selected script." ),
                 clicked_function_and_arguments = (
                     self.onScriptRemove,
-                    copyOfScripts, treeView, backgroundScriptsTreeView, commandTextView, indicatorTextEntry ) ),
+                    copyOfScripts, treeview, backgroundScriptsTreeView, commandTextView, indicatorTextEntry ) ),
             True,
             True,
             0 )
