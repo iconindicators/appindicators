@@ -73,7 +73,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
-    # Data model columns used in the Preferences dialog.
+    # Calendar treeview columns; one to one mapping between data model and view.
     COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
     COLUMN_CALENDAR_ENABLED = 1 # tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
 

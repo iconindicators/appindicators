@@ -66,7 +66,7 @@ class IndicatorFortune( IndicatorBase ):
                                         # the notification summary should be emitted as a warning
                                         # (rather than a regular fortune).
 
-    # Data model columns used in the Preferences dialog.
+    # Fortune treeview columns; one to one mapping between data model and view.
     COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
     COLUMN_ENABLED = 1 # Icon name for the APPLY icon when the fortune is enabled; None otherwise.
 

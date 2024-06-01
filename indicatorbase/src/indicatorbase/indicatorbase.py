@@ -1050,14 +1050,6 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-#TODO Indicator Virtual Box needs
-#            # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-# Maybe not...seems to work fine with SINGLE.
-# Test both BROWSE and SINGLE when NO items are in the treeview.
-#
-#TODO Indicator Script Runner needs multiple renderers for one column.
-#This is done by calling the add_attribute.
-# So maybe need an additional argument for additional attributes to take renders beyond the first?
     def create_treeview_within_scrolledwindow(
         self,
         treemodel, # Must be a sorted store for sorting of columns.
@@ -1079,7 +1071,6 @@ class IndicatorBase( ABC ):
             # Add the renderer / attribute / column model id for each column.
             is_single_tuple = not type( renderer_attribute_columnmodelid[ 0 ] ) is tuple
             if is_single_tuple:
-            # if type( renderer_attribute_columnmodelid[ 2 ] ) is int: # This is a tuple of renderer, attribute, column model id. #TODO Should be safe to delete
                 treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
@@ -1119,9 +1110,15 @@ class IndicatorBase( ABC ):
                         treeviewcolumn.connect( "clicked", *columnviewid_functionandarguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
-#TODO For Script RUnner, bitcoin in the scripts table is a thick row...is this because that table uses BROWSE? 
-# Makes no difference to row thickness!
-        treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE ) #TODO Either use single or browse...not sure yet if one can be used for all tables.
+#TODO
+# Some indicators use 
+#   treeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
+# and some use
+#   treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
+#
+# So not sure if I can use one or the other for all indicators.
+# If not, need an additional argument.
+        treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeview.expand_all() #TODO Do for all trees?
         treeview.set_hexpand( True )
         treeview.set_vexpand( True )

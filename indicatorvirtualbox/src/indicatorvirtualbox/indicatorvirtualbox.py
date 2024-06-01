@@ -51,7 +51,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
-    # Data model columns used in the Preferences dialog.
+    # Virtual Machine treeview columns; one to one mapping between data model and view.
     COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME = 0 # Either the group or name of the virtual machine.
     COLUMN_AUTOSTART = 1 # Icon name for the APPLY icon when the virtual machine is to autostart; None otherwise.
     COLUMN_START_COMMAND = 2 # Start command for the virtual machine.
