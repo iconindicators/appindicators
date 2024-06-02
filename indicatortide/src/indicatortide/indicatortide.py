@@ -18,6 +18,16 @@
 
 # Application indicator which displays tidal information.
 
+#TODO Need to work out what the 'requests' package is 
+# and how to install (via pip into venv) so this (and the user script)
+# works on Debian.
+# Might need to adjust the user instructions too...
+
+
+#TODO On Debian 12, remove any .desktop from .config/autostart.
+# Run indicator.  Open preferences and then ESC to close.
+# A .desktop will appear in .config/autostart.
+
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
