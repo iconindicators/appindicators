@@ -1282,11 +1282,10 @@ class IndicatorLunar( IndicatorBase ):
 
         PAGE_ICON = 0
         PAGE_MENU = 1
-        PAGE_PLANETS_STARS = 2
-        PAGE_COMETS_MINOR_PLANETS = 3
-        PAGE_SATELLITES = 4
-        PAGE_NOTIFICATIONS = 5
-        PAGE_GENERAL = 6
+        PAGE_NATURAL_BODIES = 2
+        PAGE_SATELLITES = 3
+        PAGE_NOTIFICATIONS = 4
+        PAGE_LOCATION = 5
 
         # Icon text.
         grid = self.create_grid()
@@ -1910,28 +1909,28 @@ class IndicatorLunar( IndicatorBase ):
 
             cityValue = city.get_active_text()
             if cityValue == "":
-                notebook.set_current_page( PAGE_GENERAL )
+                notebook.set_current_page( PAGE_LOCATION )
                 self.showMessage( dialog, _( "City cannot be empty." ) )
                 city.grab_focus()
                 continue
 
             latitudeValue = latitude.get_text().strip()
             if latitudeValue == "" or not self.isNumber( latitudeValue ) or float( latitudeValue ) > 90 or float( latitudeValue ) < -90:
-                notebook.set_current_page( PAGE_GENERAL )
+                notebook.set_current_page( PAGE_LOCATION )
                 self.showMessage( dialog, _( "Latitude must be a number between 90 and -90 inclusive." ) )
                 latitude.grab_focus()
                 continue
 
             longitudeValue = longitude.get_text().strip()
             if longitudeValue == "" or not self.isNumber( longitudeValue ) or float( longitudeValue ) > 180 or float( longitudeValue ) < -180:
-                notebook.set_current_page( PAGE_GENERAL )
+                notebook.set_current_page( PAGE_LOCATION )
                 self.showMessage( dialog, _( "Longitude must be a number between 180 and -180 inclusive." ) )
                 longitude.grab_focus()
                 continue
 
             elevationValue = elevation.get_text().strip()
             if elevationValue == "" or not self.isNumber( elevationValue ) or float( elevationValue ) > 10000 or float( elevationValue ) < 0:
-                notebook.set_current_page( PAGE_GENERAL )
+                notebook.set_current_page( PAGE_LOCATION )
                 self.showMessage( dialog, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
                 elevation.grab_focus()
                 continue
