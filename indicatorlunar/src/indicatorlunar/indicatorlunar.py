@@ -1353,7 +1353,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( COLUMN_VIEW_TRANSLATED_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
                     ( COLUMN_VIEW_VALUE, COLUMN_MODEL_VALUE ) ),
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
-                rowactivatedfunctionandarguments= ( self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText ) )
+                rowactivatedfunctionandarguments = ( self.onTagDoubleClick, COLUMN_MODEL_TRANSLATED_TAG, indicatorText ) )
 
         # tree = Gtk.TreeView.new_with_model( displayTagsStoreSort )
         # tree.set_hexpand( True )
@@ -1553,7 +1553,7 @@ class IndicatorLunar( IndicatorBase ):
         #                  "will toggle all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, planetStore )
+        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, planetStore )
 
 #TODO What about a 0.5 alignment for each of the first checkbox columns
 # for planets, minor planets, comets, stars and satellites?
@@ -1595,7 +1595,7 @@ class IndicatorLunar( IndicatorBase ):
         #         "was completely filtered by magnitude." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, minorPlanetStore )
+        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, minorPlanetStore )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -1640,7 +1640,7 @@ class IndicatorLunar( IndicatorBase ):
         #         "was completely filtered by magnitude." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, cometStore )
+        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, cometStore )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -1680,7 +1680,7 @@ class IndicatorLunar( IndicatorBase ):
         #                  "will toggle all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, starStore )
+        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, starStore )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -2114,6 +2114,8 @@ class IndicatorLunar( IndicatorBase ):
 
     def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
+#TODO Should we do something where the selection is converted from view to model?
+# See onSatelliteCheckbox below.        
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
@@ -2153,6 +2155,7 @@ class IndicatorLunar( IndicatorBase ):
 # onToggleNaturalBodyCheckbox
     def toggleCheckboxNaturalBody( self, cellRendererToggle, row, listStore ):
         listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
+#TODO Not sure what the column_index_toggle is now called.
 
 
 #TODO Rename to...?
