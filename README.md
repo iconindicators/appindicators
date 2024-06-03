@@ -98,7 +98,7 @@ You will likely need to also install various operating system packages; refer to
 ```
 
 
-## Convert this Document to HTML
+## Convert this Document from MD to HTML
 ```
     if [ ! -d venv ]; then python3 -m venv venv; fi && \
     . ./venv/bin/activate && \
