@@ -126,7 +126,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = self.removeLeadingZeroFromDate( event.getDate() ), # Allows the month/day to be passed to the copy/search functions below.
-                    activate_function_and_arguments = ( f, ) ) #TODO Ensure this function 'f' gets called.
+                    activate_function_and_arguments = ( f, ) ) #TODO Ensure this function 'f' gets called.  The copy does not work on Debian 12.  Is this a wayland thing?  Test on Ubuntu 20.04.  Also document in the README.md for the indicators (via the build_readme.py).
 
             elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 url = self.searchURL.replace(
