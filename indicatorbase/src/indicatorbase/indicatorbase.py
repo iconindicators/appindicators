@@ -16,6 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO On Debian 12, remove any .desktop from .config/autostart.
+# Run indicator.  Open preferences and then ESC to close.
+# A .desktop will appear in .config/autostart.
+
+
+
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 # with the following:
