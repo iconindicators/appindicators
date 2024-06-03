@@ -27,8 +27,9 @@ import datetime
 import gi
 import math
 
-gi.require_version( "GLib", "2.0" )
-from gi.repository import GLib
+#TODO Maybe no longer needed?  Why was this here in the first place?
+# gi.require_version( "GLib", "2.0" )
+# from gi.repository import GLib
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
