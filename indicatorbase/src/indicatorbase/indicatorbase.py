@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO On Debian 12, remove any .desktop from .config/autostart.
-# Run indicator.  Open preferences and then ESC to close.
-# A .desktop will appear in .config/autostart.
-
-
 
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
@@ -38,6 +33,7 @@
 # indicator-punycode: https://pypi.org/project/indicatorpunycode
 # indicator-script-runner: https://pypi.org/project/indicatorscriptrunner
 # indicator-stardate: https://pypi.org/project/indicatorstardate
+# indicator-test: https://pypi.org/project/indicatortest
 # indicator-tide: https://pypi.org/project/indicatortide
 # indicator-virtual-box: https://pypi.org/project/indicatorvirtualbox
 # 
@@ -55,7 +51,6 @@
 #   https://pypi.org/project/indicatorpunycode/
 #   https://pypi.org/project/indicatorscriptrunner/
 #   https://pypi.org/project/indicatorstardate/
-#   https://pypi.org/project/indicatortest/
 #   https://pypi.org/project/indicatortide/
 #   https://pypi.org/project/indicatorvirtualbox/
 
