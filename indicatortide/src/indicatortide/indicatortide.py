@@ -19,16 +19,6 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Add to the top of 
-#   /home/bernard/Programming/getTideDataFromBOM.py
-# the following comment:
-#
-# Called by indicatortide.
-#
-# Need to install the 'requests' package to venv_indicatortide:
-#   . $HOME/.local/venv_indicatortide/bin/activate && python3 -m pip install --upgrade requests
-
-
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
