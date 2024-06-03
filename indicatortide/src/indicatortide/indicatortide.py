@@ -19,16 +19,14 @@
 # Application indicator which displays tidal information.
 
 
-#TODO Need to work out what the 'requests' package is 
-# and how to install (via pip into venv) so this (and the user script)
-# works on Debian.
-# Might need to adjust the user instructions too...
+#TODO Add to the top of 
+#   /home/bernard/Programming/getTideDataFromBOM.py
+# the following comment:
 #
-# https://pypi.org/project/requests/
-# pip install requests
+# Called by indicatortide.
 #
-# If this works, add to my user script!
-
+# Need to install the 'requests' package to venv_indicatortide:
+#   . $HOME/.local/venv_indicatortide/bin/activate && python3 -m pip install --upgrade requests
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
