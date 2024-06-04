@@ -1322,7 +1322,7 @@ class IndicatorLunar( IndicatorBase ):
         box.pack_start( indicatorTextSeparator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
-        # Treeview showing all attributes of selected/checked bodies.
+        # Treeview to display attributes of selected/checked bodies.
         # If a body's magnitude passes through the magnitude filter,
         # all attributes (rise/set/az/alt) will be displayed in this table,
         # irrespective of the setting to hide bodies below the horizon.
@@ -1352,7 +1352,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( COLUMN_VIEW_TRANSLATED_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
                     ( COLUMN_VIEW_VALUE, COLUMN_MODEL_VALUE ) ),
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
-                rowactivatedfunctionandarguments = ( self.onTagDoubleClick, COLUMN_MODEL_TRANSLATED_TAG, indicatorText ) )
+                rowactivatedfunctionandarguments = ( self.on_tagsvalues_double_click, COLUMN_MODEL_TRANSLATED_TAG, indicatorText ) )
 
         # tree = Gtk.TreeView.new_with_model( displayTagsStoreSort )
         # tree.set_hexpand( True )
@@ -1370,7 +1370,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # tree.set_tooltip_text( _( "Double click to add a tag to the icon text." ) )
         # tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        # tree.connect( "row-activated", self.onTagDoubleClick, COLUMN_TRANSLATED_TAG, indicatorText )
+        # tree.connect( "row-activated", self.on_tagsvalues_double_click, COLUMN_TRANSLATED_TAG, indicatorText )
 
         # scrolledWindow = Gtk.ScrolledWindow()
         # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
@@ -1386,9 +1386,10 @@ class IndicatorLunar( IndicatorBase ):
         showRiseWhenSetBeforeSunsetCheckbutton = \
             self.create_checkbutton(
                 _( "Show rise when set is before sunset" ),
-                _( "If a body sets before sunset,\n" + \
-                   "show the body's next rise instead\n" + \
-                   "(excludes satellites)." ),
+                _(
+                    "If a body sets before sunset,\n" + \
+                    "show the body's next rise instead\n" + \
+                    "(excludes satellites)." ),
                 active = self.showRiseWhenSetBeforeSunset )
 #TODO Make sure this is converted okay
         # showRiseWhenSetBeforeSunsetCheckbutton = Gtk.CheckButton.new_with_label( _( "Show rise when set is before sunset" ) )
@@ -1402,8 +1403,9 @@ class IndicatorLunar( IndicatorBase ):
         hideBodiesBelowTheHorizonCheckbutton = \
             self.create_checkbutton(
                 _( "Hide bodies below the horizon" ),
-                _( "Hide a body if it is yet to rise\n" + \
-                   "(excludes satellites)." ),
+                _(
+                    "Hide a body if it is yet to rise\n" + \
+                    "(excludes satellites)." ),
                 active = self.hideBodiesBelowHorizon )
 #TODO Make sure this is converted okay
         # hideBodiesBelowTheHorizonCheckbutton = Gtk.CheckButton.new_with_label( _( "Hide bodies below the horizon" ) )
@@ -1418,17 +1420,18 @@ class IndicatorLunar( IndicatorBase ):
         box.set_margin_top( 5 )
 
         box.pack_start( Gtk.Label.new( _( "Hide bodies fainter than magnitude" ) ), False, False, 0 )
-        toolTip = _(
-            "A body with a fainter magnitude will be hidden\n" + \
-            "(excludes satellites)." )
+        # toolTip = _(
+        #     "A body with a fainter magnitude will be hidden\n" + \
+        #     "(excludes satellites)." ) #TODO Not needed.
         spinnerMagnitude = \
             self.create_spinbutton(
                 self.magnitude,
                 int( IndicatorLunar.astroBackend.MAGNITUDE_MINIMUM ),
                 int( IndicatorLunar.astroBackend.MAGNITUDE_MAXIMUM ),
                 page_increment = 5,
-                tooltip_text = _( "A body with a fainter magnitude will be hidden\n" + \
-                                  "(excludes satellites)." ) )
+                tooltip_text = _(
+                    "A body with a fainter magnitude will be hidden\n" + \
+                    "(excludes satellites)." ) )
 
         box.pack_start( spinnerMagnitude, False, False, 0 )
         grid.attach( box, 0, 2, 1, 1 )
@@ -1475,10 +1478,11 @@ class IndicatorLunar( IndicatorBase ):
         sortSatellitesByDateTimeCheckbutton = \
             self.create_checkbutton(
                 _( "Sort satellites by rise date/time" ),
-                _( "If checked, satellites are sorted\n" + \
-                   "by rise date/time.\n\n" + \
-                   "Otherwise, satellites are sorted\n" + \
-                   "by Name then Number." ),
+                _(
+                    "If checked, satellites are sorted\n" + \
+                    "by rise date/time.\n\n" + \
+                    "Otherwise, satellites are sorted\n" + \
+                    "by Name then Number." ),
                 margin_top = 5,
                 active = self.satellitesSortByDateTime )
 #TODO Make sure this is converted okay
@@ -1527,12 +1531,6 @@ class IndicatorLunar( IndicatorBase ):
         # Planets / minor planets / comets / stars.
         box = Gtk.Box( spacing = 20 )
 
-#TODO Only the 0 is used in the three toggle functions later on.
-# Keep this here with a big comment?
-# Where else to put it?
-        COLUMN_INDEX_TOGGLE = 0
-#        COLUMN_INDEX_DATA = 1 
-
         NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW = 0
         NATURAL_BODY_MODEL_COLUMN_NAME = 1
         NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME = 2
@@ -1552,7 +1550,11 @@ class IndicatorLunar( IndicatorBase ):
         #                  "will toggle all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, planetStore )
+        renderer_toggle.connect(
+            "toggled",
+            self.on_natural_body_checkbox,
+            planetStore,
+            NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
 
 #TODO What about a 0.5 alignment for each of the first checkbox columns
 # for planets, minor planets, comets, stars and satellites?
@@ -1568,7 +1570,10 @@ class IndicatorLunar( IndicatorBase ):
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, planetStore ), ), ) )
+                    (
+                        (
+                            NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
+                            ( self.on_columnheader, planetStore, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( planetStore, toolTipText, _( "Planets" ), PLANET_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
@@ -1594,7 +1599,11 @@ class IndicatorLunar( IndicatorBase ):
         #         "was completely filtered by magnitude." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, minorPlanetStore )
+        renderer_toggle.connect(
+            "toggled",
+            self.on_natural_body_checkbox,
+            minorPlanetStore,
+            NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -1613,7 +1622,10 @@ class IndicatorLunar( IndicatorBase ):
                     "or no data was available, or the data\n" + \
                     "was completely filtered by magnitude." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, minorPlanetStore ), ), ) )
+                    (
+                        (
+                            NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
+                            ( self.on_columnheader, minorPlanetStore, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( minorPlanetStore, toolTipText, _( "Minor Planets" ), MINOR_PLANET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
@@ -1639,7 +1651,11 @@ class IndicatorLunar( IndicatorBase ):
         #         "was completely filtered by magnitude." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, cometStore )
+        renderer_toggle.connect(
+            "toggled",
+            self.on_natural_body_checkbox,
+            cometStore,
+            NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -1658,7 +1674,10 @@ class IndicatorLunar( IndicatorBase ):
                     "available from the source, or the data\n" + \
                     "was completely filtered by magnitude." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, cometStore ), ), ) )
+                    (
+                        (
+                            NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
+                            ( self.on_columnheader, cometStore, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
@@ -1679,7 +1698,11 @@ class IndicatorLunar( IndicatorBase ):
         #                  "will toggle all checkboxes." )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.toggleCheckboxNaturalBody, starStore )
+        renderer_toggle.connect(
+            "toggled",
+            self.on_natural_body_checkbox,
+            starStore,
+            NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -1693,7 +1716,10 @@ class IndicatorLunar( IndicatorBase ):
                     "Clicking the header of the first column\n" + \
                     "will toggle all checkboxes." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, starStore ), ), ) )
+                    (
+                        (
+                            NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
+                            ( self.on_columnheader, starStore, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         box.pack_start( scrolledwindow, True, True, 0 )
         # box.pack_start( self.createTreeView( starStore, toolTipText, _( "Stars" ), STAR_STORE_INDEX_TRANSLATED_NAME ), True, True, 0 )
@@ -1703,10 +1729,15 @@ class IndicatorLunar( IndicatorBase ):
         # Satellites.
         box = Gtk.Box()
 
-        SATELLITE_STORE_COLUMN_HIDE_SHOW = 0
-        SATELLITE_STORE_COLUMN_NAME = 1
-        SATELLITE_STORE_COLUMN_NUMBER = 2
-        SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR = 3
+        SATELLITE_MODEL_COLUMN_HIDE_SHOW = 0
+        SATELLITE_MODEL_COLUMN_NAME = 1
+        SATELLITE_MODEL_COLUMN_NUMBER = 2
+        SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR = 3
+
+        SATELLITE_VIEW_COLUMN_HIDE_SHOW = 0
+        SATELLITE_VIEW_COLUMN_NAME = 1
+        SATELLITE_VIEW_COLUMN_NUMBER = 2
+        SATELLITE_VIEW_COLUMN_INTERNATIONAL_DESIGNATOR = 3
 
         satelliteStore = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satelliteGeneralPerturbationData:
@@ -1720,21 +1751,22 @@ class IndicatorLunar( IndicatorBase ):
         # satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
 
         renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
+        renderer_toggle.connect(
+            "toggled", self.on_satellite_checkbox, satelliteStore, satelliteStoreSort, SATELLITE_MODEL_COLUMN_HIDE_SHOW )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 satelliteStoreSort,
                 ( "", _( "Name" ), _( "Number" ), _( "International Designator" ) ),
                 (
-                    ( renderer_toggle, "active", SATELLITE_STORE_COLUMN_HIDE_SHOW ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_COLUMN_NAME ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_COLUMN_NUMBER ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
+                    ( renderer_toggle, "active", SATELLITE_MODEL_COLUMN_HIDE_SHOW ),
+                    ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_NAME ),
+                    ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_NUMBER ),
+                    ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
                 sortcolumnviewids_columnmodelids = (
-                    ( SATELLITE_STORE_COLUMN_NAME, SATELLITE_STORE_COLUMN_NAME ),
-                    ( SATELLITE_STORE_COLUMN_NUMBER, SATELLITE_STORE_COLUMN_NUMBER ),
-                    ( SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR, SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
+                    ( SATELLITE_VIEW_COLUMN_NAME, SATELLITE_MODEL_COLUMN_NAME ),
+                    ( SATELLITE_VIEW_COLUMN_NUMBER, SATELLITE_MODEL_COLUMN_NUMBER ),
+                    ( SATELLITE_VIEW_COLUMN_INTERNATIONAL_DESIGNATOR, SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
                 tooltip_text = _(
                     "Check a satellite to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
@@ -1744,7 +1776,10 @@ class IndicatorLunar( IndicatorBase ):
                     "the source could not be reached,\n" + \
                     "or data was available." ),
                 clickablecolumnviewids_functionsandarguments = \
-                    ( ( SATELLITE_STORE_COLUMN_HIDE_SHOW, ( self.onColumnHeaderClick, satelliteStore ), ), ) )
+                    (
+                        (
+                            SATELLITE_VIEW_COLUMN_HIDE_SHOW,
+                            ( self.on_columnheader, satelliteStore, SATELLITE_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         # tree = Gtk.TreeView.new_with_model( satelliteStoreSort )
         # tree.set_hexpand( True )
@@ -1761,23 +1796,23 @@ class IndicatorLunar( IndicatorBase ):
         #         "or data was available." ) )
 
         # renderer_toggle = Gtk.CellRendererToggle()
-        # renderer_toggle.connect( "toggled", self.onSatelliteCheckbox, satelliteStore, satelliteStoreSort )
-        # treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = SATELLITE_STORE_COLUMN_HIDE_SHOW )
+        # renderer_toggle.connect( "toggled", self.on_satellite_checkbox, satelliteStore, satelliteStoreSort )
+        # treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = SATELLITE_MODEL_COLUMN_HIDE_SHOW )
         # treeViewColumn.set_clickable( True )
-        # treeViewColumn.connect( "clicked", self.onColumnHeaderClick, satelliteStore )
+        # treeViewColumn.connect( "clicked", self.on_columnheader, satelliteStore )
         # tree.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = SATELLITE_STORE_COLUMN_NAME )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Name" ), Gtk.CellRendererText(), text = SATELLITE_MODEL_COLUMN_NAME )
         # treeViewColumn.set_sort_column_id( 1 )
         # treeViewColumn.set_expand( True )
         # tree.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = SATELLITE_STORE_COLUMN_NUMBER )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "Number" ), Gtk.CellRendererText(), text = SATELLITE_MODEL_COLUMN_NUMBER )
         # treeViewColumn.set_sort_column_id( 2 )
         # treeViewColumn.set_expand( True )
         # tree.append_column( treeViewColumn )
 
-        # treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = SATELLITE_STORE_COLUMN_INTERNATIONAL_DESIGNATOR )
+        # treeViewColumn = Gtk.TreeViewColumn( _( "International Designator" ), Gtk.CellRendererText(), text = SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR )
         # treeViewColumn.set_sort_column_id( 3 )
         # treeViewColumn.set_expand( True )
         # tree.append_column( treeViewColumn )
@@ -1807,26 +1842,49 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" + \
             IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" + \
             _( notifyOSDInformation )
-        summaryTooltip = _( "The summary for the satellite rise notification.\n\n" +  "Available tags:\n\t" ) + toolTipCommon
-        messageTooltip = _( "The message for the satellite rise notification.\n\n" + "Available tags:\n\t" ) + toolTipCommon
+
+        summaryTooltip = _(
+            "The summary for the satellite rise notification.\n\n" +  "Available tags:\n\t" ) + \
+            toolTipCommon
+
+        messageTooltip = _(
+            "The message for the satellite rise notification.\n\n" + "Available tags:\n\t" ) + \
+            toolTipCommon
 
         # Additional lines are added to the message to ensure the textview for the message text is not too small.
         showSatelliteNotificationCheckbox, satelliteNotificationSummaryText, satelliteNotificationMessageText = \
-            self.createNotificationPanel( grid, 0,
-                                          _( "Satellite rise" ), _( "Screen notification when a satellite rises above the horizon." ), self.showSatelliteNotification,
-                                          _( "Summary" ), summaryText, summaryTooltip,
-                                          _( "Message" ) + "\n \n \n \n ", messageText, messageTooltip,
-                                          _( "Test" ), _( "Show the notification using the current summary/message." ),
-                                          False )
+            self.createNotificationPanel(
+                grid,
+                0,
+                _( "Satellite rise" ),
+                _( "Screen notification when a satellite rises above the horizon." ),
+                self.showSatelliteNotification,
+                _( "Summary" ),
+                summaryText,
+                summaryTooltip,
+                _( "Message" ) + "\n \n \n \n ",
+                messageText,
+                messageTooltip,
+                _( "Test" ),
+                _( "Show the notification using the current summary/message." ),
+                False )
 
         # Additional lines are added to the message to ensure the textview for the message text is not too small.
         showWerewolfWarningCheckbox, werewolfNotificationSummaryText, werewolfNotificationMessageText = \
-            self.createNotificationPanel( grid, 4,
-                                          _( "Werewolf warning" ), _( "Hourly screen notification leading up to full moon." ), self.showWerewolfWarning,
-                                          _( "Summary" ), self.werewolfWarningSummary, _( "Hourly screen notification leading up to full moon." ),
-                                          _( "Message" ) + "\n \n ", self.werewolfWarningMessage, _( "The message for the werewolf notification.\n\n" ) + notifyOSDInformation,
-                                          _( "Test" ), _( "Show the notification using the current summary/message." ),
-                                          True )
+            self.createNotificationPanel(
+                grid,
+                4,
+                _( "Werewolf warning" ),
+                _( "Hourly screen notification leading up to full moon." ),
+                self.showWerewolfWarning,
+                _( "Summary" ),
+                self.werewolfWarningSummary,
+                _( "Hourly screen notification leading up to full moon." ),
+                _( "Message" ) + "\n \n ",
+                self.werewolfWarningMessage,
+                _( "The message for the werewolf notification.\n\n" ) + notifyOSDInformation,
+                _( "Test" ), _( "Show the notification using the current summary/message." ),
+                True )
 
         showWerewolfWarningCheckbox.set_margin_top( 10 )
 
@@ -1989,8 +2047,8 @@ class IndicatorLunar( IndicatorBase ):
             self.satellites = [ ]
             if not self.satellitesAddNew:
                 for satellite in satelliteStore:
-                    if satellite[ SATELLITE_STORE_COLUMN_HIDE_SHOW ]:
-                        self.satellites.append( satellite[ SATELLITE_STORE_COLUMN_NUMBER ] )
+                    if satellite[ SATELLITE_MODEL_COLUMN_HIDE_SHOW ]:
+                        self.satellites.append( satellite[ SATELLITE_MODEL_COLUMN_NUMBER ] )
 
             self.showSatelliteNotification = showSatelliteNotificationCheckbox.get_active()
             if not showSatelliteNotificationCheckbox.get_active(): self.satellitePreviousNotifications = { }
@@ -2111,10 +2169,11 @@ class IndicatorLunar( IndicatorBase ):
         return translatedText
 
 
-    def onTagDoubleClick( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
+    def on_tagsvalues_double_click( self, tree, rowNumber, treeViewColumn, translatedTagColumnIndex, indicatorTextEntry ):
         model, treeiter = tree.get_selection().get_selected()
 #TODO Should we do something where the selection is converted from view to model?
-# See onSatelliteCheckbox below.        
+#Probably not as we get the treeiter and model above.
+# But check  translatedtagcolumnindex and ensure it is correct for indexing into the model.
         indicatorTextEntry.insert_text( "[" + model[ treeiter ][ translatedTagColumnIndex ] + "]", indicatorTextEntry.get_position() )
 
 
@@ -2123,7 +2182,7 @@ class IndicatorLunar( IndicatorBase ):
     #     COLUMN_INDEX_TOGGLE = 0
     #     COLUMN_INDEX_DATA = 1
     #
-    #     def toggleCheckboxNaturalBody( cellRendererToggle, row, listStore ):
+    #     def on_natural_body_checkbox( cellRendererToggle, row, listStore ):
     #         listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
     #
     #
@@ -2134,10 +2193,10 @@ class IndicatorLunar( IndicatorBase ):
     #     tree.set_vexpand( True )
     #
     #     renderer_toggle = Gtk.CellRendererToggle()
-    #     renderer_toggle.connect( "toggled", toggleCheckboxNaturalBody, listStore )
+    #     renderer_toggle.connect( "toggled", on_natural_body_checkbox, listStore )
     #     treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = COLUMN_INDEX_TOGGLE )
     #     treeViewColumn.set_clickable( True )
-    #     treeViewColumn.connect( "clicked", self.onColumnHeaderClick, listStore )
+    #     treeViewColumn.connect( "clicked", self.on_columnheader, listStore )
     #     tree.append_column( treeViewColumn )
     #
     #     tree.append_column( Gtk.TreeViewColumn( columnHeaderText, Gtk.CellRendererText(), text = columnIndex ) )
@@ -2150,32 +2209,25 @@ class IndicatorLunar( IndicatorBase ):
     #     return scrolledWindow
 
 
-#TODO I think these three functions need better/consistent names...
-# onToggleNaturalBodyCheckbox
-    def toggleCheckboxNaturalBody( self, cellRendererToggle, row, listStore ):
-        listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
-#TODO Not sure what the column_index_toggle is now called.
+    def on_natural_body_checkbox( self, cell_renderer_toggle, row, liststore, natural_body_model_column_hide_show ):
+        liststore[ row ][ natural_body_model_column_hide_show ] = \
+            not liststore[ row ][ natural_body_model_column_hide_show ]
 
 
-#TODO Rename to...?
-# onToggleSatelliteCheckbox
-    def onSatelliteCheckbox( self, cellRendererToggle, row, dataStore, sortStore ):
-        actualRow = sortStore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        COLUMN_INDEX_TOGGLE = 0
-        dataStore[ actualRow ][ COLUMN_INDEX_TOGGLE ] = not dataStore[ actualRow ][ COLUMN_INDEX_TOGGLE ]
+    def on_satellite_checkbox( self, cell_renderer_toggle, row, datastore, sortstore, satellite_model_column_hide_show ):
+        actualRow = sortstore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+        datastore[ actualRow ][ satellite_model_column_hide_show ] = \
+            not datastore[ actualRow ][ satellite_model_column_hide_show ]
 
 
-#TODO Rename to...?
-# onClickColumnHeader
-    def onColumnHeaderClick( self, treeviewColumn, dataStore ):
-        COLUMN_INDEX_TOGGLE = 0
+    def on_columnheader( self, treeviewcolumn, datastore, datastore_column_hide_show ):
         atLeastOneItemChecked = False
         atLeastOneItemUnchecked = False
-        for row in range( len( dataStore ) ):
-            if dataStore[ row ][ COLUMN_INDEX_TOGGLE ]:
+        for row in range( len( datastore ) ):
+            if datastore[ row ][ datastore_column_hide_show ]:
                 atLeastOneItemChecked = True
 
-            if not dataStore[ row ][ COLUMN_INDEX_TOGGLE ]:
+            if not datastore[ row ][ datastore_column_hide_show ]:
                 atLeastOneItemUnchecked = True
 
         if atLeastOneItemChecked and atLeastOneItemUnchecked: # Mix of values checked and unchecked, so check all.
@@ -2187,8 +2239,8 @@ class IndicatorLunar( IndicatorBase ):
         else: # No items unchecked (so all are checked), so uncheck all.
             value = True
 
-        for row in range( len( dataStore ) ):
-            dataStore[ row ][ 0 ] = value
+        for row in range( len( datastore ) ):
+            datastore[ row ][ 0 ] = value
 
 
     def createNotificationPanel(
