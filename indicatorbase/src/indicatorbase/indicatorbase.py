@@ -127,6 +127,7 @@ import email.policy
 import gettext
 import gi
 import sys
+from _lzma import is_check_supported
 
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
@@ -1053,7 +1054,7 @@ class IndicatorBase( ABC ):
 
     def create_treeview_within_scrolledwindow(
         self,
-        treemodel, # Must be a sorted store for sorting of columns.
+        treemodel, # Must be a sorted store if columns are to be sorted.
         titles,
         renderers_attributes_columnmodelids, # Columns will not be expanded: treeviewcolumn.pack_start( renderer, False )
         alignments_columnviewids = None,
@@ -1067,7 +1068,10 @@ class IndicatorBase( ABC ):
 
         for title, renderer_attribute_columnmodelid in zip( titles, renderers_attributes_columnmodelids ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
-            treeviewcolumn.set_expand( True ) #TODO Do for all columns/tables?
+
+            # Expand all columns unless the column contains a single checkbox and no column header title.
+            is_checkbox_column = type( renderer_attribute_columnmodelid[ 0 ] ) == Gtk.CellRendererToggle and not title
+            treeviewcolumn.set_expand( not is_checkbox_column )
 
             # Add the renderer / attribute / column model id for each column.
             is_single_tuple = not type( renderer_attribute_columnmodelid[ 0 ] ) is tuple
@@ -1076,7 +1080,6 @@ class IndicatorBase( ABC ):
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
             else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
-#TODO Test out this clause with Indicator Script Runner (the Interval column has two cell renderers).
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
