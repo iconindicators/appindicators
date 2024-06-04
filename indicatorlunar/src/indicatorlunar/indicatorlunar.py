@@ -16,6 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO On the laptop I think the update does not work
+# when the preferences is opened.
+# The menu does not initially go grey
+# and then on hitting OK,
+# the menu does not get restored.
+# Difficult to reproduce.
+
+
 # Application indicator for the home astronomer.
 
 

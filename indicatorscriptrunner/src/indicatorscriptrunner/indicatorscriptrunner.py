@@ -310,12 +310,16 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         #TODO New... 
         renderer_text_column_interval = Gtk.CellRendererText()
-        renderer_text_column_interval.set_property( "xalign", 0.5 ) #TODO Is this needed here?  Or perhaps, is it needed down in the renderer function?
+#        renderer_text_column_interval.set_property( "xalign", 0.5 ) #TODO Is this needed here?  Or perhaps, is it needed down in the renderer function?   Maybe this is redundant as we already have an alignment parameter passed in to the create function...try to figure out if this is needed or the same as the alignment passed in.
 
+        treestore_scripts_all = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+        treestore_scripts_background = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+
+#TODO Rename the treeview and scrolledwindow if possible...also for the scripts treeview/scrolledwindow so they match up somewhat.
         backgroundScriptsTreeView, backgroundScriptsTreeViewScrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 # self.create_scripts_treestore( copyOfScripts, non_background = False, background = True ),
-                Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+                treestore_scripts_background,
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -347,7 +351,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         #TODO NEWEST version using hopefully more sensible column ids.
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                self.create_scripts_treestore( copyOfScripts, non_background = True, background = True ),
+                treestore_scripts_all,
+#                self.create_scripts_treestore( copyOfScripts, non_background = True, background = True ),
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -471,11 +476,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
 
-#TOD Can this be simplified?
+#TOD Can this be simplified?  Or should be passed in to the create function as a new argument?
         # treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
         # self.populateScriptsTreeStore( copyOfScripts, treeview, "", "" )  #TODO Not needed.
         treeview.connect( "cursor-changed", self.onScriptSelection, treeview, commandTextView, copyOfScripts )
-        self.create_scripts_treestore( copyOfScripts, non_background = False, background = True ),
+        self.create_scripts_treestore( treeview, copyOfScripts, "", "", non_background = True, background = True )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -707,6 +712,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Not sure if this is needed...
         # self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeView, "", "" )
+        self.create_scripts_treestore( backgroundScriptsTreeView, copyOfScripts, "", "", non_background = False, background = True )
 
         # grid.attach( scrolledWindow, 0, 2, 1, 20 )
         grid.attach( backgroundScriptsTreeViewScrolledwindow, 0, 2, 1, 20 )
@@ -793,19 +799,26 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Might be helpful later...
 #    https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
-    def create_scripts_treestore( self, treeview, scripts, non_background = True, background = True ):
+    def create_scripts_treestore(
+        self,
+        treeview,
+        scripts,
+        select_group,
+        select_script,
+        non_background = True,
+        background = True ):
         # treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
 
         #TODO Testing new stuff...
         treestore = treeview.get_model()
         treestore.clear()
 
-        scriptsByGroup = self.getScriptsByGroup( scripts, non_background, background )
-        groups = sorted( scriptsByGroup.keys(), key = str.lower )
+        scripts_by_group = self.getScriptsByGroup( scripts, non_background, background )
+        groups = sorted( scripts_by_group.keys(), key = str.lower )
         for group in groups:
             row = [ group, None, None, None, None, None, None, None, None ]
             parent = treestore.append( None, row )
-            for script in sorted( scriptsByGroup[ group ], key = lambda script: script.getName().lower() ):
+            for script in sorted( scripts_by_group[ group ], key = lambda script: script.getName().lower() ):
                 play_sound = Gtk.STOCK_APPLY if script.getPlaySound() else None
                 show_notification = Gtk.STOCK_APPLY if script.getShowNotification() else None
                 is_background = Gtk.STOCK_APPLY if type( script ) is Background else None
@@ -835,11 +848,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treestore.append( parent, row )
 
-        #TODO Still need to do this?
-        # if scripts:
-        #     self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
-
-        # return treestore
+        if scripts:
+            self.expandTreeAndSelect( treeview, select_group, select_script, scripts_by_group, groups )
 
 
     def populateScriptsTreeStoreORIGINAL( self, scripts, treeView, selectGroup, selectScript ):
@@ -1029,12 +1039,21 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     scripts.append( newScript )
 
-                    self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
-                    self.populateBackgroundScriptsTreeStore(
+                    self.create_scripts_treestore( scripts, scriptsTreeView, "", "", True, True )
+                    self.create_scripts_treestore(
                         scripts,
-                        backgroundScriptsTreeView,
+                        backgroundSriptsTreeView,
                         newScript.getGroup() if type( newScript ) is Background else "",
-                        newScript.getName() if type( newScript ) is Background else "" )
+                        newScript.getName() if type( newScript ) is Background else "",
+                        False,
+                        True )
+
+#                    self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
+#                    self.populateBackgroundScriptsTreeStore(
+#                        scripts,
+#                        backgroundScriptsTreeView,
+#                        newScript.getGroup() if type( newScript ) is Background else "",
+#                        newScript.getName() if type( newScript ) is Background else "" )
 
                 break
 
@@ -1057,8 +1076,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                 for script in scripts:
                     if script.getGroup() == group and script.getName() == name:
                         del scripts[ i ]
-                        self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
-                        self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
+                        self.create_scripts_treestore( scripts, scriptsTreeView, "", "", True, True )
+                        self.create_scripts_treestore( scripts, backgroundScriptsTreeView, "", "", False, True )
+
+#                        self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
+#                        self.populateBackgroundScriptsTreeStore( scripts, backgroundScriptsTreeView, "", "" )
                         self.updateIndicatorTextEntry( textEntry, self.__createKey( group, name ), "" )
                         break
 
@@ -1410,12 +1432,20 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 scripts.append( newScript )
 
-                self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
-                self.populateBackgroundScriptsTreeStore(
+                self.create_scripts_treestore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName(), True, True )
+                self.create_scripts_treestore(
                     scripts,
-                    backgroundScriptsTreeView,
+                    scriptsTreeView,
                     newScript.getGroup() if type( newScript ) is Background else "",
-                    newScript.getName() if type( newScript ) is Background else "" )
+                    newScript.getName() if type( newScript ) is Background else "",
+                    False,
+                    True )
+#                self.populateScriptsTreeStore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
+#                self.populateBackgroundScriptsTreeStore(
+#                    scripts,
+#                    backgroundScriptsTreeView,
+#                    newScript.getGroup() if type( newScript ) is Background else "",
+#                    newScript.getName() if type( newScript ) is Background else "" )
 
             break
 
