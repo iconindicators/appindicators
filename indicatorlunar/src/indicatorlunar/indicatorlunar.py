@@ -1556,8 +1556,6 @@ class IndicatorLunar( IndicatorBase ):
             planetStore,
             NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
 
-#TODO What about a 0.5 alignment for each of the first checkbox columns
-# for planets, minor planets, comets, stars and satellites?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 planetStore,
@@ -1565,6 +1563,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
+                alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
                     "Check a planet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
@@ -1612,6 +1611,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
+                alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
                     "Check a minor planet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
@@ -1664,6 +1664,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
+                alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
                     "Check a comet to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
@@ -1711,6 +1712,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
+                alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
                     "Check a star to display in the menu.\n\n" + \
                     "Clicking the header of the first column\n" + \
@@ -1763,6 +1765,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_NAME ),
                     ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_NUMBER ),
                     ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
+                alignments_columnviewids = ( ( 0.5, SATELLITE_VIEW_COLUMN_HIDE_SHOW ), ),
                 sortcolumnviewids_columnmodelids = (
                     ( SATELLITE_VIEW_COLUMN_NAME, SATELLITE_MODEL_COLUMN_NAME ),
                     ( SATELLITE_VIEW_COLUMN_NUMBER, SATELLITE_MODEL_COLUMN_NUMBER ),
