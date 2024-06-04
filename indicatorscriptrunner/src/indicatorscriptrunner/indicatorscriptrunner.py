@@ -314,7 +314,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         backgroundScriptsTreeView, backgroundScriptsTreeViewScrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                self.create_scripts_treestore( copyOfScripts, non_background = False, background = True ),
+                # self.create_scripts_treestore( copyOfScripts, non_background = False, background = True ),
+                Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -342,52 +343,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         renderer_pixbuf_column_remove = Gtk.CellRendererPixbuf()
         renderer_text_column_interval = Gtk.CellRendererText()
         renderer_text_column_name = Gtk.CellRendererText()
-
-#TODO The Terminal and Background column values are around the wrong way.
-# So define the model columns and view columns for both trees.
-        # treeview, scrolledwindow = \
-        #     self.create_treeview_within_scrolledwindow(
-        #         Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ),
-        #         (
-        #             _( "Group" ),
-        #             _( "Name" ),
-        #             _( "Sound" ),
-        #             _( "Notification" ),
-        #             _( "Terminal" ),
-        #             _( "Background" ),
-        #             _( "Interval" ),
-        #             _( "Force Update" ) ),
-        #         (
-        #             ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_GROUP ),
-        #             ( renderer_text_column_name, "text", IndicatorScriptRunner.COLUMN_NAME ),
-        #             ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_SOUND ),
-        #             ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_NOTIFICATION ),
-        #             ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_TERMINAL ),
-        #             ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_BACKGROUND ),
-        #             (
-        #                 ( renderer_text_column_interval, "text", IndicatorScriptRunner.COLUMN_INTERVAL ),
-        #                 ( renderer_pixbuf_column_remove, "icon_name", IndicatorScriptRunner.COLUMN_REMOVE ) ),
-        #             ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_FORCE_UPDATE ) ),
-        #         alignments_columnviewids = (
-        #             ( 0.5, IndicatorScriptRunner.COLUMN_SOUND - 1 ),
-        #             ( 0.5, IndicatorScriptRunner.COLUMN_NOTIFICATION - 1 ),
-        #             ( 0.5, IndicatorScriptRunner.COLUMN_TERMINAL - 1 ),
-        #             ( 0.5, IndicatorScriptRunner.COLUMN_BACKGROUND - 1 ),
-        #             ( 0.5, IndicatorScriptRunner.COLUMN_INTERVAL - 1 ),
-        #             ( 0.5, IndicatorScriptRunner.COLUMN_FORCE_UPDATE - 1 ) ),
-        #         celldatafunctionandarguments_renderers_columnviewids = (
-        #             ( ( self.dataFunctionNameColumn, copyOfScripts ), renderer_text_column_name, IndicatorScriptRunner.COLUMN_NAME - 1 ),
-        #             ( ( self.dataFunctionIntervalColumn, ), renderer_text_column_interval, IndicatorScriptRunner.COLUMN_INTERVAL - 1 ),
-        #             ( ( self.dataFunctionIntervalColumn, ), renderer_pixbuf_column_remove, IndicatorScriptRunner.COLUMN_INTERVAL - 1 ) ),
-        #         tooltip_text = _(
-        #             "Double-click to edit a script.\n\n" + \
-        #             "If an attribute does not apply to a script,\n" + \
-        #             "a dash is displayed.\n\n" + \
-        #             "If a non-background script is checked as\n" + \
-        #             "default, the name will appear in bold." ),
-        #         rowactivatedfunctionandarguments = (
-        #             self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts ), )
-
 
         #TODO NEWEST version using hopefully more sensible column ids.
         treeview, scrolledwindow = \
@@ -518,9 +473,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TOD Can this be simplified?
         # treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
-        # self.populateScriptsTreeStore( copyOfScripts, treeView, "", "" )
-        treeview.connect( "cursor-changed", self.onScriptSelection, treeview, commandTextView, copyOfScripts )
         # self.populateScriptsTreeStore( copyOfScripts, treeview, "", "" )  #TODO Not needed.
+        treeview.connect( "cursor-changed", self.onScriptSelection, treeview, commandTextView, copyOfScripts )
+        self.create_scripts_treestore( copyOfScripts, non_background = False, background = True ),
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -838,8 +793,13 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Might be helpful later...
 #    https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
-    def create_scripts_treestore( self, scripts, non_background = True, background = True ):
-        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+    def create_scripts_treestore( self, treeview, scripts, non_background = True, background = True ):
+        # treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+
+        #TODO Testing new stuff...
+        treestore = treeview.get_model()
+        treestore.clear()
+
         scriptsByGroup = self.getScriptsByGroup( scripts, non_background, background )
         groups = sorted( scriptsByGroup.keys(), key = str.lower )
         for group in groups:
@@ -878,7 +838,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         #TODO Still need to do this?
         # if scripts:
         #     self.expandTreeAndSelect( treeView, selectGroup, selectScript, scriptsByGroup, groups )
-        return treestore
+
+        # return treestore
 
 
     def populateScriptsTreeStoreORIGINAL( self, scripts, treeView, selectGroup, selectScript ):
