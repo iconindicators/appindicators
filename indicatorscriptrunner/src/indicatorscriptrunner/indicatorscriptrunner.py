@@ -307,6 +307,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         # Contains extra/redundant columns, but allows the reuse of the column definitions.
         # backgroundScriptsTreeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) )
         indicatorTextEntry = Gtk.Entry()
+        commandTextView = Gtk.TextView()
 
         #TODO New... 
         renderer_text_column_interval = Gtk.CellRendererText()
@@ -390,9 +391,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "a dash is displayed.\n\n" + \
                     "If a non-background script is checked as\n" + \
                     "default, the name will appear in bold." ),
+                cursorchangedfunctionandarguments = (
+                    self.onScriptSelection, commandTextView, copyOfScripts ),
                 rowactivatedfunctionandarguments = (
                     self.onScriptDoubleClick, backgroundScriptsTreeView, indicatorTextEntry, copyOfScripts ), )
-
 
         # treeView = Gtk.TreeView.new_with_model( Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str ) )
         # treeView.set_hexpand( True )
@@ -471,7 +473,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        commandTextView = Gtk.TextView()
+#TODO Moved up top.
+        # commandTextView = Gtk.TextView()
         commandTextView.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         commandTextView.set_editable( False )
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
@@ -479,8 +482,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 #TOD Can this be simplified?  Or should be passed in to the create function as a new argument?
         # treeView.connect( "cursor-changed", self.onScriptSelection, treeView, commandTextView, copyOfScripts )
         # self.populateScriptsTreeStore( copyOfScripts, treeview, "", "" )  #TODO Not needed.
-        treeview.connect( "cursor-changed", self.onScriptSelection, treeview, commandTextView, copyOfScripts )
-        self.create_scripts_treestore( treeview, copyOfScripts, "", "", non_background = True, background = True )
+        # treeview.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )  #TODO Cannot as yet put this into create_treeview call as commandTextView is not yet defined.
+        self.create_scripts_treestore( treeview, copyOfScripts, "", "" )
 
         scrolledWindow = Gtk.ScrolledWindow()
         scrolledWindow.add( commandTextView )
@@ -712,7 +715,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Not sure if this is needed...
         # self.populateBackgroundScriptsTreeStore( copyOfScripts, backgroundScriptsTreeView, "", "" )
-        self.create_scripts_treestore( backgroundScriptsTreeView, copyOfScripts, "", "", non_background = False, background = True )
+        self.create_scripts_treestore( backgroundScriptsTreeView, copyOfScripts, "", "", False, True )
 
         # grid.attach( scrolledWindow, 0, 2, 1, 20 )
         grid.attach( backgroundScriptsTreeViewScrolledwindow, 0, 2, 1, 20 )
@@ -799,6 +802,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Might be helpful later...
 #    https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
+#TODO Eventually rename to populate_treestore or similar...it is not a create!
+# Even update_treestore.
     def create_scripts_treestore(
         self,
         treeview,
@@ -941,8 +946,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             treeView.scroll_to_cell( treePath ) # Doesn't like to be called when empty.
 
 
-    def onScriptSelection( self, treeSelection, treeView, textView, scripts ):
-        group, name = self.__getGroupNameFromTreeView( treeView )
+    def onScriptSelection( self, treeview, textView, scripts ):
+        group, name = self.__getGroupNameFromTreeView( treeview )
         commandText = ""
         if group and name:
             commandText = self.getScript( scripts, group, name ).getCommand()
@@ -1039,10 +1044,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     scripts.append( newScript )
 
-                    self.create_scripts_treestore( scripts, scriptsTreeView, "", "", True, True )
+                    self.create_scripts_treestore( scripts, scriptsTreeView, "", "" )
                     self.create_scripts_treestore(
                         scripts,
-                        backgroundSriptsTreeView,
+                        backgroundScriptsTreeView,
                         newScript.getGroup() if type( newScript ) is Background else "",
                         newScript.getName() if type( newScript ) is Background else "",
                         False,
@@ -1076,7 +1081,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 for script in scripts:
                     if script.getGroup() == group and script.getName() == name:
                         del scripts[ i ]
-                        self.create_scripts_treestore( scripts, scriptsTreeView, "", "", True, True )
+                        self.create_scripts_treestore( scripts, scriptsTreeView, "", "" )
                         self.create_scripts_treestore( scripts, backgroundScriptsTreeView, "", "", False, True )
 
 #                        self.populateScriptsTreeStore( scripts, scriptsTreeView, "", "" )
@@ -1432,7 +1437,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 scripts.append( newScript )
 
-                self.create_scripts_treestore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName(), True, True )
+                self.create_scripts_treestore( scripts, scriptsTreeView, newScript.getGroup(), newScript.getName() )
                 self.create_scripts_treestore(
                     scripts,
                     scriptsTreeView,
@@ -1480,7 +1485,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         name = None
         model, treeiter = treeView.get_selection().get_selected()
         if treeiter:
-            group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP]
+            group = model[ treeView.get_model().iter_parent( treeiter ) ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP]
+            # group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP] #TODO Needed to get group name from parent...ensure this is correct!
             name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
 
         return group, name

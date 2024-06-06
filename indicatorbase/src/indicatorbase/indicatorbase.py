@@ -1062,6 +1062,7 @@ class IndicatorBase( ABC ):
         celldatafunctionandarguments_renderers_columnviewids = None, # Function and arguments must be a nested tuple.
         clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
+        cursorchangedfunctionandarguments = None,
         rowactivatedfunctionandarguments = None ):
 
         treeview = Gtk.TreeView.new_with_model( treemodel )
@@ -1126,6 +1127,9 @@ class IndicatorBase( ABC ):
         treeview.expand_all() #TODO Do for all trees?
         treeview.set_hexpand( True )
         treeview.set_vexpand( True )
+
+        if cursorchangedfunctionandarguments:
+            treeview.connect( "cursor-changed", *cursorchangedfunctionandarguments )
 
         if rowactivatedfunctionandarguments:
             treeview.connect( "row-activated", *rowactivatedfunctionandarguments )
