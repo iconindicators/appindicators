@@ -962,11 +962,24 @@ class IndicatorBase( ABC ):
 
     def create_scrolledwindow( self, widget ):
         scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.set_hexpand( True )#TODO Not sure if this applies to all callers.
+        scrolledwindow.set_hexpand( True )
         scrolledwindow.set_vexpand( True )
         scrolledwindow.add( widget )
-        #TODO What about hor/ver scroll policy?
         return scrolledwindow
+
+
+    def create_entry_with_label( self, label_text, entry_text, box, tooltip_text = "" ):
+        label = Gtk.Label.new( _( "URL" ) )
+#        label.set_halign( Gtk.Align.START ) #TODO Handle
+        box.pack_start( label, False, False, 0 )
+
+        entry = Gtk.Entry()
+        entry.set_text( entry_text )
+        entry.set_tooltip_text( tooltip_text )
+#        entry.set_sensitive( not self.copyToClipboard )  #TODO Handle
+        box.pack_start( entry, True, True, 0 )
+
+        return entry
 
 
     def create_button(
@@ -1153,14 +1166,6 @@ class IndicatorBase( ABC ):
 #TODO Look at all pack_start calls.
 # What should the parameters be, given buttons, labels, etc are added.
 # Some have True and some have False.
-
-
-#TODO Implement functions to encapsulate these...?
-    # 20
-    # notificationSummary = Gtk.Entry()
-    #
-    # 4
-    # scrolledWindow = Gtk.ScrolledWindow()
 
 
     def getMenuIndent( self, indent = 1 ):

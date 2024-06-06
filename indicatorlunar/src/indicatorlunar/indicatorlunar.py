@@ -2296,11 +2296,12 @@ class IndicatorLunar( IndicatorBase ):
         messageTextView.get_buffer().set_text( messageText )
         messageTextView.set_tooltip_text( messageTooltip )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( messageTextView )
-        box.pack_start( scrolledWindow, True, True, 0 )
+#        scrolledWindow = Gtk.ScrolledWindow()
+#        scrolledWindow.set_hexpand( True )
+#        scrolledWindow.set_vexpand( True )
+#        scrolledWindow.add( messageTextView )
+#        box.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start( create_scrolledwindow( messageTextView ), True, True, 0 )
         box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, gridStartIndex + 2, 1, 1 )
 

@@ -485,12 +485,13 @@ class IndicatorScriptRunner( IndicatorBase ):
         # treeview.connect( "cursor-changed", self.onScriptSelection, commandTextView, copyOfScripts )  #TODO Cannot as yet put this into create_treeview call as commandTextView is not yet defined.
         self.create_scripts_treestore( treeview, copyOfScripts, "", "" )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( commandTextView )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
+#        scrolledWindow = Gtk.ScrolledWindow()
+#        scrolledWindow.add( commandTextView )
+#        scrolledWindow.set_hexpand( True )
+#        scrolledWindow.set_vexpand( True )
 
-        box.pack_start( scrolledWindow, True, True, 0 )
+#        box.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start( create_scrolledwindow( commandTextView ), True, True, 0 )
         grid.attach( box, 0, 20, 1, 10 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1171,12 +1172,13 @@ class IndicatorScriptRunner( IndicatorBase ):
         commandTextView.set_wrap_mode( Gtk.WrapMode.WORD )
         commandTextView.get_buffer().set_text( "" if add else script.getCommand() )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( commandTextView )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
+#        scrolledWindow = Gtk.ScrolledWindow()
+#        scrolledWindow.add( commandTextView )
+#        scrolledWindow.set_hexpand( True )
+#        scrolledWindow.set_vexpand( True )
 
-        box.pack_start( scrolledWindow, True, True, 0 )
+#        box.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start( create_scrolledwindow( commandTextView ), True, True, 0 )
         grid.attach( box, 0, 2, 1, 10 )
 
         soundCheckbutton = \

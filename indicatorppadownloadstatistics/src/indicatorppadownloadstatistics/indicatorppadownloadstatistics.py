@@ -1112,11 +1112,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if rowNumber:
             textview.get_buffer().set_text( filterTreeModel[ filterTreeIter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) # This is an edit.
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.add( textview )
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        box.pack_start( scrolledWindow, True, True, 0 )
+#        scrolledWindow = Gtk.ScrolledWindow()
+#        scrolledWindow.add( textview )
+#        scrolledWindow.set_hexpand( True )
+#        scrolledWindow.set_vexpand( True )
+#        box.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start( create_scrolledwindow( textview ), True, True, 0 )
 
         grid.attach( box, 0, 3, 2, 1 )
 
