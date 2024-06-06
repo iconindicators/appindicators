@@ -23,7 +23,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import encodings.idna
 import gi
-import re
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
@@ -36,6 +35,8 @@ try:
 except ValueError:
     gi.require_version( "Notify", "0.8" )
 from gi.repository import Notify
+
+import re
 
 
 class IndicatorPunycode( IndicatorBase ):
@@ -62,8 +63,8 @@ class IndicatorPunycode( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
-            activate_function_and_arguments = ( lambda menuItem: self.onConvert(), ),
-            isSecondaryActivateTarget = True )
+            activate_functionandarguments = ( lambda menuItem: self.on_convert(), ),
+            is_secondary_activate_target = True )
 
         indent = self.getMenuIndent()
         for result in self.results:
@@ -72,19 +73,19 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
-                activate_function_and_arguments =
+                activate_functionandarguments =
                     ( lambda menuItem, result = result:
-                        self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) ) # Note result = result to handle lambda late binding.
+                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) ) # Note result = result to handle lambda late binding.
 
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                activate_function_and_arguments =
+                activate_functionandarguments =
                     ( lambda menuItem, result = result:
-                        self.sendResultsToOutput( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) ) # Note result = result to handle lambda late binding.
+                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) ) # Note result = result to handle lambda late binding.
 
 
-    def onConvert( self ):
+    def on_convert( self ):
         summary =_( "Nothing to convert..." )
         if self.inputClipboard:
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
@@ -92,21 +93,21 @@ class IndicatorPunycode( IndicatorBase ):
                 Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.get_icon_name() ).show()
 
             else:
-                self.__doConversion( text )
+                self.__do_conversion( text )
 
         else:
             # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
-            def clipboardTextReceivedFunc( clipboard, text, data ):
+            def clipboard_text_received_function( clipboard, text, data ):
                 if text is None:
                     Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.get_icon_name() ).show()
 
                 else:
-                    self.__doConversion( text )
+                    self.__do_conversion( text )
 
-            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( clipboardTextReceivedFunc, None )
+            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( clipboard_text_received_function, None )
 
 
-    def __doConversion( self, text ):
+    def __do_conversion( self, text ):
         protocol = ""
         result = re.split( r"(^.*//)", text )
         if len( result ) == 3:
@@ -142,9 +143,9 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.results.insert( 0, result )
 
-            self.cullResults()
+            self.cull_results()
 
-            self.sendResultsToOutput( protocol + convertedText + pathQuery )
+            self.send_results_to_output( protocol + convertedText + pathQuery )
             self.requestUpdate()
 
         except Exception as e:
@@ -153,12 +154,12 @@ class IndicatorPunycode( IndicatorBase ):
             Notify.Notification.new( _( "Error converting..." ), _( "See log for more details." ), self.get_icon_name() ).show()
 
 
-    def cullResults( self ):
+    def cull_results( self ):
         if len( self.results ) > self.resultHistoryLength:
             self.results = self.results[ : self.resultHistoryLength ]
 
 
-    def sendResultsToOutput( self, text ):
+    def send_results_to_output( self, text ):
         if self.outputBoth:
             Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
@@ -282,7 +283,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.dropPathQuery = dropPathQueryCheckbutton.get_active()
             self.resultHistoryLength = resultsAmountSpinner.get_value_as_int()
             self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
-            self.cullResults()
+            self.cull_results()
 
         return responseType
 

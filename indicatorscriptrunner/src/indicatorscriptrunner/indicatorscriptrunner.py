@@ -186,10 +186,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             menuItem = self.create_and_append_menuitem(
                 menu,
                 indent + script.getName(),
-                activate_function_and_arguments = ( lambda menuItem, script = script: self.onScriptMenuItem( script ), ) ) # Note script = script to handle lambda late binding.
+                activate_functionandarguments = ( lambda menuItem, script = script: self.onScriptMenuItem( script ), ) ) # Note script = script to handle lambda late binding.
 
             if script.getDefault():
-                self.secondaryActivateTarget = menuItem
+                self.secondaryActivateTarget = menuItem #TODO This variable has changed; but really, should we directly reference the variable instead of using a get/set?
 
 
     def onScriptMenuItem( self, script ):

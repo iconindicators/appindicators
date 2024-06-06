@@ -23,8 +23,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
 import gi
-import importlib.util
-import sys
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -35,7 +33,9 @@ except ValueError:
     gi.require_version( "Notify", "0.8" )
 from gi.repository import Notify
 
+import importlib.util
 from pathlib import Path
+import sys
 
 
 class IndicatorTide( IndicatorBase ):
@@ -73,7 +73,7 @@ class IndicatorTide( IndicatorBase ):
                 spec.loader.exec_module( module )
                 klazz = getattr( module, self.userScriptClassName )
                 tidalReadings = klazz.getTideData( self.getLogging() )
-                self.buildMenu( menu, tidalReadings )
+                self.build_menu( menu, tidalReadings )
 
             except FileNotFoundError as e:
                 label = _( "User script could not be found!" )
@@ -102,36 +102,36 @@ class IndicatorTide( IndicatorBase ):
         return ( fiveMinutesAfterMidnight - today ).total_seconds()
 
 
-    def buildMenu( self, menu, tidalReadings ):
+    def build_menu( self, menu, tidal_readings ):
         indent = ""
-        self.portName = tidalReadings[ 0 ].getLocation()
+        self.portName = tidal_readings[ 0 ].getLocation()
         if self.portName:
             self.create_and_append_menuitem(
                 menu,
                 self.portName,
-                name = tidalReadings[ 0 ].getURL(),
-                activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                name = tidal_readings[ 0 ].getURL(),
+                activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             indent = self.getMenuIndent()
 
         if self.showAsSubMenus:
             if self.showAsSubMenusExceptFirstDay:
                 firstDateTidalReadings, afterFirstDateTidalReadings = \
-                    self.__splitTidalReadingsAfterFirstDate( tidalReadings )
+                    self.__splitTidalReadingsAfterFirstDate( tidal_readings )
 
                 self.__createMenuFlat( firstDateTidalReadings, menu, indent )
                 self.__createMenuSub( afterFirstDateTidalReadings, menu, indent )
 
             else:
-                self.__createMenuSub( tidalReadings, menu, indent )
+                self.__createMenuSub( tidal_readings, menu, indent )
 
         else:
-            self.__createMenuFlat( tidalReadings, menu, indent )
+            self.__createMenuFlat( tidal_readings, menu, indent )
 
 
-    def __createMenuFlat( self, tidalReadings, menu, indent ):
+    def __createMenuFlat( self, tidal_readings, menu, indent ):
         todayDate = ""
-        for tidalReading in tidalReadings:
+        for tidalReading in tidal_readings:
             if todayDate != tidalReading.getDate():
                 shownToday = False
 
@@ -145,30 +145,30 @@ class IndicatorTide( IndicatorBase ):
                     menu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             else:
                 self.create_and_append_menuitem(
                     menu,
                     indent + tidalReading.getDate(),
                     name = tidalReading.getURL(),
-                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 self.create_and_append_menuitem(
                     menu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
 
 
-    def __createMenuSub( self, tidalReadings, menu, indent ):
+    def __createMenuSub( self, tidal_readings, menu, indent ):
         todayDate = ""
         shownToday = False
         subMenu = None # Only declared here to keep the compiler happy.
-        for tidalReading in tidalReadings:
+        for tidalReading in tidal_readings:
             if todayDate != tidalReading.getDate():
                 shownToday = False
 
@@ -182,7 +182,7 @@ class IndicatorTide( IndicatorBase ):
                     subMenu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             else:
                 subMenu = Gtk.Menu()
@@ -194,17 +194,17 @@ class IndicatorTide( IndicatorBase ):
                     subMenu,
                     menuText,
                     name = tidalReading.getURL(),
-                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
                 todayDate = tidalReading.getDate()
                 shownToday = True
 
 
-    def __splitTidalReadingsAfterFirstDate( self, tidalReadings ):
+    def __splitTidalReadingsAfterFirstDate( self, tidal_readings ):
         firstDateReadings = [ ]
         afterFirstDateReadings = [ ]
-        for tidalReading in tidalReadings:
-            if tidalReading.getDate() == tidalReadings[ 0 ].getDate():
+        for tidalReading in tidal_readings:
+            if tidalReading.getDate() == tidal_readings[ 0 ].getDate():
                 firstDateReadings.append( tidalReading )
 
             else:

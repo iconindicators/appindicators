@@ -294,7 +294,7 @@ class IndicatorBase( ABC ):
                 sys.exit()
 
         self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
-        self.secondaryActivateTarget = None
+        self.secondary_activate_target = None
         self.updateTimerID = None
         self.lock = Lock()
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
@@ -318,7 +318,7 @@ class IndicatorBase( ABC ):
         menu.show_all()
         self.indicator.set_menu( menu )
 
-        self.__loadConfig()
+        self.__load_config()
 
 
     def _getProjectMetadata( self ):
@@ -429,7 +429,7 @@ class IndicatorBase( ABC ):
 
     def __update_internal( self ):
         update_start = datetime.datetime.now()
-        self.secondaryActivateTarget = None
+        self.secondary_activate_target = None
         menu = Gtk.Menu()
         nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
 
@@ -445,14 +445,14 @@ class IndicatorBase( ABC ):
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
-        self.create_and_append_menuitem( menu, _( "Preferences" ), activate_function_and_arguments = ( self.__onPreferences, ) )
-        self.create_and_append_menuitem( menu, _( "About" ), activate_function_and_arguments = ( self.__onAbout, ) )
-        self.create_and_append_menuitem( menu, _( "Quit" ), activate_function_and_arguments = ( Gtk.main_quit, ) )
+        self.create_and_append_menuitem( menu, _( "Preferences" ), activate_functionandarguments = ( self.__onPreferences, ) )
+        self.create_and_append_menuitem( menu, _( "About" ), activate_functionandarguments = ( self.__onAbout, ) )
+        self.create_and_append_menuitem( menu, _( "Quit" ), activate_functionandarguments = ( Gtk.main_quit, ) )
         self.indicator.set_menu( menu )
         menu.show_all()
 
-        if self.secondaryActivateTarget:
-            self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
+        if self.secondary_activate_target:
+            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
@@ -471,19 +471,19 @@ class IndicatorBase( ABC ):
         menu,
         label,
         name = None,
-        activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
-        isSecondaryActivateTarget = False ):
+        activate_functionandarguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        is_secondary_activate_target = False ):
 
         menuItem = Gtk.MenuItem.new_with_label( label )
 
         if name:
             menuItem.set_name( name )
 
-        if activate_function_and_arguments:
-            menuItem.connect( "activate", *activate_function_and_arguments )
+        if activate_functionandarguments:
+            menuItem.connect( "activate", *activate_functionandarguments )
 
-        if isSecondaryActivateTarget:
-            self.secondaryActivateTarget = menuItem
+        if is_secondary_activate_target:
+            self.secondary_activate_target = menuItem
 
         menu.append( menuItem )
         return menuItem
@@ -512,7 +512,7 @@ class IndicatorBase( ABC ):
     #             menuItem.connect( "activate", activateFunction )
     #
     #     if isSecondaryActivateTarget:
-    #         self.secondaryActivateTarget = menuItem
+    #         self.secondary_activate_target = menuItem
     #
     #     menu.append( menuItem )
     #     return menuItem
@@ -524,15 +524,15 @@ class IndicatorBase( ABC ):
         label,
         index,
         name = None,
-        activate_function_and_arguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
-        isSecondaryActivateTarget = False ):
+        activate_functionandarguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        is_secondary_activate_target = False ):
 
         menuItem = self.create_and_append_menuitem(
             menu,
             label,
             name,
-            activate_function_and_arguments,
-            isSecondaryActivateTarget )
+            activate_functionandarguments,
+            is_secondary_activate_target )
 
         menu.reorder_child( menuItem, index )
         return menuItem
@@ -562,7 +562,7 @@ class IndicatorBase( ABC ):
 #        if self.__getMenuSensitivity():
 #            self.onMouseWheelScroll( indicator, delta, scrollDirection )
         if not self.lock.locked():
-            self.onMouseWheelScroll( indicator, delta, scrollDirection )
+            self.onMouseWheelScroll( indicator, delta, scrollDirection ) #TODO Can this be renamed to on_mouse_wheel_scroll?
 
 
     def __onAbout( self, menuItem ):
@@ -577,7 +577,7 @@ class IndicatorBase( ABC ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
-        if self.secondaryActivateTarget:
+        if self.secondary_activate_target:
             self.indicator.set_secondary_activate_target( None )
 
         aboutDialog = Gtk.AboutDialog()
@@ -623,8 +623,8 @@ class IndicatorBase( ABC ):
 
         self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( True )
-        if self.secondaryActivateTarget:
-            self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
+        if self.secondary_activate_target:
+            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         self.lock.release()
 
@@ -661,7 +661,7 @@ class IndicatorBase( ABC ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
-        if self.secondaryActivateTarget:
+        if self.secondary_activate_target:
             self.indicator.set_secondary_activate_target( None )
 
         if self.updateTimerID: #TODO If the mutex works...maybe can dispense with the ID stuff.
@@ -669,6 +669,7 @@ class IndicatorBase( ABC ):
             self.updateTimerID = None
 
         dialog = self.createDialog( menuItem, _( "Preferences" ) )
+#TODO Would be nice to rename to on_preferences
         responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
 
@@ -679,7 +680,7 @@ class IndicatorBase( ABC ):
 #        self.__setMenuSensitivity( True )
 
         if responseType == Gtk.ResponseType.OK:
-            self.__saveConfig()
+            self.__save_config()
             GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release and so the update will proceed.
 
         #TODO May not need this...If the update keeps trying every minute, then no need for the code below.
@@ -693,8 +694,8 @@ class IndicatorBase( ABC ):
                 self.__update()
         '''
         self.__set_menu_sensitivity( True )
-        if self.secondaryActivateTarget:
-            self.indicator.set_secondary_activate_target( self.secondaryActivateTarget )
+        if self.secondary_activate_target:
+            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         self.lock.release()
 
@@ -957,6 +958,15 @@ class IndicatorBase( ABC ):
         grid.set_margin_top( spacing )
         grid.set_margin_bottom( spacing )
         return grid
+
+
+    def create_scrolledwindow( self, widget ):
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_hexpand( True )#TODO Not sure if this applies to all callers.
+        scrolledwindow.set_vexpand( True )
+        scrolledwindow.add( widget )
+        #TODO What about hor/ver scroll policy?
+        return scrolledwindow
 
 
     def create_button(
@@ -1379,7 +1389,7 @@ class IndicatorBase( ABC ):
 
 
     def requestSaveConfig( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__saveConfig, False )
+        GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 
     def __copyConfigToNewDirectory( self ):
@@ -1402,7 +1412,7 @@ class IndicatorBase( ABC ):
 
 
     # Read a dictionary of configuration from a JSON text file.
-    def __loadConfig( self ):
+    def __load_config( self ):
         self.__copyConfigToNewDirectory()
         configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__EXTENSION_JSON
         config = { }
@@ -1416,6 +1426,7 @@ class IndicatorBase( ABC ):
                 logging.exception( e )
                 logging.error( "Error reading configuration: " + configFile )
 
+#TODO Eventually change to self.load_config        
         self.loadConfig( config ) # Call to implementation in indicator.
 
 
@@ -1423,7 +1434,8 @@ class IndicatorBase( ABC ):
     #
     # returnStatus If True, will return a boolean indicating success/failure.
     #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
-    def __saveConfig( self, returnStatus = True ):
+    def __save_config( self, returnStatus = True ):
+#TODO Eventually change to self.save_config        
         config = self.saveConfig() # Call to implementation in indicator.
 
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version

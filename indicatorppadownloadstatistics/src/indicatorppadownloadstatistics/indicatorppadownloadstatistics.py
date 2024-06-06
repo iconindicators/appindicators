@@ -150,7 +150,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     menu,
                     ppa.getDescriptor(),
                     name = ppa.getDescriptor(),
-                    activate_function_and_arguments = ( self.onPPA, ) )
+                    activate_functionandarguments = ( self.onPPA, ) )
 
                 if ppa.getStatus() == PPA.Status.OK:
                     publishedBinaries = ppa.getPublishedBinaries( True )
@@ -162,7 +162,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
             if len( ppas ) == 1:
-                self.secondaryActivateTarget = menuItem
+                self.secondaryActivateTarget = menuItem #TODO This variable has changed; but really, should we directly reference the variable instead of using a get/set?
 
 
     def createMenuItemForPublishedBinary( self, menu, indent, ppa, publishedBinary ):
@@ -177,7 +177,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             menu,
             label,
             name = ppa.getDescriptor(),
-            activate_function_and_arguments = ( self.onPPA, ) )
+            activate_functionandarguments = ( self.onPPA, ) )
 
 
     def createMenuItemForStatusMessage( self, menu, indent, ppa ):

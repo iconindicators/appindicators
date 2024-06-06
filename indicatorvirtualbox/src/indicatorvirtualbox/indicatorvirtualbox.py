@@ -100,8 +100,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 _( "Launch VirtualBox™ Manager" ),
-                activate_function_and_arguments = ( lambda menuItem: self.onLaunchVirtualBoxManager(), ),
-                isSecondaryActivateTarget = True )
+                activate_functionandarguments = ( lambda menuItem: self.onLaunchVirtualBoxManager(), ),
+                is_secondary_activate_target = True )
 
         else:
             self.create_and_append_menuitem( menu, _( "(VirtualBox™ is not installed)" ) )

@@ -23,7 +23,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
 import gi
-import os
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
@@ -37,6 +36,7 @@ except ValueError:
     gi.require_version( "Notify", "0.8" )
 from gi.repository import Notify
 
+import os
 from pathlib import Path
 
 
@@ -62,11 +62,13 @@ class IndicatorFortune( IndicatorBase ):
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-    NOTIFICATION_WARNING_FLAG = "%%%%%" # If present at the start of the current fortune,
-                                        # the notification summary should be emitted as a warning
-                                        # (rather than a regular fortune).
 
-    # Fortune treeview columns; one to one mapping between data model and view.
+    # If present at the start of the current fortune,
+    # the notification summary should be emitted as a warning,
+    # rather than a regular fortune.
+    NOTIFICATION_WARNING_FLAG = "%%%%%"
+
+    # Fortune treeview columns; there is a one to one mapping between model and view.
     COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
     COLUMN_ENABLED = 1 # Icon name for the APPLY icon when the fortune is enabled; None otherwise.
 
@@ -79,63 +81,72 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def update( self, menu ):
-        self.buildMenu( menu )
-        # self.refreshAndShowFortune()#TODO Put back
+        self.build_menu( menu )
+        self.refresh_and_show_fortune()
         return int( self.refreshIntervalInMinutes ) * 60
 
 
-    def buildMenu( self, menu ):
+    def build_menu( self, menu ):
         self.create_and_append_menuitem(
             menu,
             _( "New Fortune" ),
-            activate_function_and_arguments = ( lambda menuItem: self.refreshAndShowFortune(), ),
-            isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
+            activate_functionandarguments = ( lambda menuItem: self.refresh_and_show_fortune(), ),
+            is_secondary_activate_target = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
-            activate_function_and_arguments = ( lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ), ),
-            isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
+            activate_functionandarguments = ( lambda menuItem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ), ),
+            is_secondary_activate_target = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
         self.create_and_append_menuitem(
             menu,
             _( "Show Last Fortune" ),
-            activate_function_and_arguments = ( lambda menuItem: self.showFortune(), ),
-            isSecondaryActivateTarget = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
+            activate_functionandarguments = ( lambda menuItem: self.show_fortune(), ),
+            is_secondary_activate_target = ( self.middleMouseClickOnIcon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
         self.create_and_append_menuitem(
             menu,
             _( "History" ),
-            activate_function_and_arguments = ( lambda menuItem: self.showHistory(), ) )
+            activate_functionandarguments = ( lambda menuItem: self.show_history(), ) )
 
 
-    def showHistory( self ):
-        textView = Gtk.TextView()
-        textView.set_editable( False )
-        textView.get_buffer().set_text( self.readCacheTextWithoutTimestamp( IndicatorFortune.HISTORY_FILE ) )
+    def show_history( self ):
+        textview = Gtk.TextView()
+        textview.set_editable( False )
+        textview.get_buffer().set_text( self.readCacheTextWithoutTimestamp( IndicatorFortune.HISTORY_FILE ) )
 
-        scrolledWindow = Gtk.ScrolledWindow()
-        scrolledWindow.set_hexpand( True )
-        scrolledWindow.set_vexpand( True )
-        scrolledWindow.add( textView )
+        #TODO Remove below
+        # scrolledWindow = Gtk.ScrolledWindow()
+        # scrolledWindow.set_hexpand( True )
+        # scrolledWindow.set_vexpand( True )
+        # scrolledWindow.add( textView )
 
         # Scroll to the end...strange way of doing so!
         # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
-        def textViewChanged( textView, rectangle ):
-            adjustment = textView.get_parent().get_vadjustment()
+        def textview_changed( textview, rectangle ):
+            adjustment = textview.get_parent().get_vadjustment()
             adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
 
-        textView.connect( "size-allocate", textViewChanged )
+        textview.connect( "size-allocate", textview_changed )
 
         box = Gtk.Box()
-        box.pack_start( scrolledWindow, True, True, 0 )
+        box.pack_start(
+            self.create_scrolledwindow( textview ),
+            True,
+            True,
+            0 )
 
-        self.createDialogExternalToAboutOrPreferences( None, _( "Fortune History for Session" ), box, True )
+        self.createDialogExternalToAboutOrPreferences(
+            None,
+            _( "Fortune History for Session" ),
+            box, 
+            True )
 
 
-    def refreshFortune( self ):
+    def refresh_fortune( self ):
         locations = " "
         for location, enabled in self.fortunes:
             if enabled:
@@ -180,7 +191,7 @@ class IndicatorFortune( IndicatorBase ):
                     break
 
 
-    def showFortune( self ):
+    def show_fortune( self ):
         if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
             notificationSummary = _( "WARNING. . ." )
 
@@ -195,9 +206,9 @@ class IndicatorFortune( IndicatorBase ):
             self.get_icon_name() ).show()
 
 
-    def refreshAndShowFortune( self ):
-        self.refreshFortune()
-        self.showFortune()
+    def refresh_and_show_fortune( self ):
+        self.refresh_fortune()
+        self.show_fortune()
 
 
     def onPreferences( self, dialog ):
@@ -235,7 +246,7 @@ class IndicatorFortune( IndicatorBase ):
                     "There may be other fortune\n" + \
                     "packages available in your\n" + \
                     "native language." ),
-                rowactivatedfunctionandarguments = ( self.onFortuneDoubleClick, ) )
+                rowactivatedfunctionandarguments = ( self.on_fortune_double_click, ) )
 
         # tree = Gtk.TreeView.new_with_model( storeSort )
         # tree.expand_all()
@@ -259,7 +270,7 @@ class IndicatorFortune( IndicatorBase ):
         # tree.append_column( treeViewColumn )
 
         # tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        # tree.connect( "row-activated", self.onFortuneDoubleClick )
+        # tree.connect( "row-activated", self.on_fortune_double_click )
         # tree.set_tooltip_text( _(
         #     "Double click to edit a fortune.\n\n" + \
         #     "English language fortunes are\n" + \
@@ -279,42 +290,42 @@ class IndicatorFortune( IndicatorBase ):
 
         # addButton = Gtk.Button.new_with_label( _( "Add" ) )
         # addButton.set_tooltip_text( _( "Add a new fortune location." ) )
-        # addButton.connect( "clicked", self.onFortuneAdd, tree )
+        # addButton.connect( "clicked", self.on_fortune_add, tree )
         # box.pack_start( addButton, True, True, 0 )
 #TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new fortune location." ),
-                clicked_function_and_arguments = ( self.onFortuneAdd, treeview ) ),
+                clicked_function_and_arguments = ( self.on_fortune_add, treeview ) ),
             True,
             True,
             0 )
 
         # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         # removeButton.set_tooltip_text( _( "Remove the selected fortune location." ) )
-        # removeButton.connect( "clicked", self.onFortuneRemove, tree )
+        # removeButton.connect( "clicked", self.on_fortune_remove, tree )
         # box.pack_start( removeButton, True, True, 0 )
 #TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected fortune location." ),
-                clicked_function_and_arguments = ( self.onFortuneRemove, treeview ) ),
+                clicked_function_and_arguments = ( self.on_fortune_remove, treeview ) ),
             True,
             True,
             0 )
 
         # resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
         # resetButton.set_tooltip_text( _( "Reset to factory default." ) )
-        # resetButton.connect( "clicked", self.onFortuneReset, tree )
+        # resetButton.connect( "clicked", self.on_fortune_reset, tree )
         # box.pack_start( resetButton, True, True, 0 )
 #TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Reset" ),
                 tooltip_text = _( "Reset to factory default." ),
-                clicked_function_and_arguments = ( self.onFortuneReset, treeview ) ),
+                clicked_function_and_arguments = ( self.on_fortune_reset, treeview ) ),
             True,
             True,
             0 )
@@ -479,39 +490,39 @@ class IndicatorFortune( IndicatorBase ):
         return responseType
 
 
-    def onFortuneReset( self, button, treeView ):
-        if self.showOKCancel( treeView, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
-            listStore = treeView.get_model().get_model()
+    def on_fortune_reset( self, button, treeview ):
+        if self.showOKCancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
+            listStore = treeview.get_model().get_model()
             listStore.clear()
             listStore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
 
 
-    def onFortuneRemove( self, button, treeView ):
-        model, treeiter = treeView.get_selection().get_selected()
+    def on_fortune_remove( self, button, treeview ):
+        model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( treeView, _( "No fortune has been selected for removal." ) ) #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
+            self.showMessage( treeview, _( "No fortune has been selected for removal." ) ) #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
 
         elif model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE:
-            self.showMessage( treeView, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )
+            self.showMessage( treeview, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )
 
-        elif self.showOKCancel( treeView, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
+        elif self.showOKCancel( treeview, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onFortuneAdd( self, button, treeView ):
-        self.onFortuneDoubleClick( treeView, None, None )
+    def on_fortune_add( self, button, treeview ):
+        self.on_fortune_double_click( treeview, None, None )
 
 
-    def onFortuneDoubleClick( self, treeView, rowNumber, treeViewColumn ):
-        model, treeiter = treeView.get_selection().get_selected()
+    def on_fortune_double_click( self, treeview, row_number, treeviewcolumn ):
+        model, treeiter = treeview.get_selection().get_selected()
 
         grid = self.create_grid()
 
         title = _( "Add Fortune" )
-        if rowNumber:
+        if row_number:
             title = _( "Edit Fortune" )
 
-        dialog = self.createDialog( treeView, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
+        dialog = self.createDialog( treeview, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
@@ -521,7 +532,7 @@ class IndicatorFortune( IndicatorBase ):
         fortuneFileDirectory = Gtk.Entry()
         fortuneFileDirectory.set_editable( False )
 
-        if rowNumber: # This is an edit.
+        if row_number: # This is an edit.
             fortuneFileDirectory.set_text( model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
             fortuneFileDirectory.set_width_chars( len( fortuneFileDirectory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
@@ -540,7 +551,7 @@ class IndicatorFortune( IndicatorBase ):
         box.set_homogeneous( True )
 
         isSystemFortune = False # This is an add.
-        if rowNumber: # This is an edit.
+        if row_number: # This is an edit.
             isSystemFortune = \
                 model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE
 
@@ -623,17 +634,17 @@ class IndicatorFortune( IndicatorBase ):
         #     "in a terminal." ) )
         #
         # enabledCheckbox.set_active( True ) # This is an add.
-        if rowNumber: # This is an edit.
+        if row_number: # This is an edit.
             enabledCheckbox.set_active( model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabledCheckbox, 0, 2, 1, 1 )
 
 #TODO Moved to top to see if buttons can have the connect in their definitions rather than external.
         # title = _( "Add Fortune" )
-        # if rowNumber:
+        # if row_number:
         #     title = _( "Edit Fortune" )
         #
-        # dialog = self.createDialog( treeView, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
+        # dialog = self.createDialog( treeview, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
 
         # browseFileButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, True )
         # browseDirectoryButton.connect( "clicked", self.onBrowseFortune, dialog, fortuneFileDirectory, False )
@@ -647,7 +658,7 @@ class IndicatorFortune( IndicatorBase ):
                     fortuneFileDirectory.grab_focus()
                     continue
 
-                if rowNumber:
+                if row_number:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value.
 
                 model.get_model().append(
@@ -659,23 +670,23 @@ class IndicatorFortune( IndicatorBase ):
         dialog.destroy()
 
 
-    def onBrowseFortune( self, fileOrDirectoryButton, addEditDialog, fortuneFileDirectory, isFile ):
+    def onBrowseFortune( self, file_or_directory_button, add_edit_dialog, fortune_file_directory, is_file ):
         title = _( "Choose a directory containing a fortune .dat file(s)" )
         action = Gtk.FileChooserAction.SELECT_FOLDER
-        if isFile:
+        if is_file:
             title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
 
         dialog = \
             Gtk.FileChooserDialog(
                 title = title,
-                parent = addEditDialog,
+                parent = add_edit_dialog,
                 action = action )
 
         dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
 
-        dialog.set_transient_for( addEditDialog )
-        dialog.set_filename( fortuneFileDirectory.get_text() )
+        dialog.set_transient_for( add_edit_dialog )
+        dialog.set_filename( fortune_file_directory.get_text() )
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
@@ -686,7 +697,7 @@ class IndicatorFortune( IndicatorBase ):
                         Gtk.MessageType.INFO )
 
                 else:
-                    fortuneFileDirectory.set_text( dialog.get_filename() )
+                    fortune_file_directory.set_text( dialog.get_filename() )
                     break
 
             else:

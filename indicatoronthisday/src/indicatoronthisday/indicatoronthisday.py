@@ -44,11 +44,9 @@
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
+from datetime import date, datetime, timedelta
 import fnmatch
 import gi
-import os
-
-from datetime import date, datetime, timedelta
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
@@ -61,6 +59,8 @@ try:
 except ValueError:
     gi.require_version( "Notify", "0.8" )
 from gi.repository import Notify
+
+import os
 
 from event import Event
 
@@ -91,7 +91,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def update( self, menu ):
         events = self.getEvents()
-        self.buildMenu( menu, events )
+        self.build_menu( menu, events )
 
         # Set next update just after midnight.
         today = datetime.now()
@@ -106,7 +106,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     Notify.Notification.new( _( "On this day..." ), event.getDescription(), self.get_icon_name() ).show()
 
 
-    def buildMenu( self, menu, events ):
+    def build_menu( self, menu, events ):
         menuItemMaximum = self.lines - 3 # Less three to account for About, Preferences and Quit.
         menuItemCount = 0
         lastDate = ""
@@ -126,7 +126,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = self.removeLeadingZeroFromDate( event.getDate() ), # Allows the month/day to be passed to the copy/search functions below.
-                    activate_function_and_arguments = ( f, ) ) #TODO Ensure this function 'f' gets called.  The copy does not work on Debian 12.  Is this a wayland thing?  Test on Ubuntu 20.04.  Also document in the README.md for the indicators (via the build_readme.py).
+                    activate_functionandarguments = ( f, ) ) #TODO Ensure this function 'f' gets called.  The copy does not work on Debian 12.  Is this a wayland thing?  Test on Ubuntu 20.04.  Also document in the README.md for the indicators (via the build_readme.py).
 
             elif len( self.searchURL ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 url = self.searchURL.replace(
@@ -137,7 +137,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = url,
-                    activate_function_and_arguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
 
             menuItemCount += 1
             if menuItemCount == menuItemMaximum:
@@ -209,7 +209,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, str ) # Path to calendar file; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
-        for calendar in self.getCalendars():
+        for calendar in self.get_calendars():
             if calendar not in self.calendars:
                 store.append( [ calendar, None ] )
 
@@ -235,7 +235,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
                     ( IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
-                rowactivatedfunctionandarguments= ( self.onCalendarDoubleClick, ) )
+                rowactivatedfunctionandarguments= ( self.on_calendar_double_click, ) )
 
         # tree = Gtk.TreeView.new_with_model( storeSort )
         # tree.expand_all()
@@ -254,7 +254,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         # tree.append_column( treeViewColumn )
 
         # tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        # tree.connect( "row-activated", self.onCalendarDoubleClick )
+        # tree.connect( "row-activated", self.on_calendar_double_click )
         # tree.set_tooltip_text( _( "Double click to edit a calendar." ) )
 
         # scrolledWindow = Gtk.ScrolledWindow()
@@ -269,42 +269,42 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         # addButton = Gtk.Button.new_with_label( _( "Add" ) )
         # addButton.set_tooltip_text( _( "Add a new calendar." ) )
-        # addButton.connect( "clicked", self.onCalendarAdd, tree )
+        # addButton.connect( "clicked", self.on_calendar_add, tree )
         # box.pack_start( addButton, True, True, 0 )
 #TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new calendar." ),
-                clicked_function_and_arguments = ( self.onCalendarAdd, treeview ) ),
+                clicked_function_and_arguments = ( self.on_calendar_add, treeview ) ),
             True,
             True,
             0 )
 
         # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
         # removeButton.set_tooltip_text( _( "Remove the selected calendar." ) )
-        # removeButton.connect( "clicked", self.onCalendarRemove, tree )
+        # removeButton.connect( "clicked", self.on_calendar_remove, tree )
         # box.pack_start( removeButton, True, True, 0 )
 #TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected calendar." ),
-                clicked_function_and_arguments = ( self.onCalendarRemove, treeview ) ),
+                clicked_function_and_arguments = ( self.on_calendar_remove, treeview ) ),
             True,
             True,
             0 )
 
         # resetButton = Gtk.Button.new_with_label( _( "Reset" ) )
         # resetButton.set_tooltip_text( _( "Reset to factory default." ) )
-        # resetButton.connect( "clicked", self.onCalendarReset, tree )
+        # resetButton.connect( "clicked", self.on_calendar_reset, tree )
         # box.pack_start( resetButton, True, True, 0 )
 #TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Reset" ),
                 tooltip_text = _( "Reset to factory default." ),
-                clicked_function_and_arguments = ( self.onCalendarReset, treeview ) ),
+                clicked_function_and_arguments = ( self.on_calendar_reset, treeview ) ),
             True,
             True,
             0 )
@@ -392,8 +392,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         grid.attach( box, 0, 4, 1, 1 )
 
-        radioCopyToClipboard.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
-        radioInternetSearch.connect( "toggled", self.onEventClickRadio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
+        radioCopyToClipboard.connect( "toggled", self.on_event_click_radio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
+        radioInternetSearch.connect( "toggled", self.on_event_click_radio, radioCopyToClipboard, radioInternetSearch, searchEngineEntry )
 
         notifyCheckbutton = \
             self.create_checkbutton(
@@ -440,13 +440,13 @@ class IndicatorOnThisDay( IndicatorBase ):
         return responseType
 
 
-    def onEventClickRadio( self, source, radioCopyToClipboard, radioInternetSearch, searchEngineEntry ):
-        searchEngineEntry.set_sensitive( source == radioInternetSearch )
-        if source == radioCopyToClipboard and len( searchEngineEntry.get_text() ) == 0:
-            searchEngineEntry.set_text( IndicatorOnThisDay.SEARCH_URL_DEFAULT )
+    def on_event_click_radio( self, source, radio_copy_to_clipboard, radio_internet_search, search_engine_entry ):
+        search_engine_entry.set_sensitive( source == radio_internet_search )
+        if source == radio_copy_to_clipboard and len( search_engine_entry.get_text() ) == 0:
+            search_engine_entry.set_text( IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
-    def getCalendars( self ):
+    def get_calendars( self ):
         calendars = [ ]
         for root, directories, filenames in os.walk( "/usr/share/calendar" ):
             for filename in fnmatch.filter( filenames, "calendar.*" ):
@@ -456,11 +456,11 @@ class IndicatorOnThisDay( IndicatorBase ):
         return calendars
 
 
-    def onCalendarReset( self, button, treeView ):
-        if self.showOKCancel( treeView, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
-            listStore = treeView.get_model().get_model()
+    def on_calendar_reset( self, button, treeview ):
+        if self.showOKCancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
+            listStore = treeview.get_model().get_model()
             listStore.clear()
-            for calendar in self.getCalendars():
+            for calendar in self.get_calendars():
                 if calendar == IndicatorOnThisDay.DEFAULT_CALENDAR:
                     listStore.append( [ IndicatorOnThisDay.DEFAULT_CALENDAR, Gtk.STOCK_APPLY ] )
 
@@ -468,38 +468,38 @@ class IndicatorOnThisDay( IndicatorBase ):
                     listStore.append( [ calendar, None ] )
 
 
-    def onCalendarRemove( self, button, treeView ):
-        model, treeiter = treeView.get_selection().get_selected()
+    def on_calendar_remove( self, button, treeview ):
+        model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.showMessage( treeView, _( "No calendar has been selected." ) )
+            self.showMessage( treeview, _( "No calendar has been selected." ) )
 
-        elif model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.getCalendars():
-            self.showMessage( treeView, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.INFO )
+        elif model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars():
+            self.showMessage( treeview, _( "This calendar is part of your system\nand cannot be removed." ), Gtk.MessageType.INFO )
 
-        elif self.showOKCancel( treeView, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+        elif self.showOKCancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def onCalendarAdd( self, button, treeView ):
-        self.onCalendarDoubleClick( treeView, None, None )
+    def on_calendar_add( self, button, treeview ):
+        self.on_calendar_double_click( treeview, None, None )
 
 
-    def onCalendarDoubleClick( self, treeView, rowNumber, treeViewColumn ):
-        model, treeiter = treeView.get_selection().get_selected()
+    def on_calendar_double_click( self, treeview, row_number, treeViewColumn ):
+        model, treeiter = treeview.get_selection().get_selected()
 
-        if rowNumber is None: # This is an add.
+        if row_number is None: # This is an add.
             isSystemCalendar = False
 
         else: # This is an edit.
-            isSystemCalendar = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.getCalendars()
+            isSystemCalendar = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars()
 
         grid = self.create_grid()
 
         title = _( "Add Calendar" )
-        if rowNumber:
+        if row_number:
             title = _( "Edit Calendar" )
 
-        dialog = self.createDialog( treeView, title, grid )
+        dialog = self.createDialog( treeview, title, grid )
 
         box = Gtk.Box( spacing = 6 )
 
@@ -508,7 +508,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         fileEntry = Gtk.Entry()
         fileEntry.set_editable( False )
 
-        if rowNumber: # This is an edit.
+        if row_number: # This is an edit.
             fileEntry.set_text( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
             fileEntry.set_width_chars( len( fileEntry.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
@@ -530,7 +530,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         #         "'calendar' in a terminal." ) )
         #
         # box.pack_start( browseButton, False, False, 0 )
-        # browseButton.connect( "clicked", self.onBrowseCalendar, dialog, fileEntry )
+        # browseButton.connect( "clicked", self.on_browse_calendar, dialog, fileEntry )
 #TODO Ensure this was converted correctly.
         browseButton = \
             self.create_button(
@@ -544,7 +544,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "valid by running through\n" + \
                     "'calendar' in a terminal." ),
                     sensitive = not isSystemCalendar,
-                    clicked_function_and_arguments = ( self.onBrowseCalendar, dialog, fileEntry ) )
+                    clicked_function_and_arguments = ( self.on_browse_calendar, dialog, fileEntry ) )
 
         box.pack_start( browseButton, False, False, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -552,7 +552,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         enabledCheckbutton = self.create_checkbutton( _( "Enabled" ) )
 #TODO Make sure this is converted okay
         # enabledCheckbutton = Gtk.CheckButton.new_with_label( _( "Enabled" ) )
-        if rowNumber is None: # This is an add.
+        if row_number is None: # This is an add.
             enabledCheckbutton.set_active( True )
 
         else:
@@ -574,7 +574,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     fileEntry.grab_focus()
                     continue
 
-                if rowNumber:
+                if row_number:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value and append new value.
 
                 model.get_model().append( [ fileEntry.get_text().strip(), Gtk.STOCK_APPLY if enabledCheckbutton.get_active() else None ] )
@@ -584,17 +584,17 @@ class IndicatorOnThisDay( IndicatorBase ):
         dialog.destroy()
 
 
-    def onBrowseCalendar( self, button, addEditDialog, calendarFile ):
-        systemCalendars = self.getCalendars()
+    def on_browse_calendar( self, button, add_edit_dialog, calendar_file ):
+        systemCalendars = self.get_calendars()
 
         dialog = Gtk.FileChooserDialog(
                     title = _( "Choose a calendar file" ),
-                    parent = addEditDialog,
+                    parent = add_edit_dialog,
                     action = Gtk.FileChooserAction.OPEN )
 
         dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
-        dialog.set_transient_for( addEditDialog )
-        dialog.set_filename( calendarFile.get_text() )
+        dialog.set_transient_for( add_edit_dialog )
+        dialog.set_filename( calendar_file.get_text() )
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
@@ -602,7 +602,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     self.showMessage( dialog, _( "The calendar is part of your system\nand is already included." ), Gtk.MessageType.INFO )
 
                 else:
-                    calendarFile.set_text( dialog.get_filename() )
+                    calendar_file.set_text( dialog.get_filename() )
                     break
 
             else:
