@@ -702,7 +702,7 @@ class IndicatorBase( ABC ):
             GLib.source_remove( self.updateTimerID )
             self.updateTimerID = None
 
-        dialog = self.createDialog( menuItem, _( "Preferences" ) )
+        dialog = self.create_dialog( menuItem, _( "Preferences" ) )
 #TODO Would be nice to rename to on_preferences
         responseType = self.on_preferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
@@ -771,10 +771,10 @@ class IndicatorBase( ABC ):
         return sensitive
 
 
-    def createDialog( self, parentWidget, title, grid = None ):
+    def create_dialog( self, parent_widget, title, grid = None ):
         dialog = Gtk.Dialog(
             title,
-            self.__getParent( parentWidget ),
+            self.__getParent( parent_widget ),
             Gtk.DialogFlags.MODAL,
             ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
@@ -785,7 +785,7 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-    def createDialogExternalToAboutOrPreferences( self, parentWidget, title, contentWidget, setDefaultSize = False ):
+    def create_dialog_external( self, parentWidget, title, contentWidget, setDefaultSize = False ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
         # self.__setMenuSensitivity( False, True )
 
@@ -1023,13 +1023,13 @@ class IndicatorBase( ABC ):
         sensitive = True,
         margin_top = 0,
         margin_left = 0,
-        clicked_function_and_arguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        clicked_functionandarguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
 
         button = Gtk.Button.new_with_label( label )
         self.__set_widget_common_attributes( button, tooltip_text, sensitive, margin_top, margin_left )
 
-        if clicked_function_and_arguments:
-            button.connect( "clicked", *clicked_function_and_arguments )
+        if clicked_functionandarguments:
+            button.connect( "clicked", *clicked_functionandarguments )
 
         return button
 
@@ -1572,11 +1572,11 @@ class IndicatorBase( ABC ):
     #     ${XDGKey}/applicationBaseDirectory/fileName
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
-    def removeFileFromCache( self, filename ):
-        cacheDirectory = self.__get_cache_directory()
-        for file in os.listdir( cacheDirectory ):
+    def remove_file_from_cache( self, filename ):
+        cache_directory = self.__get_cache_directory()
+        for file in os.listdir( cache_directory ):
             if file == filename:
-                os.remove( cacheDirectory + file )
+                os.remove( cache_directory + file )
                 break
 
 
@@ -1734,7 +1734,7 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns filename written on success; None otherwise.
-    def writeCacheTextWithoutTimestamp( self, text, filename ):
+    def write_cache_text_without_timestamp( self, text, filename ):
         return self.__write_cache_text( text, self.__get_cache_directory() + filename )
 
 
