@@ -127,7 +127,6 @@ import email.policy
 import gettext
 import gi
 import sys
-from _lzma import is_check_supported
 
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
@@ -238,13 +237,7 @@ class IndicatorBase( ABC ):
 #
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
-    def __init__(
-        self,
-        comments,
-        artwork = None,
-        creditz = None,
-        debug = False ):
-
+    def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         self.indicatorName = IndicatorBase.INDICATOR_NAME
 
         projectMetadata = self._getProjectMetadata()
@@ -258,9 +251,10 @@ class IndicatorBase( ABC ):
         self.comments = comments
 
         # https://stackoverflow.com/a/75803208/2156453
-        emailMessageObject = email.message_from_string(
-            f'To: { projectMetadata[ "Author-email" ] }',
-            policy = email.policy.default, )
+        emailMessageObject = \
+            email.message_from_string(
+                f'To: { projectMetadata[ "Author-email" ] }',
+                policy = email.policy.default, )
 
         self.copyrightNames = [ ]
         for address in emailMessageObject[ "to" ].addresses:
@@ -306,10 +300,11 @@ class IndicatorBase( ABC ):
 
         Notify.init( self.indicatorName )
 
-        self.indicator = AppIndicator.Indicator.new(
-            self.indicatorName, #ID
-            self.get_icon_name(), # Icon name
-            AppIndicator.IndicatorCategory.APPLICATION_STATUS )
+        self.indicator = \
+            AppIndicator.Indicator.new(
+                self.indicatorName, #ID
+                self.get_icon_name(), # Icon name
+                AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
 
@@ -445,9 +440,21 @@ class IndicatorBase( ABC ):
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
-        self.create_and_append_menuitem( menu, _( "Preferences" ), activate_functionandarguments = ( self.__onPreferences, ) )
-        self.create_and_append_menuitem( menu, _( "About" ), activate_functionandarguments = ( self.__onAbout, ) )
-        self.create_and_append_menuitem( menu, _( "Quit" ), activate_functionandarguments = ( Gtk.main_quit, ) )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Preferences" ),
+            activate_functionandarguments = ( self.__onPreferences, ) )
+
+        self.create_and_append_menuitem(
+            menu,
+            _( "About" ),
+            activate_functionandarguments = ( self.__onAbout, ) )
+        
+        self.create_and_append_menuitem(
+            menu,
+            _( "Quit" ),
+            activate_functionandarguments = ( Gtk.main_quit, ) )
+
         self.indicator.set_menu( menu )
         menu.show_all()
 
@@ -456,8 +463,7 @@ class IndicatorBase( ABC ):
 
         if nextUpdateInSeconds: # Some indicators don't return a next update time.
             self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-            datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) #TODO Hopefully no longer need self.nextUpdateTime 
-            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
+            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) #TODO Hopefully no longer need self.nextUpdateTime
 
         #TODO Hopefully no longer need self.nextUpdateTime
         # else:
@@ -539,30 +545,58 @@ class IndicatorBase( ABC ):
 
 
     def getOnClickMenuItemOpenBrowserFunction( self ):
-        return lambda menuItem: webbrowser.open( menuItem.props.name ) #TODO Use the get_name()?
+        return lambda menuItem: webbrowser.open( menuItem.get_name() )
 
 
     def requestUpdate( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__update )
 
 
-    def setLabel( self, text ):
-        self.indicator.set_label( text, text )  # Second parameter is a hint for the typical length.
+#TODO Delete
+    # def setLabel( self, text ):
+    #     self.indicator.set_label( text, text )
+    #     self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
+
+    def set_label( self, text ):
+        self.indicator.set_label( text, text )
         self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
 
 
-    def requestMouseWheelScrollEvents( self ):
-        self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
+#TODO Delete
+    # def requestMouseWheelScrollEvents( self ):
+    #     self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
 
 
-    def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
-        # Need to ignore events when Preferences is open or an update is underway.
+#TODO Need to document that the function must have the form:
+#    def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, arg1, arg2, ... ):
+    def request_mouse_wheel_scroll_events( self, functionandarguments ):
+        self.indicator.connect( "scroll-event", self.__on_mouse_wheel_scroll, functionandarguments )
+
+
+    def __on_mouse_wheel_scroll( self, indicator, delta, scrollDirection, functionandarguments ):
+#TODO Check comment below...ignore also for About being open???
+        # Ignore events when Preferences is open or an update is underway.
         # Do so by checking the sensitivity of the Preferences menu item.
         # A side effect is the event will be ignored when About is showing...oh well.
 #        if self.__getMenuSensitivity():
 #            self.onMouseWheelScroll( indicator, delta, scrollDirection )
         if not self.lock.locked():
-            self.onMouseWheelScroll( indicator, delta, scrollDirection ) #TODO Can this be renamed to on_mouse_wheel_scroll?
+            if len( functionandarguments ) == 1:
+                functionandarguments[ 0 ]( indicator, delta, scrollDirection )
+
+            else:
+                functionandarguments[ 0 ]( indicator, delta, scrollDirection, *functionandarguments[ 1 : ] )
+
+
+#TODO Delete
+#     def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
+#         # Need to ignore events when Preferences is open or an update is underway.
+#         # Do so by checking the sensitivity of the Preferences menu item.
+#         # A side effect is the event will be ignored when About is showing...oh well.
+# #        if self.__getMenuSensitivity():
+# #            self.onMouseWheelScroll( indicator, delta, scrollDirection )
+#         if not self.lock.locked():
+#             self.onMouseWheelScroll( indicator, delta, scrollDirection ) #TODO Can this be renamed to on_mouse_wheel_scroll?
 
 
     def __onAbout( self, menuItem ):
@@ -607,7 +641,7 @@ class IndicatorBase( ABC ):
         if self.creditz:
             aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
 
-        self.__addHyperlinkLabel(
+        self.__add_hyperlink_label(
             aboutDialog,
             IndicatorBase.get_changelog_markdown_path( self.indicatorName ),
             _( "View the" ),
@@ -616,7 +650,7 @@ class IndicatorBase( ABC ):
 
         errorLog = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
         if os.path.exists( errorLog ):
-            self.__addHyperlinkLabel( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
+            self.__add_hyperlink_label( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
 
         aboutDialog.run()
         aboutDialog.destroy()
@@ -640,7 +674,7 @@ class IndicatorBase( ABC ):
 #                 svg = indicator_icon
 
 
-    def __addHyperlinkLabel( self, aboutDialog, filePath, leftText, anchorText, rightText ):
+    def __add_hyperlink_label( self, aboutDialog, filePath, leftText, anchorText, rightText ):
         toolTip = "file://" + filePath
         markup = leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText
         label = Gtk.Label()
@@ -670,7 +704,7 @@ class IndicatorBase( ABC ):
 
         dialog = self.createDialog( menuItem, _( "Preferences" ) )
 #TODO Would be nice to rename to on_preferences
-        responseType = self.onPreferences( dialog ) # Call to implementation in indicator.
+        responseType = self.on_preferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
 
 #TODO Don't think I need this here...if we OK the Preferences,
@@ -774,36 +808,36 @@ class IndicatorBase( ABC ):
         # self.__setMenuSensitivity( True, True )
 
 
-    def createAutostartCheckboxAndDelaySpinner( self ):
-        autostart, delay = self.getAutostartAndDelay()
+    def create_autostart_checkbox_and_delay_spinner( self ):
+        autostart, delay = self.get_autostart_and_delay()
 
 #TODO Check this was converted okay...
-        # autostartCheckbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
-        # autostartCheckbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        # autostartCheckbox.set_active( autostart )
-        autostartCheckbox = \
+        # autostart_checkbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
+        # autostart_checkbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        # autostart_checkbox.set_active( autostart )
+        autostart_checkbox = \
             self.create_checkbutton(
                 _( "Autostart" ),
                 tooltip_text = _( "Run the indicator automatically." ),
                 active = autostart )
 
-        autostartSpinner = \
+        autostart_spinner = \
             self.create_spinbutton(
                 delay,
                 0,
                 1000,
                 tooltip_text = _( "Start up delay (seconds)." ),
-                sensitive = autostartCheckbox.get_active() )
-        # autostartSpinner.set_sensitive( autostartCheckbox.get_active() )#TODO Check is converted above ok.
+                sensitive = autostart_checkbox.get_active() )
+        # autostart_spinner.set_sensitive( autostart_checkbox.get_active() )#TODO Check is converted above ok.
 
-        autostartCheckbox.connect( "toggled", self.onRadioOrCheckbox, True, autostartSpinner )
+        autostart_checkbox.connect( "toggled", self.onRadioOrCheckbox, True, autostart_spinner )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
-        box.pack_start( autostartCheckbox, False, False, 0 )
-        box.pack_start( autostartSpinner, False, False, 0 )
+        box.pack_start( autostart_checkbox, False, False, 0 )
+        box.pack_start( autostart_spinner, False, False, 0 )
 
-        return autostartCheckbox, autostartSpinner, box
+        return autostart_checkbox, autostart_spinner, box
 
 
     # Show a message dialog.
@@ -1168,7 +1202,7 @@ class IndicatorBase( ABC ):
 # Some have True and some have False.
 
 
-    def getMenuIndent( self, indent = 1 ):
+    def get_menu_indent( self, indent = 1 ):
         indentAmount = "      " * indent
         if self.getDesktopEnvironment() == IndicatorBase.__DESKTOP_UNITY7:
             indentAmount = "      " * ( indent - 1 )
@@ -1198,7 +1232,7 @@ class IndicatorBase( ABC ):
         return self.indicatorName + "-symbolic"
 
 
-    def getAutostartAndDelay( self ):
+    def get_autostart_and_delay( self ):
         autostart = False
         delay = 0
         try:
@@ -1219,7 +1253,7 @@ class IndicatorBase( ABC ):
         return autostart, delay
 
 
-    def setAutostartAndDelay( self, isSet, delay ):
+    def set_autostart_and_delay( self, is_set, delay ):
         if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
             os.makedirs( IndicatorBase.__AUTOSTART_PATH )
 
@@ -1234,7 +1268,7 @@ class IndicatorBase( ABC ):
                         output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
                     elif IndicatorBase.__X_GNOME_AUTOSTART_ENABLED in line:
-                        output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( isSet ).lower() + '\n'
+                        output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
                     else:
                         output += line
@@ -1246,7 +1280,7 @@ class IndicatorBase( ABC ):
                 output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
             if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED not in output:
-                output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( isSet ).lower() + '\n'
+                output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
             with open( self.desktopFileUserHome, 'w' ) as f:
                 f.write( output )
@@ -1255,7 +1289,7 @@ class IndicatorBase( ABC ):
             logging.exception( e )
 
 
-    def getLogging( self ):
+    def get_logging( self ):
         return logging
 
 
@@ -1269,13 +1303,13 @@ class IndicatorBase( ABC ):
 
 
     def getDesktopEnvironment( self ):
-        return self.processGet( "echo $XDG_CURRENT_DESKTOP" ).strip()
+        return self.process_get( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
     def isUbuntuVariant2004( self ):
         ubuntuVariant2004 = False
         try:
-            ubuntuVariant2004 = True if self.processGet( "lsb_release -rs" ).strip() == "20.04" else False
+            ubuntuVariant2004 = True if self.process_get( "lsb_release -rs" ).strip() == "20.04" else False
 
         except:
             pass
@@ -1315,7 +1349,7 @@ class IndicatorBase( ABC ):
     # provide a way to determine if qterminal is the current terminal.
     def isTerminalQTerminal( self ):
         terminalIsQTerminal = False
-        terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
+        terminal, terminalExecutionFlag = self.get_terminal_and_execution_flag()
         if terminal is not None and "qterminal" in terminal:
             terminalIsQTerminal = True
 
@@ -1325,11 +1359,11 @@ class IndicatorBase( ABC ):
     # Return the full path and name of the executable for the
     # current terminal and the corresponding execution flag;
     # None otherwise.
-    def getTerminalAndExecutionFlag( self ):
+    def get_terminal_and_execution_flag( self ):
         terminal = None
         executionFlag = None
         for _terminal, _executionFlag in IndicatorBase.__TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = self.processGet( "which " + _terminal )
+            terminal = self.process_get( "which " + _terminal )
             if terminal is not None:
                 executionFlag = _executionFlag
                 break
@@ -1432,7 +1466,7 @@ class IndicatorBase( ABC ):
                 logging.error( "Error reading configuration: " + configFile )
 
 #TODO Eventually change to self.load_config        
-        self.loadConfig( config ) # Call to implementation in indicator.
+        self.load_config( config ) # Call to implementation in indicator.
 
 
     # Write a dictionary of user configuration to a JSON text file.
@@ -1441,7 +1475,7 @@ class IndicatorBase( ABC ):
     #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
     def __save_config( self, returnStatus = True ):
 #TODO Eventually change to self.save_config        
-        config = self.saveConfig() # Call to implementation in indicator.
+        config = self.save_config() # Call to implementation in indicator.
 
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version
 
@@ -1488,7 +1522,7 @@ class IndicatorBase( ABC ):
     def getCacheDateTime( self, basename ):
         expiry = None
         theFile = ""
-        for file in os.listdir( self.__getCacheDirectory() ):
+        for file in os.listdir( self.__get_cache_directory() ):
             if file.startswith( basename ) and file > theFile:
                 theFile = file
 
@@ -1505,7 +1539,7 @@ class IndicatorBase( ABC ):
     # Create a filename with timestamp and extension to be used to save data to the cache.
     def getCacheFilenameWithTimestamp( self, basename, extension = EXTENSION_TEXT ):
         return \
-            self.__getCacheDirectory() + \
+            self.__get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
@@ -1515,7 +1549,7 @@ class IndicatorBase( ABC ):
     #
     # Returns the newest filename matching the basename on success; None otherwise.
     def getCacheNewestFilename( self, basename ):
-        cacheDirectory = self.__getCacheDirectory()
+        cacheDirectory = self.__get_cache_directory()
         cacheFile = ""
         for file in os.listdir( cacheDirectory ):
             if file.startswith( basename ) and file > cacheFile:
@@ -1539,7 +1573,7 @@ class IndicatorBase( ABC ):
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
     def removeFileFromCache( self, filename ):
-        cacheDirectory = self.__getCacheDirectory()
+        cacheDirectory = self.__get_cache_directory()
         for file in os.listdir( cacheDirectory ):
             if file == filename:
                 os.remove( cacheDirectory + file )
@@ -1560,8 +1594,8 @@ class IndicatorBase( ABC ):
     # and is older than the cache maximum age is discarded.
     #
     # Any file extension is ignored in determining if the file should be deleted or not.
-    def flushCache( self, basename, maximumAgeInHours ):
-        cacheDirectory = self.__getCacheDirectory()
+    def flush_cache( self, basename, maximumAgeInHours ):
+        cacheDirectory = self.__get_cache_directory()
         cacheMaximumAgeDateTime = datetime.datetime.now() - datetime.timedelta( hours = maximumAgeInHours )
         for file in os.listdir( cacheDirectory ):
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
@@ -1591,12 +1625,12 @@ class IndicatorBase( ABC ):
     def readCacheBinary( self, basename ):
         data = None
         theFile = ""
-        for file in os.listdir( self.__getCacheDirectory() ):
+        for file in os.listdir( self.__get_cache_directory() ):
             if file.startswith( basename ) and file > theFile:
                 theFile = file
 
         if theFile: # A value of "" evaluates to False.
-            filename = self.__getCacheDirectory() + theFile
+            filename = self.__get_cache_directory() + theFile
             try:
                 with open( filename, 'rb' ) as fIn:
                     data = pickle.load( fIn )
@@ -1624,7 +1658,7 @@ class IndicatorBase( ABC ):
     def writeCacheBinary( self, binaryData, basename, extension = "" ):
         success = True
         cacheFile = \
-            self.__getCacheDirectory() + \
+            self.__get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
@@ -1647,7 +1681,7 @@ class IndicatorBase( ABC ):
     #
     # Returns the contents of the text file; None on error and logs.
     def readCacheTextWithoutTimestamp( self, filename ):
-        return self.__readCacheText( self.__getCacheDirectory() + filename )
+        return self.__readCacheText( self.__get_cache_directory() + filename )
 
 
     # Read the most recent text file from the cache.
@@ -1667,7 +1701,7 @@ class IndicatorBase( ABC ):
     #
     # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
     def readCacheText( self, basename ):
-        cacheDirectory = self.__getCacheDirectory()
+        cacheDirectory = self.__get_cache_directory()
         cacheFile = ""
         for file in os.listdir( cacheDirectory ):
             if file.startswith( basename ) and file > cacheFile:
@@ -1701,7 +1735,7 @@ class IndicatorBase( ABC ):
     #
     # Returns filename written on success; None otherwise.
     def writeCacheTextWithoutTimestamp( self, text, filename ):
-        return self.__writeCacheText( text, self.__getCacheDirectory() + filename )
+        return self.__write_cache_text( text, self.__get_cache_directory() + filename )
 
 
     # Writes text to a file in the cache.
@@ -1716,17 +1750,17 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns filename written on success; None otherwise.
-    def writeCacheText( self, text, basename, extension = EXTENSION_TEXT ):
+    def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
         cacheFile = \
-            self.__getCacheDirectory() + \
+            self.__get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
-        return self.__writeCacheText( text, cacheFile )
+        return self.__write_cache_text( text, cacheFile )
 
 
-    def __writeCacheText( self, text, cacheFile ):
+    def __write_cache_text( self, text, cacheFile ):
         try:
             with open( cacheFile, 'w' ) as fIn:
                 fIn.write( text )
@@ -1740,12 +1774,12 @@ class IndicatorBase( ABC ):
 
 
     # Return the full directory path to the user cache directory for the current indicator.
-    def getCacheDirectory( self ):
-        return self.__getCacheDirectory()
+    def get_cache_directory( self ):
+        return self.__get_cache_directory()
 
 
     # Return the full directory path to the user cache directory for the current indicator.
-    def __getCacheDirectory( self ):
+    def __get_cache_directory( self ):
         return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
 
 
@@ -1776,14 +1810,14 @@ class IndicatorBase( ABC ):
 
     # Executes the command in a new process.
     # On exception, logs to file.
-    def processCall( self, command ):
+    def process_call( self, command ):
         try:
             subprocess.call( command, shell = True )
 
         except subprocess.CalledProcessError as e:
-            self.getLogging().error( e )
+            self.get_logging().error( e )
             if e.stderr:
-                self.getLogging().error( e.stderr )
+                self.get_logging().error( e.stderr )
 
 
     # Executes the command and returns the result.
@@ -1791,7 +1825,7 @@ class IndicatorBase( ABC ):
     # logNonZeroErrorCode If True, will log any exception arising from a non-zero return code; otherwise will ignore.
     #
     # On exception, logs to file.
-    def processGet( self, command, logNonZeroErrorCode = False ):
+    def process_get( self, command, logNonZeroErrorCode = False ):
         result = None
         try:
             result = subprocess.run(
@@ -1805,9 +1839,9 @@ class IndicatorBase( ABC ):
                 result = None
 
         except subprocess.CalledProcessError as e:
-            self.getLogging().error( e )
+            self.get_logging().error( e )
             if e.stderr:
-                self.getLogging().error( e.stderr )
+                self.get_logging().error( e.stderr )
 
             result = None
 
