@@ -137,7 +137,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     menu,
                     self.getMenuIndent() + event.getDescription(),
                     name = url,
-                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
             menuItemCount += 1
             if menuItemCount == menuItemMaximum:
