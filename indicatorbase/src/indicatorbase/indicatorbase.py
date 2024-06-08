@@ -548,7 +548,7 @@ class IndicatorBase( ABC ):
         return lambda menuItem: webbrowser.open( menuItem.get_name() )
 
 
-    def requestUpdate( self, delay = 0 ):
+    def request_update( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__update )
 
 
@@ -662,7 +662,7 @@ class IndicatorBase( ABC ):
 
         self.lock.release()
 
-        self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
+        self.request_update() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
 #TODO May be able to use this to determine the os/platform/distro:
 # desktop_environment = os.environ.get('DESKTOP_SESSION')
 #         if desktop_environment:
@@ -733,7 +733,7 @@ class IndicatorBase( ABC ):
 
         self.lock.release()
 
-#        self.requestUpdate() #TODO By doing an update gets around the Debian/Fedora issue
+#        self.request_update() #TODO By doing an update gets around the Debian/Fedora issue
 # when clicking the icon when the About/Preferences are open. 
 # Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
 # But...only do this "if responseType != Gtk.ResponseType.OK" because when OK,
