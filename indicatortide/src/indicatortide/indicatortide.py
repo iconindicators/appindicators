@@ -52,7 +52,7 @@ class IndicatorTide( IndicatorBase ):
 
 
     def update( self, menu ):
-        if self.userScriptPathAndFilename == "" and self.userScriptClassName == "":
+        if self.user_script_path_and_filename == "" and self.user_script_class_name == "":
             # First time the indicator is run, or really,
             # when there is no preference/json file,
             # there will be no user script specified,
@@ -65,155 +65,167 @@ class IndicatorTide( IndicatorBase ):
             Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         else:
-            tidalReadings = [ ]
+            tidal_readings = [ ]
             try:
-                spec = importlib.util.spec_from_file_location( self.userScriptClassName, self.userScriptPathAndFilename )
-                module = importlib.util.module_from_spec( spec )
-                sys.modules[ self.userScriptClassName ] = module
-                spec.loader.exec_module( module )
-                klazz = getattr( module, self.userScriptClassName )
-                tidalReadings = klazz.getTideData( self.getLogging() )
-                self.build_menu( menu, tidalReadings )
+                spec = \
+                    importlib.util.spec_from_file_location(
+                        self.user_script_class_name,
+                        self.user_script_path_and_filename )
 
-            except FileNotFoundError as e:
+                module = importlib.util.module_from_spec( spec )
+                sys.modules[ self.user_script_class_name ] = module
+                spec.loader.exec_module( module )
+                klazz = getattr( module, self.user_script_class_name )
+                tidal_readings = klazz.get_tide_data( self.get_logging() )
+                self.build_menu( menu, tidal_readings )
+
+            except FileNotFoundError:
                 label = _( "User script could not be found!" )
                 summary = _( "User script could not be found!" )
                 message = _( "Please check the user script in the preferences." )
 
-            except AttributeError as e:
+            except AttributeError:
                 label = _( "User script class name could not be found!" )
                 summary = _( "User script class name could not be found!" )
                 message = _( "Please check the user script class name in the preferences." )
 
+            except NotImplementedError:
+                label = _( "User function could not be found!" )
+                summary = _( "User function could not be found!" )
+                message = _( "You must implement the function 'get_tide_data()'." )
+
             except Exception as e:
+                self.get_logging().exception( e )
                 label = _( "Error running user script!" )
                 summary = _( "Error running user script!" )
                 message = _( "Check the log file in your home directory." )
-                self.getLogging().error( "Error running user script: " + self.userScriptPathAndFilename + " | " + self.userScriptClassName )
-                self.getLogging().exception( e )
+                self.get_logging().error(
+                    "Error running user script: " + \
+                    self.user_script_path_and_filename + " | " + \
+                    self.user_script_class_name )
 
-            if not tidalReadings:
+            if not tidal_readings:
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
                 Notify.Notification.new( summary, message, self.get_icon_name() ).show()
 
         # Update a little after midnight...best guess as to when the user's data source will update.
         today = datetime.datetime.now()
-        fiveMinutesAfterMidnight = ( today + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
-        return ( fiveMinutesAfterMidnight - today ).total_seconds()
+        five_minutes_after_midnight = ( today + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+        return ( five_minutes_after_midnight - today ).total_seconds()
 
 
     def build_menu( self, menu, tidal_readings ):
         indent = ""
-        self.portName = tidal_readings[ 0 ].getLocation()
-        if self.portName:
+        self.port_name = tidal_readings[ 0 ].get_location()
+        if self.port_name:
             self.create_and_append_menuitem(
                 menu,
-                self.portName,
-                name = tidal_readings[ 0 ].getURL(),
-                activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                self.port_name,
+                name = tidal_readings[ 0 ].get_url(),
+                activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
-            indent = self.getMenuIndent()
+            indent = self.get_menu_indent()
 
-        if self.showAsSubMenus:
-            if self.showAsSubMenusExceptFirstDay:
-                firstDateTidalReadings, afterFirstDateTidalReadings = \
-                    self.__splitTidalReadingsAfterFirstDate( tidal_readings )
+        if self.show_as_submenus:
+            if self.show_as_submenus_except_first_day:
+                first_date_tidal_readings, after_first_date_tidal_readings = \
+                    self.__split_tidal_readings_after_first_date( tidal_readings )
 
-                self.__createMenuFlat( firstDateTidalReadings, menu, indent )
-                self.__createMenuSub( afterFirstDateTidalReadings, menu, indent )
+                self.__create_menu_flat( first_date_tidal_readings, menu, indent )
+                self.__create_menu_sub( after_first_date_tidal_readings, menu, indent )
 
             else:
-                self.__createMenuSub( tidal_readings, menu, indent )
+                self.__create_menu_sub( tidal_readings, menu, indent )
 
         else:
-            self.__createMenuFlat( tidal_readings, menu, indent )
+            self.__create_menu_flat( tidal_readings, menu, indent )
 
 
-    def __createMenuFlat( self, tidal_readings, menu, indent ):
-        todayDate = ""
-        for tidalReading in tidal_readings:
-            if todayDate != tidalReading.getDate():
-                shownToday = False
+    def __create_menu_flat( self, tidal_readings, menu, indent ):
+        today_date = ""
+        for tidal_reading in tidal_readings:
+            if today_date != tidal_reading.get_date():
+                shown_today = False
 
-            menuText = \
-                indent + self.getMenuIndent() + \
-                ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + \
-                tidalReading.getTime() + "  " + tidalReading.getLevel()
+            menu_text = \
+                indent + self.get_menu_indent() + \
+                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) + "  " + \
+                tidal_reading.get_time() + "  " + tidal_reading.get_level()
 
-            if shownToday:
+            if shown_today:
                 self.create_and_append_menuitem(
                     menu,
-                    menuText,
-                    name = tidalReading.getURL(),
-                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    menu_text,
+                    name = tidal_reading.get_url(),
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
             else:
                 self.create_and_append_menuitem(
                     menu,
-                    indent + tidalReading.getDate(),
-                    name = tidalReading.getURL(),
-                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    indent + tidal_reading.get_date(),
+                    name = tidal_reading.get_url(),
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
                 self.create_and_append_menuitem(
                     menu,
-                    menuText,
-                    name = tidalReading.getURL(),
-                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    menu_text,
+                    name = tidal_reading.get_url(),
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
-                todayDate = tidalReading.getDate()
-                shownToday = True
+                today_date = tidal_reading.get_date()
+                shown_today = True
 
 
-    def __createMenuSub( self, tidal_readings, menu, indent ):
-        todayDate = ""
-        shownToday = False
+    def __create_menu_sub( self, tidal_readings, menu, indent ):
+        today_date = ""
+        shown_today = False
         subMenu = None # Only declared here to keep the compiler happy.
         for tidalReading in tidal_readings:
-            if todayDate != tidalReading.getDate():
-                shownToday = False
+            if today_date != tidalReading.get_date():
+                shown_today = False
 
             menuText = \
-                indent + self.getMenuIndent() + \
-                ( _( "HIGH" ) if tidalReading.isHigh() else _( "LOW" ) ) + "  " + \
-                tidalReading.getTime() + "  " + tidalReading.getLevel()
+                indent + self.get_menu_indent() + \
+                ( _( "HIGH" ) if tidalReading.is_high() else _( "LOW" ) ) + "  " + \
+                tidalReading.get_time() + "  " + tidalReading.get_level()
 
-            if shownToday:
+            if shown_today:
                 self.create_and_append_menuitem(
                     subMenu,
                     menuText,
-                    name = tidalReading.getURL(),
-                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    name = tidalReading.get_url(),
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
             else:
                 subMenu = Gtk.Menu()
                 self.create_and_append_menuitem(
                     menu,
-                    indent + tidalReading.getDate() ).set_submenu( subMenu )
+                    indent + tidalReading.get_date() ).set_submenu( subMenu )
 
                 self.create_and_append_menuitem(
                     subMenu,
                     menuText,
-                    name = tidalReading.getURL(),
-                    activate_functionandarguments = ( self.getOnClickMenuItemOpenBrowserFunction(), ) )
+                    name = tidalReading.get_url(),
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
-                todayDate = tidalReading.getDate()
-                shownToday = True
+                today_date = tidalReading.get_date()
+                shown_today = True
 
 
-    def __splitTidalReadingsAfterFirstDate( self, tidal_readings ):
-        firstDateReadings = [ ]
-        afterFirstDateReadings = [ ]
-        for tidalReading in tidal_readings:
-            if tidalReading.getDate() == tidal_readings[ 0 ].getDate():
-                firstDateReadings.append( tidalReading )
+    def __split_tidal_readings_after_first_date( self, tidal_readings ):
+        first_date_deadings = [ ]
+        after_first_date_readings = [ ]
+        for tidal_reading in tidal_readings:
+            if tidal_reading.get_date() == tidal_readings[ 0 ].get_date():
+                first_date_deadings.append( tidal_reading )
 
             else:
-                afterFirstDateReadings.append( tidalReading )
+                after_first_date_readings.append( tidal_reading )
 
-        return firstDateReadings, afterFirstDateReadings
+        return first_date_deadings, after_first_date_readings
 
 
-    def onPreferences( self, dialog ):
+    def on_preferences( self, dialog ):
         grid = self.create_grid()
 
         label = Gtk.Label.new( _( "User Script" ) )
@@ -226,11 +238,11 @@ class IndicatorTide( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Path and filename" ) ), False, False, 0 )
 
-        userScriptPathAndFilename = Gtk.Entry()
-        userScriptPathAndFilename.set_text( self.userScriptPathAndFilename )
-        userScriptPathAndFilename.set_tooltip_text( _( "Full path and filename\nof user's Python3 script." ) )
+        user_script_path_and_filename = Gtk.Entry()
+        user_script_path_and_filename.set_text( self.user_script_path_and_filename )
+        user_script_path_and_filename.set_tooltip_text( _( "Full path and filename\nof user's Python3 script." ) )
 
-        box.pack_start( userScriptPathAndFilename, True, True, 0 )
+        box.pack_start( user_script_path_and_filename, True, True, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -239,100 +251,104 @@ class IndicatorTide( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Class name" ) ), False, False, 0 )
 
-        userScriptClassName = Gtk.Entry()
-        userScriptClassName.set_text( self.userScriptClassName )
-        userScriptClassName.set_tooltip_text( _(
+        user_script_class_name = Gtk.Entry()
+        user_script_class_name.set_text( self.user_script_class_name )
+        user_script_class_name.set_tooltip_text( _(
             "Class name within the user script\n" + \
             "which must contain the function\n\n" + \
-            "    getTideData()\n\n" + \
+            "    get_tide_data()\n\n" + \
             "implemented by the user to obtain\n" + \
             "the tidal data." ) )
 
-        box.pack_start( userScriptClassName, True, True, 0 )
+        box.pack_start( user_script_class_name, True, True, 0 )
 
         box.set_margin_bottom( 10 )
 
         grid.attach( box, 0, 2, 1, 1 )
 
-        showAsSubmenusCheckbutton = \
+        show_as_submenus_checkbutton = \
             self.create_checkbutton(
                 _( "Show as submenus" ),
                 tooltip_text = _( "Show each day's tides in a submenu." ),
-                active = self.showAsSubMenus )
+                active = self.show_as_submenus )
 #TODO Make sure this is converted okay
-        # showAsSubmenusCheckbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
-        # showAsSubmenusCheckbutton.set_active( self.showAsSubMenus )
-        # showAsSubmenusCheckbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
-        grid.attach( showAsSubmenusCheckbutton, 0, 3, 1, 1 )
+        # show_as_submenus_checkbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
+        # show_as_submenus_checkbutton.set_active( self.show_as_submenus )
+        # show_as_submenus_checkbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
+        grid.attach( show_as_submenus_checkbutton, 0, 3, 1, 1 )
 
-        showAsSubmenusExceptFirstDayCheckbutton = \
+        show_as_submenus_except_first_day_checkbutton = \
             self.create_checkbutton(
                 _( "Except first day" ),
                 tooltip_text = _( "Show the first day's tide in full." ),
-                sensitive = showAsSubmenusCheckbutton.get_active(),
+                sensitive = show_as_submenus_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.showAsSubMenusExceptFirstDay )
+                active = self.show_as_submenus_except_first_day )
 #TODO Make sure this is converted okay
-        # showAsSubmenusExceptFirstDayCheckbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
-        # showAsSubmenusExceptFirstDayCheckbutton.set_sensitive( showAsSubmenusCheckbutton.get_active() )
-        # showAsSubmenusExceptFirstDayCheckbutton.set_active( self.showAsSubMenusExceptFirstDay )
-        # showAsSubmenusExceptFirstDayCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # showAsSubmenusExceptFirstDayCheckbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
-        grid.attach( showAsSubmenusExceptFirstDayCheckbutton, 0, 4, 1, 1 )
+        # show_as_submenus_except_first_day_checkbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
+        # show_as_submenus_except_first_day_checkbutton.set_sensitive( show_as_submenus_checkbutton.get_active() )
+        # show_as_submenus_except_first_day_checkbutton.set_active( self.show_as_submenus_except_first_day )
+        # show_as_submenus_except_first_day_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # show_as_submenus_except_first_day_checkbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
+        grid.attach( show_as_submenus_except_first_day_checkbutton, 0, 4, 1, 1 )
 
-        showAsSubmenusCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showAsSubmenusExceptFirstDayCheckbutton )
+        show_as_submenus_checkbutton.connect(
+            "toggled",
+            self.onRadioOrCheckbox,
+            True,
+            show_as_submenus_except_first_day_checkbutton )
 
-        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
         grid.attach( box, 0, 5, 1, 1 )
 
         dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
 
         while True:
-            responseType = dialog.run()
-            if responseType == Gtk.ResponseType.OK:
-                self.showAsSubMenus = showAsSubmenusCheckbutton.get_active()
-                self.showAsSubMenusExceptFirstDay = showAsSubmenusExceptFirstDayCheckbutton.get_active()
+            response_type = dialog.run()
+            if response_type == Gtk.ResponseType.OK:
+                self.show_as_submenus = show_as_submenus_checkbutton.get_active()
+                self.show_as_submenus_except_first_day = show_as_submenus_except_first_day_checkbutton.get_active()
 
-                if userScriptPathAndFilename.get_text() and userScriptClassName.get_text():
-                    if not Path( userScriptPathAndFilename.get_text().strip() ).is_file():
-                        self.showMessage( dialog, _( "The user script path/filename cannot be found." ) )
-                        userScriptPathAndFilename.grab_focus()
+                if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
+                    if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
+                        self.show_message( dialog, _( "The user script path/filename cannot be found." ) )
+                        user_script_path_and_filename.grab_focus()
                         continue
 
-                elif userScriptPathAndFilename.get_text() or userScriptClassName.get_text(): # Cannot have one empty and the other not.
-                    if not userScriptPathAndFilename.get_text():
-                        self.showMessage( dialog, _( "The user script path/filename cannot be empty." ) )
-                        userScriptPathAndFilename.grab_focus()
+                elif user_script_path_and_filename.get_text() or user_script_class_name.get_text(): # Cannot have one empty and the other not.
+                    if not user_script_path_and_filename.get_text():
+                        self.show_message( dialog, _( "The user script path/filename cannot be empty." ) )
+                        user_script_path_and_filename.grab_focus()
                         continue
 
                     else:
-                        self.showMessage( dialog, _( "The user script class name cannot be empty." ) )
-                        userScriptClassName.grab_focus()
+                        self.show_message( dialog, _( "The user script class name cannot be empty." ) )
+                        user_script_class_name.grab_focus()
                         continue
 
-                self.userScriptPathAndFilename = userScriptPathAndFilename.get_text().strip()
-                self.userScriptClassName = userScriptClassName.get_text().strip()
+                self.user_script_path_and_filename = user_script_path_and_filename.get_text().strip()
+                self.user_script_class_name = user_script_class_name.get_text().strip()
 
-            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
+            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
             break
 
-        return responseType
+        return response_type
 
 
-    def loadConfig( self, config ):
-        self.showAsSubMenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
-        self.showAsSubMenusExceptFirstDay = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
-        self.userScriptPathAndFilename = config.get( IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME, "" )
-        self.userScriptClassName = config.get( IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME, "" )
+    def load_config( self, config ):
+        self.show_as_submenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
+        self.show_as_submenus_except_first_day = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
+        self.user_script_path_and_filename = config.get( IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME, "" )
+        self.user_script_class_name = config.get( IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME, "" )
 
 
-    def saveConfig( self ):
+    def save_config( self ):
         return {
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.showAsSubMenus,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.showAsSubMenusExceptFirstDay,
-            IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME : self.userScriptClassName,
-            IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME : self.userScriptPathAndFilename
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.show_as_submenus,
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.show_as_submenus_except_first_day,
+            IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME : self.user_script_class_name,
+            IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME : self.user_script_path_and_filename
         }
 
 

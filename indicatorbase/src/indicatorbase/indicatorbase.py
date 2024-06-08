@@ -544,7 +544,7 @@ class IndicatorBase( ABC ):
         return menuItem
 
 
-    def getOnClickMenuItemOpenBrowserFunction( self ):
+    def get_on_click_menuitem_open_browser_function( self ):
         return lambda menuItem: webbrowser.open( menuItem.get_name() )
 
 
@@ -848,7 +848,7 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.QUESTION.
     #
     #    title: If None, will default to the indicator name.
-    def showMessage( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
+    def show_message( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
         IndicatorBase.__showMessageInternal(
             self.__getParent( parentWidget ),
             message,

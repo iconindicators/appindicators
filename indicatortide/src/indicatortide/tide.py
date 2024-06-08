@@ -16,6 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Rename method to be python standard.
 class Reading( object ):
     # date: Date of reading, as a string.
     # time: Time of reading, as a string.
@@ -23,38 +24,38 @@ class Reading( object ):
     # level: The tide level, as a string.
     # isHigh: True if the tide is high; false otherwise.
     # url: The URL used to source the tide information.
-    def __init__( self, date, time, location, isHigh, level, url ):
+    def __init__( self, date, time, location, is_high, level, url ):
         self.date = date
         self.time = time
         self.location = location
-        self._isHigh = isHigh
+        self._is_high = is_high
         self.level = level
         self.url = url
 
 
-    def getDate( self ):
+    def get_date( self ):
         return self.date
 
 
-    def getTime( self ):
+    def get_time( self ):
         return self.time
 
 
-    def getLocation( self ):
+    def get_location( self ):
         return self.location
 
 
     # Returns true if tide is high; false otherwise.
-    def isHigh( self ):
-        return self._isHigh
+    def is_high( self ):
+        return self._is_high
 
 
     # Returns the level of this tide.
-    def getLevel( self ):
+    def get_level( self ):
         return self.level
 
 
-    def getURL( self ):
+    def get_url( self ):
         return self.url
 
 
@@ -63,7 +64,7 @@ class Reading( object ):
             self.date + " | " + \
             self.time + " | " + \
             self.location + " | " + \
-            str( self._isHigh ) + " | " + \
+            str( self._is_high ) + " | " + \
             str( self.level ) + " | " + \
             self.url
 
@@ -75,9 +76,9 @@ class Reading( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getDate() == other.getDate() and \
-            self.getTime() == other.getTime() and \
-            self.getLocation() == other.getLocation() and \
-            self.isHigh() == other.isHigh() and \
-            self.getLevel() == other.getLevel() and \
-            self.getURL() == other.getURL()
+            self.get_date() == other.get_date() and \
+            self.get_time() == other.get_time() and \
+            self.get_location() == other.get_location() and \
+            self.is_high() == other.is_high() and \
+            self.get_level() == other.get_level() and \
+            self.get_url() == other.get_url()

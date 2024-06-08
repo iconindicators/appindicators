@@ -35,10 +35,13 @@ class TideDataGetterBase( ABC ):
     # In the users's implementation, remove the @abstractmethod from the function header.
     @staticmethod
     @abstractmethod
-    def getTideData( logging = None, urlTimeoutInSeconds = 20 ):
+    def get_tide_data( logging = None, url_timeout_in_seconds = 20 ):
         # Example data returned by this function, to be implemented by the end user in their own script and class.
+        '''
         url = "http://url-used-to-obtain-tidal-information"
         return [
             tide.Reading( "Tuesday August 3rd", "4:07 AM", "The port", True, 1.6, url ),
             tide.Reading( "Tuesday August 3rd", "10:31 AM", "The port", False, 0.3, url ),
             tide.Reading( "Wednesday August 4th", "5:26 AM", "The port", True, 1.5, url ) ]
+        '''
+        raise NotImplementedError()
