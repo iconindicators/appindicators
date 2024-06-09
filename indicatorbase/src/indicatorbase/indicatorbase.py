@@ -240,7 +240,7 @@ class IndicatorBase( ABC ):
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         self.indicatorName = IndicatorBase.INDICATOR_NAME
 
-        projectMetadata = self._getProjectMetadata()
+        projectMetadata = self._get_project_metadata()
         if projectMetadata is None:
             errorMessage = "Exiting: unable to locate project metadata!"
             self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
@@ -316,7 +316,7 @@ class IndicatorBase( ABC ):
         self.__load_config()
 
 
-    def _getProjectMetadata( self ):
+    def _get_project_metadata( self ):
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
         projectMetadata = None
@@ -443,12 +443,12 @@ class IndicatorBase( ABC ):
         self.create_and_append_menuitem(
             menu,
             _( "Preferences" ),
-            activate_functionandarguments = ( self.__onPreferences, ) )
+            activate_functionandarguments = ( self.__on_preferences, ) )
 
         self.create_and_append_menuitem(
             menu,
             _( "About" ),
-            activate_functionandarguments = ( self.__onAbout, ) )
+            activate_functionandarguments = ( self.__on_about, ) )
         
         self.create_and_append_menuitem(
             menu,
@@ -599,7 +599,7 @@ class IndicatorBase( ABC ):
 #             self.onMouseWheelScroll( indicator, delta, scrollDirection ) #TODO Can this be renamed to on_mouse_wheel_scroll?
 
 
-    def __onAbout( self, menuItem ):
+    def __on_about( self, menuItem ):
         if self.lock.acquire( blocking = False ):
             self.__on_about_internal( menuItem )
 
@@ -683,7 +683,7 @@ class IndicatorBase( ABC ):
         aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-    def __onPreferences( self, menuItem ):
+    def __on_preferences( self, menuItem ):
         if self.lock.acquire( blocking = False ):
             self.__on_preferences_internal( menuItem )
 
@@ -774,7 +774,7 @@ class IndicatorBase( ABC ):
     def create_dialog( self, parent_widget, title, grid = None ):
         dialog = Gtk.Dialog(
             title,
-            self.__getParent( parent_widget ),
+            self.__get_parent( parent_widget ),
             Gtk.DialogFlags.MODAL,
             ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
@@ -791,7 +791,7 @@ class IndicatorBase( ABC ):
 
         dialog = Gtk.Dialog(
             title,
-            self.__getParent( parentWidget ),
+            self.__get_parent( parentWidget ),
             Gtk.DialogFlags.MODAL,
             ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ) )
 
@@ -849,8 +849,8 @@ class IndicatorBase( ABC ):
     #
     #    title: If None, will default to the indicator name.
     def show_message( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__showMessageInternal(
-            self.__getParent( parentWidget ),
+        IndicatorBase.__show_message_internal(
+            self.__get_parent( parentWidget ),
             message,
             messageType,
             self.indicatorName if title is None else title )
@@ -863,8 +863,8 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.WARNING
     #                        Gtk.MessageType.QUESTION.
     @staticmethod
-    def showMessageStatic( message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__showMessageInternal(
+    def show_message_static( message, messageType = Gtk.MessageType.ERROR, title = None ):
+        IndicatorBase.__show_message_internal(
             Gtk.Dialog(),
             message,
             messageType,
@@ -878,7 +878,7 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.WARNING
     #                        Gtk.MessageType.QUESTION.
     @staticmethod
-    def __showMessageInternal( parentWidget, message, messageType, title ):
+    def __show_message_internal( parentWidget, message, messageType, title ):
         dialog = Gtk.MessageDialog(
             parentWidget,
             Gtk.DialogFlags.MODAL,
@@ -902,7 +902,7 @@ class IndicatorBase( ABC ):
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
     def show_ok_cancel( self, parentWidget, message, title = None ):
         dialog = Gtk.MessageDialog(
-            self.__getParent( parentWidget ),
+            self.__get_parent( parentWidget ),
             Gtk.DialogFlags.MODAL,
             Gtk.MessageType.QUESTION,
             Gtk.ButtonsType.OK_CANCEL,
@@ -919,7 +919,7 @@ class IndicatorBase( ABC ):
         return response
 
 
-    def __getParent( self, widget ):#What is the widget here?
+    def __get_parent( self, widget ):#What is the widget here?
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
@@ -931,8 +931,8 @@ class IndicatorBase( ABC ):
 
 
     # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
-    def getTextViewText( self, textView ):
-        textViewBuffer = textView.get_buffer()
+    def get_textview_text( self, textview ):
+        textViewBuffer = textview.get_buffer()
         return textViewBuffer.get_text( textViewBuffer.get_start_iter(), textViewBuffer.get_end_iter(), True )
 
 
@@ -943,7 +943,7 @@ class IndicatorBase( ABC ):
 
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
-    def getMenuItemsGuess( self ):
+    def get_menuitems_guess( self ):
         screenHeightsInPixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbersOfMenuItems = [ 15, 15, 15, 20, 20, 20, 20 ]
 
@@ -1293,6 +1293,7 @@ class IndicatorBase( ABC ):
         return logging
 
 
+#TODO From here down rename to python standard
     def isNumber( self, numberAsString ):
         try:
             float( numberAsString )
