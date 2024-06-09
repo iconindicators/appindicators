@@ -36,28 +36,28 @@ class Filters( object ):
         self.filters = { }
 
 
-    def addFilter( self, user, name, series, architecture, text = [ ] ):
-        self.filters[ self.__getKey( user, name, series, architecture ) ] = text
+    def add_filter( self, user, name, series, architecture, text = [ ] ):
+        self.filters[ self.__get_key( user, name, series, architecture ) ] = text
 
 
-    def hasFilter( self, user, name, series, architecture ):
-        return self.__getKey( user, name, series, architecture ) in self.filters
+    def has_filter( self, user, name, series, architecture ):
+        return self.__get_key( user, name, series, architecture ) in self.filters
 
 
-    def getFilterText( self, user, name, series, architecture ):
-        return self.filters[ self.__getKey( user, name, series, architecture ) ]
+    def get_filter_text( self, user, name, series, architecture ):
+        return self.filters[ self.__get_key( user, name, series, architecture ) ]
 
 
-    def getUserNameSeriesArchitecture( self ):
+    def get_user_name_series_architecture( self ):
         for key in sorted( self.filters.keys() ):
-            keyComponents = key.split( " | " )
-            yield keyComponents[ Filters.INDEX_USER ], \
-                  keyComponents[ Filters.INDEX_NAME ], \
-                  keyComponents[ Filters.INDEX_SERIES ], \
-                  keyComponents[ Filters.INDEX_ARCHITECTURE ]
+            key_components = key.split( " | " )
+            yield key_components[ Filters.INDEX_USER ], \
+                  key_components[ Filters.INDEX_NAME ], \
+                  key_components[ Filters.INDEX_SERIES ], \
+                  key_components[ Filters.INDEX_ARCHITECTURE ]
 
 
-    def __getKey( self, user, name, series, architecture ):
+    def __get_key( self, user, name, series, architecture ):
         return user + " | " + name + " | " + series + " | " + architecture
 
 
@@ -75,35 +75,35 @@ class PublishedBinary( object ):
     # Package name, package version (string)
     # Download count (integer)
     # Architecture specific (boolean)
-    def __init__( self, packageName, packageVersion, downloadCount, architectureSpecific ):
-        self.packageName = packageName
-        self.packageVersion = packageVersion
-        self.downloadCount = downloadCount
-        self.architectureSpecific = architectureSpecific
+    def __init__( self, package_name, package_version, download_count, architecture_specific ):
+        self.package_name = package_name
+        self.package_version = package_version
+        self.download_count = download_count
+        self.architecture_specific = architecture_specific
 
 
-    def getPackageName( self ):
-        return self.packageName
+    def get_package_name( self ):
+        return self.package_name
 
 
-    def getPackageVersion( self ):
-        return self.packageVersion
+    def get_package_version( self ):
+        return self.package_version
 
 
-    def getDownloadCount( self ):
-        return self.downloadCount
+    def get_download_count( self ):
+        return self.download_count
 
 
-    def isArchitectureSpecific( self ):
-        return self.architectureSpecific
+    def is_architecture_specific( self ):
+        return self.architecture_specific
 
 
     def __str__( self ):
         return \
-            self.getPackageName() + " | " + \
-            str( self.getPackageVersion() ) + " | " + \
-            str( self.getDownloadCount() ) + " | " + \
-            str( self.isArchitectureSpecific() ) # Must wrap str() around getPackageVersion() as it will return None when published binaries are combined.
+            self.get_package_name() + " | " + \
+            str( self.get_package_version() ) + " | " + \
+            str( self.get_download_count() ) + " | " + \
+            str( self.is_architecture_specific() ) # Requires str() as it will return None when published binaries are combined.
 
 
     def __repr__( self ):
@@ -113,10 +113,10 @@ class PublishedBinary( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getPackageName() == other.getPackageName() and \
-            self.getPackageVersion() == other.getPackageVersion() and \
-            self.getDownloadCount() == other.getDownloadCount() and \
-            self.isArchitectureSpecific() == other.isArchitectureSpecific()
+            self.get_package_name() == other.get_package_name() and \
+            self.get_package_version() == other.get_package_version() and \
+            self.get_download_count() == other.get_download_count() and \
+            self.is_architecture_specific() == other.is_architecture_specific()
 
 
 class PPA( object ):
@@ -132,7 +132,7 @@ class PPA( object ):
 
     def __init__( self, user, name, series, architecture ):
         self.status = PPA.Status.NEEDS_DOWNLOAD
-        self.publishedBinaries = [ ]
+        self.published_binaries = [ ]
 
         self.user = user
         self.name = name
@@ -140,35 +140,35 @@ class PPA( object ):
         self.architecture = architecture
 
 
-    def getStatus( self ):
+    def get_status( self ):
         return self.status
 
 
-    def setStatus( self, status ):
+    def set_status( self, status ):
         self.status = status
         if not ( status == PPA.Status.OK ): # Any other status implies the underlying published binaries are reset.
-            self.publishedBinaries = [ ]
+            self.published_binaries = [ ]
 
 
-    def getUser( self ):
+    def get_user( self ):
         return self.user
 
 
-    def getName( self ):
+    def get_name( self ):
         return self.name
 
 
-    def getSeries( self ):
+    def get_series( self ):
         return self.series
 
 
-    def getArchitecture( self ):
+    def get_architecture( self ):
         return self.architecture
 
 
     # Returns a string description of the PPA of the form 'user | name | series | architecture'
     # or 'user | name' if series/architecture are undefined.
-    def getDescriptor( self ):
+    def get_descriptor( self ):
         if self.series is None or self.architecture is None:
             descriptor = self.user + " | " + self.name
 
@@ -178,30 +178,30 @@ class PPA( object ):
         return descriptor
 
 
-    def addPublishedBinary( self, publishedBinary ):
-        self.publishedBinaries.append( publishedBinary )
+    def add_published_binary( self, published_binary ):
+        self.published_binaries.append( published_binary )
 
 
-    def addPublishedBinaries( self, publishedBinaries ):
-        self.publishedBinaries.extend( publishedBinaries )
+    def add_published_binaries( self, published_binaries ):
+        self.published_binaries.extend( published_binaries )
 
 
-    def getPublishedBinaries( self, sort = False ):
+    def get_published_binaries( self, sort = False ):
         if sort:
-            self.publishedBinaries.sort( key = operator.methodcaller( "__str__" ) )
+            self.published_binaries.sort( key = operator.methodcaller( "__str__" ) )
 
-        return self.publishedBinaries
+        return self.published_binaries
 
 
-    def sortPublishedBinariesByDownloadCountAndClip( self, clipAmount ):
-        self.publishedBinaries.sort( key = operator.methodcaller( "getDownloadCount" ), reverse = True )
-        if clipAmount > 0:
-            del self.publishedBinaries[ clipAmount : ]
+    def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
+        self.published_binaries.sort( key = operator.methodcaller( "get_download_count" ), reverse = True )
+        if clip_amount > 0:
+            del self.published_binaries[ clip_amount : ]
 
 
     @staticmethod
-    def sort( listOfPPAs ):
-        listOfPPAs.sort( key = operator.methodcaller( "getDescriptor" ) )
+    def sort( list_of_ppas ):
+        list_of_ppas.sort( key = operator.methodcaller( "get_descriptor" ) )
 
 
     def __str__( self ):
@@ -210,7 +210,7 @@ class PPA( object ):
             self.name + " | " + \
             str( self.series ) + " | " + \
             str( self.architecture ) + " | " + \
-            self.publishedBinaries
+            self.published_binaries
 
 
     def __repr__( self ):
@@ -220,15 +220,15 @@ class PPA( object ):
     def __eq__( self, other ):
         equal = \
             self.__class__ == other.__class__ and \
-            self.getUser() == other.getUser() and \
-            self.getName() == other.getName() and \
-            self.getSeries() == other.getSeries() and \
-            self.getArchitecture() == other.getArchitecture() and \
-            self.getStatus() == other.getStatus()
+            self.get_user() == other.get_user() and \
+            self.get_name() == other.get_name() and \
+            self.get_series() == other.get_series() and \
+            self.get_architecture() == other.get_architecture() and \
+            self.get_status() == other.get_status()
 
-        equal &= len( self.getPublishedBinaries() ) == len( other.getPublishedBinaries() )
+        equal &= len( self.get_published_binaries() ) == len( other.get_published_binaries() )
         if equal:
-            for publishedBinarySelf, publishedBinaryOther in zip( self.getPublishedBinaries(), other.getPublishedBinaries() ):
-                equal &= publishedBinarySelf.__eq__( publishedBinaryOther )
+            for published_binary_self, published_binary_other in zip( self.get_published_binaries(), other.get_published_binaries() ):
+                equal &= published_binary_self.__eq__( published_binary_other )
 
         return equal

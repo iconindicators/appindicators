@@ -526,7 +526,7 @@ class IndicatorFortune( IndicatorBase ):
         if row_number:
             title = _( "Edit Fortune" )
 
-        dialog = self.create_dialog( treeview, title, grid ) #TODO Can this be moved up the top so the buttons are created last and can put the clicked stuff into the new function?
+        dialog = self.create_dialog( treeview, title, grid )
 
         box = Gtk.Box( spacing = 6 )
         box.set_hexpand( True )
@@ -656,7 +656,6 @@ class IndicatorFortune( IndicatorBase ):
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-
                 if fortune_file_directory.get_text().strip() == "": # Will occur if the user does a browse, cancels the browse and hits okay.
                     self.show_message( dialog, _( "The fortune path cannot be empty." ) )
                     fortune_file_directory.grab_focus()
@@ -675,11 +674,13 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def on_browse_fortune( self, file_or_directory_button, add_edit_dialog, fortune_file_directory, is_file ):
-        title = _( "Choose a directory containing a fortune .dat file(s)" )
-        action = Gtk.FileChooserAction.SELECT_FOLDER
         if is_file:
             title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
+
+        else:
+            title = _( "Choose a directory containing a fortune .dat file(s)" )
+            action = Gtk.FileChooserAction.SELECT_FOLDER
 
         dialog = \
             Gtk.FileChooserDialog(
@@ -687,7 +688,11 @@ class IndicatorFortune( IndicatorBase ):
                 parent = add_edit_dialog,
                 action = action )
 
-        dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
+        dialog.add_buttons = (
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OPEN,
+            Gtk.ResponseType.OK )
 
         dialog.set_transient_for( add_edit_dialog )
         dialog.set_filename( fortune_file_directory.get_text() )
@@ -711,20 +716,41 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, [ IndicatorFortune.DEFAULT_FORTUNE ] )
-        self.middle_mouse_click_on_icon = config.get( IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON, IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
-        self.notification_summary = config.get( IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY, IndicatorFortune.NOTIFICATION_SUMMARY )
-        self.refresh_interval_in_minutes = config.get( IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES, 15 )
-        self.skip_fortune_character_count = config.get( IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT, 360 ) # From experimentation, about 45 characters per line, but with word boundaries maintained, say 40 characters per line (with at most 9 lines).
+        self.fortunes = \
+            config.get(
+                IndicatorFortune.CONFIG_FORTUNES,
+                [ IndicatorFortune.DEFAULT_FORTUNE ] )
+
+        self.middle_mouse_click_on_icon = \
+            config.get(
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON,
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+
+        self.notification_summary = \
+            config.get(
+                IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY,
+                IndicatorFortune.NOTIFICATION_SUMMARY )
+
+        self.refresh_interval_in_minutes = \
+            config.get(
+                IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES,
+                15 )
+
+        self.skip_fortune_character_count = \
+            config.get(
+                IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT,
+                360 )   # From experimentation, about 45 characters per line,
+                        # but with word boundaries maintained,
+                        # say 40 characters per line (with at most 9 lines).
 
 
     def save_config( self ):
         return {
             IndicatorFortune.CONFIG_FORTUNES : self.fortunes,
-            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON  : self.middle_mouse_click_on_icon,
-            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY  : self.notification_summary,
-            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES  : self.refresh_interval_in_minutes,
-            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT  : self.skip_fortune_character_count
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON : self.middle_mouse_click_on_icon,
+            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY : self.notification_summary,
+            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES : self.refresh_interval_in_minutes,
+            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT : self.skip_fortune_character_count
         }
 
 

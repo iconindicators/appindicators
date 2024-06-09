@@ -787,7 +787,7 @@ class IndicatorLunar( IndicatorBase ):
 #TODO Not sure if needed for comets...see below.
     def getOnClickFunctionComet( self, menuItem ):
         try:
-            objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
+            objectId = str( requests.get( menuItem.get_name() ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
             webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
         except Exception:
             pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.

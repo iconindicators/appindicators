@@ -26,16 +26,16 @@ class VirtualMachine( object ):
         self.uuid = uuid
 
 
-    def getName( self ):
+    def get_name( self ):
         return self.name
 
 
-    def getUUID( self ):
+    def get_uuid( self ):
         return self.uuid
 
 
     def __str__( self ):
-        return self.getName() + " | " + self.getUUID()
+        return self.get_name() + " | " + self.get_uuid()
 
 
     def __repr__( self ):
@@ -45,8 +45,8 @@ class VirtualMachine( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getName() == other.getName() and \
-            self.getUUID() == other.getUUID()
+            self.get_name() == other.get_name() and \
+            self.get_uuid() == other.get_uuid()
 
 
 class Group( object ):
@@ -56,20 +56,20 @@ class Group( object ):
         self.items = [ ] # List of virtual machines and/or groups pertaining to this group.
 
 
-    def getName( self ):
+    def get_name( self ):
         return self.name
 
 
-    def addItem( self, virtualMachineOrGroup ):
-        self.items.append( virtualMachineOrGroup )
+    def add_item( self, virtual_machine_or_group ):
+        self.items.append( virtual_machine_or_group )
 
 
-    def getItems( self ):
+    def get_items( self ):
         return self.items
 
 
     def __str__( self ):
-        return self.getName() + ": " + ' | '.join( [ str( x.getName() ) for x in self.getItems() ] )
+        return self.get_name() + ": " + ' | '.join( [ str( x.get_name() ) for x in self.get_items() ] )
 
 
     def __repr__( self ):
@@ -79,11 +79,11 @@ class Group( object ):
     def __eq__( self, other ):
         equal = \
             self.__class__ == other.__class__ and \
-            self.getName() == other.getName() and \
-            len( self.getItems() ) == len( other.getItems( ) )
+            self.get_name() == other.get_name() and \
+            len( self.get_items() ) == len( other.get_items( ) )
 
         if equal:
-            for itemFromSelf, itemFromOther in zip( self.getItems(), other.getItems() ):
-                equal &= itemFromSelf.__eq__( itemFromOther )
+            for item_from_self, item_from_other in zip( self.get_items(), other.get_items() ):
+                equal &= item_from_self.__eq__( item_from_other )
 
         return equal

@@ -28,11 +28,11 @@ class Event( object ):
         self.description = description
 
 
-    def getDate( self ):
+    def get_date( self ):
         return self.date
 
 
-    def getDescription( self ):
+    def get_description( self ):
         return self.description
 
 
@@ -47,5 +47,5 @@ class Event( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getDate() == other.getDate() and \
-            self.getDescription( )== other.getDescription()
+            self.get_date() == other.get_date() and \
+            self.get_description( )== other.get_description()

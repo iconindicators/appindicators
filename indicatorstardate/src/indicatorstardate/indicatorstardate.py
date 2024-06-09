@@ -47,49 +47,49 @@ class IndicatorStardate( IndicatorBase ):
                 _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
                 _( "Wikipedia::Stardate" "https://en.wikipedia.org/wiki/Stardate" ) ] )
 
-        self.requestMouseWheelScrollEvents()
+        self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
         self.save_config_timer_id = None #TODO What is this?  Put in a good comment!!!
 
 
     def update( self, menu ):
-        utcNow = datetime.datetime.now( datetime.timezone.utc )
+        utc_now = datetime.datetime.now( datetime.timezone.utc )
         if self.show_classic:
-            stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( utcNow )
-            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( utcNow, True )
+            stardate_issue, stardate_integer, stardate_fraction = stardate.get_stardate_classic( utc_now )
+            number_of_seconds_to_next_update = stardate.get_next_update_in_seconds( utc_now, True )
 
         else:
-            stardateIssue = None
-            stardateInteger, stardateFraction = stardate.getStardate2009Revised( utcNow )
-            numberOfSecondsToNextUpdate = stardate.getNextUpdateInSeconds( utcNow, False )
+            stardate_issue = None
+            stardate_integer, stardate_fraction = stardate.get_stardate_2009_revised( utc_now )
+            number_of_seconds_to_next_update = stardate.get_next_update_in_seconds( utc_now, False )
 
-        stardateString = \
-            stardate.toStardateString(
-                stardateIssue,
-                stardateInteger,
-                stardateFraction,
+        stardate_string = \
+            stardate.to_stardate_string(
+                stardate_issue,
+                stardate_integer,
+                stardate_fraction,
                 self.show_issue,
                 self.pad_integer )
 
-        if self.isLabelUpdateSupported():
-            self.setLabel( stardateString )
+        if self.is_label_update_supported():
+            self.set_label( stardate_string )
 
         else:
-            menu.append( Gtk.MenuItem.new_with_label( stardateString ) )
+            menu.append( Gtk.MenuItem.new_with_label( stardate_string ) )
             menu.append( Gtk.SeparatorMenuItem() )
 
-        return numberOfSecondsToNextUpdate
+        return number_of_seconds_to_next_update
 
 
-    def onMouseWheelScroll( self, indicator, delta, scroll_direction ):
+    def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
         # Based on the mouse wheel scroll event (irrespective of direction),
         # cycle through the possible combinations of options for display in the stardate.
         # If showing a 'classic' stardate and padding is not required, ignore the padding option.
         if self.show_classic:
-            stardateIssue, stardateInteger, stardateFraction = \
-                stardate.getStardateClassic( datetime.datetime.now( datetime.timezone.utc ) )
+            stardate_issue, stardate_integer, stardate_fraction = \
+                stardate.get_stardate_classic( datetime.datetime.now( datetime.timezone.utc ) )
 
-            paddingRequired = stardate.requiresPadding( stardateIssue, stardateInteger )
-            if paddingRequired:
+            padding_required = stardate.requires_padding( stardate_issue, stardate_integer )
+            if padding_required:
                 if self.show_issue and self.pad_integer:
                     self.show_issue = True
                     self.pad_integer = False
@@ -120,19 +120,19 @@ class IndicatorStardate( IndicatorBase ):
             self.pad_integer = True
             self.show_classic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-        self.requestUpdate()
+        self.request_update()
 
         if self.save_config_timer_id:
             GLib.source_remove( self.save_config_timer_id )
 
         # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
-        self.save_config_timer_id = self.requestSaveConfig( 10 )
+        self.save_config_timer_id = self.request_save_config( 10 )
 
 
-    def onPreferences( self, dialog ):
+    def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        showClassicCheckbutton = \
+        show_classic_checkbutton = \
             self.create_checkbutton(
                 _( "Show stardate 'classic'" ),
                 tooltip_text = _(
@@ -142,70 +142,75 @@ class IndicatorStardate( IndicatorBase ):
                     "\thttps://en.wikipedia.org/wiki/Stardate" ),
                 active = self.show_classic )
 #TODO Make sure this is converted okay
-        # showClassicCheckbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
-        # showClassicCheckbutton.set_active( self.show_classic )
-        # showClassicCheckbutton.set_tooltip_text( _(
+        # show_classic_checkbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
+        # show_classic_checkbutton.set_active( self.show_classic )
+        # show_classic_checkbutton.set_tooltip_text( _(
         #     "If checked, show stardate 'classic' based on\n\n" + \
         #     "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
         #     "Otherwise, show stardate '2009 revised' based on\n\n" + \
         #     "\thttps://en.wikipedia.org/wiki/Stardate" ) )
-        grid.attach( showClassicCheckbutton, 0, 0, 1, 1 )
+        grid.attach( show_classic_checkbutton, 0, 0, 1, 1 )
 
-        showIssueCheckbutton = \
+        show_issue_checkbutton = \
             self.create_checkbutton(
                 _( "Show ISSUE" ),
                 tooltip_text = _( "Show the ISSUE of the stardate 'classic'." ),
-                sensitive = showClassicCheckbutton.get_active(),
+                sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.show_issue )
 #TODO Make sure this is converted okay
-        # showIssueCheckbutton = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
-        # showIssueCheckbutton.set_active( self.show_issue )
-        # showIssueCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
-        # showIssueCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # showIssueCheckbutton.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
-        grid.attach( showIssueCheckbutton, 0, 1, 1, 1 )
+        # show_issue_checkbutton = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
+        # show_issue_checkbutton.set_active( self.show_issue )
+        # show_issue_checkbutton.set_sensitive( show_classic_checkbutton.get_active() )
+        # show_issue_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # show_issue_checkbutton.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
+        grid.attach( show_issue_checkbutton, 0, 1, 1, 1 )
 
-        padIntegerCheckbutton = \
+        pad_integer_checkbutton = \
             self.create_checkbutton(
                 _( "Pad INTEGER" ),
                 tooltip_text = _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ),
-                sensitive = showClassicCheckbutton.get_active(),
+                sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.pad_integer )
 #TODO Make sure this is converted okay
-        # padIntegerCheckbutton = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
-        # padIntegerCheckbutton.set_active( self.pad_integer )
-        # padIntegerCheckbutton.set_sensitive( showClassicCheckbutton.get_active() )
-        # padIntegerCheckbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # padIntegerCheckbutton.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
-        grid.attach( padIntegerCheckbutton, 0, 2, 1, 1 )
+        # pad_integer_checkbutton = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
+        # pad_integer_checkbutton.set_active( self.pad_integer )
+        # pad_integer_checkbutton.set_sensitive( show_classic_checkbutton.get_active() )
+        # pad_integer_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # pad_integer_checkbutton.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
+        grid.attach( pad_integer_checkbutton, 0, 2, 1, 1 )
 
-        showClassicCheckbutton.connect( "toggled", self.onRadioOrCheckbox, True, showIssueCheckbutton, padIntegerCheckbutton )
+        show_classic_checkbutton.connect(
+            "toggled",
+            self.on_radio_or_checkbox,
+            True,
+            show_issue_checkbutton,
+            pad_integer_checkbutton )
 
-        autostartCheckbox, delaySpinner, box = self.createAutostartCheckboxAndDelaySpinner()
+        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
         grid.attach( box, 0, 3, 1, 1 )
 
         dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
 
-        responseType = dialog.run()
-        if responseType == Gtk.ResponseType.OK:
-            self.pad_integer = padIntegerCheckbutton.get_active()
-            self.show_classic = showClassicCheckbutton.get_active()
-            self.show_issue = showIssueCheckbutton.get_active()
-            self.setAutostartAndDelay( autostartCheckbox.get_active(), delaySpinner.get_value_as_int() )
+        response_type = dialog.run()
+        if response_type == Gtk.ResponseType.OK:
+            self.pad_integer = pad_integer_checkbutton.get_active()
+            self.show_classic = show_classic_checkbutton.get_active()
+            self.show_issue = show_issue_checkbutton.get_active()
+            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
 
-        return responseType
+        return response_type
 
 
-    def loadConfig( self, config ):
+    def load_config( self, config ):
         self.pad_integer = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
         self.show_classic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
         self.show_issue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
 
 
-    def saveConfig( self ):
+    def save_config( self ):
         self.save_config_timer_id = None # Reset the timer ID.
 
         return {

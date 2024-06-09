@@ -830,7 +830,7 @@ class IndicatorBase( ABC ):
                 sensitive = autostart_checkbox.get_active() )
         # autostart_spinner.set_sensitive( autostart_checkbox.get_active() )#TODO Check is converted above ok.
 
-        autostart_checkbox.connect( "toggled", self.onRadioOrCheckbox, True, autostart_spinner )
+        autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_top( 10 )
@@ -900,7 +900,7 @@ class IndicatorBase( ABC ):
     #    title: If None, will default to the indicator name.
     #
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
-    def showOKCancel( self, parentWidget, message, title = None ):
+    def show_ok_cancel( self, parentWidget, message, title = None ):
         dialog = Gtk.MessageDialog(
             self.__getParent( parentWidget ),
             Gtk.DialogFlags.MODAL,
@@ -937,9 +937,9 @@ class IndicatorBase( ABC ):
 
 
     # Listens to radio/checkbox "toggled" events and toggles the visibility of the widgets according to the boolean value of 'sense'.
-    def onRadioOrCheckbox( self, radioOrCheckbox, sense, *widgets ):
+    def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
         for widget in widgets:
-            widget.set_sensitive( sense and radioOrCheckbox.get_active() )
+            widget.set_sensitive( sense and radio_or_checkbox.get_active() )
 
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
@@ -1334,7 +1334,7 @@ class IndicatorBase( ABC ):
 
 
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
-    def isLabelUpdateSupported( self ):
+    def is_label_update_supported( self ):
         labelUpdateSupported = True
         desktopEnvironment = self.getDesktopEnvironment()
         if desktopEnvironment is None or \
@@ -1427,7 +1427,7 @@ class IndicatorBase( ABC ):
         return downloaded
 
 
-    def requestSaveConfig( self, delay = 0 ):
+    def request_save_config( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 

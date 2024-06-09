@@ -76,7 +76,11 @@ class IndicatorTide( IndicatorBase ):
                 sys.modules[ self.user_script_class_name ] = module
                 spec.loader.exec_module( module )
                 klazz = getattr( module, self.user_script_class_name )
-                tidal_readings = klazz.get_tide_data( self.get_logging() )
+                tidal_readings = \
+                    klazz.get_tide_data( 
+                        logging = self.get_logging(), 
+                        url_timeout_in_seconds = 20 )
+
                 self.build_menu( menu, tidal_readings )
 
             except FileNotFoundError:

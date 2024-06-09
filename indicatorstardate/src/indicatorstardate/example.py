@@ -22,23 +22,39 @@ import stardate
 
 
 # Exercise the Stardate API.
-print( "Stardate API version: " + stardate.getVersion(), "\n" )
+print( "Stardate API version: " + stardate.get_version(), "\n" )
 
-utcNow = datetime.datetime.now( datetime.timezone.utc )
-print( "UTC now:", utcNow, "\n" )
+utc_now = datetime.datetime.now( datetime.timezone.utc )
+print( "UTC now:", utc_now, "\n" )
 
-stardateIssue, stardateInteger, stardateFraction = stardate.getStardateClassic( utcNow )
-print( "'classic' Stardate (issue, integer, fraction, fractionalPeriod):", stardateIssue, stardateInteger, stardateFraction )
-print( "'classic' Stardate (as string):", stardate.toStardateString( stardateIssue, stardateInteger, stardateFraction, True, False ) )
+stardate_issue, stardate_integer, stardate_fraction = \
+    stardate.get_stardate_classic( utc_now )
+
+print(
+    "'classic' Stardate (issue, integer, fraction, fractionalPeriod):",
+    stardate_issue, stardate_integer, stardate_fraction )
+
+print(
+    "'classic' Stardate (as string):",
+    stardate.to_stardate_string( stardate_issue, stardate_integer, stardate_fraction, True, False ) )
 
 # Use the calculated 'classic' Stardate to get the date/time (should be the same but rounding plays a part).
-print( "UTC now from 'classic' Stardate:", stardate.getGregorianFromStardateClassic( stardateIssue, stardateInteger, stardateFraction ) )
+print(
+    "UTC now from 'classic' Stardate:",
+    stardate.get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stardate_fraction ) )
 
 print()
 
-stardateInteger, stardateFraction = stardate.getStardate2009Revised( utcNow )
-print( "'2009Revised' Stardate (integer, fraction, fractionalPeriod):", stardateInteger, stardateFraction )
-print( "'2009Revised' Stardate (as string):", stardate.toStardateString( None, stardateInteger, stardateFraction, None, False ) )
+stardate_integer, stardate_fraction = stardate.get_stardate_2009_revised( utc_now )
+print(
+    "'2009Revised' Stardate (integer, fraction, fractionalPeriod):",
+    stardate_integer, stardate_fraction )
+
+print(
+    "'2009Revised' Stardate (as string):",
+    stardate.to_stardate_string( None, stardate_integer, stardate_fraction, None, False ) )
 
 # Use the calculated '2009Revised' Stardate to get the date/time (should be the same but rounding plays a part).
-print( "UTC now from '2009Revised' Stardate:", stardate.getGregorianFromStardate2009Revised( stardateInteger, stardateFraction ) )
+print(
+    "UTC now from '2009Revised' Stardate:",
+    stardate.get_gregorian_from_stardate_2009_revised( stardate_integer, stardate_fraction ) )
