@@ -207,8 +207,11 @@ class IndicatorBase( ABC ):
     # For a given indicator, indicatorbase MUST be imported FIRST!
     INDICATOR_NAME = None
     for frame_record in inspect.stack():
-        if "from indicatorbase import IndicatorBase" in str( frame_record.code_context ) and \
-           Path( frame_record.filename ).stem.startswith( "indicator" ):
+        found_indicatorbase_import = \
+            "from indicatorbase import IndicatorBase" in str( frame_record.code_context ) and \
+            Path( frame_record.filename ).stem.startswith( "indicator" )
+    
+        if found_indicatorbase_import:
             INDICATOR_NAME = Path( frame_record.filename ).stem
             gettext.install( INDICATOR_NAME, localedir = str( Path( __file__ ).parent ) + os.sep + "locale" )
             break
@@ -238,11 +241,22 @@ class IndicatorBase( ABC ):
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
+        if IndicatorBase.INDICATOR_NAME is None:
+#TODO Maybe also print the message?            
+            self.show_message(
+                None,
+                "Exiting: unable to determine indicator name!",
+                Gtk.MessageType.ERROR,
+                "" )
+
+            sys.exit()
+
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
         project_metadata = self._get_project_metadata()
         if project_metadata is None:
-            self.showMessage(
+#TODO Maybe also print the message?            
+            self.show_message(
                 None,
                 "Exiting: unable to locate project metadata!",
                 Gtk.MessageType.ERROR,
@@ -287,7 +301,8 @@ class IndicatorBase( ABC ):
 
             self.desktop_file_virtual_environment = str( Path( "/tmp/" + desktop_file_in_wheel ) )
             if not Path( self.desktop_file_virtual_environment ).exists():
-                self.showMessage(
+#TODO Maybe also print the message?            
+                self.show_message(
                     None,
                     f"Expected to find a .desktop file in { self.desktop_file_virtual_environment } but none was found!",
                     Gtk.MessageType.ERROR,
@@ -340,12 +355,14 @@ class IndicatorBase( ABC ):
                 # No .whl found, so try the current directory...
                 first_wheel = next( Path( os.path.realpath( __file__ ) ).parent.glob( "*.whl" ), None )
                 if first_wheel is None:
+#TODO Also use show message?                    
                     print( "Expected to find a .whl in the same directory as the indicator or the current directory, but none was found!" )
 
             if first_wheel is not None:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
                 if first_metadata is None:
                     print( f"No metadata was found in { first_wheel.absolute() }" )
+#TODO Also use show message?                    
 
                 else:
                     project_metadata = first_metadata.metadata
@@ -478,83 +495,6 @@ class IndicatorBase( ABC ):
         #     self.nextUpdateTime = None
 
         self.lock.release()
-
-
-#TODO Maybe move this down to menu/gui stuff?
-    def create_and_append_menuitem(
-        self,
-        menu,
-        label,
-        name = None,
-        activate_functionandarguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
-        is_secondary_activate_target = False ):
-
-        menuItem = Gtk.MenuItem.new_with_label( label )
-
-        if name:
-            menuItem.set_name( name )
-
-        if activate_functionandarguments:
-            menuItem.connect( "activate", *activate_functionandarguments )
-
-        if is_secondary_activate_target:
-            self.secondary_activate_target = menuItem
-
-        menu.append( menuItem )
-        return menuItem
-
-
-#TODO Delete eventually.
-    # def create_and_append_menuitemORIG(
-    #         self,
-    #         menu,
-    #         label,
-    #         name = None,
-    #         activateFunction = None, # The activate function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
-    #         activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
-    #         isSecondaryActivateTarget = False ):
-    #
-    #     menuItem = Gtk.MenuItem.new_with_label( label )
-    #
-    #     if name:
-    #         menuItem.set_name( name )
-    #
-    #     if activateFunction:
-    #         if activateFunctionArguments:
-    #             menuItem.connect( "activate", activateFunction, *activateFunctionArguments )
-    #
-    #         else:
-    #             menuItem.connect( "activate", activateFunction )
-    #
-    #     if isSecondaryActivateTarget:
-    #         self.secondary_activate_target = menuItem
-    #
-    #     menu.append( menuItem )
-    #     return menuItem
-
-
-    def create_and_insert_menuitem(
-        self,
-        menu,
-        label,
-        index,
-        name = None,
-        activate_functionandarguments = None, # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
-        is_secondary_activate_target = False ):
-
-        menuItem = self.create_and_append_menuitem(
-            menu,
-            label,
-            name,
-            activate_functionandarguments,
-            is_secondary_activate_target )
-
-        menu.reorder_child( menuItem, index )
-        return menuItem
-
-
-    def get_on_click_menuitem_open_browser_function( self ):
-        return lambda menuItem: webbrowser.open( menuItem.get_name() )
 
 
     def request_update( self, delay = 0 ):
@@ -824,38 +764,6 @@ class IndicatorBase( ABC ):
         # self.__setMenuSensitivity( True, True )
 
 
-    def create_autostart_checkbox_and_delay_spinner( self ):
-        autostart, delay = self.get_autostart_and_delay()
-
-#TODO Check this was converted okay...
-        # autostart_checkbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
-        # autostart_checkbox.set_tooltip_text( _( "Run the indicator automatically." ) )
-        # autostart_checkbox.set_active( autostart )
-        autostart_checkbox = \
-            self.create_checkbutton(
-                _( "Autostart" ),
-                tooltip_text = _( "Run the indicator automatically." ),
-                active = autostart )
-
-        autostart_spinner = \
-            self.create_spinbutton(
-                delay,
-                0,
-                1000,
-                tooltip_text = _( "Start up delay (seconds)." ),
-                sensitive = autostart_checkbox.get_active() )
-        # autostart_spinner.set_sensitive( autostart_checkbox.get_active() )#TODO Check is converted above ok.
-
-        autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-        box.pack_start( autostart_checkbox, False, False, 0 )
-        box.pack_start( autostart_spinner, False, False, 0 )
-
-        return autostart_checkbox, autostart_spinner, box
-
-
     # Show a message dialog.
     #
     #    messageType: One of Gtk.MessageType.INFO
@@ -956,6 +864,114 @@ class IndicatorBase( ABC ):
         return parent
 
 
+    def create_autostart_checkbox_and_delay_spinner( self ):
+        autostart, delay = self.get_autostart_and_delay()
+
+#TODO Check this was converted okay...
+        # autostart_checkbox = Gtk.CheckButton.new_with_label( _( "Autostart" ) )
+        # autostart_checkbox.set_tooltip_text( _( "Run the indicator automatically." ) )
+        # autostart_checkbox.set_active( autostart )
+        autostart_checkbox = \
+            self.create_checkbutton(
+                _( "Autostart" ),
+                tooltip_text = _( "Run the indicator automatically." ),
+                active = autostart )
+
+        autostart_spinner = \
+            self.create_spinbutton(
+                delay,
+                0,
+                1000,
+                tooltip_text = _( "Start up delay (seconds)." ),
+                sensitive = autostart_checkbox.get_active() )
+        # autostart_spinner.set_sensitive( autostart_checkbox.get_active() )#TODO Check is converted above ok.
+
+        autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
+
+        box = Gtk.Box( spacing = 6 )
+        box.set_margin_top( 10 )
+        box.pack_start( autostart_checkbox, False, False, 0 )
+        box.pack_start( autostart_spinner, False, False, 0 )
+
+        return autostart_checkbox, autostart_spinner, box
+
+
+    def create_and_append_menuitem(
+        self,
+        menu,
+        label,
+        name = None,
+        activate_functionandarguments = None,
+        is_secondary_activate_target = False ):
+
+        menuItem = Gtk.MenuItem.new_with_label( label )
+
+        if name:
+            menuItem.set_name( name )
+
+        if activate_functionandarguments:
+            menuItem.connect( "activate", *activate_functionandarguments )
+
+        if is_secondary_activate_target:
+            self.secondary_activate_target = menuItem
+
+        menu.append( menuItem )
+        return menuItem
+
+
+#TODO Delete eventually.
+    # def create_and_append_menuitemORIG(
+    #         self,
+    #         menu,
+    #         label,
+    #         name = None,
+    #         activateFunction = None, # The activate function must have as its first parameter 'widget' or similar to accept the menu item reference; or just use lambda.
+    #         activateFunctionArguments = None, # Arguments must be passed as a tuple: https://stackoverflow.com/a/6289656/2156453
+    #         isSecondaryActivateTarget = False ):
+    #
+    #     menuItem = Gtk.MenuItem.new_with_label( label )
+    #
+    #     if name:
+    #         menuItem.set_name( name )
+    #
+    #     if activateFunction:
+    #         if activateFunctionArguments:
+    #             menuItem.connect( "activate", activateFunction, *activateFunctionArguments )
+    #
+    #         else:
+    #             menuItem.connect( "activate", activateFunction )
+    #
+    #     if isSecondaryActivateTarget:
+    #         self.secondary_activate_target = menuItem
+    #
+    #     menu.append( menuItem )
+    #     return menuItem
+
+
+    def create_and_insert_menuitem(
+        self,
+        menu,
+        label,
+        index,
+        name = None,
+        activate_functionandarguments = None,
+        is_secondary_activate_target = False ):
+
+        menuItem = self.create_and_append_menuitem(
+            menu,
+            label,
+            name,
+            activate_functionandarguments,
+            is_secondary_activate_target )
+
+        menu.reorder_child( menuItem, index )
+        return menuItem
+
+
+    def get_on_click_menuitem_open_browser_function( self ):
+        return lambda menuItem: webbrowser.open( menuItem.get_name() )
+
+    
     # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
     def get_textview_text( self, textview ):
         textview_buffer = textview.get_buffer()
