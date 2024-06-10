@@ -118,7 +118,7 @@ class IndicatorTest( IndicatorBase ):
         result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
         self.create_and_append_menuitem( submenu, self.get_menu_indent() + command + "gtk-theme: " + result )
 
-        text = self.get_menu_indent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.getDesktopEnvironment()
+        text = self.get_menu_indent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_desktop_environment()
         self.create_and_append_menuitem( submenu, text )
 
         self.create_and_append_menuitem( menu, "Desktop" ).set_submenu( submenu )
@@ -131,7 +131,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             self.get_menu_indent() + "Reset icon",
             activate_functionandarguments =
-                ( lambda menuItem: self.indicator.set_icon_full( self.get_icon_name(), "" ), ) )
+                ( lambda menuitem: self.indicator.set_icon_full( self.get_icon_name(), "" ), ) )
 
         icons = [ "FULL_MOON",
                   "WANING_GIBBOUS",
@@ -155,13 +155,13 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + "Reset label",
-            activate_functionandarguments = ( lambda menuItem: self.set_label( IndicatorTest.LABEL ), ) )
+            activate_functionandarguments = ( lambda menuitem: self.set_label( IndicatorTest.LABEL ), ) )
 
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + "Show current time in label",
             activate_functionandarguments = 
-                ( lambda menuItem: (
+                ( lambda menuitem: (
                     print( "secondary activate target / mouse middle click" ),
                     self.set_label( self.__get_current_time() ) ), ),
             is_secondary_activate_target = True )
@@ -170,7 +170,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             self.get_menu_indent() + "Show current time in OSD",
             activate_functionandarguments =
-                ( lambda menuItem:
+                ( lambda menuitem:
                     Notify.Notification.new( "Current time...", self.__get_current_time(), self.get_icon_name() ).show(), ) )
 
         self.create_and_append_menuitem( menu, "Label / Tooltip / OSD" ).set_submenu( submenu )
@@ -183,7 +183,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             self.get_menu_indent() + _( "Copy current time to clipboard" ),
             activate_functionandarguments =
-                ( lambda menuItem: ( 
+                ( lambda menuitem: ( 
                     print( "clipboard" ),
                     Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__get_current_time(), -1 ) ), ) )
 
@@ -193,9 +193,9 @@ class IndicatorTest( IndicatorBase ):
     def __build_menu_terminal( self, menu ):
         submenu = Gtk.Menu()
 
-        terminal, executionFlag = self.get_terminal_and_execution_flag()
+        terminal, execution_flag = self.get_terminal_and_execution_flag()
         self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Terminal: " + str( terminal ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Execution flag: " + str( executionFlag ) )
+        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Execution flag: " + str( execution_flag ) )
 
         self.create_and_append_menuitem( menu, "Terminal" ).set_submenu( submenu )
 
@@ -224,7 +224,7 @@ class IndicatorTest( IndicatorBase ):
                 submenu,
                 self.get_menu_indent() + label,
                 activate_functionandarguments =
-                    ( lambda menuItem, command = command: self.__execute_command( command ), ) ) # Note command = command to handle lambda late binding.
+                    ( lambda menuitem, command = command: self.__execute_command( command ), ) ) # Note command = command to handle lambda late binding.
 
         self.create_and_append_menuitem( menu, "Execute Terminal Command" ).set_submenu( submenu )
 
@@ -291,10 +291,10 @@ class IndicatorTest( IndicatorBase ):
         terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
-            self.getLogging().error( message )
+            self.get_logging().error( message )
             Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
 
-        elif self.isTerminalQTerminal():
+        elif self.is_terminal_qterminal():
             # As a result of this issue
             #    https://github.com/lxqt/qterminal/issues/335
             # the default terminal in Lubuntu (qterminal) fails to parse argument.

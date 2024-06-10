@@ -206,10 +206,10 @@ class IndicatorBase( ABC ):
     # Obtain name of indicator from the call stack and initialise gettext.
     # For a given indicator, indicatorbase MUST be imported FIRST!
     INDICATOR_NAME = None
-    for frameRecord in inspect.stack():
-        if "from indicatorbase import IndicatorBase" in str( frameRecord.code_context ) and \
-           Path( frameRecord.filename ).stem.startswith( "indicator" ):
-            INDICATOR_NAME = Path( frameRecord.filename ).stem
+    for frame_record in inspect.stack():
+        if "from indicatorbase import IndicatorBase" in str( frame_record.code_context ) and \
+           Path( frame_record.filename ).stem.startswith( "indicator" ):
+            INDICATOR_NAME = Path( frame_record.filename ).stem
             gettext.install( INDICATOR_NAME, localedir = str( Path( __file__ ).parent ) + os.sep + "locale" )
             break
 
@@ -238,32 +238,36 @@ class IndicatorBase( ABC ):
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
-        self.indicatorName = IndicatorBase.INDICATOR_NAME
+        self.indicator_name = IndicatorBase.INDICATOR_NAME
 
-        projectMetadata = self._get_project_metadata()
-        if projectMetadata is None:
-            errorMessage = "Exiting: unable to locate project metadata!"
-            self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
+        project_metadata = self._get_project_metadata()
+        if project_metadata is None:
+            self.showMessage(
+                None,
+                "Exiting: unable to locate project metadata!",
+                Gtk.MessageType.ERROR,
+                self.indicator_name )
+
             sys.exit()
 
-        self.version = projectMetadata[ "Version" ]
+        self.version = project_metadata[ "Version" ]
 
         self.comments = comments
 
         # https://stackoverflow.com/a/75803208/2156453
-        emailMessageObject = \
+        email_message_object = \
             email.message_from_string(
-                f'To: { projectMetadata[ "Author-email" ] }',
+                f'To: { project_metadata[ "Author-email" ] }',
                 policy = email.policy.default, )
 
-        self.copyrightNames = [ ]
-        for address in emailMessageObject[ "to" ].addresses:
-            self.copyrightNames.append( address.display_name )
+        self.copyright_names = [ ]
+        for address in email_message_object[ "to" ].addresses:
+            self.copyright_names.append( address.display_name )
 
-        self.website = projectMetadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
+        self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
         self.authors = [ ]
-        for author in self.copyrightNames:
+        for author in self.copyright_names:
             self.authors.append( author + " " + self.website )
 
         self.artwork = artwork if artwork else self.authors
@@ -271,25 +275,29 @@ class IndicatorBase( ABC ):
         self.debug = debug
 
         # Ensure the .desktop file is present, taking into account running from a terminal or an IDE.
-        self.desktopFile = self.indicatorName + ".py.desktop"
-        self.desktopFileUserHome = IndicatorBase.__AUTOSTART_PATH + self.desktopFile
-        self.desktopFileVirtualEnvironment = str( Path( __file__ ).parent ) + "/platform/linux/" + self.desktopFile
-        if not Path( self.desktopFileVirtualEnvironment ).exists(): # Occurs when running from a terminal or in Eclipse.
-            desktop_file_in_wheel = self.indicatorName + "/platform/linux/" + self.indicatorName + ".py.desktop"
+        self.desktop_file = self.indicator_name + ".py.desktop"
+        self.desktop_file_user_home = IndicatorBase.__AUTOSTART_PATH + self.desktop_file
+        self.desktop_file_virtual_environment = str( Path( __file__ ).parent ) + "/platform/linux/" + self.desktop_file
+        if not Path( self.desktop_file_virtual_environment ).exists(): # Occurs when running from a terminal or in Eclipse.
+            desktop_file_in_wheel = self.indicator_name + "/platform/linux/" + self.indicator_name + ".py.desktop"
             with ZipFile( next( Path( "." ).glob( "*.whl" ), None ), 'r' ) as z:
                 z.extract( desktop_file_in_wheel, path = "/tmp" )
 
             z.close()
 
-            self.desktopFileVirtualEnvironment = str( Path( "/tmp/" + desktop_file_in_wheel ) )
-            if not Path( self.desktopFileVirtualEnvironment ).exists():
-                errorMessage = f"Expected to find a .desktop file in { self.desktopFileVirtualEnvironment } but none was found!"
-                self.showMessage( None, errorMessage, Gtk.MessageType.ERROR, self.indicatorName )
+            self.desktop_file_virtual_environment = str( Path( "/tmp/" + desktop_file_in_wheel ) )
+            if not Path( self.desktop_file_virtual_environment ).exists():
+                self.showMessage(
+                    None,
+                    f"Expected to find a .desktop file in { self.desktop_file_virtual_environment } but none was found!",
+                    Gtk.MessageType.ERROR,
+                    self.indicator_name )
+
                 sys.exit()
 
-        self.log = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
+        self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
         self.secondary_activate_target = None
-        self.updateTimerID = None
+        self.update_timer_id = None
         self.lock = Lock()
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
@@ -298,11 +306,11 @@ class IndicatorBase( ABC ):
             level = logging.DEBUG,
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
-        Notify.init( self.indicatorName )
+        Notify.init( self.indicator_name )
 
         self.indicator = \
             AppIndicator.Indicator.new(
-                self.indicatorName, #ID
+                self.indicator_name, #ID
                 self.get_icon_name(), # Icon name
                 AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
@@ -319,30 +327,30 @@ class IndicatorBase( ABC ):
     def _get_project_metadata( self ):
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
-        projectMetadata = None
+        project_metadata = None
         try:
-            projectMetadata = metadata.metadata( self.indicatorName ) # Obtain pyproject.toml information from pip.
+            project_metadata = metadata.metadata( self.indicator_name ) # Obtain pyproject.toml information from pip.
 
         except metadata.PackageNotFoundError:
             # No pip information found, so likely in development/testing.
-            # Look for a .whl file in the same directory as the indicator in developement
+            # Look for a .whl file in the same directory as the indicator in development
             # (indicator_name/src/indicator_name/indicator_name.py)...
-            firstWheel = next( Path( "." ).glob( "*.whl" ), None )
-            if firstWheel is None:
+            first_wheel = next( Path( "." ).glob( "*.whl" ), None )
+            if first_wheel is None:
                 # No .whl found, so try the current directory...
-                firstWheel = next( Path( os.path.realpath( __file__ ) ).parent.glob( "*.whl" ), None )
-                if firstWheel is None:
+                first_wheel = next( Path( os.path.realpath( __file__ ) ).parent.glob( "*.whl" ), None )
+                if first_wheel is None:
                     print( "Expected to find a .whl in the same directory as the indicator or the current directory, but none was found!" )
 
-            if firstWheel is not None:
-                firstMetadata = next( metadata.distributions( path = [ firstWheel ] ), None )
-                if firstMetadata is None:
-                    print( f"No metadata was found in { firstWheel.absolute() }" )
+            if first_wheel is not None:
+                first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
+                if first_metadata is None:
+                    print( f"No metadata was found in { first_wheel.absolute() }" )
 
                 else:
-                    projectMetadata = firstMetadata.metadata
+                    project_metadata = first_metadata.metadata
 
-        return projectMetadata
+        return project_metadata
 
 
     @staticmethod
@@ -426,12 +434,12 @@ class IndicatorBase( ABC ):
         update_start = datetime.datetime.now()
         self.secondary_activate_target = None
         menu = Gtk.Menu()
-        nextUpdateInSeconds = self.update( menu ) # Call to implementation in indicator.
+        next_update_in_seconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.debug:
-            if nextUpdateInSeconds:
-                nextUpdateDateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds )
-                label = "Next update: " + str( nextUpdateDateTime ).split( '.' )[ 0 ]
+            if next_update_in_seconds:
+                next_update_date_time = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
+                label = "Next update: " + str( next_update_date_time ).split( '.' )[ 0 ]
                 menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
             label = "Time to update: " + str( datetime.datetime.now() - update_start )
@@ -461,9 +469,9 @@ class IndicatorBase( ABC ):
         if self.secondary_activate_target:
             self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
-        if nextUpdateInSeconds: # Some indicators don't return a next update time.
-            self.updateTimerID = GLib.timeout_add_seconds( nextUpdateInSeconds, self.__update )
-            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = nextUpdateInSeconds ) #TODO Hopefully no longer need self.nextUpdateTime
+        if next_update_in_seconds: # Some indicators don't return a next update time.
+            self.update_timer_id = GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
+            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds ) #TODO Hopefully no longer need self.nextUpdateTime
 
         #TODO Hopefully no longer need self.nextUpdateTime
         # else:
@@ -472,6 +480,7 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
+#TODO Maybe move this down to menu/gui stuff?
     def create_and_append_menuitem(
         self,
         menu,
@@ -573,87 +582,86 @@ class IndicatorBase( ABC ):
         self.indicator.connect( "scroll-event", self.__on_mouse_wheel_scroll, functionandarguments )
 
 
-    def __on_mouse_wheel_scroll( self, indicator, delta, scrollDirection, functionandarguments ):
+    def __on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, functionandarguments ):
 #TODO Check comment below...ignore also for About being open???
         # Ignore events when Preferences is open or an update is underway.
         # Do so by checking the sensitivity of the Preferences menu item.
         # A side effect is the event will be ignored when About is showing...oh well.
 #        if self.__getMenuSensitivity():
-#            self.onMouseWheelScroll( indicator, delta, scrollDirection )
+#            self.onMouseWheelScroll( indicator, delta, scroll_direction )
         if not self.lock.locked():
             if len( functionandarguments ) == 1:
-                functionandarguments[ 0 ]( indicator, delta, scrollDirection )
+                functionandarguments[ 0 ]( indicator, delta, scroll_direction )
 
             else:
-                functionandarguments[ 0 ]( indicator, delta, scrollDirection, *functionandarguments[ 1 : ] )
+                functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
 
 #TODO Delete
-#     def __onMouseWheelScroll( self, indicator, delta, scrollDirection ):
+#     def __onMouseWheelScroll( self, indicator, delta, scroll_direction ):
 #         # Need to ignore events when Preferences is open or an update is underway.
 #         # Do so by checking the sensitivity of the Preferences menu item.
 #         # A side effect is the event will be ignored when About is showing...oh well.
 # #        if self.__getMenuSensitivity():
-# #            self.onMouseWheelScroll( indicator, delta, scrollDirection )
+# #            self.onMouseWheelScroll( indicator, delta, scroll_direction )
 #         if not self.lock.locked():
-#             self.onMouseWheelScroll( indicator, delta, scrollDirection ) #TODO Can this be renamed to on_mouse_wheel_scroll?
+#             self.onMouseWheelScroll( indicator, delta, scroll_direction ) #TODO Can this be renamed to on_mouse_wheel_scroll?
 
 
-    def __on_about( self, menuItem ):
+    def __on_about( self, menuitem ):
         if self.lock.acquire( blocking = False ):
-            self.__on_about_internal( menuItem )
+            self.__on_about_internal( menuitem )
 
         else:
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or Preferences?
 
 
-    def __on_about_internal( self, menuItem ):
+    def __on_about_internal( self, menuitem ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
         if self.secondary_activate_target:
             self.indicator.set_secondary_activate_target( None )
 
-        aboutDialog = Gtk.AboutDialog()
-        aboutDialog.set_transient_for( menuItem.get_parent().get_parent() )
-        aboutDialog.set_artists( self.artwork )
-        aboutDialog.set_authors( self.authors )
-        aboutDialog.set_comments( self.comments )
+        about_dialog = Gtk.AboutDialog()
+        about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
+        about_dialog.set_artists( self.artwork )
+        about_dialog.set_authors( self.authors )
+        about_dialog.set_comments( self.comments )
 
         copyright_start_year = \
             IndicatorBase.get_first_year_or_last_year_in_changelog_markdown(
-                    IndicatorBase.get_changelog_markdown_path( self.indicatorName ) )
+                IndicatorBase.get_changelog_markdown_path( self.indicator_name ) )
 
-        copyrightText = \
+        about_dialog.set_copyright(
             "Copyright \xa9 " + \
             copyright_start_year + '-' + str( datetime.datetime.now().year ) + " " + \
-            ' '.join( self.copyrightNames )
+            ' '.join( self.copyright_names ) )
 
-        aboutDialog.set_copyright( copyrightText )
-        aboutDialog.set_license_type( Gtk.License.GPL_3_0 )
-        aboutDialog.set_logo_icon_name( self.get_icon_name() )
-        aboutDialog.set_program_name( self.indicatorName )
-        aboutDialog.set_translator_credits( _( "translator-credits" ) )
-        aboutDialog.set_version( self.version )
-        aboutDialog.set_website( self.website )
-        aboutDialog.set_website_label( self.website )
+        about_dialog.set_license_type( Gtk.License.GPL_3_0 )
+        about_dialog.set_logo_icon_name( self.get_icon_name() )
+        about_dialog.set_program_name( self.indicator_name )
+        about_dialog.set_translator_credits( _( "translator-credits" ) )
+        about_dialog.set_version( self.version )
+        about_dialog.set_website( self.website )
+        about_dialog.set_website_label( self.website )
 
         if self.creditz:
-            aboutDialog.add_credit_section( _( "Credits" ), self.creditz )
+            about_dialog.add_credit_section( _( "Credits" ), self.creditz )
 
         self.__add_hyperlink_label(
-            aboutDialog,
-            IndicatorBase.get_changelog_markdown_path( self.indicatorName ),
+            about_dialog,
+            IndicatorBase.get_changelog_markdown_path( self.indicator_name ),
             _( "View the" ),
             _( "changelog" ),
             _( "text file." ) )
 
-        errorLog = os.getenv( "HOME" ) + '/' + self.indicatorName + ".log"
-        if os.path.exists( errorLog ):
-            self.__add_hyperlink_label( aboutDialog, errorLog, _( "View the" ), _( "error log" ), _( "text file." ) )
+        error_log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
+        if os.path.exists( error_log ):
+            self.__add_hyperlink_label( about_dialog, error_log, _( "View the" ), _( "error log" ), _( "text file." ) )
 
-        aboutDialog.run()
-        aboutDialog.destroy()
+        about_dialog.run()
+        about_dialog.destroy()
 
         self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( True )
@@ -674,37 +682,42 @@ class IndicatorBase( ABC ):
 #                 svg = indicator_icon
 
 
-    def __add_hyperlink_label( self, aboutDialog, filePath, leftText, anchorText, rightText ):
-        toolTip = "file://" + filePath
-        markup = leftText + " <a href=\'" + "file://" + filePath + "\' title=\'" + toolTip + "\'>" + anchorText + "</a> " + rightText
+    def __add_hyperlink_label( self, about_dialog, file_path, left_text, anchor_text, right_text ):
+        tooltip = "file://" + file_path
+        markup = \
+            left_text + \
+            " <a href=\'" + "file://" + file_path + "\' title=\'" + tooltip + "\'>" + \
+            anchor_text + "</a> " + \
+            right_text
+
         label = Gtk.Label()
         label.set_markup( markup )
         label.show()
-        aboutDialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
+        about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-    def __on_preferences( self, menuItem ):
+    def __on_preferences( self, menuitem ):
         if self.lock.acquire( blocking = False ):
-            self.__on_preferences_internal( menuItem )
+            self.__on_preferences_internal( menuitem )
 
         else:
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or About?
 
 
-    def __on_preferences_internal( self, menuItem ):
+    def __on_preferences_internal( self, menuitem ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
         if self.secondary_activate_target:
             self.indicator.set_secondary_activate_target( None )
 
-        if self.updateTimerID: #TODO If the mutex works...maybe can dispense with the ID stuff.
-            GLib.source_remove( self.updateTimerID )
-            self.updateTimerID = None
+        if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
+            GLib.source_remove( self.update_timer_id )
+            self.update_timer_id = None
 
-        dialog = self.create_dialog( menuItem, _( "Preferences" ) )
+        dialog = self.create_dialog( menuitem, _( "Preferences" ) )
 #TODO Would be nice to rename to on_preferences
-        responseType = self.on_preferences( dialog ) # Call to implementation in indicator.
+        response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
 
 #TODO Don't think I need this here...if we OK the Preferences,
@@ -713,7 +726,7 @@ class IndicatorBase( ABC ):
 # If we cancel the Preferences, then enable the menu.
 #        self.__setMenuSensitivity( True )
 
-        if responseType == Gtk.ResponseType.OK:
+        if response_type == Gtk.ResponseType.OK:
             self.__save_config()
             GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release and so the update will proceed.
 
@@ -757,8 +770,8 @@ class IndicatorBase( ABC ):
     def __set_menu_sensitivity( self, toggle ):
         menu_items = self.indicator.get_menu().get_children()
         if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
-            for menuItem in self.indicator.get_menu().get_children():
-                menuItem.set_sensitive( toggle )
+            for menuitem in self.indicator.get_menu().get_children():
+                menuitem.set_sensitive( toggle )
 
 
 #TODO Probably not needed.
@@ -772,11 +785,12 @@ class IndicatorBase( ABC ):
 
 
     def create_dialog( self, parent_widget, title, grid = None ):
-        dialog = Gtk.Dialog(
-            title,
-            self.__get_parent( parent_widget ),
-            Gtk.DialogFlags.MODAL,
-            ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+        dialog = \
+            Gtk.Dialog(
+                title,
+                self.__get_parent( parent_widget ),
+                Gtk.DialogFlags.MODAL,
+                ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
 
         dialog.set_border_width( 5 )
         if grid:
@@ -785,21 +799,23 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-    def create_dialog_external( self, parentWidget, title, contentWidget, setDefaultSize = False ):
+    def create_dialog_external( self, parent_widget, title, content_widget, set_default_size = False ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
         # self.__setMenuSensitivity( False, True )
 
         dialog = Gtk.Dialog(
             title,
-            self.__get_parent( parentWidget ),
+            self.__get_parent( parent_widget ),
             Gtk.DialogFlags.MODAL,
             ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ) )
 
-        if setDefaultSize:
-            dialog.set_default_size( IndicatorBase.__DIALOG_DEFAULT_WIDTH, IndicatorBase.__DIALOG_DEFAULT_HEIGHT )
+        if set_default_size:
+            dialog.set_default_size(
+                IndicatorBase.__DIALOG_DEFAULT_WIDTH,
+                IndicatorBase.__DIALOG_DEFAULT_HEIGHT )
 
         dialog.set_border_width( 5 )
-        dialog.get_content_area().pack_start( contentWidget, True, True, 0 )
+        dialog.get_content_area().pack_start( content_widget, True, True, 0 )
         dialog.show_all()
         dialog.run()
         dialog.destroy()
@@ -848,12 +864,18 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.QUESTION.
     #
     #    title: If None, will default to the indicator name.
-    def show_message( self, parentWidget, message, messageType = Gtk.MessageType.ERROR, title = None ):
-        IndicatorBase.__show_message_internal(
-            self.__get_parent( parentWidget ),
+    def show_message(
+            self,
+            parent_widget,
             message,
-            messageType,
-            self.indicatorName if title is None else title )
+            message_type = Gtk.MessageType.ERROR,
+            title = None ):
+
+        IndicatorBase.__show_message_internal(
+            self.__get_parent( parent_widget ),
+            message,
+            message_type,
+            self.indicator_name if title is None else title )
 
 
     # Show a message dialog.
@@ -863,11 +885,15 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.WARNING
     #                        Gtk.MessageType.QUESTION.
     @staticmethod
-    def show_message_static( message, messageType = Gtk.MessageType.ERROR, title = None ):
+    def show_message_static(
+            message,
+            message_type = Gtk.MessageType.ERROR,
+            title = None ):
+
         IndicatorBase.__show_message_internal(
             Gtk.Dialog(),
             message,
-            messageType,
+            message_type,
             "" if title is None else title )
 
 
@@ -878,16 +904,16 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.WARNING
     #                        Gtk.MessageType.QUESTION.
     @staticmethod
-    def __show_message_internal( parentWidget, message, messageType, title ):
+    def __show_message_internal( parent_widget, message, message_type, title ):
         dialog = Gtk.MessageDialog(
-            parentWidget,
+            parent_widget,
             Gtk.DialogFlags.MODAL,
-            messageType,
-            Gtk.ButtonsType.OK, message )
+            message_type,
+            Gtk.ButtonsType.OK,
+            message )
 
         dialog.set_title( title )
-        messageArea = dialog.get_message_area()
-        for child in messageArea.get_children():
+        for child in dialog.get_message_area().get_children():
             if type( child ) is Gtk.Label:
                 child.set_selectable( True )
 
@@ -900,16 +926,16 @@ class IndicatorBase( ABC ):
     #    title: If None, will default to the indicator name.
     #
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
-    def show_ok_cancel( self, parentWidget, message, title = None ):
+    def show_ok_cancel( self, parent_widget, message, title = None ):
         dialog = Gtk.MessageDialog(
-            self.__get_parent( parentWidget ),
+            self.__get_parent( parent_widget ),
             Gtk.DialogFlags.MODAL,
             Gtk.MessageType.QUESTION,
             Gtk.ButtonsType.OK_CANCEL,
             message )
 
         if title is None:
-            dialog.set_title( self.indicatorName )
+            dialog.set_title( self.indicator_name )
 
         else:
             dialog.set_title( title )
@@ -919,7 +945,7 @@ class IndicatorBase( ABC ):
         return response
 
 
-    def __get_parent( self, widget ):#What is the widget here?
+    def __get_parent( self, widget ):
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
@@ -932,8 +958,12 @@ class IndicatorBase( ABC ):
 
     # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
     def get_textview_text( self, textview ):
-        textViewBuffer = textview.get_buffer()
-        return textViewBuffer.get_text( textViewBuffer.get_start_iter(), textViewBuffer.get_end_iter(), True )
+        textview_buffer = textview.get_buffer()
+        return \
+            textview_buffer.get_text(
+                textview_buffer.get_start_iter(),
+                textview_buffer.get_end_iter(),
+                True )
 
 
     # Listens to radio/checkbox "toggled" events and toggles the visibility of the widgets according to the boolean value of 'sense'.
@@ -944,40 +974,46 @@ class IndicatorBase( ABC ):
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
     def get_menuitems_guess( self ):
-        screenHeightsInPixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
-        numbersOfMenuItems = [ 15, 15, 15, 20, 20, 20, 20 ]
+        screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
+        numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
 
-        screenHeightInPixels = Gtk.Window().get_screen().get_height()
-        if screenHeightInPixels < screenHeightsInPixels[ 0 ]:
-            numberOfMenuItems = numbersOfMenuItems[ 0 ] * screenHeightInPixels / screenHeightsInPixels[ 0 ] # Best guess.
+        screen_height_in_pixels = Gtk.Window().get_screen().get_height()
+        if screen_height_in_pixels < screen_heights_in_pixels[ 0 ]:
+            number_of_menuitems = \
+                numbers_of_menuitems[ 0 ] * screen_height_in_pixels / screen_heights_in_pixels[ 0 ] # Best guess.
 
-        elif screenHeightInPixels > screenHeightsInPixels[ -1 ]:
-            numberOfMenuItems = numbersOfMenuItems[ -1 ] * screenHeightInPixels / screenHeightsInPixels[ -1 ] # Best guess.
+        elif screen_height_in_pixels > screen_heights_in_pixels[ -1 ]:
+            number_of_menuitems = \
+                numbers_of_menuitems[ -1 ] * screen_height_in_pixels / screen_heights_in_pixels[ -1 ] # Best guess.
 
         else:
-            numberOfMenuItems = IndicatorBase.interpolate( screenHeightsInPixels, numbersOfMenuItems, screenHeightInPixels )
+            number_of_menuitems = \
+                IndicatorBase.interpolate(
+                    screen_heights_in_pixels,
+                    numbers_of_menuitems,
+                    screen_height_in_pixels )
 
-        return numberOfMenuItems
+        return number_of_menuitems
 
 
     # Reference: https://stackoverflow.com/a/56233642/2156453
     @staticmethod
-    def interpolate( xValues, yValues, x ):
-        if not ( xValues[ 0 ] <= x <= xValues[ -1 ] ):
+    def interpolate( x_values, y_values, x ):
+        if not ( x_values[ 0 ] <= x <= x_values[ -1 ] ):
             raise ValueError( "x out of bounds!" )
 
-        if any( y - x <= 0 for x, y in zip( xValues, xValues[ 1 : ] ) ):
+        if any( y - x <= 0 for x, y in zip( x_values, x_values[ 1 : ] ) ):
             raise ValueError( "xValues must be in strictly ascending order!" )
 
-        intervals = zip( xValues, xValues[ 1 : ], yValues, yValues[ 1 : ] )
+        intervals = zip( x_values, x_values[ 1 : ], y_values, y_values[ 1 : ] )
         slopes = [ ( y2 - y1 ) / ( x2 - x1 ) for x1, x2, y1, y2 in intervals ]
 
-        if x == xValues[ -1 ]:
-            y = yValues[ -1 ]
+        if x == y_values[ -1 ]:
+            y = y_values[ -1 ]
 
         else:
-            i = bisect_right( xValues, x ) - 1
-            y = yValues[ i ] + slopes[ i ] * ( x - xValues[ i ] )
+            i = bisect_right( x_values, x ) - 1
+            y = y_values[ i ] + slopes[ i ] * ( x - x_values[ i ] )
 
         return y
 
@@ -1002,6 +1038,7 @@ class IndicatorBase( ABC ):
         return scrolledwindow
 
 
+#TODO label_text is unused...
     def create_entry_with_label( self, label_text, entry_text, box, tooltip_text = "" ):
         label = Gtk.Label.new( _( "URL" ) )
 #        label.set_halign( Gtk.Align.START ) #TODO Handle
@@ -1203,15 +1240,15 @@ class IndicatorBase( ABC ):
 
 
     def get_menu_indent( self, indent = 1 ):
-        indentAmount = "      " * indent
-        if self.getDesktopEnvironment() == IndicatorBase.__DESKTOP_UNITY7:
-            indentAmount = "      " * ( indent - 1 )
+        indent_amount = "      " * indent
+        if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:
+            indent_amount = "      " * ( indent - 1 )
 
-        return indentAmount
+        return indent_amount
 
 
     # Get the name of the icon for the indicator to be passed
-    # to the operating system (really the desktop environment) for display.
+    # to the desktop environment for display.
     #
     # GTK will take an icon and display it as expected.
     #
@@ -1229,15 +1266,15 @@ class IndicatorBase( ABC ):
     #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
     # and if that fails, either log out/in or restart.
     def get_icon_name( self ):
-        return self.indicatorName + "-symbolic"
+        return self.indicator_name + "-symbolic"
 
 
     def get_autostart_and_delay( self ):
         autostart = False
         delay = 0
         try:
-            if os.path.exists( self.desktopFileUserHome ):
-                with open( self.desktopFileUserHome, 'r' ) as f:
+            if os.path.exists( self.desktop_file_user_home ):
+                with open( self.desktop_file_user_home, 'r' ) as f:
                     for line in f:
                         if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + "=true" in line:
                             autostart = True
@@ -1257,12 +1294,12 @@ class IndicatorBase( ABC ):
         if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
             os.makedirs( IndicatorBase.__AUTOSTART_PATH )
 
-        if not os.path.exists( self.desktopFileUserHome ):
-            shutil.copy( self.desktopFileVirtualEnvironment, self.desktopFileUserHome )
+        if not os.path.exists( self.desktop_file_user_home ):
+            shutil.copy( self.desktop_file_virtual_environment, self.desktop_file_user_home )
 
         try:
             output = ""
-            with open( self.desktopFileUserHome, 'r' ) as f:
+            with open( self.desktop_file_user_home, 'r' ) as f:
                 for line in f:
                     if IndicatorBase.__X_GNOME_AUTOSTART_DELAY in line:
                         output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
@@ -1282,7 +1319,7 @@ class IndicatorBase( ABC ):
             if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED not in output:
                 output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
-            with open( self.desktopFileUserHome, 'w' ) as f:
+            with open( self.desktop_file_user_home, 'w' ) as f:
                 f.write( output )
 
         except Exception as e:
@@ -1293,29 +1330,30 @@ class IndicatorBase( ABC ):
         return logging
 
 
-#TODO From here down rename to python standard
-    def isNumber( self, numberAsString ):
+    def is_number( self, number_as_string ):
         try:
-            float( numberAsString )
+            float( number_as_string )
             return True
 
         except ValueError:
             return False
 
 
-    def getDesktopEnvironment( self ):
+    def get_desktop_environment( self ):
         return self.process_get( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
 
-    def isUbuntuVariant2004( self ):
-        ubuntuVariant2004 = False
+    def is_ubuntu_variant_2004( self ):
+        ubuntu_variant_2004 = False
         try:
-            ubuntuVariant2004 = True if self.process_get( "lsb_release -rs" ).strip() == "20.04" else False
+            ubuntu_variant_2004 = (
+                True if self.process_get( "lsb_release -rs" ).strip() == "20.04"
+                else False )
 
         except:
             pass
 
-        return ubuntuVariant2004
+        return ubuntu_variant_2004
 
 
     # Lubuntu 20.04/22.04 ignores any change to the icon after initialisation.
@@ -1323,38 +1361,42 @@ class IndicatorBase( ABC ):
     #
     # Ubuntu MATE 20.04 truncates the icon when changed,
     # despite the icon being fine when clicked.
-    def isIconUpdateSupported( self ):
-        iconUpdateSupported = True
-        desktopEnvironment = self.getDesktopEnvironment()
-        if desktopEnvironment is None or \
-           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT or \
-           ( desktopEnvironment == IndicatorBase.__DESKTOP_MATE and self.isUbuntuVariant2004() ):
-            iconUpdateSupported = False
+    def is_icon_update_supported( self ):
+        icon_update_supported = True
+        desktop_environment = self.get_desktop_environment()
 
-        return iconUpdateSupported
+#TODO Tidy up
+        if desktop_environment is None or \
+           desktop_environment == IndicatorBase.__DESKTOP_LXQT or \
+           ( desktop_environment == IndicatorBase.__DESKTOP_MATE and self.isUbuntuVariant2004() ):
+            icon_update_supported = False
+
+        return icon_update_supported
 
 
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
     def is_label_update_supported( self ):
-        labelUpdateSupported = True
-        desktopEnvironment = self.getDesktopEnvironment()
-        if desktopEnvironment is None or \
-           desktopEnvironment == IndicatorBase.__DESKTOP_LXQT:
-            labelUpdateSupported = False
+        label_update_supported = True
+        desktop_environment = self.get_desktop_environment()
 
-        return labelUpdateSupported
+#TODO Tidy up        
+        if desktop_environment is None or \
+           desktop_environment == IndicatorBase.__DESKTOP_LXQT:
+            label_update_supported = False
+
+        return label_update_supported
 
 
     # As a result of
     #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
-    def isTerminalQTerminal( self ):
-        terminalIsQTerminal = False
-        terminal, terminalExecutionFlag = self.get_terminal_and_execution_flag()
+    def is_terminal_qterminal( self ):
+        terminal_is_qterminal = False
+        terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
         if terminal is not None and "qterminal" in terminal:
-            terminalIsQTerminal = True
+            terminal_is_qterminal = True
 
-        return terminalIsQTerminal
+        return terminal_is_qterminal
 
 
     # Return the full path and name of the executable for the
@@ -1362,11 +1404,11 @@ class IndicatorBase( ABC ):
     # None otherwise.
     def get_terminal_and_execution_flag( self ):
         terminal = None
-        executionFlag = None
-        for _terminal, _executionFlag in IndicatorBase.__TERMINALS_AND_EXECUTION_FLAGS:
+        execution_flag = None
+        for _terminal, _execution_flag in IndicatorBase.__TERMINALS_AND_EXECUTION_FLAGS:
             terminal = self.process_get( "which " + _terminal )
             if terminal is not None:
-                executionFlag = _executionFlag
+                execution_flag = _execution_flag
                 break
 
         if terminal:
@@ -1374,9 +1416,9 @@ class IndicatorBase( ABC ):
 
         if terminal == "":
             terminal = None
-            executionFlag = None
+            execution_flag = None
 
-        return terminal, executionFlag
+        return terminal, execution_flag
 
 
     # Converts a list of lists to a GTK ListStore.
@@ -1397,17 +1439,17 @@ class IndicatorBase( ABC ):
     #    type( dataA ) == type( dataX ) and type( dataB ) == type( dataY ) and type( dataC ) == type( dataZ ).
     #
     # Each row of the returned ListStore contain one inner list.
-    def listOfListsToListStore( self, listofLists ):
+    def list_of_lists_to_liststore( self, list_of_lists ):
         types = [ ]
-        for item in listofLists[ 0 ]:
+        for item in list_of_lists[ 0 ]:
             types.append( type( item[ 0 ] ) )
 
-        listStore = Gtk.ListStore()
-        listStore.set_column_types( types )
-        for item in listofLists:
-            listStore.append( item )
+        liststore = Gtk.ListStore()
+        liststore.set_column_types( types )
+        for item in list_of_lists:
+            liststore.append( item )
 
-        return listStore
+        return liststore
 
 
     # Download the contents of the given URL and save to file.
@@ -1416,8 +1458,8 @@ class IndicatorBase( ABC ):
         downloaded = False
         try:
             response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w' ) as fIn:
-                fIn.write( response )
+            with open( filename, 'w' ) as f_out:
+                f_out.write( response )
 
             downloaded = True
 
@@ -1432,7 +1474,7 @@ class IndicatorBase( ABC ):
         GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 
-    def __copyConfigToNewDirectory( self ):
+    def __copy_config_to_new_directory( self ):
         mapping = {
             "indicatorfortune":                 "indicator-fortune",
             "indicatorlunar":                   "indicator-lunar",
@@ -1445,28 +1487,27 @@ class IndicatorBase( ABC ):
             "indicatortest":                    "indicator-test",
             "indicatorvirtualbox":              "indicator-virtual-box" }
 
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__EXTENSION_JSON
-        configFileOld = configFile.replace( self.indicatorName, mapping[ self.indicatorName ] )
-        if not os.path.isfile( configFile ) and os.path.isfile( configFileOld ):
-            shutil.copyfile( configFileOld, configFile )
+        config_file = self.__get_config_directory() + self.indicator_name + IndicatorBase.__EXTENSION_JSON
+        config_file_old = config_file.replace( self.indicator_name, mapping[ self.indicator_name ] )
+        if not os.path.isfile( config_file ) and os.path.isfile( config_file_old ):
+            shutil.copyfile( config_file_old, config_file )
 
 
     # Read a dictionary of configuration from a JSON text file.
     def __load_config( self ):
-        self.__copyConfigToNewDirectory()
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__EXTENSION_JSON
+        self.__copy_config_to_new_directory()
+        config_file = self.__get_config_directory() + self.indicator_name + IndicatorBase.__EXTENSION_JSON
         config = { }
-        if os.path.isfile( configFile ):
+        if os.path.isfile( config_file ):
             try:
-                with open( configFile, 'r' ) as fIn:
-                    config = json.load( fIn )
+                with open( config_file, 'r' ) as f_in:
+                    config = json.load( f_in )
 
             except Exception as e:
                 config = { }
                 logging.exception( e )
-                logging.error( "Error reading configuration: " + configFile )
+                logging.error( "Error reading configuration: " + config_file )
 
-#TODO Eventually change to self.load_config        
         self.load_config( config ) # Call to implementation in indicator.
 
 
@@ -1474,43 +1515,40 @@ class IndicatorBase( ABC ):
     #
     # returnStatus If True, will return a boolean indicating success/failure.
     #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
-    def __save_config( self, returnStatus = True ):
-#TODO Eventually change to self.save_config        
+    def __save_config( self, return_status = True ):
         config = self.save_config() # Call to implementation in indicator.
-
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version
-
-        configFile = self.__getConfigDirectory() + self.indicatorName + IndicatorBase.__EXTENSION_JSON
+        config_file = self.__get_config_directory() + self.indicator_name + IndicatorBase.__EXTENSION_JSON
         success = True
         try:
-            with open( configFile, 'w' ) as fIn:
-                fIn.write( json.dumps( config ) )
+            with open( config_file, 'w' ) as f_out:
+                f_out.write( json.dumps( config ) )
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error writing configuration: " + configFile )
+            logging.error( "Error writing configuration: " + config_file )
             success = False
 
-        if returnStatus:
+        if return_status:
             return success
 
 
     # Return the full directory path to the user config directory for the current indicator.
-    def __getConfigDirectory( self ):
-        return self.__getUserDirectory( "XDG_CONFIG_HOME", ".config", self.indicatorName )
+    def __get_config_directory( self ):
+        return self.__get_user_directory( "XDG_CONFIG_HOME", ".config", self.indicator_name )
 
 
     # Finds the most recent file in the cache with the given basename
     # and if the timestamp is older than the current date/time
     # plus the maximum age, returns True, otherwise False.
     # If no file can be found, returns True.
-    def isCacheStale( self, utcNow, basename, maximumAgeInHours ):
-        cacheDateTime = self.getCacheDateTime( basename )
-        if cacheDateTime is None:
+    def is_cache_stale( self, utc_now, basename, maximum_age_in_hours ):
+        cache_date_time = self.get_cache_date_time( basename )
+        if cache_date_time is None:
             stale = True
 
         else:
-            stale = ( cacheDateTime + datetime.timedelta( hours = maximumAgeInHours ) ) < utcNow
+            stale = ( cache_date_time + datetime.timedelta( hours = maximum_age_in_hours ) ) < utc_now
 
         return stale
 
@@ -1520,25 +1558,25 @@ class IndicatorBase( ABC ):
     # basename: The text used to form the file name, typically the name of the calling application.
     #
     # Returns the datetime of the newest file in the cache; None if no file can be found.
-    def getCacheDateTime( self, basename ):
+    def get_cache_date_time( self, basename ):
         expiry = None
-        theFile = ""
+        the_file = ""
         for file in os.listdir( self.__get_cache_directory() ):
-            if file.startswith( basename ) and file > theFile:
-                theFile = file
+            if file.startswith( basename ) and file > the_file:
+                the_file = file
 
-        if theFile: # A value of "" evaluates to False.
-            dateTimeComponent = theFile[ len( basename ) : len( basename ) + 14 ]
+        if the_file: # A value of "" evaluates to False.
+            date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
 
             # YYYYMMDDHHMMSS is 14 characters.
-            expiry = datetime.datetime.strptime( dateTimeComponent, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            expiry = datetime.datetime.strptime( date_time_component, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
             expiry = expiry.replace( tzinfo = datetime.timezone.utc )
 
         return expiry
 
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
-    def getCacheFilenameWithTimestamp( self, basename, extension = EXTENSION_TEXT ):
+    def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
         return \
             self.__get_cache_directory() + \
             basename + \
@@ -1549,20 +1587,20 @@ class IndicatorBase( ABC ):
     # Search through the cache for all files matching the basename.
     #
     # Returns the newest filename matching the basename on success; None otherwise.
-    def getCacheNewestFilename( self, basename ):
-        cacheDirectory = self.__get_cache_directory()
-        cacheFile = ""
-        for file in os.listdir( cacheDirectory ):
-            if file.startswith( basename ) and file > cacheFile:
-                cacheFile = file
+    def get_cache_newest_filename( self, basename ):
+        cache_directory = self.__get_cache_directory()
+        cache_file = ""
+        for file in os.listdir( cache_directory ):
+            if file.startswith( basename ) and file > cache_file:
+                cache_file = file
 
-        if cacheFile:
-            cacheFile = cacheDirectory + cacheFile
+        if cache_file:
+            cache_file = cache_directory + cache_file
 
         else:
-            cacheFile = None
+            cache_file = None
 
-        return cacheFile
+        return cache_file
 
 
     # Remove a file from the cache.
@@ -1595,16 +1633,16 @@ class IndicatorBase( ABC ):
     # and is older than the cache maximum age is discarded.
     #
     # Any file extension is ignored in determining if the file should be deleted or not.
-    def flush_cache( self, basename, maximumAgeInHours ):
-        cacheDirectory = self.__get_cache_directory()
-        cacheMaximumAgeDateTime = datetime.datetime.now() - datetime.timedelta( hours = maximumAgeInHours )
-        for file in os.listdir( cacheDirectory ):
+    def flush_cache( self, basename, maximum_age_in_hours ):
+        cache_directory = self.__get_cache_directory()
+        cache_maximum_age_date_time = datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
+        for file in os.listdir( cache_directory ):
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
                 dateTime = file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
                 if dateTime.isdigit():
                     fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-                    if fileDateTime < cacheMaximumAgeDateTime:
-                        os.remove( cacheDirectory + file )
+                    if fileDateTime < cache_maximum_age_date_time:
+                        os.remove( cache_directory + file )
 
 
     # Read the most recent binary file from the cache.
@@ -1623,18 +1661,18 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-    def readCacheBinary( self, basename ):
+    def read_cache_binary( self, basename ):
         data = None
-        theFile = ""
+        the_file = ""
         for file in os.listdir( self.__get_cache_directory() ):
-            if file.startswith( basename ) and file > theFile:
-                theFile = file
+            if file.startswith( basename ) and file > the_file:
+                the_file = file
 
-        if theFile: # A value of "" evaluates to False.
-            filename = self.__get_cache_directory() + theFile
+        if the_file: # A value of "" evaluates to False.
+            filename = self.__get_cache_directory() + the_file
             try:
-                with open( filename, 'rb' ) as fIn:
-                    data = pickle.load( fIn )
+                with open( filename, 'rb' ) as f_in:
+                    data = pickle.load( f_in )
 
             except Exception as e:
                 data = None
@@ -1656,21 +1694,21 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # Returns True on success; False otherwise.
-    def writeCacheBinary( self, binaryData, basename, extension = "" ):
+    def writeCacheBinary( self, binary_data, basename, extension = "" ):
         success = True
-        cacheFile = \
+        cache_file = \
             self.__get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
         try:
-            with open( cacheFile, 'wb' ) as fIn:
-                pickle.dump( binaryData, fIn )
+            with open( cache_file, 'wb' ) as f_out:
+                pickle.dump( binary_data, f_out )
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error writing to cache: " + cacheFile )
+            logging.error( "Error writing to cache: " + cache_file )
             success = False
 
         return success
@@ -1681,8 +1719,8 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
-    def readCacheTextWithoutTimestamp( self, filename ):
-        return self.__readCacheText( self.__get_cache_directory() + filename )
+    def read_cache_text_without_timestamp( self, filename ):
+        return self.__read_cache_text( self.__get_cache_directory() + filename )
 
 
     # Read the most recent text file from the cache.
@@ -1701,30 +1739,30 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
-    def readCacheText( self, basename ):
-        cacheDirectory = self.__get_cache_directory()
-        cacheFile = ""
-        for file in os.listdir( cacheDirectory ):
-            if file.startswith( basename ) and file > cacheFile:
-                cacheFile = file
+    def read_cache_text( self, basename ):
+        cache_directory = self.__get_cache_directory()
+        cache_file = ""
+        for file in os.listdir( cache_directory ):
+            if file.startswith( basename ) and file > cache_file:
+                cache_file = file
 
-        if cacheFile:
-            cacheFile = cacheDirectory + cacheFile
+        if cache_file:
+            cache_file = cache_directory + cache_file
 
-        return self.__readCacheText( cacheFile )
+        return self.__read_cache_text( cache_file )
 
 
-    def __readCacheText( self, cacheFile ):
+    def __read_cache_text( self, cache_file ):
         text = ""
-        if os.path.isfile( cacheFile ):
+        if os.path.isfile( cache_file ):
             try:
-                with open( cacheFile, 'r' ) as fIn:
-                    text = fIn.read()
+                with open( cache_file, 'r' ) as f_in:
+                    text = f_in.read()
 
             except Exception as e:
                 text = ""
                 logging.exception( e )
-                logging.error( "Error reading from cache: " + cacheFile )
+                logging.error( "Error reading from cache: " + cache_file )
 
         return text
 
@@ -1752,26 +1790,26 @@ class IndicatorBase( ABC ):
     #
     # Returns filename written on success; None otherwise.
     def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
-        cacheFile = \
+        cache_file = \
             self.__get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
-        return self.__write_cache_text( text, cacheFile )
+        return self.__write_cache_text( text, cache_file )
 
 
-    def __write_cache_text( self, text, cacheFile ):
+    def __write_cache_text( self, text, cache_file ):
         try:
-            with open( cacheFile, 'w' ) as fIn:
-                fIn.write( text )
+            with open( cache_file, 'w' ) as f_out:
+                f_out.write( text )
 
         except Exception as e:
             logging.exception( e )
-            logging.error( "Error writing to cache: " + cacheFile )
-            cacheFile = None
+            logging.error( "Error writing to cache: " + cache_file )
+            cache_file = None
 
-        return cacheFile
+        return cache_file
 
 
     # Return the full directory path to the user cache directory for the current indicator.
@@ -1781,7 +1819,7 @@ class IndicatorBase( ABC ):
 
     # Return the full directory path to the user cache directory for the current indicator.
     def __get_cache_directory( self ):
-        return self.__getUserDirectory( "XDG_CACHE_HOME", ".cache", self.indicatorName )
+        return self.__get_user_directory( "XDG_CACHE_HOME", ".cache", self.indicator_name )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
@@ -1796,12 +1834,12 @@ class IndicatorBase( ABC ):
     #    ${XDGKey}/applicationBaseDirectory
     # or
     #    ~/.userBaseDirectory/applicationBaseDirectory
-    def __getUserDirectory( self, XDGKey, userBaseDirectory, applicationBaseDirectory ):
-        if XDGKey in os.environ:
-            directory = os.environ[ XDGKey ] + os.sep + applicationBaseDirectory + os.sep
+    def __get_user_directory( self, xdg_key, user_base_directory, application_base_directory ):
+        if xdg_key in os.environ:
+            directory = os.environ[ xdg_key ] + os.sep + application_base_directory + os.sep
 
         else:
-            directory = os.path.expanduser( '~' ) + os.sep + userBaseDirectory + os.sep + applicationBaseDirectory + os.sep
+            directory = os.path.expanduser( '~' ) + os.sep + user_base_directory + os.sep + application_base_directory + os.sep
 
         if not os.path.isdir( directory ):
             os.mkdir( directory )
@@ -1826,15 +1864,16 @@ class IndicatorBase( ABC ):
     # logNonZeroErrorCode If True, will log any exception arising from a non-zero return code; otherwise will ignore.
     #
     # On exception, logs to file.
-    def process_get( self, command, logNonZeroErrorCode = False ):
+    def process_get( self, command, log_non_zero_error_code = False ):
         result = None
         try:
-            result = subprocess.run(
-                        command,
-                        stdout = subprocess.PIPE,
-                        stderr = subprocess.PIPE,
-                        shell = True,
-                        check = logNonZeroErrorCode ).stdout.decode()
+            result = \
+                subprocess.run(
+                    command,
+                    stdout = subprocess.PIPE,
+                    stderr = subprocess.PIPE,
+                    shell = True,
+                    check = log_non_zero_error_code ).stdout.decode()
 
             if not result:
                 result = None
@@ -1852,18 +1891,20 @@ class IndicatorBase( ABC ):
 # Log file handler which truncates the file when the file size limit is reached.
 #
 # References:
-#     http://stackoverflow.com/questions/24157278/limit-python-log-file
-#     http://svn.python.org/view/python/trunk/Lib/logging/handlers.py?view=markup
+#   https://docs.python.org/3/library/logging.handlers.html
+#   https://stackoverflow.com/questions/24157278/limit-python-log-file
+#   https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
+
     def __init__( self, filename, maxBytes = 10000 ):
-        super().__init__( filename, 'a', maxBytes, 0, None, True )
+        super().__init__( filename, maxBytes = maxBytes )
 
 
     def doRollover( self ):
         if self.stream:
             self.stream.close()
 
-        if os.path.exists( self.baseFilename ):
+        if os.path.exists( self.baseFilename ): # self.baseFilename is defined in parent class.
             os.remove( self.baseFilename )
 
         self.mode = 'a'
