@@ -311,15 +311,15 @@ class IndicatorBase( ABC ):
                 sys.exit()
 
         self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
-        self.secondary_activate_target = None
-        self.update_timer_id = None
-        self.lock = Lock()
-        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
-
         logging.basicConfig(
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             level = logging.DEBUG,
             handlers = [ TruncatedFileHandler( self.log ) ] )
+
+        self.secondary_activate_target = None
+        self.update_timer_id = None
+        self.lock = Lock()
+        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
         Notify.init( self.indicator_name )
 
@@ -474,7 +474,7 @@ class IndicatorBase( ABC ):
             menu,
             _( "About" ),
             activate_functionandarguments = ( self.__on_about, ) )
-        
+
         self.create_and_append_menuitem(
             menu,
             _( "Quit" ),
@@ -497,6 +497,7 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
+#TODO OK
     def request_update( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__update )
 
@@ -506,9 +507,28 @@ class IndicatorBase( ABC ):
     #     self.indicator.set_label( text, text )
     #     self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
 
+#TODO OK
     def set_label( self, text ):
         self.indicator.set_label( text, text )
         self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
+
+
+#TODO OK
+    def set_icon( self, icon ):
+        self.indicator.set_icon_full( icon, "" )
+
+
+#TODO OK
+    def show_notification( self, summary, message, icon = None ):
+        if icon is None:
+            _icon = self.get_icon_name()
+
+        Notify.Notification.new( summary, message, _icon ).show()
+
+
+#TODO OK
+    def set_secondary_activate_target( self, widget ):
+        self.indicator.set_secondary_activate_target( widget )
 
 
 #TODO Delete
@@ -516,8 +536,16 @@ class IndicatorBase( ABC ):
     #     self.indicator.connect( "scroll-event", self.__onMouseWheelScroll )
 
 
-#TODO Need to document that the function must have the form:
-#    def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, arg1, arg2, ... ):
+    # Registers a function (and arguments) to be called on mouse wheel scroll.
+    #
+    # The function must have the form:
+    #
+    #   def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction )
+    #
+    # The name of the function may be any name.
+    # The arguments must be present as specified.
+    # Additional arguments may be specified.
+#TODO OK
     def request_mouse_wheel_scroll_events( self, functionandarguments ):
         self.indicator.connect( "scroll-event", self.__on_mouse_wheel_scroll, functionandarguments )
 
@@ -724,6 +752,7 @@ class IndicatorBase( ABC ):
         return sensitive
 
 
+#TODO OK
     def create_dialog( self, parent_widget, title, grid = None ):
         dialog = \
             Gtk.Dialog(
@@ -772,6 +801,7 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.QUESTION.
     #
     #    title: If None, will default to the indicator name.
+#TODO OK
     def show_message(
             self,
             parent_widget,
@@ -834,6 +864,7 @@ class IndicatorBase( ABC ):
     #    title: If None, will default to the indicator name.
     #
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
+#TODO OK
     def show_ok_cancel( self, parent_widget, message, title = None ):
         dialog = Gtk.MessageDialog(
             self.__get_parent( parent_widget ),
@@ -853,6 +884,7 @@ class IndicatorBase( ABC ):
         return response
 
 
+#TODO OK
     def __get_parent( self, widget ):
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
@@ -864,6 +896,7 @@ class IndicatorBase( ABC ):
         return parent
 
 
+#TODO OK
     def create_autostart_checkbox_and_delay_spinner( self ):
         autostart, delay = self.get_autostart_and_delay()
 
@@ -896,6 +929,7 @@ class IndicatorBase( ABC ):
         return autostart_checkbox, autostart_spinner, box
 
 
+#TODO OK
     def create_and_append_menuitem(
         self,
         menu,
@@ -968,6 +1002,7 @@ class IndicatorBase( ABC ):
         return menuItem
 
 
+#TODO OK
     def get_on_click_menuitem_open_browser_function( self ):
         return lambda menuItem: webbrowser.open( menuItem.get_name() )
 
@@ -983,12 +1018,14 @@ class IndicatorBase( ABC ):
 
 
     # Listens to radio/checkbox "toggled" events and toggles the visibility of the widgets according to the boolean value of 'sense'.
+#TODO OK
     def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
         for widget in widgets:
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
 
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
+#TODO OK
     def get_menuitems_guess( self ):
         screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
@@ -1024,7 +1061,7 @@ class IndicatorBase( ABC ):
         intervals = zip( x_values, x_values[ 1 : ], y_values, y_values[ 1 : ] )
         slopes = [ ( y2 - y1 ) / ( x2 - x1 ) for x1, x2, y1, y2 in intervals ]
 
-        if x == y_values[ -1 ]:
+        if x == x_values[ -1 ]:
             y = y_values[ -1 ]
 
         else:
@@ -1034,6 +1071,7 @@ class IndicatorBase( ABC ):
         return y
 
 
+#TODO OK
     def create_grid( self ):
         spacing = 10
         grid = Gtk.Grid()
@@ -1069,6 +1107,7 @@ class IndicatorBase( ABC ):
         return entry
 
 
+#TODO OK
     def create_button(
         self,
         label,
@@ -1097,6 +1136,7 @@ class IndicatorBase( ABC ):
     #     return spinner
 
 
+#TODO OK
     def create_spinbutton(
         self,
         value,
@@ -1117,6 +1157,7 @@ class IndicatorBase( ABC ):
         return spinner
 
 
+#TODO OK
     def create_checkbutton(
         self,
         label,
@@ -1132,6 +1173,7 @@ class IndicatorBase( ABC ):
         return checkbutton
 
 
+#TODO OK
     def create_radiobutton(
         self,
         radio_group_member,
@@ -1148,6 +1190,7 @@ class IndicatorBase( ABC ):
         return radiobutton
 
 
+#TODO OK
     def __set_widget_common_attributes(
         self,
         widget,
@@ -1162,6 +1205,7 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
+#TODO OK
     def create_treeview_within_scrolledwindow(
         self,
         treemodel, # Must be a sorted store if columns are to be sorted.
@@ -1250,11 +1294,25 @@ class IndicatorBase( ABC ):
         return treeview, scrolledwindow
 
 
+    def create_filechooser_dialog( self, title, parent, filename, action = Gtk.FileChooserAction.OPEN ):
+        dialog = \
+            Gtk.FileChooserDialog(
+                title = title,
+                parent = parent,
+                action = action )
+
+        dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
+        dialog.set_transient_for( parent )
+        dialog.set_filename( filename )
+        return dialog
+
+
 #TODO Look at all pack_start calls.
 # What should the parameters be, given buttons, labels, etc are added.
 # Some have True and some have False.
 
 
+#TODO OK
     def get_menu_indent( self, indent = 1 ):
         indent_amount = "      " * indent
         if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:
@@ -1281,10 +1339,12 @@ class IndicatorBase( ABC ):
     # So perhaps first try:
     #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
     # and if that fails, either log out/in or restart.
+#TODO OK
     def get_icon_name( self ):
         return self.indicator_name + "-symbolic"
 
 
+#TODO OK
     def get_autostart_and_delay( self ):
         autostart = False
         delay = 0
@@ -1306,6 +1366,7 @@ class IndicatorBase( ABC ):
         return autostart, delay
 
 
+#TODO OK
     def set_autostart_and_delay( self, is_set, delay ):
         if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
             os.makedirs( IndicatorBase.__AUTOSTART_PATH )
@@ -1342,6 +1403,7 @@ class IndicatorBase( ABC ):
             logging.exception( e )
 
 
+#TODO OK
     def get_logging( self ):
         return logging
 
@@ -1406,6 +1468,7 @@ class IndicatorBase( ABC ):
     # As a result of
     #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
+#TODO OK
     def is_terminal_qterminal( self ):
         terminal_is_qterminal = False
         terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
@@ -1418,6 +1481,7 @@ class IndicatorBase( ABC ):
     # Return the full path and name of the executable for the
     # current terminal and the corresponding execution flag;
     # None otherwise.
+#TODO OK
     def get_terminal_and_execution_flag( self ):
         terminal = None
         execution_flag = None
@@ -1627,6 +1691,7 @@ class IndicatorBase( ABC ):
     #     ${XDGKey}/applicationBaseDirectory/fileName
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
+#TODO OK
     def remove_file_from_cache( self, filename ):
         cache_directory = self.__get_cache_directory()
         for file in os.listdir( cache_directory ):
@@ -1649,15 +1714,20 @@ class IndicatorBase( ABC ):
     # and is older than the cache maximum age is discarded.
     #
     # Any file extension is ignored in determining if the file should be deleted or not.
+#TODO OK
     def flush_cache( self, basename, maximum_age_in_hours ):
         cache_directory = self.__get_cache_directory()
         cache_maximum_age_date_time = datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
         for file in os.listdir( cache_directory ):
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
-                dateTime = file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
-                if dateTime.isdigit():
-                    fileDateTime = datetime.datetime.strptime( dateTime, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-                    if fileDateTime < cache_maximum_age_date_time:
+                date_time = file[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
+                if date_time.isdigit():
+                    file_date_time = \
+                        datetime.datetime.strptime(
+                            date_time,
+                            IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+
+                    if file_date_time < cache_maximum_age_date_time:
                         os.remove( cache_directory + file )
 
 
@@ -1735,6 +1805,7 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
+#TODO OK
     def read_cache_text_without_timestamp( self, filename ):
         return self.__read_cache_text( self.__get_cache_directory() + filename )
 
@@ -1768,6 +1839,7 @@ class IndicatorBase( ABC ):
         return self.__read_cache_text( cache_file )
 
 
+#TODO OK
     def __read_cache_text( self, cache_file ):
         text = ""
         if os.path.isfile( cache_file ):
@@ -1828,12 +1900,15 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
+#TODO Why have a private and a public function...?  Just have one.
     # Return the full directory path to the user cache directory for the current indicator.
+#TODO OK
     def get_cache_directory( self ):
         return self.__get_cache_directory()
 
 
     # Return the full directory path to the user cache directory for the current indicator.
+#TODO OK
     def __get_cache_directory( self ):
         return self.__get_user_directory( "XDG_CACHE_HOME", ".cache", self.indicator_name )
 
@@ -1850,12 +1925,18 @@ class IndicatorBase( ABC ):
     #    ${XDGKey}/applicationBaseDirectory
     # or
     #    ~/.userBaseDirectory/applicationBaseDirectory
+#TODO OK
     def __get_user_directory( self, xdg_key, user_base_directory, application_base_directory ):
         if xdg_key in os.environ:
-            directory = os.environ[ xdg_key ] + os.sep + application_base_directory + os.sep
+            directory = \
+                os.environ[ xdg_key ] + os.sep + \
+                application_base_directory + os.sep
 
         else:
-            directory = os.path.expanduser( '~' ) + os.sep + user_base_directory + os.sep + application_base_directory + os.sep
+            directory = \
+                os.path.expanduser( '~' ) + os.sep + \
+                user_base_directory + os.sep + \
+                application_base_directory + os.sep
 
         if not os.path.isdir( directory ):
             os.mkdir( directory )
@@ -1880,6 +1961,7 @@ class IndicatorBase( ABC ):
     # logNonZeroErrorCode If True, will log any exception arising from a non-zero return code; otherwise will ignore.
     #
     # On exception, logs to file.
+#TODO OK
     def process_get( self, command, log_non_zero_error_code = False ):
         result = None
         try:
@@ -1913,7 +1995,10 @@ class IndicatorBase( ABC ):
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
 
     def __init__( self, filename, maxBytes = 10000 ):
-        super().__init__( filename, maxBytes = maxBytes )
+        super().__init__(
+            filename,
+            maxBytes = maxBytes,
+            delay = True )
 
 
     def doRollover( self ):

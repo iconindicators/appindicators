@@ -30,12 +30,6 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
@@ -51,6 +45,7 @@ class IndicatorTest( IndicatorBase ):
     CONFIG_X = "x"
 
     LABEL = "Test Indicator"
+
 
     def __init__( self ):
         super().__init__( comments = _( "Exercises a range of indicator functionality." ) )
@@ -131,7 +126,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             self.get_menu_indent() + "Reset icon",
             activate_functionandarguments =
-                ( lambda menuitem: self.indicator.set_icon_full( self.get_icon_name(), "" ), ) )
+                ( lambda menuitem: self.set_icon( self.get_icon_name() ), ) )
 
         icons = [ "FULL_MOON",
                   "WANING_GIBBOUS",
@@ -171,7 +166,7 @@ class IndicatorTest( IndicatorBase ):
             self.get_menu_indent() + "Show current time in OSD",
             activate_functionandarguments =
                 ( lambda menuitem:
-                    Notify.Notification.new( "Current time...", self.__get_current_time(), self.get_icon_name() ).show(), ) )
+                    self.show_notification( "Current time...", self.__get_current_time() ), ) )
 
         self.create_and_append_menuitem( menu, "Label / Tooltip / OSD" ).set_submenu( submenu )
 
@@ -234,12 +229,13 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __use_icon_dynamically_created( self, menuitem ):
-        icon_filename = self.write_cache_text(
-            self.__get_svg_icon_text( menuitem.get_name(), 35, 65 ),
-            IndicatorTest.CACHE_ICON_BASENAME,
-            IndicatorBase.EXTENSION_SVG_SYMBOLIC )
+        icon_filename = \
+            self.write_cache_text(
+                self.__get_svg_icon_text( menuitem.get_name(), 35, 65 ),
+                IndicatorTest.CACHE_ICON_BASENAME,
+                IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
-        self.indicator.set_icon_full( icon_filename, "" )
+        self.set_icon( icon_filename )
 
 
     # A direct copy from Indicator Lunar to test
@@ -292,7 +288,7 @@ class IndicatorTest( IndicatorBase ):
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
             self.get_logging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
+            self.show_notification( "Cannot run script", message )
 
         elif self.is_terminal_qterminal():
             # As a result of this issue
@@ -302,7 +298,7 @@ class IndicatorTest( IndicatorBase ):
             # So the quickest/easiest workaround is to install gnome-terminal.
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
             self.get_logging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
+            self.show_notification( "Cannot run script", message )
 
         else:
             command_ = terminal + " " + terminal_execution_flag + " ${SHELL} -c '"

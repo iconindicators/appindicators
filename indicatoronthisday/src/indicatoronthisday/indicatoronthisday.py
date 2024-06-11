@@ -54,12 +54,6 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 import os
 
 from event import Event
@@ -103,7 +97,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             today_in_short_date_format = today.strftime( '%b %d' ) # It is assumed/hoped the dates in the calendar result are always short date format irrespective of locale.
             for event in events:
                 if today_in_short_date_format == event.get_date():
-                    Notify.Notification.new( _( "On this day..." ), event.get_description(), self.get_icon_name() ).show()
+                    self.show_notification( _( "On this day..." ), event.get_description() )
+                    # Notify.Notification.new( _( "On this day..." ), event.get_description(), self.get_icon_name() ).show()#TODO Check
 
 
     def build_menu( self, menu, events ):
@@ -610,15 +605,22 @@ class IndicatorOnThisDay( IndicatorBase ):
     def on_browse_calendar( self, button, add_edit_dialog, calendar_file ):
         system_calendars = self.get_calendars()
 
+#TODO This matches the new code below.
+        # dialog = \
+        #     Gtk.FileChooserDialog(
+        #         title = _( "Choose a calendar file" ),
+        #         parent = add_edit_dialog,
+        #         action = Gtk.FileChooserAction.OPEN )
+        #
+        # dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
+        # dialog.set_transient_for( add_edit_dialog )
+        # dialog.set_filename( calendar_file.get_text() )
         dialog = \
-            Gtk.FileChooserDialog(
-                title = _( "Choose a calendar file" ),
-                parent = add_edit_dialog,
-                action = Gtk.FileChooserAction.OPEN )
+            self.create_filechooser_dialog( 
+                _( "Choose a calendar file" ),
+                add_edit_dialog,
+                calendar_file.get_text() )
 
-        dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
-        dialog.set_transient_for( add_edit_dialog )
-        dialog.set_filename( calendar_file.get_text() )
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
@@ -638,7 +640,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     def load_config( self, config ):
         self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
         self.copy_to_clipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, True )
-        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, self.getMenuItemsGuess() )
+        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, self.get_menuitems_guess() )
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
         self.search_url = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 

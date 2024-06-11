@@ -48,4 +48,4 @@ class Event( object ):
         return \
             self.__class__ == other.__class__ and \
             self.get_date() == other.get_date() and \
-            self.get_description( )== other.get_description()
+            self.get_description() == other.get_description()

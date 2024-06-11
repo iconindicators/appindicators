@@ -149,7 +149,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     menu,
                     ppa.get_descriptor(),
                     name = ppa.get_descriptor(),
-                    activate_functionandarguments = ( self.onPPA, ) )
+                    activate_functionandarguments = ( self.on_ppa, ) )
 
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
@@ -161,7 +161,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
             if len( ppas ) == 1:
-                self.secondary_activate_target = menuitem #TODO This variable has changed; but really, should we directly reference the variable instead of using a get/set?
+                self.set_secondary_activate_target( menuitem )
 
 
     def create_menuitem_for_published_binary( self, menu, indent, ppa, published_binary ):
@@ -176,7 +176,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             menu,
             label,
             name = ppa.get_descriptor(),
-            activate_functionandarguments = ( self.onPPA, ) )
+            activate_functionandarguments = ( self.on_ppa, ) )
 
 
     def create_menuitem_for_status_message( self, menu, indent, ppa ):
@@ -274,7 +274,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return ppas
 
 
-    def onPPA( self, menuitem ):
+    def on_ppa( self, menuitem ):
         url = "https://launchpad.net/~"
         first_pipe = str.find( menuitem.get_name(), "|" )
         ppa_user = menuitem.get_name()[ 0 : first_pipe ].strip()
@@ -388,8 +388,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         except Exception as e:
             has_publised_binaries = None
-            self.getLogging().error( "Problem with " + url )
-            self.getLogging().exception( e )
+            self.get_logging().error( "Problem with " + url )
+            self.get_logging().exception( e )
 
         return has_publised_binaries
 

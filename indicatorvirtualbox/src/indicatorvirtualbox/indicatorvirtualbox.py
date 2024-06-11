@@ -30,12 +30,6 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 import time
 
 from virtualmachine import Group, VirtualMachine
@@ -101,7 +95,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 _( "Launch VirtualBox™ Manager" ),
-                activate_functionandarguments = ( lambda menuItem: self.on_launch_virtual_box_manager(), ),
+                activate_functionandarguments = (
+                    lambda menuitem: self.on_launch_virtual_box_manager(), ),
                 is_secondary_activate_target = True )
 
         else:
@@ -110,10 +105,16 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __build_menu( self, menu, items, indent, running_uuids ):
         if self.sort_groups_and_virtual_machines_equally:
-            sorted_items = sorted( items, key = lambda x: ( x.get_name().lower() ) )
+            sorted_items = \
+                sorted(
+                    items,
+                    key = lambda x: ( x.get_name().lower() ) )
 
         else:
-            sorted_items = sorted( items, key = lambda x: ( type( x ) is not Group, x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+            sorted_items = \
+                sorted(
+                    items,
+                    key = lambda x: ( type( x ) is not Group, x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
 
         for item in sorted_items:
             if type( item ) is Group:
@@ -181,7 +182,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                 previous_virtual_machine_was_already_running = False
 
 
-    def __get_virtual_machines_for_autostart( self, virtual_machines, virtual_machines_for_autostart ):
+    def __get_virtual_machines_for_autostart(
+            self,
+            virtual_machines,
+            virtual_machines_for_autostart ):
+
         for item in virtual_machines:
             if type( item ) is Group:
                 self.__get_virtual_machines_for_autostart( item.get_items(), virtual_machines_for_autostart )
@@ -195,7 +200,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         result = self.process_get( "VBoxManage list vms | grep " + uuid )
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
-            Notify.Notification.new( _( "Error" ), message, self.get_icon_name() ).show()
+            self.show_notification( _( "Error" ), message )
+            # Notify.Notification.new( _( "Error" ), message, self.get_icon_name() ).show()#TODO Check
 
         else:
             self.process_call( self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
@@ -206,7 +212,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if number_of_windows_with_the_same_name == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
             summary = _( "Warning" )
-            self.send_notification_with_delay( summary, message, delay_in_seconds )
+            self.show_notification_with_delay( summary, message, delay_in_seconds )
 
         elif number_of_windows_with_the_same_name == "1":
             for line in self.process_get( "wmctrl -l" ).splitlines():
@@ -218,14 +224,15 @@ class IndicatorVirtualBox( IndicatorBase ):
         else:
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
             summary = _( "Warning" )
-            self.send_notification_with_delay( summary, message, delay_in_seconds )
+            self.show_notification_with_delay( summary, message, delay_in_seconds )
 
 
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
     # Prevent notifications from appearing until a set time has elapsed since the previous notification.
-    def send_notification_with_delay( self, summary, message, delay_in_seconds = 0 ):
+    def show_notification_with_delay( self, summary, message, delay_in_seconds = 0 ):
         if( self.date_time_of_last_notification + datetime.timedelta( seconds = delay_in_seconds ) < datetime.datetime.now() ):
-            Notify.Notification.new( summary, message, self.get_icon_name() ).show()
+            self.show_notification( summary, message )
+            # Notify.Notification.new( summary, message, self.get_icon_name() ).show()#TODO Check
             self.date_time_of_last_notification = datetime.datetime.now()
 
 
@@ -405,10 +412,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         box.pack_start( label, False, False, 0 )
 
         window_name = Gtk.Entry()
-        window_name.set_tooltip_text( _( \
+        window_name.set_text( self.virtualbox_manager_window_name )
+        window_name.set_tooltip_text( _(
             "The window title of VirtualBox™ Manager.\n" + \
             "You may have to adjust for your local language." ) )
-        window_name.set_text( self.virtualbox_manager_window_name )
+
         box.pack_start( window_name, True, True, 0 )
 
         grid.attach( box, 0, 0, 1, 1 )

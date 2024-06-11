@@ -34,12 +34,6 @@ import math
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
@@ -196,8 +190,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         terminal, terminalExecutionFlag = self.getTerminalAndExecutionFlag()
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
-            self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
+            self.get_logging().error( message )
+            self.show_notification( "Cannot run script", message )
+            # Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()#TODO Check
 
         elif self.isTerminalQTerminal():
             # As a result of this issue
@@ -206,8 +201,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             # Although a fix has been made, it is unlikely the repository will be updated any time soon.
             # So the quickest/easiest workaround is to install gnome-terminal.
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
-            self.getLogging().error( message )
-            Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()
+            self.get_logging().error( message )
+            self.show_notification( "Cannot run script", message )
+            # Notify.Notification.new( "Cannot run script", message, self.get_icon_name() ).show()#TODO Check
 
         else:
             command = terminal + " " + terminalExecutionFlag + " ${SHELL} -c '"
@@ -225,7 +221,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += "'"
 
             if self.sendCommandToLog:
-                self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
+                self.get_logging().debug( script.getGroup() + " | " + script.getName() + ": " + command )
 
             Thread( target = self.processCall, args = ( command, ) ).start()
 
@@ -262,7 +258,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def __updateBackgroundScript( self, script, now ):
         if self.sendCommandToLog:
-            self.getLogging().debug( script.getGroup() + " | " + script.getName() + ": " + script.getCommand() )
+            self.get_logging().debug( script.getGroup() + " | " + script.getName() + ": " + script.getCommand() )
 
         commandResult = self.processGet( script.getCommand(), logNonZeroErrorCode = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
         if commandResult:
@@ -491,7 +487,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 #        scrolledWindow.set_vexpand( True )
 
 #        box.pack_start( scrolledWindow, True, True, 0 )
-        box.pack_start( create_scrolledwindow( commandTextView ), True, True, 0 )
+        box.pack_start( self.create_scrolledwindow( commandTextView ), True, True, 0 )
         grid.attach( box, 0, 20, 1, 10 )
 
         box = Gtk.Box( spacing = 6 )
@@ -1178,7 +1174,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 #        scrolledWindow.set_vexpand( True )
 
 #        box.pack_start( scrolledWindow, True, True, 0 )
-        box.pack_start( create_scrolledwindow( commandTextView ), True, True, 0 )
+        box.pack_start( self.create_scrolledwindow( commandTextView ), True, True, 0 )
         grid.attach( box, 0, 2, 1, 10 )
 
         soundCheckbutton = \

@@ -30,12 +30,6 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 import os
 from pathlib import Path
 
@@ -203,10 +197,13 @@ class IndicatorFortune( IndicatorBase ):
             if notification_summary == "":
                 notification_summary = " "
 
-        Notify.Notification.new(
+        self.show_notification(
             notification_summary,
-            self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ),
-            self.get_icon_name() ).show()
+            self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ) )
+        # Notify.Notification.new(
+        #     notification_summary,
+        #     self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ),
+        #     self.get_icon_name() ).show()#TODO Check
 
 
     def refresh_and_show_fortune( self ):
@@ -495,7 +492,7 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def on_fortune_reset( self, button, treeview ):
-        if self.showOKCancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
+        if self.show_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
             listStore = treeview.get_model().get_model()
             listStore.clear()
             listStore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -673,6 +670,9 @@ class IndicatorFortune( IndicatorBase ):
         dialog.destroy()
 
 
+#TODO Do we browse in other indicators...?
+# If so, can the code that builds the browser dialog be put into a function?
+#Look at onthisday.
     def on_browse_fortune( self, file_or_directory_button, add_edit_dialog, fortune_file_directory, is_file ):
         if is_file:
             title = _( "Choose a fortune .dat file" )
@@ -682,20 +682,28 @@ class IndicatorFortune( IndicatorBase ):
             title = _( "Choose a directory containing a fortune .dat file(s)" )
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
+#TODO This matches the new code below.
+        # dialog = \
+        #     Gtk.FileChooserDialog(
+        #         title = title,
+        #         parent = add_edit_dialog,
+        #         action = action )
+        #
+        # dialog.add_buttons = (
+        #     Gtk.STOCK_CANCEL,
+        #     Gtk.ResponseType.CANCEL,
+        #     Gtk.STOCK_OPEN,
+        #     Gtk.ResponseType.OK )
+        #
+        # dialog.set_transient_for( add_edit_dialog )
+        # dialog.set_filename( fortune_file_directory.get_text() )
         dialog = \
-            Gtk.FileChooserDialog(
-                title = title,
-                parent = add_edit_dialog,
-                action = action )
+            self.create_filechooser_dialog( 
+                title,
+                add_edit_dialog,
+                fortune_file_directory.get_text(),
+                action )
 
-        dialog.add_buttons = (
-            Gtk.STOCK_CANCEL,
-            Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OPEN,
-            Gtk.ResponseType.OK )
-
-        dialog.set_transient_for( add_edit_dialog )
-        dialog.set_filename( fortune_file_directory.get_text() )
         while( True ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:

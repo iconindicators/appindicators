@@ -37,13 +37,6 @@ from gi.repository import Gtk
 
 import locale
 import math
-
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 import re
 import requests
 import webbrowser
@@ -215,7 +208,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # On comet lookup and download of comet / minor planet data,
         # an unnecessary log message is created, so ignore.
-        self.getLogging().getLogger( "urllib3" ).propagate = False
+        self.get_logging().getLogger( "urllib3" ).propagate = False
 
         self.debug = True # TODO Remove
 
@@ -273,7 +266,7 @@ class IndicatorLunar( IndicatorBase ):
             self.comets, self.cometOrbitalElementData, None,
             self.minorPlanets, self.minorPlanetOrbitalElementData, self.minorPlanetApparentMagnitudeData,
             self.magnitude,
-            self.getLogging() )
+            self.get_logging() )
 
         if self.dataPrevious is None: # Happens only on first run or when the user alters the satellite visibility window.
             self.dataPrevious = self.data
@@ -380,10 +373,10 @@ class IndicatorLunar( IndicatorBase ):
             freshData = { }
             if nextDownloadTime < utcNow: # Download is allowed (do not want to annoy third-party data provider).
                 downloadDataFilename = self.getCacheFilenameWithTimestamp( cacheBasename, cacheExtension )
-                if downloadDataFunction( downloadDataFilename, self.getLogging(), *downloadDataAdditionalArguments ):
+                if downloadDataFunction( downloadDataFilename, self.get_logging(), *downloadDataAdditionalArguments ):
                     downloadCount = 0
                     nextDownloadTime = utcNow + datetime.timedelta( hours = cacheMaximumAge )
-                    freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
+                    freshData = loadDataFunction( downloadDataFilename, self.get_logging(), *loadDataAdditionalArguments )
 
                 else:
                     downloadCount += 1
@@ -396,7 +389,7 @@ class IndicatorLunar( IndicatorBase ):
 
             else:
                 downloadDataFilename = self.getCacheNewestFilename( cacheBasename ) # Should NOT return None as the cache was checked for staleness above.
-                freshData = loadDataFunction( downloadDataFilename, self.getLogging(), *loadDataAdditionalArguments )
+                freshData = loadDataFunction( downloadDataFilename, self.get_logging(), *loadDataAdditionalArguments )
 
         return freshData, downloadCount, nextDownloadTime
 
@@ -533,14 +526,22 @@ class IndicatorLunar( IndicatorBase ):
         #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
         key = ( IndicatorLunar.astroBackend.BodyType.MOON, IndicatorLunar.astroBackend.NAME_TAG_MOON )
         phase = self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_PHASE, ) ]
-        illuminationPercentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
-        brightLimbAngleInDegrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
-        svgIconText = self.getSVGIconText( phase, illuminationPercentage, brightLimbAngleInDegrees )
-        iconFilename = self.writeCacheText(
-            svgIconText,
-            IndicatorLunar.ICON_CACHE_BASENAME,
-            IndicatorBase.EXTENSION_SVG_SYMBOLIC )
-        self.indicator.set_icon_full( iconFilename, "" )
+        illumination_percentage = int( round( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION, ) ] ) ) )
+        brightLimb_angle_in_degrees = int( math.degrees( float( self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
+
+        svg_icon_text = \
+            self.getSVGIconText(
+                phase,
+                illumination_percentage,
+                brightLimb_angle_in_degrees )
+
+        icon_filename = \
+            self.writeCacheText(
+                svg_icon_text,
+                IndicatorLunar.ICON_CACHE_BASENAME,
+                IndicatorBase.EXTENSION_SVG_SYMBOLIC )
+
+        self.set_icon( icon_filename )
 
 
     def notificationFullMoon( self ):
@@ -557,7 +558,8 @@ class IndicatorLunar( IndicatorBase ):
             if self.werewolfWarningSummary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
 
-            Notify.Notification.new( summary, self.werewolfWarningMessage, self.createFullMoonIcon() ).show()
+            self.show_notification( summary, self.werewolfWarningMessage, self.createFullMoonIcon() )
+            # Notify.Notification.new( summary, self.werewolfWarningMessage, self.createFullMoonIcon() ).show()#TODO Check
             self.lastFullMoonNotfication = utcNow
 
 
@@ -638,7 +640,8 @@ class IndicatorLunar( IndicatorBase ):
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_TIME, setTime )
 
-        Notify.Notification.new( summary, message, self.icon_satellite ).show()
+        self.show_notification( summary, message, self.icon_satellite )
+        # Notify.Notification.new( summary, message, self.icon_satellite ).show()#TODO Check
 
 
     def updateMenuMoon( self, menu ):
@@ -805,7 +808,7 @@ class IndicatorLunar( IndicatorBase ):
 
             elif bodyType == IndicatorLunar.astroBackend.BodyType.COMET:
                 menuItemNameFunction = lambda name: IndicatorLunar.SEARCH_URL_COMET_DATABASE + \
-                                                    IndicatorLunar.__getCometDesignationForCOBSLookup( name, self.getLogging() )
+                                                    IndicatorLunar.__getCometDesignationForCOBSLookup( name, self.get_logging() )
 
             elif bodyType == IndicatorLunar.astroBackend.BodyType.STAR:
                 menuItemNameFunction = lambda name: IndicatorLunar.SEARCH_URL_STAR + \
@@ -1275,7 +1278,7 @@ class IndicatorLunar( IndicatorBase ):
 
         if displayData is None:
             displayData = "" # Better to show nothing than let None slip through and crash.
-            self.getLogging().error( "Unknown data tag: " + dataTag )
+            self.get_logging().error( "Unknown data tag: " + dataTag )
 
         return displayData
 
@@ -2393,7 +2396,8 @@ class IndicatorLunar( IndicatorBase ):
         message = self.getTextViewText( messageTextView )
 
         if isMoonNotification:
-            Notify.Notification.new( summary, message, self.createFullMoonIcon() ).show()
+            self.show_notification( summary, message, self.createFullMoonIcon() )
+            # Notify.Notification.new( summary, message, self.createFullMoonIcon() ).show()#TODO Check
 
         else:
             def replaceTags( text ):
@@ -2409,7 +2413,8 @@ class IndicatorLunar( IndicatorBase ):
 
             summary = replaceTags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
             message = replaceTags( message )
-            Notify.Notification.new( summary, message, self.icon_satellite ).show()
+            self.show_notification( summary, message, self.icon_satellite )
+            # Notify.Notification.new( summary, message, self.icon_satellite ).show()#TODO Check
 
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
@@ -2435,8 +2440,8 @@ class IndicatorLunar( IndicatorBase ):
                 theCity = cities[ 0 ] # No city found, so choose first city by default.
 
         except Exception as e:
-            self.getLogging().exception( e )
-            self.getLogging().error( "Error getting default city." )
+            self.get_logging().exception( e )
+            self.get_logging().error( "Error getting default city." )
             theCity = cities[ 0 ] # Some error occurred, so choose first city by default.
 
         return theCity

@@ -27,12 +27,6 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 import importlib.util
 from pathlib import Path
 import sys
@@ -62,7 +56,8 @@ class IndicatorTide( IndicatorBase ):
             summary = _( "No user script specified!" )
             message = _( "Please specify a user script and class name in the preferences." )
             menu.append( Gtk.MenuItem.new_with_label( label ) )
-            Notify.Notification.new( summary, message, self.get_icon_name() ).show()
+            self.show_notification( summary, message )
+            # Notify.Notification.new( summary, message, self.get_icon_name() ).show()#TODO Check
 
         else:
             tidal_readings = [ ]
@@ -110,7 +105,8 @@ class IndicatorTide( IndicatorBase ):
 
             if not tidal_readings:
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
-                Notify.Notification.new( summary, message, self.get_icon_name() ).show()
+                self.show_notification( summary, message )
+                # Notify.Notification.new( summary, message, self.get_icon_name() ).show()#TODO Check
 
         # Update a little after midnight...best guess as to when the user's data source will update.
         today = datetime.datetime.now()
@@ -126,7 +122,8 @@ class IndicatorTide( IndicatorBase ):
                 menu,
                 self.port_name,
                 name = tidal_readings[ 0 ].get_url(),
-                activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                activate_functionandarguments = (
+                    self.get_on_click_menuitem_open_browser_function(), ) )
 
             indent = self.get_menu_indent()
 
@@ -161,20 +158,23 @@ class IndicatorTide( IndicatorBase ):
                     menu,
                     menu_text,
                     name = tidal_reading.get_url(),
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ) )
 
             else:
                 self.create_and_append_menuitem(
                     menu,
                     indent + tidal_reading.get_date(),
                     name = tidal_reading.get_url(),
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ) )
 
                 self.create_and_append_menuitem(
                     menu,
                     menu_text,
                     name = tidal_reading.get_url(),
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ) )
 
                 today_date = tidal_reading.get_date()
                 shown_today = True
@@ -198,7 +198,8 @@ class IndicatorTide( IndicatorBase ):
                     subMenu,
                     menuText,
                     name = tidalReading.get_url(),
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ) )
 
             else:
                 subMenu = Gtk.Menu()
@@ -210,7 +211,8 @@ class IndicatorTide( IndicatorBase ):
                     subMenu,
                     menuText,
                     name = tidalReading.get_url(),
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ) )
 
                 today_date = tidalReading.get_date()
                 shown_today = True
@@ -232,7 +234,7 @@ class IndicatorTide( IndicatorBase ):
     def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        label = Gtk.Label.new( _( "User Script" ) )
+        label = Gtk.Label.new( _( "User Script" ) ) #TODO Maybe put into a box?  Look for other haligns below in rest of code.
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
@@ -298,7 +300,7 @@ class IndicatorTide( IndicatorBase ):
 
         show_as_submenus_checkbutton.connect(
             "toggled",
-            self.onRadioOrCheckbox,
+            self.on_radio_or_checkbox,
             True,
             show_as_submenus_except_first_day_checkbutton )
 

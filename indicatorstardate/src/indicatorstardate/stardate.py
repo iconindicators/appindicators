@@ -83,7 +83,7 @@ __stardate_rates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
 def get_version():
-    return "Version 6.0 (2024-06-09)"
+    return "Version 6.0 (2024-06-11)"
 
 
 # Convert a Gregorian datetime.datetime in UTC to a 'classic' stardate.

@@ -30,12 +30,6 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-try:
-    gi.require_version( "Notify", "0.7" )
-except ValueError:
-    gi.require_version( "Notify", "0.8" )
-from gi.repository import Notify
-
 import re
 
 
@@ -63,7 +57,7 @@ class IndicatorPunycode( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
-            activate_functionandarguments = ( lambda menuItem: self.on_convert(), ),
+            activate_functionandarguments = ( lambda menuitem: self.on_convert(), ),
             is_secondary_activate_target = True )
 
         indent = self.get_menu_indent()
@@ -73,15 +67,15 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
-                activate_functionandarguments =
-                    ( lambda menuItem, result = result:
+                activate_functionandarguments = (
+                    lambda menuitem, result = result:
                         self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) ) # Note result = result to handle lambda late binding.
 
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                activate_functionandarguments =
-                    ( lambda menuItem, result = result:
+                activate_functionandarguments = (
+                    lambda menuitem, result = result:
                         self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) ) # Note result = result to handle lambda late binding.
 
 
@@ -90,7 +84,8 @@ class IndicatorPunycode( IndicatorBase ):
         if self.input_clipboard:
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
             if text is None:
-                Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.get_icon_name() ).show()
+                self.show_notification( summary, _( "No text is in the clipboard." ) )
+                # Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.get_icon_name() ).show()#TODO Check
 
             else:
                 self.__do_conversion( text )
@@ -99,7 +94,8 @@ class IndicatorPunycode( IndicatorBase ):
             # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
             def clipboard_text_received_function( clipboard, text, data ):
                 if text is None:
-                    Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.get_icon_name() ).show()
+                    self.show_notification( summary, _( "No text is highlighted/selected." ) )
+                    # Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.get_icon_name() ).show()#TODO Check
 
                 else:
                     self.__do_conversion( text )
@@ -151,10 +147,11 @@ class IndicatorPunycode( IndicatorBase ):
         except Exception as e:
             self.get_logging().exception( e )
             self.get_logging().error( "Error converting '" + protocol + text + path_query + "'." )
-            Notify.Notification.new(
-                _( "Error converting..." ),
-                _( "See log for more details." ),
-                self.get_icon_name() ).show()
+            self.show_notification( _( "Error converting..." ), _( "See log for more details." ) )
+            # Notify.Notification.new(
+            #     _( "Error converting..." ),
+            #     _( "See log for more details." ),
+            #     self.get_icon_name() ).show()#TODO Check
 
 
     def cull_results( self ):

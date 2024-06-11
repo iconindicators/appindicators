@@ -81,8 +81,7 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
-        # Based on the mouse wheel scroll event (irrespective of direction),
-        # cycle through the possible combinations of options for display in the stardate.
+        # Cycle through all combinations of options for display of the stardate.
         # If showing a 'classic' stardate and padding is not required, ignore the padding option.
         if self.show_classic:
             stardate_issue, stardate_integer, stardate_fraction = \
