@@ -191,6 +191,8 @@ class IndicatorBase( ABC ):
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ] )
 
+    __UPDATE_PERIOD_IN_SECONDS = 60
+
     __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
@@ -298,7 +300,6 @@ class IndicatorBase( ABC ):
 
             self.desktop_file_virtual_environment = str( Path( "/tmp/" + desktop_file_in_wheel ) )
             if not Path( self.desktop_file_virtual_environment ).exists():
-#TODO Maybe also print the message?            
                 self.show_dialog_ok(
                     None,
                     f"No .desktop file found in { self.desktop_file_virtual_environment }!",
@@ -438,8 +439,7 @@ class IndicatorBase( ABC ):
             GLib.idle_add( self.__update_internal )
 
         else:
-            GLib.timeout_add_seconds( 60, self.__update )
-            #TODO Make the 60 a constant.
+            GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS, self.__update )
             #TODO This call returns an ID...need to keep it?
             #TODO Keep the About/Prefernces open and see if we keep trying to do an update every 60 seconds.
 
@@ -572,10 +572,7 @@ class IndicatorBase( ABC ):
 
 #TODO OK
     def __on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, functionandarguments ):
-#TODO Check comment below...ignore also for About being open???
-        # Ignore events when Preferences is open or an update is underway.
-        # Do so by checking the sensitivity of the Preferences menu item.
-        # A side effect is the event will be ignored when About is showing...oh well.
+#TODO Below is not needed I think...given we now have a lock.
 #        if self.__getMenuSensitivity():
 #            self.onMouseWheelScroll( indicator, delta, scroll_direction )
         if not self.lock.locked():
@@ -693,7 +690,6 @@ class IndicatorBase( ABC ):
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or About?
 
 
-#TODO Seems to now appear off centre...why?
     def __on_preferences_internal( self, menuitem ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
@@ -707,7 +703,6 @@ class IndicatorBase( ABC ):
 
         # dialog = self.create_dialog( menuitem, _( "Preferences" ) )#TODO Hopefully below stays and this goes.
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
-#TODO Would be nice to rename to on_preferences
         response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
 
@@ -1036,11 +1031,9 @@ class IndicatorBase( ABC ):
 
         dialog.set_title( self.indicator_name if title is None else title )
 
-#TODO This should be an option...perhaps only do it for a certain message type?
-#Maybe just do it for all?
-        # for child in dialog.get_message_area().get_children():
-        #     if type( child ) is Gtk.Label:
-        #         child.set_selectable( True ) # Allow the label to be highlighted for copy/paste.
+        for child in dialog.get_message_area().get_children():
+            if type( child ) is Gtk.Label:
+                child.set_selectable( True ) # Allow the label to be highlighted for copy/paste.
 
         response = dialog.run()
         dialog.destroy()
@@ -1473,6 +1466,8 @@ class IndicatorBase( ABC ):
 #TODO Look at all pack_start calls.
 # What should the parameters be, given buttons, labels, etc are added.
 # Some have True and some have False.
+# Is this related to creating a box?
+# Also look at set_homogeneous
 
 
 #TODO OK
@@ -2041,7 +2036,7 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-#TODO Why have a private and a public function...?  Just have one.
+#TODO Why have a private and a public function...?  Just have one (public).
     # Return the full directory path to the user cache directory for the current indicator.
 #TODO OK
     def get_cache_directory( self ):

@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Rename method to be python standard.
 class Reading( object ):
     # date: Date of reading, as a string.
     # time: Time of reading, as a string.
