@@ -75,15 +75,15 @@ class IndicatorPunycode( IndicatorBase ):
                 menu,
                 indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
                 activate_functionandarguments = (
-                    lambda menuitem, result = result:
-                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) ) # Note result = result to handle lambda late binding.
+                    lambda menuitem, result = result: # Need result = result to handle lambda late binding.
+                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) )
 
             self.create_and_append_menuitem(
                 menu,
                 indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
                 activate_functionandarguments = (
                     lambda menuitem, result = result:
-                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) ) # Note result = result to handle lambda late binding.
+                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) )
 
 
     def on_convert( self ):
@@ -92,7 +92,6 @@ class IndicatorPunycode( IndicatorBase ):
             text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
             if text is None:
                 self.show_notification( summary, _( "No text is in the clipboard." ) )
-                # Notify.Notification.new( summary, _( "No text is in the clipboard." ), self.get_icon_name() ).show()#TODO Check
 
             else:
                 self.__do_conversion( text )
@@ -102,7 +101,6 @@ class IndicatorPunycode( IndicatorBase ):
             def clipboard_text_received_function( clipboard, text, data ):
                 if text is None:
                     self.show_notification( summary, _( "No text is highlighted/selected." ) )
-                    # Notify.Notification.new( summary, _( "No text is highlighted/selected." ), self.get_icon_name() ).show()#TODO Check
 
                 else:
                     self.__do_conversion( text )
@@ -155,10 +153,6 @@ class IndicatorPunycode( IndicatorBase ):
             self.get_logging().exception( e )
             self.get_logging().error( "Error converting '" + protocol + text + path_query + "'." )
             self.show_notification( _( "Error converting..." ), _( "See log for more details." ) )
-            # Notify.Notification.new(
-            #     _( "Error converting..." ),
-            #     _( "See log for more details." ),
-            #     self.get_icon_name() ).show()#TODO Check
 
 
     def cull_results( self ):
@@ -186,12 +180,6 @@ class IndicatorPunycode( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
-        # input_clipboard_radio = Gtk.RadioButton.new_with_label_from_widget( None, _( "Clipboard" ) )
-        # input_clipboard_radio.set_tooltip_text( _( "Input is taken from the clipboard." ) )
-        # input_clipboard_radio.set_active( self.input_clipboard )
-        # input_clipboard_radio.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # grid.attach( input_clipboard_radio, 0, 1, 1, 1 )
-#TODO Check above.
         input_clipboard_radio = \
             self.create_radiobutton(
                 None,
@@ -202,12 +190,6 @@ class IndicatorPunycode( IndicatorBase ):
 
         grid.attach( input_clipboard_radio, 0, 1, 1, 1 )
 
-        # input_primary_radio = Gtk.RadioButton.new_with_label_from_widget( input_clipboard_radio, _( "Primary" ) )
-        # input_primary_radio.set_tooltip_text( _( "Input is taken from the currently selected text." ) )
-        # input_primary_radio.set_active( not self.input_clipboard )
-        # input_primary_radio.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # grid.attach( input_primary_radio, 0, 2, 1, 1 )
-#TODO Check above.
         input_primary_radio = \
             self.create_radiobutton(
                 input_clipboard_radio,
@@ -228,16 +210,8 @@ class IndicatorPunycode( IndicatorBase ):
                     "only to the input source." ),
                 margin_top = 10,
                 active = self.output_both )
-#TODO Make sure this is converted okay
-        # output_both_checkbutton = Gtk.CheckButton.new_with_label( _( "Output to clipboard and primary" ) )
-        # output_both_checkbutton.set_tooltip_text( _(
-        #     "If checked, the converted text is sent\n" + \
-        #     "to both the clipboard and primary.\n\n" + \
-        #     "Otherwise the converted text is sent\n" + \
-        #     "only to the input source." ) )
-        # output_both_checkbutton.set_active( self.output_both )
-        # output_both_checkbutton.set_margin_top( 10 )
-        # grid.attach( output_both_checkbutton, 0, 3, 1, 1 )
+
+        grid.attach( output_both_checkbutton, 0, 3, 1, 1 )
 
         drop_path_query_checkbutton = \
             self.create_checkbutton(
@@ -247,13 +221,7 @@ class IndicatorPunycode( IndicatorBase ):
                     "contain any path/query (if present)." ),
                 margin_top = 10,
                 active = self.drop_path_query )
-#TODO Make sure this is converted okay
-        # drop_path_query_checkbutton = Gtk.CheckButton.new_with_label( _( "Drop path/query in output" ) )
-        # drop_path_query_checkbutton.set_tooltip_text( _(
-        #     "If checked, the output text will not\n" + \
-        #     "contain any path/query (if present)." ) )
-        # drop_path_query_checkbutton.set_active( self.drop_path_query )
-        # drop_path_query_checkbutton.set_margin_top( 10 )
+
         grid.attach( drop_path_query_checkbutton, 0, 4, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
