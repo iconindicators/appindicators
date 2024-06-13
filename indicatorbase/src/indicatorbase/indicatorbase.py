@@ -180,9 +180,6 @@ class IndicatorBase( ABC ):
     __DESKTOP_MATE = "MATE"
     __DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
 
-    __DIALOG_DEFAULT_HEIGHT = 480
-    __DIALOG_DEFAULT_WIDTH = 640
-
     __EXTENSION_JSON = ".json"
 
     __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS list first so as to be the "default".
@@ -196,6 +193,9 @@ class IndicatorBase( ABC ):
 
     __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
+
+    DIALOG_DEFAULT_HEIGHT = 480
+    DIALOG_DEFAULT_WIDTH = 640
 
     EXTENSION_SVG = ".svg"
     EXTENSION_SVG_SYMBOLIC = "-symbolic.svg"
@@ -242,25 +242,22 @@ class IndicatorBase( ABC ):
 # and also to prevent an update from happening.
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         if IndicatorBase.INDICATOR_NAME is None:
-#TODO Maybe also print the message?            
-            self.show_message(
+            self.show_dialog_ok(
                 None,
                 "Exiting: unable to determine indicator name!",
-                Gtk.MessageType.ERROR,
-                "" )
+                title = "ERROR",
+                message_type = Gtk.MessageType.ERROR )
 
             sys.exit()
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
-        project_metadata = self._get_project_metadata()
+        project_metadata, error_message = self._get_project_metadata()
         if project_metadata is None:
-#TODO Maybe also print the message?            
-            self.show_message(
+            self.show_dialog_ok(
                 None,
-                "Exiting: unable to locate project metadata!",
-                Gtk.MessageType.ERROR,
-                self.indicator_name )
+                error_message,
+                message_type = Gtk.MessageType.ERROR )
 
             sys.exit()
 
@@ -302,11 +299,10 @@ class IndicatorBase( ABC ):
             self.desktop_file_virtual_environment = str( Path( "/tmp/" + desktop_file_in_wheel ) )
             if not Path( self.desktop_file_virtual_environment ).exists():
 #TODO Maybe also print the message?            
-                self.show_message(
+                self.show_dialog_ok(
                     None,
-                    f"Expected to find a .desktop file in { self.desktop_file_virtual_environment } but none was found!",
-                    Gtk.MessageType.ERROR,
-                    self.indicator_name )
+                    f"No .desktop file found in { self.desktop_file_virtual_environment }!",
+                    Gtk.MessageType.ERROR )
 
                 sys.exit()
 
@@ -343,6 +339,7 @@ class IndicatorBase( ABC ):
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
         project_metadata = None
+        error_message = None
         try:
             project_metadata = metadata.metadata( self.indicator_name ) # Obtain pyproject.toml information from pip.
 
@@ -355,19 +352,19 @@ class IndicatorBase( ABC ):
                 # No .whl found, so try the current directory...
                 first_wheel = next( Path( os.path.realpath( __file__ ) ).parent.glob( "*.whl" ), None )
                 if first_wheel is None:
-#TODO Also use show message?                    
-                    print( "Expected to find a .whl in the same directory as the indicator or the current directory, but none was found!" )
+                    project_metadata = None
+                    error_message = "Unable to locate a .whl in the same directory as the indicator or the current directory!"
 
             if first_wheel is not None:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
                 if first_metadata is None:
-                    print( f"No metadata was found in { first_wheel.absolute() }" )
-#TODO Also use show message?                    
+                    project_metadata = None
+                    error_message = f"No metadata was found in { first_wheel.absolute() }!"
 
                 else:
                     project_metadata = first_metadata.metadata
 
-        return project_metadata
+        return project_metadata, error_message
 
 
     @staticmethod
@@ -518,6 +515,29 @@ class IndicatorBase( ABC ):
         self.indicator.set_icon_full( icon, "" )
 
 
+    # Get the name of the icon for the indicator to be passed
+    # to the desktop environment for display.
+    #
+    # GTK will take an icon and display it as expected.
+    #
+    # The exception is if the icon filename ends with "-symbolic" (before the extension).
+    # In this case, GTK will take the colour in the icon (say a generic flat #777777)
+    # and replace it with a suitable colour to make the current theme/background/colour.
+    # Refer to this discussion:
+    #   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
+    #
+    # If the icon with "-symbolic" cannot be found, it appears the desktop environment as
+    # a fallback will look for the icon name without the "-symbolic" which is the hicolor.
+    #
+    # When updating/replacing an icon, the desktop environment appears to cache.
+    # So perhaps first try:
+    #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
+    # and if that fails, either log out/in or restart.
+#TODO OK
+    def get_icon_name( self ):
+        return self.indicator_name + "-symbolic"
+
+
 #TODO OK
     def show_notification( self, summary, message, icon = None ):
         if icon is None:
@@ -550,6 +570,7 @@ class IndicatorBase( ABC ):
         self.indicator.connect( "scroll-event", self.__on_mouse_wheel_scroll, functionandarguments )
 
 
+#TODO OK
     def __on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, functionandarguments ):
 #TODO Check comment below...ignore also for About being open???
         # Ignore events when Preferences is open or an update is underway.
@@ -672,6 +693,7 @@ class IndicatorBase( ABC ):
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or About?
 
 
+#TODO Seems to now appear off centre...why?
     def __on_preferences_internal( self, menuitem ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
@@ -683,6 +705,7 @@ class IndicatorBase( ABC ):
             GLib.source_remove( self.update_timer_id )
             self.update_timer_id = None
 
+        # dialog = self.create_dialog( menuitem, _( "Preferences" ) )#TODO Hopefully below stays and this goes.
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
 #TODO Would be nice to rename to on_preferences
         response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
@@ -735,6 +758,10 @@ class IndicatorBase( ABC ):
                 menuItems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
+    def set_menu_sensitivity( self, toggle ):
+        self.__set_menu_sensitivity( toggle )
+
+
     def __set_menu_sensitivity( self, toggle ):
         menu_items = self.indicator.get_menu().get_children()
         if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
@@ -752,45 +779,96 @@ class IndicatorBase( ABC ):
         return sensitive
 
 
+#TODO Look at all the create dialog / show message functions...
+#    ...can they be amalgamated somehow and/or share common code?
 #TODO OK
-    def create_dialog( self, parent_widget, title, grid = None ):
-        dialog = \
-            Gtk.Dialog(
-                title,
-                self.__get_parent( parent_widget ),
-                Gtk.DialogFlags.MODAL,
-                ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+#TODO Hopefully no longer needed.
+    # def create_dialog_ORIGINAL( self, parent_widget, title, grid = None ):
+    #     dialog = \
+    #         Gtk.Dialog(
+    #             title,
+    #             self.__get_parent( parent_widget ),
+    #             Gtk.DialogFlags.MODAL,
+    #             ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+    #
+    #     dialog.set_border_width( 5 )
+    #     if grid:
+    #         dialog.get_content_area().pack_start( grid, True, True, 0 )
+    #
+    #     dialog.show_all()
+    #     return dialog
 
-        dialog.set_border_width( 5 )
-        if grid:
-            dialog.get_content_area().pack_start( grid, True, True, 0 )
 
-        return dialog
+#TODO I think widget should not be None or have any default value.
+#TODO Hopefully can delete.
+    # def create_dialog( self, parent_widget, title, content_widget = None ):
+    #     dialog = \
+    #         Gtk.Dialog(
+    #             title,
+    #             self.__get_parent( parent_widget ),
+    #             Gtk.DialogFlags.MODAL,
+    #             ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ) )
+    #
+    #     dialog.set_border_width( 5 )
+    #     if content_widget:
+    #         dialog.get_content_area().pack_start( content_widget, True, True, 0 )
+    #
+    #     dialog.show_all()
+    #     return dialog
 
 
-    def create_dialog_external( self, parent_widget, title, content_widget, set_default_size = False ):
-        self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
-        # self.__setMenuSensitivity( False, True )
+#TODO Hopefully no longer needed.
+    # def create_dialog_external( self, parent_widget, title, content_widget, set_default_size = False ):
+    #     self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
+    #     # self.__setMenuSensitivity( False, True )
+    #
+    #     dialog = Gtk.Dialog(
+    #         title,
+    #         self.__get_parent( parent_widget ),
+    #         Gtk.DialogFlags.MODAL,
+    #         ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ) )
+    #
+    #     if set_default_size:
+    #         dialog.set_default_size(
+    #             IndicatorBase.__DIALOG_DEFAULT_WIDTH,
+    #             IndicatorBase.__DIALOG_DEFAULT_HEIGHT )
+    #
+    #     dialog.set_border_width( 5 )
+    #     dialog.get_content_area().pack_start( content_widget, True, True, 0 )
+    #     dialog.show_all()
+    #     dialog.run()
+    #     dialog.destroy()
+    #
+    #     self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
+    #     # self.__setMenuSensitivity( True, True )
+
+
+#TODO Seems Gtk.STOCK_OK et al are deprecated:
+#   https://lazka.github.io/pgi-docs/Gtk-3.0/constants.html#Gtk.STOCK_OK
+    def create_dialog(
+            self,
+            parent_widget,
+            title,
+            content_widget = None,
+            buttons_responsetypes = ( Gtk.STOCK_OK, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL ),
+            default_size = None ):
 
         dialog = Gtk.Dialog(
             title,
             self.__get_parent( parent_widget ),
-            Gtk.DialogFlags.MODAL,
-            ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ) )
+            Gtk.DialogFlags.MODAL )
 
-        if set_default_size:
-            dialog.set_default_size(
-                IndicatorBase.__DIALOG_DEFAULT_WIDTH,
-                IndicatorBase.__DIALOG_DEFAULT_HEIGHT )
+        dialog.add_buttons( *buttons_responsetypes )
+
+        if default_size:
+            dialog.set_default_size( *default_size )
+
+        if content_widget:
+            dialog.get_content_area().pack_start( content_widget, True, True, 0 )
 
         dialog.set_border_width( 5 )
-        dialog.get_content_area().pack_start( content_widget, True, True, 0 )
-        dialog.show_all()
-        dialog.run()
-        dialog.destroy()
 
-        self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
-        # self.__setMenuSensitivity( True, True )
+        return dialog
 
 
     # Show a message dialog.
@@ -802,18 +880,45 @@ class IndicatorBase( ABC ):
     #
     #    title: If None, will default to the indicator name.
 #TODO OK
-    def show_message(
-            self,
-            parent_widget,
-            message,
-            message_type = Gtk.MessageType.ERROR,
-            title = None ):
-
-        IndicatorBase.__show_message_internal(
-            self.__get_parent( parent_widget ),
-            message,
-            message_type,
-            self.indicator_name if title is None else title )
+    # def show_message(
+    #         self,
+    #         parent_widget,
+    #         message,
+    #         message_type = Gtk.MessageType.ERROR,
+    #         title = None ):
+    #
+    #     IndicatorBase.__show_message_internal(
+    #         self.__get_parent( parent_widget ),
+    #         message,
+    #         message_type,
+    #         self.indicator_name if title is None else title )
+#TODO Given the static version below does not appear to be used,
+# pull the show message internal into show message...
+#Change of heart...replaced with show_dialog_ok and show_dialog_ok_cancel
+    # def show_message(
+    #         self,
+    #         parent_widget,
+    #         message,
+    #         message_type = Gtk.MessageType.ERROR,
+    #         title = None ):
+    #
+    #     dialog = Gtk.MessageDialog(
+    #         self.__get_parent( parent_widget ),
+    #         Gtk.DialogFlags.MODAL,
+    #         message_type,
+    #         Gtk.ButtonsType.OK,
+    #         message )
+    #
+    #     dialog.set_title( self.indicator_name if title is None else title )
+    #     for child in dialog.get_message_area().get_children():
+    #         if type( child ) is Gtk.Label:
+    #             child.set_selectable( True ) # Allow the label to be highlighted for copy/paste.
+    #
+    #     # dialog.run()
+    #     # dialog.destroy()
+    #     response = dialog.run()
+    #     dialog.destroy()
+    #     return response
 
 
     # Show a message dialog.
@@ -822,17 +927,18 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.ERROR
     #                        Gtk.MessageType.WARNING
     #                        Gtk.MessageType.QUESTION.
-    @staticmethod
-    def show_message_static(
-            message,
-            message_type = Gtk.MessageType.ERROR,
-            title = None ):
-
-        IndicatorBase.__show_message_internal(
-            Gtk.Dialog(),
-            message,
-            message_type,
-            "" if title is None else title )
+#TODO Does not appear to be used...candidate for deletion.
+    # @staticmethod
+    # def show_message_static(
+    #         message,
+    #         message_type = Gtk.MessageType.ERROR,
+    #         title = None ):
+    #
+    #     IndicatorBase.__show_message_internal(
+    #         Gtk.Dialog(),
+    #         message,
+    #         message_type,
+    #         "" if title is None else title )
 
 
     # Show a message dialog.
@@ -841,22 +947,23 @@ class IndicatorBase( ABC ):
     #                        Gtk.MessageType.ERROR
     #                        Gtk.MessageType.WARNING
     #                        Gtk.MessageType.QUESTION.
-    @staticmethod
-    def __show_message_internal( parent_widget, message, message_type, title ):
-        dialog = Gtk.MessageDialog(
-            parent_widget,
-            Gtk.DialogFlags.MODAL,
-            message_type,
-            Gtk.ButtonsType.OK,
-            message )
-
-        dialog.set_title( title )
-        for child in dialog.get_message_area().get_children():
-            if type( child ) is Gtk.Label:
-                child.set_selectable( True )
-
-        dialog.run()
-        dialog.destroy()
+#TODO Candidate for deletion.
+    # @staticmethod
+    # def __show_message_internal( parent_widget, message, message_type, title ):
+    #     dialog = Gtk.MessageDialog(
+    #         parent_widget,
+    #         Gtk.DialogFlags.MODAL,
+    #         message_type,
+    #         Gtk.ButtonsType.OK,
+    #         message )
+    #
+    #     dialog.set_title( title )
+    #     for child in dialog.get_message_area().get_children():
+    #         if type( child ) is Gtk.Label:
+    #             child.set_selectable( True )
+    #
+    #     dialog.run()
+    #     dialog.destroy()
 
 
     # Show OK/Cancel dialog prompt.
@@ -865,19 +972,75 @@ class IndicatorBase( ABC ):
     #
     # Return either Gtk.ResponseType.OK or Gtk.ResponseType.CANCEL.
 #TODO OK
-    def show_ok_cancel( self, parent_widget, message, title = None ):
+#TODO Try to replace whatever calls this with show_dialog_ok_cancel
+# SHOULD BE SAFE TO DELETE
+    # def show_ok_cancel( self, parent_widget, message, title = None ):
+    #     dialog = Gtk.MessageDialog(
+    #         self.__get_parent( parent_widget ),
+    #         Gtk.DialogFlags.MODAL,
+    #         Gtk.MessageType.QUESTION,
+    #         Gtk.ButtonsType.OK_CANCEL,
+    #         message )
+    #
+    #     if title is None:
+    #         dialog.set_title( self.indicator_name )
+    #
+    #     else:
+    #         dialog.set_title( title )
+    #
+    #     response = dialog.run()
+    #     dialog.destroy()
+    #     return response
+
+
+    def show_dialog_ok_cancel( self, parent_widget, message, title = None ):
+        return \
+            self.__show_dialog(
+                parent_widget,
+                message,
+                Gtk.MessageType.QUESTION,
+                Gtk.ButtonsType.OK_CANCEL,
+                title )
+
+
+    def show_dialog_ok(
+            self,
+            parent_widget,
+            message,
+            title = None,
+            message_type = Gtk.MessageType.ERROR ):
+
+        return \
+            self.__show_dialog(
+                parent_widget,
+                message,
+                message_type,
+                Gtk.ButtonsType.OK,
+                title )
+
+
+    def __show_dialog(
+            self,
+            parent_widget,
+            message,
+            message_type,
+            buttons_type,
+            title = None ):
+
         dialog = Gtk.MessageDialog(
             self.__get_parent( parent_widget ),
             Gtk.DialogFlags.MODAL,
-            Gtk.MessageType.QUESTION,
-            Gtk.ButtonsType.OK_CANCEL,
+            message_type,
+            buttons_type,
             message )
 
-        if title is None:
-            dialog.set_title( self.indicator_name )
+        dialog.set_title( self.indicator_name if title is None else title )
 
-        else:
-            dialog.set_title( title )
+#TODO This should be an option...perhaps only do it for a certain message type?
+#Maybe just do it for all?
+        # for child in dialog.get_message_area().get_children():
+        #     if type( child ) is Gtk.Label:
+        #         child.set_selectable( True ) # Allow the label to be highlighted for copy/paste.
 
         response = dialog.run()
         dialog.destroy()
@@ -1321,29 +1484,6 @@ class IndicatorBase( ABC ):
         return indent_amount
 
 
-    # Get the name of the icon for the indicator to be passed
-    # to the desktop environment for display.
-    #
-    # GTK will take an icon and display it as expected.
-    #
-    # The exception is if the icon filename ends with "-symbolic" (before the extension).
-    # In this case, GTK will take the colour in the icon (say a generic flat #777777)
-    # and replace it with a suitable colour to make the current theme/background/colour.
-    # Refer to this discussion:
-    #   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
-    #
-    # If the icon with "-symbolic" cannot be found, it appears the desktop environment as
-    # a fallback will look for the icon name without the "-symbolic" which is the hicolor.
-    #
-    # When updating/replacing an icon, the desktop environment appears to cache.
-    # So perhaps first try:
-    #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
-    # and if that fails, either log out/in or restart.
-#TODO OK
-    def get_icon_name( self ):
-        return self.indicator_name + "-symbolic"
-
-
 #TODO OK
     def get_autostart_and_delay( self ):
         autostart = False
@@ -1408,6 +1548,7 @@ class IndicatorBase( ABC ):
         return logging
 
 
+#TODO Who calls this?
     def is_number( self, number_as_string ):
         try:
             float( number_as_string )

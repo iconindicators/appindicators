@@ -503,7 +503,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new script." ),
-                clicked_function_and_arguments = (
+                clicked_functionandarguments = (
                     self.onScriptAdd,
                     copyOfScripts, treeview, backgroundScriptsTreeView ) ),
             True,
@@ -519,7 +519,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_button(
                 _( "Edit" ),
                 tooltip_text = _( "Edit the selected script." ),
-                clicked_function_and_arguments = (
+                clicked_functionandarguments = (
                     self.onScriptEdit,
                     copyOfScripts, treeview, backgroundScriptsTreeView, indicatorTextEntry ) ),
             True,
@@ -535,7 +535,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_button(
                 _( "Copy" ),
                 tooltip_text = _( "Duplicate the selected script." ),
-                clicked_function_and_arguments = (
+                clicked_functionandarguments = (
                     self.onScriptCopy,
                     copyOfScripts, treeview, backgroundScriptsTreeView ) ),
             True,
@@ -551,7 +551,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected script." ),
-                clicked_function_and_arguments = (
+                clicked_functionandarguments = (
                     self.onScriptRemove,
                     copyOfScripts, treeview, backgroundScriptsTreeView, commandTextView, indicatorTextEntry ) ),
             True,
@@ -1005,17 +1005,20 @@ class IndicatorScriptRunner( IndicatorBase ):
                 dialog.show_all()
                 if dialog.run() == Gtk.ResponseType.OK:
                     if scriptGroupCombo.get_active_text().strip() == "":
-                        self.show_message( dialog, _( "The group cannot be empty." ) )
+                        # self.show_message( dialog, _( "The group cannot be empty." ) )#TODO Remove
+                        self.show_dialog_ok( dialog, _( "The group cannot be empty." ) )
                         scriptGroupCombo.grab_focus()
                         continue
 
                     if scriptNameEntry.get_text().strip() == "":
-                        self.show_message( dialog, _( "The name cannot be empty." ) )
+                        # self.show_message( dialog, _( "The name cannot be empty." ) )#TODO Remove
+                        self.show_dialog_ok( dialog, _( "The name cannot be empty." ) )
                         scriptNameEntry.grab_focus()
                         continue
 
                     if self.getScript( scripts, scriptGroupCombo.get_active_text().strip(), scriptNameEntry.get_text().strip() ):
-                        self.show_message( dialog, _( "A script of the same group and name already exists." ) )
+                        # self.show_message( dialog, _( "A script of the same group and name already exists." ) )#TODO Remove
+                        self.show_dialog_ok( dialog, _( "A script of the same group and name already exists." ) )
                         scriptGroupCombo.grab_focus()
                         continue
 
@@ -1356,17 +1359,20 @@ class IndicatorScriptRunner( IndicatorBase ):
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 if groupCombo.get_active_text().strip() == "":
-                    self.show_message( dialog, _( "The group cannot be empty." ) )
+                    # self.show_message( dialog, _( "The group cannot be empty." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The group cannot be empty." ) )
                     groupCombo.grab_focus()
                     continue
 
                 if nameEntry.get_text().strip() == "":
-                    self.show_message( dialog, _( "The name cannot be empty." ) )
+                    # self.show_message( dialog, _( "The name cannot be empty." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The name cannot be empty." ) )
                     nameEntry.grab_focus()
                     continue
 
                 if self.getTextViewText( commandTextView ).strip() == "":
-                    self.show_message( dialog, _( "The command cannot be empty." ) )
+                    # self.show_message( dialog, _( "The command cannot be empty." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The command cannot be empty." ) )
                     commandTextView.grab_focus()
                     continue
 
@@ -1376,7 +1382,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 scriptOfSameNameAndGroupExists = self.getScript( scripts, groupCombo.get_active_text().strip(), nameEntry.get_text().strip() ) is not None
                 editedScriptGroupOrNameDifferent = not add and ( groupCombo.get_active_text().strip() != script.getGroup() or nameEntry.get_text().strip() != script.getName() )
                 if ( add or editedScriptGroupOrNameDifferent ) and scriptOfSameNameAndGroupExists:
-                    self.show_message( dialog, _( "A script of the same group and name already exists." ) )
+                    # self.show_message( dialog, _( "A script of the same group and name already exists." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "A script of the same group and name already exists." ) )
                     groupCombo.grab_focus()
                     continue
 

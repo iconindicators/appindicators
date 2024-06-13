@@ -865,11 +865,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_ppa_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_message( treeview, _( "No PPA has been selected for removal." ) )
+            # self.show_message( treeview, _( "No PPA has been selected for removal." ) )#TODO Remove
+            self.show_dialog_ok( treeview, _( "No PPA has been selected for removal." ) )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if self.show_ok_cancel( treeview, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
+            # if self.show_ok_cancel( treeview, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:#TODO Remove
+            if self.show_dialog_ok_cancel( treeview, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
 
 
@@ -983,12 +985,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_name_value = ppaName.get_text().strip()
 
                 if ppa_user_value == "":
-                    self.show_message( dialog, _( "PPA user cannot be empty." )  )
+                    # self.show_message( dialog, _( "PPA user cannot be empty." )  )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "PPA user cannot be empty." )  )
                     ppa_user.grab_focus()
                     continue
 
                 if ppa_name_value == "":
-                    self.show_message( dialog, _( "PPA name cannot be empty." ) )
+                    # self.show_message( dialog, _( "PPA name cannot be empty." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "PPA name cannot be empty." ) )
                     ppaName.grab_focus()
                     continue
 
@@ -1017,7 +1021,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                 break
 
                         if duplicate:
-                            self.show_message( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )
+                            # self.show_message( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )#TODO Remove
+                            self.show_dialog_ok( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )
                             continue
 
                 # Update the model...
@@ -1038,17 +1043,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_filter_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_message( treeview, _( "No filter has been selected for removal." ) )
+            # self.show_message( treeview, _( "No filter has been selected for removal." ) )#TODO Remove
+            self.show_dialog_ok( treeview, _( "No filter has been selected for removal." ) )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            if self.show_ok_cancel( treeview, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
+            # if self.show_ok_cancel( treeview, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:#TODO remove
+            if self.show_dialog_ok_cancel( treeview, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
 
 
     def on_filter_add( self, button, filter_treeview, ppa_treeview ):
         if len( ppa_treeview.get_model() ) == 0:
-            self.show_message( filter_treeview, _( "Please add a PPA first!" ) )
+            # self.show_message( filter_treeview, _( "Please add a PPA first!" ) )#TODO Remove
+            self.show_dialog_ok( filter_treeview, _( "Please add a PPA first!" ) )
 
         else:
             # If the number of filters equals the number of PPA User/Names, cannot add a filter!
@@ -1063,7 +1071,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_users_names.append( ppa_user_name )
 
             if len( filter_treeview.get_model() ) == len( ppa_users_names ):
-                self.show_message( filter_treeview, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )
+                # self.show_message( filter_treeview, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )#TODO Remove
+                self.show_dialog_ok( filter_treeview, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )
 
             else:
                 self.on_filter_double_click( filter_treeview, None, None, ppa_treeview )
@@ -1149,6 +1158,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if row_number is None:
             title = _( "Add Filter" )
 
+        # dialog = self.create_dialog( filter_treeview, title, grid )#TODO Hopefully can be deleted.
         dialog = self.create_dialog( filter_treeview, title, grid )
         while True:
             dialog.show_all()
@@ -1157,7 +1167,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 filter_text = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
                 filter_text = "\n".join( filter_text.split() )
                 if len( filter_text ) == 0:
-                    self.show_message( dialog, _( "Please enter filter text!" ) )
+                    # self.show_message( dialog, _( "Please enter filter text!" ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "Please enter filter text!" ) )
                     continue
 
                 # Update the model...

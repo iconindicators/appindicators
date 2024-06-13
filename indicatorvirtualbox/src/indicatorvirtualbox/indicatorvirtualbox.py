@@ -609,6 +609,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         #     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
         grid.attach( autostart_checkbutton, 0, 1, 2, 1 )
 
+        # dialog = self.create_dialog( tree, _( "Virtual Machine Properties" ), grid )#TODO Hopefully can be deleted.
         dialog = self.create_dialog( tree, _( "Virtual Machine Properties" ), grid )
         while True:
             dialog.show_all()
@@ -617,12 +618,20 @@ class IndicatorVirtualBox( IndicatorBase ):
                 break
 
             if start_command.get_text().strip() == "":
-                self.show_message( dialog, _( "The start command cannot be empty." ) )
+                # self.show_message( dialog, _( "The start command cannot be empty." ) )#TODO Remove
+                self.show_dialog_ok(
+                    dialog,
+                    _( "The start command cannot be empty." ) )
+
                 start_command.grab_focus()
                 continue
 
             if not "%VM%" in start_command.get_text().strip():
-                self.show_message( dialog, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ) )
+                # self.show_message( dialog, _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ) )#TODO Remove
+                self.show_dialog_ok(
+                    dialog,
+                    _( "The start command must contain %VM% which is substituted for the virtual machine name/id." ) )
+
                 start_command.grab_focus()
                 continue
 

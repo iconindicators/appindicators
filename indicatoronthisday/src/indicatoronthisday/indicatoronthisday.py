@@ -468,7 +468,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_calendar_reset( self, button, treeview ):
-        if self.show_ok_cancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
+        # if self.show_ok_cancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:#TODO Remove
+        if self.show_dialog_ok_cancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
             liststore = treeview.get_model().get_model()
             liststore.clear()
             for calendar in self.get_calendars():
@@ -482,15 +483,21 @@ class IndicatorOnThisDay( IndicatorBase ):
     def on_calendar_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_message( treeview, _( "No calendar has been selected." ) )
+            # self.show_message( treeview, _( "No calendar has been selected." ) )#TODO REmove
+            self.show_dialog_ok( treeview, _( "No calendar has been selected." ) )
 
         elif model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars():
-            self.show_message(
+            # self.show_message(
+            #     treeview,
+            #     _( "This calendar is part of your system\nand cannot be removed." ),
+            #     Gtk.MessageType.INFO )#TODO REmove
+            self.show_dialog_ok(
                 treeview,
                 _( "This calendar is part of your system\nand cannot be removed." ),
-                Gtk.MessageType.INFO )
+                message_type = Gtk.MessageType.INFO )
 
-        elif self.show_ok_cancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+        # elif self.show_ok_cancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.  #TODO Remove
+        elif self.show_dialog_ok_cancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -513,6 +520,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         if row_number:
             title = _( "Edit Calendar" )
 
+        # dialog = self.create_dialog( treeview, title, grid )#TODO Hopefully can be deleted.
         dialog = self.create_dialog( treeview, title, grid )
 
         box = Gtk.Box( spacing = 6 )
@@ -581,12 +589,14 @@ class IndicatorOnThisDay( IndicatorBase ):
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 if not is_system_calendar and file_entry.get_text().strip() == "":
-                    self.show_message( dialog, _( "The calendar path cannot be empty." ) )
+                    # self.show_message( dialog, _( "The calendar path cannot be empty." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The calendar path cannot be empty." ) )
                     file_entry.grab_focus()
                     continue
 
                 if not is_system_calendar and not os.path.exists( file_entry.get_text().strip() ):
-                    self.show_message( dialog, _( "The calendar path does not exist." ) )
+                    # self.show_message( dialog, _( "The calendar path does not exist." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The calendar path does not exist." ) )
                     file_entry.grab_focus()
                     continue
 
@@ -625,7 +635,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename() in system_calendars:
-                    self.show_message( dialog, _( "The calendar is part of your system\nand is already included." ), Gtk.MessageType.INFO )
+                    # self.show_message( dialog, _( "The calendar is part of your system\nand is already included." ), Gtk.MessageType.INFO )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The calendar is part of your system\nand is already included." ), Gtk.MessageType.INFO )
 
                 else:
                     calendar_file.set_text( dialog.get_filename() )

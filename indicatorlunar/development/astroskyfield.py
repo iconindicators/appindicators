@@ -19,6 +19,10 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO Might be able to use new OMM method to load satellite data:
+#   https://github.com/skyfielders/python-skyfield/commit/9d4087bb2b8515b6441362fddff8bfe83142de6b
+
+
 #TODO COBS now has a parameter cur-mag to filter the comet downloads by observed magnitude.
 # When cur-mag=15 the number of comets is around 22,
 # which now, may not be too much to calculate in Skyfield.

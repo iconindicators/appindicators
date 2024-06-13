@@ -318,18 +318,21 @@ class IndicatorTide( IndicatorBase ):
 
                 if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
                     if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
-                        self.show_message( dialog, _( "The user script path/filename cannot be found." ) )
+                        # self.show_message( dialog, _( "The user script path/filename cannot be found." ) )#TODO Remove
+                        self.show_dialog_ok( dialog, _( "The user script path/filename cannot be found." ) )
                         user_script_path_and_filename.grab_focus()
                         continue
 
                 elif user_script_path_and_filename.get_text() or user_script_class_name.get_text(): # Cannot have one empty and the other not.
                     if not user_script_path_and_filename.get_text():
-                        self.show_message( dialog, _( "The user script path/filename cannot be empty." ) )
+                        # self.show_message( dialog, _( "The user script path/filename cannot be empty." ) )#TODO Remove
+                        self.show_dialog_ok( dialog, _( "The user script path/filename cannot be empty." ) )
                         user_script_path_and_filename.grab_focus()
                         continue
 
                     else:
-                        self.show_message( dialog, _( "The user script class name cannot be empty." ) )
+                        # self.show_message( dialog, _( "The user script class name cannot be empty." ) )#TODO Remove
+                        self.show_dialog_ok( dialog, _( "The user script class name cannot be empty." ) )
                         user_script_class_name.grab_focus()
                         continue
 

@@ -112,6 +112,8 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def show_history( self ):
+        self.set_menu_sensitivity( False )
+
         textview = Gtk.TextView()
         textview.set_editable( False )
         textview.get_buffer().set_text( self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE ) )
@@ -137,7 +139,20 @@ class IndicatorFortune( IndicatorBase ):
             True,
             0 )
 
-        self.create_dialog_external( None, _( "Fortune History for Session" ), box, True )
+        # self.create_dialog_external( None, _( "Fortune History for Session" ), box, True )
+        dialog = \
+            self.create_dialog(
+                None,
+                _( "Fortune History for Session" ),
+                box,
+                ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ),
+                ( IndicatorBase.DIALOG_DEFAULT_WIDTH, IndicatorBase.DIALOG_DEFAULT_HEIGHT ) )
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
+
+        self.set_menu_sensitivity( True )
 
 
     def refresh_fortune( self ):
@@ -298,7 +313,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Add" ),
                 tooltip_text = _( "Add a new fortune location." ),
-                clicked_function_and_arguments = ( self.on_fortune_add, treeview ) ),
+                clicked_functionandarguments = ( self.on_fortune_add, treeview ) ),
             True,
             True,
             0 )
@@ -312,7 +327,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Remove" ),
                 tooltip_text = _( "Remove the selected fortune location." ),
-                clicked_function_and_arguments = ( self.on_fortune_remove, treeview ) ),
+                clicked_functionandarguments = ( self.on_fortune_remove, treeview ) ),
             True,
             True,
             0 )
@@ -326,7 +341,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Reset" ),
                 tooltip_text = _( "Reset to factory default." ),
-                clicked_function_and_arguments = ( self.on_fortune_reset, treeview ) ),
+                clicked_functionandarguments = ( self.on_fortune_reset, treeview ) ),
             True,
             True,
             0 )
@@ -492,7 +507,8 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def on_fortune_reset( self, button, treeview ):
-        if self.show_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
+        if self.show_dialog_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
+        # if self.show_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:#TODO Remove
             listStore = treeview.get_model().get_model()
             listStore.clear()
             listStore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
@@ -501,10 +517,13 @@ class IndicatorFortune( IndicatorBase ):
     def on_fortune_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_message( treeview, _( "No fortune has been selected for removal." ) ) #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
+            # self.show_message( treeview, _( "No fortune has been selected for removal." ) )#TODO Remove 
+            #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
+            self.show_dialog_ok( treeview, _( "No fortune has been selected for removal." ) )
 
         elif model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE:
-            self.show_message( treeview, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )
+            # self.show_message( treeview, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )#TODO Remove
+            self.show_dialog_ok( treeview, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )
 
         elif self.showOKCancel( treeview, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
             model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
@@ -523,6 +542,7 @@ class IndicatorFortune( IndicatorBase ):
         if row_number:
             title = _( "Edit Fortune" )
 
+        # dialog = self.create_dialog( treeview, title, grid )#TODO Hopefully can be deleted.
         dialog = self.create_dialog( treeview, title, grid )
 
         box = Gtk.Box( spacing = 6 )
@@ -654,7 +674,8 @@ class IndicatorFortune( IndicatorBase ):
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 if fortune_file_directory.get_text().strip() == "": # Will occur if the user does a browse, cancels the browse and hits okay.
-                    self.show_message( dialog, _( "The fortune path cannot be empty." ) )
+                    # self.show_message( dialog, _( "The fortune path cannot be empty." ) )#TODO Remove
+                    self.show_dialog_ok( dialog, _( "The fortune path cannot be empty." ) )
                     fortune_file_directory.grab_focus()
                     continue
 
@@ -708,10 +729,14 @@ class IndicatorFortune( IndicatorBase ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] ):
-                    self.show_message(
+                    # self.show_message(
+                    #     dialog,
+                    #     _( "The fortune is part of your system and is already included." ),
+                    #     Gtk.MessageType.INFO )#TODO Remove
+                    self.show_dialog_ok(
                         dialog,
                         _( "The fortune is part of your system and is already included." ),
-                        Gtk.MessageType.INFO )
+                        message_type = Gtk.MessageType.INFO )
 
                 else:
                     fortune_file_directory.set_text( dialog.get_filename() )
