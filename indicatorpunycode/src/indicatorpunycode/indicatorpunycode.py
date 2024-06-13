@@ -16,6 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO On Debian 12, when selecting text and either middle mouse click or select convert
+# (from primary, not clipboard), get a message "no text is highlight/selected".
+# HOwever this seems intermittent...seemed to get it to work once...
+# maybe switching from primary to clipboard and back again via the preferences.
+
+
 # Application indicator which converts domain names between Unicode and ASCII.
 
 
