@@ -60,12 +60,6 @@ class IndicatorTest( IndicatorBase ):
         self.set_label( IndicatorTest.LABEL )
 
 
-#TODO Delete
-    # def onMouseWheelScroll( self, indicator, delta, scroll_direction ):
-    #     self.setLabel( self.__get_current_time() )
-    #     print( "Mouse wheel is scrolling..." )
-
-
     def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
         self.set_label( self.__get_current_time() )
         print( "Mouse wheel is scrolling..." )
@@ -108,10 +102,14 @@ class IndicatorTest( IndicatorBase ):
         command = "gsettings get org.gnome.desktop.interface "
 
         result = self.process_get( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + command + "icon-theme: " + result )
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() + command + "icon-theme: " + result )
 
         result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + command + "gtk-theme: " + result )
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() + command + "gtk-theme: " + result )
 
         text = self.get_menu_indent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_desktop_environment()
         self.create_and_append_menuitem( submenu, text )
@@ -125,8 +123,9 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + "Reset icon",
-            activate_functionandarguments =
-                ( lambda menuitem: self.set_icon( self.get_icon_name() ), ) )
+            activate_functionandarguments = (
+                lambda menuitem:
+                    self.set_icon( self.get_icon_name() ), ) )
 
         icons = [ "FULL_MOON",
                   "WANING_GIBBOUS",
@@ -150,13 +149,15 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + "Reset label",
-            activate_functionandarguments = ( lambda menuitem: self.set_label( IndicatorTest.LABEL ), ) )
+            activate_functionandarguments = (
+                lambda menuitem:
+                    self.set_label( IndicatorTest.LABEL ), ) )
 
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + "Show current time in label",
-            activate_functionandarguments = 
-                ( lambda menuitem: (
+            activate_functionandarguments = (
+                lambda menuitem: (
                     print( "secondary activate target / mouse middle click" ),
                     self.set_label( self.__get_current_time() ) ), ),
             is_secondary_activate_target = True )
@@ -164,8 +165,8 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + "Show current time in OSD",
-            activate_functionandarguments =
-                ( lambda menuitem:
+            activate_functionandarguments = (
+                lambda menuitem:
                     self.show_notification( "Current time...", self.__get_current_time() ), ) )
 
         self.create_and_append_menuitem( menu, "Label / Tooltip / OSD" ).set_submenu( submenu )
@@ -177,8 +178,8 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() + _( "Copy current time to clipboard" ),
-            activate_functionandarguments =
-                ( lambda menuitem: ( 
+            activate_functionandarguments = (
+                lambda menuitem: ( 
                     print( "clipboard" ),
                     Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__get_current_time(), -1 ) ), ) )
 
@@ -189,8 +190,14 @@ class IndicatorTest( IndicatorBase ):
         submenu = Gtk.Menu()
 
         terminal, execution_flag = self.get_terminal_and_execution_flag()
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Terminal: " + str( terminal ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Execution flag: " + str( execution_flag ) )
+
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() + "Terminal: " + str( terminal ) )
+
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() + "Execution flag: " + str( execution_flag ) )
 
         self.create_and_append_menuitem( menu, "Terminal" ).set_submenu( submenu )
 
@@ -218,8 +225,9 @@ class IndicatorTest( IndicatorBase ):
             self.create_and_append_menuitem(
                 submenu,
                 self.get_menu_indent() + label,
-                activate_functionandarguments =
-                    ( lambda menuitem, command = command: self.__execute_command( command ), ) ) # Note command = command to handle lambda late binding.
+                activate_functionandarguments = (
+                    lambda menuitem, command = command:  # Need command = command to handle lambda late binding.
+                        self.__execute_command( command ), ) )
 
         self.create_and_append_menuitem( menu, "Execute Terminal Command" ).set_submenu( submenu )
 
@@ -238,8 +246,7 @@ class IndicatorTest( IndicatorBase ):
         self.set_icon( icon_filename )
 
 
-    # A direct copy from Indicator Lunar to test
-    # dynamically created SVG icons in the user cache.
+    # A direct copy from indicatorlunar to test dynamically created SVG icons in the user cache.
     #
     # phase The current phase of the moon.
     # illumination_percentage         The brightness ranging from 0 to 100 inclusive.
@@ -291,7 +298,7 @@ class IndicatorTest( IndicatorBase ):
             self.show_notification( "Cannot run script", message )
 
         elif self.is_terminal_qterminal():
-            # As a result of this issue
+            # As a result of
             #    https://github.com/lxqt/qterminal/issues/335
             # the default terminal in Lubuntu (qterminal) fails to parse argument.
             # Although a fix has been made, it is unlikely the repository will be updated any time soon.
@@ -316,11 +323,8 @@ class IndicatorTest( IndicatorBase ):
             self.create_checkbutton(
                 _( "Enable/disable X" ),
                 tooltip_text = _( "Enable/disable X" ),
-                active = self.X )
-#TODO Make sure this is converted okay
-        # x_checkbutton = Gtk.CheckButton.new_with_label( _( "Enable/disable X" ) )
-        # x_checkbutton.set_active( self.X )
-        # x_checkbutton.set_tooltip_text( _( "Enable/disable X" ) )
+                active = self.x )
+
         grid.attach( x_checkbutton, 0, 0, 1, 1 )
 
         store = Gtk.ListStore( str )
@@ -342,23 +346,6 @@ class IndicatorTest( IndicatorBase ):
                     ( ( self.data_function, "" ), renderer_text_for_column_dayofweek, 0 ), ),
                 tooltip_text = "Days of week containing an 'n' are bold." )
 
-        # treeView = Gtk.TreeView.new_with_model( store )
-        # treeView.expand_all()
-        # treeView.set_hexpand( True )
-        # treeView.set_vexpand( True )
-        # treeView.set_tooltip_text( "Days of week containing an 'n' are bold." )
-        #
-        # rendererText = Gtk.CellRendererText()
-        # treeViewColumn = Gtk.TreeViewColumn( _( "Day of Week" ), rendererText, text = 0 )
-        # treeViewColumn.set_expand( True )
-        # treeViewColumn.set_cell_data_func( rendererText, self.dataFunction, "" )
-        # treeView.append_column( treeViewColumn )
-        #
-        # scrolledWindow = Gtk.ScrolledWindow()
-        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        # scrolledWindow.add( treeView )
-        #
-        # grid.attach( scrolledWindow, 0, 1, 1, 10 )
         grid.attach( scrolledwindow, 0, 1, 1, 10 )
 
         autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
@@ -369,7 +356,7 @@ class IndicatorTest( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-            self.X = x_checkbutton.get_active()
+            self.x = x_checkbutton.get_active()
             self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
 
         return response_type
@@ -383,12 +370,12 @@ class IndicatorTest( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.X = config.get( IndicatorTest.CONFIG_X, True )
+        self.x = config.get( IndicatorTest.CONFIG_X, True )
 
 
     def save_config( self ):
         return {
-            IndicatorTest.CONFIG_X : self.X
+            IndicatorTest.CONFIG_X : self.x
         }
 
 
