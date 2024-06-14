@@ -57,7 +57,6 @@ class IndicatorTide( IndicatorBase ):
             message = _( "Please specify a user script and class name in the preferences." )
             menu.append( Gtk.MenuItem.new_with_label( label ) )
             self.show_notification( summary, message )
-            # Notify.Notification.new( summary, message, self.get_icon_name() ).show()#TODO Check
 
         else:
             tidal_readings = [ ]
@@ -106,7 +105,6 @@ class IndicatorTide( IndicatorBase ):
             if not tidal_readings:
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
                 self.show_notification( summary, message )
-                # Notify.Notification.new( summary, message, self.get_icon_name() ).show()#TODO Check
 
         # Update a little after midnight...best guess as to when the user's data source will update.
         today = datetime.datetime.now()
@@ -277,10 +275,7 @@ class IndicatorTide( IndicatorBase ):
                 _( "Show as submenus" ),
                 tooltip_text = _( "Show each day's tides in a submenu." ),
                 active = self.show_as_submenus )
-#TODO Make sure this is converted okay
-        # show_as_submenus_checkbutton = Gtk.CheckButton.new_with_label( _( "Show as submenus" ) )
-        # show_as_submenus_checkbutton.set_active( self.show_as_submenus )
-        # show_as_submenus_checkbutton.set_tooltip_text( _( "Show each day's tides in a submenu." ) )
+
         grid.attach( show_as_submenus_checkbutton, 0, 3, 1, 1 )
 
         show_as_submenus_except_first_day_checkbutton = \
@@ -290,12 +285,7 @@ class IndicatorTide( IndicatorBase ):
                 sensitive = show_as_submenus_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.show_as_submenus_except_first_day )
-#TODO Make sure this is converted okay
-        # show_as_submenus_except_first_day_checkbutton = Gtk.CheckButton.new_with_label( _( "Except first day" ) )
-        # show_as_submenus_except_first_day_checkbutton.set_sensitive( show_as_submenus_checkbutton.get_active() )
-        # show_as_submenus_except_first_day_checkbutton.set_active( self.show_as_submenus_except_first_day )
-        # show_as_submenus_except_first_day_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # show_as_submenus_except_first_day_checkbutton.set_tooltip_text( _( "Show the first day's tide in full." ) )
+
         grid.attach( show_as_submenus_except_first_day_checkbutton, 0, 4, 1, 1 )
 
         show_as_submenus_checkbutton.connect(
@@ -318,20 +308,17 @@ class IndicatorTide( IndicatorBase ):
 
                 if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
                     if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
-                        # self.show_message( dialog, _( "The user script path/filename cannot be found." ) )#TODO Remove
                         self.show_dialog_ok( dialog, _( "The user script path/filename cannot be found." ) )
                         user_script_path_and_filename.grab_focus()
                         continue
 
                 elif user_script_path_and_filename.get_text() or user_script_class_name.get_text(): # Cannot have one empty and the other not.
                     if not user_script_path_and_filename.get_text():
-                        # self.show_message( dialog, _( "The user script path/filename cannot be empty." ) )#TODO Remove
                         self.show_dialog_ok( dialog, _( "The user script path/filename cannot be empty." ) )
                         user_script_path_and_filename.grab_focus()
                         continue
 
                     else:
-                        # self.show_message( dialog, _( "The user script class name cannot be empty." ) )#TODO Remove
                         self.show_dialog_ok( dialog, _( "The user script class name cannot be empty." ) )
                         user_script_class_name.grab_focus()
                         continue
