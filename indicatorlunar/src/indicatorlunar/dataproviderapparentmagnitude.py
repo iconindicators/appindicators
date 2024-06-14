@@ -31,13 +31,18 @@ class DataProviderApparentMagnitude( DataProvider ):
     # Download apparent magnitude data for comets and minor planets
     # and save to the given filename.
     @staticmethod
-    def download( filename, logging, isComet, apparentMagnitudeMaximum ):
-        if isComet:
+    def download(
+            filename,
+            logging,
+            is_comet,
+            apparent_magnitude_maximum ):
+
+        if is_comet:
             downloaded = False # COBS does not directly provide apparent magnitude data.
 
         else:
-            downloaded = DataProviderApparentMagnitude.__downloadFromLowellMinorPlanetServices(
-                filename, logging, apparentMagnitudeMaximum )
+            downloaded = DataProviderApparentMagnitude.__download_from_lowell_minor_planet_services(
+                filename, logging, apparent_magnitude_maximum )
 
         return downloaded
 
@@ -45,11 +50,11 @@ class DataProviderApparentMagnitude( DataProvider ):
     # Download apparent magnitude data for minor planets from Lowell Minor Planet Services
     # and saves to the given filename.
     @staticmethod
-    def __downloadFromLowellMinorPlanetServices( filename, logging, apparentMagnitudeMaximum ):
+    def __download_from_lowell_minor_planet_services( filename, logging, apparent_magnitude_maximum ):
         try:
             variables = {
                 "date": datetime.date.today().isoformat(),
-                "apparentMagnitude": apparentMagnitudeMaximum }
+                "apparentMagnitude": apparent_magnitude_maximum }
 
             query = """
                 query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
@@ -90,21 +95,21 @@ class DataProviderApparentMagnitude( DataProvider ):
             json = { "query": query, "variables": variables }
             response = requests.post( url, None, json, timeout = 5 )
             data = response.json()
-            minorPlanets = data[ "data" ][ "minorplanet" ]
+            minor_planets = data[ "data" ][ "minorplanet" ]
 
             with open( filename, 'w' ) as f:
-                for minorPlanet in minorPlanets:
-                    asteroid_number = minorPlanet[ "ast_number" ]
+                for minor_planet in minor_planets:
+                    asteroid_number = minor_planet[ "ast_number" ]
                     if asteroid_number is None:
                         continue # Not all asteroids / minor planets have a number. 
 
-                    if minorPlanet[ "designameByIdDesignationName" ] is None:
+                    if minor_planet[ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.
 
-                    designationName = minorPlanet[ "designameByIdDesignationName" ][ "str_designame" ]
+                    designation_name = minor_planet[ "designameByIdDesignationName" ][ "str_designame" ]
 
-                    apparentMagnitude = str( minorPlanet[ "ephemeris" ][ 0 ][ "v_mag" ] )
-                    f.write( str( asteroid_number ) + ' ' + designationName + ',' + apparentMagnitude + '\n' )
+                    apparent_magnitude = str( minor_planet[ "ephemeris" ][ 0 ][ "v_mag" ] )
+                    f.write( str( asteroid_number ) + ' ' + designation_name + ',' + apparent_magnitude + '\n' )
 
             downloaded = True
 
@@ -125,42 +130,43 @@ class DataProviderApparentMagnitude( DataProvider ):
     # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
     def load( filename, logging ):
-        amData = { }
+        am_data = { }
         try:
             with open( filename, 'r' ) as f:
                 for line in f.read().splitlines():
-                    lastComma = line.rfind( ',' )
-                    name = line[ 0 : lastComma ]
-                    apparentMagnitude = line[ lastComma + 1 : ]
-                    am = AM( name, apparentMagnitude )
-                    amData[ am.getName().upper() ] = am
+                    last_comma = line.rfind( ',' )
+                    name = line[ 0 : last_comma ]
+                    apparent_magnitude = line[ last_comma + 1 : ]
+                    am = AM( name, apparent_magnitude )
+                    am_data[ am.get_name().upper() ] = am
 
         except Exception as e:
-            amData = { }
+            am_data = { }
             logging.exception( e )
             logging.error( "Error reading apparent magnitude data from: " + filename )
 
-        return amData
+        return am_data
 
 
 # Hold apparent magnitude for a comet or minor planet.
 class AM( object ):
 
-    def __init__( self, name, apparentMagnitude ):
+    def __init__( self, name, apparent_magnitude ):
         self.name = name
-        self.apparentMagnitude = apparentMagnitude
+        self.apparent_magnitude = apparent_magnitude
 
 
-    def getName( self ):
+#TODO Try to figure out who might call this and ensure they call by get_name and not getName
+    def get_name( self ):
         return self.name
 
 
-    def getApparentMagnitude( self ):
-        return self.apparentMagnitude
+    def get_apparent_magnitude( self ):
+        return self.apparent_magnitude
 
 
     def __str__( self ):
-        return self.name + ',' + self.apparentMagnitude
+        return self.name + ',' + self.apparent_magnitude
 
 
     def __repr__( self ):
@@ -170,5 +176,5 @@ class AM( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getName() == other.getName() and \
-            self.getApparentMagnitude() == other.getApparentMagnitude()
+            self.get_name() == other.get_name() and \
+            self.get_apparent_magnitude() == other.get_apparent_magnitude()

@@ -89,14 +89,14 @@ class IndicatorLunar( IndicatorBase ):
     CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
     CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://celestrak.org" )
     if astroBackendName == astroBackendPyEphem:
-        CREDIT = [ astroBackend.getCredit(),
+        CREDIT = [ astroBackend.get_credit(),
                   CREDIT_COMETS,
                   CREDIT_ECLIPSES,
                   CREDIT_MINOR_PLANETS,
                   CREDIT_SATELLITES ]
 
     else:
-        CREDIT = [ astroBackend.getCredit(),
+        CREDIT = [ astroBackend.get_credit(),
                   CREDIT_COMETS,
                   CREDIT_ECLIPSE_SOLAR_ONLY,
                   CREDIT_MINOR_PLANETS,
@@ -118,7 +118,7 @@ class IndicatorLunar( IndicatorBase ):
     BODY_TAGS_TRANSLATIONS = dict(
         list( astroBackend.NAME_TAG_MOON_TRANSLATION.items() ) +
         list( astroBackend.PLANET_TAGS_TRANSLATIONS.items() ) +
-        [ x for x in zip( astroBackend.getStarNames(), astroBackend.getStarTagTranslations() ) ] +
+        [ x for x in zip( astroBackend.get_star_names(), astroBackend.get_star_tag_translations() ) ] +
         list( astroBackend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     CACHE_VERSION = "-96-"
@@ -275,7 +275,7 @@ class IndicatorLunar( IndicatorBase ):
         if self.debug:
             self.create_and_append_menuitem(
                 menu,
-                IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.getVersion() )
+                IndicatorLunar.astroBackendName + ": " + IndicatorLunar.astroBackend.get_version() )
 
         self.updateMenu( menu, utcNow )
         self.setLabel( self.processTags() )
@@ -621,9 +621,9 @@ class IndicatorLunar( IndicatorBase ):
 
         summary = \
             self.satelliteNotificationSummary. \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteGeneralPerturbationData[ number ].getName() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteGeneralPerturbationData[ number ].getNumber() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteGeneralPerturbationData[ number ].get_name() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteGeneralPerturbationData[ number ].get_number() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteGeneralPerturbationData[ number ].get_iternational_designator() ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
@@ -632,9 +632,9 @@ class IndicatorLunar( IndicatorBase ):
 
         message = \
             self.satelliteNotificationMessage. \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteGeneralPerturbationData[ number ].getName() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteGeneralPerturbationData[ number ].getNumber() ). \
-            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NAME, self.satelliteGeneralPerturbationData[ number ].get_name() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_NUMBER, self.satelliteGeneralPerturbationData[ number ].get_number() ). \
+            replace( IndicatorLunar.astroBackend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satelliteGeneralPerturbationData[ number ].get_iternational_designator() ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_AZIMUTH, riseAzimuth ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_RISE_TIME, riseTime ). \
             replace( IndicatorLunar.astroBackend.SATELLITE_TAG_SET_AZIMUTH, setAzimuth ). \
@@ -851,7 +851,7 @@ class IndicatorLunar( IndicatorBase ):
 
             # elif bodyType == IndicatorLunar.astroBackend.BodyType.STAR: displayNameFunction = getDisplayNameStar
             elif bodyType == IndicatorLunar.astroBackend.BodyType.STAR:
-                displayNameFunction = lambda name: IndicatorLunar.astroBackend.getStarNameTranslation( name )
+                displayNameFunction = lambda name: IndicatorLunar.astroBackend.get_star_name_translation( name )
 
             return displayNameFunction
 
@@ -1071,7 +1071,7 @@ class IndicatorLunar( IndicatorBase ):
                 if self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] < utcNowPlusFiveMinutes: # Satellite will rise within the next five minutes.
                     satellites.append( [
                         number,
-                        self.satelliteGeneralPerturbationData[ number ].getName(),
+                        self.satelliteGeneralPerturbationData[ number ].get_name(),
                         self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
                         self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
                         self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
@@ -1086,7 +1086,7 @@ class IndicatorLunar( IndicatorBase ):
                         if inTransit:
                             satellites.append( [
                                 number,
-                                self.satelliteGeneralPerturbationData[ number ].getName(),
+                                self.satelliteGeneralPerturbationData[ number ].get_name(),
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_AZIMUTH, ) ],
                                 self.dataPrevious[ key + ( IndicatorLunar.astroBackend.DATA_TAG_SET_DATE_TIME, ) ],
@@ -1095,19 +1095,19 @@ class IndicatorLunar( IndicatorBase ):
                         else: # Previous transit is complete (and too far back in the past to be applicable), so show next pass.
                             satellites.append( [
                                 number,
-                                self.satelliteGeneralPerturbationData[ number ].getName(),
+                                self.satelliteGeneralPerturbationData[ number ].get_name(),
                                 self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
                     else: # No previous transit, show next pass.
                         satellites.append( [
                             number,
-                            self.satelliteGeneralPerturbationData[ number ].getName(),
+                            self.satelliteGeneralPerturbationData[ number ].get_name(),
                             self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
             elif key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is polar (always up).
                 satellitesPolar.append( [
                     number,
-                    self.satelliteGeneralPerturbationData[ number ].getName(),
+                    self.satelliteGeneralPerturbationData[ number ].get_name(),
                     self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_AZIMUTH, ) ],
                     self.data[ key + ( IndicatorLunar.astroBackend.DATA_TAG_ALTITUDE, ) ] ] )
 
@@ -1147,7 +1147,7 @@ class IndicatorLunar( IndicatorBase ):
             number = info[ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
-            label = indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].getInternationalDesignator()
+            label = indent + name + " : " + number + " : " + self.satelliteGeneralPerturbationData[ number ].get_iternational_designator()
             self.create_and_append_menuitem(
                 subMenu,
                 label,
@@ -1268,7 +1268,7 @@ class IndicatorLunar( IndicatorBase ):
                 displayData = longitude + "° " +_( "W" )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ECLIPSE_TYPE:
-            displayData = eclipse.getEclipseTypeAsText( data )
+            displayData = eclipse.get_eclipse_type_as_text( data )
 
         elif dataTag == IndicatorLunar.astroBackend.DATA_TAG_ILLUMINATION:
             displayData = data + "%"
@@ -1651,7 +1651,7 @@ class IndicatorLunar( IndicatorBase ):
                 minorPlanetStore.append( [
                     minorPlanet in self.minorPlanets,
                     minorPlanet,
-                    self.minorPlanetOrbitalElementData[ minorPlanet ].getName() ] )
+                    self.minorPlanetOrbitalElementData[ minorPlanet ].get_name() ] )
 
         # if self.minorPlanetOrbitalElementData and self.minorPlanetApparentMagnitudeData:
         #     toolTipText = _( "Check a minor planet to display in the menu." ) + "\n\n" + \
@@ -1704,7 +1704,7 @@ class IndicatorLunar( IndicatorBase ):
             cometStore.append( [
                 comet in self.comets,
                 comet,
-                self.cometOrbitalElementData[ comet ].getName() ] )
+                self.cometOrbitalElementData[ comet ].get_name() ] )
 
         # if self.cometOrbitalElementData:
         #     toolTipText = _( "Check a comet to display in the menu." ) + "\n\n" + \
@@ -1752,11 +1752,11 @@ class IndicatorLunar( IndicatorBase ):
         # box.pack_start( self.createTreeView( cometStore, toolTipText, _( "Comets" ), COMET_STORE_INDEX_HUMAN_READABLE_NAME ), True, True, 0 )
 
         stars = [ ]
-        for starName in IndicatorLunar.astroBackend.getStarNames():
+        for starName in IndicatorLunar.astroBackend.get_star_names():
             stars.append( [
                 starName in self.stars,
                 starName,
-                IndicatorLunar.astroBackend.getStarNameTranslation( starName ) ] )
+                IndicatorLunar.astroBackend.get_star_name_translation( starName ) ] )
 
         starStore = Gtk.ListStore( bool, str, str ) # Show/hide, star name, star translated name.
         for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
@@ -1813,9 +1813,9 @@ class IndicatorLunar( IndicatorBase ):
         for satellite in self.satelliteGeneralPerturbationData:
             satelliteStore.append( [
                 satellite in self.satellites,
-                self.satelliteGeneralPerturbationData[ satellite ].getName(),
+                self.satelliteGeneralPerturbationData[ satellite ].get_name(),
                 satellite,
-                self.satelliteGeneralPerturbationData[ satellite ].getInternationalDesignator() ] )
+                self.satelliteGeneralPerturbationData[ satellite ].get_iternational_designator() ] )
 
         satelliteStoreSort = Gtk.TreeModelSort( model = satelliteStore )
         # satelliteStoreSort.set_sort_column_id( 1, Gtk.SortType.ASCENDING )
@@ -1974,7 +1974,7 @@ class IndicatorLunar( IndicatorBase ):
             "Choose a city from the list.\n" + \
             "Or, add in your own city name." ) )
 
-        cities = IndicatorLunar.astroBackend.getCities()
+        cities = IndicatorLunar.astroBackend.get_cities()
         if self.city not in cities:
             cities.append( self.city )
             cities = sorted( cities, key = locale.strxfrm )
@@ -2164,7 +2164,7 @@ class IndicatorLunar( IndicatorBase ):
                         displayTagsStore.append( [ bodyTag + " " + dataTag, translatedTag, value ] )
 
         items = [ [ IndicatorLunar.astroBackend.BodyType.PLANET, IndicatorLunar.astroBackend.PLANETS, IndicatorLunar.astroBackend.DATA_TAGS_PLANET ],
-                  [ IndicatorLunar.astroBackend.BodyType.STAR, IndicatorLunar.astroBackend.getStarNames(), IndicatorLunar.astroBackend.DATA_TAGS_STAR ] ]
+                  [ IndicatorLunar.astroBackend.BodyType.STAR, IndicatorLunar.astroBackend.get_star_names(), IndicatorLunar.astroBackend.DATA_TAGS_STAR ] ]
 
         for item in items:
             bodyType = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
@@ -2207,8 +2207,8 @@ class IndicatorLunar( IndicatorBase ):
             if riseIsPresent:
                 for dataTag in IndicatorLunar.astroBackend.DATA_TAGS_SATELLITE:
                     value = ""
-                    name = self.satelliteGeneralPerturbationData[ bodyTag ].getName()
-                    internationalDesignator = self.satelliteGeneralPerturbationData[ bodyTag ].getInternationalDesignator()
+                    name = self.satelliteGeneralPerturbationData[ bodyTag ].get_name()
+                    internationalDesignator = self.satelliteGeneralPerturbationData[ bodyTag ].get_iternational_designator()
                     translatedTag = name + " : " + bodyTag + " : " + internationalDesignator + " " + IndicatorLunar.astroBackend.DATA_TAGS_TRANSLATIONS[ dataTag ]
                     key = ( IndicatorLunar.astroBackend.BodyType.SATELLITE, bodyTag, dataTag )
                     if key in self.data:
@@ -2424,8 +2424,8 @@ class IndicatorLunar( IndicatorBase ):
 
     def onCityChanged( self, combobox, latitude, longitude, elevation ):
         city = combobox.get_active_text()
-        if city in IndicatorLunar.astroBackend.getCities():
-            theLatitude, theLongitude, theElevation = IndicatorLunar.astroBackend.getLatitudeLongitudeElevation( city )
+        if city in IndicatorLunar.astroBackend.get_cities():
+            theLatitude, theLongitude, theElevation = IndicatorLunar.astroBackend.get_latitude_longitude_elevation( city )
             latitude.set_text( str( theLatitude ) )
             longitude.set_text( str( theLongitude ) )
             elevation.set_text( str( theElevation ) )
@@ -2435,7 +2435,7 @@ class IndicatorLunar( IndicatorBase ):
         try:
             timezone = self.processGet( "cat /etc/timezone" )
             theCity = None
-            cities = IndicatorLunar.astroBackend.getCities()
+            cities = IndicatorLunar.astroBackend.get_cities()
             for city in cities:
                 if city in timezone:
                     theCity = city
@@ -2456,7 +2456,7 @@ class IndicatorLunar( IndicatorBase ):
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
         if self.city is None:
             self.city = self.getDefaultCity()
-            self.latitude, self.longitude, self.elevation = IndicatorLunar.astroBackend.getLatitudeLongitudeElevation( self.city )
+            self.latitude, self.longitude, self.elevation = IndicatorLunar.astroBackend.get_latitude_longitude_elevation( self.city )
 
         else:
             self.elevation = config.get( IndicatorLunar.CONFIG_CITY_ELEVATION )

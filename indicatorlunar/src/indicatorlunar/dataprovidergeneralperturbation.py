@@ -49,7 +49,7 @@ class DataProviderGeneralPerturbation( DataProvider ):
         data = { }
         for fields in omm.parse_xml( filename ):
             gp = GP( fields )
-            data[ gp.getNumber() ] = gp
+            data[ gp.get_number() ] = gp
 
         return data
 
@@ -57,7 +57,7 @@ class DataProviderGeneralPerturbation( DataProvider ):
 class GP( object ):
     '''Hold general perturbation for a satellite.'''
 
-    def __init__( self, xmlFieldsFromOMM ):
+    def __init__( self, xml_fields_from_omm ):
         '''
         Take the XML fields from the OMM data and propagate.
 
@@ -73,45 +73,45 @@ class GP( object ):
 
         Although the resultant satellite record will contain a value of '0'
         for the NORAD catalog number, the actual NORAD catalog number
-        is still available via getNumber().
+        is still available via get_number().
         '''
 
-        self.satelliteRecord = Satrec()
+        self.satellite_record = Satrec()
 
         # Satellite record does not hold the name.
-        self.name = xmlFieldsFromOMM[ "OBJECT_NAME" ]
+        self.name = xml_fields_from_omm[ "OBJECT_NAME" ]
 
-        self.number = xmlFieldsFromOMM[ "NORAD_CAT_ID" ]
-        if float( xmlFieldsFromOMM[ "NORAD_CAT_ID" ] ) > float( "339999" ):
-            xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = '0'
-            omm.initialize( self.satelliteRecord, xmlFieldsFromOMM ) # The satellite record now has a satnum = 0.
-            xmlFieldsFromOMM[ "NORAD_CAT_ID" ] = self.number
+        self.number = xml_fields_from_omm[ "NORAD_CAT_ID" ]
+        if float( xml_fields_from_omm[ "NORAD_CAT_ID" ] ) > float( "339999" ):
+            xml_fields_from_omm[ "NORAD_CAT_ID" ] = '0'
+            omm.initialize( self.satellite_record, xml_fields_from_omm ) # The satellite record now has a satnum = 0.
+            xml_fields_from_omm[ "NORAD_CAT_ID" ] = self.number
 
         else:
-            omm.initialize( self.satelliteRecord, xmlFieldsFromOMM )
+            omm.initialize( self.satellite_record, xml_fields_from_omm )
 
         # Generate on demand.
-        self.tleLineOne = None
-        self.tleLineTwo = None
+        self.tle_line_one = None
+        self.tle_line_two = None
 
 
-    def getName( self ):
+    def get_name( self ):
         return self.name
 
 
-    def getNumber( self ):
+    def get_number( self ):
         return self.number
 
 
-    def getInternationalDesignator( self ):
-        return self.satelliteRecord.intldesg
+    def get_international_designator( self ):
+        return self.satellite_record.intldesg
 
 
-    def getSatelliteRecord( self ):
-        return self.satelliteRecord
+    def get_satellite_record( self ):
+        return self.satellite_record
 
 
-    def getTLELineOneLineTwo( self ):
+    def get_tle_line_one_line_two( self ):
         '''
         The TLE format supports a NORAD catalog number of five characters,
         whereas OMM supports a NORAD catalog number from 1 up to 999,999,999.
@@ -120,30 +120,30 @@ class GP( object ):
         exceeds five characters, the NORAD catalog number will be set to '0'
         in the TLE, which makes no impact upon computing satellite trajectory.
 
-        The actual NORAD catalog number is still available via getNumber().
+        The actual NORAD catalog number is still available via get_number().
         '''
-        if self.tleLineOne is None:
-            if float( self.getNumber() ) > float( "339999" ):
+        if self.tle_line_one is None:
+            if float( self.get_number() ) > float( "339999" ):
                 # The satnum was set to '0' in the init, so safe to do an export.
-                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+                self.tle_line_one, self.tle_line_two = exporter.export_tle( self.satellite_record )
 
-            elif len( self.getNumber() ) > 5:
+            elif len( self.get_number() ) > 5:
                 # https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
-                self.satelliteRecord.satnum_str = "00000"
-                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
-                self.satelliteRecord.satnum_str = alpha5.to_alpha5( int( self.getNumber() ) )
+                self.satellite_record.satnum_str = "00000"
+                self.tle_line_one, self.tle_line_two = exporter.export_tle( self.satellite_record )
+                self.satellite_record.satnum_str = alpha5.to_alpha5( int( self.get_number() ) )
 
             else:
-                self.tleLineOne, self.tleLineTwo = exporter.export_tle( self.satelliteRecord )
+                self.tle_line_one, self.tle_line_two = exporter.export_tle( self.satellite_record )
 
-        return self.tleLineOne, self.tleLineTwo
+        return self.tle_line_one, self.tle_line_two
 
 
     def __str__( self ):
         return \
             self.name + " | " + \
-            str( self.getNumber() ) + " | " + \
-            self.getInternationalDesignator()
+            str( self.get_number() ) + " | " + \
+            self.get_international_designator()
 
 
     def __repr__( self ):
@@ -153,5 +153,5 @@ class GP( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getName() == other.getName() and \
-            self.getSatelliteRecord() == other.getSatelliteRecord()
+            self.get_name() == other.get_name() and \
+            self.get_satellite_record() == other.get_satellite_record()

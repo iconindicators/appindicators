@@ -417,14 +417,14 @@ class AstroBase( ABC ):
     @staticmethod
     @abstractmethod
     def calculate(
-            utcNow,
+            utc_now,
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC,
-            comets, cometData, cometApparentMagnitudeData,
-            minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
-            apparentMagnitudeMaximum,
+            satellites, satellite_data, start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
+            comets, comet_data, comet_apparent_magnitude_data,
+            minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
+            apparent_magnitude_maximum,
             logging = None ):
         return { }
 
@@ -432,7 +432,7 @@ class AstroBase( ABC ):
     # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
     @abstractmethod
-    def getCities():
+    def get_cities():
         return [ ]
 
 
@@ -440,56 +440,58 @@ class AstroBase( ABC ):
     # Format is a credit string followed by an optional URL.
     @staticmethod
     @abstractmethod
-    def getCredit():
+    def get_credit():
         return ""
 
 
     # Returns a tuple of floats of the latitude, longitude and elevation for the city.
     @staticmethod
     @abstractmethod
-    def getLatitudeLongitudeElevation( city ):
+    def get_latitude_longitude_elevation( city ):
         return 0.0, 0.0, 0.0
 
 
     # Returns the version of the underlying astronomical library.
     @staticmethod
     @abstractmethod
-    def getVersion():
+    def get_version():
         return None
 
 
     @staticmethod
-    def __getStarRow( star ):
+    def __get_star_row( star ):
         return next( i for i in AstroBase.STARS if i[ AstroBase.__STARS_INDEX_NAME ] == star )
 
 
     @staticmethod
-    def getStarHIP( star ):
-        return AstroBase.__getStarRow( star )[ AstroBase.__STARS_INDEX_HIP ]
+    def get_star_hip( star ):
+        return AstroBase.__get_star_row( star )[ AstroBase.__STARS_INDEX_HIP ]
 
 
     @staticmethod
-    def getStarNameTranslation( star ):
-        return AstroBase.__getStarRow( star )[ AstroBase.__STARS_INDEX_NAME_TRANSLATION ]
+    def get_star_name_translation( star ):
+        return AstroBase.__get_star_row( star )[ AstroBase.__STARS_INDEX_NAME_TRANSLATION ]
 
 
     @staticmethod
-    def getStarTagTranslation( star ):
-        return AstroBase.__getStarRow( star )[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ]
+    def get_star_tag_translation( star ):
+        return AstroBase.__get_star_row( star )[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ]
 
 
     @staticmethod
-    def getStarNames():
+    def get_star_names():
         return [ i[ AstroBase.__STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
-    @staticmethod
-    def getStarHIPs():
-        return [ i[ AstroBase.__STARS_INDEX_HIP ] for i in AstroBase.STARS ]
+#TODO Does not appear to be called from any file/module...if so, delete it?
+# Otherwise, rename to get_star_hips().
+    # @staticmethod
+    # def getStarHIPs():
+    #     return [ i[ AstroBase.__STARS_INDEX_HIP ] for i in AstroBase.STARS ]
 
 
     @staticmethod
-    def getStarTagTranslations():
+    def get_star_tag_translations():
         return [ i[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
 
 
@@ -499,11 +501,16 @@ class AstroBase( ABC ):
     #
     # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
     @staticmethod
-    def getApparentMagnitude_gk( g_absoluteMagnitude, k_luminosityIndex, bodyEarthDistanceAU, bodySunDistanceAU ):
+    def get_apparent_magnitude_gk(
+            g_absolute_magnitude,
+            k_luminosity_index,
+            body_earth_distance_au,
+            body_sun_distance_au ):
+
         return \
-            g_absoluteMagnitude + \
-            5 * math.log10( bodyEarthDistanceAU ) + \
-            2.5 * k_luminosityIndex * math.log10( bodySunDistanceAU )
+            g_absolute_magnitude + \
+            5 * math.log10( body_earth_distance_au ) + \
+            2.5 * k_luminosity_index * math.log10( body_sun_distance_au )
 
 
     # Calculate apparent magnitude.
@@ -513,7 +520,13 @@ class AstroBase( ABC ):
     # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
     # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
-    def getApparentMagnitude_HG( H_absoluteMagnitude, G_slope, bodyEarthDistanceAU, bodySunDistanceAU, earthSunDistanceAU ):
+    def get_apparent_magnitude_hg(
+            h_absolute_magnitude,
+            g_slope,
+            body_earth_distance_au,
+            body_sun_distance_au,
+            earth_sun_distance_au ):
+
         # The division may result in a number greater than 1 in the fifth or sixth decimal place
         # and when the arccos is executed, throws:
         #
@@ -528,11 +541,11 @@ class AstroBase( ABC ):
         # Not really sure what can be done, or should be done;
         # leave things as they are and the caller can catch the error/exception.
         numerator = \
-            bodySunDistanceAU * bodySunDistanceAU + \
-            bodyEarthDistanceAU * bodyEarthDistanceAU - \
-            earthSunDistanceAU * earthSunDistanceAU
+            body_sun_distance_au * body_sun_distance_au + \
+            body_earth_distance_au * body_earth_distance_au - \
+            earth_sun_distance_au * earth_sun_distance_au
 
-        denominator = 2 * bodySunDistanceAU * bodyEarthDistanceAU
+        denominator = 2 * body_sun_distance_au * body_earth_distance_au
         beta = math.acos( numerator / denominator )
 
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
@@ -540,43 +553,43 @@ class AstroBase( ABC ):
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
         Psi_2 = math.exp( -1.87 * psi_t )
 
-        apparentMagnitude = \
-            H_absoluteMagnitude + \
-            5.0 * math.log10( bodySunDistanceAU * bodyEarthDistanceAU ) - \
-            2.5 * math.log10( ( 1 - G_slope ) * Psi_1 + G_slope * Psi_2 )
+        apparent_magnitude = \
+            h_absolute_magnitude + \
+            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au ) - \
+            2.5 * math.log10( ( 1 - g_slope ) * Psi_1 + g_slope * Psi_2 )
 
-        return apparentMagnitude
+        return apparent_magnitude
 
 
     # Get the lunar phase.
     #
-    #    illuminationPercentage The brightness from 0 to 100 inclusive.
-    #    nextFullMoonDate The date of the next full moon.
-    #    nextNewMoonDate The date of the next new moon.
+    #    illumination_percentage The brightness from 0 to 100 inclusive.
+    #    next_full_moon_date The date of the next full moon.
+    #    next_new_moon_date The date of the next new moon.
     @staticmethod
-    def getLunarPhase( illuminationPercentage, nextFullMoonDate, nextNewMoonDate ):
-        if illuminationPercentage >= 99:
+    def get_lunar_phase( illumination_percentage, next_full_moon_date, next_new_moon_date ):
+        if illumination_percentage >= 99:
             phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
-        elif illuminationPercentage <= 1:
+        elif illumination_percentage <= 1:
             phase = AstroBase.LUNAR_PHASE_NEW_MOON
 
         else: # 1 < illuminationPercentage < 99
-            betweenNewAndFull = nextNewMoonDate > nextFullMoonDate
-            if illuminationPercentage > 51:
-                if betweenNewAndFull:
+            between_new_and_full = next_new_moon_date > next_full_moon_date
+            if illumination_percentage > 51:
+                if between_new_and_full:
                     phase = AstroBase.LUNAR_PHASE_WAXING_GIBBOUS
                 else:
                     phase = AstroBase.LUNAR_PHASE_WANING_GIBBOUS
 
-            elif illuminationPercentage < 49:
-                if betweenNewAndFull:
+            elif illumination_percentage < 49:
+                if between_new_and_full:
                     phase = AstroBase.LUNAR_PHASE_WAXING_CRESCENT
                 else:
                     phase = AstroBase.LUNAR_PHASE_WANING_CRESCENT
 
             else:
-                if betweenNewAndFull:
+                if between_new_and_full:
                     phase = AstroBase.LUNAR_PHASE_FIRST_QUARTER
                 else:
                     phase = AstroBase.LUNAR_PHASE_THIRD_QUARTER
@@ -589,44 +602,44 @@ class AstroBase( ABC ):
     # Reference:
     #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
     @staticmethod
-    def getSiderealTime( utcNow, longitude ):
+    def get_sidereal_time( utc_now, longitude ):
         # Find the Julian date.  Section 4 of the reference.
         # Assume the date is always later than 15th October, 1582.
-        y = utcNow.year
-        m = utcNow.month
+        y = utc_now.year
+        m = utc_now.month
         d = \
-            utcNow.day + \
-            ( utcNow.hour / 24 ) + \
-            ( utcNow.minute / ( 60 * 24 ) ) + \
-            ( utcNow.second / ( 60 * 60 * 24 ) ) + \
-            ( utcNow.microsecond / ( 60 * 60 * 24 * 1000 ) )
+            utc_now.day + \
+            ( utc_now.hour / 24 ) + \
+            ( utc_now.minute / ( 60 * 24 ) ) + \
+            ( utc_now.second / ( 60 * 60 * 24 ) ) + \
+            ( utc_now.microsecond / ( 60 * 60 * 24 * 1000 ) )
 
         if m == 1 or m == 2:
-            yPrime = y - 1
-            mPrime = m + 12
+            y_prime = y - 1
+            m_prime = m + 12
 
         else:
-            yPrime = y
-            mPrime = m
+            y_prime = y
+            m_prime = m
 
-        A = int( yPrime / 100 )
+        A = int( y_prime / 100 )
         B = 2 - A + int( A / 4 )
-        C = int( 365.25 * yPrime )
-        D = int( 30.6001 * ( mPrime + 1 ) )
-        julianDate = B + C + D + d + 1720994.5
+        C = int( 365.25 * y_prime )
+        D = int( 30.6001 * ( m_prime + 1 ) )
+        julian_date = B + C + D + d + 1720994.5
 
         # Find universal time.  Section 12 of the reference.
-        S = julianDate - 2451545.0
+        S = julian_date - 2451545.0
         T = S / 36525.0
         T0 = ( 6.697374558 + ( 2400.051336 * T ) + ( 0.000025862 * T * T ) ) % 24
-        universalTimeDecimal = ( ( ( utcNow.second / 60 ) + utcNow.minute ) / 60 ) + utcNow.hour
-        A = universalTimeDecimal * 1.002737909
-        greenwichSiderealTimeDecimal = ( A + T0 ) % 24
+        universal_time_decimal = ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 ) + utc_now.hour
+        A = universal_time_decimal * 1.002737909
+        greenwich_sidereal_time_decimal = ( A + T0 ) % 24
 
         # Find local sidereal time.  Section 14 of the reference.
-        longitudeInHours = math.degrees( longitude ) / 15
+        longitude_in_hours = math.degrees( longitude ) / 15
 
-        return ( greenwichSiderealTimeDecimal + longitudeInHours ) % 24 # Local sidereal time as a decimal time.
+        return ( greenwich_sidereal_time_decimal + longitude_in_hours ) % 24 # Local sidereal time as a decimal time.
 
 
     # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
@@ -651,27 +664,35 @@ class AstroBase( ABC ):
     #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitudeInDegrees/13425515#13425515
     #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
     @staticmethod
-    def getZenithAngleOfBrightLimb( utcNow, sunRA, sunDec, bodyRA, bodyDec, observerLat, observerLon ):
+    def get_zenith_angle_of_bright_limb(
+            utc_now,
+            sun_ra,
+            sun_dec,
+            body_ra,
+            body_dec,
+            observer_lat,
+            observer_lon ):
+
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
-        y = math.cos( sunDec ) * math.sin( sunRA - bodyRA )
-        x = math.sin( sunDec ) * math.cos( bodyDec ) - math.cos( sunDec ) * math.sin( bodyDec ) * math.cos( sunRA - bodyRA )
-        positionAngleOfBrightLimb = math.atan2( y, x )
+        y = math.cos( sun_dec ) * math.sin( sun_ra - body_ra )
+        x = math.sin( sun_dec ) * math.cos( body_dec ) - math.cos( sun_dec ) * math.sin( body_dec ) * math.cos( sun_ra - body_ra )
+        position_angle_of_bright_limb = math.atan2( y, x )
 
         # Multiply by 15 to convert from decimal time to decimal degrees; section 22 of Practical Astronomy with Your Calculator.
-        localSiderealTime = math.radians( AstroBase.getSiderealTime( utcNow, observerLon ) * 15 )
+        local_sidereal_time = math.radians( AstroBase.get_sidereal_time( utc_now, observer_lon ) * 15 )
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
         # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
-        hourAngle = localSiderealTime - bodyRA
+        hour_angle = local_sidereal_time - body_ra
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
-        y = math.sin( hourAngle )
-        x = math.tan( observerLat ) * math.cos( bodyDec ) - math.sin( bodyDec ) * math.cos( hourAngle )
-        parallacticAngle = math.atan2( y, x )
+        y = math.sin( hour_angle )
+        x = math.tan( observer_lat ) * math.cos( body_dec ) - math.sin( body_dec ) * math.cos( hour_angle )
+        parallactic_angle = math.atan2( y, x )
 
-        return ( positionAngleOfBrightLimb - parallacticAngle ) % ( 2.0 * math.pi )
+        return ( position_angle_of_bright_limb - parallactic_angle ) % ( 2.0 * math.pi )
 
 
     # Take a start/end date/time in UTC to define a search window for a satellite transit
@@ -681,37 +702,42 @@ class AstroBase( ABC ):
     #
     # The start hour (as date/time in UTC) < end hour (as date/time UTC).
     @staticmethod
-    def getStartEndWindows( startDateTime, endDateTime, startHourAsDateTime, endHourAsDateTime ):
+    def getStartEndWindows(
+            start_date_time,
+            end_date_time,
+            start_hour_as_date_time,
+            end_hour_as_date_time ):
+
         #   SH            EH
         #                 SH            EH
         #                               SH            EH
         #                                             SH            EH
         #                                                           SH            EH
         #                        X------------------------X
-        #                 StartDateTime                   EndDateTime
+        #                 start_date_time                   end_date_time
         windows = [ ]
 
-        current = startDateTime - datetime.timedelta( days = 1 )
-        end = endDateTime + datetime.timedelta( days = 1 )
+        current = start_date_time - datetime.timedelta( days = 1 )
+        end = end_date_time + datetime.timedelta( days = 1 )
 
         while current < end:
-            if startHourAsDateTime < startDateTime:
-                if endHourAsDateTime < startDateTime:
+            if start_hour_as_date_time < start_date_time:
+                if end_hour_as_date_time < start_date_time:
                     pass
 
                 else:
-                    windows.append( [ startDateTime, endHourAsDateTime ] )
+                    windows.append( [ start_date_time, end_hour_as_date_time ] )
 
             else:
-                if startHourAsDateTime < endDateTime:
-                    if endHourAsDateTime < endDateTime:
-                        windows.append( [ startHourAsDateTime, endHourAsDateTime ] )
+                if start_hour_as_date_time < end_date_time:
+                    if end_hour_as_date_time < end_date_time:
+                        windows.append( [ start_hour_as_date_time, end_hour_as_date_time ] )
 
                     else:
-                        windows.append( [ startHourAsDateTime, endDateTime ] )
+                        windows.append( [ start_hour_as_date_time, end_date_time ] )
 
             current = current + datetime.timedelta( days = 1 )
-            startHourAsDateTime = startHourAsDateTime + datetime.timedelta( days = 1 )
-            endHourAsDateTime = endHourAsDateTime + datetime.timedelta( days = 1 )
+            start_hour_as_date_time = start_hour_as_date_time + datetime.timedelta( days = 1 )
+            end_hour_as_date_time = end_hour_as_date_time + datetime.timedelta( days = 1 )
 
         return windows

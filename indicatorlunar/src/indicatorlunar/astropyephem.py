@@ -164,61 +164,68 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def calculate(
-            utcNow,
+            utc_now,
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC,
-            comets, cometData, cometApparentMagnitudeData,
-            minorPlanets, minorPlanetData, minorPlanetApparentMagnitudeData,
-            apparentMagnitudeMaximum,
+            satellites, satellite_data, start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
+            comets, comet_data, comet_apparent_magnitude_data,
+            minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
+            apparent_magnitude_maximum,
             logging ):
 
         data = { }
 
-        ephemNow = ephem.Date( utcNow ) # PyEphem date/time is NOT timezone aware.
+        ephem_now = ephem.Date( utc_now ) # PyEphem date/time is NOT timezone aware.
 
         observer = ephem.city( "London" ) # Any name will do; add in the correct latitude/longitude/elevation.
         observer.lat = str( latitude )
         observer.lon = str( longitude )
         observer.elev = elevation
-        observer.date = ephemNow
+        observer.date = ephem_now
 
-        AstroPyEphem.__calculateMoon( ephemNow, observer, data )
-        AstroPyEphem.__calculateSun( ephemNow, observer, data )
-        AstroPyEphem.__calculatePlanets( observer, data, planets, apparentMagnitudeMaximum )
-        AstroPyEphem.__calculateStars( observer, data, stars, apparentMagnitudeMaximum )
+        AstroPyEphem.__calculate_moon( ephem_now, observer, data )
+        AstroPyEphem.__calculate_sun( ephem_now, observer, data )
+        AstroPyEphem.__calculate_planets( observer, data, planets, apparent_magnitude_maximum )
+        AstroPyEphem.__calculate_stars( observer, data, stars, apparent_magnitude_maximum )
 
-        AstroPyEphem.__calculateComets(
+        AstroPyEphem.__calculate_comets(
             observer,
             data,
-            comets, cometData,
-            apparentMagnitudeMaximum,
+            comets, comet_data,
+            apparent_magnitude_maximum,
             logging )
 
-        AstroPyEphem.__calculateMinorPlanets(
+        AstroPyEphem.__calculate_minor_planets(
             observer,
             data,
-            minorPlanets, minorPlanetData,
-            minorPlanetApparentMagnitudeData, apparentMagnitudeMaximum )
+            minor_planets, minor_planet_data,
+            apparent_magnitude_maximum, minor_planet_apparent_magnitude_data )
 
-        AstroPyEphem.__calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC )
+        AstroPyEphem.__calculate_satellites(
+            ephem_now,
+            observer,
+            data,
+            satellites,
+            satellite_data,
+            start_hour_as_date_time_in_utc,
+            end_hour_as_date_time_in_utc )
 
         return data
 
 
     @staticmethod
-    def getCities():
+    def get_cities():
         return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
     @staticmethod
-    def getCredit():
+    def get_credit():
         return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
 
 
     @staticmethod
-    def getLatitudeLongitudeElevation( city ):
+    def get_latitude_longitude_elevation( city ):
         return \
             float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LATITUDE ] ), \
             float( _city_data.get( city )[ AstroPyEphem.__PYEPHEM_CITY_LONGITUDE ] ), \
@@ -226,90 +233,92 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def getVersion():
+    def get_version():
         return ephem.__version__
 
 
     @staticmethod
-    def __calculateMoon( ephemNow, observer, data ):
+    def __calculate_moon( ephem_now, observer, data ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
         moon = ephem.Moon( observer )
         sun = ephem.Sun( observer )
 
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( moon.phase ) # Needed for icon.
 
-        phase = AstroBase.getLunarPhase(
+        phase = AstroBase.get_lunar_phase(
             moon.phase,
-            ephem.next_full_moon( ephemNow ),
-            ephem.next_new_moon( ephemNow ) ) # Need for notification.
+            ephem.next_full_moon( ephem_now ),
+            ephem.next_new_moon( ephem_now ) ) # Need for notification.
+
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase
 
-        brightLimb = AstroBase.getZenithAngleOfBrightLimb(
-            ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ),
+        brightLimb = AstroBase.get_zenith_angle_of_bright_limb(
+            ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ),
             sun.ra, sun.dec,
             moon.ra, moon.dec,
             float( observer.lat ), float( observer.lon ) )
+
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
 
-        if not AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
+        if not AstroPyEphem.__calculate_common( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
-                ephem.next_first_quarter_moon( ephemNow ).datetime().replace( tzinfo = datetime.timezone.utc )
+                ephem.next_first_quarter_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
 
             data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = \
-                ephem.next_full_moon( ephemNow ).datetime().replace( tzinfo = datetime.timezone.utc )
+                ephem.next_full_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
 
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
-                ephem.next_last_quarter_moon( ephemNow ).datetime().replace( tzinfo = datetime.timezone.utc )
+                ephem.next_last_quarter_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
 
             data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = \
-                ephem.next_new_moon( ephemNow ).datetime().replace( tzinfo = datetime.timezone.utc )
+                ephem.next_new_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
 
-            AstroPyEphem.__calculateEclipse( ephemNow, data, key, False )
+            AstroPyEphem.__calculate_eclipse( ephem_now, data, key, False )
 
 
     @staticmethod
-    def __calculateSun( ephemNow, observer, data ):
+    def __calculate_sun( ephem_now, observer, data ):
         sun = ephem.Sun()
         sun.compute( observer )
-        if not AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ), observer, sun ):
+        if not AstroPyEphem.__calculate_common( data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ), observer, sun ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
             data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = \
-                ephem.next_equinox( ephemNow ).datetime().replace( tzinfo = datetime.timezone.utc )
+                ephem.next_equinox( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
 
             data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = \
-                ephem.next_solstice( ephemNow ).datetime().replace( tzinfo = datetime.timezone.utc )
+                ephem.next_solstice( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
 
-            AstroPyEphem.__calculateEclipse( ephemNow, data, key, True )
+            AstroPyEphem.__calculate_eclipse( ephem_now, data, key, True )
 
 
     @staticmethod
-    def __calculateEclipse( ephemNow, data, key, isSolar ):
-        if isSolar:
-            date_time, eclipseType, latitude, longitude = \
-                eclipse.getEclipseSolar( ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ) )
+    def __calculate_eclipse( ephem_now, data, key, is_solar ):
+        if is_solar:
+            date_time, eclipse_type, latitude, longitude = \
+                eclipse.get_eclipse_solar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) )
 
         else:
-            date_time, eclipseType, latitude, longitude = \
-                eclipse.getEclipseLunar( ephemNow.datetime().replace( tzinfo = datetime.timezone.utc ) )
+            date_time, eclipse_type, latitude, longitude = \
+                eclipse.get_eclipse_lunar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) )
 
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = date_time.replace( tzinfo = datetime.timezone.utc )
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipseType
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipse_type
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     @staticmethod
-    def __calculatePlanets( observer, data, planets, apparentMagnitudeMaximum ):
+    def __calculate_planets( observer, data, planets, apparent_magnitude_maximum ):
         for planet in planets:
             body = getattr( ephem, planet.title() )()
             body.compute( observer )
-            if body.mag <= apparentMagnitudeMaximum:
-                AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.PLANET, planet ), observer, body )
+            if body.mag <= apparent_magnitude_maximum:
+                AstroPyEphem.__calculate_common( data, ( AstroBase.BodyType.PLANET, planet ), observer, body )
 
 
     @staticmethod
-    def __calculateStars( observer, data, stars, apparentMagnitudeMaximum ):
+    def __calculate_stars( observer, data, stars, apparent_magnitude_maximum ):
         for star in stars:
             # Did test obtaining the absolute magnitude directly from the ephemeris
             # before reading in and computing the body.
@@ -317,23 +326,23 @@ class AstroPyEphem( AstroBase ):
             # read, compute and obtain the absolute magnitude.
             body = ephem.readdb( AstroPyEphem.__EPHEMERIS_STARS[ star.upper() ] )
             body.compute( observer )
-            if body.mag <= apparentMagnitudeMaximum:
-                AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.STAR, star ), observer, body )
+            if body.mag <= apparent_magnitude_maximum:
+                AstroPyEphem.__calculate_common( data, ( AstroBase.BodyType.STAR, star ), observer, body )
 
 
     @staticmethod
-    def __calculateComets(
+    def __calculate_comets(
             observer,
             data,
-            comets, orbitalElementData,
-            apparentMagnitudeMaximum,
+            comets, orbital_element_data,
+            apparent_magnitude_maximum,
             logging ):
 
         sun = ephem.Sun()
         sun.compute( observer )
         for key in comets:
-            if key in orbitalElementData:
-                fields = orbitalElementData[ key ].getData().split( ',' )
+            if key in orbital_element_data:
+                fields = orbital_element_data[ key ].get_data().split( ',' )
                 object_type = fields[ 2 - 1 ]
                 is_gk = True
                 if object_type == 'e':
@@ -358,48 +367,67 @@ class AstroPyEphem( AstroBase ):
                     logging.warning( "Found unknown object type " + object_type + " for comet " + key )
                     continue
 
-                body = AstroPyEphem.__computeMinorPlanetOrCometForObserver( observer, orbitalElementData[ key ].getData() )
-                if not AstroPyEphem.__isBodyBad( body ):
+                body = AstroPyEphem.__compute_minor_planet_or_comet_for_observer( observer, orbital_element_data[ key ].get_data() )
+                if not AstroPyEphem.__is_body_bad( body ):
                     if is_gk:
-                        apparent_magnitude = AstroBase.getApparentMagnitude_gk(
-                            float( absolute_magnitude ), float( slope_parameter ),
-                            body.earth_distance, body.sun_distance )
+                        apparent_magnitude = \
+                            AstroBase.get_apparent_magnitude_gk(
+                                float( absolute_magnitude ),
+                                float( slope_parameter ),
+                                body.earth_distance,
+                                body.sun_distance )
 
                     else:
-                        apparent_magnitude = AstroBase.getApparentMagnitude_HG(
-                            float( absolute_magnitude ), float( slope_parameter ),
-                            body.earth_distance, body.sun_distance, sun.earth_distance )
+                        apparent_magnitude = \
+                            AstroBase.get_apparent_magnitude_hg(
+                                float( absolute_magnitude ),
+                                float( slope_parameter ),
+                                body.earth_distance,
+                                body.sun_distance,
+                                sun.earth_distance )
 
-                    if apparent_magnitude <= apparentMagnitudeMaximum:
-                        AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.COMET, key ), observer, body )
+                    if apparent_magnitude <= apparent_magnitude_maximum:
+                        AstroPyEphem.__calculate_common(
+                            data,
+                            ( AstroBase.BodyType.COMET, key ),
+                            observer,
+                            body )
 
 
     @staticmethod
-    def __calculateMinorPlanets(
+    def __calculate_minor_planets(
             observer,
             data,
-            minorPlanets, orbitalElementData,
-            apparentMagnitudeData, apparentMagnitudeMaximum ):
+            minor_planets, orbital_element_data,
+            apparent_magnitude_maximum, apparent_magnitude_data ):
 
-        for key in minorPlanets:
-            if key in orbitalElementData and \
-               key in apparentMagnitudeData and \
-               float( apparentMagnitudeData[ key ].getApparentMagnitude() ) < apparentMagnitudeMaximum:
-                body = AstroPyEphem.__computeMinorPlanetOrCometForObserver( observer, orbitalElementData[ key ].getData() )
-                if not AstroPyEphem.__isBodyBad( body ):
-                    AstroPyEphem.__calculateCommon( data, ( AstroBase.BodyType.MINOR_PLANET, key ), observer, body )
+        for key in minor_planets:
+            if key in orbital_element_data and \
+               key in apparent_magnitude_data and \
+               float( apparent_magnitude_data[ key ].get_apparent_magnitude() ) < apparent_magnitude_maximum:
+                body = \
+                    AstroPyEphem.__compute_minor_planet_or_comet_for_observer(
+                        observer,
+                        orbital_element_data[ key ].get_data() )
+
+                if not AstroPyEphem.__is_body_bad( body ):
+                    AstroPyEphem.__calculate_common(
+                        data,
+                        ( AstroBase.BodyType.MINOR_PLANET, key ),
+                        observer,
+                        body )
 
 
     @staticmethod
-    def __computeMinorPlanetOrCometForObserver( observer, orbitalElementData ):
-        body = ephem.readdb( orbitalElementData )
+    def __compute_minor_planet_or_comet_for_observer( observer, orbital_element_data ):
+        body = ephem.readdb( orbital_element_data )
         body.compute( observer )
         return body
 
 
     # Check computed comets and minor planets to guard against bad data.
     @staticmethod
-    def __isBodyBad( body ):
+    def __is_body_bad( body ):
         try:
             bad = \
                 math.isnan( body.earth_distance ) or \
@@ -419,7 +447,7 @@ class AstroPyEphem( AstroBase ):
     #
     # Returns True if the body is never up; false otherwise.
     @staticmethod
-    def __calculateCommon( data, key, observer, body ):
+    def __calculate_common( data, key, observer, body ):
         neverUp = False
         try:
             # Must compute az/alt BEFORE rise/set otherwise results will be incorrect.
@@ -444,9 +472,17 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellites( ephemNow, observer, data, satellites, satelliteData, startHourAsDateTimeInUTC, endHourAsDateTimeInUTC ):
-        utcNow = ephemNow.datetime().replace( tzinfo = datetime.timezone.utc )
-        windows = AstroBase.getStartEndWindows(
+    def __calculate_satellites(
+            ephem_now,
+            observer,
+            data,
+            satellites,
+            satelliteData,
+            startHourAsDateTimeInUTC,
+            endHourAsDateTimeInUTC ):
+
+        utcNow = ephem_now.datetime().replace( tzinfo = datetime.timezone.utc )
+        windows = AstroBase.get_start_end_windows(
             utcNow,
             utcNow + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ),
             startHourAsDateTimeInUTC,
@@ -460,8 +496,8 @@ class AstroPyEphem( AstroBase ):
             if satellite in satelliteData:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
                 earthSatellite = ephem.readtle(
-                                    satelliteData[ satellite ].getName(),
-                                    *satelliteData[ satellite ].getTLELineOneLineTwo() )
+                                    satelliteData[ satellite ].get_name(),
+                                    *satelliteData[ satellite ].get_tle_line_one_line_two() )
 
                 for startDateTime, endDateTime in windows:
                     if AstroPyEphem.__calculateSatellite(
@@ -476,7 +512,7 @@ class AstroPyEphem( AstroBase ):
 
         # The observer's date was constantly changed in the calculate satellite method,
         # so clean up before returning in case the observer is used later.
-        observer.date = ephemNow
+        observer.date = ephem_now
 
 
     @staticmethod

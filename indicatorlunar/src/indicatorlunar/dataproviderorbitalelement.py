@@ -32,19 +32,38 @@ class DataProviderOrbitalElement( DataProvider ):
 
     # Download orbital element data and save to the given filename.
     @staticmethod
-    def download( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
-        if orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET or \
-           orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
-            downloaded = DataProviderOrbitalElement.__downloadFromLowellMinorPlanetServices(
-                filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
+    def download(
+            filename,
+            logging,
+            orbital_element_data_type,
+            apparent_magnitude_maximum ):
 
-        elif orbitalElementDataType == OE.DataType.SKYFIELD_COMET or \
-             orbitalElementDataType == OE.DataType.XEPHEM_COMET:
-            downloaded = DataProviderOrbitalElement.__downloadFromCometObservationDatabase(
-                filename, logging, orbitalElementDataType, apparentMagnitudeMaximum )
+        is_minor_planet = \
+            orbital_element_data_type == OE.DataType.SKYFIELD_MINOR_PLANET or \
+            orbital_element_data_type == OE.DataType.XEPHEM_MINOR_PLANET
+
+        is_comet = \
+            orbital_element_data_type == OE.DataType.SKYFIELD_COMET or \
+            orbital_element_data_type == OE.DataType.XEPHEM_COMET
+
+        if is_minor_planet:
+            downloaded = \
+                DataProviderOrbitalElement.__download_from_lowell_minor_planet_services(
+                    filename,
+                    logging,
+                    orbital_element_data_type,
+                    apparent_magnitude_maximum )
+
+        elif is_comet:
+            downloaded = \
+                DataProviderOrbitalElement.__download_from_comet_observation_database(
+                    filename,
+                    logging,
+                    orbital_element_data_type,
+                    apparent_magnitude_maximum )
 
         else:
-            logging.error( "Unknown data type: " + str( orbitalElementDataType ) )
+            logging.error( "Unknown data type: " + str( orbital_element_data_type ) )
             downloaded = False
 
         return downloaded
@@ -53,11 +72,16 @@ class DataProviderOrbitalElement( DataProvider ):
     # Download orbital element data for minor planets from
     # Lowell Minor Planet Services and save to the given filename.
     @staticmethod
-    def __downloadFromLowellMinorPlanetServices( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
+    def __download_from_lowell_minor_planet_services(
+            filename,
+            logging,
+            orbital_element_data_type,
+            apparent_magnitude_maximum ):
+
         try:
             variables = {
                 "date": datetime.date.today().isoformat(),
-                "apparentMagnitude": apparentMagnitudeMaximum }
+                "apparentMagnitude": apparent_magnitude_maximum }
 
             query = """
                 query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
@@ -104,29 +128,29 @@ class DataProviderOrbitalElement( DataProvider ):
             json = { "query": query, "variables": variables }
             response = requests.post( url, None, json, timeout = 5 )
             data = response.json()
-            minorPlanets = data[ "data" ][ "query_closest_orbelements" ]
+            minor_planets = data[ "data" ][ "query_closest_orbelements" ]
 
             with open( filename, 'w' ) as f:
-                for minorPlanet in minorPlanets:
-                    asteroid_number = minorPlanet[ "minorplanet" ][ "ast_number" ]
+                for minor_planet in minor_planets:
+                    asteroid_number = minor_planet[ "minorplanet" ][ "ast_number" ]
                     if asteroid_number is None:
                         continue # Not all asteroids / minor planets have a number. 
 
-                    if minorPlanet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
+                    if minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.
 
-                    designationName = minorPlanet[ "minorplanet" ][ "designameByIdDesignationName" ][ "str_designame" ]
+                    designation_name = minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ][ "str_designame" ]
 
-                    designation = str( asteroid_number ) + ' ' + designationName
+                    designation = str( asteroid_number ) + ' ' + designation_name
 
-                    absoluteMagnitude = str( minorPlanet[ "minorplanet" ][ 'h' ] )
-                    slopeParameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
-                    meanAnomalyEpoch = str( minorPlanet[ 'm' ] )
-                    argumentPerihelion = str( minorPlanet[ "peri" ] )
-                    longitudeAscendingNode = str( minorPlanet[ "node" ] )
-                    inclinationToEcliptic = str( minorPlanet[ 'i' ] )
-                    orbitalEccentricity = str( minorPlanet[ 'e' ] )
-                    semimajorAxis = str( minorPlanet[ 'a' ] )
+                    absolute_magnitude = str( minor_planet[ "minorplanet" ][ 'h' ] )
+                    slope_parameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
+                    mean_anomaly_epoch = str( minor_planet[ 'm' ] )
+                    argument_perihelion = str( minor_planet[ "peri" ] )
+                    longitude_ascending_node = str( minor_planet[ "node" ] )
+                    inclination_to_ecliptic = str( minor_planet[ 'i' ] )
+                    orbital_eccentricity = str( minor_planet[ 'e' ] )
+                    semimajor_axis = str( minor_planet[ 'a' ] )
 
                     # XEphem has three formats for minor planets
                     # based on the value of the eccentricity ( < 1, == 1, > 1 ):
@@ -137,26 +161,26 @@ class DataProviderOrbitalElement( DataProvider ):
                     # there are no bodies for which the eccentricity is >= 1.0
                     # Therefore this should not be a problem of concern...
                     # ...however, screen out a body with such an eccentricity just to be safe!
-                    if float( orbitalEccentricity ) >= 1.0:
+                    if float( orbital_eccentricity ) >= 1.0:
                         logging.error( "Found a body with eccentricity >= 1.0:" )
-                        logging.error( "\t" + str( minorPlanet ) )
+                        logging.error( "\t" + str( minor_planet ) )
                         continue
 
-                    if orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
+                    if orbital_element_data_type == OE.DataType.XEPHEM_MINOR_PLANET:
                         components = [
                             designation,
                             'e',
-                            inclinationToEcliptic,
-                            longitudeAscendingNode,
-                            argumentPerihelion,
-                            semimajorAxis,
+                            inclination_to_ecliptic,
+                            longitude_ascending_node,
+                            argument_perihelion,
+                            semimajor_axis,
                             '0',
-                            orbitalEccentricity,
-                            meanAnomalyEpoch,
-                            minorPlanet[ "epoch" ][ 5 : 7 ] + '/' + minorPlanet[ "epoch" ][ 8 : 10 ] + '/' + minorPlanet[ "epoch" ][ 0 : 4 ],
+                            orbital_eccentricity,
+                            mean_anomaly_epoch,
+                            minor_planet[ "epoch" ][ 5 : 7 ] + '/' + minor_planet[ "epoch" ][ 8 : 10 ] + '/' + minor_planet[ "epoch" ][ 0 : 4 ],
                             "2000.0",
-                            absoluteMagnitude,
-                            slopeParameter ]
+                            absolute_magnitude,
+                            slope_parameter ]
 
                         f.write( ','.join( components )  + '\n' )
 
@@ -164,25 +188,25 @@ class DataProviderOrbitalElement( DataProvider ):
                         components = [
                             ' ' * 7, # number or designation packed
                             ' ', # 8
-                            str( round( float( absoluteMagnitude ), 2 ) ).rjust( 5 ),
+                            str( round( float( absolute_magnitude ), 2 ) ).rjust( 5 ),
                             ' ', # 14
-                            str( round( float( slopeParameter ), 2 ) ).rjust( 5 ),
+                            str( round( float( slope_parameter ), 2 ) ).rjust( 5 ),
                             ' ', # 20
-                            DataProviderOrbitalElement.getPackedDate( minorPlanet[ "epoch" ][ 0 : 4 ], minorPlanet[ "epoch" ][ 5 : 7 ], minorPlanet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
+                            DataProviderOrbitalElement.get_packed_date( minor_planet[ "epoch" ][ 0 : 4 ], minor_planet[ "epoch" ][ 5 : 7 ], minor_planet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
                             ' ', # 26
-                            str( round( float( meanAnomalyEpoch ), 5 ) ).rjust( 9 ),
+                            str( round( float( mean_anomaly_epoch ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 36, 37
-                            str( round( float( argumentPerihelion ), 5 ) ).rjust( 9 ),
+                            str( round( float( argument_perihelion ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 47, 48
-                            str( round( float( longitudeAscendingNode ), 5 ) ).rjust( 9 ),
+                            str( round( float( longitude_ascending_node ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 58, 59
-                            str( round( float( inclinationToEcliptic ), 5 ) ).rjust( 9 ),
+                            str( round( float( inclination_to_ecliptic ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 69, 70
-                            str( round( float( orbitalEccentricity ), 7 ) ).rjust( 9 ),
+                            str( round( float( orbital_eccentricity ), 7 ) ).rjust( 9 ),
                             ' ', # 80
                             ' ' * 11, # mean daily motion
                             ' ', # 92
-                            str( round( float( semimajorAxis ), 7 ) ).rjust( 11 ),
+                            str( round( float( semimajor_axis ), 7 ) ).rjust( 11 ),
                             ' ' * 2, # 104, 105
                             ' ', # uncertainty parameter
                             ' ', # 107
@@ -221,41 +245,47 @@ class DataProviderOrbitalElement( DataProvider ):
 
     # https://www.minorplanetcenter.net/iau/info/PackedDates.html
     @staticmethod
-    def getPackedDate( year, month, day ):
-        packedYear = year[ 2 : ]
+    def get_packed_date( year, month, day ):
+        packed_year = year[ 2 : ]
         if int( year ) < 1900:
-            packedYear = 'I' + packedYear
+            packed_year = 'I' + packed_year
 
         elif int( year ) < 2000:
-            packedYear = 'J' + packedYear
+            packed_year = 'J' + packed_year
 
         else:
-            packedYear = 'K' + packedYear
+            packed_year = 'K' + packed_year
 
 
-        def getPackedDayMonth( dayOrMonth ):
-            if int( dayOrMonth ) < 10:
-                packedDayMonth = str( int( dayOrMonth ) )
+        def get_packed_day_month( day_or_month ):
+            if int( day_or_month ) < 10:
+                packed_day_month = str( int( day_or_month ) )
 
             else:
-                packedDayMonth = chr( int( dayOrMonth ) - 10 + ord( 'A' ) )
+                packed_day_month = chr( int( day_or_month ) - 10 + ord( 'A' ) )
 
-            return packedDayMonth
+            return packed_day_month
 
-        packedMonth = getPackedDayMonth( month )
-        packedDay = getPackedDayMonth( day )
+        packed_month = get_packed_day_month( month )
+        packed_day = get_packed_day_month( day )
 
-        return packedYear + packedMonth + packedDay
+        return packed_year + packed_month + packed_day
 
 
     # Download orbital element data for comets from
     # Comet Observation Database and save to the given filename.
     @staticmethod
-    def __downloadFromCometObservationDatabase( filename, logging, orbitalElementDataType, apparentMagnitudeMaximum ):
-        url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag=" + \
-              str( int( apparentMagnitudeMaximum ) )
+    def __download_from_comet_observation_database(
+            filename,
+            logging,
+            orbital_element_data_type,
+            apparent_magnitude_maximum ):
 
-        if orbitalElementDataType == OE.DataType.SKYFIELD_COMET:
+        url = \
+            "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag=" + \
+            str( int( apparent_magnitude_maximum ) )
+
+        if orbital_element_data_type == OE.DataType.SKYFIELD_COMET:
             url += "&format=mpc"
 
         else: # Assume to be OE.DataType.PYEPHEM_COMET
@@ -272,17 +302,17 @@ class DataProviderOrbitalElement( DataProvider ):
     #
     # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
-    def load( filename, logging, orbitalElementDataType ):
-        oeData = { }
-        if orbitalElementDataType == OE.DataType.SKYFIELD_COMET or orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET:
-            if orbitalElementDataType == OE.DataType.SKYFIELD_COMET: # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
-                nameStart = 103
-                nameEnd = 158
+    def load( filename, logging, orbital_element_data_type ):
+        oe_data = { }
+        if orbital_element_data_type == OE.DataType.SKYFIELD_COMET or orbital_element_data_type == OE.DataType.SKYFIELD_MINOR_PLANET:
+            if orbital_element_data_type == OE.DataType.SKYFIELD_COMET: # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
+                name_start = 103
+                name_end = 158
                 valid_indices = [ 13, 14, 19, 22, 30, 40, 41, 50, 51, 60, 61, 70, 71, 80, 81, 90, 91, 96, 101, 102, 159 ]
 
-            elif orbitalElementDataType == OE.DataType.SKYFIELD_MINOR_PLANET: # https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
-                nameStart = 167
-                nameEnd = 194
+            elif orbital_element_data_type == OE.DataType.SKYFIELD_MINOR_PLANET: # https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
+                name_start = 167
+                name_end = 194
                 valid_indices = [ 8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
             try:
@@ -295,16 +325,16 @@ class DataProviderOrbitalElement( DataProvider ):
                                 break
 
                         if keep:
-                            name = line[ nameStart - 1 : nameEnd - 1 + 1 ].strip()
-                            oe = OE( name, line, orbitalElementDataType )
-                            oeData[ oe.getName().upper() ] = oe
+                            name = line[ name_start - 1 : name_end - 1 + 1 ].strip()
+                            oe = OE( name, line, orbital_element_data_type )
+                            oe_data[ oe.get_name().upper() ] = oe
 
             except Exception as e:
-                oeData = { }
+                oe_data = { }
                 logging.exception( e )
                 logging.error( "Error reading orbital element data from: " + filename )
 
-        elif orbitalElementDataType == OE.DataType.XEPHEM_COMET or orbitalElementDataType == OE.DataType.XEPHEM_MINOR_PLANET:
+        elif orbital_element_data_type == OE.DataType.XEPHEM_COMET or orbital_element_data_type == OE.DataType.XEPHEM_MINOR_PLANET:
             try:
                 with open( filename, 'r' ) as f:
                     for line in f.read().splitlines():
@@ -319,19 +349,19 @@ class DataProviderOrbitalElement( DataProvider ):
                             # When the cache becomes stale,
                             # a fresh (and hopefully successful) download will occur.
                             name = line[ : line.find( ',' ) ].strip()
-                            oe = OE( name, line, orbitalElementDataType )
-                            oeData[ oe.getName().upper() ] = oe
+                            oe = OE( name, line, orbital_element_data_type )
+                            oe_data[ oe.get_name().upper() ] = oe
 
             except Exception as e:
-                oeData = { }
+                oe_data = { }
                 logging.exception( e )
                 logging.error( "Error reading orbital element data from: " + filename )
 
         else:
-            oeData = { }
-            logging.error( "Unknown data type encountered when loading orbital elements from file: '" + str( orbitalElementDataType ) + "', '" + filename + "'" )
+            oe_data = { }
+            logging.error( "Unknown data type encountered when loading orbital elements from file: '" + str( orbital_element_data_type ) + "', '" + filename + "'" )
 
-        return oeData
+        return oe_data
 
 
 # Hold orbital element for a comet or minor planet.
@@ -344,22 +374,22 @@ class OE( object ):
         XEPHEM_MINOR_PLANET = 3
 
 
-    def __init__( self, name, data, dataType ):
+    def __init__( self, name, data, data_type ):
         self.name = name
         self.data = data
-        self.dataType = dataType
+        self.data_type = data_type
 
 
-    def getName( self ):
+    def get_name( self ):
         return self.name
 
 
-    def getData( self ):
+    def get_data( self ):
         return self.data
 
 
-    def getDataType( self ):
-        return self.dataType
+    def get_data_type( self ):
+        return self.data_type
 
 
     def __str__( self ):
@@ -373,6 +403,6 @@ class OE( object ):
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getName() == other.getName() and \
-            self.getData() == other.getData() and \
-            self.getDataType() == other.getDataType()
+            self.get_name() == other.get_name() and \
+            self.get_data() == other.get_data() and \
+            self.get_data_type() == other.get_data_type()
