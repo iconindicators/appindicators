@@ -32,42 +32,42 @@ class Info( ABC ):
     # The command or script with any arguments as needed.
     # True to play a sound on completion of script/command execution.
     # True to show a notification on completion of script/command execution.
-    def __init__( self, group, name, command, playSound, showNotification ):
+    def __init__( self, group, name, command, play_sound, show_notification ):
         self.group = group
         self.name = name
         self.command = command
-        self.playSound = playSound
-        self.showNotification = showNotification
+        self.play_sound = play_sound
+        self.show_notification = show_notification
 
 
-    def getGroup( self ):
+    def get_group( self ):
         return self.group
 
 
-    def getName( self ):
+    def get_name( self ):
         return self.name
 
 
-    def getCommand( self ):
+    def get_command( self ):
         return self.command
 
 
-    def getPlaySound( self ):
-        return self.playSound
+    def get_play_sound( self ):
+        return self.play_sound
 
 
-    def getShowNotification( self ):
-        return self.showNotification
+    def get_show_notification( self ):
+        return self.show_notification
 
 
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.getGroup() == other.getGroup() and \
-            self.getName() == other.getName() and \
-            self.getCommand() == other.getCommand() and \
-            self.getPlaySound() == other.getPlaySound() and \
-            self.getShowNotification() == other.getShowNotification()
+            self.get_group() == other.get_group() and \
+            self.get_name() == other.get_name() and \
+            self.get_command() == other.get_command() and \
+            self.get_play_sound() == other.get_play_sound() and \
+            self.get_show_notification() == other.get_show_notification()
 
 
     def __str__( self ):
@@ -75,8 +75,8 @@ class Info( ABC ):
             self.group + " | " + \
             self.name + " | " + \
             self.command + " | " + \
-            str( self.playSound ) + " | " + \
-            str( self.showNotification )
+            str( self.play_sound ) + " | " + \
+            str( self.show_notification )
 
 
     def __repr__( self ):
@@ -92,33 +92,33 @@ class Background( Info ):
     # True to show a notification on completion of script/command execution.
     # Update interval (in minutes).
     # Force update; script will update when the next update occurs for ANY background script.
-    def __init__( self, group, name, command, playSound, showNotification, intervalInMinutes, forceUpdate ):
-        super().__init__( group, name, command, playSound, showNotification )
-        self.intervalInMinutes = intervalInMinutes
-        self.forceUpdate = forceUpdate
+    def __init__( self, group, name, command, play_sound, show_notification, interval_in_minutes, force_update ):
+        super().__init__( group, name, command, play_sound, show_notification )
+        self.interval_in_minutes = interval_in_minutes
+        self.force_update = force_update
 
 
-    def getIntervalInMinutes( self ):
-        return int( self.intervalInMinutes )
+    def get_interval_in_minutes( self ):
+        return int( self.interval_in_minutes )
 
 
-    def getForceUpdate( self ):
-        return self.forceUpdate
+    def get_force_update( self ):
+        return self.force_update
 
 
     def __eq__( self, other ):
         return \
             super().__eq__( other ) and \
             self.__class__ == other.__class__ and \
-            self.getIntervalInMinutes() == other.getIntervalInMinutes() and \
-            self.getForceUpdate() == other.getForceUpdate()
+            self.get_interval_in_minutes() == other.get_interval_in_minutes() and \
+            self.get_force_update() == other.get_force_update()
 
 
     def __str__( self ):
         return \
             super().__str__() + " | " + \
-            str( self.intervalInMinutes ) + " | " + \
-            str( self.forceUpdate )
+            str( self.interval_in_minutes ) + " | " + \
+            str( self.force_update )
 
 
     def __repr__( self ):
@@ -134,17 +134,17 @@ class NonBackground( Info ):
     # True to show a notification on completion of script/command execution.
     # True to leave the terminal open on completion of script/command execution.
     # True if the script is default (only one non-background script can be default).
-    def __init__( self, group, name, command, playSound, showNotification, terminalOpen, default ):
-        super().__init__( group, name, command, playSound, showNotification )
-        self.terminalOpen = terminalOpen
+    def __init__( self, group, name, command, play_sound, show_notification, terminal_open, default ):
+        super().__init__( group, name, command, play_sound, show_notification )
+        self.terminal_open = terminal_open
         self.default = default
 
 
-    def getTerminalOpen( self ):
-        return self.terminalOpen
+    def get_terminal_open( self ):
+        return self.terminal_open
 
 
-    def getDefault( self ):
+    def get_default( self ):
         return self.default
 
 
@@ -152,14 +152,14 @@ class NonBackground( Info ):
         return \
             super().__eq__( other ) and \
             self.__class__ == other.__class__ and \
-            self.getTerminalOpen() == other.getTerminalOpen() and \
-            self.getDefault() == other.getDefault()
+            self.get_terminal_open() == other.get_terminal_open() and \
+            self.get_default() == other.get_default()
 
 
     def __str__( self ):
         return \
             super().__str__() + " | " + \
-            str( self.terminalOpen ) + " | " + \
+            str( self.terminal_open ) + " | " + \
             str( self.default )
 
 
