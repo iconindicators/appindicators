@@ -110,7 +110,7 @@ def get_stardate_classic( gregorian_date_time ):
     month = gregorian_date_time.month # Month is one-based.
     day = gregorian_date_time.day
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
-        # Pre-stardate (pre 2162/1/4)...do the conversion here as a negative time is generated.
+        # Pre-stardate era; do the conversion here as a negative time is generated.
         index = 0
         number_of_seconds = ( __gregorian_dates[ index ] - gregorian_date_time ).total_seconds()
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
@@ -126,7 +126,7 @@ def get_stardate_classic( gregorian_date_time ):
     else:
         # First period of stardates (2162/1/4 - 2270/1/26).
         first_period = \
-            (year == 2162 and month == 1 and day >= 4 ) or \
+            ( year == 2162 and month == 1 and day >= 4 ) or \
             ( year == 2162 and month > 1 ) or \
             ( year > 2162 and year < 2270 ) or \
             ( year == 2270 and month == 1 and day < 26 )
@@ -166,8 +166,7 @@ def get_stardate_classic( gregorian_date_time ):
         # Now convert...
         number_of_seconds = ( gregorian_date_time - __gregorian_dates[ index ] ).total_seconds()
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
-        rate = __stardate_rates[ index ]
-        units = number_of_days * rate
+        units = number_of_days * __stardate_rates[ index ]
         stardate_issue = int( units / stardate_ranges[ index ] ) + stardate_issues[ index ]
         remainder = units % stardate_ranges[ index ]
         stardate_integer = int( remainder ) + stardate_integers[ index ]
@@ -302,8 +301,7 @@ def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stard
     else:
         raise Exception( "Illegal issue/integer: " + str( stardate_issue ) + "/" + str( stardate_integer ) )
 
-    rate = __stardate_rates[ index ]
-    days = units / rate
+    days = units / __stardate_rates[ index ]
     hours = ( days - int( days ) ) * 24.0
     minutes = ( hours - int( hours ) ) * 60.0
     seconds = ( minutes - int( minutes ) ) * 60.0

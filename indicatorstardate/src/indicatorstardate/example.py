@@ -22,39 +22,53 @@ import stardate
 
 
 # Exercise the Stardate API.
-print( "Stardate API version: " + stardate.get_version(), "\n" )
+print( f"Stardate API version: {stardate.get_version() }\n" )
 
 utc_now = datetime.datetime.now( datetime.timezone.utc )
-print( "UTC now:", utc_now, "\n" )
+print( f"UTC now: { utc_now }\n" )
 
 stardate_issue, stardate_integer, stardate_fraction = \
     stardate.get_stardate_classic( utc_now )
 
 print(
-    "'classic' Stardate (issue, integer, fraction, fractionalPeriod):",
-    stardate_issue, stardate_integer, stardate_fraction )
+    f"'classic' Stardate components (issue, integer, fraction): " + \
+    f"{ stardate_issue } { stardate_integer } { stardate_fraction }" )
 
-print(
-    "'classic' Stardate (as string):",
-    stardate.to_stardate_string( stardate_issue, stardate_integer, stardate_fraction, True, False ) )
+stardate_as_string = \
+    stardate.to_stardate_string(
+        stardate_issue,
+        stardate_integer,
+        stardate_fraction,
+        True,
+        False )
 
-# Use the calculated 'classic' Stardate to get the date/time (should be the same but rounding plays a part).
-print(
-    "UTC now from 'classic' Stardate:",
-    stardate.get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stardate_fraction ) )
+print( f"'classic' Stardate string: { stardate_as_string }" )
+
+# Use the calculated 'classic' Stardate to get the date/time;
+# should be the same but rounding plays a part.
+utc_now_from_stardate_classic = \
+    stardate.get_gregorian_from_stardate_classic(
+        stardate_issue,
+        stardate_integer,
+        stardate_fraction )
+print( f"UTC now from 'classic' Stardate: { utc_now_from_stardate_classic } " )
 
 print()
 
-stardate_integer, stardate_fraction = stardate.get_stardate_2009_revised( utc_now )
+stardate_integer, stardate_fraction = \
+    stardate.get_stardate_2009_revised( utc_now )
 print(
-    "'2009Revised' Stardate (integer, fraction, fractionalPeriod):",
-    stardate_integer, stardate_fraction )
+    f"'2009 Revised' Stardate components (integer, fraction): "
+    f"{ stardate_integer }, { stardate_fraction }" )
 
 print(
-    "'2009Revised' Stardate (as string):",
+    "'2009 Revised' Stardate (as string):",
     stardate.to_stardate_string( None, stardate_integer, stardate_fraction, None, False ) )
 
-# Use the calculated '2009Revised' Stardate to get the date/time (should be the same but rounding plays a part).
-print(
-    "UTC now from '2009Revised' Stardate:",
-    stardate.get_gregorian_from_stardate_2009_revised( stardate_integer, stardate_fraction ) )
+# Use the calculated '2009 Revised' Stardate to get the date/time;
+# should be the same but rounding plays a part.
+utc_now_from_stardate_2009 = \
+    stardate.get_gregorian_from_stardate_2009_revised(
+        stardate_integer,
+        stardate_fraction )
+print( f"UTC now from '2009 Revised' Stardate: { utc_now_from_stardate_2009 } " )
