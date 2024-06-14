@@ -145,7 +145,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             indent = self.get_menu_indent()
             for ppa in ppas:
-                menuitem = self.create_and_append_menuitem(
+                self.create_and_append_menuitem(
                     menu,
                     ppa.get_descriptor(),
                     name = ppa.get_descriptor(),
@@ -159,9 +159,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 else:
                     self.create_menuitem_for_status_message( menu, indent, ppa )
 
-            # When only one PPA is present, enable middle mouse click on the icon to open the PPA in the browser.
+            # When only one PPA is present, enable a middle mouse click
+            # on the icon to open the PPA in the browser.
             if len( ppas ) == 1:
-                self.set_secondary_activate_target( menuitem )
+                self.set_secondary_activate_target( menu.get_children()[ 0 ] )
 
 
     def create_menuitem_for_published_binary( self, menu, indent, ppa, published_binary ):
@@ -170,7 +171,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             label += ":  " + str( published_binary.get_download_count() )
 
         else:
-            label += " " + published_binary.get_package_version() + ":  " + str( published_binary.get_download_count() )
+            label += \
+                " " + published_binary.get_package_version() + ":  " + \
+                str( published_binary.get_download_count() )
 
         self.create_and_append_menuitem(
             menu,
@@ -383,7 +386,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             "&exact_match=false&ordered=false"
 
         try:
-            published_binaries = json.loads( urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+            published_binaries = \
+                json.loads(
+                    urlopen(
+                        url,
+                        timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+
             has_publised_binaries = published_binaries[ "total_size" ] > 0
 
         except Exception as e:
@@ -415,7 +423,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         while( published_binary_counter < total_published_binaries and ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
                 current_url =  url + "&ws.start=" + str( published_binary_counter )
-                published_binaries = json.loads( urlopen( current_url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                published_binaries = \
+                    json.loads(
+                        urlopen(
+                            current_url,
+                            timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
 
             except Exception as e:
                 self.get_logging().error( "Problem with " + current_url )
@@ -431,9 +443,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             number_published_binaries_current_page = published_binaries_per_page
             if( page_number * published_binaries_per_page ) > total_published_binaries:
-                number_published_binaries_current_page = total_published_binaries - ( ( page_number - 1 ) * published_binaries_per_page )
+                number_published_binaries_current_page = \
+                    total_published_binaries - ( ( page_number - 1 ) * published_binaries_per_page )
 
-            with concurrent.futures.ThreadPoolExecutor( max_workers = 1 if self.low_bandwidth else 3 ) as executor:
+            max_workers = 1 if self.low_bandwidth else 3
+            with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
                 {
                     executor.submit( self.get_download_count, ppa, published_binaries, i ):
                         i for i in range( number_published_binaries_current_page )
@@ -454,12 +468,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.get_name() + "/+binarypub/" + \
                     package_id + "?ws.op=getDownloadCount"
 
-                download_count = json.loads( urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                download_count = \
+                    json.loads(
+                        urlopen(
+                            url,
+                            timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+
                 if str( download_count ).isnumeric():
                     package_name = published_binaries[ "entries" ][ i ][ "binary_package_name" ]
                     package_version = published_binaries[ "entries" ][ i ][ "binary_package_version" ]
                     architecture_specific = published_binaries[ "entries" ][ i ][ "architecture_specific" ]
-                    ppa.add_published_binary( PublishedBinary( package_name, package_version, download_count, architecture_specific ) )
+                    ppa.add_published_binary(
+                        PublishedBinary(
+                            package_name,
+                            package_version,
+                            download_count,
+                            architecture_specific ) )
 
                 else:
                     self.get_logging().error( "The download count at the URL was not numeric: " + url )
@@ -497,34 +521,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 tooltip_text = _( "Double click to edit a PPA." ),
                 rowactivatedfunctionandarguments = ( self.on_ppa_double_click, ) )
 
-        # ppa_treeview = Gtk.TreeView.new_with_model( ppa_store )
-        # ppa_treeview.set_hexpand( True )
-        # ppa_treeview.set_vexpand( True )
-        # ppa_treeview.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
-        # ppa_treeview.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
-        # ppa_treeview.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
-        # ppa_treeview.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
-        # ppa_treeview.set_tooltip_text( _( "Double click to edit a PPA." ) )
-        # ppa_treeview.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        # ppa_treeview.connect( "row-activated", self.on_ppa_double_click )
-        # for column in ppa_treeview.get_columns():
-        #     column.set_expand( True )
-
-        # scrolledWindow = Gtk.ScrolledWindow()
-        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        # scrolledWindow.add( ppa_treeview )
-        # grid.attach( scrolledWindow, 0, 0, 1, 1 )
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )  #TODO Why need this?
         box.set_halign( Gtk.Align.CENTER )
 
-        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        # addButton.set_tooltip_text( _( "Add a new PPA." ) )
-        # addButton.connect( "clicked", self.on_ppa_add, ppa_treeview )
-        # box.pack_start( addButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Add" ),
@@ -534,11 +536,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             True,
             0 )
 
-        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        # removeButton.set_tooltip_text( _( "Remove the selected PPA." ) )
-        # removeButton.connect( "clicked", self.on_ppa_remove, ppa_treeview )
-        # box.pack_start( removeButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
@@ -557,8 +554,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         filter_store = Gtk.ListStore( str, str, str, str, str ) # PPA user, name, series, architecture, filter text.
         for user, name, series, architecture in self.filters.get_user_name_series_architecture():
-            filter_text = self.filters.get_filter_text( user, name, series, architecture )
-            filter_store.append( [ user, name, series, architecture, "\n".join( filter_text ) ] )
+            filter_text = \
+                self.filters.get_filter_text(
+                    user,
+                    name,
+                    series,
+                    architecture )
+
+            filter_store.append(
+                [
+                    user,
+                    name,
+                    series,
+                    architecture,
+                    "\n".join( filter_text ) ] )
 
         filter_treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -578,35 +587,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 tooltip_text = _( "Double click to edit a filter." ),
                 rowactivatedfunctionandarguments = ( self.on_filter_double_click, ppa_treeview ) )
 
-        # filter_treeview = Gtk.TreeView.new_with_model( filter_store )
-        # filter_treeview.set_hexpand( True )
-        # filter_treeview.set_vexpand( True )
-        # filter_treeview.append_column( Gtk.TreeViewColumn( _( "PPA User" ), Gtk.CellRendererText(), text = 0 ) )
-        # filter_treeview.append_column( Gtk.TreeViewColumn( _( "PPA Name" ), Gtk.CellRendererText(), text = 1 ) )
-        # filter_treeview.append_column( Gtk.TreeViewColumn( _( "Series" ), Gtk.CellRendererText(), text = 2 ) )
-        # filter_treeview.append_column( Gtk.TreeViewColumn( _( "Architecture" ), Gtk.CellRendererText(), text = 3 ) )
-        # filter_treeview.append_column( Gtk.TreeViewColumn( _( "Filter" ), Gtk.CellRendererText(), text = 4 ) )
-        # filter_treeview.set_tooltip_text( _( "Double click to edit a filter." ) )
-        # filter_treeview.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-        # filter_treeview.connect( "row-activated", self.on_filter_double_click, ppa_treeview )
-        # for column in filter_treeview.get_columns():
-        #     column.set_expand( True )
-
-        # scrolledWindow = Gtk.ScrolledWindow()
-        # scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-        # scrolledWindow.add( filter_treeview )
-        # grid.attach( scrolledWindow, 0, 0, 1, 1 )
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )  #TODO Why have this?
         box.set_halign( Gtk.Align.CENTER )
 
-        # addButton = Gtk.Button.new_with_label( _( "Add" ) )
-        # addButton.set_tooltip_text( _( "Add a new filter." ) )
-        # addButton.connect( "clicked", self.on_filter_add, filter_treeview, ppa_treeview )
-        # box.pack_start( addButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Add" ),
@@ -616,11 +602,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             True,
             0 )
 
-        # removeButton = Gtk.Button.new_with_label( _( "Remove" ) )
-        # removeButton.set_tooltip_text( _( "Remove the selected filter." ) )
-        # removeButton.connect( "clicked", self.on_filter_remove, filter_treeview )
-        # box.pack_start( removeButton, True, True, 0 )
-#TODO Ensure this was converted correctly.
         box.pack_start(
             self.create_button(
                 _( "Remove" ),
@@ -644,12 +625,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "The download statistics for each PPA\n" + \
                     "are shown in a separate submenu." ),
                 active = self.show_submenu )
-#TODO Make sure this is converted okay
-        # show_as_submenus_checkbutton = Gtk.CheckButton.new_with_label( _( "Show PPAs as submenus" ) )
-        # show_as_submenus_checkbutton.set_tooltip_text( _(
-        #     "The download statistics for each PPA\n" + \
-        #     "are shown in a separate submenu." ) )
-        # show_as_submenus_checkbutton.set_active( self.show_submenu )
+
         grid.attach( show_as_submenus_checkbutton, 0, 0, 1, 1 )
 
         combine_ppas_checkbutton = \
@@ -677,30 +653,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "this category." ),
                 margin_top = 10,
                 active = self.combine_ppas )
-#TODO Make sure this is converted okay
-        # combine_ppas_checkbutton = Gtk.CheckButton.new_with_label( _( "Combine PPAs" ) )
-        # combine_ppas_checkbutton.set_tooltip_text( _(
-        #     "Combine the statistics of binary\n" + \
-        #     "packages when the PPA user/name\n" + \
-        #     "are the same.\n\n" + \
-        #     "Non-architecture specific packages:\n" + \
-        #     "If the package names and version\n" + \
-        #     "numbers of two binary packages are\n" + \
-        #     "identical, the packages are treated\n" + \
-        #     "as the same package and the\n" + \
-        #     "download counts are NOT summed.\n" + \
-        #     "Packages such as Python fall into\n" + \
-        #     "this category.\n\n" + \
-        #     "Architecture specific packages:\n" + \
-        #     "If the package names and version\n" + \
-        #     "numbers of two binary packages are\n" + \
-        #     "identical, the packages are treated\n" + \
-        #     "as the same package and the download\n" + \
-        #     "counts ARE summed.\n" + \
-        #     "Packages such as compiled C fall into\n" + \
-        #     "this category." ) )
-        # combine_ppas_checkbutton.set_active( self.combine_ppas )
-        # combine_ppas_checkbutton.set_margin_top( 10 )
+
         grid.attach( combine_ppas_checkbutton, 0, 1, 1, 1 )
 
         ignore_version_architecture_specific_checkbutton = \
@@ -726,28 +679,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 sensitive = combine_ppas_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.ignore_version_architecture_specific )
-#TODO Make sure this is converted okay
-        # ignore_version_architecture_specific_checkbutton = Gtk.CheckButton.new_with_label( _( "Ignore version for architecture specific" ) )
-        # ignore_version_architecture_specific_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # ignore_version_architecture_specific_checkbutton.set_tooltip_text( _(
-        #     "Sometimes architecture specific\n" + \
-        #     "packages with the same package\n" + \
-        #     "name but different version 'number'\n" + \
-        #     "are logically the SAME package.\n\n" + \
-        #     "For example, a C source package for\n" + \
-        #     "both Ubuntu Saucy and Ubuntu Trusty\n" + \
-        #     "will be compiled twice, each with a\n" + \
-        #     "different 'number', despite being\n" + \
-        #     "the SAME release.\n\n" + \
-        #     "Checking this option will ignore the\n" + \
-        #     "version number when determining if\n" + \
-        #     "two architecture specific packages\n" + \
-        #     "are identical.\n\n" + \
-        #     "The version number is retained only\n" + \
-        #     "if it is identical across ALL\n" + \
-        #     "instances of a published binary." ) )
-        # ignore_version_architecture_specific_checkbutton.set_active( self.ignore_version_architecture_specific )
-        # ignore_version_architecture_specific_checkbutton.set_sensitive( combine_ppas_checkbutton.get_active() )
+
         grid.attach( ignore_version_architecture_specific_checkbutton, 0, 2, 1, 1 )
 
 #TODO Can or should this be moved up or down?
@@ -763,11 +695,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 tooltip_text = _( "Sort by download count within each PPA." ),
                 margin_top = 10,
                 active = self.sort_by_download )
-#TODO Make sure this is converted okay
-        # sort_by_download_checkbutton = Gtk.CheckButton.new_with_label( _( "Sort by download" ) )
-        # sort_by_download_checkbutton.set_tooltip_text( _( "Sort by download count within each PPA." ) )
-        # sort_by_download_checkbutton.set_active( self.sort_by_download )
-        # sort_by_download_checkbutton.set_margin_top( 10 )
+
         grid.attach( sort_by_download_checkbutton, 0, 3, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
@@ -788,7 +716,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "when sorting by download.\n\n" + \
                     "A value of zero will not clip." ),
                 sensitive = sort_by_download_checkbutton.get_active() )
-        # spinner.set_sensitive( sort_by_download_checkbutton.get_active() ) #TODO Check above was converted correctly.
+
         box.pack_start( spinner, False, False, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
@@ -807,11 +735,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 tooltip_text = _( "Enable if your internet connection is slow." ),
                 margin_top = 10,
                 active = self.low_bandwidth )
-#TODO Make sure this is converted okay
-        # low_bandwidth_checkbutton = Gtk.CheckButton.new_with_label( _( "Low bandwidth" ) )
-        # low_bandwidth_checkbutton.set_tooltip_text( _( "Enable if your internet connection is slow." ) )
-        # low_bandwidth_checkbutton.set_active( self.low_bandwidth )
-        # low_bandwidth_checkbutton.set_margin_top( 10 )
+
         grid.attach( low_bandwidth_checkbutton, 0, 5, 1, 1 )
 
         autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
@@ -865,12 +789,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_ppa_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            # self.show_message( treeview, _( "No PPA has been selected for removal." ) )#TODO Remove
             self.show_dialog_ok( treeview, _( "No PPA has been selected for removal." ) )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            # if self.show_ok_cancel( treeview, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:#TODO Remove
             if self.show_dialog_ok_cancel( treeview, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
 
@@ -985,13 +907,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_name_value = ppaName.get_text().strip()
 
                 if ppa_user_value == "":
-                    # self.show_message( dialog, _( "PPA user cannot be empty." )  )#TODO Remove
                     self.show_dialog_ok( dialog, _( "PPA user cannot be empty." )  )
                     ppa_user.grab_focus()
                     continue
 
                 if ppa_name_value == "":
-                    # self.show_message( dialog, _( "PPA name cannot be empty." ) )#TODO Remove
                     self.show_dialog_ok( dialog, _( "PPA name cannot be empty." ) )
                     ppaName.grab_focus()
                     continue
@@ -1021,7 +941,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                 break
 
                         if duplicate:
-                            # self.show_message( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )#TODO Remove
                             self.show_dialog_ok( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )
                             continue
 
@@ -1043,19 +962,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_filter_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            # self.show_message( treeview, _( "No filter has been selected for removal." ) )#TODO Remove
             self.show_dialog_ok( treeview, _( "No filter has been selected for removal." ) )
 
         else:
             # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            # if self.show_ok_cancel( treeview, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:#TODO remove
             if self.show_dialog_ok_cancel( treeview, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
 
 
     def on_filter_add( self, button, filter_treeview, ppa_treeview ):
         if len( ppa_treeview.get_model() ) == 0:
-            # self.show_message( filter_treeview, _( "Please add a PPA first!" ) )#TODO Remove
             self.show_dialog_ok( filter_treeview, _( "Please add a PPA first!" ) )
 
         else:
@@ -1071,7 +987,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_users_names.append( ppa_user_name )
 
             if len( filter_treeview.get_model() ) == len( ppa_users_names ):
-                # self.show_message( filter_treeview, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )#TODO Remove
                 self.show_dialog_ok( filter_treeview, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )
 
             else:
@@ -1145,11 +1060,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             textview.get_buffer().set_text(
                 filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) # This is an edit.
 
-#        scrolledWindow = Gtk.ScrolledWindow()
-#        scrolledWindow.add( textview )
-#        scrolledWindow.set_hexpand( True )
-#        scrolledWindow.set_vexpand( True )
-#        box.pack_start( scrolledWindow, True, True, 0 )
         box.pack_start( self.create_scrolledwindow( textview ), True, True, 0 )
 
         grid.attach( box, 0, 3, 2, 1 )
@@ -1158,7 +1068,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if row_number is None:
             title = _( "Add Filter" )
 
-        # dialog = self.create_dialog( filter_treeview, title, grid )#TODO Hopefully can be deleted.
         dialog = self.create_dialog( filter_treeview, title, grid )
         while True:
             dialog.show_all()
@@ -1167,7 +1076,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 filter_text = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
                 filter_text = "\n".join( filter_text.split() )
                 if len( filter_text ) == 0:
-                    # self.show_message( dialog, _( "Please enter filter text!" ) )#TODO Remove
                     self.show_dialog_ok( dialog, _( "Please enter filter text!" ) )
                     continue
 
