@@ -54,7 +54,7 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-import os #TODO Is this used?
+import os
 
 from event import Event
 
@@ -145,17 +145,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def remove_leading_zero_from_date( self, date ):
-        _date = date[ 0 : -3 ] + ' '
         if date[ -2 ] == '0':
-            _date += date[ -1 ]
+            _date = date[ 0 : -3 ] + ' ' + date[ -1 ]
         
         else:
-            _date += date[ -2 : ]
+            _date = date[ 0 : -3 ] + ' ' + date[ -2 : ]
 
         return _date
-
-#TODO Original is below...check above is correct!
-        # return date[ 0 : -3 ] + ' ' + date[ -1 ] if date[ -2 ] == '0' else date[ 0 : -3 ] + ' ' + date[ -2 : ]
 
 
     def get_events( self ):
@@ -469,7 +465,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         if row_number:
             title = _( "Edit Calendar" )
 
-        # dialog = self.create_dialog( treeview, title, grid )#TODO Hopefully can be deleted.
         dialog = self.create_dialog( treeview, title, grid )
 
         box = Gtk.Box( spacing = 6 )
