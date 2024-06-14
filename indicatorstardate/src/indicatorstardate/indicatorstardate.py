@@ -54,13 +54,19 @@ class IndicatorStardate( IndicatorBase ):
     def update( self, menu ):
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         if self.show_classic:
-            stardate_issue, stardate_integer, stardate_fraction = stardate.get_stardate_classic( utc_now )
-            number_of_seconds_to_next_update = stardate.get_next_update_in_seconds( utc_now, True )
+            stardate_issue, stardate_integer, stardate_fraction = \
+                stardate.get_stardate_classic( utc_now )
+
+            number_of_seconds_to_next_update = \
+                stardate.get_next_update_in_seconds( utc_now, True )
 
         else:
             stardate_issue = None
-            stardate_integer, stardate_fraction = stardate.get_stardate_2009_revised( utc_now )
-            number_of_seconds_to_next_update = stardate.get_next_update_in_seconds( utc_now, False )
+            stardate_integer, stardate_fraction = \
+                stardate.get_stardate_2009_revised( utc_now )
+
+            number_of_seconds_to_next_update = \
+                stardate.get_next_update_in_seconds( utc_now, False )
 
         stardate_string = \
             stardate.to_stardate_string(
@@ -87,7 +93,9 @@ class IndicatorStardate( IndicatorBase ):
             stardate_issue, stardate_integer, stardate_fraction = \
                 stardate.get_stardate_classic( datetime.datetime.now( datetime.timezone.utc ) )
 
-            padding_required = stardate.requires_padding( stardate_issue, stardate_integer )
+            padding_required = \
+                stardate.requires_padding( stardate_issue, stardate_integer )
+
             if padding_required:
                 if self.show_issue and self.pad_integer:
                     self.show_issue = True
@@ -140,14 +148,7 @@ class IndicatorStardate( IndicatorBase ):
                     "Otherwise, show stardate '2009 revised' based on\n\n" + \
                     "\thttps://en.wikipedia.org/wiki/Stardate" ),
                 active = self.show_classic )
-#TODO Make sure this is converted okay
-        # show_classic_checkbutton = Gtk.CheckButton.new_with_label( _( "Show stardate 'classic'" ) )
-        # show_classic_checkbutton.set_active( self.show_classic )
-        # show_classic_checkbutton.set_tooltip_text( _(
-        #     "If checked, show stardate 'classic' based on\n\n" + \
-        #     "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
-        #     "Otherwise, show stardate '2009 revised' based on\n\n" + \
-        #     "\thttps://en.wikipedia.org/wiki/Stardate" ) )
+
         grid.attach( show_classic_checkbutton, 0, 0, 1, 1 )
 
         show_issue_checkbutton = \
@@ -157,12 +158,7 @@ class IndicatorStardate( IndicatorBase ):
                 sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.show_issue )
-#TODO Make sure this is converted okay
-        # show_issue_checkbutton = Gtk.CheckButton.new_with_label( _( "Show ISSUE" ) )
-        # show_issue_checkbutton.set_active( self.show_issue )
-        # show_issue_checkbutton.set_sensitive( show_classic_checkbutton.get_active() )
-        # show_issue_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # show_issue_checkbutton.set_tooltip_text( _( "Show the ISSUE of the stardate 'classic'." ) )
+
         grid.attach( show_issue_checkbutton, 0, 1, 1, 1 )
 
         pad_integer_checkbutton = \
@@ -172,12 +168,7 @@ class IndicatorStardate( IndicatorBase ):
                 sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.pad_integer )
-#TODO Make sure this is converted okay
-        # pad_integer_checkbutton = Gtk.CheckButton.new_with_label( _( "Pad INTEGER" ) )
-        # pad_integer_checkbutton.set_active( self.pad_integer )
-        # pad_integer_checkbutton.set_sensitive( show_classic_checkbutton.get_active() )
-        # pad_integer_checkbutton.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # pad_integer_checkbutton.set_tooltip_text( _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ) )
+
         grid.attach( pad_integer_checkbutton, 0, 2, 1, 1 )
 
         show_classic_checkbutton.connect(
