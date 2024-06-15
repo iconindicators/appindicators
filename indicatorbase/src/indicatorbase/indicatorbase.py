@@ -16,6 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Add changelog entry for each indicator about moving closer to PEP8 or whatever the Python code standard is?
+
 
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
@@ -313,7 +315,6 @@ class IndicatorBase( ABC ):
             level = logging.DEBUG,
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
-        self.secondary_activate_target = None
         self.update_timer_id = None
         self.lock = Lock()
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
@@ -446,7 +447,7 @@ class IndicatorBase( ABC ):
 
     def __update_internal( self ):
         update_start = datetime.datetime.now()
-        self.secondary_activate_target = None
+        self.secondary_activate_target = None # Used as the activate target (menuitem) must be set AFTER the menu is built.
         menu = Gtk.Menu()
         next_update_in_seconds = self.update( menu ) # Call to implementation in indicator.
 
@@ -480,8 +481,10 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
         menu.show_all()
 
-        if self.secondary_activate_target:
-            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+#TODO Hopefully can delete
+        # if self.secondary_activate_target:
+        #     self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         if next_update_in_seconds: # Some indicators don't return a next update time.
             self.update_timer_id = GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
@@ -496,7 +499,7 @@ class IndicatorBase( ABC ):
 
 #TODO OK
     def request_update( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__update )
+        GLib.timeout_add_seconds( delay, self.__update )  #TODO Should the default delay be 1?  Is 0 too fast?  Could some race condition arise?
 
 
 #TODO Delete
@@ -547,9 +550,8 @@ class IndicatorBase( ABC ):
 
 
 #TODO OK
-    def set_secondary_activate_target( self, widget ):
-        self.indicator.set_secondary_activate_target( widget )
-
+    def set_secondary_activate_target( self, menuitem ):
+        self.secondary_activate_target = menuitem
 
 #TODO Delete
     # def requestMouseWheelScrollEvents( self ):
@@ -606,8 +608,10 @@ class IndicatorBase( ABC ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
-        if self.secondary_activate_target:
-            self.indicator.set_secondary_activate_target( None )
+#TODO HOpefully can delete
+        # if self.secondary_activate_target:
+        #     self.indicator.set_secondary_activate_target( None ) #TODO Cannot this be done regardless of the check above?
+        self.indicator.set_secondary_activate_target( None )
 
         about_dialog = Gtk.AboutDialog()
         about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
@@ -651,8 +655,11 @@ class IndicatorBase( ABC ):
 
         self.__set_menu_sensitivity( True )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( True )
-        if self.secondary_activate_target:
-            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+
+#TODO Hopefully can delete
+        # if self.secondary_activate_target:
+        #     self.indicator.set_secondary_activate_target( self.secondary_activate_target ) #TODO Can't we do this regardless of the check above?
+        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         self.lock.release()
 
@@ -694,8 +701,10 @@ class IndicatorBase( ABC ):
         self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
 #        self.__setMenuSensitivity( False )
 
-        if self.secondary_activate_target:
-            self.indicator.set_secondary_activate_target( None )
+#TODO Hopefully delete
+        # if self.secondary_activate_target:
+        #     self.indicator.set_secondary_activate_target( None )
+        self.indicator.set_secondary_activate_target( None )
 
         if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
             GLib.source_remove( self.update_timer_id )
@@ -727,8 +736,11 @@ class IndicatorBase( ABC ):
                 self.__update()
         '''
         self.__set_menu_sensitivity( True )
-        if self.secondary_activate_target:
-            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+
+#TODOHopefuly deletre
+        # if self.secondary_activate_target:
+        #     self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         self.lock.release()
 
@@ -742,15 +754,15 @@ class IndicatorBase( ABC ):
 #TODO Hopefully not needed.
     def __setMenuSensitivity( self, toggle, allMenuItems = False ):
         if allMenuItems:
-            for menuItem in self.indicator.get_menu().get_children():
-                menuItem.set_sensitive( toggle )
+            for menuitem in self.indicator.get_menu().get_children():
+                menuitem.set_sensitive( toggle )
 
         else:
-            menuItems = self.indicator.get_menu().get_children()
-            if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
-                menuItems[ -1 ].set_sensitive( toggle ) # Quit
-                menuItems[ -2 ].set_sensitive( toggle ) # About
-                menuItems[ -3 ].set_sensitive( toggle ) # Preferences
+            menuitems = self.indicator.get_menu().get_children()
+            if len( menuitems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
+                menuitems[ -1 ].set_sensitive( toggle ) # Quit
+                menuitems[ -2 ].set_sensitive( toggle ) # About
+                menuitems[ -3 ].set_sensitive( toggle ) # Preferences
 
 
     def set_menu_sensitivity( self, toggle ):
@@ -758,8 +770,8 @@ class IndicatorBase( ABC ):
 
 
     def __set_menu_sensitivity( self, toggle ):
-        menu_items = self.indicator.get_menu().get_children()
-        if len( menu_items ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
+        menuitems = self.indicator.get_menu().get_children()
+        if len( menuitems ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
             for menuitem in self.indicator.get_menu().get_children():
                 menuitem.set_sensitive( toggle )
 
@@ -767,9 +779,9 @@ class IndicatorBase( ABC ):
 #TODO Probably not needed.
     def __getMenuSensitivity( self ):
         sensitive = False
-        menuItems = self.indicator.get_menu().get_children()
-        if len( menuItems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
-            sensitive = menuItems[ -1 ].get_sensitive() # Quit menu item; no need to check for About/Preferences.
+        menuitems = self.indicator.get_menu().get_children()
+        if len( menuitems ) > 1: # On the first update, the menu only contains a single "initialising" menu item.
+            sensitive = menuitems[ -1 ].get_sensitive() # Quit menu item; no need to check for About/Preferences.
 
         return sensitive
 
@@ -1094,19 +1106,19 @@ class IndicatorBase( ABC ):
         activate_functionandarguments = None,
         is_secondary_activate_target = False ):
 
-        menuItem = Gtk.MenuItem.new_with_label( label )
+        menuitem = Gtk.MenuItem.new_with_label( label )
 
         if name:
-            menuItem.set_name( name )
+            menuitem.set_name( name )
 
         if activate_functionandarguments:
-            menuItem.connect( "activate", *activate_functionandarguments )
+            menuitem.connect( "activate", *activate_functionandarguments )
 
         if is_secondary_activate_target:
-            self.secondary_activate_target = menuItem
+            self.secondary_activate_target = menuitem
 
-        menu.append( menuItem )
-        return menuItem
+        menu.append( menuitem )
+        return menuitem
 
 
 #TODO Delete eventually.
@@ -1147,23 +1159,24 @@ class IndicatorBase( ABC ):
         activate_functionandarguments = None,
         is_secondary_activate_target = False ):
 
-        menuItem = self.create_and_append_menuitem(
+        menuitem = self.create_and_append_menuitem(
             menu,
             label,
             name,
             activate_functionandarguments,
             is_secondary_activate_target )
 
-        menu.reorder_child( menuItem, index )
-        return menuItem
+        menu.reorder_child( menuitem, index )
+        return menuitem
 
 
 #TODO OK
     def get_on_click_menuitem_open_browser_function( self ):
-        return lambda menuItem: webbrowser.open( menuItem.get_name() )
+        return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
     
     # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
+#TODO OK
     def get_textview_text( self, textview ):
         textview_buffer = textview.get_buffer()
         return \
@@ -1240,6 +1253,7 @@ class IndicatorBase( ABC ):
         return grid
 
 
+#TODO OK
     def create_scrolledwindow( self, widget ):
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_hexpand( True )
@@ -1426,13 +1440,9 @@ class IndicatorBase( ABC ):
 
         treeview.set_tooltip_text( tooltip_text )
 #TODO
-# Some indicators use 
-#   treeView.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-# and some use
-#   treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-#
-# So not sure if I can use one or the other for all indicators.
-# If not, need an additional argument.
+# Script runner and virtual box use Gtk.SelectionMode.BROWSE...
+# ...rest of indicators use Gtk.SelectionMode.SINGLE...
+# ...test each variation (browse with those that use single and vice versa)...any difference?
         treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeview.expand_all() #TODO Do for all trees?
         treeview.set_hexpand( True )
@@ -1589,6 +1599,7 @@ class IndicatorBase( ABC ):
 
 
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
+#TODO OK
     def is_label_update_supported( self ):
         label_update_supported = True
         desktop_environment = self.get_desktop_environment()
@@ -1655,6 +1666,7 @@ class IndicatorBase( ABC ):
     #    type( dataA ) == type( dataX ) and type( dataB ) == type( dataY ) and type( dataC ) == type( dataZ ).
     #
     # Each row of the returned ListStore contain one inner list.
+#TODO OK
     def list_of_lists_to_liststore( self, list_of_lists ):
         types = [ ]
         for item in list_of_lists[ 0 ]:
@@ -1758,6 +1770,7 @@ class IndicatorBase( ABC ):
     # and if the timestamp is older than the current date/time
     # plus the maximum age, returns True, otherwise False.
     # If no file can be found, returns True.
+#TODO OK
     def is_cache_stale( self, utc_now, basename, maximum_age_in_hours ):
         cache_date_time = self.get_cache_date_time( basename )
         if cache_date_time is None:
@@ -1792,6 +1805,7 @@ class IndicatorBase( ABC ):
 
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
+#TODO OK
     def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
         return \
             self.__get_cache_directory() + \
@@ -1803,6 +1817,7 @@ class IndicatorBase( ABC ):
     # Search through the cache for all files matching the basename.
     #
     # Returns the newest filename matching the basename on success; None otherwise.
+#TODO OK
     def get_cache_newest_filename( self, basename ):
         cache_directory = self.__get_cache_directory()
         cache_file = ""
@@ -1997,6 +2012,7 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns filename written on success; None otherwise.
+#TODO OK
     def write_cache_text_without_timestamp( self, text, filename ):
         return self.__write_cache_text( text, self.__get_cache_directory() + filename )
 
@@ -2013,6 +2029,7 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns filename written on success; None otherwise.
+#TODO OK
     def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
         cache_file = \
             self.__get_cache_directory() + \
