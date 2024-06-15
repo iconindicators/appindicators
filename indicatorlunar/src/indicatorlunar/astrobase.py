@@ -702,7 +702,7 @@ class AstroBase( ABC ):
     #
     # The start hour (as date/time in UTC) < end hour (as date/time UTC).
     @staticmethod
-    def getStartEndWindows(
+    def get_start_end_windows(
             start_date_time,
             end_date_time,
             start_hour_as_date_time,

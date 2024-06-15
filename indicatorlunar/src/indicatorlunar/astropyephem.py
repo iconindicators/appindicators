@@ -245,20 +245,22 @@ class AstroPyEphem( AstroBase ):
 
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( moon.phase ) # Needed for icon.
 
-        phase = AstroBase.get_lunar_phase(
-            moon.phase,
-            ephem.next_full_moon( ephem_now ),
-            ephem.next_new_moon( ephem_now ) ) # Need for notification.
+        phase = \
+            AstroBase.get_lunar_phase(
+                moon.phase,
+                ephem.next_full_moon( ephem_now ),
+                ephem.next_new_moon( ephem_now ) ) # Need for notification.
 
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase
 
-        brightLimb = AstroBase.get_zenith_angle_of_bright_limb(
-            ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ),
-            sun.ra, sun.dec,
-            moon.ra, moon.dec,
-            float( observer.lat ), float( observer.lon ) )
+        bright_limb = \
+            AstroBase.get_zenith_angle_of_bright_limb(
+                ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ),
+                sun.ra, sun.dec,
+                moon.ra, moon.dec,
+                float( observer.lat ), float( observer.lon ) )
 
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( brightLimb ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( bright_limb ) # Needed for icon.
 
         if not AstroPyEphem.__calculate_common( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
@@ -367,7 +369,11 @@ class AstroPyEphem( AstroBase ):
                     logging.warning( "Found unknown object type " + object_type + " for comet " + key )
                     continue
 
-                body = AstroPyEphem.__compute_minor_planet_or_comet_for_observer( observer, orbital_element_data[ key ].get_data() )
+                body = \
+                    AstroPyEphem.__compute_minor_planet_or_comet_for_observer(
+                        observer,
+                        orbital_element_data[ key ].get_data() )
+
                 if not AstroPyEphem.__is_body_bad( body ):
                     if is_gk:
                         apparent_magnitude = \
@@ -477,37 +483,41 @@ class AstroPyEphem( AstroBase ):
             observer,
             data,
             satellites,
-            satelliteData,
-            startHourAsDateTimeInUTC,
-            endHourAsDateTimeInUTC ):
+            satellite_data,
+            start_hour_as_date_time_in_utc,
+            end_hour_as_date_time_in_utc ):
 
-        utcNow = ephem_now.datetime().replace( tzinfo = datetime.timezone.utc )
-        windows = AstroBase.get_start_end_windows(
-            utcNow,
-            utcNow + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ),
-            startHourAsDateTimeInUTC,
-            endHourAsDateTimeInUTC )
+        utc_now = ephem_now.datetime().replace( tzinfo = datetime.timezone.utc )
+        windows = \
+            AstroBase.get_start_end_windows(
+                utc_now,
+                utc_now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ),
+                start_hour_as_date_time_in_utc,
+                end_hour_as_date_time_in_utc )
 
-        observerVisiblePasses = observer.copy()
-        observerVisiblePasses.pressure = 0
-        observerVisiblePasses.horizon = "-0:34"
+        observer_visible_passes = observer.copy()
+        observer_visible_passes.pressure = 0
+        observer_visible_passes.horizon = "-0:34"
 
         for satellite in satellites:
-            if satellite in satelliteData:
+            if satellite in satellite_data:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
-                earthSatellite = ephem.readtle(
-                                    satelliteData[ satellite ].get_name(),
-                                    *satelliteData[ satellite ].get_tle_line_one_line_two() )
+                earth_satellite = \
+                    ephem.readtle(
+                        satellite_data[ satellite ].get_name(),
+                        *satellite_data[ satellite ].get_tle_line_one_line_two() )
 
-                for startDateTime, endDateTime in windows:
-                    if AstroPyEphem.__calculateSatellite(
-                        ephem.Date( startDateTime ),
-                        ephem.Date( endDateTime ),
-                        data,
-                        key,
-                        earthSatellite,
-                        observer,
-                        observerVisiblePasses ):
+                for start_date_time, end_date_time in windows:
+                    if \
+                        AstroPyEphem.__calculate_satellite(
+                            ephem.Date( start_date_time ),
+                            ephem.Date( end_date_time ),
+                            data,
+                            key,
+                            earth_satellite,
+                            observer,
+                            observer_visible_passes ):
+
                         break
 
         # The observer's date was constantly changed in the calculate satellite method,
@@ -516,51 +526,68 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def __calculateSatellite( startDateTime, endDateTime, data, key, earthSatellite, observer, observerVisiblePasses ):
-        foundPass = False
-        currentDateTime = startDateTime
-        while currentDateTime < endDateTime:
-            observer.date = currentDateTime
-            earthSatellite.compute( observer )
+    def __calculate_satellite(
+            start_date_time,
+            end_date_time,
+            data,
+            key,
+            earth_satellite,
+            observer,
+            observer_visible_passes ):
+
+        found_pass = False
+        current_date_time = start_date_time
+        while current_date_time < end_date_time:
+            observer.date = current_date_time
+            earth_satellite.compute( observer )
             try:
                 # Must set 'singlepass = False' as it is possible a pass is too quick/low and an exception is thrown.
                 # https://github.com/brandon-rhodes/pyephem/issues/164
                 # https://github.com/brandon-rhodes/pyephem/pull/85/files
-                nextPass = observer.next_pass( earthSatellite, singlepass = False )
-                if AstroPyEphem.__isSatellitePassValid( nextPass ):
-                    passBeforeEndDateTime = nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] < endDateTime
-                    passIsVisible = AstroPyEphem.__isSatellitePassVisible( observerVisiblePasses, earthSatellite, nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] )
-                    if passBeforeEndDateTime and passIsVisible:
+                next_pass = observer.next_pass( earth_satellite, singlepass = False )
+                if AstroPyEphem.__is_satellite_pass_valid( next_pass ):
+                    pass_before_end_date_time = \
+                        next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] < end_date_time
+
+                    pass_is_visible = \
+                        AstroPyEphem.__is_satellite_pass_visible(
+                            observer_visible_passes,
+                            earth_satellite,
+                            next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] )
+
+                    if pass_before_end_date_time and pass_is_visible:
                         data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
-                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc )
+                            next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc )
 
                         data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
-                            repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] )
+                            repr( next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] )
 
                         data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
-                            nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc )
+                            next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc )
 
                         data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = \
-                            repr( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_ANGLE ] )
+                            repr( next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_ANGLE ] )
 
-                        foundPass = True
+                        found_pass = True
                         break
 
                     # Look for the next pass starting shortly after current set.
-                    currentDateTime = ephem.Date( nextPass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
+                    current_date_time = \
+                        ephem.Date(
+                            next_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
 
                 else:
-                    currentDateTime = ephem.Date( currentDateTime + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
+                    current_date_time = ephem.Date( current_date_time + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
 
             except ValueError:
-                if earthSatellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                    data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earthSatellite.az )
-                    data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earthSatellite.alt )
-                    foundPass = True
+                if earth_satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
+                    data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earth_satellite.az )
+                    data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earth_satellite.alt )
+                    found_pass = True
 
                 break
 
-        return foundPass
+        return found_pass
 
 
     # Ensure:
@@ -568,18 +595,18 @@ class AstroPyEphem( AstroBase ):
     #    Rise time exceeds transit time.
     #    Transit time exceeds set time.
     @staticmethod
-    def __isSatellitePassValid( satellitePass ):
+    def __is_satellite_pass_valid( satellite_pass ):
         return \
-            satellitePass and \
-            len( satellitePass ) == 6 and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_ANGLE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_ANGLE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ] and \
-            satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] > satellitePass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ]
+            satellite_pass and \
+            len( satellite_pass ) == 6 and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_ANGLE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_ANGLE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_ANGLE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ] > satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_RISING_DATE ] and \
+            satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_SETTING_DATE ] > satellite_pass[ AstroPyEphem.__PYEPHEM_SATELLITE_CULMINATION_DATE ]
 
 
     # Determine if a satellite pass is visible.
@@ -588,11 +615,11 @@ class AstroPyEphem( AstroBase ):
     #    https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
     #    https://celestrak.org/columns/v03n01
     @staticmethod
-    def __isSatellitePassVisible( observerVisiblePasses, satellite, passDateTime ):
-        observerVisiblePasses.date = passDateTime
-        satellite.compute( observerVisiblePasses )
+    def __is_satellite_pass_visible( observer_visible_passes, satellite, pass_date_time ):
+        observer_visible_passes.date = pass_date_time
+        satellite.compute( observer_visible_passes )
         sun = ephem.Sun()
-        sun.compute( observerVisiblePasses )
+        sun.compute( observer_visible_passes )
 
         return \
             not satellite.eclipsed and \
