@@ -156,7 +156,6 @@ class AM( object ):
         self.apparent_magnitude = apparent_magnitude
 
 
-#TODO Try to figure out who might call this and ensure they call by get_name and not getName
     def get_name( self ):
         return self.name
 

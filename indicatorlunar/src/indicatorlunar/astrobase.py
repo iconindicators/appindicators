@@ -426,6 +426,7 @@ class AstroBase( ABC ):
             minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
             apparent_magnitude_maximum,
             logging = None ):
+
         return { }
 
 
@@ -483,11 +484,9 @@ class AstroBase( ABC ):
         return [ i[ AstroBase.__STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
-#TODO Does not appear to be called from any file/module...if so, delete it?
-# Otherwise, rename to get_star_hips().
-    # @staticmethod
-    # def getStarHIPs():
-    #     return [ i[ AstroBase.__STARS_INDEX_HIP ] for i in AstroBase.STARS ]
+    @staticmethod
+    def get_star_hips():
+        return [ i[ AstroBase.__STARS_INDEX_HIP ] for i in AstroBase.STARS ]
 
 
     @staticmethod

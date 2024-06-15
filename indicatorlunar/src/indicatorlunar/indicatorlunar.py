@@ -828,7 +828,7 @@ class IndicatorLunar( IndicatorBase ):
                 menuitem_name_function = (
                     lambda name:
                         IndicatorLunar.SEARCH_URL_STAR + \
-                        str( IndicatorLunar.astro_backend.getStarHIP( name ) ) )
+                        str( IndicatorLunar.astro_backend.get_star_hip( name ) ) )
 
             return menuitem_name_function
 
