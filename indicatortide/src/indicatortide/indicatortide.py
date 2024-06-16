@@ -181,38 +181,38 @@ class IndicatorTide( IndicatorBase ):
     def __create_menu_sub( self, tidal_readings, menu, indent ):
         today_date = ""
         shown_today = False
-        subMenu = None # Only declared here to keep the compiler happy.
-        for tidalReading in tidal_readings:
-            if today_date != tidalReading.get_date():
+        submenu = None # Only declared here to keep the compiler happy.
+        for tidal_reading in tidal_readings:
+            if today_date != tidal_reading.get_date():
                 shown_today = False
 
-            menuText = \
+            menu_text = \
                 indent + self.get_menu_indent() + \
-                ( _( "HIGH" ) if tidalReading.is_high() else _( "LOW" ) ) + "  " + \
-                tidalReading.get_time() + "  " + tidalReading.get_level()
+                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) + "  " + \
+                tidal_reading.get_time() + "  " + tidal_reading.get_level()
 
             if shown_today:
                 self.create_and_append_menuitem(
-                    subMenu,
-                    menuText,
-                    name = tidalReading.get_url(),
+                    submenu,
+                    menu_text,
+                    name = tidal_reading.get_url(),
                     activate_functionandarguments = (
                         self.get_on_click_menuitem_open_browser_function(), ) )
 
             else:
-                subMenu = Gtk.Menu()
+                submenu = Gtk.Menu()
                 self.create_and_append_menuitem(
                     menu,
-                    indent + tidalReading.get_date() ).set_submenu( subMenu )
+                    indent + tidal_reading.get_date() ).set_submenu( submenu )
 
                 self.create_and_append_menuitem(
-                    subMenu,
-                    menuText,
-                    name = tidalReading.get_url(),
+                    submenu,
+                    menu_text,
+                    name = tidal_reading.get_url(),
                     activate_functionandarguments = (
                         self.get_on_click_menuitem_open_browser_function(), ) )
 
-                today_date = tidalReading.get_date()
+                today_date = tidal_reading.get_date()
                 shown_today = True
 
 
@@ -333,10 +333,25 @@ class IndicatorTide( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.show_as_submenus = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS, True )
-        self.show_as_submenus_except_first_day = config.get( IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY, True )
-        self.user_script_path_and_filename = config.get( IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME, "" )
-        self.user_script_class_name = config.get( IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME, "" )
+        self.show_as_submenus = \
+            config.get(
+                IndicatorTide.CONFIG_SHOW_AS_SUBMENUS,
+                True )
+
+        self.show_as_submenus_except_first_day = \
+            config.get(
+                IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY,
+                True )
+
+        self.user_script_path_and_filename = \
+            config.get(
+                IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME,
+                "" )
+
+        self.user_script_class_name = \
+            config.get(
+                IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME,
+                "" )
 
 
     def save_config( self ):
