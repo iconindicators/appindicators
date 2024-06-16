@@ -30,6 +30,8 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
+import os
+
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
@@ -49,6 +51,7 @@ class IndicatorTest( IndicatorBase ):
 
     def __init__( self ):
         super().__init__( comments = _( "Exercises a range of indicator functionality." ) )
+        self.debug = True
         self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
         self.flush_cache(
             IndicatorTest.CACHE_ICON_BASENAME,
@@ -79,12 +82,16 @@ class IndicatorTest( IndicatorBase ):
         submenu = Gtk.Menu()
 
         uname = platform.uname()
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Machine: " + str( uname.machine ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Node: " + str( uname.node ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Processor: " + str( uname.processor ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Release: " + str( uname.release ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "System: " + str( uname.system ) )
-        self.create_and_append_menuitem( submenu, self.get_menu_indent() + "Version: " + str( uname.version ) )
+        labels = (
+            "Machine: " + str( uname.machine ),
+            "Node: " + str( uname.node ),
+            "Processor: " + str( uname.processor ),
+            "Release: " + str( uname.release ),
+            "System: " + str( uname.system ),
+            "Version: " + str( uname.version ) )
+
+        for label in labels:
+            self.create_and_append_menuitem( submenu, self.get_menu_indent() + label )
 
         self.create_and_append_menuitem( menu, "Platform | Uname" ).set_submenu( submenu )
 
@@ -114,6 +121,11 @@ class IndicatorTest( IndicatorBase ):
         text = self.get_menu_indent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_desktop_environment()
         self.create_and_append_menuitem( submenu, text )
 
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() + \
+            "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ) )
+
         self.create_and_append_menuitem( menu, "Desktop" ).set_submenu( submenu )
 
 
@@ -127,11 +139,12 @@ class IndicatorTest( IndicatorBase ):
                 lambda menuitem:
                     self.set_icon( self.get_icon_name() ), ) )
 
-        icons = [ "FULL_MOON",
-                  "WANING_GIBBOUS",
-                  "THIRD_QUARTER",
-                  "NEW_MOON",
-                  "WAXING_CRESCENT" ]
+        icons = (
+            "FULL_MOON",
+            "WANING_GIBBOUS",
+            "THIRD_QUARTER",
+            "NEW_MOON",
+            "WAXING_CRESCENT" )
 
         for icon in icons:
             self.create_and_append_menuitem(
@@ -205,21 +218,21 @@ class IndicatorTest( IndicatorBase ):
     def __build_menu_execute_command( self, menu ):
         submenu = Gtk.Menu()
 
-        labels = [
+        labels = (
             "calendar",
             "fortune",
             "ls",
             "notify-send",
             "paplay",
-            "wmctrl" ]
+            "wmctrl" )
 
-        commands = [
+        commands = (
             "calendar -f /usr/share/calendar/calendar.all -A 3",
             "fortune",
             "ls -la",
             f"notify-send -i { self.get_icon_name() } 'summary' 'body'",
             "paplay /usr/share/sounds/freedesktop/stereo/complete.oga",
-            "wmctrl -l" ]
+            "wmctrl -l" )
 
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(
@@ -248,11 +261,14 @@ class IndicatorTest( IndicatorBase ):
 
     # A direct copy from indicatorlunar to test dynamically created SVG icons in the user cache.
     #
-    # phase The current phase of the moon.
-    # illumination_percentage         The brightness ranging from 0 to 100 inclusive.
-    #                                 Ignored when phase is full/new or first/third quarter.
-    # bright_limb_angle_in_degrees    Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
-    #                                 Ignored when phase is full/new.
+    # phase
+    #   The current phase of the moon.
+    # illumination percentage
+    #   The brightness ranging from 0 to 100 inclusive.
+    #   Ignored when phase is full/new or first/third quarter.
+    # bright limb angle in degrees
+    #   Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
+    #   Ignored when phase is full/new.
     def __get_svg_icon_text( self, phase, illumination_percentage, bright_limb_angle_in_degrees ):
         width = 100
         height = width
