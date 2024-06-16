@@ -164,7 +164,9 @@ def get_stardate_classic( gregorian_date_time ):
             raise Exception( "Invalid year/month/day: " + str( year ) + "/" + str( month ) + "/" + str( day ) )
 
         # Now convert...
-        number_of_seconds = ( gregorian_date_time - __gregorian_dates[ index ] ).total_seconds()
+        number_of_seconds = (
+            gregorian_date_time - __gregorian_dates[ index ] ).total_seconds()
+
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
         units = number_of_days * __stardate_rates[ index ]
         stardate_issue = int( units / stardate_ranges[ index ] ) + stardate_issues[ index ]
@@ -189,9 +191,9 @@ def get_stardate_2009_revised( gregorian_date_time ):
         raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
 
     stardate_integer = gregorian_date_time.year
-    stardate_fraction = \
-        ( datetime.date( gregorian_date_time.year, gregorian_date_time.month, gregorian_date_time.day ) - \
-          datetime.date( gregorian_date_time.year, 1, 1 ) ).days + 1
+    stardate_fraction = (
+        datetime.date( gregorian_date_time.year, gregorian_date_time.month, gregorian_date_time.day ) - \
+        datetime.date( gregorian_date_time.year, 1, 1 ) ).days + 1
 
     return stardate_integer, stardate_fraction
 
@@ -313,7 +315,15 @@ def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stard
             __gregorian_dates[ index ].day,
             tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) )
 
-    gregorian_date_time += datetime.timedelta( int( days ), int( seconds ), 0, 0, int( minutes ), int( hours ) )
+    gregorian_date_time += \
+        datetime.timedelta(
+            int( days ),
+            int( seconds ),
+            0,
+            0,
+            int( minutes ),
+            int( hours ) )
+
     return gregorian_date_time
 
 
