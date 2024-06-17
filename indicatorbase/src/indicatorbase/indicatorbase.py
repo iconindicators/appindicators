@@ -19,6 +19,12 @@
 #TODO Add changelog entry for each indicator about moving closer to PEP8 or whatever the Python code standard is?
 
 
+#TODO Given clipboard and wmctr don't seem to work under Wayland...
+# figure out if this is the case/scenarios...
+# then figure out if things like in virtualbox need to handle when middle mouse click
+# or mouse wheel scroll is used...is there an issue?
+
+
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 # with the following:
@@ -971,7 +977,7 @@ class IndicatorBase( ABC ):
 
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
-#TODO UNCHECKED
+#TODO CHECKED
     def get_menuitems_guess( self ):
         screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
@@ -1229,15 +1235,20 @@ class IndicatorBase( ABC ):
         return treeview, scrolledwindow
 
 
-#TODO UNCHECKED
-    def create_filechooser_dialog( self, title, parent, filename, action = Gtk.FileChooserAction.OPEN ):
+#TODO CHECKED
+    def create_filechooser_dialog(
+        self,
+        title,
+        parent, filename,
+        action = Gtk.FileChooserAction.OPEN ):
+
         dialog = \
             Gtk.FileChooserDialog(
                 title = title,
                 parent = parent,
                 action = action )
 
-        dialog.add_buttons = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
+        dialog.add_buttons( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
         dialog.set_transient_for( parent )
         dialog.set_filename( filename )
         return dialog
@@ -1743,7 +1754,7 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
-#TODO UNCHECKED
+#TODO CHECKED
     def read_cache_text_without_timestamp( self, filename ):
         return self.__read_cache_text( self.__get_cache_directory() + filename )
 
@@ -1778,7 +1789,7 @@ class IndicatorBase( ABC ):
         return self.__read_cache_text( cache_file )
 
 
-#TODO UNCHECKED
+#TODO CHECKED
     def __read_cache_text( self, cache_file ):
         text = ""
         if os.path.isfile( cache_file ):
@@ -1800,7 +1811,7 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns filename written on success; None otherwise.
-#TODO UNCHECKED
+#TODO CHECKED
     def write_cache_text_without_timestamp( self, text, filename ):
         return self.__write_cache_text( text, self.__get_cache_directory() + filename )
 

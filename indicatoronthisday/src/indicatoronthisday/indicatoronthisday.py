@@ -159,13 +159,18 @@ class IndicatorOnThisDay( IndicatorBase ):
         content = ""
         for calendar in self.calendars:
             if os.path.isfile( calendar ):
-                content += "#include <" +calendar + ">\n"
+                content += "#include <" + calendar + ">\n"
 
         self.write_cache_text_without_timestamp( content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
         # Run the calendar command and parse the results.
         events_sorted_by_date = [ ]
-        command = "calendar -f " + self.get_cache_directory() + IndicatorOnThisDay.CALENDARS_FILENAME + " -A 366"
+        command = \
+            "calendar -f " + \
+            self.get_cache_directory() + \
+            IndicatorOnThisDay.CALENDARS_FILENAME + \
+            " -A 366"
+
         for line in self.process_get( command ).splitlines():
             if line is None or len( line.strip() ) == 0:
                 continue
@@ -195,7 +200,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                 j += 1
 
             else:
-                events_sorted_by_date_then_description += sorted( events_sorted_by_date[ i : j ], key = lambda event: event.get_description() )
+                events_sorted_by_date_then_description += \
+                    sorted(
+                        events_sorted_by_date[ i : j ],
+                        key = lambda event: event.get_description() )
+
                 i = j
                 j = i + 1
 
@@ -245,32 +254,28 @@ class IndicatorOnThisDay( IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True )
 
-        box.pack_start(
-            self.create_button(
-                _( "Add" ),
-                tooltip_text = _( "Add a new calendar." ),
-                clicked_functionandarguments = ( self.on_calendar_add, treeview ) ),
-            True,
-            True,
-            0 )
+        labels = ( _( "Add" ), _( "Remove" ), _( "Reset" ) )
 
-        box.pack_start(
-            self.create_button(
-                _( "Remove" ),
-                tooltip_text = _( "Remove the selected calendar." ),
-                clicked_functionandarguments = ( self.on_calendar_remove, treeview ) ),
-            True,
-            True,
-            0 )
+        tooltip_texts = (
+            _( "Add a new calendar." ),
+            _( "Remove the selected calendar." ),
+            _( "Reset to factory default." ) )
 
-        box.pack_start(
-            self.create_button(
-                _( "Reset" ),
-                tooltip_text = _( "Reset to factory default." ),
-                clicked_functionandarguments = ( self.on_calendar_reset, treeview ) ),
-            True,
-            True,
-            0 )
+        clicked_functionandarguments = (
+            self.on_calendar_add,
+            self.on_calendar_remove,
+            self.on_calendar_reset )
+
+        z = zip( labels, tooltip_texts, clicked_functionandarguments )
+        for label, tooltip_text, clicked_functionandargument in z:
+            box.pack_start(
+                self.create_button(
+                    label,
+                    tooltip_text = tooltip_text,
+                    clicked_functionandarguments = ( clicked_functionandargument, treeview ) ),
+                True,
+                True,
+                0 )
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 26, 1, 1 )
@@ -434,16 +439,22 @@ class IndicatorOnThisDay( IndicatorBase ):
     def on_calendar_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
+            #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
             self.show_dialog_ok( treeview, _( "No calendar has been selected." ) )
 
-        elif model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars():
-            self.show_dialog_ok(
-                treeview,
-                _( "This calendar is part of your system\nand cannot be removed." ),
-                message_type = Gtk.MessageType.INFO )
+        else:
+            selected_calendar_path = \
+                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
 
-        elif self.show_dialog_ok_cancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
-            model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
+            if selected_calendar_path in self.get_calendars():
+                self.show_dialog_ok(
+                    treeview,
+                    _( "This is a system calendar and cannot be removed." ),
+                    message_type = Gtk.MessageType.INFO )
+
+            else:
+                if self.show_dialog_ok_cancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
     def on_calendar_add( self, button, treeview ):
@@ -548,7 +559,10 @@ class IndicatorOnThisDay( IndicatorBase ):
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename() in system_calendars:
-                    self.show_dialog_ok( dialog, _( "The calendar is part of your system\nand is already included." ), Gtk.MessageType.INFO )
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "The calendar is part of your system\nand is already included." ), 
+                        nessage_type = Gtk.MessageType.INFO )
 
                 else:
                     calendar_file.set_text( dialog.get_filename() )
@@ -561,11 +575,27 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.calendars = config.get( IndicatorOnThisDay.CONFIG_CALENDARS, [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
-        self.copy_to_clipboard = config.get( IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD, True )
-        self.lines = config.get( IndicatorOnThisDay.CONFIG_LINES, self.get_menuitems_guess() )
+        self.calendars = \
+            config.get(
+                IndicatorOnThisDay.CONFIG_CALENDARS,
+                [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
+
+        self.copy_to_clipboard = \
+            config.get(
+                IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD,
+                True )
+
+        self.lines = \
+            config.get(
+                IndicatorOnThisDay.CONFIG_LINES,
+                self.get_menuitems_guess() )
+
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
-        self.search_url = config.get( IndicatorOnThisDay.CONFIG_SEARCH_URL, IndicatorOnThisDay.SEARCH_URL_DEFAULT )
+
+        self.search_url = \
+            config.get(
+                IndicatorOnThisDay.CONFIG_SEARCH_URL,
+                IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
     def save_config( self ):

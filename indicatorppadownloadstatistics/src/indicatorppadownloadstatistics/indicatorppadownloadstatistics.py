@@ -987,7 +987,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_users_names.append( ppa_user_name )
 
             if len( filter_treeview.get_model() ) == len( ppa_users_names ):
-                self.show_dialog_ok( filter_treeview, _( "Only one filter per PPA User/Name." ), Gtk.MessageType.INFO )
+                self.show_dialog_ok(
+                    filter_treeview,
+                    _( "Only one filter per PPA User/Name." ),
+                    message_type = Gtk.MessageType.INFO )
 
             else:
                 self.on_filter_double_click( filter_treeview, None, None, ppa_treeview )

@@ -264,38 +264,33 @@ class IndicatorFortune( IndicatorBase ):
         box = Gtk.Box( spacing = 6 )
         box.set_homogeneous( True ) #TODO What does homogeneous mean?
 
-        box.pack_start(
-            self.create_button(
-                _( "Add" ),
-                tooltip_text = _( "Add a new fortune location." ),
-                clicked_functionandarguments = ( self.on_fortune_add, treeview ) ),
-            True,
-            True,
-            0 )
+        labels = ( _( "Add" ), _( "Remove" ), _( "Reset" ) )
 
-        box.pack_start(
-            self.create_button(
-                _( "Remove" ),
-                tooltip_text = _( "Remove the selected fortune location." ),
-                clicked_functionandarguments = ( self.on_fortune_remove, treeview ) ),
-            True,
-            True,
-            0 )
+        tooltip_texts = (
+            _( "Add a new fortune location." ),
+            _( "Remove the selected fortune location." ),
+            _( "Reset to factory default." ) )
 
-        box.pack_start(
-            self.create_button(
-                _( "Reset" ),
-                tooltip_text = _( "Reset to factory default." ),
-                clicked_functionandarguments = ( self.on_fortune_reset, treeview ) ),
-            True,
-            True,
-            0 )
+        clicked_functionandarguments = (
+            self.on_fortune_add,
+            self.on_fortune_remove,
+            self.on_fortune_reset )
+
+        z = zip( labels, tooltip_texts, clicked_functionandarguments )
+        for label, tooltip_text, clicked_functionandargument in z:
+            box.pack_start(
+                self.create_button(
+                    label,
+                    tooltip_text = tooltip_text,
+                    clicked_functionandarguments = ( clicked_functionandargument, treeview ) ),
+                True,
+                True,
+                0 )
 
         box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
-
 
         # General.
         grid = self.create_grid()
