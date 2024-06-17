@@ -438,11 +438,22 @@ class IndicatorFortune( IndicatorBase ):
             #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
             self.show_dialog_ok( treeview, _( "No fortune has been selected for removal." ) )
 
-        elif model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE:
-            self.show_dialog_ok( treeview, _( "This is the default fortune and cannot be deleted." ), Gtk.MessageType.INFO )
+        else:
+            selected_fortune_path = \
+                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
 
-        elif self.show_dialog_ok_cancel( treeview, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
-            model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
+            default_fortune_path = \
+                IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
+
+            if selected_fortune_path == default_fortune_path:
+                self.show_dialog_ok(
+                    treeview,
+                    _( "This is the default fortune and cannot be deleted." ),
+                    message_type = Gtk.MessageType.INFO )
+
+            else:
+                if self.show_dialog_ok_cancel( treeview, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
     def on_fortune_add( self, button, treeview ):
@@ -559,9 +570,6 @@ class IndicatorFortune( IndicatorBase ):
         dialog.destroy()
 
 
-#TODO Do we browse in other indicators...?
-# If so, can the code that builds the browser dialog be put into a function?
-# Can this function be made generic?
     def on_browse_fortune( self, file_or_directory_button, add_edit_dialog, fortune_file_directory, is_file ):
         if is_file:
             title = _( "Choose a fortune .dat file" )
