@@ -276,33 +276,33 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
 
 
 def _process_locale( directory_dist, indicator_name ):
-    directoryIndicator = str( directory_dist ) + os.sep + indicator_name
-    directoryIndicatorLocale = directoryIndicator + "/src/" + indicator_name + "/locale"
-    directoryIndicatorBaseLocale = "indicatorbase/src/indicatorbase/locale"
+    directory_indicator = str( directory_dist ) + os.sep + indicator_name
+    directory_indicator_locale = directory_indicator + "/src/" + indicator_name + "/locale"
+    directory_indicator_base_locale = "indicatorbase/src/indicatorbase/locale"
 
     # Append translations from indicatorbase to POT.
     command = \
         "msgcat --use-first " + \
-        directoryIndicatorLocale + os.sep + indicator_name + ".pot " + \
-        directoryIndicatorBaseLocale + "/indicatorbase.pot " + \
-        "--output-file=" + directoryIndicatorLocale + os.sep + indicator_name + ".pot"
+        directory_indicator_locale + os.sep + indicator_name + ".pot " + \
+        directory_indicator_base_locale + "/indicatorbase.pot " + \
+        "--output-file=" + directory_indicator_locale + os.sep + indicator_name + ".pot"
 
     subprocess.call( command, shell = True )
 
     # Append translations from indicatorbase to PO files.
-    for po in list( Path( directoryIndicatorLocale ).rglob( "*.po" ) ):
-        languageCode = po.parent.parts[ -2 ]
+    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+        language_code = po.parent.parts[ -2 ]
 
         command = \
             "msgcat --use-first " + \
             str( po ) + " " + \
-            directoryIndicatorBaseLocale + os.sep + languageCode + "/LC_MESSAGES/indicatorbase.po " + \
+            directory_indicator_locale + os.sep + language_code + "/LC_MESSAGES/indicatorbase.po " + \
             "--output-file=" + str( po )
 
         subprocess.call( command, shell = True )
 
     # Create .mo files.
-    for po in list( Path( directoryIndicatorLocale ).rglob( "*.po" ) ):
+    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         command = \
             "msgfmt " + str( po ) + \
             " --output-file=" + str( po.parent ) + os.sep + str( po.stem ) + ".mo"
@@ -310,22 +310,22 @@ def _process_locale( directory_dist, indicator_name ):
         subprocess.call( command, shell = True )
 
 
-def _create_symbolic_icons( directoryWheel, indicatorName ):
-    directoryIcons = str( directoryWheel ) + "/" + indicatorName + "/src/" + indicatorName + "/icons"
-    print( directoryIcons )
-    for hicolorIcon in list( Path( directoryIcons ).glob( "*.svg" ) ):
-        symbolic_icon = directoryIcons + "/" + str( hicolorIcon.name )[ 0 : -4 ] + "-symbolic.svg"
-        shutil.copy( hicolorIcon, symbolic_icon )
+def _create_symbolic_icons( directory_wheel, indicator_name ):
+    directory_icons = str( directory_wheel ) + "/" + indicator_name + "/src/" + indicator_name + "/icons"
+    print( directory_icons )
+    for hicolor_icon in list( Path( directory_icons ).glob( "*.svg" ) ):
+        symbolic_icon = directory_icons + "/" + str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg"
+        shutil.copy( hicolor_icon, symbolic_icon )
         with open( symbolic_icon, 'r' ) as f:
-            svgText = f.read()
-            for m in re.finditer( r"fill:#", svgText ):
-                svgText = svgText[ 0 : m.start() + 6 ] + "777777" + svgText[ m.start() + 6 + 6 : ]
+            svg_text = f.read()
+            for m in re.finditer( r"fill:#", svg_text ):
+                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
 
-            for m in re.finditer( r"stroke:#", svgText ):
-                svgText = svgText[ 0 : m.start() + 6 ] + "777777" + svgText[ m.start() + 6 + 6 : ]
+            for m in re.finditer( r"stroke:#", svg_text ):
+                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
 
         with open( symbolic_icon, 'w' ) as f:
-            f.write( svgText )
+            f.write( svg_text )
 
 
 def _build_wheel_for_indicator( directory_release, indicator_name ):
@@ -373,7 +373,7 @@ def _initialise_parser():
         description = "Create a Python wheel for one or more indicators." )
 
     parser.add_argument(
-        "directoryRelease",
+        "directory_release",
         help = "The output directory for the Python wheel. " +
                "If the directory specified is 'release', " +
                "the Python wheel will be created in 'release/wheel'. " )
@@ -392,7 +392,7 @@ if __name__ == "__main__":
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         for indicator_name in args.indicators:
-            message = _build_wheel_for_indicator( args.directoryRelease, indicator_name )
+            message = _build_wheel_for_indicator( args.directory_release, indicator_name )
             if message:
                 print( message )
 

@@ -134,17 +134,19 @@ __eclipses_solar = \
      9598  480   2040 Nov 04  19:09:02     85    505  124   P   -t   1.0993  0.8074  62.2N  53.4W   0  234'''
 
 
+#TODO Fix this comment
 # Gets the upcoming lunar eclipse.
 #
 # Returns a tuple:
-#    DateTime in UTC with UTC timezone
+#    UTC now with timezone
 #    EclipseType
 #    latitude (south is negative)
 #    longitude (east is negative)
 def get_eclipse_lunar( utc_now ):
-    return __getEclipse( utc_now, __eclipses_lunar, 1, 2, 3, 4, 5, 8, 16, 17 )
+    return __get_eclipse( utc_now, __eclipses_lunar, 1, 2, 3, 4, 5, 8, 16, 17 )
 
 
+#TODO Fix this comment
 # Gets the upcoming solar eclipse.
 #
 # Returns a tuple:
@@ -153,10 +155,10 @@ def get_eclipse_lunar( utc_now ):
 #    latitude (south is negative)
 #    longitude (east is negative)
 def get_eclipse_solar( utc_now ):
-    return __getEclipse( utc_now, __eclipses_solar, 2, 3, 4, 5, 6, 9, 13, 14 )
+    return __get_eclipse( utc_now, __eclipses_solar, 2, 3, 4, 5, 6, 9, 13, 14 )
 
 
-def __getEclipse(
+def __get_eclipse(
         utc_now,
         eclipses,
         field_year,

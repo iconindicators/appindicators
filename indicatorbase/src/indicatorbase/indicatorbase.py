@@ -1235,6 +1235,31 @@ class IndicatorBase( ABC ):
         return treeview, scrolledwindow
 
 
+    def create_buttons_in_box(
+            self,
+            labels,
+            tooltip_texts,
+            clicked_functionandarguments ):
+
+        box = Gtk.Box( spacing = 6 ) #TODO Pass in spacing?
+        box.set_homogeneous( True ) #TODO What does homogeneous mean?  Is it needed?  Where else is it used?
+
+        z = zip( labels, tooltip_texts, clicked_functionandarguments )
+        for label, tooltip_text, clicked_functionandargument in z:
+            box.pack_start(
+                self.create_button(
+                    label,
+                    tooltip_text = tooltip_text,
+                    clicked_functionandarguments = clicked_functionandargument ),
+                True,
+                True,
+                0 )
+
+        box.set_halign( Gtk.Align.CENTER )
+
+        return box
+
+
 #TODO CHECKED
     def create_filechooser_dialog(
         self,
@@ -1379,7 +1404,7 @@ class IndicatorBase( ABC ):
 #TODO Tidy up
         if desktop_environment is None or \
            desktop_environment == IndicatorBase.__DESKTOP_LXQT or \
-           ( desktop_environment == IndicatorBase.__DESKTOP_MATE and self.isUbuntuVariant2004() ):
+           ( desktop_environment == IndicatorBase.__DESKTOP_MATE and self.is_ubuntu_variant_2004() ):
             icon_update_supported = False
 
         return icon_update_supported
@@ -1729,7 +1754,7 @@ class IndicatorBase( ABC ):
     #
     # Returns True on success; False otherwise.
 #TODO UNCHECKED
-    def writeCacheBinary( self, binary_data, basename, extension = "" ):
+    def write_cache_binary( self, binary_data, basename, extension = "" ):
         success = True
         cache_file = \
             self.__get_cache_directory() + \

@@ -527,23 +527,26 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         box.set_homogeneous( True )  #TODO Why need this?
         box.set_halign( Gtk.Align.CENTER )
 
-        box.pack_start(
-            self.create_button(
-                _( "Add" ),
-                tooltip_text = _( "Add a new PPA." ),
-                clicked_functionandarguments = ( self.on_ppa_add, ppa_treeview ) ),
-            True,
-            True,
-            0 )
+        labels = ( _( "Add" ), _( "Remove" ) )
 
-        box.pack_start(
-            self.create_button(
-                _( "Remove" ),
-                tooltip_text = _( "Remove the selected PPA." ),
-                clicked_functionandarguments = ( self.on_ppa_remove, ppa_treeview ) ),
-            True,
-            True,
-            0 )
+        tooltip_texts = (
+            _( "Add a new PPA." ),
+            _( "Remove the selected PPA." ) )
+
+        clicked_functionandarguments = (
+            self.on_ppa_add,
+            self.on_ppa_remove )
+
+        z = zip( labels, tooltip_texts, clicked_functionandarguments )
+        for label, tooltip_text, clicked_functionandargument in z:
+            box.pack_start(
+                self.create_button(
+                    label,
+                    tooltip_text = tooltip_text,
+                    clicked_functionandarguments = ( clicked_functionandargument, ppa_treeview ) ),
+                True,
+                True,
+                0 )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -589,27 +592,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True )  #TODO Why have this?
-        box.set_halign( Gtk.Align.CENTER )
-
-        box.pack_start(
-            self.create_button(
-                _( "Add" ),
-                tooltip_text = _( "Add a new filter." ),
-                clicked_functionandarguments = ( self.on_filter_add, filter_treeview, ppa_treeview ) ),
-            True,
-            True,
-            0 )
-
-        box.pack_start(
-            self.create_button(
-                _( "Remove" ),
-                tooltip_text = _( "Remove the selected filter." ),
-                clicked_functionandarguments = ( self.on_filter_remove, filter_treeview ) ),
-            True,
-            True,
-            0 )
+        box = \
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Remove" ) ),
+                (
+                    _( "Add a new filter." ),
+                    _( "Remove the selected filter." ) ),
+                (
+                    ( self.on_filter_add, filter_treeview, ppa_treeview ),
+                    ( self.on_filter_remove, filter_treeview ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -801,7 +794,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self.on_ppa_double_click( treeview, None, None )
 
 
-    def on_ppa_double_click( self, treeview, row_number, treeViewColumn ):
+    def on_ppa_double_click( self, treeview, row_number, treeviewcolumn ):
         model, treeiter = treeview.get_selection().get_selected()
 
         grid = self.create_grid()
@@ -894,7 +887,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if row_number:
             title = _( "Edit PPA" )
 
-        dialog = self.createDialog( treeview, title, grid )
+        dialog = self.create_dialog( treeview, title, content_widget = grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -1071,7 +1064,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if row_number is None:
             title = _( "Add Filter" )
 
-        dialog = self.create_dialog( filter_treeview, title, grid )
+        dialog = self.create_dialog( filter_treeview, title, content_widget = grid )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:

@@ -119,9 +119,9 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             if self.copy_to_clipboard:
                 f = (
-                    lambda menuItem:
+                    lambda menuitem:
                         Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text(
-                            menuItem.get_name() + ' ' + menuItem.get_label().strip(), -1 ) )
+                            menuitem.get_name() + ' ' + menuitem.get_label().strip(), -1 ) )
 
                 self.create_and_append_menuitem(
                     menu,
@@ -251,33 +251,21 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 0, 1, 25 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True )
-
-        labels = ( _( "Add" ), _( "Remove" ), _( "Reset" ) )
-
-        tooltip_texts = (
-            _( "Add a new calendar." ),
-            _( "Remove the selected calendar." ),
-            _( "Reset to factory default." ) )
-
-        clicked_functionandarguments = (
-            self.on_calendar_add,
-            self.on_calendar_remove,
-            self.on_calendar_reset )
-
-        z = zip( labels, tooltip_texts, clicked_functionandarguments )
-        for label, tooltip_text, clicked_functionandargument in z:
-            box.pack_start(
-                self.create_button(
-                    label,
-                    tooltip_text = tooltip_text,
-                    clicked_functionandarguments = ( clicked_functionandargument, treeview ) ),
-                True,
-                True,
-                0 )
-
-        box.set_halign( Gtk.Align.CENTER )
+        box = \
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Remove" ),
+                    _( "Reset" ) ),
+                (
+                    _( "Add a new calendar." ),
+                    _( "Remove the selected calendar." ),
+                    _( "Reset to factory default." ) ),
+                (
+                    ( self.on_calendar_add, treeview ),
+                    ( self.on_calendar_remove, treeview ),
+                    ( self.on_calendar_reset, treeview ) ) )
+        
         grid.attach( box, 0, 26, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
@@ -476,7 +464,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         if row_number:
             title = _( "Edit Calendar" )
 
-        dialog = self.create_dialog( treeview, title, grid )
+        dialog = self.create_dialog( treeview, title, content_widget = grid )
 
         box = Gtk.Box( spacing = 6 )
 

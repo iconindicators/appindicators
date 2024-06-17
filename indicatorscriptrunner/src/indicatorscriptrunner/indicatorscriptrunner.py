@@ -26,10 +26,6 @@ import copy
 import datetime
 import gi
 
-#TODO Maybe no longer needed?  Why was this here in the first place?
-# gi.require_version( "GLib", "2.0" )
-# from gi.repository import GLib
-
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
@@ -582,8 +578,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
 
-        responseType = dialog.run()
-        if responseType == Gtk.ResponseType.OK:
+        response_type = dialog.run()
+        if response_type == Gtk.ResponseType.OK:
             self.scripts = copy_of_scripts
             self.send_command_to_log = send_command_to_log_checkbutton.get_active()
             self.show_scripts_in_submenus = radio_show_scripts_submenu.get_active()
@@ -593,7 +589,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.initialise_background_scripts()
             self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
 
-        return responseType
+        return response_type
 
 
     # Renders the script name bold when the (non-background) script is default.
@@ -717,11 +713,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         path_as_string = "0:0"
         if select_group:
-            groupIndex = groups.index( select_group )
+            group_index = groups.index( select_group )
             i = 0
             for script in sorted( scripts_by_group[ select_group ], key = lambda script: script.get_name().lower() ):
                 if select_script == script.get_name():
-                    path_as_string = str( groupIndex ) + ":" + str( i )
+                    path_as_string = str( group_index ) + ":" + str( i )
                     break
 
                 i += 1
@@ -1169,8 +1165,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                         name_entry.get_text().strip() ) is not None
 
                 #TODO Tidy up below and above
-                editedScriptGroupOrNameDifferent = not add and ( group_combo.get_active_text().strip() != script.get_group() or name_entry.get_text().strip() != script.get_name() )
-                if ( add or editedScriptGroupOrNameDifferent ) and script_of_same_name_and_group_exists:
+                edited_script_group_or_name_different = not add and ( group_combo.get_active_text().strip() != script.get_group() or name_entry.get_text().strip() != script.get_name() )
+                if ( add or edited_script_group_or_name_different ) and script_of_same_name_and_group_exists:
                     self.show_dialog_ok( dialog, _( "A script of the same group and name already exists." ) )
                     group_combo.grab_focus()
                     continue
@@ -1192,7 +1188,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     i = 0
                     for skript in scripts:
                         if type( skript ) is NonBackground and skript.get_default():
-                            undefaultScript = NonBackground(
+                            undefault_script = NonBackground(
                                 skript.get_group(),
                                 skript.get_name(),
                                 skript.get_command(),
@@ -1202,7 +1198,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 False )
 
                             del scripts[ i ]
-                            scripts.append( undefaultScript )
+                            scripts.append( undefault_script )
                             break
 
                         i += 1
@@ -1212,7 +1208,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     new_script = Background(
                         group_combo.get_active_text().strip(),
                         name_entry.get_text().strip(),
-                        self.getTextViewText( command_text_view ).strip(),
+                        self.get_textview_text( command_text_view ).strip(),
                         sound_checkbutton.get_active(),
                         notification_checkbutton.get_active(),
                         interval_spinner.get_value_as_int(),
@@ -1222,7 +1218,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     new_script = NonBackground(
                         group_combo.get_active_text().strip(),
                         name_entry.get_text().strip(),
-                        self.getTextViewText( command_text_view ).strip(),
+                        self.get_textview_text( command_text_view ).strip(),
                         sound_checkbutton.get_active(),
                         notification_checkbutton.get_active(),
                         terminal_checkbutton.get_active(),
@@ -1272,12 +1268,12 @@ class IndicatorScriptRunner( IndicatorBase ):
         return scripts_by_group
 
 
-    def __get_group_name_from_treeview( self, treeView ):
+    def __get_group_name_from_treeview( self, treeview ):
         group = None
         name = None
-        model, treeiter = treeView.get_selection().get_selected()
+        model, treeiter = treeview.get_selection().get_selected()
         if treeiter:
-            group = model[ treeView.get_model().iter_parent( treeiter ) ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP]
+            group = model[ treeview.get_model().iter_parent( treeiter ) ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP]
             # group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP] #TODO Needed to get group name from parent...ensure this is correct!
             name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
 

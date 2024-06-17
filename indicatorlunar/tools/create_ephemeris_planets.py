@@ -24,7 +24,7 @@
 #
 # This script essentially wraps up the following command:
 #
-#    python3 -m jplephem excerpt startDate endDate inFile.bsp outFile.bsp
+#    python3 -m jplephem excerpt start_date end_date in_file.bsp out_file.bsp
 #
 # Requires jplephem:
 #    https://pypi.org/project/jplephem
@@ -51,19 +51,19 @@ import subprocess
 from dateutil.relativedelta import relativedelta
 
 
-def createEphemerisPlanets( inBsp, outBsp, years ):
+def create_ephemeris_planets( in_bsp, out_bsp, years ):
     today = datetime.date.today()
-    startDate = today - relativedelta( months = 1 )
-    endDate = today.replace( year = today.year + years )
-    dateFormat = "%Y/%m/%d"
+    start_date = today - relativedelta( months = 1 )
+    end_date = today.replace( year = today.year + years )
+    date_format = "%Y/%m/%d"
     command = \
         "python3 -m jplephem excerpt " + \
-        startDate.strftime( dateFormat ) + " " + \
-        endDate.strftime( dateFormat ) + " " + \
-        inBsp + " " + outBsp
+        start_date.strftime( date_format ) + " " + \
+        end_date.strftime( date_format ) + " " + \
+        in_bsp + " " + out_bsp
     print( "Processing...\n\t", command )
     subprocess.call( command, shell = True )
-    print( "Created", outBsp )
+    print( "Created", out_bsp )
 
 
 if __name__ == "__main__":
@@ -71,11 +71,11 @@ if __name__ == "__main__":
         description = "Reduce the date range of a .bsp from today to a specified number of years from today." )
 
     parser.add_argument(
-        "inBSP",
+        "in_bsp",
         help = "The .bsp file to reduce, such as de440s.bsp." )
 
     parser.add_argument(
-        "outBSP",
+        "out_bsp",
         help = "The .bsp file to be created with reduced date range, such as planets.bsp." )
 
     parser.add_argument(
@@ -84,4 +84,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    createEphemerisPlanets( args.inBSP, args.outBSP, int( args.years ) )
+    create_ephemeris_planets( args.in_bsp, args.out_bsp, int( args.years ) )

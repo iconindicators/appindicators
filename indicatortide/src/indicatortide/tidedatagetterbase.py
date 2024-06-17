@@ -19,7 +19,7 @@
 # Base class to provide tidal information used by Indicator Tide.
 # The end user must create their own Python script,
 # containing a class which extends this abstract base class and
-# implements the abstract method getTideData().
+# implements the abstract method get_tide_data().
 
 
 from abc import ABC, abstractmethod

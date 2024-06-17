@@ -31,101 +31,101 @@
 import argparse
 
 
-def processAndWriteOneLine( line, outFile ):
+def process_and_write_one_line( line, out_file ):
     if len( line.strip() ) > 0:
         # Field numbers: 0  1   2   3   4   5   6   7   8   9  10  11  12  13  14   15   16   17
-        startIndices = [ 1, 5,  6, 15, 20, 23, 31, 42, 52, 62, 72, 82, 86, 88, 92,  97, 103, 160 ]
-        endIndices =   [ 4, 5, 12, 18, 21, 29, 39, 49, 59, 69, 79, 85, 87, 89, 95, 100, 158, 168 ]
+        start_indices = [ 1, 5,  6, 15, 20, 23, 31, 42, 52, 62, 72, 82, 86, 88, 92,  97, 103, 160 ]
+        end_indices =   [ 4, 5, 12, 18, 21, 29, 39, 49, 59, 69, 79, 85, 87, 89, 95, 100, 158, 168 ]
 
         # Offset back to zero to match lines read into a string.
-        startIndices = [ x - 1 for x in startIndices ]
-        endIndices = [ x - 1 for x in endIndices ]
+        start_indices = [ x - 1 for x in start_indices ]
+        end_indices = [ x - 1 for x in end_indices ]
 
-        fields = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        fields = [ line[ i : j + 1 ] for i, j in zip( start_indices, end_indices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
         name = fields[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = fields[ 14 ].strip()
+        absolute_magnitude = fields[ 14 ].strip()
 
         if len( name ) == 0:
             print( "Missing name:\n" + line )
 
-        elif len( absoluteMagnitude ) == 0:
+        elif len( absolute_magnitude ) == 0:
             print( "Missing absolute magnitude:\n" + line )
 
         else:
             year = fields[ 3 ].strip()
             month = fields[ 4 ].strip()
             day = fields[ 5 ].strip()
-            epochDate = month + '/' + day + '/' + year
+            epoch_date = month + '/' + day + '/' + year
 
-            perihelionDistance = fields[ 6 ].strip()
-            orbitalEccentricity = fields[ 7 ].strip()
-            argumentPerihelion = fields[ 8 ].strip()
-            longitudeAscendingNode = fields[ 9 ].strip()
+            perihelion_distance = fields[ 6 ].strip()
+            orbital_eccentricity = fields[ 7 ].strip()
+            argument_perihelion = fields[ 8 ].strip()
+            longitude_ascending_node = fields[ 9 ].strip()
             inclination = fields[ 10 ].strip()
-            slopeParameter = fields[ 15 ].strip()
+            slope_parameter = fields[ 15 ].strip()
 
-            if float( orbitalEccentricity ) < 0.99: # Elliptical orbit.
-                meanAnomaly = str( 0.0 )
-                meanDistance = str( float( perihelionDistance ) / ( 1.0 - float( orbitalEccentricity ) ) )
+            if float( orbital_eccentricity ) < 0.99: # Elliptical orbit.
+                mean_anomaly = str( 0.0 )
+                mean_distance = str( float( perihelion_distance ) / ( 1.0 - float( orbital_eccentricity ) ) )
 
                 components = [
                     name,
                     'e',
                     inclination,
-                    longitudeAscendingNode,
-                    argumentPerihelion,
-                    meanDistance,
+                    longitude_ascending_node,
+                    argument_perihelion,
+                    mean_distance,
                     '0',
-                    orbitalEccentricity,
-                    meanAnomaly,
-                    epochDate,
+                    orbital_eccentricity,
+                    mean_anomaly,
+                    epoch_date,
                     "2000.0",
-                    absoluteMagnitude,
-                    slopeParameter ]
+                    absolute_magnitude,
+                    slope_parameter ]
 
-            elif float( orbitalEccentricity ) > 1.0: # Hyperbolic orbit.
+            elif float( orbital_eccentricity ) > 1.0: # Hyperbolic orbit.
                 components = [
                     name,
                     'h',
-                    epochDate,
+                    epoch_date,
                     inclination,
-                    longitudeAscendingNode,
-                    argumentPerihelion,
-                    orbitalEccentricity,
-                    perihelionDistance,
+                    longitude_ascending_node,
+                    argument_perihelion,
+                    orbital_eccentricity,
+                    perihelion_distance,
                     "2000.0",
-                    absoluteMagnitude,
-                    slopeParameter ]
+                    absolute_magnitude,
+                    slope_parameter ]
 
             else: # Parabolic orbit.
                 components = [
                     name,
                     'p',
-                    epochDate,
+                    epoch_date,
                     inclination,
-                    argumentPerihelion,
-                    perihelionDistance,
-                    longitudeAscendingNode,
+                    argument_perihelion,
+                    perihelion_distance,
+                    longitude_ascending_node,
                     "2000.0",
-                    absoluteMagnitude,
-                    slopeParameter ]
+                    absolute_magnitude,
+                    slope_parameter ]
 
-            outFile.write( ','.join( components ) + '\n' )
+            out_file.write( ','.join( components ) + '\n' )
 
 
-def convert( inFile, outFile ):
-    fIn = open( inFile, 'r' )
-    fOut = open( outFile, 'w' )
-    for line in fIn:
-        processAndWriteOneLine( line, fOut )
+def convert( in_file, out_file ):
+    f_in = open( in_file, 'r' )
+    f_out = open( out_file, 'w' )
+    for line in f_in:
+        process_and_write_one_line( line, f_out )
 
-    fIn.close()
-    fOut.close()
+    f_in.close()
+    f_out.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser( description = "Convert a comet text file such as CometEls.txt from MPC to XEphem format." )
-    parser.add_argument( "inFile", help = "File to convert" )
-    parser.add_argument( "outFile", help = "Output file to be created" )
+    parser.add_argument( "in_file", help = "File to convert" )
+    parser.add_argument( "out_file", help = "Output file to be created" )
     args = parser.parse_args()
-    convert( args.inFile, args.outFile )
+    convert( args.in_file, args.out_file )

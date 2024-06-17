@@ -107,6 +107,7 @@ class IndicatorLunar( IndicatorBase ):
     DATA_INDEX_BODY_NAME = 1
     DATA_INDEX_DATA_NAME = 2
 
+#TODO Rename to Python standard?
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used in the display of the satellite rise notification.
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M" # Used to display any body's rise/set in the menu.
 
@@ -808,6 +809,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def update_menu_planets_minor_planets_comets_stars( self, menu, menu_label, bodies, bodies_data, body_type ):
 
+        #TODO Rename to Python standard?
         def getMenuItemNameFunction():
             if body_type == IndicatorLunar.astro_backend.BodyType.PLANET:
                 menuitem_name_function = lambda name: IndicatorLunar.SEARCH_URL_PLANET + name.lower()
@@ -874,7 +876,7 @@ class IndicatorLunar( IndicatorBase ):
             return display_name_function
 
 
-        menuitem_name_function = getMenuItemNameFunction()
+        menuitem_name_function = getMenuItemNameFunction()#TODO Rename to Python standard?
         on_click_function = get_on_click_function()
         display_name_function = get_display_name_function()
         indent = self.get_menu_indent()
@@ -1243,7 +1245,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def format_data( self, data_tag, data, date_time_format = None ):
-        displayData = None
+        display_data = None
 
         if data_tag == IndicatorLunar.astro_backend.DATA_TAG_ALTITUDE or \
            data_tag == IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH or \
@@ -2067,21 +2069,21 @@ class IndicatorLunar( IndicatorBase ):
                 continue
 
             latitude_value = latitude.get_text().strip()
-            if latitude_value == "" or not self.isNumber( latitude_value ) or float( latitude_value ) > 90 or float( latitude_value ) < -90:
+            if latitude_value == "" or not self.is_number( latitude_value ) or float( latitude_value ) > 90 or float( latitude_value ) < -90:
                 notebook.set_current_page( PAGE_LOCATION )
                 self.show_dialog_ok( dialog, _( "Latitude must be a number between 90 and -90 inclusive." ) )
                 latitude.grab_focus()
                 continue
 
             longitude_value = longitude.get_text().strip()
-            if longitude_value == "" or not self.isNumber( longitude_value ) or float( longitude_value ) > 180 or float( longitude_value ) < -180:
+            if longitude_value == "" or not self.is_number( longitude_value ) or float( longitude_value ) > 180 or float( longitude_value ) < -180:
                 notebook.set_current_page( PAGE_LOCATION )
                 self.show_dialog_ok( dialog, _( "Longitude must be a number between 180 and -180 inclusive." ) )
                 longitude.grab_focus()
                 continue
 
             elevation_value = elevation.get_text().strip()
-            if elevation_value == "" or not self.isNumber( elevation_value ) or float( elevation_value ) > 10000 or float( elevation_value ) < 0:
+            if elevation_value == "" or not self.is_number( elevation_value ) or float( elevation_value ) > 10000 or float( elevation_value ) < 0:
                 notebook.set_current_page( PAGE_LOCATION )
                 self.show_dialog_ok( dialog, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
                 elevation.grab_focus()
@@ -2147,11 +2149,11 @@ class IndicatorLunar( IndicatorBase ):
             self.show_satellite_notification = show_satellite_notification_checkbox.get_active()
             if not show_satellite_notification_checkbox.get_active(): self.satellite_previous_notifications = { }
             self.satellite_notification_summary = self.translate_tags( satellite_tag_translations, False, satellite_notification_summary_text.get_text() )
-            self.satellite_notification_message = self.translate_tags( satellite_tag_translations, False, self.getTextViewText( satellite_notification_messaget_ext ) )
+            self.satellite_notification_message = self.translate_tags( satellite_tag_translations, False, self.get_textview_text( satellite_notification_messaget_ext ) )
 
             self.show_werewolf_warning = show_werewolf_warning_checkbox.get_active()
             self.werewolf_warning_summary = werewolf_notification_summary_text.get_text()
-            self.werewolf_warning_message = self.getTextViewText( werewolf_notification_message_text )
+            self.werewolf_warning_message = self.get_textview_text( werewolf_notification_message_text )
 
             self.city = city_value
             self.latitude = float( latitude_value )
@@ -2380,7 +2382,7 @@ class IndicatorLunar( IndicatorBase ):
         box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, grid_start_index + 1, 1, 1 )
 
-        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box ) #TODO This checkbutton has 3 .connects()...does that make sense?  Check!!!!
+        checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, box ) #TODO This checkbutton has 3 .connects()...does that make sense?  Check!!!!
 
         box = Gtk.Box( spacing = 6 )
         box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
@@ -2402,7 +2404,7 @@ class IndicatorLunar( IndicatorBase ):
         box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, grid_start_index + 2, 1, 1 )
 
-        checkbutton.connect( "toggled", self.onRadioOrCheckbox, True, box )
+        checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, box )
 
         # test = Gtk.Button.new_with_label( testButtonText )
         # test.set_halign( Gtk.Align.END )
@@ -2439,7 +2441,7 @@ class IndicatorLunar( IndicatorBase ):
         message = self.get_textview_text( message_text_view )
 
         if is_moon_notification:
-            self.show_notification( summary, message, self.createFullMoonIcon() )
+            self.show_notification( summary, message, self.create_full_moon_icon() )
 
         else:
             def replace_tags( text ):

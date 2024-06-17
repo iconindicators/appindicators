@@ -57,9 +57,8 @@ class IndicatorFortune( IndicatorBase ):
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
 
-    # If present at the start of the current fortune,
-    # the notification summary should be emitted as a warning,
-    # rather than a regular fortune.
+    # When no fortune is enabled or no fortunes are present in the fortune .dat,
+    # this flag is inserted into a dummy fortune to be shown as a notification.
     NOTIFICATION_WARNING_FLAG = "%%%%%"
 
     # Fortune treeview columns; there is a one to one mapping between model and view.
@@ -155,55 +154,63 @@ class IndicatorFortune( IndicatorBase ):
 
     def refresh_fortune( self ):
         locations = " "
+        no_enabled_fortunes = True
         for location, enabled in self.fortunes:
             if enabled:
+                no_enabled_fortunes = False
                 if os.path.isdir( location ):
                     locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it!
 
                 elif os.path.isfile( location ):
                     locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
-        if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
+        if no_enabled_fortunes:
             self.fortune = \
                 IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                _( "No enabled fortunes have a valid location!" )
+                _( "No enabled fortunes!" )
 
         else:
-            while True:
-                self.fortune = self.process_get( "fortune" + locations )
-                if self.fortune is None: # Occurs when no fortune data is found...
-                    self.fortune = \
-                        IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                        _( "Ensure enabled fortunes contain fortune data!" )
+            if locations == " ": # Despite one or more fortunes enabled, none seem to be valid paths/files...
+                self.fortune = \
+                    IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
+                    _( "No enabled fortunes have a valid location!" )
 
-                    break
-
-                elif len( self.fortune ) <= self.skip_fortune_character_count: # If the fortune is within the character limit keep it...
-                    history = self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE )
-                    if history is None:
-                        history = ""
-
-                    # Remove characters/glyphs which appear as hexadecimal.  Refer to:
-                    #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
-                    #
-                    # Examples:
-                    #     Ask not for whom the <CONTROL-G> tolls.
-                    #         *** System shutdown message from root ***
-                    #     It's a very *__UN*lucky week in which to be took dead.   <--- On Debian 12 this is x0008
-                    output = ""
-                    for c in self.fortune:
-                        if codecs.encode( str.encode( c ), "hex" ) == b'07' or \
-                           codecs.encode( str.encode( c ), "hex" ) == b'08':
-                            continue
-
-                        output += c
-
-                    self.fortune = output
-                    self.write_cache_text_without_timestamp(
-                        history + self.fortune + "\n\n",
-                        IndicatorFortune.HISTORY_FILE )
-
-                    break
+            else:
+                while True:
+                    self.fortune = self.process_get( "fortune" + locations )
+                    if self.fortune is None: # Occurs when no fortune data is found...
+                        self.fortune = \
+                            IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
+                            _( "Ensure enabled fortunes contain fortune data!" )
+    
+                        break
+    
+                    elif len( self.fortune ) <= self.skip_fortune_character_count: # If the fortune is within the character limit keep it...
+                        history = self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE )
+                        if history is None:
+                            history = ""
+    
+                        # Remove characters/glyphs which appear as hexadecimal.  Refer to:
+                        #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+                        #
+                        # Examples:
+                        #     Ask not for whom the <CONTROL-G> tolls.
+                        #         *** System shutdown message from root ***
+                        #     It's a very *__UN*lucky week in which to be took dead.   <--- On Debian 12 this is x0008
+                        output = ""
+                        for c in self.fortune:
+                            if codecs.encode( str.encode( c ), "hex" ) == b'07' or \
+                               codecs.encode( str.encode( c ), "hex" ) == b'08':
+                                continue
+    
+                            output += c
+    
+                        self.fortune = output
+                        self.write_cache_text_without_timestamp(
+                            history + self.fortune + "\n\n",
+                            IndicatorFortune.HISTORY_FILE )
+    
+                        break
 
 
     def show_fortune( self ):
@@ -261,33 +268,21 @@ class IndicatorFortune( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True ) #TODO What does homogeneous mean?
+        box = \
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Remove" ),
+                    _( "Reset" ) ),
+                (
+                    _( "Add a new fortune location." ),
+                    _( "Remove the selected fortune location." ),
+                    _( "Reset to factory default." ) ),
+                (
+                    ( self.on_fortune_add, treeview ),
+                    ( self.on_fortune_remove, treeview ),
+                    ( self.on_fortune_reset, treeview ) ) )
 
-        labels = ( _( "Add" ), _( "Remove" ), _( "Reset" ) )
-
-        tooltip_texts = (
-            _( "Add a new fortune location." ),
-            _( "Remove the selected fortune location." ),
-            _( "Reset to factory default." ) )
-
-        clicked_functionandarguments = (
-            self.on_fortune_add,
-            self.on_fortune_remove,
-            self.on_fortune_reset )
-
-        z = zip( labels, tooltip_texts, clicked_functionandarguments )
-        for label, tooltip_text, clicked_functionandargument in z:
-            box.pack_start(
-                self.create_button(
-                    label,
-                    tooltip_text = tooltip_text,
-                    clicked_functionandarguments = ( clicked_functionandargument, treeview ) ),
-                True,
-                True,
-                0 )
-
-        box.set_halign( Gtk.Align.CENTER )
         grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
@@ -422,9 +417,9 @@ class IndicatorFortune( IndicatorBase ):
 
     def on_fortune_reset( self, button, treeview ):
         if self.show_dialog_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
-            listStore = treeview.get_model().get_model()
-            listStore.clear()
-            listStore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
+            liststore = treeview.get_model().get_model()
+            liststore.clear()
+            liststore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
 
 
     def on_fortune_remove( self, button, treeview ):

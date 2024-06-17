@@ -454,7 +454,7 @@ class AstroPyEphem( AstroBase ):
     # Returns True if the body is never up; false otherwise.
     @staticmethod
     def __calculate_common( data, key, observer, body ):
-        neverUp = False
+        never_up = False
         try:
             # Must compute az/alt BEFORE rise/set otherwise results will be incorrect.
             data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
@@ -472,9 +472,9 @@ class AstroPyEphem( AstroBase ):
         except ephem.NeverUpError:
             del data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ]
             del data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ]
-            neverUp = True
+            never_up = True
 
-        return neverUp
+        return never_up
 
 
     @staticmethod

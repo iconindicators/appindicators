@@ -32,107 +32,107 @@ import argparse
 import gzip
 
 
-centuryMap = {
+century_map = {
     'I': 1800,
     'J': 1900,
     'K': 2000 }
 
 
 # https://www.minorplanetcenter.net/iau/info/PackedDates.html
-def getUnpackedDate( i ): return str( i ) if i.isdigit() else str( ord( i ) - ord( 'A' ) + 10 )
+def get_unpacked_date( i ): return str( i ) if i.isdigit() else str( ord( i ) - ord( 'A' ) + 10 )
 
 
-def processAndWriteOneLine( line, outputFile ):
+def process_and_write_one_line( line, output_file ):
     if len( line.strip() ) > 0:
         # Field numbers: 0   1   2   3   4   5   6   7   8   9   10   11   12   13   14   15   16   17   18   19   20   21   22
-        startIndices = [ 1,  9, 15, 21, 27, 38, 49, 60, 71, 81,  93, 106, 108, 118, 124, 128, 138, 143, 147, 151, 162, 167, 195 ]
-        endIndices =   [ 7, 13, 19, 25, 35, 46, 57, 68, 79, 91, 103, 106, 116, 122, 126, 136, 141, 145, 149, 160, 165, 194, 202 ]
+        start_indices = [ 1,  9, 15, 21, 27, 38, 49, 60, 71, 81,  93, 106, 108, 118, 124, 128, 138, 143, 147, 151, 162, 167, 195 ]
+        end_indices =   [ 7, 13, 19, 25, 35, 46, 57, 68, 79, 91, 103, 106, 116, 122, 126, 136, 141, 145, 149, 160, 165, 194, 202 ]
 
         # Offset back to zero to match lines read into a string.
-        startIndices = [ x - 1 for x in startIndices ]
-        endIndices = [ x - 1 for x in endIndices ]
+        start_indices = [ x - 1 for x in start_indices ]
+        end_indices = [ x - 1 for x in end_indices ]
 
-        fields = [ line[ i : j + 1 ] for i, j in zip( startIndices, endIndices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+        fields = [ line[ i : j + 1 ] for i, j in zip( start_indices, end_indices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
         name = fields[ 21 ].replace( '(', '' ).replace( ')', '' ).strip()
-        absoluteMagnitude = fields[ 1 ].strip()
+        absolute_magnitude = fields[ 1 ].strip()
 
         if len( name ) == 0:
             print( "Missing name:\n" + line )
 
-        elif len( absoluteMagnitude ) == 0:
+        elif len( absolute_magnitude ) == 0:
             print( "Missing absolute magnitude:\n" + line )
 
         else:
-            slopeParameter = fields[ 2 ].strip()
+            slope_parameter = fields[ 2 ].strip()
 
-            epochPacked = fields[ 3 ].strip()
-            century = epochPacked[ 0 ]
-            lastTwoDigitsOfYear = epochPacked[ 1 : 3 ]
-            year = str( centuryMap[ century ] + int( lastTwoDigitsOfYear ) )
-            month = getUnpackedDate( epochPacked[ 3 ] )
-            day = getUnpackedDate( epochPacked[ 4 ] )
-            epochDate = month + '/' + day + '/' + year
+            epoch_packed = fields[ 3 ].strip()
+            century = epoch_packed[ 0 ]
+            last_two_digits_of_year = epoch_packed[ 1 : 3 ]
+            year = str( century_map[ century ] + int( last_two_digits_of_year ) )
+            month = get_unpacked_date( epoch_packed[ 3 ] )
+            day = get_unpacked_date( epoch_packed[ 4 ] )
+            epoch_date = month + '/' + day + '/' + year
 
-            meanAnomalyEpoch = fields[ 4 ].strip()
-            argumentPerihelion = fields[ 5 ].strip()
-            longitudeAscendingNode = fields[ 6 ].strip()
-            inclinationToEcliptic = fields[ 7 ].strip()
-            orbitalEccentricity = fields[ 8 ].strip()
-            semimajorAxis = fields[ 10 ].strip()
+            mean_anomaly_epoch = fields[ 4 ].strip()
+            argument_perihelion = fields[ 5 ].strip()
+            longitude_ascending_node = fields[ 6 ].strip()
+            inclination_to_ecliptic = fields[ 7 ].strip()
+            orbital_eccentricity = fields[ 8 ].strip()
+            semimajor_axis = fields[ 10 ].strip()
 
             components = [
                 name,
                 'e',
-                inclinationToEcliptic,
-                longitudeAscendingNode,
-                argumentPerihelion,
-                semimajorAxis,
+                inclination_to_ecliptic,
+                longitude_ascending_node,
+                argument_perihelion,
+                semimajor_axis,
                 '0',
-                orbitalEccentricity,
-                meanAnomalyEpoch,
-                epochDate,
+                orbital_eccentricity,
+                mean_anomaly_epoch,
+                epoch_date,
                 "2000.0",
-                absoluteMagnitude,
-                slopeParameter ]
+                absolute_magnitude,
+                slope_parameter ]
 
-            outputFile.write( ','.join( components ) + '\n' )
+            output_file.write( ','.join( components ) + '\n' )
 
 
-def convert( inFile, header, outFile ):
-    if inFile.endswith( ".gz" ):
-        fIn = gzip.open( inFile, 'rt' )
+def convert( in_file, header, out_file ):
+    if in_file.endswith( ".gz" ):
+        f_in = gzip.open( in_file, 'rt' )
 
     else:
-        fIn = open( inFile, 'r' )
+        f_in = open( in_file, 'r' )
 
-    fOut = open( outFile, 'w' )
+    f_out = open( out_file, 'w' )
 
     if header:
-        endOfHeader = False
-        for line in fIn:
-            if endOfHeader:
-                processAndWriteOneLine( line, fOut )
+        end_of_header = False
+        for line in f_in:
+            if end_of_header:
+                process_and_write_one_line( line, f_out )
 
             elif line.startswith( "----------" ):
-                endOfHeader = True
+                end_of_header = True
 
     else:
-        for line in fIn:
-            processAndWriteOneLine( line, fOut )
+        for line in f_in:
+            process_and_write_one_line( line, f_out )
 
-    fIn.close()
-    fOut.close()
+    f_in.close()
+    f_out.close()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description = "Convert a minor planet text file such as MPCORB.DAT or MPCORB.DAT.gz from MPC to XEphem format. " + \
         "If the file ends in '.gz' the file will be treated as a gzip file; otherwise the file is assumed to be text." )
-    parser.add_argument( "inFile", help = "File to convert" )
+    parser.add_argument( "in_file", help = "File to convert" )
     parser.add_argument(
         "--header",
         action = "store_true",
         help = "Only specify this option if the file to convert contains a header, such as MPCORB.DAT or MPCORB.DAT.gz." )
-    parser.add_argument( "outFile", help = "Output file to be created" )
+    parser.add_argument( "out_file", help = "Output file to be created" )
     args = parser.parse_args()
-    convert( args.inFile, args.header, args.outFile )
+    convert( args.in_file, args.header, args.out_file )

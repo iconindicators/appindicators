@@ -405,7 +405,7 @@ class AstroSkyfield( AstroBase ):
             str( position_angle_of( moon_at_now_apparent.altaz(), sun_alt_az ).radians ) # Needed for icon.
 
         never_up = \
-            AstroSkyfield.__calculateCommon(
+            AstroSkyfield.__calculate_common(
                 now,
                 now + datetime.timedelta( hours = 36 ), # Rise/set window for the moon.
                 location, location_at_now,
@@ -430,7 +430,7 @@ class AstroSkyfield( AstroBase ):
         key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
         never_up = \
-            AstroSkyfield.__calculateCommon(
+            AstroSkyfield.__calculate_common(
                 now, now_plus_twenty_five_hours,
                 location, location_at_now,
                 data, key, AstroSkyfield.__EPHEMERIS_PLANETS[ AstroSkyfield.__SUN ] )
@@ -552,7 +552,7 @@ class AstroSkyfield( AstroBase ):
             apparent_magnitude_maximum ):
 
         for star in stars:
-            the_star = AstroSkyfield.__EPHEMERIS_STARS.loc[ AstroBase.getStarHIP( star ) ]
+            the_star = AstroSkyfield.__EPHEMERIS_STARS.loc[ AstroBase.get_star_hip( star ) ]
             if the_star.magnitude <= apparent_magnitude_maximum:
                 AstroSkyfield.__calculate_common(
                     now, now_plus_twenty_five_hours,
