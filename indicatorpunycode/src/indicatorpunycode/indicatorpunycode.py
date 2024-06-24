@@ -31,9 +31,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 import encodings.idna
 import gi
 
-gi.require_version( "Gdk", "3.0" )
-from gi.repository import Gdk
-
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
@@ -89,7 +86,7 @@ class IndicatorPunycode( IndicatorBase ):
     def on_convert( self ):
         summary =_( "Nothing to convert..." )
         if self.input_clipboard:
-            text = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+            text = self.copy_from_selection_clipboard()
             if text is None:
                 self.show_notification( summary, _( "No text is in the clipboard." ) )
 
@@ -105,7 +102,7 @@ class IndicatorPunycode( IndicatorBase ):
                 else:
                     self.__do_conversion( text )
 
-            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text( clipboard_text_received_function, None )
+            self.copy_from_selection_primary( ( clipboard_text_received_function, None ) )
 
 
     def __do_conversion( self, text ):
@@ -162,15 +159,15 @@ class IndicatorPunycode( IndicatorBase ):
 
     def send_results_to_output( self, text ):
         if self.output_both:
-            Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
-            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
+            self.copy_to_selection( text )
+            self.copy_to_selection( text, is_primary = True )
 
         else:
             if self.input_clipboard:
-                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( text, -1 )
+                self.copy_to_selection( text )
 
             else:
-                Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).set_text( text, -1 )
+                self.copy_to_selection( text, is_primary = True )
 
 
     def on_preferences( self, dialog ):

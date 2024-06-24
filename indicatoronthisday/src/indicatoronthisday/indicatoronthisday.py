@@ -48,9 +48,6 @@ from datetime import date, datetime, timedelta
 import fnmatch
 import gi
 
-gi.require_version( "Gdk", "3.0" )
-from gi.repository import Gdk
-
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
@@ -118,16 +115,13 @@ class IndicatorOnThisDay( IndicatorBase ):
                     break # Don't add the menu item for the new date and don't add a subsequent event.
 
             if self.copy_to_clipboard:
-                f = (
-                    lambda menuitem:
-                        Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text(
-                            menuitem.get_name() + ' ' + menuitem.get_label().strip(), -1 ) )
-
                 self.create_and_append_menuitem(
                     menu,
                     self.get_menu_indent() + event.get_description(),
                     name = self.remove_leading_zero_from_date( event.get_date() ), # Allows the month/day to be passed to the copy/search functions below.
-                    activate_functionandarguments = ( f, ) ) #TODO The copy to clipboard does not work on Debian 12; does work on Ubuntu 20.04; test on Ubuntu 22.04/24.04.  Also document in the README.md for the indicators (via the build_readme.py).
+                    activate_functionandarguments = ( 
+                        lambda menuitem:
+                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ) ) #TODO The copy to clipboard does not work on Debian 12; does work on Ubuntu 20.04; test on Ubuntu 22.04/24.04.  Also document in the README.md for the indicators (via the build_readme.py).
 
             elif len( self.search_url ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 date_and_description = self.remove_leading_zero_from_date( event.get_date() ) + ' ' + event.get_description()

@@ -147,6 +147,9 @@ except:
         print( "Unable to find either AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
 
+gi.require_version( "Gdk", "3.0" )
+from gi.repository import Gdk
+
 gi.require_version( "GLib", "2.0" )
 from gi.repository import GLib
 
@@ -226,10 +229,8 @@ class IndicatorBase( ABC ):
     
         if found_indicatorbase_import:
             INDICATOR_NAME = Path( frame_record.filename ).stem
-            gettext.install(
-                INDICATOR_NAME,
-                localedir = str( Path( __file__ ).parent ) + os.sep + "locale" )
-
+            locale_directory = str( Path( __file__ ).parent ) + os.sep + "locale" #TODO Is this correct for when the indiator is running under the venv?
+            gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
     URL_TIMEOUT_IN_SECONDS = 20
@@ -256,7 +257,7 @@ class IndicatorBase( ABC ):
 #
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
-#TODO CHECKED
+#TODO UNCHECKED
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         if IndicatorBase.INDICATOR_NAME is None:
             self.show_dialog_ok(
@@ -270,7 +271,7 @@ class IndicatorBase( ABC ):
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
         project_metadata, error_message = self._get_project_metadata()
-        if project_metadata is None:
+        if error_message:
             self.show_dialog_ok(
                 None,
                 error_message,
@@ -340,7 +341,6 @@ class IndicatorBase( ABC ):
         self.__load_config()
 
 
-#TODO CHECKED
     def _get_project_metadata( self ):
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
@@ -373,7 +373,6 @@ class IndicatorBase( ABC ):
         return project_metadata, error_message
 
 
-#TODO CHECKED
     def initialise_desktop_file( self ):
         # Ensure the .desktop file is present,
         # either running installed in a virtual environment,
@@ -441,7 +440,7 @@ class IndicatorBase( ABC ):
         return value
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     @staticmethod
     def get_first_year_or_last_year_in_changelog_markdown( changelog_markdown, first_year = True ):
         first_or_last_year = ""
@@ -474,7 +473,7 @@ class IndicatorBase( ABC ):
         return version
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     @staticmethod
     def get_changelog_markdown_path( indicator_name ):
         # If running outside of a venv/wheel, say under development/IDE,
@@ -487,38 +486,36 @@ class IndicatorBase( ABC ):
         return changelog
 
 
-#TODO CHECKED
     def main( self ):
         GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that the Gtk main executes to show initialisation.
         Gtk.main()
 
 
-#TODO CHECKED
     def __update( self ):
         if self.lock.acquire( blocking = False ):
-            self.__set_menu_sensitivity( False )#TODO Either keep this new line or the one below.
+            self.set_menu_sensitivity( False )
             GLib.idle_add( self.__update_internal )
 
         else:
+#TODO Test this clause.
             GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS, self.__update )
             #TODO This call returns an ID...need to keep it?
             #TODO Keep the About/Prefernces open and see if we keep trying to do an update every 60 seconds.
 
 
-#TODO CHECKED
     def __update_internal( self ):
         update_start = datetime.datetime.now()
 
         # The user can nominate any menuitem as a secondary activate target during menu construction.
         # However the secondary activate target can only be set once the menu is built.
-        # Therefore, keep a variable around for the user to set as needed
-        # and then set the secondary activate target once the menu is built/shown.
+        # Therefore, keep a variable for the user to set as needed.
+        # Then set the secondary activate target once the menu is built/shown.
         self.secondary_activate_target = None
 
         menu = Gtk.Menu()
         next_update_in_seconds = self.update( menu ) # Call to implementation in indicator.
 
-        if self.debug:
+        if self.is_debug():
             if next_update_in_seconds:
                 next_update_date_time = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
                 label = "Next update: " + str( next_update_date_time ).split( '.' )[ 0 ]
@@ -527,6 +524,8 @@ class IndicatorBase( ABC ):
             label = "Time to update: " + str( datetime.datetime.now() - update_start )
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
+#TODO Ensure this works for indicatortest (with one menu item) and
+# indicatorlunar with two menu items.
         if len( menu.get_children() ) > 0:
             menu.append( Gtk.SeparatorMenuItem() )
 
@@ -547,18 +546,16 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def request_update( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__update )  #TODO Should the default delay be 1?  Is 0 too fast?  Could some race condition arise?
 
 
-#TODO CHECKED
     def set_label( self, text ):
         self.indicator.set_label( text, text )
         self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
 
 
-#TODO CHECKED
     def set_icon( self, icon ):
         self.indicator.set_icon_full( icon, "" )
 
@@ -581,12 +578,14 @@ class IndicatorBase( ABC ):
     # So perhaps first try:
     #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
     # and if that fails, either log out/in or restart.
-#TODO CHECKED
     def get_icon_name( self ):
         return self.indicator_name + "-symbolic"
 
 
-#TODO CHECKED
+    def is_debug( self ):
+        return self.debug
+
+
     def show_notification( self, summary, message, icon = None ):
         if icon is None:
             _icon = self.get_icon_name()
@@ -608,14 +607,16 @@ class IndicatorBase( ABC ):
     # The name of the function may be any name.
     # The arguments must be present as specified.
     # Additional arguments may be specified.
-#TODO CHECKED
     def request_mouse_wheel_scroll_events( self, functionandarguments ):
-        self.indicator.connect( "scroll-event", self.__on_mouse_wheel_scroll, functionandarguments )
+        self.indicator.connect(
+            "scroll-event",
+            self.__on_mouse_wheel_scroll,
+            functionandarguments )
 
 
-#TODO CHECKED
     def __on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, functionandarguments ):
         if not self.lock.locked():
+#TODO Force a lock (open about/preferences and ensure this clause does not run on mouse wheel scroll.
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
 
@@ -623,7 +624,7 @@ class IndicatorBase( ABC ):
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __on_about( self, menuitem ):
         if self.lock.acquire( blocking = False ):
             self.__on_about_internal( menuitem )
@@ -632,9 +633,9 @@ class IndicatorBase( ABC ):
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or Preferences?
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __on_about_internal( self, menuitem ):
-        self.__set_menu_sensitivity( False )
+        self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
         about_dialog = Gtk.AboutDialog()
@@ -677,7 +678,7 @@ class IndicatorBase( ABC ):
         about_dialog.run()
         about_dialog.destroy()
 
-        self.__set_menu_sensitivity( True )
+        self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
         self.lock.release()
 
@@ -693,7 +694,7 @@ class IndicatorBase( ABC ):
 #                 svg = indicator_icon
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __add_hyperlink_label(
             self,
             about_dialog,
@@ -715,7 +716,7 @@ class IndicatorBase( ABC ):
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __on_preferences( self, menuitem ):
         if self.lock.acquire( blocking = False ):
             self.__on_preferences_internal( menuitem )
@@ -726,7 +727,7 @@ class IndicatorBase( ABC ):
 
 #TODO UNCHECKED
     def __on_preferences_internal( self, menuitem ):
-        self.__set_menu_sensitivity( False )
+        self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
         if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
@@ -758,7 +759,7 @@ class IndicatorBase( ABC ):
                 self.__update()
         '''
 
-        self.__set_menu_sensitivity( True )
+        self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
         self.lock.release()
 
@@ -771,20 +772,33 @@ class IndicatorBase( ABC ):
 
 #TODO UNCHECKED
     def set_menu_sensitivity( self, toggle ):
-        self.__set_menu_sensitivity( toggle )
-
-
-#TODO CHECKED
-    def __set_menu_sensitivity( self, toggle ):
         menuitems = self.indicator.get_menu().get_children()
         if len( menuitems ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
             for menuitem in self.indicator.get_menu().get_children():
                 menuitem.set_sensitive( toggle )
 
 
+    # Copy text to clipboard or primary.
+    def copy_to_selection( self, text, is_primary = False ):
+        selection = Gdk.SELECTION_CLIPBOARD
+        if is_primary:
+            selection = Gdk.SELECTION_PRIMARY
+
+        Gtk.Clipboard.get( selection ).set_text( text, -1 )
+
+
+    def copy_from_selection_clipboard( self ):
+        return Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+
+
+    def copy_from_selection_primary( self, clipboard_text_received_functionandarguments ):
+        Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
+            *clipboard_text_received_functionandarguments )
+
+
 #TODO Seems Gtk.STOCK_OK et al are deprecated:
 #   https://lazka.github.io/pgi-docs/Gtk-3.0/constants.html#Gtk.STOCK_OK
-#TODO CHECKED
+#TODO UNCHECKED
     def create_dialog(
             self,
             parent_widget,
@@ -823,7 +837,7 @@ class IndicatorBase( ABC ):
                 title )
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def show_dialog_ok(
             self,
             parent_widget,
@@ -840,7 +854,7 @@ class IndicatorBase( ABC ):
                 title )
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __show_dialog(
             self,
             parent_widget,
@@ -868,7 +882,7 @@ class IndicatorBase( ABC ):
         return response
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __get_parent( self, widget ):
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
@@ -880,7 +894,7 @@ class IndicatorBase( ABC ):
         return parent
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def create_autostart_checkbox_and_delay_spinner( self ):
         autostart, delay = self.get_autostart_and_delay()
 
@@ -908,7 +922,6 @@ class IndicatorBase( ABC ):
         return autostart_checkbox, autostart_spinner, box
 
 
-#TODO CHECKED
     def create_and_append_menuitem(
         self,
         menu,
@@ -942,12 +955,13 @@ class IndicatorBase( ABC ):
         activate_functionandarguments = None,
         is_secondary_activate_target = False ):
 
-        menuitem = self.create_and_append_menuitem(
-            menu,
-            label,
-            name,
-            activate_functionandarguments,
-            is_secondary_activate_target )
+        menuitem = \
+            self.create_and_append_menuitem(
+                menu,
+                label,
+                name,
+                activate_functionandarguments,
+                is_secondary_activate_target )
 
         menu.reorder_child( menuitem, index )
         return menuitem
@@ -977,7 +991,7 @@ class IndicatorBase( ABC ):
 
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
-#TODO CHECKED
+#TODO UNCHECKED
     def get_menuitems_guess( self ):
         screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
@@ -1024,7 +1038,7 @@ class IndicatorBase( ABC ):
         return y
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def create_grid( self ):
         spacing = 10
         grid = Gtk.Grid()
@@ -1081,7 +1095,7 @@ class IndicatorBase( ABC ):
         return button
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def create_spinbutton(
         self,
         value,
@@ -1102,7 +1116,7 @@ class IndicatorBase( ABC ):
         return spinner
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def create_checkbutton(
         self,
         label,
@@ -1135,7 +1149,7 @@ class IndicatorBase( ABC ):
         return radiobutton
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __set_widget_common_attributes(
         self,
         widget,
@@ -1150,7 +1164,7 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def create_treeview_within_scrolledwindow(
         self,
         treemodel, # Must be a sorted store if columns are to be sorted.
@@ -1260,7 +1274,7 @@ class IndicatorBase( ABC ):
         return box
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def create_filechooser_dialog(
         self,
         title,
@@ -1286,7 +1300,6 @@ class IndicatorBase( ABC ):
 # Also look at set_homogeneous
 
 
-#TODO CHECKED
     def get_menu_indent( self, indent = 1 ):
         indent_amount = "      " * indent
         if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
@@ -1295,7 +1308,7 @@ class IndicatorBase( ABC ):
         return indent_amount
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def get_autostart_and_delay( self ):
         autostart = False
         delay = 0
@@ -1317,7 +1330,7 @@ class IndicatorBase( ABC ):
         return autostart, delay
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def set_autostart_and_delay( self, is_set, delay ):
         if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
             os.makedirs( IndicatorBase.__AUTOSTART_PATH )
@@ -1372,7 +1385,6 @@ class IndicatorBase( ABC ):
 
 #TODO This returns a \n at the end of the result...should this be trimmed at all...
 # and if so, here or by process_get?  Who else calls process_get?
-#TODO CHECKED
     def get_desktop_environment( self ):
         return self.process_get( "echo $XDG_CURRENT_DESKTOP" ).strip()
 
@@ -1440,7 +1452,6 @@ class IndicatorBase( ABC ):
     # Return the full path and name of the executable for the
     # current terminal and the corresponding execution flag;
     # None otherwise.
-#TODO CHECKED
     def get_terminal_and_execution_flag( self ):
         terminal = None
         execution_flag = None
@@ -1514,7 +1525,6 @@ class IndicatorBase( ABC ):
         GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 
-#TODO CHECKED
     def __copy_config_to_new_directory( self ):
         mapping = {
             "indicatorfortune":                 "indicator-fortune",
@@ -1534,7 +1544,6 @@ class IndicatorBase( ABC ):
             shutil.copyfile( config_file_old, config_file )
 
 
-#TODO CHECKED
     # Read a dictionary of configuration from a JSON text file.
     def __load_config( self ):
         self.__copy_config_to_new_directory()
@@ -1557,7 +1566,7 @@ class IndicatorBase( ABC ):
     #
     # returnStatus If True, will return a boolean indicating success/failure.
     #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
-#TODO CHECKED
+#TODO UNCHECKED
     def __save_config( self, return_status = True ):
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version
@@ -1580,7 +1589,6 @@ class IndicatorBase( ABC ):
             return success
 
 
-#TODO CHECKED
     # Return the full directory path to the user config directory for the current indicator.
     def __get_config_directory( self ):
         return self.__get_user_directory( "XDG_CONFIG_HOME", ".config", self.indicator_name )
@@ -1611,7 +1619,7 @@ class IndicatorBase( ABC ):
     def get_cache_date_time( self, basename ):
         expiry = None
         the_file = ""
-        for file in os.listdir( self.__get_cache_directory() ):
+        for file in os.listdir( self.get_cache_directory() ):
             if file.startswith( basename ) and file > the_file:
                 the_file = file
 
@@ -1629,7 +1637,7 @@ class IndicatorBase( ABC ):
 #TODO UNCHECKED
     def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
         return \
-            self.__get_cache_directory() + \
+            self.get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
@@ -1640,7 +1648,7 @@ class IndicatorBase( ABC ):
     # Returns the newest filename matching the basename on success; None otherwise.
 #TODO UNCHECKED
     def get_cache_newest_filename( self, basename ):
-        cache_directory = self.__get_cache_directory()
+        cache_directory = self.get_cache_directory()
         cache_file = ""
         for file in os.listdir( cache_directory ):
             if file.startswith( basename ) and file > cache_file:
@@ -1665,7 +1673,7 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/fileName
 #TODO UNCHECKED
     def remove_file_from_cache( self, filename ):
-        cache_directory = self.__get_cache_directory()
+        cache_directory = self.get_cache_directory()
         for file in os.listdir( cache_directory ):
             if file == filename:
                 os.remove( cache_directory + file )
@@ -1686,11 +1694,11 @@ class IndicatorBase( ABC ):
     # and is older than the cache maximum age is discarded.
     #
     # Any file extension is ignored in determining if the file should be deleted or not.
-#TODO CHECKED
     def flush_cache( self, basename, maximum_age_in_hours ):
-        cache_directory = self.__get_cache_directory()
+        cache_directory = self.get_cache_directory()
         cache_maximum_age_date_time = datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
         for file in os.listdir( cache_directory ):
+#TODO Test with something like indicatorlunar to ensure only appropriate files are cleared from the cache.
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
                 date_time = file[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
                 if date_time.isdigit():
@@ -1723,12 +1731,12 @@ class IndicatorBase( ABC ):
     def read_cache_binary( self, basename ):
         data = None
         the_file = ""
-        for file in os.listdir( self.__get_cache_directory() ):
+        for file in os.listdir( self.get_cache_directory() ):
             if file.startswith( basename ) and file > the_file:
                 the_file = file
 
         if the_file: # A value of "" evaluates to False.
-            filename = self.__get_cache_directory() + the_file
+            filename = self.get_cache_directory() + the_file
             try:
                 with open( filename, 'rb' ) as f_in:
                     data = pickle.load( f_in )
@@ -1757,7 +1765,7 @@ class IndicatorBase( ABC ):
     def write_cache_binary( self, binary_data, basename, extension = "" ):
         success = True
         cache_file = \
-            self.__get_cache_directory() + \
+            self.get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
@@ -1779,9 +1787,9 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
-#TODO CHECKED
+#TODO UNCHECKED
     def read_cache_text_without_timestamp( self, filename ):
-        return self.__read_cache_text( self.__get_cache_directory() + filename )
+        return self.__read_cache_text( self.get_cache_directory() + filename )
 
 
     # Read the most recent text file from the cache.
@@ -1802,7 +1810,7 @@ class IndicatorBase( ABC ):
     # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
 #TODO UNCHECKED
     def read_cache_text( self, basename ):
-        cache_directory = self.__get_cache_directory()
+        cache_directory = self.get_cache_directory()
         cache_file = ""
         for file in os.listdir( cache_directory ):
             if file.startswith( basename ) and file > cache_file:
@@ -1814,7 +1822,7 @@ class IndicatorBase( ABC ):
         return self.__read_cache_text( cache_file )
 
 
-#TODO CHECKED
+#TODO UNCHECKED
     def __read_cache_text( self, cache_file ):
         text = ""
         if os.path.isfile( cache_file ):
@@ -1836,9 +1844,9 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns filename written on success; None otherwise.
-#TODO CHECKED
+#TODO UNCHECKED
     def write_cache_text_without_timestamp( self, text, filename ):
-        return self.__write_cache_text( text, self.__get_cache_directory() + filename )
+        return self.__write_cache_text( text, self.get_cache_directory() + filename )
 
 
     # Writes text to a file in the cache.
@@ -1853,10 +1861,9 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns filename written on success; None otherwise.
-#TODO CHECKED
     def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
         cache_file = \
-            self.__get_cache_directory() + \
+            self.get_cache_directory() + \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
@@ -1864,7 +1871,6 @@ class IndicatorBase( ABC ):
         return self.__write_cache_text( text, cache_file )
 
 
-#TODO CHECKED
     def __write_cache_text( self, text, cache_file ):
         try:
             with open( cache_file, 'w' ) as f_out:
@@ -1878,16 +1884,8 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-#TODO Why have a private and a public function...?  Just have one (public) perhaps?
     # Return the full directory path to the user cache directory for the current indicator.
-#TODO CHECKED
     def get_cache_directory( self ):
-        return self.__get_cache_directory()
-
-
-    # Return the full directory path to the user cache directory for the current indicator.
-#TODO CHECKED
-    def __get_cache_directory( self ):
         return self.__get_user_directory( "XDG_CACHE_HOME", ".cache", self.indicator_name )
 
 
@@ -1903,7 +1901,6 @@ class IndicatorBase( ABC ):
     #    ${XDGKey}/applicationBaseDirectory
     # or
     #    ~/.userBaseDirectory/applicationBaseDirectory
-#TODO CHECKED
     def __get_user_directory( self, xdg_key, user_base_directory, application_base_directory ):
         if xdg_key in os.environ:
             directory = \
@@ -1940,7 +1937,6 @@ class IndicatorBase( ABC ):
     # logNonZeroErrorCode If True, will log any exception arising from a non-zero return code; otherwise will ignore.
     #
     # On exception, logs to file.
-#TODO CHECKED
     def process_get( self, command, log_non_zero_error_code = False ):
         result = None
         try:
@@ -1971,7 +1967,7 @@ class IndicatorBase( ABC ):
 #   https://docs.python.org/3/library/logging.handlers.html
 #   https://stackoverflow.com/questions/24157278/limit-python-log-file
 #   https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
-#TODO CHECKED
+#TODO UNCHECKED
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
 
     def __init__( self, filename, maxBytes = 10000 ):

@@ -24,9 +24,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 import codecs
 import gi
 
-gi.require_version( "Gdk", "3.0" )
-from gi.repository import Gdk
-
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
@@ -92,7 +89,7 @@ class IndicatorFortune( IndicatorBase ):
             menu,
             _( "Copy Last Fortune" ),
             activate_functionandarguments = (
-                lambda menuitem: Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.fortune, -1 ), ),
+                lambda menuitem: self.copy_to_selection( self.fortune ), ),
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 

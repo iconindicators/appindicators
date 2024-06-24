@@ -24,9 +24,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 import datetime
 import gi
 
-gi.require_version( "Gdk", "3.0" )
-from gi.repository import Gdk
-
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
@@ -46,12 +43,14 @@ class IndicatorTest( IndicatorBase ):
 
     CONFIG_X = "x"
 
-    LABEL = "Test Indicator"
+    LABEL = _( "Test Indicator" )
 
 
     def __init__( self ):
-        super().__init__( comments = _( "Exercises a range of indicator functionality." ) )
-        self.debug = True
+        super().__init__(
+            comments = _( "Exercises a range of indicator functionality." ),
+            debug = True )
+
         self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
         self.flush_cache(
             IndicatorTest.CACHE_ICON_BASENAME,
@@ -69,12 +68,20 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __build_menu( self, menu ):
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        self.create_and_append_menuitem( menu, _( "Information" ) )
         self.__build_menu_platform_uname( menu )
         self.__build_menu_desktop( menu )
+        self.__build_menu_icon_theme( menu )
+        self.__build_menu_terminal( menu )
+
+        menu.append( Gtk.SeparatorMenuItem() )
+
+        self.create_and_append_menuitem( menu, _( "Functionality" ) )
         self.__build_menu_icon( menu )
         self.__build_menu_label_tooltip_osd( menu )
         self.__build_menu_clipboard( menu )
-        self.__build_menu_terminal( menu )
         self.__build_menu_execute_command( menu )
 
 
@@ -83,24 +90,40 @@ class IndicatorTest( IndicatorBase ):
 
         uname = platform.uname()
         labels = (
-            "Machine: " + str( uname.machine ),
-            "Node: " + str( uname.node ),
-            "Processor: " + str( uname.processor ),
-            "Release: " + str( uname.release ),
-            "System: " + str( uname.system ),
-            "Version: " + str( uname.version ) )
+            _( "Machine: " ) + str( uname.machine ),
+            _( "Node: " ) + str( uname.node ),
+            _( "Processor: " ) + str( uname.processor ),
+            _( "Release: " ) + str( uname.release ),
+            _( "System: " ) + str( uname.system ),
+            _( "Version: " ) + str( uname.version ) )
 
         for label in labels:
-            self.create_and_append_menuitem( submenu, self.get_menu_indent() + label )
+            self.create_and_append_menuitem( submenu, self.get_menu_indent() * 2 + label )
 
-        self.create_and_append_menuitem( menu, "Platform | Uname" ).set_submenu( submenu )
+        label = self.get_menu_indent() + _( "Platform | Uname" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
 
 
     def __build_menu_desktop( self, menu ):
         submenu = Gtk.Menu()
 
+        text = self.get_menu_indent() * 2 + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_desktop_environment()
+        self.create_and_append_menuitem( submenu, text )
+
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() * 2 + \
+            "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ) )
+
+        label = self.get_menu_indent() + _( "Desktop" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+
+
+    def __build_menu_icon_theme( self, menu ):
+        submenu = Gtk.Menu()
+
         text = \
-            self.get_menu_indent() + \
+            self.get_menu_indent() * 2 + \
             "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + \
             Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
@@ -111,22 +134,32 @@ class IndicatorTest( IndicatorBase ):
         result = self.process_get( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + command + "icon-theme: " + result )
+            self.get_menu_indent() * 2 + command + "icon-theme: " + result )
 
         result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + command + "gtk-theme: " + result )
+            self.get_menu_indent() * 2 + command + "gtk-theme: " + result )
 
-        text = self.get_menu_indent() + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_desktop_environment()
-        self.create_and_append_menuitem( submenu, text )
+        label = self.get_menu_indent() + _( "Icon Theme" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+
+
+    def __build_menu_terminal( self, menu ):
+        submenu = Gtk.Menu()
+
+        terminal, execution_flag = self.get_terminal_and_execution_flag()
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + \
-            "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ) )
+            self.get_menu_indent() * 2 + _( "Terminal: " ) + str( terminal ) )
 
-        self.create_and_append_menuitem( menu, "Desktop" ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            submenu,
+            self.get_menu_indent() * 2 + _( "Execution flag: " ) + str( execution_flag ) )
+
+        label = self.get_menu_indent() + _( "Terminal" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
 
 
     def __build_menu_icon( self, menu ):
@@ -134,7 +167,7 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + "Reset icon",
+            self.get_menu_indent() * 2 + _( "Reset icon" ),
             activate_functionandarguments = (
                 lambda menuitem:
                     self.set_icon( self.get_icon_name() ), ) )
@@ -149,11 +182,13 @@ class IndicatorTest( IndicatorBase ):
         for icon in icons:
             self.create_and_append_menuitem(
                 submenu,
-                self.get_menu_indent() + "Use " + icon + " dynamically created in " + self.get_cache_directory(),
+#TODO Figure out a way to add _( ) around the menu label with or without translating the moon phase names. 
+                self.get_menu_indent() * 2 + "Use " + icon + " dynamically created in " + self.get_cache_directory(),
                 name = icon,
                 activate_functionandarguments = ( self.__use_icon_dynamically_created, ) )
 
-        self.create_and_append_menuitem( menu, "Icon" ).set_submenu( submenu )
+        label = self.get_menu_indent() + _( "Icon" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
 
 
     def __build_menu_label_tooltip_osd( self, menu ):
@@ -161,14 +196,14 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + "Reset label",
+            self.get_menu_indent() * 2 + _( "Reset label" ),
             activate_functionandarguments = (
                 lambda menuitem:
                     self.set_label( IndicatorTest.LABEL ), ) )
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + "Show current time in label",
+            self.get_menu_indent() * 2 + _( "Show current time in label" ),
             activate_functionandarguments = (
                 lambda menuitem: (
                     print( "secondary activate target / mouse middle click" ),
@@ -177,12 +212,13 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + "Show current time in OSD",
+            self.get_menu_indent() * 2 + _( "Show current time in OSD" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.show_notification( "Current time...", self.__get_current_time() ), ) )
+                    self.show_notification( _( "Current time..." ), self.__get_current_time() ), ) )
 
-        self.create_and_append_menuitem( menu, "Label / Tooltip / OSD" ).set_submenu( submenu )
+        label = self.get_menu_indent() + _( "Label / Tooltip / OSD" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
 
 
     def __build_menu_clipboard( self, menu ):
@@ -190,29 +226,14 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() + _( "Copy current time to clipboard" ),
+            self.get_menu_indent() * 2 + _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: ( 
+                lambda menuitem: (
                     print( "clipboard" ),
-                    Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).set_text( self.__get_current_time(), -1 ) ), ) )
+                    self.copy_to_selection( self.__get_current_time() ) ), ) )
 
-        self.create_and_append_menuitem( menu, "Clipboard" ).set_submenu( submenu )
-
-
-    def __build_menu_terminal( self, menu ):
-        submenu = Gtk.Menu()
-
-        terminal, execution_flag = self.get_terminal_and_execution_flag()
-
-        self.create_and_append_menuitem(
-            submenu,
-            self.get_menu_indent() + "Terminal: " + str( terminal ) )
-
-        self.create_and_append_menuitem(
-            submenu,
-            self.get_menu_indent() + "Execution flag: " + str( execution_flag ) )
-
-        self.create_and_append_menuitem( menu, "Terminal" ).set_submenu( submenu )
+        label = self.get_menu_indent() + _( "Clipboard" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
 
 
     def __build_menu_execute_command( self, menu ):
@@ -237,12 +258,13 @@ class IndicatorTest( IndicatorBase ):
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(
                 submenu,
-                self.get_menu_indent() + label,
+                self.get_menu_indent() * 2 + label,
                 activate_functionandarguments = (
                     lambda menuitem, command = command:  # Need command = command to handle lambda late binding.
                         self.__execute_command( command ), ) )
 
-        self.create_and_append_menuitem( menu, "Execute Terminal Command" ).set_submenu( submenu )
+        label = self.get_menu_indent() + _( "Execute Terminal Command" )
+        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
 
 
     def __get_current_time( self ):
@@ -360,7 +382,7 @@ class IndicatorTest( IndicatorBase ):
                 ( ( renderer_text_for_column_dayofweek, "text", 0 ), ),
                 celldatafunctionandarguments_renderers_columnviewids = (
                     ( ( self.data_function, "" ), renderer_text_for_column_dayofweek, 0 ), ),
-                tooltip_text = "Days of week containing an 'n' are bold." )
+                tooltip_text = _( "Days of week containing an 'n' are bold." ) )
 
         grid.attach( scrolledwindow, 0, 1, 1, 10 )
 
@@ -378,6 +400,11 @@ class IndicatorTest( IndicatorBase ):
         return response_type
 
 
+#TODO Maybe this function should be renamed to something like cellrendererfunction?
+# Find a URL reference for how this is supposed to work.
+# Is this used elsewhere in other indicators?
+#
+# treeviewcolumn.set_cell_data_func
     def data_function( self, treeviewcolumn, cell_renderer, tree_model, tree_iter, data ):
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         day_of_week = tree_model.get_value( tree_iter, 0 )
