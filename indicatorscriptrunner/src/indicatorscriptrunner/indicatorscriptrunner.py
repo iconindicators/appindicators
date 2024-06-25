@@ -592,6 +592,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         return response_type
 
 
+#TODO Check the URLs here and for the function below to make sure they all match up
+# (they should match up if the functions are essentially the same...right?)
+# Also should these URLs be added to indicatortest's data_function comment header?
     # Renders the script name bold when the (non-background) script is default.
     # Otherwise normal style is used.
     #
