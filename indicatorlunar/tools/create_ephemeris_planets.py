@@ -48,6 +48,7 @@ import argparse
 import datetime
 from dateutil.relativedelta import relativedelta
 import subprocess
+import textwrap
 
 
 def create_ephemeris_planets( in_bsp, out_bsp, years ):
@@ -64,12 +65,21 @@ def create_ephemeris_planets( in_bsp, out_bsp, years ):
 
     print( "Processing...\n\t", command )
     subprocess.call( command, shell = True )
-    print( "Created", out_bsp )
 
 
 if __name__ == "__main__":
-    description = "Reduce the date range of a .bsp from today to a specified number of years from today."
-    parser = argparse.ArgumentParser( description = description )
+    description = \
+        textwrap.dedent( '''\
+            Reduce the date range of a .bsp from today to a specified number of years from today.
+
+            ------------------------------------------------------------------------
+            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST BE DOUBLE QUOTED ---
+            ------------------------------------------------------------------------''' )
+
+    parser = \
+        argparse.ArgumentParser(
+            formatter_class = argparse.RawDescriptionHelpFormatter,
+            description = description )
 
     parser.add_argument(
         "in_bsp",

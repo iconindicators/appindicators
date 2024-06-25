@@ -138,7 +138,11 @@ if __name__ == "__main__":
             2) Creates a star ephemeris file for Skyfield.
             3) Prints a star ephemeris for PyEphem as a Python dictionary.
         
-            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat''' )
+            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat
+
+            ------------------------------------------------------------------------
+            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST BE DOUBLE QUOTED ---
+            ------------------------------------------------------------------------''' )
 
     parser = \
         argparse.ArgumentParser(
