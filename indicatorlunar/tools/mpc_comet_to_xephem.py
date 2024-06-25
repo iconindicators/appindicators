@@ -33,7 +33,7 @@ import argparse
 
 def process_and_write_one_line( line, out_file ):
     if len( line.strip() ) > 0:
-        # Field numbers: 0  1   2   3   4   5   6   7   8   9  10  11  12  13  14   15   16   17
+        # Field numbers:  0  1   2   3   4   5   6   7   8   9  10  11  12  13  14   15   16   17
         start_indices = [ 1, 5,  6, 15, 20, 23, 31, 42, 52, 62, 72, 82, 86, 88, 92,  97, 103, 160 ]
         end_indices =   [ 4, 5, 12, 18, 21, 29, 39, 49, 59, 69, 79, 85, 87, 89, 95, 100, 158, 168 ]
 
@@ -124,8 +124,12 @@ def convert( in_file, out_file ):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser( description = "Convert a comet text file such as CometEls.txt from MPC to XEphem format." )
+    description = "Convert a comet text file such as CometEls.txt from MPC to XEphem format."
+    parser = argparse.ArgumentParser( description = description )
+
     parser.add_argument( "in_file", help = "File to convert" )
+
     parser.add_argument( "out_file", help = "Output file to be created" )
+
     args = parser.parse_args()
     convert( args.in_file, args.out_file )

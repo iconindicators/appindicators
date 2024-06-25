@@ -20,7 +20,8 @@
 # keeping only those present in the IAU CSN Catalog with accompanying HIP and absolute magnitude.
 
 
-import argparse, textwrap
+import argparse
+import textwrap
 
 from ephem import stars
 from pandas import read_csv
@@ -58,7 +59,7 @@ def get_stars_and_hips( iau_catalog_file ):
 
 
 def print_formatted_stars( stars_and_hips ):
-    print( "Printing formatted stars from", star_information_url ) #TODO What is star_information_url?
+    print( "Printing formatted stars from", star_information_url )
     for name, hip in stars_and_hips:
         print(
             "        [ " + \
@@ -130,26 +131,35 @@ def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips ):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        formatter_class = argparse.RawDescriptionHelpFormatter,
-        description = textwrap.dedent( '''\
+    description = \
+        textwrap.dedent( '''\
             Takes the star information and:
             1) Prints a list of star names, corresponding HIP and star name for translation (as a Python list of lists).
             2) Creates a star ephemeris file for Skyfield.
             3) Prints a star ephemeris for PyEphem as a Python dictionary.
+        
+            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat''' )
 
-            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat''' ) )
+    parser = \
+        argparse.ArgumentParser(
+            formatter_class = argparse.RawDescriptionHelpFormatter,
+            description = description )
 
-    starInformationURL = "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
-    parser.add_argument( "star_information", help = "A text file containing the list of stars, downloaded from " + starInformationURL + "." )
+    star_information_url = "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
+    _help = "A text file containing the list of stars, downloaded from " + star_information_url + "."
+    parser.add_argument( "star_information", help = _help )
 
-    starEphemerisURL = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
-    parser.add_argument( "star_ephemeris", help = "A star ephemeris file, typically hip_main.dat and downloaded from " + starEphemerisURL + "." )
+    star_ephemeris_url = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
+    _help = "A star ephemeris file, typically hip_main.dat and downloaded from " + star_ephemeris_url + "."
+    parser.add_argument( "star_ephemeris", help = _help )
 
-    planetEphemerisURL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
-    parser.add_argument( "planet_ephemeris", help = "A planet ephemeris file in .bsp format, downloaded from " + planetEphemerisURL + "." )
+    planet_ephemeris_url = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
+    _help = "A planet ephemeris file in .bsp format, downloaded from " + planet_ephemeris_url + "."
+    parser.add_argument( "planet_ephemeris", help = _help )
 
-    parser.add_argument( "output_filename_for_skyfield_star_ephemeris", help = "The output filename for the Skyfield star ephemeris." )
+    _help = "The output filename for the Skyfield star ephemeris."
+    parser.add_argument( "output_filename_for_skyfield_star_ephemeris", help = _help ) 
+
     args = parser.parse_args()
 
     stars_and_hips = get_stars_and_hips( args.star_information )

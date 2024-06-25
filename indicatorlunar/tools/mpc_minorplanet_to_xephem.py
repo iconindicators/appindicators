@@ -125,14 +125,20 @@ def convert( in_file, header, out_file ):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description = "Convert a minor planet text file such as MPCORB.DAT or MPCORB.DAT.gz from MPC to XEphem format. " + \
-        "If the file ends in '.gz' the file will be treated as a gzip file; otherwise the file is assumed to be text." )
+    description = \
+        "Convert a minor planet text file such as MPCORB.DAT or MPCORB.DAT.gz from MPC to XEphem format. " + \
+        "If the file ends in '.gz' the file will be treated as a gzip file; otherwise the file is assumed to be text."
+
+    parser = argparse.ArgumentParser( description = description )
+
     parser.add_argument( "in_file", help = "File to convert" )
+
     parser.add_argument(
         "--header",
         action = "store_true",
         help = "Only specify this option if the file to convert contains a header, such as MPCORB.DAT or MPCORB.DAT.gz." )
+
     parser.add_argument( "out_file", help = "Output file to be created" )
+
     args = parser.parse_args()
     convert( args.in_file, args.header, args.out_file )

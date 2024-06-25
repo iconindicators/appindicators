@@ -46,9 +46,8 @@
 
 import argparse
 import datetime
-import subprocess
-
 from dateutil.relativedelta import relativedelta
+import subprocess
 
 
 def create_ephemeris_planets( in_bsp, out_bsp, years ):
@@ -56,19 +55,21 @@ def create_ephemeris_planets( in_bsp, out_bsp, years ):
     start_date = today - relativedelta( months = 1 )
     end_date = today.replace( year = today.year + years )
     date_format = "%Y/%m/%d"
+
     command = \
         "python3 -m jplephem excerpt " + \
         start_date.strftime( date_format ) + " " + \
         end_date.strftime( date_format ) + " " + \
         in_bsp + " " + out_bsp
+
     print( "Processing...\n\t", command )
     subprocess.call( command, shell = True )
     print( "Created", out_bsp )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description = "Reduce the date range of a .bsp from today to a specified number of years from today." )
+    description = "Reduce the date range of a .bsp from today to a specified number of years from today."
+    parser = argparse.ArgumentParser( description = description )
 
     parser.add_argument(
         "in_bsp",
