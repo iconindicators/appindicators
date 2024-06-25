@@ -180,10 +180,14 @@ class IndicatorTest( IndicatorBase ):
             "WAXING_CRESCENT" )
 
         for icon in icons:
+            label = \
+                _( "Show '{0}' rendered to {1}" ).format(
+                    icon.replace( '_', ' ' ).title(),
+                    self.get_cache_directory() )
+
             self.create_and_append_menuitem(
                 submenu,
-#TODO Figure out a way to add _( ) around the menu label with or without translating the moon phase names. 
-                self.get_menu_indent() * 2 + "Use " + icon + " dynamically created in " + self.get_cache_directory(),
+                self.get_menu_indent() * 2 + label,
                 name = icon,
                 activate_functionandarguments = ( self.__use_icon_dynamically_created, ) )
 
@@ -400,11 +404,6 @@ class IndicatorTest( IndicatorBase ):
         return response_type
 
 
-#TODO Maybe this function should be renamed to something like cellrendererfunction?
-# Find a URL reference for how this is supposed to work.
-# Is this used elsewhere in other indicators?
-#
-# treeviewcolumn.set_cell_data_func
     def data_function( self, treeviewcolumn, cell_renderer, tree_model, tree_iter, data ):
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         day_of_week = tree_model.get_value( tree_iter, 0 )
