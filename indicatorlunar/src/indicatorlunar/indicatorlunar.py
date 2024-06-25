@@ -31,7 +31,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
 import gi
-from numpy import object_
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -186,6 +185,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            debug = True, # TODO Remove for production.
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
@@ -213,8 +213,6 @@ class IndicatorLunar( IndicatorBase ):
         # On comet lookup and download of comet / minor planet data,
         # an unnecessary log message is created, so ignore.
         self.get_logging().getLogger( "urllib3" ).propagate = False
-
-        self.debug = True # TODO Remove
 
 
     def flush_the_cache( self ):
@@ -278,7 +276,7 @@ class IndicatorLunar( IndicatorBase ):
             self.data_previous = self.data
 
         # Update frontend.
-        if self.debug:
+        if self.is_debug():
             self.create_and_append_menuitem(
                 menu,
                 IndicatorLunar.astro_backend_name + ": " + IndicatorLunar.astro_backend.get_version() )
