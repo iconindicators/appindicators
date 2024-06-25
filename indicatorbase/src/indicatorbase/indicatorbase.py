@@ -257,7 +257,6 @@ class IndicatorBase( ABC ):
 #
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
-#TODO UNCHECKED
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         if IndicatorBase.INDICATOR_NAME is None:
             self.show_dialog_ok(
@@ -440,7 +439,6 @@ class IndicatorBase( ABC ):
         return value
 
 
-#TODO UNCHECKED
     @staticmethod
     def get_first_year_or_last_year_in_changelog_markdown( changelog_markdown, first_year = True ):
         first_or_last_year = ""
@@ -473,11 +471,12 @@ class IndicatorBase( ABC ):
         return version
 
 
-#TODO UNCHECKED
     @staticmethod
     def get_changelog_markdown_path( indicator_name ):
         # If running outside of a venv/wheel, say under development/IDE,
         # the location of the changelog file will be different.
+#TODO Verify this works both in dev and under venv. 
+# Can we use Path( "." ) instead?  Maybe search for "." and __file__ to see where they are used and how.       
         changelog = str( Path( __file__ ).parent ) + "/CHANGELOG.md"
         if not Path( changelog ).exists():
             parents = Path( __file__ ).parents
@@ -546,7 +545,6 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
-#TODO UNCHECKED
     def request_update( self, delay = 0 ):
         GLib.timeout_add_seconds( delay, self.__update )  #TODO Should the default delay be 1?  Is 0 too fast?  Could some race condition arise?
 
@@ -616,7 +614,6 @@ class IndicatorBase( ABC ):
 
     def __on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, functionandarguments ):
         if not self.lock.locked():
-#TODO Force a lock (open about/preferences and ensure this clause does not run on mouse wheel scroll.
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
 
@@ -624,7 +621,6 @@ class IndicatorBase( ABC ):
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
 
-#TODO UNCHECKED
     def __on_about( self, menuitem ):
         if self.lock.acquire( blocking = False ):
             self.__on_about_internal( menuitem )
@@ -633,7 +629,6 @@ class IndicatorBase( ABC ):
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or Preferences?
 
 
-#TODO UNCHECKED
     def __on_about_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
@@ -694,7 +689,6 @@ class IndicatorBase( ABC ):
 #                 svg = indicator_icon
 
 
-#TODO UNCHECKED
     def __add_hyperlink_label(
             self,
             about_dialog,
@@ -716,7 +710,6 @@ class IndicatorBase( ABC ):
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-#TODO UNCHECKED
     def __on_preferences( self, menuitem ):
         if self.lock.acquire( blocking = False ):
             self.__on_preferences_internal( menuitem )
@@ -725,7 +718,6 @@ class IndicatorBase( ABC ):
             pass #TODO Show notification to user?  How to tell if we're blocked due to update or About?
 
 
-#TODO UNCHECKED
     def __on_preferences_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
@@ -770,7 +762,6 @@ class IndicatorBase( ABC ):
 # an update is kicked off any way.
 
 
-#TODO UNCHECKED
     def set_menu_sensitivity( self, toggle ):
         menuitems = self.indicator.get_menu().get_children()
         if len( menuitems ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
@@ -798,7 +789,6 @@ class IndicatorBase( ABC ):
 
 #TODO Seems Gtk.STOCK_OK et al are deprecated:
 #   https://lazka.github.io/pgi-docs/Gtk-3.0/constants.html#Gtk.STOCK_OK
-#TODO UNCHECKED
     def create_dialog(
             self,
             parent_widget,
@@ -882,7 +872,6 @@ class IndicatorBase( ABC ):
         return response
 
 
-#TODO UNCHECKED
     def __get_parent( self, widget ):
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
@@ -894,7 +883,6 @@ class IndicatorBase( ABC ):
         return parent
 
 
-#TODO UNCHECKED
     def create_autostart_checkbox_and_delay_spinner( self ):
         autostart, delay = self.get_autostart_and_delay()
 
@@ -1038,7 +1026,6 @@ class IndicatorBase( ABC ):
         return y
 
 
-#TODO UNCHECKED
     def create_grid( self ):
         spacing = 10
         grid = Gtk.Grid()
@@ -1095,7 +1082,6 @@ class IndicatorBase( ABC ):
         return button
 
 
-#TODO UNCHECKED
     def create_spinbutton(
         self,
         value,
@@ -1116,7 +1102,6 @@ class IndicatorBase( ABC ):
         return spinner
 
 
-#TODO UNCHECKED
     def create_checkbutton(
         self,
         label,
@@ -1149,7 +1134,6 @@ class IndicatorBase( ABC ):
         return radiobutton
 
 
-#TODO UNCHECKED
     def __set_widget_common_attributes(
         self,
         widget,
@@ -1184,7 +1168,9 @@ class IndicatorBase( ABC ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
 
             # Expand all columns unless the column contains a single checkbox and no column header title.
-            is_checkbox_column = type( renderer_attribute_columnmodelid[ 0 ] ) == Gtk.CellRendererToggle and not title
+            is_checkbox_column = \
+                type( renderer_attribute_columnmodelid[ 0 ] ) == Gtk.CellRendererToggle and not title
+
             treeviewcolumn.set_expand( not is_checkbox_column )
 
             # Add the renderer / attribute / column model id for each column.
@@ -1194,6 +1180,7 @@ class IndicatorBase( ABC ):
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
             else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
+#TODO This clause should happen for script runner when we have interval with two possible renderers...                
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
@@ -1233,7 +1220,7 @@ class IndicatorBase( ABC ):
 # ...rest of indicators use Gtk.SelectionMode.SINGLE...
 # ...test each variation (browse with those that use single and vice versa)...any difference?
         treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
-        treeview.expand_all() #TODO Do for all trees?
+        treeview.expand_all()
         treeview.set_hexpand( True )
         treeview.set_vexpand( True )
 
@@ -1308,7 +1295,6 @@ class IndicatorBase( ABC ):
         return indent_amount
 
 
-#TODO UNCHECKED
     def get_autostart_and_delay( self ):
         autostart = False
         delay = 0
@@ -1330,7 +1316,6 @@ class IndicatorBase( ABC ):
         return autostart, delay
 
 
-#TODO UNCHECKED
     def set_autostart_and_delay( self, is_set, delay ):
         if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
             os.makedirs( IndicatorBase.__AUTOSTART_PATH )
@@ -1367,7 +1352,6 @@ class IndicatorBase( ABC ):
             logging.exception( e )
 
 
-#TODO UNCHECKED
     def get_logging( self ):
         return logging
 
@@ -1440,6 +1424,10 @@ class IndicatorBase( ABC ):
     #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
 #TODO UNCHECKED
+#TODO In indicatortest (maybe elsewhere too)
+# first get the terminal and execution flag,
+# then call this function (which also calls the get the terminal and execution flag function)...
+#...is there a smarter way to do this (maybe pass in the 'terminal' return value)?
     def is_terminal_qterminal( self ):
         terminal_is_qterminal = False
         terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
@@ -1566,7 +1554,6 @@ class IndicatorBase( ABC ):
     #
     # returnStatus If True, will return a boolean indicating success/failure.
     #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
-#TODO UNCHECKED
     def __save_config( self, return_status = True ):
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version
@@ -1921,7 +1908,6 @@ class IndicatorBase( ABC ):
 
     # Executes the command in a new process.
     # On exception, logs to file.
-#TODO UNCHECKED
     def process_call( self, command ):
         try:
             subprocess.call( command, shell = True )
