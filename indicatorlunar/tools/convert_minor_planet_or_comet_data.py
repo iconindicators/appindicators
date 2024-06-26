@@ -16,8 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check this against originals...if all good, delete the originals from the repository!
-
 # Convert:
 #   Minor planets from Lowell Observatory to Skyfield / XEphem format.
 #   Minor planets file from Minor Planet Center to XEphem format.
@@ -106,7 +104,6 @@ def get_packed_date( year, month, day ):
 def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfield ):
     # Field numbers:  1  2   3   4   5   6   7   8   9  10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25
     start_indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
-#        start_indices = [ 1, 8, 27, 43, 49, 55, 60, 66, 71, 96, 101, 107, 116, 127, 138, 148, 159, 169, 183, 192, 200, 209, 218, 235, 252 ]  #TODO This was the original...ensure above is now correct!
     start_indices = [ x - 1 for x in start_indices ] # Offset back to zero to match each line read into a string.
 
     # Inspired by https://stackoverflow.com/a/10851479/2156453
@@ -192,7 +189,7 @@ def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfiel
 
             separator = ''
 
-        else:
+        else: # To XEphem
             components = [
                 ( number + ' ' + name ).strip(),
                 'e',
@@ -211,6 +208,7 @@ def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfiel
             separator = ','
 
         output_file.write( separator.join( components ) + '\n' )
+
 
 # References:
 #   https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
@@ -284,8 +282,10 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, output_f
     fields = [ line[ i : j + 1 ] for i, j in zip( start_indices, end_indices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
 
     name = fields[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
-    H = fields[ 15 ].strip()
-    G = fields[ 14 ].strip()
+
+    # The perl script reference refers to H, G in reverse to that specified in the comet format.
+    H = fields[ 14 ].strip()
+    G = fields[ 15 ].strip()
 
     if len( name ) == 0:
         print( "Missing name:\n" + line )
