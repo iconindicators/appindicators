@@ -51,9 +51,7 @@ utc_now_from_stardate_classic = \
         stardate_issue,
         stardate_integer,
         stardate_fraction )
-print( f"UTC now from 'classic' Stardate: { utc_now_from_stardate_classic } " )
-
-print()
+print( f"UTC now from 'classic' Stardate: { utc_now_from_stardate_classic }\n" )
 
 stardate_integer, stardate_fraction = \
     stardate.get_stardate_2009_revised( utc_now )
