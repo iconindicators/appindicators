@@ -540,13 +540,13 @@ class IndicatorFortune( IndicatorBase ):
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if fortune_file_directory.get_text().strip() == "": # Will occur if the user does a browse, cancels the browse and hits okay.
+                if fortune_file_directory.get_text().strip() == "": # Will occur if the user does a browse: cancels the browse and hits okay.
                     self.show_dialog_ok( dialog, _( "The fortune path cannot be empty." ) )
                     fortune_file_directory.grab_focus()
                     continue
 
                 if row_number:
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit...remove the old value.
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit; remove the old value.
 
                 model.get_model().append(
                     [ fortune_file_directory.get_text().strip(),
@@ -557,7 +557,13 @@ class IndicatorFortune( IndicatorBase ):
         dialog.destroy()
 
 
-    def on_browse_fortune( self, file_or_directory_button, add_edit_dialog, fortune_file_directory, is_file ):
+    def on_browse_fortune(
+            self,
+            file_or_directory_button,
+            add_edit_dialog,
+            fortune_file_directory,
+            is_file ):
+
         if is_file:
             title = _( "Choose a fortune .dat file" )
             action = Gtk.FileChooserAction.OPEN
