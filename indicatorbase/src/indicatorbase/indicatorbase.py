@@ -387,10 +387,6 @@ class IndicatorBase( ABC ):
             "/platform/linux/" + \
             self.desktop_file
 
-#TODO Ensure the correct path to a .desktop file in an installed indicator in its venv_...
-        # self.show_dialog_ok( None, self.desktop_file_user_home )#TODO Remove
-        # self.show_dialog_ok( None, self.desktop_file_virtual_environment )#TODO Remove
-
         error_message = None
         if not Path( self.desktop_file_virtual_environment ).exists():
             # Assume running in development; extract the .desktop file
@@ -1117,7 +1113,6 @@ class IndicatorBase( ABC ):
         return checkbutton
 
 
-#TODO UNCHECKED
     def create_radiobutton(
         self,
         radio_group_member,
@@ -1161,7 +1156,9 @@ class IndicatorBase( ABC ):
         tooltip_text = "",
         cursorchangedfunctionandarguments = None,
         rowactivatedfunctionandarguments = None ):
-
+#TODO Figure out how to do a proper header comment/docstring/whatever it is called...
+#...and document each argument...notably the renderers_attributes_columnmodelids
+# can be single tuples or a tuple of tuples (as in script runner main treeview).
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
         for title, renderer_attribute_columnmodelid in zip( titles, renderers_attributes_columnmodelids ):
@@ -1180,7 +1177,7 @@ class IndicatorBase( ABC ):
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
             else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
-#TODO This clause should happen for script runner when we have interval with two possible renderers...                
+#TODO This clause should happen for script runner when we have interval with two possible renderers...
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
@@ -1285,6 +1282,13 @@ class IndicatorBase( ABC ):
 # Some have True and some have False.
 # Is this related to creating a box?
 # Also look at set_homogeneous
+
+
+#TODO Worth doing this?
+        # label = Gtk.Label.new( _( "Input source" ) )
+        # label.set_halign( Gtk.Align.START )
+        # grid.attach( label, 0, 0, 1, 1 )
+
 
 
     def get_menu_indent( self, indent = 1 ):
@@ -1407,7 +1411,6 @@ class IndicatorBase( ABC ):
 
 
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
-#TODO UNCHECKED
     def is_label_update_supported( self ):
         label_update_supported = True
         desktop_environment = self.get_desktop_environment()
