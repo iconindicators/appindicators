@@ -673,7 +673,15 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
         self.lock.release()
 
-        self.request_update() #TODO By doing an update gets around the Debian/Fedora issue when clicking the icon when the About/Preferences are open.  Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
+        #TODO By doing an update gets around the Debian/Fedora issue
+        # when clicking the icon when the About/Preferences are open. 
+        # Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
+        #
+        # Is there some other way to try?
+        # Call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
+        #
+        #Does this issue happen under Debian/Fedora under xorg (rather than default wayland)?
+        # self.request_update()
 #TODO May be able to use this to determine the os/platform/distro:
 # desktop_environment = os.environ.get('DESKTOP_SESSION')
 #         if desktop_environment:
@@ -812,7 +820,6 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-#TODO UNCHECKED
     def show_dialog_ok_cancel( self, parent_widget, message, title = None ):
         return \
             self.__show_dialog(
@@ -840,7 +847,6 @@ class IndicatorBase( ABC ):
                 title )
 
 
-#TODO UNCHECKED
     def __show_dialog(
             self,
             parent_widget,
@@ -975,7 +981,6 @@ class IndicatorBase( ABC ):
 
 
     # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
-#TODO UNCHECKED
     def get_menuitems_guess( self ):
         screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
@@ -999,7 +1004,6 @@ class IndicatorBase( ABC ):
         return number_of_menuitems
 
 
-#TODO UNCHECKED
     # Reference: https://stackoverflow.com/a/56233642/2156453
     @staticmethod
     def interpolate( x_values, y_values, x ):
@@ -1034,7 +1038,6 @@ class IndicatorBase( ABC ):
         return grid
 
 
-#TODO UNCHECKED
     def create_scrolledwindow( self, widget ):
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_hexpand( True )
@@ -1059,7 +1062,6 @@ class IndicatorBase( ABC ):
         return entry
 
 
-#TODO UNCHECKED
     def create_button(
         self,
         label,
@@ -1258,7 +1260,6 @@ class IndicatorBase( ABC ):
         return box
 
 
-#TODO UNCHECKED
     def create_filechooser_dialog(
         self,
         title,
@@ -1289,6 +1290,9 @@ class IndicatorBase( ABC ):
         # label.set_halign( Gtk.Align.START )
         # grid.attach( label, 0, 0, 1, 1 )
 
+
+#TODO What about this?
+# Gtk.Entry()
 
 
     def get_menu_indent( self, indent = 1 ):
@@ -1661,7 +1665,6 @@ class IndicatorBase( ABC ):
     #     ${XDGKey}/applicationBaseDirectory/fileName
     # or
     #     ~/.cache/applicationBaseDirectory/fileName
-#TODO UNCHECKED
     def remove_file_from_cache( self, filename ):
         cache_directory = self.get_cache_directory()
         for file in os.listdir( cache_directory ):
@@ -1777,7 +1780,6 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns the contents of the text file; None on error and logs.
-#TODO UNCHECKED
     def read_cache_text_without_timestamp( self, filename ):
         return self.__read_cache_text( self.get_cache_directory() + filename )
 
@@ -1812,7 +1814,6 @@ class IndicatorBase( ABC ):
         return self.__read_cache_text( cache_file )
 
 
-#TODO UNCHECKED
     def __read_cache_text( self, cache_file ):
         text = ""
         if os.path.isfile( cache_file ):
@@ -1834,7 +1835,6 @@ class IndicatorBase( ABC ):
     # filename: The name of the file.
     #
     # Returns filename written on success; None otherwise.
-#TODO UNCHECKED
     def write_cache_text_without_timestamp( self, text, filename ):
         return self.__write_cache_text( text, self.get_cache_directory() + filename )
 
