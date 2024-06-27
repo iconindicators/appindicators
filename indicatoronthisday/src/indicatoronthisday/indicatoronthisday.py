@@ -435,7 +435,12 @@ class IndicatorOnThisDay( IndicatorBase ):
                     message_type = Gtk.MessageType.INFO )
 
             else:
-                if self.show_dialog_ok_cancel( treeview, _( "Remove the selected calendar?" ) ) == Gtk.ResponseType.OK: # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+                response = \
+                    self.show_dialog_ok_cancel(
+                        treeview,
+                        _( "Remove the selected calendar?" ) )
+
+                if response == Gtk.ResponseType.OK:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
