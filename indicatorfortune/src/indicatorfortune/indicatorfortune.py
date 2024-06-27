@@ -416,7 +416,7 @@ class IndicatorFortune( IndicatorBase ):
         if self.show_dialog_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
             liststore = treeview.get_model().get_model()
             liststore.clear()
-            liststore.append( IndicatorFortune.DEFAULT_FORTUNE  ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
+            liststore.append( IndicatorFortune.DEFAULT_FORTUNE ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
 
 
     def on_fortune_remove( self, button, treeview ):
@@ -439,7 +439,12 @@ class IndicatorFortune( IndicatorBase ):
                     message_type = Gtk.MessageType.INFO )
 
             else:
-                if self.show_dialog_ok_cancel( treeview, _( "Remove the selected fortune?" ) ) == Gtk.ResponseType.OK:
+                response = \
+                    self.show_dialog_ok_cancel(
+                        treeview,
+                        _( "Remove the selected fortune?" ) )
+
+                if response == Gtk.ResponseType.OK:
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
 
@@ -545,8 +550,8 @@ class IndicatorFortune( IndicatorBase ):
                     fortune_file_directory.grab_focus()
                     continue
 
-                if row_number:
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) ) # This is an edit; remove the old value.
+                if row_number: # This is an edit; remove the old value.
+                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
                 model.get_model().append(
                     [ fortune_file_directory.get_text().strip(),
