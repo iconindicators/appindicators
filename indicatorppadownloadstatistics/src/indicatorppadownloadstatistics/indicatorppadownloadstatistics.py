@@ -414,7 +414,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa.get_name() + "?ws.op=getPublishedBinaries" + \
             "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.get_series() + "/" + \
             ppa.get_architecture() + "&status=Published" + \
-            "&exact_match=false&ordered=false&binary_name=" + filter_text # A filterText of "" equates to no filterText.
+            "&exact_match=false&ordered=false&binary_name=" + filter_text # A filter_text of "" equates to no filter_text.
 
         page_number = 1
         published_binaries_per_page = 75 # Results are presented in at most 75 per page.
@@ -845,9 +845,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa_name.set_active( ppa_names.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) ) # This is an edit.
 
         else:
-            ppaName = Gtk.Entry() # There are no PPAs present - adding the first PPA.
+            ppa_name = Gtk.Entry() # There are no PPAs present - adding the first PPA.
 
-        grid.attach( ppaName, 1, 1, 1, 1 )
+        grid.attach( ppa_name, 1, 1, 1, 1 )
 
         label = Gtk.Label.new( _( "Series" ) )
         label.set_halign( Gtk.Align.START )
@@ -893,11 +893,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             if dialog.run() == Gtk.ResponseType.OK:
                 if len( model ) > 0:
                     ppa_user_value = ppa_user.get_active_text().strip()
-                    ppa_name_value = ppaName.get_active_text().strip()
+                    ppa_name_value = ppa_name.get_active_text().strip()
 
                 else:
                     ppa_user_value = ppa_user.get_text().strip()
-                    ppa_name_value = ppaName.get_text().strip()
+                    ppa_name_value = ppa_name.get_text().strip()
 
                 if ppa_user_value == "":
                     self.show_dialog_ok( dialog, _( "PPA user cannot be empty." )  )
@@ -906,7 +906,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 if ppa_name_value == "":
                     self.show_dialog_ok( dialog, _( "PPA name cannot be empty." ) )
-                    ppaName.grab_focus()
+                    ppa_name.grab_focus()
                     continue
 
                 # Ensure there is no duplicate...
@@ -1011,13 +1011,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     continue
 
                 # Ensure the PPA User/Name is not present in the list of filters in the preferences.
-                inFilterList = False
-                for theFilter in range( len( filter_model ) ):
-                    if ppa_user_name in filter_model[ theFilter ][ IndicatorPPADownloadStatistics.COLUMN_USER ]:
-                        inFilterList = True
+                in_filter_list = False
+                for the_filter in range( len( filter_model ) ):
+                    if ppa_user_name in filter_model[ the_filter ][ IndicatorPPADownloadStatistics.COLUMN_USER ]:
+                        in_filter_list = True
                         break
 
-                if not inFilterList:
+                if not in_filter_list:
                     ppa_users_names.append_text( ppa_user_name )
                     temp.append( ppa_user_name )
 
