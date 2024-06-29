@@ -316,17 +316,19 @@ class IndicatorOnThisDay( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         box.pack_start( label, False, False, 0 )
 
-        search_engine_entry = Gtk.Entry()
-        search_engine_entry.set_tooltip_text( _(
-            "The URL to search for the event.\n\n" + \
-            "Use {0} in the URL to specify the\n" + \
-            "position of the event text/date.\n\n" + \
-            "If the URL is empty and 'search' is selected,\n" + \
-            "the search will effectively be ignored.\n\n" + \
-            "If the URL is empty and 'copy' is selected,\n" + \
-            "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ) )
-        search_engine_entry.set_text( self.search_url )
-        search_engine_entry.set_sensitive( not self.copy_to_clipboard )
+        search_engine_entry = \
+            self.create_entry(
+                self.search_url,
+                tooltip_text = _(
+                    "The URL to search for the event.\n\n" + \
+                    "Use {0} in the URL to specify the\n" + \
+                    "position of the event text/date.\n\n" + \
+                    "If the URL is empty and 'search' is selected,\n" + \
+                    "the search will effectively be ignored.\n\n" + \
+                    "If the URL is empty and 'copy' is selected,\n" + \
+                    "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ),
+                sensitive = not self.copy_to_clipboard )
+
         box.pack_start( search_engine_entry, True, True, 0 )
 
         grid.attach( box, 0, 4, 1, 1 )
@@ -469,14 +471,16 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Calendar file" ) ), False, False, 0 )
 
-        file_entry = Gtk.Entry()
-        file_entry.set_editable( False )
+        file_entry = \
+            self.create_entry(
+                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] if row_number else "",
+                tooltip_text = _( "The path to a calendar file." ),
+                editable = False )
+                # width_chars = ) #TODO If set width char can be sorted then add here and remove code below.
 
         if row_number: # This is an edit.
-            file_entry.set_text( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
             file_entry.set_width_chars( len( file_entry.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
 
-        file_entry.set_tooltip_text( _( "The path to a calendar file." ) )
         box.pack_start( file_entry, True, True, 0 )
 
         box.pack_start(

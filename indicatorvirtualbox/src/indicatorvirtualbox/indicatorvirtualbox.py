@@ -414,17 +414,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         grid = self.create_grid()
 
         box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )
+        box.set_hexpand( True )#TODO Although not needed elsewhere (seemingly)
+        # if not used here, the entry below is truncated.
+        # Maybe try with other places we use hexpand = true...maybe this should be the default? 
 
         label = Gtk.Label.new( _( "VirtualBox™ Manager" ) )
-        label.set_halign( Gtk.Align.START )
+        # label.set_halign( Gtk.Align.START )#TODO Seems unnecessary.
         box.pack_start( label, False, False, 0 )
 
-        window_name = Gtk.Entry()
-        window_name.set_text( self.virtualbox_manager_window_name )
-        window_name.set_tooltip_text( _(
-            "The window title of VirtualBox™ Manager.\n" + \
-            "You may have to adjust for your local language." ) )
+        window_name = \
+            self.create_entry(
+                self.virtualbox_manager_window_name,
+                tooltip_text = _(
+                    "The window title of VirtualBox™ Manager.\n" + \
+                    "You may have to adjust for your local language." ) )
 
         box.pack_start( window_name, True, True, 0 )
 
@@ -571,25 +574,34 @@ class IndicatorVirtualBox( IndicatorBase ):
     def edit_virtual_machine( self, tree, model, treeiter ):
         grid = self.create_grid()
 
-#TODO SHould the label and entry be in a box?  Then don't need the halign and/or hexpand. 
+#TODO SHould the label and entry be in a box?  Then don't need the halign and/or hexpand.   See new code below...
+        # label = Gtk.Label.new( _( "Start Command" ) )
+        # label.set_halign( Gtk.Align.START )
+        # grid.attach( label, 0, 0, 1, 1 )
+        
+#TODO New code below to replace above I think...      
+        box = Gtk.Box( spacing = 6 )
+        box.set_hexpand( True )
+
         label = Gtk.Label.new( _( "Start Command" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
+        box.pack_start( label, False, False, 0 )
 
-        start_command = Gtk.Entry()
-        start_command.set_width_chars( 20 )
-        if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ]:
-            start_command.set_text( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] )
-            start_command.set_width_chars( len( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ) * 5 / 4 ) # Sometimes the length is shorter than specified due to packing, so make it longer.
+        start_command = \
+            self.create_entry(
+                model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else "",
+                tooltip_text = _(
+                    "The terminal command to start the virtual machine such as\n\n" + \
+                    "\tVBoxManage startvm %VM%\n" + \
+                    "or\n" + \
+                    "\tVBoxHeadless --startvm %VM% --vrde off" ),
+                width_chars = len( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ) * 5 / 4 if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else 20 )
+#TODO Check width_chars...still needed?
 
-        start_command.set_tooltip_text( _(
-            "The terminal command to start the virtual machine such as\n\n" + \
-            "\tVBoxManage startvm %VM%\n" + \
-            "or\n" + \
-            "\tVBoxHeadless --startvm %VM% --vrde off" ) )
-
-        start_command.set_hexpand( True ) # Only need to set this once and all objects will expand.
-        grid.attach( start_command, 1, 0, 1, 1 )
+#TODO Old and new
+        # start_command.set_hexpand( True ) # Only need to set this once and all objects will expand.
+        # grid.attach( start_command, 1, 0, 1, 1 )
+        box.pack_start( start_command, True, True, 0 )
+        grid.attach( box, 0, 0, 2, 1 )
 
         autostart_checkbutton = \
             self.create_checkbutton(

@@ -173,9 +173,9 @@ class IndicatorPunycode( IndicatorBase ):
     def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        label = Gtk.Label.new( _( "Input source" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
+        box = Gtk.Box( spacing = 6 )#TODO Spacing is irrlevant
+        box.pack_start( Gtk.Label.new( _( "Input source" ) ), False, False, 0 )
+        grid.attach( box, 0, 0, 1, 1 )
 
         input_clipboard_radio = \
             self.create_radiobutton(

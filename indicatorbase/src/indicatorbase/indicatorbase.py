@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Do a search for case sensitive regex   [a-z][A-Z]  to find potential unconverted code. 
+
+
 #TODO Add changelog entry for each indicator about moving closer to PEP8 or whatever the Python code standard is?
 
 
@@ -798,7 +801,7 @@ class IndicatorBase( ABC ):
             parent_widget,
             title,
             content_widget = None,
-            buttons_responsetypes = ( Gtk.STOCK_OK, Gtk.ResponseType.OK, Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL ),
+            buttons_responsetypes = ( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK ),
             default_size = None ):
 
         dialog = \
@@ -1046,18 +1049,67 @@ class IndicatorBase( ABC ):
         return scrolledwindow
 
 
-#TODO UNCHECKED
-#TODO label_text is unused...
-    def create_entry_with_label( self, label_text, entry_text, box, tooltip_text = "" ):
-        label = Gtk.Label.new( _( "URL" ) )
-#        label.set_halign( Gtk.Align.START ) #TODO Handle
-        box.pack_start( label, False, False, 0 )
+
+#TODO Look at all pack_start calls.
+# What should the parameters be, given buttons, labels, etc are added.
+# Some have True and some have False.
+# Is this related to creating a box?
+# Also look at set_homogeneous
+
+
+#TODO Worth doing this?
+        # label = Gtk.Label.new( _( "Input source" ) )
+        # label.set_halign( Gtk.Align.START )
+        # grid.attach( label, 0, 0, 1, 1 )
+
+        # label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
+        # label.set_tooltip_text( _( "Not supported on all desktops." ) )
+        # label.set_halign( Gtk.Align.START )
+        # label.set_margin_top( 10 )
+        # grid.attach( label, 0, 3, 1, 1 )
+
+        # label = Gtk.Label.new( message_label )
+        # label.set_valign( Gtk.Align.START )
+        # box.pack_start( label, False, False, 0 )
+
+        # label = Gtk.Label.new( _( "On event click" ) )
+        # label.set_halign( Gtk.Align.START )
+        # label.set_margin_top( 10 )
+        # grid.attach( label, 0, 1, 1, 1 )
+
+        # label = Gtk.Label.new( _( "Clip amount" ) )
+        # label.set_sensitive( sort_by_download_checkbutton.get_active() )
+        # label.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
+        # box.pack_start( label, False, False, 0 )
+
+
+
+
+
+
+    def create_entry(
+        self,
+        text,
+        tooltip_text = "",
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0,
+        editable = True,
+        width_chars = None, #TODO Not sure about this default.  Who calls this?
+        active = True ): #TODO Need active?  Check to see if can set active on an entry.
 
         entry = Gtk.Entry()
-        entry.set_text( entry_text )
-        entry.set_tooltip_text( tooltip_text )
-#        entry.set_sensitive( not self.copyToClipboard )  #TODO Handle
-        box.pack_start( entry, True, True, 0 )
+        self.__set_widget_common_attributes( entry, tooltip_text, sensitive, margin_top, margin_left )
+        entry.set_text( text )
+
+        if editable:
+            entry.set_editable( editable )
+
+        if width_chars:
+            entry.set_width_chars( width_chars )
+
+        #TODO Only used in PPA when no PPAs exist...so see if really needed or a workaround can be used.
+        # entry.set_hexpand( True )   
 
         return entry
 
@@ -1278,23 +1330,6 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-#TODO Look at all pack_start calls.
-# What should the parameters be, given buttons, labels, etc are added.
-# Some have True and some have False.
-# Is this related to creating a box?
-# Also look at set_homogeneous
-
-
-#TODO Worth doing this?
-        # label = Gtk.Label.new( _( "Input source" ) )
-        # label.set_halign( Gtk.Align.START )
-        # grid.attach( label, 0, 0, 1, 1 )
-
-
-#TODO What about this?
-# Gtk.Entry()
-
-
     def get_menu_indent( self, indent = 1 ):
         indent_amount = "      " * indent
         if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
@@ -1485,7 +1520,7 @@ class IndicatorBase( ABC ):
     #
     # Each row of the returned ListStore contain one inner list.
 #TODO UNCHECKED
-    def list_of_lists_to_liststore( self, list_of_lists ):
+    def list_of_lists_to_liststore( self, list_of_lists ): #TODO Check how this function works...if all good, maybe move back into Lunar?
         types = [ ]
         for item in list_of_lists[ 0 ]:
             types.append( type( item[ 0 ] ) )
@@ -1621,7 +1656,11 @@ class IndicatorBase( ABC ):
             date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
 
             # YYYYMMDDHHMMSS is 14 characters.
-            expiry = datetime.datetime.strptime( date_time_component, IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            expiry = \
+                datetime.datetime.strptime(
+                    date_time_component,
+                    IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+
             expiry = expiry.replace( tzinfo = datetime.timezone.utc )
 
         return expiry

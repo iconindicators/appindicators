@@ -322,8 +322,21 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid = self.create_grid()
 
         # Define these here so that widgets can connect to handle events.
-        indicator_text_entry = Gtk.Entry()
-        command_text_view = Gtk.TextView()
+        indicator_text_entry = \
+            self.create_entry(
+                self.indicator_text,
+                tooltip_text = _(
+                    "The text shown next to the indicator icon,\n" + \
+                    "or tooltip where applicable.\n\n" + \
+                    "A background script must:\n" + \
+                    "\tAlways return non-empty text; or\n" + \
+                    "\tReturn non-empty text on success\n" + \
+                    "\tand empty text otherwise.\n\n" + \
+                    "Only background scripts added to the\n" + \
+                    "icon text will be run.\n\n" + \
+                    "Not supported on all desktops." ) )
+
+        command_text_view = Gtk.TextView() #TODO Check for Textview and create a function for it?
 
         renderer_text_column_interval = Gtk.CellRendererText() #TODO If the alignment passed into the treeview function works (aligns the interval colunn) can pass this renderer directly in I think.
 #        renderer_text_column_interval.set_property( "xalign", 0.5 ) #TODO Is this needed here?  Or perhaps, is it needed down in the renderer function?   Maybe this is redundant as we already have an alignment parameter passed in to the create function...try to figure out if this is needed or the same as the alignment passed in.
@@ -413,7 +426,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.set_margin_top( 10 )
 
         label = Gtk.Label.new( _( "Command" ) )
-        label.set_halign( Gtk.Align.START )
+        label.set_halign( Gtk.Align.START ) #TODO Given the box is vertical, not sure if this can be removed or changed with a box function call.  
+        #BUT why is a vertical box used in the first place?
         box.pack_start( label, False, False, 0 )
 
         command_text_view.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
@@ -536,17 +550,18 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
-        indicator_text_entry.set_text( self.indicator_text )
-        indicator_text_entry.set_tooltip_text( _(
-            "The text shown next to the indicator icon,\n" + \
-            "or tooltip where applicable.\n\n" + \
-            "A background script must:\n" + \
-            "\tAlways return non-empty text; or\n" + \
-            "\tReturn non-empty text on success\n" + \
-            "\tand empty text otherwise.\n\n" + \
-            "Only background scripts added to the\n" + \
-            "icon text will be run.\n\n" + \
-            "Not supported on all desktops." ) )
+#TODO Should be safe to go.
+        # indicator_text_entry.set_text( self.indicator_text )
+        # indicator_text_entry.set_tooltip_text( _(
+        #     "The text shown next to the indicator icon,\n" + \
+        #     "or tooltip where applicable.\n\n" + \
+        #     "A background script must:\n" + \
+        #     "\tAlways return non-empty text; or\n" + \
+        #     "\tReturn non-empty text on success\n" + \
+        #     "\tand empty text otherwise.\n\n" + \
+        #     "Only background scripts added to the\n" + \
+        #     "icon text will be run.\n\n" + \
+        #     "Not supported on all desktops." ) )
 
         box.pack_start( indicator_text_entry, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -555,9 +570,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
 
-        indicator_text_separator_entry = Gtk.Entry()
-        indicator_text_separator_entry.set_text( self.indicator_text_separator )
-        indicator_text_separator_entry.set_tooltip_text( _( "The separator will be added between script tags." ) )
+        indicator_text_separator_entry = \
+            self.create_entry(
+                self.indicator_text_separator,
+                tooltip_text = _( "The separator will be added between script tags." ) )
+
         box.pack_start( indicator_text_separator_entry, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -810,9 +827,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
 
-            script_name_entry = Gtk.Entry()
-            script_name_entry.set_tooltip_text( _( "The name of the script." ) )
-            script_name_entry.set_text( script.get_name() )
+            script_name_entry = \
+                self.create_entry(
+                    script.get_name(),
+                    tooltip_text = _( "The name of the script." ) )
+
             box.pack_start( script_name_entry, True, True, 0 )
 
             grid.attach( box, 0, 1, 1, 1 )
@@ -994,9 +1013,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
 
-        name_entry = Gtk.Entry()
-        name_entry.set_tooltip_text( _( "The name of the script." ) )
-        name_entry.set_text( "" if add else script.get_name() )
+        name_entry = \
+            self.create_entry(
+                "" if add else script.get_name(),
+                tooltip_text = _( "The name of the script." ) )
 
         box.pack_start( name_entry, True, True, 0 )
 
@@ -1006,7 +1026,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         box.set_margin_top( 10 )
 
         label = Gtk.Label.new( _( "Command" ) )
-        label.set_halign( Gtk.Align.START )
+        label.set_halign( Gtk.Align.START )#TODO See above in main prefs tab for the "command" text label...
+        # Can that and this label be put into a box and then the grid directly rather than a vertical box?
         box.pack_start( label, False, False, 0 )
 
         command_text_view = Gtk.TextView()

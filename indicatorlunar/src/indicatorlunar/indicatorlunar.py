@@ -106,7 +106,6 @@ class IndicatorLunar( IndicatorBase ):
     DATA_INDEX_BODY_NAME = 1
     DATA_INDEX_DATA_NAME = 2
 
-#TODO Rename to Python standard?
     DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used in the display of the satellite rise notification.
     DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M" # Used to display any body's rise/set in the menu.
 
@@ -1381,21 +1380,23 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
 
-        indicator_text = Gtk.Entry()
-        indicator_text.set_tooltip_text( _(
-            "The text shown next to the indicator icon,\n" + \
-            "or tooltip where applicable.\n\n" + \
-            "The icon text may contain text and/or\n" + \
-            "tags from the table below.\n\n" + \
-            "To associate text with one or more tags,\n" + \
-            "enclose the text and tag(s) within { }.\n\n" + \
-            "For example\n\n" + \
-            "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
-            "If any tag contains no data at render time,\n" + \
-            "the tag will be removed.\n\n" + \
-            "If a removed tag is within { }, the tag and\n" + \
-            "text will be removed.\n\n" + \
-            "Not supported on all desktops." ) )
+        indicator_text = \
+            self.create_entry(
+                "",
+                tooltip_text = _(
+                    "The text shown next to the indicator icon,\n" + \
+                    "or tooltip where applicable.\n\n" + \
+                    "The icon text may contain text and/or\n" + \
+                    "tags from the table below.\n\n" + \
+                    "To associate text with one or more tags,\n" + \
+                    "enclose the text and tag(s) within { }.\n\n" + \
+                    "For example\n\n" + \
+                    "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
+                    "If any tag contains no data at render time,\n" + \
+                    "the tag will be removed.\n\n" + \
+                    "If a removed tag is within { }, the tag and\n" + \
+                    "text will be removed.\n\n" + \
+                    "Not supported on all desktops." ) )
 
         box.pack_start( indicator_text, True, True, 0 )
         grid.attach( box, 0, 0, 1, 1 )
@@ -1404,9 +1405,11 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
 
-        indicator_text_separator = Gtk.Entry()
-        indicator_text_separator.set_text( self.indicator_text_separator )
-        indicator_text_separator.set_tooltip_text( _( "The separator will be added between pairs of { }." ) )
+        indicator_text_separator = \
+            self.create_entry(
+                self.indicator_text_separator,
+                tooltip_text = _( "The separator will be added between pairs of { }." ) )
+
         box.pack_start( indicator_text_separator, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -1424,6 +1427,7 @@ class IndicatorLunar( IndicatorBase ):
         display_tags_store = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialise_display_tags_store( display_tags_store )
 
+#TODO Can this be set as part of the call to create_entry above?
         indicator_text.set_text( self.translate_tags( display_tags_store, True, self.indicator_text ) ) # Translate tags into local language.
 
         # displayTagsStoreSort = Gtk.TreeModelSort( model = display_tags_store )
@@ -2013,8 +2017,11 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Latitude" ) ), False, False, 0 )
 
-        latitude = Gtk.Entry()
-        latitude.set_tooltip_text( _( "Latitude of your location in decimal degrees." ) )
+        latitude = \
+            self.create_entry(
+                str( self.latitude ),
+                tooltip_text = _( "Latitude of your location in decimal degrees." ) )
+
         box.pack_start( latitude, False, False, 0 )
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -2023,8 +2030,11 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Longitude" ) ), False, False, 0 )
 
-        longitude = Gtk.Entry()
-        longitude.set_tooltip_text( _( "Longitude of your location in decimal degrees." ) )
+        longitude = \
+            self.create_entry(
+                str( self.longitude ),
+                tooltip_text = _( "Longitude of your location in decimal degrees." ) )
+
         box.pack_start( longitude, False, False, 0 )
         grid.attach( box, 0, 2, 1, 1 )
 
@@ -2033,17 +2043,21 @@ class IndicatorLunar( IndicatorBase ):
 
         box.pack_start( Gtk.Label.new( _( "Elevation" ) ), False, False, 0 )
 
-        elevation = Gtk.Entry()
-        elevation.set_tooltip_text( _( "Height in metres above sea level." ) )
+        elevation = \
+            self.create_entry(
+                str( self.elevation ),
+                tooltip_text = _( "Height in metres above sea level." ) )
+
         box.pack_start( elevation, False, False, 0 )
         grid.attach( box, 0, 3, 1, 1 )
 
         city.connect( "changed", self.on_city_changed, latitude, longitude, elevation )
         city.set_active( cities.index( self.city ) )
 
-        latitude.set_text( str( self.latitude ) )
-        longitude.set_text( str( self.longitude ) )
-        elevation.set_text( str( self.elevation ) )
+#TODO Why are these done here and not at point of creation?
+        # latitude.set_text( str( self.latitude ) )
+        # longitude.set_text( str( self.longitude ) )
+        # elevation.set_text( str( self.elevation ) )
 
         autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
         box.set_margin_top( 30 ) # Put some distance from the prior section.
@@ -2373,9 +2387,11 @@ class IndicatorLunar( IndicatorBase ):
         label = Gtk.Label.new( summary_label )
         box.pack_start( label, False, False, 0 )
 
-        summary_text_entry = Gtk.Entry()
-        summary_text_entry.set_text( summary_text )
-        summary_text_entry.set_tooltip_text( summary_tooltip )
+        summary_text_entry = \
+            self.create_entry(
+                summary_text,
+                tooltip_text = summary_tooltip )
+
         box.pack_start( summary_text_entry, True, True, 0 )
         box.set_sensitive( checkbutton.get_active() )
         grid.attach( box, 0, grid_start_index + 1, 1, 1 )

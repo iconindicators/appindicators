@@ -226,7 +226,7 @@ class IndicatorFortune( IndicatorBase ):
 
     def refresh_and_show_fortune( self ):
         self.refresh_fortune()
-        self.show_fortune()
+        # self.show_fortune()#TODO Put back
 
 
     def on_preferences( self, dialog ):
@@ -303,14 +303,16 @@ class IndicatorFortune( IndicatorBase ):
         grid.attach( box, 0, 0, 1, 1 )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )
+        # box.set_hexpand( True )#TODO Seems to be irrelevant.
         box.set_margin_top( 10 )
 
         box.pack_start( Gtk.Label.new( _( "Notification summary" ) ), False, False, 0 )
 
-        notification_summary = Gtk.Entry()
-        notification_summary.set_text( self.notification_summary )
-        notification_summary.set_tooltip_text( _( "The summary text for the notification." ) )
+        notification_summary = \
+            self.create_entry(
+                self.notification_summary,
+                tooltip_text = _( "The summary text for the notification." ) )
+
         box.pack_start( notification_summary, True, True, 0 )
 
         grid.attach( box, 0, 1, 1, 1 )
@@ -464,23 +466,24 @@ class IndicatorFortune( IndicatorBase ):
         dialog = self.create_dialog( treeview, title, content_widget = grid )
 
         box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )
+        # box.set_hexpand( True )#TODO Seemm to make no difference.
 
         box.pack_start( Gtk.Label.new( _( "Fortune file/directory" ) ), False, False, 0 )
 
-        fortune_file_directory = Gtk.Entry()
-        fortune_file_directory.set_editable( False )
+        fortune_file_directory = \
+            self.create_entry(
+                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] if row_number else "",
+                tooltip_text = _(
+                    "The path to a fortune .dat file,\n" + \
+                    "or a directory containing\n" + \
+                    "fortune .dat files.\n\n" + \
+                    "Ensure the corresponding\n" + \
+                    "fortune text file(s) is present." ),
+                editable = False )
 
+#TODO Can the set width chars be somehow put into the create_entry?
         if row_number: # This is an edit.
-            fortune_file_directory.set_text( model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
             fortune_file_directory.set_width_chars( len( fortune_file_directory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
-
-        fortune_file_directory.set_tooltip_text( _(
-            "The path to a fortune .dat file,\n" + \
-            "or a directory containing\n" + \
-            "fortune .dat files.\n\n" + \
-            "Ensure the corresponding\n" + \
-            "fortune text file(s) is present." ) )
 
         box.pack_start( fortune_file_directory, True, True, 0 )
 

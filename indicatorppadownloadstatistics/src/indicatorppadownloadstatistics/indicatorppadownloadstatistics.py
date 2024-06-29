@@ -819,9 +819,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa_user.set_active( ppa_users.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ) ) # This is an edit.
 
         else:
-            ppa_user = Gtk.Entry() # There are no PPAs present - adding the first PPA.
+            ppa_user = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
 
+#TODO What to do with this?
         ppa_user.set_hexpand( True ) # Only need to set this once and all objects will expand.
+
+#TODO What about a tooltip for each type of GUI element for ppa_user?
 
         grid.attach( ppa_user, 1, 0, 1, 1 )
 
@@ -845,7 +848,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa_name.set_active( ppa_names.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) ) # This is an edit.
 
         else:
-            ppa_name = Gtk.Entry() # There are no PPAs present - adding the first PPA.
+            ppa_name = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
+
+#TODO Add a tooltip (see same TODO above)?
 
         grid.attach( ppa_name, 1, 1, 1, 1 )
 
