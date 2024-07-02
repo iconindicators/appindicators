@@ -232,32 +232,22 @@ class IndicatorTide( IndicatorBase ):
     def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        # label = Gtk.Label.new( _( "User Script" ) ) #TODO Maybe put into a box?  Look for other haligns below in rest of code.
-        # label.set_halign( Gtk.Align.START )
-        # grid.attach( label, 0, 0, 1, 1 )
-        box = Gtk.Box( spacing = 6 )#TODO Spacing is irrlevant
-        box.pack_start( Gtk.Label.new( _( "User Script" ) ), False, False, 0 )
-        grid.attach( box, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True ) # Only need to set this once and all objects will expand.
-        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-
-        box.pack_start( Gtk.Label.new( _( "Path and filename" ) ), False, False, 0 )
+        grid.attach(
+            self.create_box( ( ( Gtk.Label.new( _( "User Script" ) ), False ), ), ),
+            0, 0, 1, 1 )
 
         user_script_path_and_filename = \
             self.create_entry(
                 self.user_script_path_and_filename,
                 tooltip_text = _( "Full path and filename\nof user's Python3 script." ) )
 
-        box.pack_start( user_script_path_and_filename, True, True, 0 )
-
-        grid.attach( box, 0, 1, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-
-        box.pack_start( Gtk.Label.new( _( "Class name" ) ), False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Path and filename" ) ), False ),
+                    ( user_script_path_and_filename, True ) ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
+            0, 1, 1, 1 )
 
         user_script_class_name = \
             self.create_entry(
@@ -269,16 +259,19 @@ class IndicatorTide( IndicatorBase ):
                     "implemented by the user to obtain\n" + \
                     "the tidal data." ) )
 
-        box.pack_start( user_script_class_name, True, True, 0 )
-
-        box.set_margin_bottom( 10 )
-
-        grid.attach( box, 0, 2, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Class name" ) ), False ),
+                    ( user_script_class_name, True ) ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
+                0, 2, 1, 1 )
 
         show_as_submenus_checkbutton = \
             self.create_checkbutton(
                 _( "Show as submenus" ),
                 tooltip_text = _( "Show each day's tides in a submenu." ),
+                margin_top = 10,
                 active = self.show_as_submenus )
 
         grid.attach( show_as_submenus_checkbutton, 0, 3, 1, 1 )

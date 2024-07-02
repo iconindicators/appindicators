@@ -336,7 +336,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "icon text will be run.\n\n" + \
                     "Not supported on all desktops." ) )
 
-        command_text_view = Gtk.TextView() #TODO Check for Textview and create a function for it?
+        command_text_view = Gtk.TextView()
+        command_text_view.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
+        command_text_view.set_editable( False )
+        command_text_view.set_wrap_mode( Gtk.WrapMode.WORD )
 
         renderer_text_column_interval = Gtk.CellRendererText() #TODO If the alignment passed into the treeview function works (aligns the interval colunn) can pass this renderer directly in I think.
 #        renderer_text_column_interval.set_property( "xalign", 0.5 ) #TODO Is this needed here?  Or perhaps, is it needed down in the renderer function?   Maybe this is redundant as we already have an alignment parameter passed in to the create function...try to figure out if this is needed or the same as the alignment passed in.
@@ -422,73 +425,39 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid.attach( scripts_scrolledwindow, 0, 0, 1, 20 )
 
-        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
-        box.set_margin_top( 10 )
-
-        label = Gtk.Label.new( _( "Command" ) )
-        label.set_halign( Gtk.Align.START ) #TODO Given the box is vertical, not sure if this can be removed or changed with a box function call.  
-        #BUT why is a vertical box used in the first place?
-        box.pack_start( label, False, False, 0 )
-
-        command_text_view.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
-        command_text_view.set_editable( False )
-        command_text_view.set_wrap_mode( Gtk.WrapMode.WORD )
+        grid.attach(
+            self.create_box(
+                ( ( Gtk.Label.new( _( "Command" ) ), False ), ),
+                halign = Gtk.Align.START ),
+             0, 20, 1, 1 )
 
         self.populate_scripts_treestore( scripts_treeview, copy_of_scripts, "", "" )
 
-        box.pack_start( self.create_scrolledwindow( command_text_view ), True, True, 0 )
-        grid.attach( box, 0, 20, 1, 10 )
+        grid.attach(
+            self.create_box(
+                ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
+             0, 21, 1, 10 )
 
-        box = Gtk.Box( spacing = 6 )
+        box = \
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Edit" ),
+                    _( "Copy" ),
+                    _( "Remove" ) ),
+                (
+                    _( "Add a new script." ),
+                    _( "Edit the selected script." ),
+                    _( "Duplicate the selected script." ),
+                    _( "Remove the selected script." ) ),
+                (
+                    ( self.on_script_add, copy_of_scripts, scripts_treeview, background_scripts_treeview ),
+                    ( self.on_script_edit, copy_of_scripts, scripts_treeview, background_scripts_treeview, indicator_text_entry ),
+                    ( self.on_script_copy, copy_of_scripts, scripts_treeview, background_scripts_treeview ),
+                    ( self.on_script_remove, copy_of_scripts, scripts_treeview, background_scripts_treeview, command_text_view, indicator_text_entry ) ) )
+
         box.set_margin_top( 10 )
-        box.set_homogeneous( True )
-
-        box.pack_start(
-            self.create_button(
-                _( "Add" ),
-                tooltip_text = _( "Add a new script." ),
-                clicked_functionandarguments = (
-                    self.on_script_add,
-                    copy_of_scripts, scripts_treeview, background_scripts_treeview ) ),
-            True,
-            True,
-            0 )
-
-        box.pack_start(
-            self.create_button(
-                _( "Edit" ),
-                tooltip_text = _( "Edit the selected script." ),
-                clicked_functionandarguments = (
-                    self.on_script_edit,
-                    copy_of_scripts, scripts_treeview, background_scripts_treeview, indicator_text_entry ) ),
-            True,
-            True,
-            0 )
-
-        box.pack_start(
-            self.create_button(
-                _( "Copy" ),
-                tooltip_text = _( "Duplicate the selected script." ),
-                clicked_functionandarguments = (
-                    self.on_script_copy,
-                    copy_of_scripts, scripts_treeview, background_scripts_treeview ) ),
-            True,
-            True,
-            0 )
-
-        box.pack_start(
-            self.create_button(
-                _( "Remove" ),
-                tooltip_text = _( "Remove the selected script." ),
-                clicked_functionandarguments = (
-                    self.on_script_remove,
-                    copy_of_scripts, scripts_treeview, background_scripts_treeview, command_text_view, indicator_text_entry ) ),
-            True,
-            True,
-            0 )
-
-        box.set_halign( Gtk.Align.CENTER )
-        grid.attach( box, 0, 30, 1, 1 )
+        grid.attach( box, 0, 31, 1, 1 )
 
         send_command_to_log_checkbutton = \
             self.create_checkbutton(
@@ -499,7 +468,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "(located in your home directory)." ),
                 active = self.send_command_to_log )
 
-        grid.attach( send_command_to_log_checkbutton, 0, 31, 1, 1 )
+        grid.attach( send_command_to_log_checkbutton, 0, 32, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Scripts" ) ) )
 
@@ -546,37 +515,24 @@ class IndicatorScriptRunner( IndicatorBase ):
         # Icon text settings.
         grid = self.create_grid()
 
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Icon Text" ) ), False, False, 0 )
-
-#TODO Should be safe to go.
-        # indicator_text_entry.set_text( self.indicator_text )
-        # indicator_text_entry.set_tooltip_text( _(
-        #     "The text shown next to the indicator icon,\n" + \
-        #     "or tooltip where applicable.\n\n" + \
-        #     "A background script must:\n" + \
-        #     "\tAlways return non-empty text; or\n" + \
-        #     "\tReturn non-empty text on success\n" + \
-        #     "\tand empty text otherwise.\n\n" + \
-        #     "Only background scripts added to the\n" + \
-        #     "icon text will be run.\n\n" + \
-        #     "Not supported on all desktops." ) )
-
-        box.pack_start( indicator_text_entry, True, True, 0 )
-        grid.attach( box, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Separator" ) ), False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Icon Text" ) ), False ),
+                    ( indicator_text_entry, True ) ) ),
+            0, 0, 1, 1 )
 
         indicator_text_separator_entry = \
             self.create_entry(
                 self.indicator_text_separator,
                 tooltip_text = _( "The separator will be added between script tags." ) )
 
-        box.pack_start( indicator_text_separator_entry, False, False, 0 )
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Separator" ) ), False ),
+                    ( indicator_text_separator_entry, False ) ) ),
+            0, 1, 1, 1 )
 
         self.populate_scripts_treestore( background_scripts_treeview, copy_of_scripts, "", "", False, True )
 
@@ -803,11 +759,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             grid = self.create_grid()
 
-            box = Gtk.Box( spacing = 6 )
-            box.set_hexpand( True ) # Only need to set this once and all objects will expand.
-
-            box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
-
             script_group_combo = Gtk.ComboBoxText.new_with_entry()
             script_group_combo.set_tooltip_text( _(
                 "The group to which the script belongs.\n\n" + \
@@ -818,23 +769,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                 script_group_combo.append_text( group )
 
             script_group_combo.set_active( groups.index( script.get_group() ) )
-            box.pack_start( script_group_combo, True, True, 0 )
 
-            grid.attach( box, 0, 0, 1, 1 )
-
-            box = Gtk.Box( spacing = 6 )
-            box.set_margin_top( 10 )
-
-            box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
+            grid.attach(
+                self.create_box(
+                    (
+                        ( Gtk.Label.new( _( "Group" ) ), False ),
+                        ( script_group_combo, True ) ) ),
+                0, 0, 1, 1 )
 
             script_name_entry = \
                 self.create_entry(
                     script.get_name(),
                     tooltip_text = _( "The name of the script." ) )
 
-            box.pack_start( script_name_entry, True, True, 0 )
-
-            grid.attach( box, 0, 1, 1, 1 )
+            grid.attach(
+                self.create_box(
+                    (
+                        ( Gtk.Label.new( _( "Name" ) ), False ),
+                        ( script_name_entry, True ) ),
+                    margin_top = 10 ),
+                0, 1, 1, 1 )
 
             dialog = \
                 self.create_dialog(
@@ -978,10 +932,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid = self.create_grid()
 
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Group" ) ), False, False, 0 )
-
         group_combo = Gtk.ComboBoxText.new_with_entry()
         group_combo.set_tooltip_text( _(
             "The group to which the script belongs.\n\n" + \
@@ -1004,39 +954,41 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         group_combo.set_active( index )
 
-        box.pack_start( group_combo, True, True, 0 )
-
-        grid.attach( box, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Name" ) ), False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Group" ) ), False ),
+                    ( group_combo, True ) ) ),
+            0, 0, 1, 1 )
 
         name_entry = \
             self.create_entry(
                 "" if add else script.get_name(),
                 tooltip_text = _( "The name of the script." ) )
 
-        box.pack_start( name_entry, True, True, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Name" ) ), False ),
+                    ( name_entry, True ) ),
+                margin_top = 10 ),
+            0, 1, 1, 1 )
 
-        grid.attach( box, 0, 1, 1, 1 )
-
-        box = Gtk.Box( orientation = Gtk.Orientation.VERTICAL, spacing = 6 )
-        box.set_margin_top( 10 )
-
-        label = Gtk.Label.new( _( "Command" ) )
-        label.set_halign( Gtk.Align.START )#TODO See above in main prefs tab for the "command" text label...
-        # Can that and this label be put into a box and then the grid directly rather than a vertical box?
-        box.pack_start( label, False, False, 0 )
+        grid.attach(
+            self.create_box(
+                ( ( Gtk.Label.new( _( "Command" ) ), False ), ),
+                margin_top = 10 ),
+            0, 2, 1, 1 )
 
         command_text_view = Gtk.TextView()
         command_text_view.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
         command_text_view.set_wrap_mode( Gtk.WrapMode.WORD )
         command_text_view.get_buffer().set_text( "" if add else script.get_command() )
 
-        box.pack_start( self.create_scrolledwindow( command_text_view ), True, True, 0 )
-        grid.attach( box, 0, 2, 1, 10 )
+        grid.attach(
+            self.create_box(
+                ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
+            0, 3, 1, 10 )
 
         sound_checkbutton = \
             self.create_checkbutton(
@@ -1048,7 +1000,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "only if the script returns non-empty text." ),
                 active = False if add else script.get_play_sound() )
 
-        grid.attach( sound_checkbutton, 0, 12, 1, 1 )
+        grid.attach( sound_checkbutton, 0, 13, 1, 1 )
 
         notification_checkbutton = \
             self.create_checkbutton(
@@ -1060,7 +1012,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "only if the script returns non-empty text." ),
                 active = False if add else script.get_show_notification() )
 
-        grid.attach( notification_checkbutton, 0, 13, 1, 1 )
+        grid.attach( notification_checkbutton, 0, 14, 1, 1 )
 
         script_non_background_radio = \
             self.create_radiobutton(
@@ -1072,7 +1024,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "clicks on the corresponding menu item." ),
                 active = True if add else type( script ) is NonBackground )
 
-        grid.attach( script_non_background_radio, 0, 14, 1, 1 )
+        grid.attach( script_non_background_radio, 0, 15, 1, 1 )
 
         terminal_checkbutton = \
             self.create_checkbutton(
@@ -1082,7 +1034,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else type( script ) is NonBackground and script.get_terminal_open() )
 
-        grid.attach( terminal_checkbutton, 0, 15, 1, 1 )
+        grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
 
         default_script_checkbutton = \
             self.create_checkbutton(
@@ -1096,7 +1048,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else type( script ) is NonBackground and script.get_default() )
 
-        grid.attach( default_script_checkbutton, 0, 16, 1, 1 )
+        grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
 
         script_background_radio = \
             self.create_radiobutton(
@@ -1112,14 +1064,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "will remain in the icon text." ),
                 active = False if add else type( script ) is Background )
 
-        grid.attach( script_background_radio, 0, 17, 1, 1 )
+        grid.attach( script_background_radio, 0, 18, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
-
+#TODO THis is referred to down in the .connect functions...so is there way around that?
         label = Gtk.Label.new( _( "Interval" ) )
         label.set_sensitive( False if add else type( script ) is Background )
-        box.pack_start( label, False, False, 0 )
 
         interval_spinner = \
             self.create_spinbutton(
@@ -1131,9 +1080,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                 sensitive = False if add else type( script ) is Background )
         # interval_spinner.set_sensitive( False if add else type( script ) is Background )#TODO Check above is okay.
 
-        box.pack_start( interval_spinner, False, False, 0 )
-
-        grid.attach( box, 0, 18, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( label, False ),
+                    ( interval_spinner, False ) ),
+                sensitive = False if add else type( script ) is Background, #TODO Ensure this works for both label and spinner as above!
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ), # Approximate alignment with the checkboxes above.
+            0, 18, 1, 1 )
 
         force_update_checkbutton = \
             self.create_checkbutton(

@@ -127,12 +127,10 @@ class IndicatorFortune( IndicatorBase ):
         textview.get_buffer().set_text( history )
         textview.connect( "size-allocate", textview_changed )
 
-        box = Gtk.Box()
-        box.pack_start(
-            self.create_scrolledwindow( textview ),
-            True,
-            True,
-            0 )
+        box = \
+            self.create_box(
+                ( ( self.create_scrolledwindow( textview ), True ), ),
+                spacing = 0 )
 
         dialog = \
             self.create_dialog(
@@ -287,10 +285,6 @@ class IndicatorFortune( IndicatorBase ):
         # General.
         grid = self.create_grid()
 
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
-
         spinner_refresh_interval = \
             self.create_spinbutton(
                 self.refresh_interval_in_minutes,
@@ -298,29 +292,25 @@ class IndicatorFortune( IndicatorBase ):
                 60 * 24,
                 tooltip_text = _( "How often a fortune is displayed." ) )
 
-        box.pack_start( spinner_refresh_interval, False, False, 0 )
-
-        grid.attach( box, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        # box.set_hexpand( True )#TODO Seems to be irrelevant.
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Notification summary" ) ), False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False ),
+                    ( spinner_refresh_interval, False ) ) ),
+            0, 0, 1, 1 )
 
         notification_summary = \
             self.create_entry(
                 self.notification_summary,
                 tooltip_text = _( "The summary text for the notification." ) )
 
-        box.pack_start( notification_summary, True, True, 0 )
-
-        grid.attach( box, 0, 1, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Message character limit" ) ), False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Notification summary" ) ), False ),
+                    ( notification_summary, True ) ),
+                margin_top = 10 ),
+            0, 1, 1, 1 )
 
         spinner_character_count = \
             self.create_spinbutton(
@@ -335,15 +325,19 @@ class IndicatorFortune( IndicatorBase ):
                     "resulting in excessive calls to the\n" + \
                     "'fortune' program." ) )
 
-        box.pack_start( spinner_character_count, False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Message character limit" ) ), False ),
+                    ( spinner_character_count, False ) ),
+                margin_top = 10 ),
+            0, 2, 1, 1 )
 
-        grid.attach( box, 0, 2, 1, 1 )
-
-        label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
-        label.set_tooltip_text( _( "Not supported on all desktops." ) )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
-        grid.attach( label, 0, 3, 1, 1 )
+        grid.attach(
+            self.create_box(
+                ( ( Gtk.Label.new( _( "Middle mouse click of the icon" ) ), False ), ),
+                margin_top = 10 ),
+            0, 3, 1, 1 )
 
         radio_middle_mouse_click_new_fortune = \
             self.create_radiobutton(
@@ -424,7 +418,6 @@ class IndicatorFortune( IndicatorBase ):
     def on_fortune_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
             self.show_dialog_ok( treeview, _( "No fortune has been selected for removal." ) )
 
         else:
@@ -465,11 +458,6 @@ class IndicatorFortune( IndicatorBase ):
 
         dialog = self.create_dialog( treeview, title, content_widget = grid )
 
-        box = Gtk.Box( spacing = 6 )
-        # box.set_hexpand( True )#TODO Seemm to make no difference.
-
-        box.pack_start( Gtk.Label.new( _( "Fortune file/directory" ) ), False, False, 0 )
-
         fortune_file_directory = \
             self.create_entry(
                 model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] if row_number else "",
@@ -481,16 +469,12 @@ class IndicatorFortune( IndicatorBase ):
                     "fortune text file(s) is present." ),
                 editable = False )
 
-#TODO Can the set width chars be somehow put into the create_entry?
-        if row_number: # This is an edit.
-            fortune_file_directory.set_width_chars( len( fortune_file_directory.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
-
-        box.pack_start( fortune_file_directory, True, True, 0 )
-
-        grid.attach( box, 0, 0, 1, 1 )
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Fortune file/directory" ) ), False ),
+                    ( fortune_file_directory, True ) ) ),
+            0, 0, 1, 1 )
 
         is_system_fortune = False # This is an add.
         if row_number: # This is an edit.
@@ -510,8 +494,6 @@ class IndicatorFortune( IndicatorBase ):
                 sensitive = not is_system_fortune,
                 clicked_functionandarguments = ( self.on_browse_fortune, dialog, fortune_file_directory, True ) )
 
-        box.pack_start( browse_file_button, True, True, 0 )
-
         browse_directory_button = \
             self.create_button(
                 _( "Directory" ),
@@ -526,11 +508,14 @@ class IndicatorFortune( IndicatorBase ):
                 sensitive = not is_system_fortune,
                 clicked_functionandarguments = ( self.on_browse_fortune, dialog, fortune_file_directory, False ) )
 
-        box.pack_start( browse_directory_button, True, True, 0 )
-
-        box.set_halign( Gtk.Align.END )
-
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( browse_file_button, True ),
+                    ( browse_directory_button, True ) ),
+                halign = Gtk.Align.END,
+                homogeneous = True ),
+            0, 1, 1, 1 )       
 
         enabled_checkbox = \
             self.create_checkbutton(
@@ -585,7 +570,7 @@ class IndicatorFortune( IndicatorBase ):
                 title,
                 add_edit_dialog,
                 fortune_file_directory.get_text(),
-                action )
+                action = action )
 
         while( True ):
             response = dialog.run()

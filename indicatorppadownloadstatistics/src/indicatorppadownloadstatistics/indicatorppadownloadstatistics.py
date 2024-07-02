@@ -523,32 +523,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True )  #TODO Why need this?
-        box.set_halign( Gtk.Align.CENTER )
-
-        labels = ( _( "Add" ), _( "Remove" ) )
-
-        tooltip_texts = (
-            _( "Add a new PPA." ),
-            _( "Remove the selected PPA." ) )
-
-        clicked_functionandarguments = (
-            self.on_ppa_add,
-            self.on_ppa_remove )
-
-        z = zip( labels, tooltip_texts, clicked_functionandarguments )
-        for label, tooltip_text, clicked_functionandargument in z:
-            box.pack_start(
-                self.create_button(
-                    label,
-                    tooltip_text = tooltip_text,
-                    clicked_functionandarguments = ( clicked_functionandargument, ppa_treeview ) ),
-                True,
-                True,
-                0 )
-
-        grid.attach( box, 0, 1, 1, 1 )
+        grid.attach(
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Remove" ) ),
+                (
+                    _( "Add a new PPA." ),
+                    _( "Remove the selected PPA." ) ),
+                (
+                    ( self.on_ppa_add, ppa_treeview ),
+                    ( self.on_ppa_remove, ppa_treeview ) ) ),
+            0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
@@ -592,19 +578,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box = \
+        grid.attach(
             self.create_buttons_in_box(
-                (
-                    _( "Add" ),
-                    _( "Remove" ) ),
-                (
-                    _( "Add a new filter." ),
-                    _( "Remove the selected filter." ) ),
-                (
-                    ( self.on_filter_add, filter_treeview, ppa_treeview ),
-                    ( self.on_filter_remove, filter_treeview ) ) )
-
-        grid.attach( box, 0, 1, 1, 1 )
+            (
+                _( "Add" ),
+                _( "Remove" ) ),
+            (
+                _( "Add a new filter." ),
+                _( "Remove the selected filter." ) ),
+            (
+                ( self.on_filter_add, filter_treeview, ppa_treeview ),
+                ( self.on_filter_remove, filter_treeview ) ) ),
+            0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Filters" ) ) )
 
@@ -675,7 +660,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( ignore_version_architecture_specific_checkbutton, 0, 2, 1, 1 )
 
-#TODO Can or should this be moved up or down?
         combine_ppas_checkbutton.connect(
             "toggled",
             self.on_radio_or_checkbox,
@@ -691,12 +675,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( sort_by_download_checkbutton, 0, 3, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-
         label = Gtk.Label.new( _( "Clip amount" ) )
         label.set_sensitive( sort_by_download_checkbutton.get_active() )
-        label.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        box.pack_start( label, False, False, 0 )
 
         spinner = \
             self.create_spinbutton(
@@ -710,11 +690,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "A value of zero will not clip." ),
                 sensitive = sort_by_download_checkbutton.get_active() )
 
-        box.pack_start( spinner, False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( label, False ),
+                    ( spinner, False ) ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
+            0, 4, 1, 1 )
 
-        grid.attach( box, 0, 4, 1, 1 )
-
-#TODO Can/should this be moved up/down?
         sort_by_download_checkbutton.connect(
             "toggled",
             self.on_radio_or_checkbox,
@@ -821,11 +804,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             ppa_user = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
 
-#TODO What to do with this?
-        ppa_user.set_hexpand( True ) # Only need to set this once and all objects will expand.
-
-#TODO What about a tooltip for each type of GUI element for ppa_user?
-
         grid.attach( ppa_user, 1, 0, 1, 1 )
 
         label = Gtk.Label.new( _( "PPA Name" ) )
@@ -849,8 +827,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         else:
             ppa_name = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
-
-#TODO Add a tooltip (see same TODO above)?
 
         grid.attach( ppa_name, 1, 1, 1, 1 )
 
@@ -1039,12 +1015,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 2, 1 )
 
-        box = Gtk.Box( spacing = 0 )
-
-        label = Gtk.Label.new( "\n\n\n\n\n" ) # Padding to ensure the textview for the message text is not too small.
-        label.set_valign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
         textview = Gtk.TextView()
         textview.set_tooltip_text( _(
             "Each line of text is a single\n" + \
@@ -1061,9 +1031,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             textview.get_buffer().set_text(
                 filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) # This is an edit.
 
-        box.pack_start( self.create_scrolledwindow( textview ), True, True, 0 )
-
-        grid.attach( box, 0, 3, 2, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( "\n\n\n\n\n" ), False ), # Padding to ensure the textview for the message text is not too small.
+                    ( self.create_scrolledwindow( textview ), True ) ) ),
+                     0, 3, 2, 1 )
 
         title = _( "Edit Filter" )
         if row_number is None:

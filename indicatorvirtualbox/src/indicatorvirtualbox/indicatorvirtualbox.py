@@ -174,11 +174,11 @@ class IndicatorVirtualBox( IndicatorBase ):
     def _on_virtual_machine( self, menuitem, virtual_machine ):
         if self.is_virtual_machine_running( virtual_machine.get_uuid() ):
             self.bring_window_to_front( virtual_machine.get_name() )
-            self.request_update( 1 )
+            self.request_update( delay = 1 )
 
         else:
             self.start_virtual_machine( virtual_machine.get_uuid() )
-            self.request_update( 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+            self.request_update( delay = 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
 
 
     def auto_start_virtual_machines( self ):
@@ -233,7 +233,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if number_of_windows_with_the_same_name == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
             summary = _( "Warning" )
-            self.show_notification_with_delay( summary, message, delay_in_seconds )
+            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
         elif number_of_windows_with_the_same_name == "1":
             for line in self.process_get( "wmctrl -l" ).splitlines():
@@ -245,7 +245,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         else:
             message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
             summary = _( "Warning" )
-            self.show_notification_with_delay( summary, message, delay_in_seconds )
+            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
 
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
@@ -407,20 +407,10 @@ class IndicatorVirtualBox( IndicatorBase ):
                 tooltip_text = _( "Double click to edit a virtual machine's properties." ),
                 rowactivatedfunctionandarguments = ( self.on_virtual_machine_double_click, ) )
 
-        # treeView.get_selection().set_mode( Gtk.SelectionMode.BROWSE )  #TODO Currently using SINGLE but see if that is okay instaed of BROWSE.
         notebook.append_page( scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
 
         # General settings.
         grid = self.create_grid()
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )#TODO Although not needed elsewhere (seemingly)
-        # if not used here, the entry below is truncated.
-        # Maybe try with other places we use hexpand = true...maybe this should be the default? 
-
-        label = Gtk.Label.new( _( "VirtualBox™ Manager" ) )
-        # label.set_halign( Gtk.Align.START )#TODO Seems unnecessary.
-        box.pack_start( label, False, False, 0 )
 
         window_name = \
             self.create_entry(
@@ -429,9 +419,12 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "The window title of VirtualBox™ Manager.\n" + \
                     "You may have to adjust for your local language." ) )
 
-        box.pack_start( window_name, True, True, 0 )
-
-        grid.attach( box, 0, 0, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
+                    ( window_name, True ) ) ),
+            0, 0, 1, 1 )
 
         sort_groups_and_virtual_machines_equally_checkbox = \
             self.create_checkbutton(
@@ -458,11 +451,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             grid.attach( show_as_submenus_checkbox, 0, row, 1, 1 )
             row += 1
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False, False, 0 )
-
         spinner_refresh_interval = \
             self.create_spinbutton(
                 self.refresh_interval_in_minutes,
@@ -473,15 +461,14 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "How often the list of virtual machines\n" + \
                     "and their running status are updated." ) )
 
-        box.pack_start( spinner_refresh_interval, False, False, 0 )
-
-        grid.attach( box, 0, row, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False ),
+                    ( spinner_refresh_interval, False ) ),
+                margin_top = 10 ),
+            0, row, 1, 1 )
         row += 1
-
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False, False, 0 )
 
         spinner_delay = \
             self.create_spinbutton(
@@ -493,9 +480,13 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "Amount of time to wait from automatically\n" + \
                     "starting one virtual machine to the next." ) )
 
-        box.pack_start( spinner_delay, False, False, 0 )
-
-        grid.attach( box, 0, row, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False ),
+                    ( spinner_delay, False ) ), 
+                margin_top = 10 ),
+            0, row, 1, 1 )
         row += 1
 
         autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
@@ -574,18 +565,6 @@ class IndicatorVirtualBox( IndicatorBase ):
     def edit_virtual_machine( self, tree, model, treeiter ):
         grid = self.create_grid()
 
-#TODO SHould the label and entry be in a box?  Then don't need the halign and/or hexpand.   See new code below...
-        # label = Gtk.Label.new( _( "Start Command" ) )
-        # label.set_halign( Gtk.Align.START )
-        # grid.attach( label, 0, 0, 1, 1 )
-        
-#TODO New code below to replace above I think...      
-        box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )
-
-        label = Gtk.Label.new( _( "Start Command" ) )
-        box.pack_start( label, False, False, 0 )
-
         start_command = \
             self.create_entry(
                 model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else "",
@@ -593,15 +572,14 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "The terminal command to start the virtual machine such as\n\n" + \
                     "\tVBoxManage startvm %VM%\n" + \
                     "or\n" + \
-                    "\tVBoxHeadless --startvm %VM% --vrde off" ),
-                width_chars = len( model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ) * 5 / 4 if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else 20 )
-#TODO Check width_chars...still needed?
+                    "\tVBoxHeadless --startvm %VM% --vrde off" ) )
 
-#TODO Old and new
-        # start_command.set_hexpand( True ) # Only need to set this once and all objects will expand.
-        # grid.attach( start_command, 1, 0, 1, 1 )
-        box.pack_start( start_command, True, True, 0 )
-        grid.attach( box, 0, 0, 2, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Start Command" ) ), False ),
+                    ( start_command, True ) ) ),
+            0, 0, 2, 1 )
 
         autostart_checkbutton = \
             self.create_checkbutton(
@@ -613,7 +591,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         grid.attach( autostart_checkbutton, 0, 1, 2, 1 )
 
-        dialog = self.create_dialog( tree, _( "Virtual Machine Properties" ), grid )
+        dialog = self.create_dialog( tree, _( "Virtual Machine Properties" ), content_widget = grid )
         while True:
             dialog.show_all()
 

@@ -267,10 +267,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         # General settings.
         grid = self.create_grid()
 
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Lines" ) ), False, False, 0 )
-
         spinner = \
             self.create_spinbutton(
                 self.lines,
@@ -278,15 +274,18 @@ class IndicatorOnThisDay( IndicatorBase ):
                 1000,
                 tooltip_text = _( "The number of menu items available for display." ) )
 
-        box.pack_start( spinner, False, False, 0 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Lines" ) ), False ),
+                    ( spinner, False ) ) ),
+            0, 0, 1, 1 )
 
-        grid.attach( box, 0, 0, 1, 1 )
-
-#TODO Any point creating a label function?  Or maybe put this into a box...and eventually a box function?
-        label = Gtk.Label.new( _( "On event click" ) )
-        label.set_halign( Gtk.Align.START )
-        label.set_margin_top( 10 )
-        grid.attach( label, 0, 1, 1, 1 )
+        grid.attach(
+            self.create_box(
+                ( ( Gtk.Label.new( _( "On event click" ) ), False ), ),
+                margin_top = 10 ),
+            0, 1, 1, 1 )
 
         radio_copy_to_clipboard = \
             self.create_radiobutton(
@@ -308,14 +307,6 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         grid.attach( radio_internet_search, 0, 3, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_hexpand( True )
-        box.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT * 2 )
-
-        label = Gtk.Label.new( _( "URL" ) )
-        label.set_halign( Gtk.Align.START )
-        box.pack_start( label, False, False, 0 )
-
         search_engine_entry = \
             self.create_entry(
                 self.search_url,
@@ -329,9 +320,13 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ),
                 sensitive = not self.copy_to_clipboard )
 
-        box.pack_start( search_engine_entry, True, True, 0 )
-
-        grid.attach( box, 0, 4, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "URL" ) ), False ),
+                    ( search_engine_entry, True ) ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2 ),
+            0, 4, 1, 1 )
 
         radio_copy_to_clipboard.connect(
             "toggled",
@@ -423,7 +418,6 @@ class IndicatorOnThisDay( IndicatorBase ):
     def on_calendar_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            #TODO If we switch to using BROWSE over SINGLE for all treeviews, can remove this type of check....except if there is no data present!  Need testing!
             self.show_dialog_ok( treeview, _( "No calendar has been selected." ) )
 
         else:
@@ -467,23 +461,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         dialog = self.create_dialog( treeview, title, content_widget = grid )
 
-        box = Gtk.Box( spacing = 6 )
-
-        box.pack_start( Gtk.Label.new( _( "Calendar file" ) ), False, False, 0 )
-
         file_entry = \
             self.create_entry(
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] if row_number else "",
                 tooltip_text = _( "The path to a calendar file." ),
                 editable = False )
-                # width_chars = ) #TODO If set width char can be sorted then add here and remove code below.
 
-        if row_number: # This is an edit.
-            file_entry.set_width_chars( len( file_entry.get_text() ) * 5 / 4 ) # Sometimes the length is shorter than set due to packing, so make it longer.
-
-        box.pack_start( file_entry, True, True, 0 )
-
-        box.pack_start(
+        browse_button = \
             self.create_button(
                 _( "Browse" ),
                 tooltip_text = _(
@@ -495,12 +479,15 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "valid by running through\n" + \
                     "'calendar' in a terminal." ),
                     sensitive = not is_system_calendar,
-                    clicked_functionandarguments = ( self.on_browse_calendar, dialog, file_entry ) ),
-             False,
-             False,
-             0 )
+                    clicked_functionandarguments = ( self.on_browse_calendar, dialog, file_entry ) )
 
-        grid.attach( box, 0, 0, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Calendar file" ) ), False ),
+                    ( file_entry, True ),
+                    ( browse_button, False ) ) ),
+            0, 0, 1, 1 )
 
         enabled_checkbutton = self.create_checkbutton( _( "Enabled" ) )
         if row_number is None: # This is an add.

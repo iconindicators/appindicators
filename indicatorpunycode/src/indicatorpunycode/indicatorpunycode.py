@@ -173,9 +173,9 @@ class IndicatorPunycode( IndicatorBase ):
     def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        box = Gtk.Box( spacing = 6 )#TODO Spacing is irrlevant
-        box.pack_start( Gtk.Label.new( _( "Input source" ) ), False, False, 0 )
-        grid.attach( box, 0, 0, 1, 1 )
+        grid.attach(
+            self.create_box( ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
+            0, 0, 1, 1 )
 
         input_clipboard_radio = \
             self.create_radiobutton(
@@ -221,11 +221,6 @@ class IndicatorPunycode( IndicatorBase ):
 
         grid.attach( drop_path_query_checkbutton, 0, 4, 1, 1 )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-
-        box.pack_start( Gtk.Label.new( _( "Maximum results" ) ), False, False, 0 )
-
         results_amount_spinner = \
             self.create_spinbutton(
                 self.result_history_length,
@@ -238,9 +233,13 @@ class IndicatorPunycode( IndicatorBase ):
                     "contains a result will copy\n" + \
                     "the result to the output." ) )
 
-        box.pack_start( results_amount_spinner, False, False, 0 )
-
-        grid.attach( box, 0, 5, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Maximum results" ) ), False ),
+                    ( results_amount_spinner, False ) ),
+                margin_top = 10 ),
+            0, 5, 1, 1 )
 
         autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
         grid.attach( box, 0, 6, 1, 1 )

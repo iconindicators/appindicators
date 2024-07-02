@@ -309,27 +309,32 @@ class IndicatorTest( IndicatorBase ):
                 body += '" fill="#' + colour + '" />'
 
         else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
-            body = '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
-                   'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
-                   str( width / 2 + radius ) + ' ' + str( height / 2 )
+            body = \
+                '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
+                'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
+                str( width / 2 + radius ) + ' ' + str( height / 2 )
 
             if phase == "FIRST_QUARTER" or phase == "THIRD_QUARTER":
                 body += ' Z"'
 
             elif phase == "WANING_CRESCENT" or phase == "WAXING_CRESCENT":
-                body += ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illumination_percentage ) / 50 ) + ' 0 0 0 ' + \
-                        str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+                body += \
+                    ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illumination_percentage ) / 50 ) + ' 0 0 0 ' + \
+                    str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
             else: # Waning/Waxing Gibbous
-                body += ' A ' + str( radius ) + ' ' + str( radius * ( illumination_percentage - 50 ) / 50 ) + ' 0 0 1 ' + \
-                        str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
+                body += \
+                    ' A ' + str( radius ) + ' ' + str( radius * ( illumination_percentage - 50 ) / 50 ) + ' 0 0 1 ' + \
+                    str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
-            body += ' transform="rotate(' + str( -bright_limb_angle_in_degrees ) + ' ' + \
-                    str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
+            body += \
+                ' transform="rotate(' + str( -bright_limb_angle_in_degrees ) + ' ' + \
+                str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
 
-        return '<?xml version="1.0" standalone="no"?>' \
-               '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-               '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
+        return \
+            '<?xml version="1.0" standalone="no"?>' \
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
 
 
     def __execute_command( self, command ):

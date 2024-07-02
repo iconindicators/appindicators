@@ -16,13 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Do a search for case sensitive regex   [a-z][A-Z]  to find potential unconverted code. 
-
-
 #TODO Add changelog entry for each indicator about moving closer to PEP8 or whatever the Python code standard is?
 
 
-#TODO Given clipboard and wmctr don't seem to work under Wayland...
+#TODO Given clipboard and wmctrl don't seem to work under Wayland...
 # figure out if this is the case/scenarios...
 # then figure out if things like in virtualbox need to handle when middle mouse click
 # or mouse wheel scroll is used...is there an issue?
@@ -232,7 +229,7 @@ class IndicatorBase( ABC ):
     
         if found_indicatorbase_import:
             INDICATOR_NAME = Path( frame_record.filename ).stem
-            locale_directory = str( Path( __file__ ).parent ) + os.sep + "locale" #TODO Is this correct for when the indiator is running under the venv?
+            locale_directory = str( Path( __file__ ).parent ) + os.sep + "locale"
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
@@ -349,24 +346,19 @@ class IndicatorBase( ABC ):
         project_metadata = None
         error_message = None
         try:
-            project_metadata = metadata.metadata( self.indicator_name ) # Obtain pyproject.toml information from pip.
+            # Obtain pyproject.toml information from pip.
+            project_metadata = metadata.metadata( self.indicator_name )
 
         except metadata.PackageNotFoundError:
-            # No pip information found, so likely in development/testing.
-            # Look for a .whl file in the same directory as the indicator in development
-            # (indicator_name/src/indicator_name/indicator_name.py)...
-            first_wheel = next( Path( "." ).glob( "*.whl" ), None )
+            # No pip information found; assume in development/testing.
+            # Look for a .whl file in the same directory as the indicator.
+            first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
             if first_wheel is None:
-                # No .whl found, so try the current directory...
-                first_wheel = next( Path( os.path.realpath( __file__ ) ).parent.glob( "*.whl" ), None )
-                if first_wheel is None:
-                    project_metadata = None
-                    error_message = "Unable to locate a .whl in the same directory as the indicator or the current directory!"
+                error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }"
 
-            if first_wheel is not None:
+            else:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
                 if first_metadata is None:
-                    project_metadata = None
                     error_message = f"No metadata was found in { first_wheel.absolute() }!"
 
                 else:
@@ -377,8 +369,7 @@ class IndicatorBase( ABC ):
 
     def initialise_desktop_file( self ):
         # Ensure the .desktop file is present,
-        # either running installed in a virtual environment,
-        # or in development.
+        # either in a virtual environment or in development.
         self.desktop_file = self.indicator_name + ".py.desktop"
 
         self.desktop_file_user_home = \
@@ -394,9 +385,9 @@ class IndicatorBase( ABC ):
         if not Path( self.desktop_file_virtual_environment ).exists():
             # Assume running in development; extract the .desktop file
             # from (the first) wheel located in the development folder.
-            first_wheel = next( Path( "." ).glob( "*.whl" ), None )
+            first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
             if first_wheel is None:
-                error_message = f"No wheel found in { os.path.realpath( Path( '.' ) ) }."
+                error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }"
 
             else:
                 desktop_file_in_wheel = \
@@ -412,7 +403,7 @@ class IndicatorBase( ABC ):
                         z.extract( desktop_file_in_wheel, path = "/tmp" )
                         self.desktop_file_virtual_environment = \
                             str( Path( "/tmp/" + desktop_file_in_wheel ) )
-        
+
                         if not Path( self.desktop_file_virtual_environment ).exists():
                             error_message = f"Unable to locate { self.desktop_file_virtual_environment }!"
 
@@ -471,15 +462,10 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_changelog_markdown_path( indicator_name ):
-        # If running outside of a venv/wheel, say under development/IDE,
-        # the location of the changelog file will be different.
-#TODO Verify this works both in dev and under venv. 
-# Can we use Path( "." ) instead?  Maybe search for "." and __file__ to see where they are used and how.       
-        changelog = str( Path( __file__ ).parent ) + "/CHANGELOG.md"
+    def get_changelog_markdown_path():
+        changelog = str( Path( __file__ ).parent ) + "/CHANGELOG.md" # Path under virtual environment.
         if not Path( changelog ).exists():
-            parents = Path( __file__ ).parents
-            changelog = str( parents[ 3 ] ) + '/' + indicator_name + "/src/" + indicator_name + "/CHANGELOG.md"
+            changelog = str( os.path.realpath( Path( '.' ) ) ) + "/CHANGELOG.md" # Assume running in development.
 
         return changelog
 
@@ -496,7 +482,9 @@ class IndicatorBase( ABC ):
 
         else:
 #TODO Test this clause.
-            GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS, self.__update )
+            GLib.timeout_add_seconds(
+                IndicatorBase.__UPDATE_PERIOD_IN_SECONDS,
+                self.__update )
             #TODO This call returns an ID...need to keep it?
             #TODO Keep the About/Prefernces open and see if we keep trying to do an update every 60 seconds.
 
@@ -611,7 +599,13 @@ class IndicatorBase( ABC ):
             functionandarguments )
 
 
-    def __on_mouse_wheel_scroll( self, indicator, delta, scroll_direction, functionandarguments ):
+    def __on_mouse_wheel_scroll(
+            self,
+            indicator,
+            delta,
+            scroll_direction,
+            functionandarguments ):
+
         if not self.lock.locked():
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
@@ -638,9 +632,10 @@ class IndicatorBase( ABC ):
         about_dialog.set_authors( self.authors )
         about_dialog.set_comments( self.comments )
 
+        changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
+
         copyright_start_year = \
-            IndicatorBase.get_first_year_or_last_year_in_changelog_markdown(
-                IndicatorBase.get_changelog_markdown_path( self.indicator_name ) )
+            IndicatorBase.get_first_year_or_last_year_in_changelog_markdown( changelog_markdown_path )
 
         about_dialog.set_copyright(
             "Copyright \xa9 " + \
@@ -660,7 +655,7 @@ class IndicatorBase( ABC ):
 
         self.__add_hyperlink_label(
             about_dialog,
-            IndicatorBase.get_changelog_markdown_path( self.indicator_name ),
+            changelog_markdown_path,
             _( "View the" ),
             _( "changelog" ),
             _( "text file." ) )
@@ -823,14 +818,19 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-    def show_dialog_ok_cancel( self, parent_widget, message, title = None ):
+    def show_dialog_ok_cancel(
+            self,
+            parent_widget,
+            message,
+            title = None ):
+
         return \
             self.__show_dialog(
                 parent_widget,
                 message,
                 Gtk.MessageType.QUESTION,
                 Gtk.ButtonsType.OK_CANCEL,
-                title )
+                title = title )
 
 
 #TODO UNCHECKED
@@ -847,7 +847,7 @@ class IndicatorBase( ABC ):
                 message,
                 message_type,
                 Gtk.ButtonsType.OK,
-                title )
+                title = title )
 
 
     def __show_dialog(
@@ -907,10 +907,12 @@ class IndicatorBase( ABC ):
 
         autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_margin_top( 10 )
-        box.pack_start( autostart_checkbox, False, False, 0 )
-        box.pack_start( autostart_spinner, False, False, 0 )
+        box = \
+            self.create_box(
+                (
+                    ( autostart_checkbox, False ),
+                    ( autostart_spinner, False ) ),
+                margin_top = 10 )
 
         return autostart_checkbox, autostart_spinner, box
 
@@ -952,9 +954,9 @@ class IndicatorBase( ABC ):
             self.create_and_append_menuitem(
                 menu,
                 label,
-                name,
-                activate_functionandarguments,
-                is_secondary_activate_target )
+                name = name,
+                activate_functionandarguments = activate_functionandarguments,
+                is_secondary_activate_target = is_secondary_activate_target )
 
         menu.reorder_child( menuitem, index )
         return menuitem
@@ -965,7 +967,8 @@ class IndicatorBase( ABC ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
     
-    # Takes a Gtk.TextView and returns the containing text, avoiding the additional calls to get the start/end positions.
+    # Takes a Gtk.TextView and returns the containing text,
+    # avoiding the additional calls to get the start/end positions.
 #TODO UNCHECKED
     def get_textview_text( self, textview ):
         textview_buffer = textview.get_buffer()
@@ -976,14 +979,16 @@ class IndicatorBase( ABC ):
                 True )
 
 
-    # Listens to radio/checkbox "toggled" events and toggles the visibility of the widgets according to the boolean value of 'sense'.
+    # Listens to radio/checkbox "toggled" events and toggles the visibility
+    # of the widgets according to the boolean value of 'sense'.
 #TODO UNCHECKED
     def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
         for widget in widgets:
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
 
 
-    # Estimate the number of menu items which will fit into an indicator menu without exceeding the screen height.
+    # Estimate the number of menu items which will fit into an indicator menu
+    # without exceeding the screen height.
     def get_menuitems_guess( self ):
         screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
@@ -1049,42 +1054,58 @@ class IndicatorBase( ABC ):
         return scrolledwindow
 
 
+    def create_box(
+            self,
+            widgets_and_expands,
+            sensitive = True,
+            margin_top = 0,
+            margin_left = 0,
+            spacing = 6,
+            halign = Gtk.Align.FILL,
+            homogeneous = False ):
 
-#TODO Look at all pack_start calls.
-# What should the parameters be, given buttons, labels, etc are added.
-# Some have True and some have False.
-# Is this related to creating a box?
-# Also look at set_homogeneous
+        box = Gtk.Box( spacing = spacing, orientation = Gtk.Orientation.HORIZONTAL )
+        box.set_sensitive( sensitive )
+        box.set_margin_top( margin_top )
+        box.set_margin_left( margin_left )
+        box.set_halign( halign )
+        box.set_homogeneous( homogeneous )
 
+        for widget, expand in widgets_and_expands:
+            box.pack_start( widget, expand, expand, 0 )
+            if expand:
+                box.set_hexpand( True )
 
-#TODO Worth doing this?
-        # label = Gtk.Label.new( _( "Input source" ) )
-        # label.set_halign( Gtk.Align.START )
-        # grid.attach( label, 0, 0, 1, 1 )
-
-        # label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
-        # label.set_tooltip_text( _( "Not supported on all desktops." ) )
-        # label.set_halign( Gtk.Align.START )
-        # label.set_margin_top( 10 )
-        # grid.attach( label, 0, 3, 1, 1 )
-
-        # label = Gtk.Label.new( message_label )
-        # label.set_valign( Gtk.Align.START )
-        # box.pack_start( label, False, False, 0 )
-
-        # label = Gtk.Label.new( _( "On event click" ) )
-        # label.set_halign( Gtk.Align.START )
-        # label.set_margin_top( 10 )
-        # grid.attach( label, 0, 1, 1, 1 )
-
-        # label = Gtk.Label.new( _( "Clip amount" ) )
-        # label.set_sensitive( sort_by_download_checkbutton.get_active() )
-        # label.set_margin_left( IndicatorBase.INDENT_WIDGET_LEFT )
-        # box.pack_start( label, False, False, 0 )
+        return box
 
 
+#TODO Not sure if this should be absorbed into create_box
+# (but would need to take tooltips and click arguments in the tuple I suppose)
+# or if not absorbed and this function stays,
+# call create_box internally.
+    def create_buttons_in_box(
+            self,
+            labels,
+            tooltip_texts,
+            clicked_functionandarguments ):
 
+        box = Gtk.Box( spacing = 6 )
+        box.set_homogeneous( True )
 
+        z = zip( labels, tooltip_texts, clicked_functionandarguments )
+        for label, tooltip_text, clicked_functionandargument in z:
+            box.pack_start(
+                self.create_button(
+                    label,
+                    tooltip_text = tooltip_text,
+                    clicked_functionandarguments = clicked_functionandargument ),
+                True,
+                True,
+                0 )
+
+        box.set_halign( Gtk.Align.CENTER )
+
+        return box
 
 
     def create_entry(
@@ -1094,22 +1115,21 @@ class IndicatorBase( ABC ):
         sensitive = True,
         margin_top = 0,
         margin_left = 0,
-        editable = True,
-        width_chars = None, #TODO Not sure about this default.  Who calls this?
-        active = True ): #TODO Need active?  Check to see if can set active on an entry.
+        editable = True ):
 
         entry = Gtk.Entry()
-        self.__set_widget_common_attributes( entry, tooltip_text, sensitive, margin_top, margin_left )
+        self.__set_widget_common_attributes(
+            entry,
+            tooltip_text = tooltip_text,
+            sensitive = sensitive,
+            margin_top = margin_top,
+            margin_left = margin_left )
+
         entry.set_text( text )
+        entry.set_editable( editable )
 
-        if editable:
-            entry.set_editable( editable )
-
-        if width_chars:
-            entry.set_width_chars( width_chars )
-
-        #TODO Only used in PPA when no PPAs exist...so see if really needed or a workaround can be used.
-        # entry.set_hexpand( True )   
+        if text:
+            entry.set_width_chars( len( text ) * 5 / 4 ) # Give a little more space; sometimes too short due to packing.
 
         return entry
 
@@ -1124,7 +1144,12 @@ class IndicatorBase( ABC ):
         clicked_functionandarguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
 
         button = Gtk.Button.new_with_label( label )
-        self.__set_widget_common_attributes( button, tooltip_text, sensitive, margin_top, margin_left )
+        self.__set_widget_common_attributes(
+            button,
+            tooltip_text = tooltip_text,
+            sensitive = sensitive,
+            margin_top = margin_top,
+            margin_left = margin_left )
 
         if clicked_functionandarguments:
             button.connect( "clicked", *clicked_functionandarguments )
@@ -1145,7 +1170,13 @@ class IndicatorBase( ABC ):
         margin_left = 0 ):
 
         spinner = Gtk.SpinButton()
-        self.__set_widget_common_attributes( spinner, tooltip_text, sensitive, margin_top, margin_left )
+        self.__set_widget_common_attributes(
+            spinner,
+            tooltip_text = tooltip_text,
+            sensitive = sensitive,
+            margin_top = margin_top,
+            margin_left = margin_left )
+
         spinner.set_adjustment( Gtk.Adjustment.new( value, lower, upper, step_increment, page_increment, 0 ) )
         spinner.set_numeric( True )
         spinner.set_update_policy( Gtk.SpinButtonUpdatePolicy.IF_VALID )
@@ -1162,7 +1193,13 @@ class IndicatorBase( ABC ):
         active = True ):
 
         checkbutton = Gtk.CheckButton.new_with_label( label )
-        self.__set_widget_common_attributes( checkbutton, tooltip_text, sensitive, margin_top, margin_left )
+        self.__set_widget_common_attributes(
+            checkbutton,
+            tooltip_text = tooltip_text,
+            sensitive = sensitive,
+            margin_top = margin_top,
+            margin_left = margin_left )
+
         checkbutton.set_active( active )
         return checkbutton
 
@@ -1178,7 +1215,13 @@ class IndicatorBase( ABC ):
         active = True ):
 
         radiobutton = Gtk.RadioButton.new_with_label_from_widget( radio_group_member, label )
-        self.__set_widget_common_attributes( radiobutton, tooltip_text, sensitive, margin_top, margin_left )
+        self.__set_widget_common_attributes(
+            radiobutton,
+            tooltip_text = tooltip_text,
+            sensitive = sensitive,
+            margin_top = margin_top,
+            margin_left = margin_left )
+
         radiobutton.set_active( active )
         return radiobutton
 
@@ -1266,10 +1309,6 @@ class IndicatorBase( ABC ):
                         treeviewcolumn.connect( "clicked", *columnviewid_functionandarguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
-#TODO
-# Script runner and virtual box use Gtk.SelectionMode.BROWSE...
-# ...rest of indicators use Gtk.SelectionMode.SINGLE...
-# ...test each variation (browse with those that use single and vice versa)...any difference?
         treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
         treeview.expand_all()
         treeview.set_hexpand( True )
@@ -1287,35 +1326,11 @@ class IndicatorBase( ABC ):
         return treeview, scrolledwindow
 
 
-    def create_buttons_in_box(
-            self,
-            labels,
-            tooltip_texts,
-            clicked_functionandarguments ):
-
-        box = Gtk.Box( spacing = 6 ) #TODO Pass in spacing?
-        box.set_homogeneous( True ) #TODO What does homogeneous mean?  Is it needed?  Where else is it used?
-
-        z = zip( labels, tooltip_texts, clicked_functionandarguments )
-        for label, tooltip_text, clicked_functionandargument in z:
-            box.pack_start(
-                self.create_button(
-                    label,
-                    tooltip_text = tooltip_text,
-                    clicked_functionandarguments = clicked_functionandargument ),
-                True,
-                True,
-                0 )
-
-        box.set_halign( Gtk.Align.CENTER )
-
-        return box
-
-
     def create_filechooser_dialog(
         self,
         title,
-        parent, filename,
+        parent,
+        filename,
         action = Gtk.FileChooserAction.OPEN ):
 
         dialog = \
