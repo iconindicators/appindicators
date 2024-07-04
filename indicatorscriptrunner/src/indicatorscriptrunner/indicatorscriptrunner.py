@@ -52,24 +52,6 @@ class IndicatorScriptRunner( IndicatorBase ):
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
     COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
-#TODO May need two sets of these...one for the model and one for the view.
-    # Data model columns used in the Preferences dialog...
-    #    in the table to display all scripts;
-    #    in the table to display background scripts.
-    # COLUMN_GROUP_INTERNAL = 0 # Never shown; used when the script group is needed by decision logic.
-    # COLUMN_GROUP = 1 # Group name when displaying a group; empty when displaying a script.
-    # COLUMN_NAME = 2 # Script name.
-    # COLUMN_SOUND = 3 # Icon name for the APPLY icon; None otherwise.
-    # COLUMN_NOTIFICATION = 4 # Icon name for the APPLY icon; None otherwise.
-    # COLUMN_TERMINAL = 5 # Icon name for the APPLY icon; None otherwise.
-    # COLUMN_BACKGROUND = 6 # Icon name for the APPLY icon; None otherwise.
-    # COLUMN_INTERVAL = 7 # Numeric amount as a string.
-    # COLUMN_FORCE_UPDATE = 8 # Icon name for the APPLY icon; None otherwise.
-    # COLUMN_REMOVE = 9 # Icon name for the REMOVE icon; None otherwise.
-
-#TODO Try and use these column IDs...
-# Surely don't need a flag for the group name, just use the group name 
-# to determine if the row is a group (group name is not None) or a script (group name is None).
     COLUMN_MODEL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
     COLUMN_MODEL_NAME = 1 # Script name.
     COLUMN_MODEL_SOUND = 2 # Icon name for the APPLY icon; None otherwise.
@@ -326,26 +308,20 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_entry(
                 self.indicator_text,
                 tooltip_text = _(
-                    "The text shown next to the indicator icon,\n" + \
-                    "or tooltip where applicable.\n\n" + \
-                    "A background script must:\n" + \
-                    "\tAlways return non-empty text; or\n" + \
-                    "\tReturn non-empty text on success\n" + \
-                    "\tand empty text otherwise.\n\n" + \
-                    "Only background scripts added to the\n" + \
-                    "icon text will be run.\n\n" + \
+                    "The text shown next to the indicator icon,\n" +
+                    "or tooltip where applicable.\n\n" +
+                    "A background script must:\n" +
+                    "\tAlways return non-empty text; or\n" +
+                    "\tReturn non-empty text on success\n" +
+                    "\tand empty text otherwise.\n\n" +
+                    "Only background scripts added to the\n" +
+                    "icon text will be run.\n\n" +
                     "Not supported on all desktops." ) )
 
         command_text_view = \
             self.create_textview(
                 tooltip_text = _( "The terminal script/command, along with any arguments." ),
                 editable = False )
-
-        renderer_text_column_interval = Gtk.CellRendererText() #TODO If the alignment passed into the treeview function works (aligns the interval colunn) can pass this renderer directly in I think.
-#        renderer_text_column_interval.set_property( "xalign", 0.5 ) #TODO Is this needed here?  Or perhaps, is it needed down in the renderer function?   Maybe this is redundant as we already have an alignment parameter passed in to the create function...try to figure out if this is needed or the same as the alignment passed in.
-
-        # treestore_scripts_all = Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) #TODO Now passed in directly.
-        # treestore_scripts_background = Gtk.TreeStore( str, str, str, str, str, str, str, str, str ) #TODO Now passed in directly.
 
         background_scripts_treeview, background_scripts_scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -362,7 +338,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_NAME ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                    ( renderer_text_column_interval, "text", IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
                     ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND ),
@@ -371,12 +347,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE) ),
                 tooltip_text = _( "Double click on a script to add to the icon text." ),
                 rowactivatedfunctionandarguments = (
-                    self.on_background_script_double_click, indicator_text_entry, copy_of_scripts ), )
+                    self.on_background_script_double_click, indicator_text_entry ), )
 
-#TODO Need to check the whole conversion below!!!
-        renderer_pixbuf_column_remove = Gtk.CellRendererPixbuf()
-        renderer_text_column_interval = Gtk.CellRendererText()
         renderer_text_column_name = Gtk.CellRendererText()
+        renderer_text_column_interval = Gtk.CellRendererText()
+        renderer_pixbuf_column_remove = Gtk.CellRendererPixbuf()
 
         scripts_treeview, scripts_scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -409,14 +384,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_FORCE_UPDATE ) ),
                 celldatafunctionandarguments_renderers_columnviewids = (
-                    ( ( self.dataFunctionNameColumn, copy_of_scripts ), renderer_text_column_name, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ),
-                    ( ( self.dataFunctionIntervalColumn, ), renderer_text_column_interval, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ),
-                    ( ( self.dataFunctionIntervalColumn, ), renderer_pixbuf_column_remove, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ) ),
+                    ( ( self.data_function_column_name_renderer, copy_of_scripts ), renderer_text_column_name, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ),
+                    ( ( self.data_function_column_interval_renderer, ), renderer_text_column_interval, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ),
+                    ( ( self.data_function_column_interval_renderer, ), renderer_pixbuf_column_remove, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ) ),
                 tooltip_text = _(
-                    "Double-click to edit a script.\n\n" + \
-                    "If an attribute does not apply to a script,\n" + \
-                    "a dash is displayed.\n\n" + \
-                    "If a non-background script is checked as\n" + \
+                    "Double-click to edit a script.\n\n" +
+                    "If an attribute does not apply to a script,\n" +
+                    "a dash is displayed.\n\n" +
+                    "If a non-background script is checked as\n" +
                     "default, the name will appear in bold." ),
                 cursorchangedfunctionandarguments = (
                     self.on_script_selection, command_text_view, copy_of_scripts ),
@@ -454,7 +429,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( self.on_script_add, copy_of_scripts, scripts_treeview, background_scripts_treeview ),
                     ( self.on_script_edit, copy_of_scripts, scripts_treeview, background_scripts_treeview, indicator_text_entry ),
                     ( self.on_script_copy, copy_of_scripts, scripts_treeview, background_scripts_treeview ),
-                    ( self.on_script_remove, copy_of_scripts, scripts_treeview, background_scripts_treeview, command_text_view, indicator_text_entry ) ) )
+                    ( self.on_script_remove, copy_of_scripts, scripts_treeview, background_scripts_treeview, indicator_text_entry ) ) )
 
         box.set_margin_top( 10 )
         grid.attach( box, 0, 31, 1, 1 )
@@ -463,8 +438,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Send command to log" ),
                 tooltip_text = _(
-                    "When a script is run,\n" + \
-                    "send the command to the log\n" + \
+                    "When a script is run,\n" +
+                    "send the command to the log\n" +
                     "(located in your home directory)." ),
                 active = self.send_command_to_log )
 
@@ -495,8 +470,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Hide groups" ),
                 tooltip_text = _(
-                    "If checked, only script names are displayed.\n" + \
-                    "Otherwise, script names are indented\n" + \
+                    "If checked, only script names are displayed.\n" +
+                    "Otherwise, script names are indented\n" +
                     "within their respective group." ),
                 sensitive = not self.show_scripts_in_submenus,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
@@ -579,16 +554,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
     # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-#TODO Rename to python standard
-    def dataFunctionNameColumn( self, treeviewcolumn, cell_renderer, treemodel, treeiter, scripts ):
-#TODO Review original below
-        # cellRenderer.set_property( "weight", Pango.Weight.NORMAL )
-        # group = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_GROUP_INTERNAL )
-        # name = treeModel.get_value( treeIter, IndicatorScriptRunner.COLUMN_NAME )
-        # script = self.get_script( scripts, group, name )
-        # if type( script ) is NonBackground and script.get_default():
-        #     cellRenderer.set_property( "weight", Pango.Weight.BOLD )
-
+    def data_function_column_name_renderer( self, treeviewcolumn, cell_renderer, treemodel, treeiter, scripts ):
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         name = treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name:
@@ -602,28 +568,54 @@ class IndicatorScriptRunner( IndicatorBase ):
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-    # Renderer for the Interval column.
-    #    For a background script, the value will be a number (as text) for the interval in minutes.
-    #    For a non-background script, the interval does not apply and so a dash icon is rendered.
+    # Renders the interval column.
+    #   For a background script, the value will be a number (as text) for the interval in minutes.
+    #   For a group or non-background script, the interval does not apply and so a dash icon is rendered.
     #
     # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
     # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
     # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
     # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-#TODO Rename to python standard
-    def dataFunctionIntervalColumn( self, treeviewcolumn, cell_renderer, treemodel, treeiter, data ):
-#TODO Review this function!
-        cell_renderer.set_visible( True )
-        if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
+    def data_function_column_interval_renderer( self, treeviewcolumn, cell_renderer, treemodel, treeiter, data ):
+#TODO Below is original...
+# I think it was slighly wrong (but didn't show up)
+# as the group and non-background script rendering should be different.
+        # cell_renderer.set_visible( True )
+        # if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
+        #     if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
+        #         cell_renderer.set_visible( False )
+        #
+        #     else:
+        #         cell_renderer.set_visible( True )
+        #         cell_renderer.set_property( "xalign", 0.5 )
+        #
+        # else:
+        #     if isinstance( cell_renderer, Gtk.CellRendererText ):
+        #         print( treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
+        #         cell_renderer.set_visible( False )
+
+        if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) is None:
+            if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
+                if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
+                    cell_renderer.set_visible( False )
+    
+                if isinstance( cell_renderer, Gtk.CellRendererText ):
+                    cell_renderer.set_visible( True )
+                    cell_renderer.set_property( "xalign", 0.5 )
+    
+            else:
+                if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
+                    cell_renderer.set_visible( True )
+
+                if isinstance( cell_renderer, Gtk.CellRendererText ):
+                    cell_renderer.set_visible( False )
+
+        else:
             if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
                 cell_renderer.set_visible( False )
 
-            else:
-                cell_renderer.set_property( "xalign", 0.5 )
-
-        else:
             if isinstance( cell_renderer, Gtk.CellRendererText ):
-                cell_renderer.set_visible( False )
+                cell_renderer.set_visible( True )
 
 
 #TODO Might be helpful later...
@@ -737,13 +729,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             treeview,
             treepath,
             treeviewcolumn,
-            textentry,
-            scripts ):
-#TODO Why is scripts passed in if not used?        
+            textentry ):
 
         group, name = self.__get_group_name_from_treeview( treeview )
         if group and name:
-            textentry.insert_text( "[" + self.__create_key( group, name ) + "]", textentry.get_position() )
+            textentry.insert_text(
+                "[" + self.__create_key( group, name ) + "]", textentry.get_position() )
 
 
     def on_script_copy(
@@ -764,7 +755,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self.create_comboboxtext(
                       groups,
                       tooltip_text = _(
-                          "The group to which the script belongs.\n\n" + \
+                          "The group to which the script belongs.\n\n" +
                           "Choose an existing group or enter a new one." ),
                       active = groups.index( script.get_group() ) )
 
@@ -862,7 +853,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             scripts,
             scripts_treeview,
             background_scripts_treeview,
-            command_text_view,
             textentry ):
 
         group, name = self.__get_group_name_from_treeview( scripts_treeview )
@@ -924,50 +914,29 @@ class IndicatorScriptRunner( IndicatorBase ):
             scripts,
             scripts_treeview,
             background_scripts_treeview ):
-#TODO Why is background_scripts_treeview passed in if not used?
+
+        groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
 
         add = True if script is None else False
-
-        grid = self.create_grid()
-
-#TODO Check this was converted correctly for both ADD and EDIT...
-# but first, there is a TODO below about the wrong column id ...fix that first!
-        # group_combo = Gtk.ComboBoxText.new_with_entry()
-        # group_combo.set_tooltip_text( _(
-        #     "The group to which the script belongs.\n\n" + \
-        #     "Choose an existing group or enter a new one." ) )
-        #
-        groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
-        # for group in groups:
-        #     group_combo.append_text( group )
-
         if add:
             index = 0
-            print( "Add")
-            print( index )
             model, treeiter = scripts_treeview.get_selection().get_selected()
             if treeiter:
-                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ] #TODO Fix...not sure what the column should be...
-#...might have to get group from parent row?
+                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
                 index = groups.index( group )
-                print( index )
 
         else:
             index = groups.index( script.get_group() )
-            print( "Edit")
-            print( index)
 
-        # group_combo.set_active( index )
         group_combo = \
             self.create_comboboxtext(
                 groups,
                 tooltip_text = _(
-                    "The group to which the script belongs.\n\n" + \
+                    "The group to which the script belongs.\n\n" +
                     "Choose an existing group or enter a new one." ),
                 active = index )
 
-#TODO Got exception when a group is selected and then clicked ADD.
-# Might be due to getting parent (which is what I think the above TODO is about when selecting a script).
+        grid = self.create_grid()
 
         grid.attach(
             self.create_box(
@@ -1009,9 +978,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Play sound" ),
                 tooltip_text = _(
-                    "For non-background scripts, play a sound\n" + \
-                    "on script completion.\n\n" + \
-                    "For background scripts, play a sound\n" + \
+                    "For non-background scripts, play a sound\n" +
+                    "on script completion.\n\n" +
+                    "For background scripts, play a sound\n" +
                     "only if the script returns non-empty text." ),
                 active = False if add else script.get_play_sound() )
 
@@ -1021,9 +990,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Show notification" ),
                 tooltip_text = _(
-                    "For non-background scripts, show a\n" + \
-                    "notification on script completion.\n\n" + \
-                    "For background scripts, show a notification\n" + \
+                    "For non-background scripts, show a\n" +
+                    "notification on script completion.\n\n" +
+                    "For background scripts, show a notification\n" +
                     "only if the script returns non-empty text." ),
                 active = False if add else script.get_show_notification() )
 
@@ -1034,8 +1003,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 None,
                 _( "Non-background" ),
                 tooltip_text = _(
-                    "Non-background scripts are displayed\n" + \
-                    "in the menu and run when the user\n" + \
+                    "Non-background scripts are displayed\n" +
+                    "in the menu and run when the user\n" +
                     "clicks on the corresponding menu item." ),
                 active = True if add else type( script ) is NonBackground )
 
@@ -1055,9 +1024,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Default script" ),
                 tooltip_text = _(
-                    "One script may be set as default\n" + \
-                    "which is run on a middle mouse\n" + \
-                    "click of the indicator icon.\n\n" + \
+                    "One script may be set as default\n" +
+                    "which is run on a middle mouse\n" +
+                    "click of the indicator icon.\n\n" +
                     "Not supported on all desktops." ),
                 sensitive = True if add else type( script ) is NonBackground,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
@@ -1070,12 +1039,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                 script_non_background_radio,
                 _( "Background" ),
                 tooltip_text = _(
-                    "Background scripts automatically run\n" + \
-                    "at the interval specified, but only if\n" + \
-                    "added to the icon text.\n\n" + \
-                    "Any exception which occurs during script\n" + \
-                    "execution will be logged to a file in the\n" + \
-                    "user's home directory and the script tag\n" + \
+                    "Background scripts automatically run\n" +
+                    "at the interval specified, but only if\n" +
+                    "added to the icon text.\n\n" +
+                    "Any exception which occurs during script\n" +
+                    "execution will be logged to a file in the\n" +
+                    "user's home directory and the script tag\n" +
                     "will remain in the icon text." ),
                 active = False if add else type( script ) is Background )
 
@@ -1093,14 +1062,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 page_increment = 100,
                 tooltip_text = _( "Interval, in minutes, between runs." ),
                 sensitive = False if add else type( script ) is Background )
-        # interval_spinner.set_sensitive( False if add else type( script ) is Background )#TODO Check above is okay.
 
         grid.attach(
             self.create_box(
                 (
                     ( label, False ),
                     ( interval_spinner, False ) ),
-                sensitive = False if add else type( script ) is Background, #TODO Ensure this works for both label and spinner as above!
+                sensitive = False if add else type( script ) is Background, #TODO Ensure this works for both label and spinner as above!  OR maybe this is not needed as I set sensitive on the label and spinner.  Is there a .connect function also?
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ), # Approximate alignment with the checkboxes above.
             0, 19, 1, 1 )
 
@@ -1108,8 +1076,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Force update" ),
                 tooltip_text = _(
-                    "If the script returns non-empty text\n" + \
-                    "on its update, the script will run\n" + \
+                    "If the script returns non-empty text\n" +
+                    "on its update, the script will run\n" +
                     "on the next update of ANY script." ),
                 sensitive = True if add else type( script ) is Background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
@@ -1157,8 +1125,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                         group_combo.get_active_text().strip(),
                         name_entry.get_text().strip() ) is not None
 
-                #TODO Tidy up below and above
-                edited_script_group_or_name_different = not add and ( group_combo.get_active_text().strip() != script.get_group() or name_entry.get_text().strip() != script.get_name() )
+                edited_script_group_or_name_different = \
+                    not add and \
+                    (
+                        group_combo.get_active_text().strip() != script.get_group() or \
+                        name_entry.get_text().strip() != script.get_name() )
+
                 if ( add or edited_script_group_or_name_different ) and script_of_same_name_and_group_exists:
                     self.show_dialog_ok( dialog, _( "A script of the same group and name already exists." ) )
                     group_combo.grab_focus()
@@ -1227,7 +1199,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 self.populate_scripts_treestore(
                     scripts,
-                    scripts_treeview,
+                    background_scripts_treeview,
                     new_script.get_group() if type( new_script ) is Background else "",
                     new_script.get_name() if type( new_script ) is Background else "",
                     False,
@@ -1278,17 +1250,20 @@ class IndicatorScriptRunner( IndicatorBase ):
     # Each time a background script is run, cache the result.
     #
     # If for example, one script has an interval of five minutes and another script is hourly,
-    # the hourly script should not be run any more frequently so use a cached result when the quicker script is run.
+    # the hourly script should only be run hourly,
+    # so use a cached result when the quicker script is run.
     #
-    # Initialise the cache results and set a next update time in the past to force all (background) scripts to update first time.
+    # Initialise the cache results and set a next update time in the past
+    # to force all (background) scripts to update first time.
     def initialise_background_scripts( self ):
         self.background_script_results = { }
         self.background_script_next_update_time = { }
         today = datetime.datetime.now()
         for script in self.scripts:
             if type( script ) is Background:
-                self.background_script_results[ self.__create_key( script.get_group(), script.get_name() ) ] = None
-                self.background_script_next_update_time[ self.__create_key( script.get_group(), script.get_name() ) ] = today
+                key = self.__create_key( script.get_group(), script.get_name() )
+                self.background_script_results[ key ] = None
+                self.background_script_next_update_time[ key ] = today
 
 
     def __create_key( self, group, name ):
@@ -1336,14 +1311,45 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         else:
             # Example non-background scripts.
-            self.scripts.append( NonBackground( "Network", "Ping Google", "ping -c 3 www.google.com", False, False, False, False ) )
-            self.scripts.append( NonBackground( "Network", "Public IP address", "notify-send -i " + self.get_icon_name() + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"", False, False, False, False ) )
-            self.scripts.append( NonBackground( "Network", "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.get_icon_name() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi", False, False, False, True ) )
-            self.scripts.append( NonBackground( "Update", "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade", True, True, True, False ) )
+            self.scripts.append(
+                NonBackground(
+                    "Network",
+                    "Ping Google",
+                    "ping -c 3 www.google.com",
+                    False, False, False, False ) )
+
+            self.scripts.append(
+                NonBackground(
+                    "Network",
+                    "Public IP address",
+                    "notify-send -i " + self.get_icon_name() + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"",
+                    False, False, False, False ) )
+
+            self.scripts.append(
+                NonBackground(
+                    "Network",
+                    "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.get_icon_name() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
+                    False, False, False, True ) )
+
+            self.scripts.append(
+                NonBackground(
+                    "Update",
+                    "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade",
+                    True, True, True, False ) )
 
             # Example background scripts.
-            self.scripts.append( Background( "Network", "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi", False, True, 60, True ) )
-            self.scripts.append( Background( "System", "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"", False, False, 5, False ) )
+            self.scripts.append(
+                Background(
+                    "Network",
+                    "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi",
+                    False, True, 60, True ) )
+
+            self.scripts.append(
+                Background(
+                    "System",
+                    "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"",
+                    False, False, 5, False ) )
+
             self.indicator_text = " [Network::Internet Down][System::Available Memory]"
 
             self.request_save_config()

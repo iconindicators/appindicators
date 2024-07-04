@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Maybe look for all \
+# and test if I can remove when used with ( ) of a function call.
+
+
 #TODO Add changelog entry for each indicator about moving closer to PEP8 or whatever the Python code standard is?
 
 
@@ -1115,7 +1119,8 @@ class IndicatorBase( ABC ):
         sensitive = True,
         margin_top = 0,
         margin_left = 0,
-        editable = True ):
+        editable = True,
+        make_longer = False ):
 
         entry = Gtk.Entry()
         self.__set_widget_common_attributes(
@@ -1128,14 +1133,11 @@ class IndicatorBase( ABC ):
         entry.set_text( text )
         entry.set_editable( editable )
 
-        if text:
-            entry.set_width_chars( len( text ) * 5 / 4 ) # Give a little more space; sometimes too short due to packing.
+        if make_longer and text:
+            # Give a little more space; sometimes too short due to packing.
+            entry.set_width_chars( len( text ) * 5 / 4 )
 
         return entry
-
-
-#TODO In all the (GUI) code, look for set_active...
-# this needs to be an index...not a boolean nor string nor None. 
 
 
 #TODO UNCHECKED

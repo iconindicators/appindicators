@@ -465,7 +465,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_entry(
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] if row_number else "",
                 tooltip_text = _( "The path to a calendar file." ),
-                editable = False )
+                editable = False,
+                make_longer = True )
 
         browse_button = \
             self.create_button(

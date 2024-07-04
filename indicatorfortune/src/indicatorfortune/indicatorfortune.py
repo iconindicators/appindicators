@@ -468,7 +468,8 @@ class IndicatorFortune( IndicatorBase ):
                     "fortune .dat files.\n\n" + \
                     "Ensure the corresponding\n" + \
                     "fortune text file(s) is present." ),
-                editable = False )
+                editable = False,
+                make_longer = True )
 
         grid.attach(
             self.create_box(

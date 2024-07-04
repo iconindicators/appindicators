@@ -572,7 +572,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "The terminal command to start the virtual machine such as\n\n" + \
                     "\tVBoxManage startvm %VM%\n" + \
                     "or\n" + \
-                    "\tVBoxHeadless --startvm %VM% --vrde off" ) )
+                    "\tVBoxHeadless --startvm %VM% --vrde off" ),
+                make_longer = True )
 
         grid.attach(
             self.create_box(
