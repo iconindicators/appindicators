@@ -31,6 +31,11 @@ import importlib.util
 from pathlib import Path
 import sys
 
+#TODO Got 
+#   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+#
+# on the laptop....not sure when it happened.
+
 
 class IndicatorTide( IndicatorBase ):
 
