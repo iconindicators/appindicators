@@ -376,7 +376,7 @@ def _initialise_parser():
         "directory_release",
         help = "The output directory for the Python wheel. " +
                "If the directory specified is 'release', " +
-               "the Python wheel will be created in 'release/wheel'. " )
+               "the Python wheel will be created in 'release/wheel'." )
 
     parser.add_argument(
         "indicators",
