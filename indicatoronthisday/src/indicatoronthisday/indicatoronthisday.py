@@ -491,7 +491,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         enabled_checkbutton = self.create_checkbutton( _( "Enabled" ) )
         if row_number is None: # This is an add.
-            enabled_checkbutton.set_active( True )
+            enabled_checkbutton.set_active( True ) #TODO Can this and the line below be put into the create_checkbutton call?
 
         else:
             enabled_checkbutton.set_active( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )

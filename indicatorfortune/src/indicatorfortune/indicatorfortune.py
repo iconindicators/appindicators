@@ -121,10 +121,11 @@ class IndicatorFortune( IndicatorBase ):
             adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
 
 
-        textview = Gtk.TextView()
-        textview.set_editable( False )
-        history = self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE )
-        textview.get_buffer().set_text( history )
+        textview = \
+            self.create_textview(
+                text = self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE ),
+                editable = False )
+
         textview.connect( "size-allocate", textview_changed )
 
         box = \
@@ -527,6 +528,7 @@ class IndicatorFortune( IndicatorBase ):
 
         if row_number: # This is an edit.
             enabled_checkbox.set_active( model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY )
+#TODO Can the line above be worked into the create_checkbutton call?
 
         grid.attach( enabled_checkbox, 0, 2, 1, 1 )
 

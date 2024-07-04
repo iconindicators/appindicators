@@ -794,12 +794,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             ppa_users.sort( key = locale.strxfrm )
 
-            ppa_user = Gtk.ComboBoxText.new_with_entry()
-            for item in ppa_users:
-                ppa_user.append_text( item )
-
-            if row_number:
-                ppa_user.set_active( ppa_users.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ) ) # This is an edit.
+            ppa_user = \
+                self.create_comboboxtext(
+                    ppa_users,
+                    active =
+                        ppa_users.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
+                        if row_number else
+                        -1 )
 
         else:
             ppa_user = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
@@ -818,12 +819,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             ppa_names.sort( key = locale.strxfrm )
 
-            ppa_name = Gtk.ComboBoxText.new_with_entry()
-            for item in ppa_names:
-                ppa_name.append_text( item )
-
-            if row_number:
-                ppa_name.set_active( ppa_names.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) ) # This is an edit.
+            ppa_name = \
+                self.create_comboboxtext(
+                    ppa_names,
+                    active =
+                        ppa_names.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
+                        if row_number else
+                        -1 )
 
         else:
             ppa_name = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
@@ -834,16 +836,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
-        series = Gtk.ComboBoxText()
-        for item in IndicatorPPADownloadStatistics.SERIES:
-            series.append_text( item )
-
-        if row_number:
-            series.set_active(
-                IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] ) )
-
-        else:
-            series.set_active( 0 )
+        series = \
+            self.create_comboboxtext(
+                IndicatorPPADownloadStatistics.SERIES,
+                active =
+                    IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] )
+                    if row_number else
+                    0 )
 
         grid.attach( series, 1, 2, 1, 1 )
 
@@ -851,16 +850,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 3, 1, 1 )
 
-        architectures = Gtk.ComboBoxText()
-        for item in IndicatorPPADownloadStatistics.ARCHITECTURES:
-            architectures.append_text( item )
-
-        if row_number:
-            architectures.set_active(
-                IndicatorPPADownloadStatistics.ARCHITECTURES.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ] ) )
-
-        else:
-            architectures.set_active( 0 )
+        architectures = \
+            self.create_comboboxtext(
+                IndicatorPPADownloadStatistics.ARCHITECTURES,
+                active =
+                    IndicatorPPADownloadStatistics.ARCHITECTURES.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ] )
+                    if row_number else
+                    0 )
 
         grid.attach( architectures, 1, 3, 1, 1 )
 
@@ -1015,21 +1011,21 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 1, 2, 1 )
 
-        textview = Gtk.TextView()
-        textview.set_tooltip_text( _(
-            "Each line of text is a single\n" + \
-            "filter which is compared against\n" + \
-            "each package during download.\n\n" + \
-            "If a package name contains ANY\n" + \
-            "part of ANY filter, that package\n" + \
-            "is included in the download\n" + \
-            "statistics.\n\n" + \
-            "Regular expressions and wild\n" + \
-            "cards are not accepted!" ) )
-
-        if row_number:
-            textview.get_buffer().set_text(
-                filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) # This is an edit.
+        textview = \
+            self.create_textview(
+                text =
+                    filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] 
+                    if row_number else "",
+                tooltip_text = _(
+                    "Each line of text is a single\n" + \
+                    "filter which is compared against\n" + \
+                    "each package during download.\n\n" + \
+                    "If a package name contains ANY\n" + \
+                    "part of ANY filter, that package\n" + \
+                    "is included in the download\n" + \
+                    "statistics.\n\n" + \
+                    "Regular expressions and wild\n" + \
+                    "cards are not accepted!" ) )
 
         grid.attach(
             self.create_box(

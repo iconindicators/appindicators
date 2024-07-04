@@ -1134,6 +1134,43 @@ class IndicatorBase( ABC ):
         return entry
 
 
+#TODO In all the (GUI) code, look for set_active...
+# this needs to be an index...not a boolean nor string nor None. 
+
+
+#TODO UNCHECKED
+    def create_comboboxtext(
+            self,
+            data,
+            tooltip_text = "",
+            active = -1 ):
+
+        comboboxtext = Gtk.ComboBoxText.new_with_entry()
+
+        for d in data:
+            comboboxtext.append_text( d )
+
+        comboboxtext.set_tooltip_text( tooltip_text )
+        comboboxtext.set_active( active )
+        return comboboxtext
+
+
+#TODO UNCHECKED
+    def create_textview(
+            self,
+            text = "",
+            tooltip_text = "",
+            editable = True,
+            wrap_mode = Gtk.WrapMode.WORD ):
+
+        textview = Gtk.TextView()
+        textview.get_buffer().set_text( text )
+        textview.set_tooltip_text( tooltip_text ) #TODO Test that if a tooltip of "" (or no tooltip) actually shows no tooltip.
+        textview.set_editable( editable )
+        textview.set_wrap_mode( wrap_mode )
+        return textview
+
+
     def create_button(
         self,
         label,

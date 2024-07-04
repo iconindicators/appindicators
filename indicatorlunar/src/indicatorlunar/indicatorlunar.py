@@ -1860,18 +1860,17 @@ class IndicatorLunar( IndicatorBase ):
         # Location.
         grid = self.create_grid()
 
-        city = Gtk.ComboBoxText.new_with_entry()
-        city.set_tooltip_text( _(
-            "Choose a city from the list.\n" + \
-            "Or, add in your own city name." ) )
-
         cities = IndicatorLunar.astro_backend.get_cities()
         if self.city not in cities:
             cities.append( self.city )
             cities = sorted( cities, key = locale.strxfrm )
 
-        for c in cities:
-            city.append_text( c )
+        city = \
+            self.create_comboboxtext(
+                cities,
+                tooltip_text = _(
+                    "Choose a city from the list.\n" + \
+                    "Or, add in your own city name." ) )
 
         grid.attach(
             self.create_box(
@@ -2268,9 +2267,11 @@ class IndicatorLunar( IndicatorBase ):
 
         checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, box ) #TODO This checkbutton has 3 .connects()...does that make sense?  Check!!!!
 
-        message_text_view = Gtk.TextView()
-        message_text_view.get_buffer().set_text( message_text )
-        message_text_view.set_tooltip_text( message_tooltip )
+        message_text_view = \
+            self.create_textview(
+                text = message_text,
+                tooltip_text = message_tooltip,
+                editable = False )
 
         box = \
             self.create_box(

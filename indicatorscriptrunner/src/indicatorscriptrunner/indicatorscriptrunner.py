@@ -336,10 +336,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "icon text will be run.\n\n" + \
                     "Not supported on all desktops." ) )
 
-        command_text_view = Gtk.TextView()
-        command_text_view.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
-        command_text_view.set_editable( False )
-        command_text_view.set_wrap_mode( Gtk.WrapMode.WORD )
+        command_text_view = \
+            self.create_textview(
+                tooltip_text = _( "The terminal script/command, along with any arguments." ),
+                editable = False )
 
         renderer_text_column_interval = Gtk.CellRendererText() #TODO If the alignment passed into the treeview function works (aligns the interval colunn) can pass this renderer directly in I think.
 #        renderer_text_column_interval.set_property( "xalign", 0.5 ) #TODO Is this needed here?  Or perhaps, is it needed down in the renderer function?   Maybe this is redundant as we already have an alignment parameter passed in to the create function...try to figure out if this is needed or the same as the alignment passed in.
@@ -759,16 +759,14 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             grid = self.create_grid()
 
-            script_group_combo = Gtk.ComboBoxText.new_with_entry()
-            script_group_combo.set_tooltip_text( _(
-                "The group to which the script belongs.\n\n" + \
-                "Choose an existing group or enter a new one." ) )
-
             groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
-            for group in groups:
-                script_group_combo.append_text( group )
-
-            script_group_combo.set_active( groups.index( script.get_group() ) )
+            script_group_combo = \
+                self.create_comboboxtext(
+                      groups,
+                      tooltip_text = _(
+                          "The group to which the script belongs.\n\n" + \
+                          "Choose an existing group or enter a new one." ),
+                      active = groups.index( script.get_group() ) )
 
             grid.attach(
                 self.create_box(
@@ -932,27 +930,44 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid = self.create_grid()
 
-        group_combo = Gtk.ComboBoxText.new_with_entry()
-        group_combo.set_tooltip_text( _(
-            "The group to which the script belongs.\n\n" + \
-            "Choose an existing group or enter a new one." ) )
-
+#TODO Check this was converted correctly for both ADD and EDIT...
+# but first, there is a TODO below about the wrong column id ...fix that first!
+        # group_combo = Gtk.ComboBoxText.new_with_entry()
+        # group_combo.set_tooltip_text( _(
+        #     "The group to which the script belongs.\n\n" + \
+        #     "Choose an existing group or enter a new one." ) )
+        #
         groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
-        for group in groups:
-            group_combo.append_text( group )
+        # for group in groups:
+        #     group_combo.append_text( group )
 
         if add:
             index = 0
+            print( "Add")
+            print( index )
             model, treeiter = scripts_treeview.get_selection().get_selected()
             if treeiter:
-                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_GROUP_INTERNAL ] #TODO Fix...not sure what the column should be...
+                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ] #TODO Fix...not sure what the column should be...
 #...might have to get group from parent row?
                 index = groups.index( group )
+                print( index )
 
         else:
             index = groups.index( script.get_group() )
+            print( "Edit")
+            print( index)
 
-        group_combo.set_active( index )
+        # group_combo.set_active( index )
+        group_combo = \
+            self.create_comboboxtext(
+                groups,
+                tooltip_text = _(
+                    "The group to which the script belongs.\n\n" + \
+                    "Choose an existing group or enter a new one." ),
+                active = index )
+
+#TODO Got exception when a group is selected and then clicked ADD.
+# Might be due to getting parent (which is what I think the above TODO is about when selecting a script).
 
         grid.attach(
             self.create_box(
@@ -980,10 +995,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_top = 10 ),
             0, 2, 1, 1 )
 
-        command_text_view = Gtk.TextView()
-        command_text_view.set_tooltip_text( _( "The terminal script/command, along with any arguments." ) )
-        command_text_view.set_wrap_mode( Gtk.WrapMode.WORD )
-        command_text_view.get_buffer().set_text( "" if add else script.get_command() )
+        command_text_view = \
+            self.create_textview(
+                text = "" if add else script.get_command(),
+                tooltip_text = _( "The terminal script/command, along with any arguments." ) )
 
         grid.attach(
             self.create_box(
@@ -1087,7 +1102,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( interval_spinner, False ) ),
                 sensitive = False if add else type( script ) is Background, #TODO Ensure this works for both label and spinner as above!
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ), # Approximate alignment with the checkboxes above.
-            0, 18, 1, 1 )
+            0, 19, 1, 1 )
 
         force_update_checkbutton = \
             self.create_checkbutton(
@@ -1100,7 +1115,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else type( script ) is Background and script.get_force_update() )
 
-        grid.attach( force_update_checkbutton, 0, 19, 1, 1 )
+        grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
 
 #TODO Worthwhile adding these to the general function?
         script_non_background_radio.connect( "toggled", self.on_radio_or_checkbox, True, terminal_checkbutton, default_script_checkbutton )
@@ -1251,9 +1266,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         name = None
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter:
-            group = model[ treeview.get_model().iter_parent( treeiter ) ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP]
-            # group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP] #TODO Needed to get group name from parent...ensure this is correct!
-            name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
+            group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
+            if group is None:
+                parent = treeview.get_model().iter_parent( treeiter )
+                group = model[ parent ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
+                name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
 
         return group, name
 
