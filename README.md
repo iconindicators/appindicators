@@ -88,6 +88,8 @@ Copy icon, run script and desktop file to `$HOME/.local`:
 
 You will likely need to also install various operating system packages; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
+To install the wheel for multiple indicators, use the script `install_wheel`.
+
 
 ## Run an Indicator
 
