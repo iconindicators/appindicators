@@ -1133,6 +1133,9 @@ class IndicatorBase( ABC ):
         entry.set_text( text )
         entry.set_editable( editable )
 
+#TODO Check this again...
+# Check for when doing an 'add' so the entry is empty
+# and for doing an 'edit' so the entry has text.
         if make_longer and text:
             # Give a little more space; sometimes too short due to packing.
             entry.set_width_chars( len( text ) * 5 / 4 )
