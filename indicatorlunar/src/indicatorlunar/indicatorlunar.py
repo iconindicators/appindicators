@@ -634,7 +634,7 @@ class IndicatorLunar( IndicatorBase ):
             self.satellite_notification_summary. \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_NAME, self.satellite_general_perturbation_data[ number ].get_name() ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_NUMBER, self.satellite_general_perturbation_data[ number ].get_number() ). \
-            replace( IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satellite_general_perturbation_data[ number ].get_iternational_designator() ). \
+            replace( IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satellite_general_perturbation_data[ number ].get_international_designator() ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH, rise_azimuth ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_TIME, rise_time ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_SET_AZIMUTH, set_azimuth ). \
@@ -645,7 +645,7 @@ class IndicatorLunar( IndicatorBase ):
             self.satellite_notification_message. \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_NAME, self.satellite_general_perturbation_data[ number ].get_name() ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_NUMBER, self.satellite_general_perturbation_data[ number ].get_number() ). \
-            replace( IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satellite_general_perturbation_data[ number ].get_iternational_designator() ). \
+            replace( IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR, self.satellite_general_perturbation_data[ number ].get_international_designator() ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH, rise_azimuth ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_TIME, rise_time ). \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_SET_AZIMUTH, set_azimuth ). \
@@ -1168,7 +1168,7 @@ class IndicatorLunar( IndicatorBase ):
             number = info[ IndicatorLunar.SATELLITE_MENU_NUMBER ]
             name = info[ IndicatorLunar.SATELLITE_MENU_NAME ]
             url = IndicatorLunar.SEARCH_URL_SATELLITE + "lat=" + str( self.latitude ) + "&lng=" + str( self.longitude ) + "&satid=" + number
-            label = indent + name + " : " + number + " : " + self.satellite_general_perturbation_data[ number ].get_iternational_designator()
+            label = indent + name + " : " + number + " : " + self.satellite_general_perturbation_data[ number ].get_international_designator()
             self.create_and_append_menuitem(
                 submenu,
                 label,
@@ -2108,7 +2108,7 @@ class IndicatorLunar( IndicatorBase ):
                 for data_tag in IndicatorLunar.astro_backend.DATA_TAGS_SATELLITE:
                     value = ""
                     name = self.satellite_general_perturbation_data[ body_tag ].get_name()
-                    international_designator = self.satellite_general_perturbation_data[ body_tag ].get_iternational_designator()
+                    international_designator = self.satellite_general_perturbation_data[ body_tag ].get_international_designator()
                     translated_tag = name + " : " + body_tag + " : " + international_designator + " " + IndicatorLunar.astro_backend.DATA_TAGS_TRANSLATIONS[ data_tag ]
                     key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, body_tag, data_tag )
                     if key in self.data:
