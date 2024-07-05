@@ -600,7 +600,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_checkbutton(
                 _( "Show PPAs as submenus" ),
                 tooltip_text = _(
-                    "The download statistics for each PPA\n" + \
+                    "The download statistics for each PPA\n" +
                     "are shown in a separate submenu." ),
                 active = self.show_submenu )
 
@@ -610,24 +610,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_checkbutton(
                 _( "Combine PPAs" ),
                 tooltip_text = _(
-                    "Combine the statistics of binary\n" + \
-                    "packages when the PPA user/name\n" + \
-                    "are the same.\n\n" + \
-                    "Non-architecture specific packages:\n" + \
-                    "If the package names and version\n" + \
-                    "numbers of two binary packages are\n" + \
-                    "identical, the packages are treated\n" + \
-                    "as the same package and the\n" + \
-                    "download counts are NOT summed.\n" + \
-                    "Packages such as Python fall into\n" + \
-                    "this category.\n\n" + \
-                    "Architecture specific packages:\n" + \
-                    "If the package names and version\n" + \
-                    "numbers of two binary packages are\n" + \
-                    "identical, the packages are treated\n" + \
-                    "as the same package and the download\n" + \
-                    "counts ARE summed.\n" + \
-                    "Packages such as compiled C fall into\n" + \
+                    "Combine the statistics of binary\n" +
+                    "packages when the PPA user/name\n" +
+                    "are the same.\n\n" +
+                    "Non-architecture specific packages:\n" +
+                    "If the package names and version\n" +
+                    "numbers of two binary packages are\n" +
+                    "identical, the packages are treated\n" +
+                    "as the same package and the\n" +
+                    "download counts are NOT summed.\n" +
+                    "Packages such as Python fall into\n" +
+                    "this category.\n\n" +
+                    "Architecture specific packages:\n" +
+                    "If the package names and version\n" +
+                    "numbers of two binary packages are\n" +
+                    "identical, the packages are treated\n" +
+                    "as the same package and the download\n" +
+                    "counts ARE summed.\n" +
+                    "Packages such as compiled C fall into\n" +
                     "this category." ),
                 margin_top = 10,
                 active = self.combine_ppas )
@@ -638,21 +638,21 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_checkbutton(
                 _( "Ignore version for architecture specific" ),
                 tooltip_text = _(
-                    "Sometimes architecture specific\n" + \
-                    "packages with the same package\n" + \
-                    "name but different version 'number'\n" + \
-                    "are logically the SAME package.\n\n" + \
-                    "For example, a C source package for\n" + \
-                    "both Ubuntu Saucy and Ubuntu Trusty\n" + \
-                    "will be compiled twice, each with a\n" + \
-                    "different 'number', despite being\n" + \
-                    "the SAME release.\n\n" + \
-                    "Checking this option will ignore the\n" + \
-                    "version number when determining if\n" + \
-                    "two architecture specific packages\n" + \
-                    "are identical.\n\n" + \
-                    "The version number is retained only\n" + \
-                    "if it is identical across ALL\n" + \
+                    "Sometimes architecture specific\n" +
+                    "packages with the same package\n" +
+                    "name but different version 'number'\n" +
+                    "are logically the SAME package.\n\n" +
+                    "For example, a C source package for\n" +
+                    "both Ubuntu Saucy and Ubuntu Trusty\n" +
+                    "will be compiled twice, each with a\n" +
+                    "different 'number', despite being\n" +
+                    "the SAME release.\n\n" +
+                    "Checking this option will ignore the\n" +
+                    "version number when determining if\n" +
+                    "two architecture specific packages\n" +
+                    "are identical.\n\n" +
+                    "The version number is retained only\n" +
+                    "if it is identical across ALL\n" +
                     "instances of a published binary." ),
                 sensitive = combine_ppas_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
@@ -685,8 +685,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 10000,
                 page_increment = 100,
                 tooltip_text = _(
-                    "Limit the number of entries\n" + \
-                    "when sorting by download.\n\n" + \
+                    "Limit the number of entries\n" +
+                    "when sorting by download.\n\n" +
                     "A value of zero will not clip." ),
                 sensitive = sort_by_download_checkbutton.get_active() )
 
@@ -1017,14 +1017,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] 
                     if row_number else "",
                 tooltip_text = _(
-                    "Each line of text is a single\n" + \
-                    "filter which is compared against\n" + \
-                    "each package during download.\n\n" + \
-                    "If a package name contains ANY\n" + \
-                    "part of ANY filter, that package\n" + \
-                    "is included in the download\n" + \
-                    "statistics.\n\n" + \
-                    "Regular expressions and wild\n" + \
+                    "Each line of text is a single\n" +
+                    "filter which is compared against\n" +
+                    "each package during download.\n\n" +
+                    "If a package name contains ANY\n" +
+                    "part of ANY filter, that package\n" +
+                    "is included in the download\n" +
+                    "statistics.\n\n" +
+                    "Regular expressions and wild\n" +
                     "cards are not accepted!" ) )
 
         grid.attach(

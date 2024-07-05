@@ -201,9 +201,9 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_checkbutton(
                 _( "Output to clipboard and primary" ),
                 tooltip_text = _(
-                    "If checked, the converted text is sent\n" + \
-                    "to both the clipboard and primary.\n\n" + \
-                    "Otherwise the converted text is sent\n" + \
+                    "If checked, the converted text is sent\n" +
+                    "to both the clipboard and primary.\n\n" +
+                    "Otherwise the converted text is sent\n" +
                     "only to the input source." ),
                 margin_top = 10,
                 active = self.output_both )
@@ -214,7 +214,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_checkbutton(
                 _( "Drop path/query in output" ),
                 tooltip_text = _(
-                    "If checked, the output text will not\n" + \
+                    "If checked, the output text will not\n" +
                     "contain any path/query (if present)." ),
                 margin_top = 10,
                 active = self.drop_path_query )
@@ -227,10 +227,10 @@ class IndicatorPunycode( IndicatorBase ):
                 0,
                 1000,
                 tooltip_text = _(
-                    "The number of most recent\n" + \
-                    "results to show in the menu.\n\n" + \
-                    "Selecting a menu item which\n" + \
-                    "contains a result will copy\n" + \
+                    "The number of most recent\n" +
+                    "results to show in the menu.\n\n" +
+                    "Selecting a menu item which\n" +
+                    "contains a result will copy\n" +
                     "the result to the output." ) )
 
         grid.attach(

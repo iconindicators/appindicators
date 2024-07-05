@@ -16,6 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Got 
+#   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
+#
+# on the laptop...
+#
+# Happens when the screen is locked.
+# Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
+
+
 #TODO Maybe look for all \
 # and test if I can remove when used with ( ) of a function call.
 
@@ -576,6 +585,7 @@ class IndicatorBase( ABC ):
 
 
     def show_notification( self, summary, message, icon = None ):
+        _icon = icon
         if icon is None:
             _icon = self.get_icon_name()
 

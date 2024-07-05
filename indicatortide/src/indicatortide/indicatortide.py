@@ -31,11 +31,6 @@ import importlib.util
 from pathlib import Path
 import sys
 
-#TODO Got 
-#   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
-#
-# on the laptop....not sure when it happened.
-
 
 class IndicatorTide( IndicatorBase ):
 
@@ -103,8 +98,8 @@ class IndicatorTide( IndicatorBase ):
                 summary = _( "Error running user script!" )
                 message = _( "Check the log file in your home directory." )
                 self.get_logging().error(
-                    "Error running user script: " + \
-                    self.user_script_path_and_filename + " | " + \
+                    "Error running user script: " +
+                    self.user_script_path_and_filename + " | " +
                     self.user_script_class_name )
 
             if not tidal_readings:
@@ -258,10 +253,10 @@ class IndicatorTide( IndicatorBase ):
             self.create_entry(
                 self.user_script_class_name,
                 tooltip_text = _(
-                    "Class name within the user script\n" + \
-                    "which must contain the function\n\n" + \
-                    "    get_tide_data()\n\n" + \
-                    "implemented by the user to obtain\n" + \
+                    "Class name within the user script\n" +
+                    "which must contain the function\n\n" +
+                    "    get_tide_data()\n\n" +
+                    "implemented by the user to obtain\n" +
                     "the tidal data." ) )
 
         grid.attach(

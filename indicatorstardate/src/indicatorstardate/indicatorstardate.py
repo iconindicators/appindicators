@@ -143,9 +143,9 @@ class IndicatorStardate( IndicatorBase ):
             self.create_checkbutton(
                 _( "Show stardate 'classic'" ),
                 tooltip_text = _(
-                    "If checked, show stardate 'classic' based on\n\n" + \
-                    "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" + \
-                    "Otherwise, show stardate '2009 revised' based on\n\n" + \
+                    "If checked, show stardate 'classic' based on\n\n" +
+                    "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" +
+                    "Otherwise, show stardate '2009 revised' based on\n\n" +
                     "\thttps://en.wikipedia.org/wiki/Stardate" ),
                 active = self.show_classic )
 

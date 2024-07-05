@@ -416,7 +416,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_entry(
                 self.virtualbox_manager_window_name,
                 tooltip_text = _(
-                    "The window title of VirtualBox™ Manager.\n" + \
+                    "The window title of VirtualBox™ Manager.\n" +
                     "You may have to adjust for your local language." ) )
 
         grid.attach(
@@ -430,9 +430,9 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_checkbutton(
                 _( "Sort groups and virtual machines equally" ),
                 tooltip_text = _(
-                    "If checked, groups and virtual machines\n" + \
-                    "are sorted without distinction.\n\n" + \
-                    "Otherwise, groups are sorted first,\n" + \
+                    "If checked, groups and virtual machines\n" +
+                    "are sorted without distinction.\n\n" +
+                    "Otherwise, groups are sorted first,\n" +
                     "followed by virtual machines." ),
                 active = self.sort_groups_and_virtual_machines_equally )
 
@@ -442,7 +442,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_checkbutton(
                 _( "Show groups as submenus" ),
                 tooltip_text = _(
-                    "If checked, groups are shown using submenus.\n\n" + \
+                    "If checked, groups are shown using submenus.\n\n" +
                     "Otherwise, groups are shown as an indented list." ),
                 active = self.show_submenu )
 
@@ -458,7 +458,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 60,
                 page_increment = 5,
                 tooltip_text = _(
-                    "How often the list of virtual machines\n" + \
+                    "How often the list of virtual machines\n" +
                     "and their running status are updated." ) )
 
         grid.attach(
@@ -477,7 +477,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 300,
                 page_increment = 30,
                 tooltip_text = _(
-                    "Amount of time to wait from automatically\n" + \
+                    "Amount of time to wait from automatically\n" +
                     "starting one virtual machine to the next." ) )
 
         grid.attach(
@@ -569,9 +569,9 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_entry(
                 model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else "",
                 tooltip_text = _(
-                    "The terminal command to start the virtual machine such as\n\n" + \
-                    "\tVBoxManage startvm %VM%\n" + \
-                    "or\n" + \
+                    "The terminal command to start the virtual machine such as\n\n" +
+                    "\tVBoxManage startvm %VM%\n" +
+                    "or\n" +
                     "\tVBoxHeadless --startvm %VM% --vrde off" ),
                 make_longer = True )
 

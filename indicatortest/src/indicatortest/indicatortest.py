@@ -112,7 +112,7 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + \
+            self.get_menu_indent() * 2 +
             "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ) )
 
         label = self.get_menu_indent() + _( "Desktop" )

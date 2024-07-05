@@ -225,7 +225,7 @@ class IndicatorFortune( IndicatorBase ):
 
     def refresh_and_show_fortune( self ):
         self.refresh_fortune()
-        # self.show_fortune()#TODO Put back
+        self.show_fortune()
 
 
     def on_preferences( self, dialog ):
@@ -254,11 +254,11 @@ class IndicatorFortune( IndicatorBase ):
                     ( IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
                     ( IndicatorFortune.COLUMN_ENABLED, IndicatorFortune.COLUMN_ENABLED ) ),
                 tooltip_text = _(
-                    "Double click to edit a fortune.\n\n" + \
-                    "English language fortunes are\n" + \
-                    "installed by default.\n\n" + \
-                    "There may be other fortune\n" + \
-                    "packages available in your\n" + \
+                    "Double click to edit a fortune.\n\n" +
+                    "English language fortunes are\n" +
+                    "installed by default.\n\n" +
+                    "There may be other fortune\n" +
+                    "packages available in your\n" +
                     "native language." ),
                 rowactivatedfunctionandarguments = ( self.on_fortune_double_click, ) )
 
@@ -320,10 +320,10 @@ class IndicatorFortune( IndicatorBase ):
                 1000,
                 tooltip_text = _(
                     "If the fortune exceeds the limit,\n" +                                  
-                    "a new fortune is created.\n\n" + \
-                    "Do not set too low (below 50) as\n" + \
-                    "many fortunes may be dropped,\n" + \
-                    "resulting in excessive calls to the\n" + \
+                    "a new fortune is created.\n\n" +
+                    "Do not set too low (below 50) as\n" +
+                    "many fortunes may be dropped,\n" +
+                    "resulting in excessive calls to the\n" +
                     "'fortune' program." ) )
 
         grid.attach(
@@ -463,10 +463,10 @@ class IndicatorFortune( IndicatorBase ):
             self.create_entry(
                 model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] if row_number else "",
                 tooltip_text = _(
-                    "The path to a fortune .dat file,\n" + \
-                    "or a directory containing\n" + \
-                    "fortune .dat files.\n\n" + \
-                    "Ensure the corresponding\n" + \
+                    "The path to a fortune .dat file,\n" +
+                    "or a directory containing\n" +
+                    "fortune .dat files.\n\n" +
+                    "Ensure the corresponding\n" +
                     "fortune text file(s) is present." ),
                 editable = False,
                 make_longer = True )
@@ -487,11 +487,11 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "File" ),
                 tooltip_text = _(
-                    "This fortune is part of your\n" + \
-                    "system and cannot be modified." ) \
+                    "This fortune is part of your\n" +
+                    "system and cannot be modified." )
                     if is_system_fortune else _(
-                    "Choose a fortune .dat file.\n\n" + \
-                    "Ensure the corresponding text\n" + \
+                    "Choose a fortune .dat file.\n\n" +
+                    "Ensure the corresponding text\n" +
                     "file is present." ),
                 sensitive = not is_system_fortune,
                 clicked_functionandarguments = ( self.on_browse_fortune, dialog, fortune_file_directory, True ) )
@@ -500,12 +500,12 @@ class IndicatorFortune( IndicatorBase ):
             self.create_button(
                 _( "Directory" ),
                 tooltip_text = _( 
-                    "This fortune is part of your\n" + \
-                    "system and cannot be modified." ) \
+                    "This fortune is part of your\n" +
+                    "system and cannot be modified." )
                     if is_system_fortune else _(
-                    "Choose a directory containing\n" + \
-                    "a fortune .dat file(s).\n\n" + \
-                    "Ensure the corresponding text\n" + \
+                    "Choose a directory containing\n" +
+                    "a fortune .dat file(s).\n\n" +
+                    "Ensure the corresponding text\n" +
                     "file is present." ),
                 sensitive = not is_system_fortune,
                 clicked_functionandarguments = ( self.on_browse_fortune, dialog, fortune_file_directory, False ) )
@@ -523,8 +523,8 @@ class IndicatorFortune( IndicatorBase ):
             self.create_checkbutton(
                 _( "Enabled" ),
                 tooltip_text = _(
-                    "Ensure the fortune file/directory\n" + \
-                    "works by running through 'fortune'\n" + \
+                    "Ensure the fortune file/directory\n" +
+                    "works by running through 'fortune'\n" +
                     "in a terminal." ) )
 
         if row_number: # This is an edit.

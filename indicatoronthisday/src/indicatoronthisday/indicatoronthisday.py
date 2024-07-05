@@ -311,12 +311,12 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_entry(
                 self.search_url,
                 tooltip_text = _(
-                    "The URL to search for the event.\n\n" + \
-                    "Use {0} in the URL to specify the\n" + \
-                    "position of the event text/date.\n\n" + \
-                    "If the URL is empty and 'search' is selected,\n" + \
-                    "the search will effectively be ignored.\n\n" + \
-                    "If the URL is empty and 'copy' is selected,\n" + \
+                    "The URL to search for the event.\n\n" +
+                    "Use {0} in the URL to specify the\n" +
+                    "position of the event text/date.\n\n" +
+                    "If the URL is empty and 'search' is selected,\n" +
+                    "the search will effectively be ignored.\n\n" +
+                    "If the URL is empty and 'copy' is selected,\n" +
                     "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ),
                 sensitive = not self.copy_to_clipboard )
 
@@ -346,7 +346,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_checkbutton(
                 _( "Notify" ),
                 tooltip_text = _(
-                    "On startup or when saving preferences,\n" + \
+                    "On startup or when saving preferences,\n" +
                     "show a notification for each of today's events." ),
                 margin_top = 10,
                 active = self.notify )
@@ -472,12 +472,12 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Browse" ),
                 tooltip_text = _(
-                    "This calendar is part of your\n" + \
-                    "system and cannot be modified." ) \
+                    "This calendar is part of your\n" +
+                    "system and cannot be modified." )
                     if is_system_calendar else _(
-                    "Choose a calendar file.\n\n" + \
-                    "Ensure the calendar file is\n" + \
-                    "valid by running through\n" + \
+                    "Choose a calendar file.\n\n" +
+                    "Ensure the calendar file is\n" +
+                    "valid by running through\n" +
                     "'calendar' in a terminal." ),
                     sensitive = not is_system_calendar,
                     clicked_functionandarguments = ( self.on_browse_calendar, dialog, file_entry ) )

@@ -630,6 +630,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
+#TODO Can the subsequent \ be removed?
         summary = \
             self.satellite_notification_summary. \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_NAME, self.satellite_general_perturbation_data[ number ].get_name() ). \
@@ -663,8 +664,8 @@ class IndicatorLunar( IndicatorBase ):
 
             self.create_and_append_menuitem(
                 submenu,
-                self.get_menu_indent() + \
-                _( "Phase: " ) + \
+                self.get_menu_indent() +
+                _( "Phase: " ) +
                 self.format_data( IndicatorLunar.astro_backend.DATA_TAG_PHASE, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
                 activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
@@ -766,16 +767,16 @@ class IndicatorLunar( IndicatorBase ):
 
         self.create_and_append_menuitem(
             menu,
-            self.get_menu_indent( indent = 2 ) + \
-            _( "Date/Time: " ) + \
+            self.get_menu_indent( indent = 2 ) +
+            _( "Date/Time: " ) +
             self.format_data( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             name = url,
             activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
         self.create_and_append_menuitem(
             menu,
-            self.get_menu_indent( indent = 2 ) + \
-            _( "Type: " ) + \
+            self.get_menu_indent( indent = 2 ) +
+            _( "Type: " ) +
             self.format_data( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
             name = url,
             activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
@@ -818,19 +819,19 @@ class IndicatorLunar( IndicatorBase ):
             elif body_type == IndicatorLunar.astro_backend.BodyType.MINOR_PLANET:
                 menuitem_name_function = (
                     lambda name:
-                        IndicatorLunar.SEARCH_URL_MINOR_PLANET + \
+                        IndicatorLunar.SEARCH_URL_MINOR_PLANET +
                         IndicatorLunar.__get_minor_planet_designation_for_lowell_lookup( name ) )
 
             elif body_type == IndicatorLunar.astro_backend.BodyType.COMET:
                 menuitem_name_function = (
                     lambda name:
-                        IndicatorLunar.SEARCH_URL_COMET_DATABASE + \
+                        IndicatorLunar.SEARCH_URL_COMET_DATABASE +
                         IndicatorLunar.__get_comet_designation_for_cobs_lookup( name, self.get_logging() ) )
 
             elif body_type == IndicatorLunar.astro_backend.BodyType.STAR:
                 menuitem_name_function = (
                     lambda name:
-                        IndicatorLunar.SEARCH_URL_STAR + \
+                        IndicatorLunar.SEARCH_URL_STAR +
                         str( IndicatorLunar.astro_backend.get_star_hip( name ) ) )
 
             return menuitem_name_function
@@ -1020,8 +1021,8 @@ class IndicatorLunar( IndicatorBase ):
         if is_rise:
             self.create_and_append_menuitem(
                 menu,
-                indent + \
-                _( "Rise: " ) + \
+                indent +
+                _( "Rise: " ) +
                 self.format_data( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] ),
                 name = menuitem_name,
                 activate_functionandarguments = on_click_function_and_arguments )
@@ -1029,16 +1030,16 @@ class IndicatorLunar( IndicatorBase ):
         else:
             self.create_and_append_menuitem(
                 menu,
-                indent + \
-                _( "Azimuth: " ) + \
+                indent +
+                _( "Azimuth: " ) +
                 self.format_data( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) ] ),
                 name = menuitem_name,
                 activate_functionandarguments = on_click_function_and_arguments )
 
             self.create_and_append_menuitem(
                 menu,
-                indent + \
-                _( "Altitude: " ) + \
+                indent +
+                _( "Altitude: " ) +
                 self.format_data( IndicatorLunar.astro_backend.DATA_TAG_ALTITUDE, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ALTITUDE, ) ] ),
                 name = menuitem_name,
                 activate_functionandarguments = on_click_function_and_arguments )
@@ -1046,8 +1047,8 @@ class IndicatorLunar( IndicatorBase ):
             if is_set:
                 self.create_and_append_menuitem(
                     menu,
-                    indent + \
-                    _( "Set: " ) + \
+                    indent +
+                    _( "Set: " ) +
                     self.format_data( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] ),
                     name = menuitem_name,
                     activate_functionandarguments = on_click_function_and_arguments )
@@ -1390,18 +1391,18 @@ class IndicatorLunar( IndicatorBase ):
             self.create_entry(
                 "",
                 tooltip_text = _(
-                    "The text shown next to the indicator icon,\n" + \
-                    "or tooltip where applicable.\n\n" + \
-                    "The icon text may contain text and/or\n" + \
-                    "tags from the table below.\n\n" + \
-                    "To associate text with one or more tags,\n" + \
-                    "enclose the text and tag(s) within { }.\n\n" + \
-                    "For example\n\n" + \
-                    "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" + \
-                    "If any tag contains no data at render time,\n" + \
-                    "the tag will be removed.\n\n" + \
-                    "If a removed tag is within { }, the tag and\n" + \
-                    "text will be removed.\n\n" + \
+                    "The text shown next to the indicator icon,\n" +
+                    "or tooltip where applicable.\n\n" +
+                    "The icon text may contain text and/or\n" +
+                    "tags from the table below.\n\n" +
+                    "To associate text with one or more tags,\n" +
+                    "enclose the text and tag(s) within { }.\n\n" +
+                    "For example\n\n" +
+                    "\t{The sun will rise at [SUN RISE DATE TIME]}\n\n" +
+                    "If any tag contains no data at render time,\n" +
+                    "the tag will be removed.\n\n" +
+                    "If a removed tag is within { }, the tag and\n" +
+                    "text will be removed.\n\n" +
                     "Not supported on all desktops." ) )
 
         grid.attach(
@@ -1467,8 +1468,8 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Show rise when set is before sunset" ),
                 tooltip_text = _(
-                    "If a body sets before sunset,\n" + \
-                    "show the body's next rise instead\n" + \
+                    "If a body sets before sunset,\n" +
+                    "show the body's next rise instead\n" +
                     "(excludes satellites)." ),
                 active = self.show_rise_when_set_before_sunset )
 
@@ -1478,7 +1479,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Hide bodies below the horizon" ),
                 tooltip_text = _(
-                    "Hide a body if it is yet to rise\n" + \
+                    "Hide a body if it is yet to rise\n" +
                     "(excludes satellites)." ),
                 active = self.hide_bodies_below_horizon )
 
@@ -1491,7 +1492,7 @@ class IndicatorLunar( IndicatorBase ):
                 int( IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
                 page_increment = 5,
                 tooltip_text = _(
-                    "A body with a fainter magnitude will be hidden\n" + \
+                    "A body with a fainter magnitude will be hidden\n" +
                     "(excludes satellites)." ) )
 
         grid.attach(
@@ -1534,9 +1535,9 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Sort satellites by rise date/time" ),
                 tooltip_text = _(
-                    "If checked, satellites are sorted\n" + \
-                    "by rise date/time.\n\n" + \
-                    "Otherwise, satellites are sorted\n" + \
+                    "If checked, satellites are sorted\n" +
+                    "by rise date/time.\n\n" +
+                    "Otherwise, satellites are sorted\n" +
                     "by Name then Number." ),
                 margin_top = 5,
                 active = self.satellites_sort_by_date_time )
@@ -1604,8 +1605,8 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
-                    "Check a planet to display in the menu.\n\n" + \
-                    "Clicking the header of the first column\n" + \
+                    "Check a planet to display in the menu.\n\n" +
+                    "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
@@ -1636,13 +1637,13 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
-                    "Check a minor planet to display in the menu.\n\n" + \
-                    "Clicking the header of the first column\n" + \
+                    "Check a minor planet to display in the menu.\n\n" +
+                    "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." )
                     if self.minor_planet_orbital_element_data and self.minor_planet_apparent_magnitude_data else _(
-                    "Minor planet data is unavailable;\n" + \
-                    "the source could not be reached,\n" + \
-                    "or no data was available, or the data\n" + \
+                    "Minor planet data is unavailable;\n" +
+                    "the source could not be reached,\n" +
+                    "or no data was available, or the data\n" +
                     "was completely filtered by magnitude." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
@@ -1673,13 +1674,13 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
-                    "Check a comet to display in the menu.\n\n" + \
-                    "Clicking the header of the first column\n" + \
+                    "Check a comet to display in the menu.\n\n" +
+                    "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." )
                     if self.comet_orbital_element_data else _(
-                    "Comet data is unavailable; the source\n" + \
-                    "could not be reached, or no data was\n" + \
-                    "available from the source, or the data\n" + \
+                    "Comet data is unavailable; the source\n" +
+                    "could not be reached, or no data was\n" +
+                    "available from the source, or the data\n" +
                     "was completely filtered by magnitude." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
@@ -1713,8 +1714,8 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
                 alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = _(
-                    "Check a star to display in the menu.\n\n" + \
-                    "Clicking the header of the first column\n" + \
+                    "Check a star to display in the menu.\n\n" +
+                    "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
@@ -1776,12 +1777,12 @@ class IndicatorLunar( IndicatorBase ):
                     ( SATELLITE_VIEW_COLUMN_NUMBER, SATELLITE_MODEL_COLUMN_NUMBER ),
                     ( SATELLITE_VIEW_COLUMN_INTERNATIONAL_DESIGNATOR, SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
                 tooltip_text = _(
-                    "Check a satellite to display in the menu.\n\n" + \
-                    "Clicking the header of the first column\n" + \
+                    "Check a satellite to display in the menu.\n\n" +
+                    "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." )
                     if self.satellite_general_perturbation_data else _(
-                    "Satellite data is unavailable;\n" + \
-                    "the source could not be reached,\n" + \
+                    "Satellite data is unavailable;\n" +
+                    "the source could not be reached,\n" +
                     "or data was available." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
@@ -1869,7 +1870,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_comboboxtext(
                 cities,
                 tooltip_text = _(
-                    "Choose a city from the list.\n" + \
+                    "Choose a city from the list.\n" +
                     "Or, add in your own city name." ) )
 
         grid.attach(
