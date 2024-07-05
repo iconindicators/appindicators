@@ -296,7 +296,7 @@ def _process_locale( directory_dist, indicator_name ):
         command = \
             "msgcat --use-first " + \
             str( po ) + " " + \
-            directory_indicator_locale + os.sep + language_code + "/LC_MESSAGES/indicatorbase.po " + \
+            directory_indicator_base_locale + os.sep + language_code + "/LC_MESSAGES/indicatorbase.po " + \
             "--output-file=" + str( po )
 
         subprocess.call( command, shell = True )
@@ -312,7 +312,6 @@ def _process_locale( directory_dist, indicator_name ):
 
 def _create_symbolic_icons( directory_wheel, indicator_name ):
     directory_icons = str( directory_wheel ) + "/" + indicator_name + "/src/" + indicator_name + "/icons"
-    print( directory_icons )
     for hicolor_icon in list( Path( directory_icons ).glob( "*.svg" ) ):
         symbolic_icon = directory_icons + "/" + str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg"
         shutil.copy( hicolor_icon, symbolic_icon )
