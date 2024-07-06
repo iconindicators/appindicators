@@ -976,6 +976,24 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
+    # Creates a single (isolated, not part of a group)
+    # RadioMenuItem that is enabled/active.
+    def create_and_append_radiomenuitem(
+        self,
+        menu,
+        label,
+        activate_functionandarguments = None ):
+
+        menuitem = Gtk.RadioMenuItem.new_with_label( [ ], label ) # Always set the group to empty.
+        menuitem.set_active( True )
+
+        if activate_functionandarguments:
+            menuitem.connect( "activate", *activate_functionandarguments )
+
+        menu.append( menuitem )
+        return menuitem
+
+
 #TODO UNCHECKED
     def get_on_click_menuitem_open_browser_function( self ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
