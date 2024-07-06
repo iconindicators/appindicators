@@ -121,7 +121,10 @@ class IndicatorOnThisDay( IndicatorBase ):
                     name = self.remove_leading_zero_from_date( event.get_date() ), # Allows the month/day to be passed to the copy/search functions below.
                     activate_functionandarguments = ( 
                         lambda menuitem:
-                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ) ) #TODO The copy to clipboard does not work on Debian 12; does work on Ubuntu 20.04; test on Ubuntu 22.04/24.04.  Also document in the README.md for the indicators (via the build_readme.py).
+                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ) )
+                #TODO The copy to clipboard does not work on Debian 12;
+                # does work on Ubuntu 20.04; test on Ubuntu 22.04/24.04. 
+                # Also document in the README.md for the indicators (via the build_readme.py).
 
             elif len( self.search_url ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 date_and_description = self.remove_leading_zero_from_date( event.get_date() ) + ' ' + event.get_description()
@@ -187,7 +190,11 @@ class IndicatorOnThisDay( IndicatorBase ):
         events_sorted_by_date_then_description = [ ]
         while True:
             if j == len( events_sorted_by_date ):
-                events_sorted_by_date_then_description += sorted( events_sorted_by_date[ i : j ], key = lambda event: event.get_description() )
+                events_sorted_by_date_then_description += \
+                    sorted(
+                        events_sorted_by_date[ i : j ],
+                        key = lambda event: event.get_description() )
+
                 break
 
             if events_sorted_by_date[ j ].get_date() == events_sorted_by_date[ i ].get_date():

@@ -1154,7 +1154,9 @@ class IndicatorLunar( IndicatorBase ):
         if satellites_polar:
             satellites_polar = sorted(
                 satellites_polar,
-                key = lambda x: ( x[ IndicatorLunar.SATELLITE_MENU_NAME ], x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+                key = lambda x: (
+                    x[ IndicatorLunar.SATELLITE_MENU_NAME ],
+                    x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
 
             self.__update_menu_satellites( menu, _( "Satellites (Polar)" ), satellites_polar )
 
