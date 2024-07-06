@@ -155,20 +155,10 @@ class IndicatorVirtualBox( IndicatorBase ):
     def __add_virtual_machine_to_menu( self, menu, virtual_machine, level, is_running ):
         indent = level * self.get_menu_indent()
         if is_running:
-#TODO Perhaps make a function for this?
-# Who else uses a radiomenuitem?            
             self.create_and_append_radiomenuitem(
                 menu,
                 indent + virtual_machine.get_name(),
                 activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ) )
-            # menuitem = \
-            #     Gtk.RadioMenuItem.new_with_label(
-            #         [ ],
-            #         indent + virtual_machine.get_name() )
-            #
-            # menuitem.set_active( True )
-            # menuitem.connect( "activate", self._on_virtual_machine, virtual_machine )
-            # menu.append( menuitem )
 
         else:
             self.create_and_append_menuitem(
