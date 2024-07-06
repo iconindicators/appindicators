@@ -425,23 +425,6 @@ class IndicatorBase( ABC ):
         return error_message
 
 
-#TODO UNCHECKED
-    @staticmethod
-    def get_value_for_single_line_tag_from_pyproject_toml( pyproject_toml, tag ):
-        # Would like to use
-        #   https://docs.python.org/3/library/tomllib.html
-        # but it is only in 3.11 which is unavailable for Ubuntu 20.04.
-        value = ""
-        pattern_tag = re.compile( f"{ tag } = .*" )
-        for line in open( pyproject_toml ).readlines():
-            matches = pattern_tag.match( line )
-            if matches:
-                value = matches.group().split( " = " )[ 1 ][ 1 : -1 ]
-                break
-
-        return value
-
-
     @staticmethod
     def get_first_year_or_last_year_in_changelog_markdown( changelog_markdown, first_year = True ):
         first_or_last_year = ""
@@ -459,19 +442,6 @@ class IndicatorBase( ABC ):
                     break
 
         return first_or_last_year
-
-
-#TODO UNCHECKED
-    @staticmethod
-    def get_version_in_changelog_markdown( changelog_markdown ):
-        version = ""
-        with open( changelog_markdown, 'r' ) as f:
-            for line in f.readlines():
-                if line.startswith( "## v" ):
-                    version = line.split( ' ' )[ 1 ][ 1 : ]
-                    break
-
-        return version
 
 
     @staticmethod
@@ -551,7 +521,7 @@ class IndicatorBase( ABC ):
 
     def set_label( self, text ):
         self.indicator.set_label( text, text )
-        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu, although on Lubuntu of old, this used to work.
+        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.
 
 
     def set_icon( self, icon ):
@@ -676,7 +646,12 @@ class IndicatorBase( ABC ):
 
         error_log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
         if os.path.exists( error_log ):
-            self.__add_hyperlink_label( about_dialog, error_log, _( "View the" ), _( "error log" ), _( "text file." ) )
+            self.__add_hyperlink_label(
+                about_dialog,
+                error_log,
+                _( "View the" ),
+                _( "error log" ),
+                _( "text file." ) )
 
         about_dialog.run()
         about_dialog.destroy()

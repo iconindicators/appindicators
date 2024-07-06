@@ -42,6 +42,7 @@ from pathlib import Path
 sys.path.append( "indicatorbase/src" )
 try:
     from indicatorbase import indicatorbase
+
 except ModuleNotFoundError:
     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
@@ -358,8 +359,10 @@ def _get_installation_for_operating_system(
         dependencies = ''
 
     else:
-        operating_system_packages = _get_operating_system_dependencies_function_name(
-                                        operating_system, Indicator_Name[ indicator_name.upper() ] )
+        operating_system_packages = \
+            _get_operating_system_dependencies_function_name(
+                operating_system,
+                Indicator_Name[ indicator_name.upper() ] )
 
         # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
@@ -628,8 +631,9 @@ def _create_readme( directory_out, indicator_name ):
 
 
 def _initialise_parser():
-    parser = argparse.ArgumentParser(
-        description = "Create README.md for an indicator." )
+    parser = \
+        argparse.ArgumentParser(
+            description = "Create README.md for an indicator." )
 
     parser.add_argument(
         "directory_out",

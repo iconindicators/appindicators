@@ -43,8 +43,9 @@ def _install_wheel_for_indicator( directory_release, indicator_name ):
 
 
 def _initialise_parser():
-    parser = argparse.ArgumentParser(
-        description = "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local." )
+    parser = \
+        argparse.ArgumentParser(
+            description = "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local." )
 
     parser.add_argument(
         "directory_release",

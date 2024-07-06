@@ -41,8 +41,9 @@ def _intialise_virtual_environment( *modules_to_install ):
 
 
 def _initialise_parser():
-    parser = argparse.ArgumentParser(
-        description = "Upload to PyPI a Python .whl/.tar.gz for an indicator." )
+    parser = \
+        argparse.ArgumentParser(
+            description = "Upload to PyPI a Python .whl/.tar.gz for an indicator." )
 
     parser.add_argument(
         "directory_dist",

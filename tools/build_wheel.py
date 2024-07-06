@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Build a Python Wheel package for one or more indicators.
+# Build a Python wheel for one or more indicators.
 #
 # To view the contents of a .whl:
 #    unzip -l indicatortest-1.0.7-py3-none-any.whl
@@ -31,15 +31,8 @@ import re
 import shutil
 import stat
 import subprocess
-import sys
 
 from pathlib import Path
-
-sys.path.append( "indicatorbase/src" )
-try:
-    from indicatorbase import indicatorbase
-except ModuleNotFoundError:
-    pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
 # Create the .desktop file dynamically...
@@ -155,12 +148,15 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
         dot_desktop_text = f.read()
 
-    dot_desktop_text = dot_desktop_text.format(
-                        indicator_name = indicator_name,
-                        categories = indicator_name_to_desktop_file_categories[ indicator_name ],
-                        names = '\n'.join( indicator_name_to_desktop_file_names[ indicator_name ] ) )
+    dot_desktop_text = \
+        dot_desktop_text.format(
+            indicator_name = indicator_name,
+            categories = indicator_name_to_desktop_file_categories[ indicator_name ],
+            names = '\n'.join( indicator_name_to_desktop_file_names[ indicator_name ] ) )
 
-    indicator_dot_desktop_path = str( directory_platform_linux ) + "/" + indicator_name + ".py.desktop"
+    indicator_dot_desktop_path = \
+        str( directory_platform_linux ) + "/" + indicator_name + ".py.desktop"
+
     with open( indicator_dot_desktop_path, 'w' ) as f:
         f.write( dot_desktop_text )
 
@@ -220,14 +216,14 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
             if not line.startswith( '#' ):
                 indicatorbase_pyproject_toml_text += line
 
-    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
-                                            "{classifiers}", classifiers )
+    indicatorbase_pyproject_toml_text = \
+        indicatorbase_pyproject_toml_text.replace( "{classifiers}", classifiers )
 
-    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
-                                            "{dependencies}", dependencies )
+    indicatorbase_pyproject_toml_text = \
+        indicatorbase_pyproject_toml_text.replace( "{dependencies}", dependencies )
 
-    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
-                                            "{indicator_name}", indicator_name )
+    indicatorbase_pyproject_toml_text = \
+        indicatorbase_pyproject_toml_text.replace( "{indicator_name}", indicator_name )
 
     project_name_version_description = \
         "[project]\n" + \
@@ -235,8 +231,8 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
         "version = \'" + version + '\'\n' + \
         "description = \'" + description + '\''
 
-    indicatorbase_pyproject_toml_text = indicatorbase_pyproject_toml_text.replace(
-                                            "[project]", project_name_version_description )
+    indicatorbase_pyproject_toml_text = \
+        indicatorbase_pyproject_toml_text.replace( "[project]", project_name_version_description )
 
     with open( indicator_pyproject_toml_path, 'w' ) as f:
         f.write( indicatorbase_pyproject_toml_text )
@@ -268,7 +264,9 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
     command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
     subprocess.call( command, shell = True )
 
-    directory_platform_linux = Path( str( directory_dist ) + "/" + indicator_name + "/src/" + indicator_name + "/platform/linux" )
+    directory_platform_linux = \
+        Path( str( directory_dist ) + "/" + indicator_name + "/src/" + indicator_name + "/platform/linux" )
+
     directory_platform_linux.mkdir( parents = True )
 
     _create_dot_desktop( directory_platform_linux, indicator_name )
@@ -327,16 +325,44 @@ def _create_symbolic_icons( directory_wheel, indicator_name ):
             f.write( svg_text )
 
 
+#TODO UNCHECKED
+def _get_value_for_single_line_tag_from_pyproject_toml( pyproject_toml, tag ):
+    # Would like to use
+    #   https://docs.python.org/3/library/tomllib.html
+    # but it is only in 3.11 which is unavailable for Ubuntu 20.04.
+    value = ""
+    pattern_tag = re.compile( f"{ tag } = .*" )
+    for line in open( pyproject_toml ).readlines():
+        matches = pattern_tag.match( line )
+        if matches:
+            value = matches.group().split( " = " )[ 1 ][ 1 : -1 ]
+            break
+
+    return value
+
+
+#TODO UNCHECKED
+def _get_version_in_changelog_markdown( changelog_markdown ):
+    version = ""
+    with open( changelog_markdown, 'r' ) as f:
+        for line in f.readlines():
+            if line.startswith( "## v" ):
+                version = line.split( ' ' )[ 1 ][ 1 : ]
+                break
+
+    return version
+
+
 def _build_wheel_for_indicator( directory_release, indicator_name ):
     message = ""
     version_from_pyproject_toml = \
-        indicatorbase.IndicatorBase.get_value_for_single_line_tag_from_pyproject_toml(
+        _get_value_for_single_line_tag_from_pyproject_toml(
             indicator_name + '/pyproject.toml',
             "version" )
 
     version_from_changelog_markdown = \
-        indicatorbase.IndicatorBase.get_version_in_changelog_markdown(
-                indicator_name + "/src/" + indicator_name + "/CHANGELOG.md" )
+        _get_version_in_changelog_markdown(
+            indicator_name + "/src/" + indicator_name + "/CHANGELOG.md" )
 
     if version_from_pyproject_toml == version_from_changelog_markdown:
         message = _run_checks_specific_to_indicator( indicator_name )
@@ -368,14 +394,16 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
 
 def _initialise_parser():
-    parser = argparse.ArgumentParser(
-        description = "Create a Python wheel for one or more indicators." )
+    parser = \
+        argparse.ArgumentParser(
+            description = "Create a Python wheel for one or more indicators." )
 
     parser.add_argument(
         "directory_release",
-        help = "The output directory for the Python wheel. " +
-               "If the directory specified is 'release', " +
-               "the Python wheel will be created in 'release/wheel'." )
+        help = \
+            "The output directory for the Python wheel. " +
+            "If the directory specified is 'release', " +
+            "the Python wheel will be created in 'release/wheel'." )
 
     parser.add_argument(
         "indicators",
