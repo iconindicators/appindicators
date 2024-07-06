@@ -144,6 +144,18 @@ def _chmod(
 
 
 def _create_dot_desktop( directory_platform_linux, indicator_name ):
+#TODO First manually add "Comment" to say indicatorfortune .desktop file.
+# If the comment appears in the startup applications on Ubuntu,
+# then use the code below to pull the "description" from the pyproject.toml
+# and use that as the "Comment".
+# The line below is repeated in the function _create_pyproject_dot_toml
+# so maybe pass in indicator_pyproject_toml_path to both this function and _create_pyproject_dot_toml.
+    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
+    with open( indicator_pyproject_toml_path, 'r' ) as f:
+        for line in f:
+            if line.startswith( "description" ):
+                description = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
+
     indicatorbase_dot_desktop_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.py.desktop"
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
         dot_desktop_text = f.read()
@@ -151,6 +163,7 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
     dot_desktop_text = \
         dot_desktop_text.format(
             indicator_name = indicator_name,
+            comment = description, #TODO Only stays if the "Comment" field appears in startup applications.
             categories = indicator_name_to_desktop_file_categories[ indicator_name ],
             names = '\n'.join( indicator_name_to_desktop_file_names[ indicator_name ] ) )
 
@@ -161,6 +174,10 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
         f.write( dot_desktop_text )
 
     _chmod( indicator_dot_desktop_path )
+#TODO Testing...    
+    print( "-----------------------------------------------" )
+    print( dot_desktop_text )
+    print( "-----------------------------------------------" )
 
 
 def _create_run_script( directory_platform_linux, indicator_name ):
