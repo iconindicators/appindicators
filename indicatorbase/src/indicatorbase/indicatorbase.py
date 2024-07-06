@@ -954,7 +954,6 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO UNCHECKED
     def create_and_insert_menuitem(
         self,
         menu,
