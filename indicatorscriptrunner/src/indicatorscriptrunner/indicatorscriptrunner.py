@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Delete does not update the table.
+
+
 # Application indicator to run a terminal command or script from an indicator.
 
 

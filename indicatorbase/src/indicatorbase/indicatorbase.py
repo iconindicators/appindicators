@@ -16,20 +16,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Add this
+#
+# Need to install the 'requests' package to venv_indicatortide:
+#   . $HOME/.local/venv_indicatorscriptrunner/bin/activate && python3 -m pip install --upgrade requests
+#
+# to getStackExchange.py
+
+
 #TODO Got 
 #   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
 #
 # on the laptop...
-#
 # Happens when the screen is locked.
 # Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
 
 
-#TODO Maybe look for all \
-# and test if I can remove when used with ( ) of a function call.
+#TODO On desktop, indicatortide does not run on startup.
+# Desktop file, run shell script all have same permissions for other indicators.
+# Starts up fine on laptop!
 
 
-#TODO Add changelog entry for each indicator about moving closer to PEP8 or whatever the Python code standard is?
+#TODO Add changelog entry for each indicator about moving closer to PEP8
+# or whatever the Python code standard is?
 
 
 #TODO Given clipboard and wmctrl don't seem to work under Wayland...

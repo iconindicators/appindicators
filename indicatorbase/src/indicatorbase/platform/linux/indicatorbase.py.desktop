@@ -8,6 +8,7 @@
 [Desktop Entry]
 Type=Application
 {names}
+{comment}
 Icon={indicator_name}
 Terminal=false
 Exec=sh -c "$HOME/.local/bin/{indicator_name}.sh"
