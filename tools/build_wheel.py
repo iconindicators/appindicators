@@ -47,6 +47,9 @@ from pathlib import Path
 # and use that for the pyproject.toml description and also the .desktop Comment.
 # For the .desktop Comment in other lang/locales, need to use something like gettext 
 # (either the python package or bash command) to extract the Comment from the .mo file.
+#   https://stackoverflow.com/questions/54638570/extract-single-translation-from-gettext-po-file-from-shell
+#   https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its/
+#   https://stackoverflow.com/questions/53316631/unable-to-use-gettext-to-retrieve-the-translated-string-in-mo-files
 
 
 # Create the .desktop file dynamically...
@@ -147,14 +150,8 @@ def _run_checks_specific_to_indicator( indicator_name ):
     return message
 
 
-def _chmod(
-        file,
-        mode = \
-            stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH |
-            stat.S_IWUSR | stat.S_IWGRP |
-            stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH ):
-
-    os.chmod( file, mode )
+def _chmod( file, user_permission, group_permission, other_permission ):
+    os.chmod( file, user_permission | group_permission | other_permission )
 
 
 def _create_dot_desktop(
@@ -188,8 +185,11 @@ def _create_dot_desktop(
     with open( indicator_dot_desktop_path, 'w' ) as f:
         f.write( dot_desktop_text )
 
-#TODO .desktop should be rw-rw-r--
-    _chmod( indicator_dot_desktop_path )
+    _chmod(
+        indicator_dot_desktop_path,
+        stat.S_IRUSR | stat.S_IWUSR,
+        stat.S_IRGRP,
+        stat.S_IROTH )
 
 
 def _create_run_script( directory_platform_linux, indicator_name ):
@@ -203,20 +203,25 @@ def _create_run_script( directory_platform_linux, indicator_name ):
     with open( indicator_run_script_path, 'w' ) as f:
         f.write( run_script_text )
 
-    _chmod( indicator_run_script_path )
+    _chmod(
+        indicator_run_script_path,
+        stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
+        stat.S_IRGRP | stat.S_IXGRP,
+        stat.S_IROTH | stat.S_IXOTH )
 
 
-def _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path ):
+def _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path, description ):
     classifiers = ""
     dependencies = ""
-    description = ""
+#    description = "" #TODO Delete
     version = ""
     with open( indicator_pyproject_toml_path, 'r' ) as f:
         for line in f:
-            if line.startswith( "description" ):
-                description = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
+#TODO Delete        
+#            if line.startswith( "description" ):
+#                description = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
 
-            elif line.startswith( "version" ):
+            if line.startswith( "version" ):
                 version = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
 
             elif line.startswith( "classifiers" ):
@@ -265,8 +270,11 @@ def _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path ):
     with open( indicator_pyproject_toml_path, 'w' ) as f:
         f.write( indicatorbase_pyproject_toml_text )
 
-#TODO Probably should only be rw-rw-r
-    _chmod( indicator_pyproject_toml_path )
+    _chmod(
+        indicator_pyproject_toml_path,
+        stat.S_IRUSR | stat.S_IWUSR,
+        stat.S_IRGRP,
+        stat.S_IROTH )
 
 
 def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
@@ -288,8 +296,10 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
         "indicatorbase/src/indicatorbase/indicatorbase.py",
         directory_indicator + "/src/" + indicator_name )
 
+    comments = get_comments_from_indicator_constructor( directory_indicator, indicator_name )
+#TODO Pass in 'comments' to the create pyproject.toml function below?
     indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
-    _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path )
+    _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path, comments )
 
     command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
     subprocess.call( command, shell = True )
@@ -298,6 +308,11 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
         Path( str( directory_dist ) + "/" + indicator_name + "/src/" + indicator_name + "/platform/linux" )
 
     directory_platform_linux.mkdir( parents = True )
+
+#TODO Moved from main function...
+# Hopefully can then use the built locale (.mo files)
+# to get the translated description for each locale and put into the .desktop. 
+    _process_locale( directory_dist, indicator_name )
 
     _create_dot_desktop( directory_platform_linux, indicator_name, indicator_pyproject_toml_path )
     _create_run_script( directory_platform_linux, indicator_name )
@@ -336,6 +351,44 @@ def _process_locale( directory_dist, indicator_name ):
             " --output-file=" + str( po.parent ) + os.sep + str( po.stem ) + ".mo"
 
         subprocess.call( command, shell = True )
+
+
+def get_comments_from_indicator_constructor( directory_indicator, indicator_name ):
+    indicator_source = Path( directory_indicator + "/src/" + indicator_name + '/' + indicator_name + ".py" )
+    with open( indicator_source, 'r' ) as f:
+        for line in f:
+            if line.startswith( "            comments = _(" ):
+                comments = line.split( '\"' )[ 1 ].replace( '\"', '' ).replace( '\'', '\"' ).strip()
+                #TODO Fortune comments contains a 'fortune'...so not sure how to escape it
+                # as it causes a parse error.
+                # Tried replacing the ' with " and seems okay.
+                print( comments )
+                break
+
+    return comments
+
+
+#TODO Not sure of name or anything else!
+def _gettext():
+    import gettext
+
+    translation = \
+        gettext.translation(
+            indicator_name,
+            localedir = directory_indicator_locale,
+            languages=[ 'ru' ] )
+
+    translated_string = translation.gettext( "Calls the 'fortune' program displaying the result in the on-screen notification." )
+    print( "-------------------------------------" )
+    print( translation.info() )
+    print( "-------------------------------------" )
+    print( translation.charset() )
+    print( "-------------------------------------" )
+    print( translated_string )
+    print( "-------------------------------------" )
+
+    import sys
+    sys.exit()
 
 
 def _create_symbolic_icons( directory_wheel, indicator_name ):
@@ -404,7 +457,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
             directory_dist.mkdir( parents = True )
 
             _copy_indicator_directory_and_files( directory_dist, indicator_name )
-            _process_locale( directory_dist, indicator_name )
+#            _process_locale( directory_dist, indicator_name ) #TODO Moving to _copy_indicator_directory_and_files
             _create_symbolic_icons( directory_dist, indicator_name )
 
             _intialise_virtual_environment( "build", "pip", "PyGObject" )
@@ -415,7 +468,8 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             subprocess.call( command, shell = True )
 
-            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
+#TODO Restore
+#            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
 
     else:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"

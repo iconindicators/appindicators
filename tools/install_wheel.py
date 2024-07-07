@@ -33,11 +33,11 @@ def _install_wheel_for_indicator( directory_release, indicator_name ):
         f"python3 -m pip install --upgrade --force-reinstall $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
         f"deactivate && " + \
         f"mkdir -p $HOME/.local/bin && " + \
-        f"cp $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.sh $HOME/.local/bin && " + \
+        f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.sh $HOME/.local/bin && " + \
         f"mkdir -p $HOME/.local/share/applications && " + \
-        f"cp $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.py.desktop $HOME/.local/share/applications && " + \
+        f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.py.desktop $HOME/.local/share/applications && " + \
         f"mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && " + \
-        f"cp $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps"
+        f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps"
 
     subprocess.call( command, shell = True )
 

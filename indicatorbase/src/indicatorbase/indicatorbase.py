@@ -251,7 +251,7 @@ class IndicatorBase( ABC ):
         found_indicatorbase_import = \
             "from indicatorbase import IndicatorBase" in str( frame_record.code_context ) and \
             Path( frame_record.filename ).stem.startswith( "indicator" )
-    
+
         if found_indicatorbase_import:
             INDICATOR_NAME = Path( frame_record.filename ).stem
             locale_directory = str( Path( __file__ ).parent ) + os.sep + "locale"
