@@ -35,6 +35,9 @@
 #TODO On desktop, indicatortide does not run on startup.
 # Desktop file, run shell script all have same permissions for other indicators.
 # Starts up fine on laptop!
+#
+# Also on desktop, PPA and Punycode don't autostart...what else...and why?
+# They seem to have correct permissions.
 
 
 #TODO Add changelog entry for each indicator about moving closer to PEP8

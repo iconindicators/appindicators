@@ -35,6 +35,20 @@ import subprocess
 from pathlib import Path
 
 
+#TODO Think about creating a .desktop file for each indicator which contains
+# the indicator Name(s) and the Categories from below.
+# Then this script would read the indicator .desktop file 
+# and merge into that the contents from the indicatorbase .desktop file.
+
+
+# TODO I think the description from pyprojet.toml is good but needs to be 
+# in the indicator.py source file instead (passed in the constructor as a 'comments').
+# So, need to extract the 'comments' string from the .py
+# and use that for the pyproject.toml description and also the .desktop Comment.
+# For the .desktop Comment in other lang/locales, need to use something like gettext 
+# (either the python package or bash command) to extract the Comment from the .mo file.
+
+
 # Create the .desktop file dynamically...
 # ...these are the entries for the Name (and any translations) for each indicator.
 indicator_name_to_desktop_file_names = {
@@ -143,18 +157,19 @@ def _chmod(
     os.chmod( file, mode )
 
 
-def _create_dot_desktop( directory_platform_linux, indicator_name ):
-#TODO First manually add "Comment" to say indicatorfortune .desktop file.
-# If the comment appears in the startup applications on Ubuntu,
-# then use the code below to pull the "description" from the pyproject.toml
-# and use that as the "Comment".
-# The line below is repeated in the function _create_pyproject_dot_toml
-# so maybe pass in indicator_pyproject_toml_path to both this function and _create_pyproject_dot_toml.
-    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
+def _create_dot_desktop(
+        directory_platform_linux,
+        indicator_name,
+        indicator_pyproject_toml_path ):
+
+    # Extract the 'description' from the pyproject.toml and use that as the comment.
+    # To handle comments for other locales/languages,
+    # will need something like a dictionary using the comment as key
+    # and retrieve a list of translated comments.
     with open( indicator_pyproject_toml_path, 'r' ) as f:
         for line in f:
             if line.startswith( "description" ):
-                description = line.split( '=' )[ 1 ].replace( '\"', '' ).strip()
+                description = line.split( '=' )[ 1 ].replace( '\'', '' ).strip()
 
     indicatorbase_dot_desktop_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.py.desktop"
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
@@ -163,7 +178,7 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
     dot_desktop_text = \
         dot_desktop_text.format(
             indicator_name = indicator_name,
-            comment = description, #TODO Only stays if the "Comment" field appears in startup applications.
+            comment = "Comment=" + description,
             categories = indicator_name_to_desktop_file_categories[ indicator_name ],
             names = '\n'.join( indicator_name_to_desktop_file_names[ indicator_name ] ) )
 
@@ -173,11 +188,8 @@ def _create_dot_desktop( directory_platform_linux, indicator_name ):
     with open( indicator_dot_desktop_path, 'w' ) as f:
         f.write( dot_desktop_text )
 
+#TODO .desktop should be rw-rw-r--
     _chmod( indicator_dot_desktop_path )
-#TODO Testing...    
-    print( "-----------------------------------------------" )
-    print( dot_desktop_text )
-    print( "-----------------------------------------------" )
 
 
 def _create_run_script( directory_platform_linux, indicator_name ):
@@ -194,12 +206,11 @@ def _create_run_script( directory_platform_linux, indicator_name ):
     _chmod( indicator_run_script_path )
 
 
-def _create_pyproject_dot_toml( directory_dist, indicator_name ):
+def _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path ):
     classifiers = ""
     dependencies = ""
     description = ""
     version = ""
-    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
     with open( indicator_pyproject_toml_path, 'r' ) as f:
         for line in f:
             if line.startswith( "description" ):
@@ -254,6 +265,7 @@ def _create_pyproject_dot_toml( directory_dist, indicator_name ):
     with open( indicator_pyproject_toml_path, 'w' ) as f:
         f.write( indicatorbase_pyproject_toml_text )
 
+#TODO Probably should only be rw-rw-r
     _chmod( indicator_pyproject_toml_path )
 
 
@@ -276,7 +288,8 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
         "indicatorbase/src/indicatorbase/indicatorbase.py",
         directory_indicator + "/src/" + indicator_name )
 
-    _create_pyproject_dot_toml( directory_dist, indicator_name )
+    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
+    _create_pyproject_dot_toml( indicator_name, indicator_pyproject_toml_path )
 
     command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
     subprocess.call( command, shell = True )
@@ -286,7 +299,7 @@ def _copy_indicator_directory_and_files( directory_dist, indicator_name ):
 
     directory_platform_linux.mkdir( parents = True )
 
-    _create_dot_desktop( directory_platform_linux, indicator_name )
+    _create_dot_desktop( directory_platform_linux, indicator_name, indicator_pyproject_toml_path )
     _create_run_script( directory_platform_linux, indicator_name )
 
 
