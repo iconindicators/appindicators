@@ -395,7 +395,6 @@ def _copy_indicator_directory_and_build_release( directory_dist, indicator_name 
     return ( name != "" ) and ( comments != "" )
 
 
-#TODO UNCHECKED
 def _get_value_for_single_line_tag_from_pyproject_toml( pyproject_toml, tag ):
     # Would like to use
     #   https://docs.python.org/3/library/tomllib.html
@@ -411,7 +410,6 @@ def _get_value_for_single_line_tag_from_pyproject_toml( pyproject_toml, tag ):
     return value
 
 
-#TODO UNCHECKED
 def _get_version_in_changelog_markdown( changelog_markdown ):
     version = ""
     with open( changelog_markdown, 'r' ) as f:
