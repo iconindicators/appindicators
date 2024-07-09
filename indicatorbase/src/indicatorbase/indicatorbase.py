@@ -16,17 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Ensure all indicator 'comments' make sense.
-
-
-#TODO Add this
-#
-# Need to install the 'requests' package to venv_indicatortide:
-#   . $HOME/.local/venv_indicatorscriptrunner/bin/activate && python3 -m pip install --upgrade requests
-#
-# to getStackExchange.py
-
-
 #TODO Got 
 #   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
 #
