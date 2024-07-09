@@ -499,12 +499,13 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( browse_button, False ) ) ),
             0, 0, 1, 1 )
 
-        enabled_checkbutton = self.create_checkbutton( _( "Enabled" ) )
-        if row_number is None: # This is an add.
-            enabled_checkbutton.set_active( True ) #TODO Can this and the line below be put into the create_checkbutton call?
-
-        else:
-            enabled_checkbutton.set_active( model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
+        enabled_checkbutton = \
+            self.create_checkbutton(
+                _( "Enabled" ),
+                active = \
+                    True
+                    if row_number is None else \
+                    model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabled_checkbutton, 0, 1, 1, 1 )
 

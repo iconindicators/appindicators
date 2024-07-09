@@ -527,11 +527,11 @@ class IndicatorFortune( IndicatorBase ):
                 tooltip_text = _(
                     "Ensure the fortune file/directory\n" +
                     "works by running through 'fortune'\n" +
-                    "in a terminal." ) )
-
-        if row_number: # This is an edit.
-            enabled_checkbox.set_active( model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY )
-#TODO Can the line above be worked into the create_checkbutton call?
+                    "in a terminal." ),
+                active = \
+                    True
+                    if row_number is None else \
+                    model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY )
 
         grid.attach( enabled_checkbox, 0, 2, 1, 1 )
 
