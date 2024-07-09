@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Is it worth renaming from PyEphem to Pyephem?
-# Search "pyephem", case insensitive, in all files...see where it is used.
-
-
 # Calculate astronomical information using PyEphem.
 
 
