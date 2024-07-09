@@ -96,17 +96,15 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
     if name == "":
         # This flags to the user that no name was found,
         # but allows the build to continue...
-#TODO Maybe should abort the build on a "" return?
         print( "----------------------------------------------" )
-        print( f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }." )
+        print( f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }" )
         print( "----------------------------------------------" )
 
     if comments == "":
         # This flags to the user that no comments was found,
         # but allows the build to continue...
-#TODO Maybe should abort the build on a "" return?
         print( "-----------------------------------------------------------" )
-        print( f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }." )
+        print( f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }" )
         print( "-----------------------------------------------------------" )
 
     return name, comments
@@ -415,6 +413,8 @@ def _copy_indicator_directory_and_build_release( directory_dist, indicator_name 
     _create_run_script( directory_platform_linux, indicator_name )
 
     _create_symbolic_icons( directory_dist, indicator_name )
+    
+    return ( name != "" ) and ( comments != "" )
 
 
 #TODO UNCHECKED
@@ -465,17 +465,15 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             directory_dist.mkdir( parents = True )
 
-            _copy_indicator_directory_and_build_release( directory_dist, indicator_name )
+            if _copy_indicator_directory_and_build_release( directory_dist, indicator_name ):
+                _intialise_virtual_environment( "build", "pip", "PyGObject" )
 
-            _intialise_virtual_environment( "build", "pip", "PyGObject" )
+                command = \
+                    f". ./venv/bin/activate && " + \
+                    f"python3 -m build --outdir { str( directory_dist ) } { str( directory_dist ) }/{ indicator_name }"
 
-            command = \
-                f". ./venv/bin/activate && " + \
-                f"python3 -m build --outdir { str( directory_dist ) } { str( directory_dist ) }/{ indicator_name }"
-
-            subprocess.call( command, shell = True )
-
-            shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
+                subprocess.call( command, shell = True )
+                shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
 
     else:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
