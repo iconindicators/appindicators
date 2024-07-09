@@ -5,4 +5,3 @@ description = "Application indicator which displays calendar events."
 classifiers = [
   "Topic :: Games/Entertainment"
 ]
-

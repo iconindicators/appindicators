@@ -5,4 +5,3 @@ description = "Application indicator which displays PPA download statistics."
 classifiers = [
   "Topic :: Utilities"
 ]
-

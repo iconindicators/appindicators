@@ -32,6 +32,8 @@ from pathlib import Path
 
 
 class IndicatorFortune( IndicatorBase ):
+    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    indicator_name_for_desktop_file = _( "Indicator Fortune" )
 
     CONFIG_FORTUNES = "fortunes"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
@@ -66,7 +68,7 @@ class IndicatorFortune( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
-
+Application indicator which displays fortunes.
         self.remove_file_from_cache( IndicatorFortune.HISTORY_FILE )
 
 

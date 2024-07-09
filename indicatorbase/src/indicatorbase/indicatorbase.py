@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Ensure all indicator 'comments' make sense.
+
+
 #TODO Add this
 #
 # Need to install the 'requests' package to venv_indicatortide:
@@ -282,6 +285,12 @@ class IndicatorBase( ABC ):
 #
 #Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
 # and also to prevent an update from happening.
+    # The comments argument is used in two places:
+    #
+    #   1) The first letter of the comments is capitalised and incorporated
+    #      into the Project Description on the PyPI page.
+    #
+    #   2) The comments is used, as is, in the About dialog.
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         if IndicatorBase.INDICATOR_NAME is None:
             self.show_dialog_ok(

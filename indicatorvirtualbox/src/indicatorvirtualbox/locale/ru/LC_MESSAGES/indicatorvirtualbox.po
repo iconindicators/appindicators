@@ -1,14 +1,14 @@
 # Russian translation for indicatorvirtualbox.
-# Copyright (C) 2015-2022 Bernard Giannetti
+# Copyright (C) 2015-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorvirtualbox package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2015-2022.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorvirtualbox 1.0.73\n"
+"Project-Id-Version: indicatorvirtualbox 1.0.74\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2022-10-29 10:23+1100\n"
-"PO-Revision-Date: 2021-11-03 15:53+0300\n"
+"POT-Creation-Date: 2024-07-08 10:23+1100\n"
+"PO-Revision-Date: 2024-07-09 15:53+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -17,6 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Indicator VirtualBox™"
+msgstr "Индикатор VirtualBox™"
 
 #: indicatorvirtualbox.py:64
 msgid "Shows VirtualBox™ virtual machines and allows them to be started."

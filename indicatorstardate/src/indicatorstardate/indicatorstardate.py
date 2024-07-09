@@ -34,6 +34,8 @@ import stardate
 
 
 class IndicatorStardate( IndicatorBase ):
+    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    indicator_name_for_desktop_file = _( "Indicator Stardate" )
 
     CONFIG_PAD_INTEGER = "padInteger"
     CONFIG_SHOW_CLASSIC = "showClassic"

@@ -1,14 +1,14 @@
 # Portable Object Template for indicatorfortune.
-# Copyright (C) 2015-2022 Bernard Giannetti
+# Copyright (C) 2015-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorfortune package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorfortune 1.0.40\n"
+"Project-Id-Version: indicatorfortune 1.0.41\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2020-04-20 22:20+1000\n"
+"POT-Creation-Date: 2024-07-08 22:20+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "Indicator Fortune"
+msgstr ""
 
 #: indicatorfortune.py:50
 msgid "Fortune. . ."

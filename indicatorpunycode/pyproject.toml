@@ -5,4 +5,3 @@ description = "Application indicator which converts domain names between Unicode
 classifiers = [
   "Topic :: Utilities"
 ]
-

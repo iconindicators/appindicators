@@ -1,8 +1,7 @@
 # THIS IS AN INCOMPLETE PYPROJECT.TOML USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 version = "1.0.25"
-description = "Application indicator to run a terminal command or script from an indicator."
+description = "Application indicator to run a terminal command or script."
 classifiers = [
   "Topic :: Utilities"
 ]
-

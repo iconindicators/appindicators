@@ -33,6 +33,8 @@ import sys
 
 
 class IndicatorTide( IndicatorBase ):
+    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    indicator_name_for_desktop_file = _( "Indicator Tide" )
 
     CONFIG_SHOW_AS_SUBMENUS = "showAsSubmenus"
     CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"

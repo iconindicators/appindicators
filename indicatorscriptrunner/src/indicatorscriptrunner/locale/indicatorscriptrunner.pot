@@ -1,14 +1,14 @@
 # Portable Object Template for indicatorscriptrunner.
-# Copyright (C) 2016-2022 Bernard Giannetti
+# Copyright (C) 2016-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorscriptrunner package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorscriptrunner 1.0.22\n"
+"Project-Id-Version: indicatorscriptrunner 1.0.23\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2022-06-25 13:17+1000\n"
+"POT-Creation-Date: 2024-07-08 13:17+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "Indicator Script Runner"
+msgstr ""
 
 #: indicatorscriptrunner.py:51
 msgid "...has completed."

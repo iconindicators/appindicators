@@ -1,14 +1,14 @@
 # Czech translation for indicatorppadownloadstatistics.
-# Copyright (C) 2015-2023 Bernard Giannetti
+# Copyright (C) 2015-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorppadownloadstatistics package.
-# Pavel Rehak <pavel-rehak@email.cz>, 2017-2023.
+# Pavel Rehak <pavel-rehak@email.cz>, 2017-2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorppadownloadstatistics 1.0.80\n"
+"Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2019-10-21 00:24+1100\n"
-"PO-Revision-Date: 2019-10-21 00:24+1100\n"
+"POT-Creation-Date: 2024-07-08 13:10+1100\n"
+"PO-Revision-Date: 2024-07-09 00:24+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language-Team: \n"
 "Language: cs\n"
@@ -16,6 +16,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+msgid "Indicator PPA Download Statistics"
+msgstr "PPA indikátor statisktik stahování"
 
 #: indicatorppadownloadstatistics.py:60
 msgid "(error retrieving PPA)"

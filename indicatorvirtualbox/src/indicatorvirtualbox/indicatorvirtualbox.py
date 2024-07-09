@@ -36,6 +36,8 @@ from virtualmachine import Group, VirtualMachine
 
 
 class IndicatorVirtualBox( IndicatorBase ):
+    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    indicator_name_for_desktop_file = _( "Indicator VirtualBox™" )
 
     CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
