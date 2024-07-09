@@ -134,11 +134,10 @@ __eclipses_solar = \
      9598  480   2040 Nov 04  19:09:02     85    505  124   P   -t   1.0993  0.8074  62.2N  53.4W   0  234'''
 
 
-#TODO Fix this comment
 # Gets the upcoming lunar eclipse.
 #
 # Returns a tuple:
-#    UTC now with timezone
+#    datetime in UTC with UTC timezone
 #    EclipseType
 #    latitude (south is negative)
 #    longitude (east is negative)
@@ -146,11 +145,10 @@ def get_eclipse_lunar( utc_now ):
     return __get_eclipse( utc_now, __eclipses_lunar, 1, 2, 3, 4, 5, 8, 16, 17 )
 
 
-#TODO Fix this comment
 # Gets the upcoming solar eclipse.
 #
 # Returns a tuple:
-#    DateTime in UTC with UTC timezone
+#    datetime in UTC with UTC timezone
 #    EclipseType
 #    latitude (south is negative)
 #    longitude (east is negative)
@@ -199,9 +197,11 @@ def __get_eclipse(
             if longitude.endswith( 'E' ):
                 the_longitude = '-' + the_longitude
 
-            eclipse_information = \
-                date_time, \
-                __get_cclipse_type_from_table_value( eclipse_type ), the_latitude, the_longitude
+            eclipse_information = ( 
+                date_time,
+                __get_eclipse_type_from_table_value( eclipse_type ),
+                the_latitude,
+                the_longitude )
 
             break
 
@@ -230,7 +230,7 @@ def get_eclipse_type_as_text( eclipse_type ):
 
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
-def __get_cclipse_type_from_table_value( eclipse_type_from_table_value ):
+def __get_eclipse_type_from_table_value( eclipse_type_from_table_value ):
     if eclipse_type_from_table_value == 'A':
         __eclipse_type = EclipseType.ANNULAR
 
