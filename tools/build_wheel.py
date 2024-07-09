@@ -247,28 +247,6 @@ def _get_names_and_comments_from_mo_files(
     return names_from_mo_files, comments_from_mo_files
 
 
-def _get_comments_from_mo_files( indicator_name, directory_indicator_locale, comments ):
-    comments_from_mo_files = { }
-    for mo in list( Path( directory_indicator_locale ).rglob( "*.mo" ) ):
-        locale = mo.parent.parent.stem
-
-        # https://stackoverflow.com/questions/54638570/extract-single-translation-from-gettext-po-file-from-shell
-        # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
-        # https://stackoverflow.com/questions/53316631/unable-to-use-gettext-to-retrieve-the-translated-string-in-mo-files
-        translation = \
-            gettext.translation(
-                indicator_name,
-                localedir = directory_indicator_locale,
-                languages = [ locale ] )
-
-        translated_string = translation.gettext( comments )
-
-        if translated_string != comments:
-            comments_from_mo_files[ locale ] = translated_string
-
-    return comments_from_mo_files
-
-
 def _create_run_script( directory_platform_linux, indicator_name ):
     indicatorbase_run_script_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.sh"
     with open( indicatorbase_run_script_path, 'r' ) as f:
