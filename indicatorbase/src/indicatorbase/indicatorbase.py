@@ -1427,9 +1427,6 @@ class IndicatorBase( ABC ):
         return autostart, delay
 
 
-#TODO Make sure this does not clobber an existing .desktop file
-# when the user checks the autostart checkbox
-# or when the user does an upgrade via pip.
     def set_autostart_and_delay( self, is_set, delay ):
         if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
             os.makedirs( IndicatorBase.__AUTOSTART_PATH )
