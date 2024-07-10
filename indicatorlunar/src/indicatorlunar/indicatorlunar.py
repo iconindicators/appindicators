@@ -1604,6 +1604,8 @@ class IndicatorLunar( IndicatorBase ):
 
         minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
         #TODO Is the below comment/check valid...?  Why have the full check for the tooltip below?
+        # Is it true that either have both apparent mag data AND OE data, OR have neither?
+        # The tooltip in creating the treeview below checks for both app mag data AND OE data...
         if self.minor_planet_apparent_magnitude_data: # No need to also check for orbital element data; either have both or neither.
             for minor_planet in sorted( self.minor_planet_orbital_element_data.keys() ):
                 minor_planet_store.append( [
@@ -2154,39 +2156,13 @@ class IndicatorLunar( IndicatorBase ):
             "[" + model[ treeiter ][ translated_tag_column_index ] + "]", indicator_textentry.get_position() )
 
 
-#TODO Hopefully delete
-    # def createTreeView( self, listStore, toolTipText, columnHeaderText, columnIndex ):
-    #     COLUMN_INDEX_TOGGLE = 0
-    #     COLUMN_INDEX_DATA = 1
-    #
-    #     def on_natural_body_checkbox( cellRendererToggle, row, listStore ):
-    #         listStore[ row ][ COLUMN_INDEX_TOGGLE ] = not listStore[ row ][ COLUMN_INDEX_TOGGLE ]
-    #
-    #
-    #     tree = Gtk.TreeView.new_with_model( listStore )
-    #     tree.get_selection().set_mode( Gtk.SelectionMode.SINGLE )
-    #     tree.set_tooltip_text( toolTipText )
-    #     tree.set_hexpand( True )
-    #     tree.set_vexpand( True )
-    #
-    #     renderer_toggle = Gtk.CellRendererToggle()
-    #     renderer_toggle.connect( "toggled", on_natural_body_checkbox, listStore )
-    #     treeViewColumn = Gtk.TreeViewColumn( "", renderer_toggle, active = COLUMN_INDEX_TOGGLE )
-    #     treeViewColumn.set_clickable( True )
-    #     treeViewColumn.connect( "clicked", self.on_columnheader, listStore )
-    #     tree.append_column( treeViewColumn )
-    #
-    #     tree.append_column( Gtk.TreeViewColumn( columnHeaderText, Gtk.CellRendererText(), text = columnIndex ) )
-    #     tree.get_column( COLUMN_INDEX_DATA ).set_expand( True )
-    #
-    #     scrolledWindow = Gtk.ScrolledWindow()
-    #     scrolledWindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
-    #     scrolledWindow.add( tree )
-    #
-    #     return scrolledWindow
+    def on_natural_body_checkbox(
+            self,
+            cell_renderer_toggle,
+            row,
+            liststore,
+            natural_body_model_column_hide_show ):
 
-
-    def on_natural_body_checkbox( self, cell_renderer_toggle, row, liststore, natural_body_model_column_hide_show ):
         liststore[ row ][ natural_body_model_column_hide_show ] = \
             not liststore[ row ][ natural_body_model_column_hide_show ]
 
@@ -2198,6 +2174,7 @@ class IndicatorLunar( IndicatorBase ):
             datastore,
             sortstore,
             satellite_model_column_hide_show ):
+
         actual_row = sortstore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
         datastore[ actual_row ][ satellite_model_column_hide_show ] = \
             not datastore[ actual_row ][ satellite_model_column_hide_show ]
