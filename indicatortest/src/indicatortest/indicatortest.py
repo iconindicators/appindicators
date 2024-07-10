@@ -411,6 +411,10 @@ class IndicatorTest( IndicatorBase ):
         return response_type
 
 
+    # References
+    #   https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
+    #   https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
+    #   https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
     def data_function( self, treeviewcolumn, cell_renderer, tree_model, tree_iter, data ):
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         day_of_week = tree_model.get_value( tree_iter, 0 )
