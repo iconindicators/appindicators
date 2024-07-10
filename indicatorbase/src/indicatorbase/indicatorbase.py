@@ -1621,7 +1621,7 @@ class IndicatorBase( ABC ):
 
 
     def request_save_config( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__save_config, False )
+        return GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 
     def __copy_config_to_new_directory( self ):
