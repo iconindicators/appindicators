@@ -1617,7 +1617,8 @@ class IndicatorLunar( IndicatorBase ):
                     ( self.on_columnheader, planet_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-        if self.minor_planet_apparent_magnitude_data: # No need to also check for orbital element data; either have both or neither.   #TODO Is this comment/check valid...?  Why have the full check for the tooltip below?
+        #TODO Is the below comment/check valid...?  Why have the full check for the tooltip below?
+        if self.minor_planet_apparent_magnitude_data: # No need to also check for orbital element data; either have both or neither.
             for minor_planet in sorted( self.minor_planet_orbital_element_data.keys() ):
                 minor_planet_store.append( [
                     minor_planet in self.minor_planets,
@@ -1926,10 +1927,12 @@ class IndicatorLunar( IndicatorBase ):
         city.connect( "changed", self.on_city_changed, latitude, longitude, elevation )
         city.set_active( cities.index( self.city ) )
 
-#TODO Why are these done here and not at point of creation?
-        # latitude.set_text( str( self.latitude ) )
-        # longitude.set_text( str( self.longitude ) )
-        # elevation.set_text( str( self.elevation ) )
+        # Must set the values here AFTER city is selected,
+        # as the user may set a different latitude/longitude/elevation
+        # to that defaulted with the city.
+        latitude.set_text( str( self.latitude ) )
+        longitude.set_text( str( self.longitude ) )
+        elevation.set_text( str( self.elevation ) )
 
         autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
         box.set_margin_top( 30 ) # Put some distance from the prior section.
@@ -2269,7 +2272,7 @@ class IndicatorLunar( IndicatorBase ):
 
         grid.attach( box, 0, grid_start_index + 1, 1, 1 )
 
-        checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, box ) #TODO This checkbutton has 3 .connects()...does that make sense?  Check!!!!
+        checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, box )
 
         message_text_view = \
             self.create_textview(
