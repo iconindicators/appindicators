@@ -275,6 +275,9 @@ def _get_extension( operating_system ):
     return extension
 
 
+#TODO Wonder if I should split the install line into two 
+# (install pip with upgrade, then install indicator with force-reinstall)?
+# Similar to than in README.md and install_wheel.py
 def _get_installation_python_virtual_environment( indicator_name ):
     return (
         f"Create a `Python` virtual environment, activate and install the indicator package:\n"
