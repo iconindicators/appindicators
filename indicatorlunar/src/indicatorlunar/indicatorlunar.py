@@ -16,14 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO On the laptop I think the update does not work
-# when the preferences is opened.
-# The menu does not initially go grey
-# and then on hitting OK,
-# the menu does not get restored.
-# Difficult to reproduce.
-
-
 # Application indicator for the home astronomer.
 
 
@@ -1440,7 +1432,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.CellRendererText(), "text", COLUMN_MODEL_TRANSLATED_TAG ),
                     ( Gtk.CellRendererText(), "text", COLUMN_MODEL_VALUE ) ),
-                sortcolumnviewids_columnmodelids = (
+                sortcolumnviewids_columnmodelids = (  #TODO Only the value column is sorted...why?
                     ( COLUMN_VIEW_TRANSLATED_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
                     ( COLUMN_VIEW_VALUE, COLUMN_MODEL_VALUE ) ),
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
@@ -1603,15 +1595,12 @@ class IndicatorLunar( IndicatorBase ):
                     ( self.on_columnheader, planet_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-        #TODO Is the below comment/check valid...?  Why have the full check for the tooltip below?
-        # Is it true that either have both apparent mag data AND OE data, OR have neither?
-        # The tooltip in creating the treeview below checks for both app mag data AND OE data...
-        if self.minor_planet_apparent_magnitude_data: # No need to also check for orbital element data; either have both or neither.
-            for minor_planet in sorted( self.minor_planet_orbital_element_data.keys() ):
-                minor_planet_store.append( [
-                    minor_planet in self.minor_planets,
-                    minor_planet,
-                    self.minor_planet_orbital_element_data[ minor_planet ].get_name() ] )
+
+        for minor_planet in sorted( self.minor_planet_orbital_element_data.keys() ):
+            minor_planet_store.append( [
+                minor_planet in self.minor_planets,
+                minor_planet,
+                self.minor_planet_orbital_element_data[ minor_planet ].get_name() ] )
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
@@ -1643,7 +1632,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( self.on_columnheader, minor_planet_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         comet_store = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
-#TODO Check for data present as minor planets above?        
+
         for comet in sorted( self.comet_orbital_element_data.keys() ):
             comet_store.append( [
                 comet in self.comets,
@@ -2149,9 +2138,12 @@ class IndicatorLunar( IndicatorBase ):
             indicator_textentry ):
 
         model, treeiter = tree.get_selection().get_selected()
-#TODO Should we do something where the selection is converted from view to model?
-#Probably not as we get the treeiter and model above.
-# But check  translatedtagcolumnindex and ensure it is correct for indexing into the model.
+#TODO Given the tags treeview is sortable,
+# should the selected row be converted as per the satellite treeview below:
+#        actual_row = sortstore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+#        datastore[ actual_row ][ satellite_model_column_hide_show ] = \
+#            not datastore[ actual_row ][ satellite_model_column_hide_show ]
+
         indicator_textentry.insert_text(
             "[" + model[ treeiter ][ translated_tag_column_index ] + "]", indicator_textentry.get_position() )
 
