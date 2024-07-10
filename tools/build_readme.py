@@ -275,16 +275,14 @@ def _get_extension( operating_system ):
     return extension
 
 
-#TODO Wonder if I should split the install line into two 
-# (install pip with upgrade, then install indicator with force-reinstall)?
-# Similar to than in README.md and install_wheel.py
 def _get_installation_python_virtual_environment( indicator_name ):
     return (
         f"Create a `Python` virtual environment, activate and install the indicator package:\n"
         f"    ```\n"
         f"    if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade pip { indicator_name } && \\\n"
+        f"    python3 -m pip install --upgrade pip && \\\n"
+        f"    python3 -m pip install --upgrade --force-reinstall { indicator_name } && \\\n"
         f"    deactivate\n"
         f"    ```\n" )
 
