@@ -174,11 +174,11 @@ class IndicatorLunar( IndicatorBase ):
     SEARCH_URL_COMET_DATABASE = "https://cobs.si/api/comet.api?des="
     SEARCH_URL_COMET_ID = "https://cobs.si/comet/"
     SEARCH_URL_MINOR_PLANET = "https://asteroid.lowell.edu/astinfo/"
-    SEARCH_URL_MOON = "https://solarsystem.nasa.gov/moons/earths-moon"
-    SEARCH_URL_PLANET = "https://solarsystem.nasa.gov/planets/"
+    SEARCH_URL_MOON = "https://science.nasa.gov/moon/"
+    SEARCH_URL_PLANET = "https://science.nasa.gov/"
     SEARCH_URL_SATELLITE = "https://www.heavens-above.com/PassSummary.aspx?"
     SEARCH_URL_STAR = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=HIP+"
-    SEARCH_URL_SUN = "https://solarsystem.nasa.gov/solar-system/sun"
+    SEARCH_URL_SUN = "https://science.nasa.gov/sun/"
 
     WEREWOLF_WARNING_MESSAGE_DEFAULT = _( "                                          ...werewolves about ! ! !" )
     WEREWOLF_WARNING_SUMMARY_DEFAULT = _( "W  A  R  N  I  N  G" )
@@ -800,22 +800,23 @@ class IndicatorLunar( IndicatorBase ):
                 activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
 
 
-
-#TODO Not sure if needed for comets...see below.
-    def get_on_click_function_comet( self, menuitem ):
+    def get_on_click_function_comet( self ):
         try:
-            object_id = str( requests.get( menuitem.get_name() ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
-            webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + object_id )
+            return lambda menuitem: (
+                webbrowser.open(
+                    IndicatorLunar.SEARCH_URL_COMET_ID + \
+                    str( requests.get( menuitem.get_name() ).json()[ "object" ][ "id" ] ) ) )
+
         except Exception:
-            pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
+            pass # Ignore as the network/site may be down, or is a bad comet designation.
 
 
     def update_menu_planets_minor_planets_comets_stars( self, menu, menu_label, bodies, bodies_data, body_type ):
 
-        #TODO Rename to Python standard?
-        def getMenuItemNameFunction():
+        def get_menuitem_name_function():
             if body_type == IndicatorLunar.astro_backend.BodyType.PLANET:
-                menuitem_name_function = lambda name: IndicatorLunar.SEARCH_URL_PLANET + name.lower()
+                menuitem_name_function = (
+                    lambda name: IndicatorLunar.SEARCH_URL_PLANET + name.lower() )
 
             elif body_type == IndicatorLunar.astro_backend.BodyType.MINOR_PLANET:
                 menuitem_name_function = (
@@ -837,41 +838,26 @@ class IndicatorLunar( IndicatorBase ):
 
             return menuitem_name_function
 
-#TODO Sort out for comets
-        # def __getOnClickFunctionComet( self, menuItem ):
-        #     try:
-        #         objectId = str( requests.get( menuItem.props.name ).json()[ "object" ][ "id" ] )  #TODO Use the get_name()?
-        #         webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + objectId )
-        #
-        #     except Exception:
-        #         pass # Ignore because the network/site is down; or perhaps a bad comet designation which has already been logged.
-
 
         def get_on_click_function():
             on_click_function = ( self.get_on_click_menuitem_open_browser_function(), )
-#TODO Need to test this...            
-            # if body_type == IndicatorLunar.astro_backend.BodyType.COMET:
-            #     on_click_function = ( self.getOnClickFunctionComet(), )
+            if body_type == IndicatorLunar.astro_backend.BodyType.COMET:
+                on_click_function = ( self.get_on_click_function_comet(), )
 
             return on_click_function
 
 
-#TODO Why are there commented out if/elif?
         def get_display_name_function():
-            # if body_type == IndicatorLunar.astro_backend.BodyType.PLANET: display_name_function = getDisplayNamePlanet
             if body_type == IndicatorLunar.astro_backend.BodyType.PLANET:
                 display_name_function = \
                     lambda name: IndicatorLunar.astro_backend.PLANET_NAMES_TRANSLATIONS[ name ]
 
-            # elif body_type == IndicatorLunar.astro_backend.BodyType.MINOR_PLANET: display_name_function = getDisplayNameMinorPlanet
             elif body_type == IndicatorLunar.astro_backend.BodyType.MINOR_PLANET:
-                display_name_function = lambda name: bodies_data[ name ].getName()
+                display_name_function = lambda name: bodies_data[ name ].get_name()
 
-            # elif body_type == IndicatorLunar.astro_backend.BodyType.COMET: display_name_function = getDisplayNameComet
             elif body_type == IndicatorLunar.astro_backend.BodyType.COMET:
-                display_name_function = lambda name: bodies_data[ name ].getName()
+                display_name_function = lambda name: bodies_data[ name ].get_name()
 
-            # elif body_type == IndicatorLunar.astro_backend.BodyType.STAR: display_name_function = getDisplayNameStar
             elif body_type == IndicatorLunar.astro_backend.BodyType.STAR:
                 display_name_function = \
                     lambda name: IndicatorLunar.astro_backend.get_star_name_translation( name )
@@ -879,7 +865,7 @@ class IndicatorLunar( IndicatorBase ):
             return display_name_function
 
 
-        menuitem_name_function = getMenuItemNameFunction()#TODO Rename to Python standard?
+        menuitem_name_function = get_menuitem_name_function()
         on_click_function = get_on_click_function()
         display_name_function = get_display_name_function()
         indent = self.get_menu_indent()

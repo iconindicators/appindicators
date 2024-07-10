@@ -978,7 +978,6 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO UNCHECKED
     def get_on_click_menuitem_open_browser_function( self ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
