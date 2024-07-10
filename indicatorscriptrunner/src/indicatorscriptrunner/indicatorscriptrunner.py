@@ -550,21 +550,16 @@ class IndicatorScriptRunner( IndicatorBase ):
         return response_type
 
 
-#TODO Check the URLs here and for the function below to make sure they all match up
-# (they should match up if the functions are essentially the same...right?)
-# Also should these URLs be added to indicatortest's data_function comment header?
     # Renders the script name bold when the (non-background) script is default.
     # Otherwise normal style is used.
-    #
-    # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
-    # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
-    # https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
-    # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TextTag.html
-    # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
-    # https://developer.gnome.org/pygtk/stable/pango-markup-language.html
-    # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
-    # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-    def data_function_column_name_renderer( self, treeviewcolumn, cell_renderer, treemodel, treeiter, scripts ):
+    def data_function_column_name_renderer(
+        self,
+        treeviewcolumn,
+        cell_renderer,
+        treemodel,
+        treeiter,
+        scripts ):
+
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         name = treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name:
@@ -581,12 +576,14 @@ class IndicatorScriptRunner( IndicatorBase ):
     # Renders the interval column.
     #   For a background script, the value will be a number (as text) for the interval in minutes.
     #   For a group or non-background script, the interval does not apply and so a dash icon is rendered.
-    #
-    # https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
-    # https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
-    # https://developer.gnome.org/pygtk/stable/class-gtkcellrenderertext.html
-    # https://developer.gnome.org/pygtk/stable/pango-constants.html#pango-alignment-constants
-    def data_function_column_interval_renderer( self, treeviewcolumn, cell_renderer, treemodel, treeiter, data ):
+    def data_function_column_interval_renderer(
+        self,
+        treeviewcolumn,
+        cell_renderer,
+        treemodel,
+        treeiter,
+        data ):
+
 #TODO Below is original...
 # I think it was slighly wrong (but didn't show up)
 # as the group and non-background script rendering should be different.
