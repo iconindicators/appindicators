@@ -632,7 +632,6 @@ class IndicatorLunar( IndicatorBase ):
                 self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
-#TODO Can the subsequent \ be removed?
         summary = \
             self.satellite_notification_summary. \
             replace( IndicatorLunar.astro_backend.SATELLITE_TAG_NAME, self.satellite_general_perturbation_data[ number ].get_name() ). \
