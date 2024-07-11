@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Take a copy of Ubuntu 20.04 /usr/share/indicatorfortune, .../indicatorlunar,...
-# all indicators at some point.
-
-
 #TODO Got 
 #   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
 #
