@@ -281,8 +281,7 @@ def _get_installation_python_virtual_environment( indicator_name ):
         f"    ```\n"
         f"    if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade pip && \\\n"
-        f"    python3 -m pip install --upgrade --force-reinstall { indicator_name } && \\\n"
+        f"    python3 -m pip install --upgrade --force-reinstall pip { indicator_name } && \\\n"
         f"    deactivate\n"
         f"    ```\n" )
 

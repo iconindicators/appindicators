@@ -72,8 +72,7 @@ Rather than install via `PyPI` or `TestPyPI`, you may install a wheel in the loc
 ```
     if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
     . $HOME/.local/venv_indicatortest/bin/activate && \
-    python3 -m pip install --upgrade pip && \
-    python3 -m pip install --upgrade --force-reinstall $(ls -d release/wheel/dist_indicatortest/indicatortest*.whl | head -1) && \
+    python3 -m pip install --upgrade --force-reinstall pip $(ls -d release/wheel/dist_indicatortest/indicatortest*.whl | head -1) && \
     deactivate
 ```
 

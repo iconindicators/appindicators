@@ -30,8 +30,7 @@ def _install_wheel_for_indicator( directory_release, indicator_name ):
     command = \
         f"if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && " + \
         f". $HOME/.local/venv_{ indicator_name }/bin/activate && " + \
-        f"python3 -m pip install --upgrade pip && " + \
-        f"python3 -m pip install --upgrade --force-reinstall $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
+        f"python3 -m pip install --upgrade --force-reinstall pip $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
         f"deactivate && " + \
         f"mkdir -p $HOME/.local/bin && " + \
         f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.sh $HOME/.local/bin && " + \
