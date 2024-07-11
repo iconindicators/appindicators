@@ -178,7 +178,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            debug = True, # TODO Remove for production.
+            debug = False,
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
@@ -2101,10 +2101,10 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def translate_tags( self, tags_list_store, original_to_local, text ):
-        # The tags list store contains at least 2 columns; additional columns may exist,
-        # depending on the tags list store provided by the caller, but are ignored.
+        # The tags list store contains at three columns.
         # First column contains the original/untranslated tags.
         # Second column contains the translated tags.
+        # Third column contains the tag's corresponding value.
         if original_to_local:
             i = 0
             j = 1
@@ -2137,15 +2137,9 @@ class IndicatorLunar( IndicatorBase ):
             translated_tag_column_index,
             indicator_textentry ):
 
-        model, treeiter = tree.get_selection().get_selected()
-#TODO Given the tags treeview is sortable,
-# should the selected row be converted as per the satellite treeview below:
-#        actual_row = sortstore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-#        datastore[ actual_row ][ satellite_model_column_hide_show ] = \
-#            not datastore[ actual_row ][ satellite_model_column_hide_show ]
-
-        indicator_textentry.insert_text(
-            "[" + model[ treeiter ][ translated_tag_column_index ] + "]", indicator_textentry.get_position() )
+        model_sort, treeiter_sort = tree.get_selection().get_selected()
+        value = model_sort[ treeiter_sort ][ translated_tag_column_index ]
+        indicator_textentry.insert_text( "[" + value + "]", indicator_textentry.get_position() )
 
 
     def on_natural_body_checkbox(
@@ -2163,32 +2157,28 @@ class IndicatorLunar( IndicatorBase ):
             self,
             cell_renderer_toggle,
             row,
-            datastore,
+            liststore,
             sortstore,
             satellite_model_column_hide_show ):
 
-        actual_row = sortstore.convert_path_to_child_path( Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
-        datastore[ actual_row ][ satellite_model_column_hide_show ] = \
-            not datastore[ actual_row ][ satellite_model_column_hide_show ]
+        actual_row = \
+            sortstore.convert_path_to_child_path(
+                Gtk.TreePath.new_from_string( row ) ) # Convert sorted model index to underlying (child) model index.
+
+        liststore[ actual_row ][ satellite_model_column_hide_show ] = \
+            not liststore[ actual_row ][ satellite_model_column_hide_show ]
 
 
     def on_columnheader( self, treeviewcolumn, datastore, datastore_column_hide_show ):
-        at_least_one_item_checked = False
-        at_least_one_item_unchecked = False
+        all_items_checked = True
         for row in range( len( datastore ) ):
-            if datastore[ row ][ datastore_column_hide_show ]:
-                at_least_one_item_checked = True
-
             if not datastore[ row ][ datastore_column_hide_show ]:
-                at_least_one_item_unchecked = True
+                all_items_checked = False
 
-        if at_least_one_item_checked and at_least_one_item_unchecked: # Mix of values checked and unchecked, so check all.
-            value = True
-
-        elif at_least_one_item_checked: # No items checked (so all are unchecked), so check all.
+        if all_items_checked:
             value = False
 
-        else: # No items unchecked (so all are checked), so uncheck all.
+        else:
             value = True
 
         for row in range( len( datastore ) ):
