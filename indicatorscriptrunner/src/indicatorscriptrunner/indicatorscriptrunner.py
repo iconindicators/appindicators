@@ -102,12 +102,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
-#TODO How does the comment above appear on the PyPI project description?
-# Might need to (when running build_readme.py) remove the \n).
-#
-# In the .desktop, the comment still has the \n.
-#
-# Where else is the comment used?
+
         self.command_notify_background = \
             "notify-send -i " + self.get_icon_name() + \
             " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \

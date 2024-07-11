@@ -89,14 +89,14 @@ def _get_introduction( indicator_name ):
     for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py" ).readlines():
         matches = pattern_tag.search( line )
         if matches:
-            comments = matches.group().split( "\"" )[ 1 ].split( ' ' )
-            comments[ 0 ] = comments[ 0 ].lower()
+            comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ] # Remove \n and drop ending .
+            comments = comments[ 0 ].lower() + comments[ 1 : ] # Lower case leading char
             break
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     introduction = (
-        f"`{ indicator_name }` { ' '.join( comments )[ 0 : -1 ] } on "
+        f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
 
     if indicator_name.upper() != Indicator_Name.INDICATORONTHISDAY.name:

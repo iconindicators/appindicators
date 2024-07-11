@@ -312,9 +312,10 @@ def _create_dot_desktop(
     for language, _name in names_from_mo_files.items():
         names += f"\nName[{ language }]={ _name }"
 
-    comment = comments
+    newline = '\\n'
+    comment = comments.replace( newline, ' ' ) # If an indicator uses a \n to break up the comments (to fit the About dialog), replace with ' '.
     for language, _comment in comments_from_mo_files.items():
-        comment += f"\nComment[{ language }]={ _comment }"
+        comment += f"\nComment[{ language }]={ _comment.replace( newline, ' ' ) }"
 
     dot_desktop_text = \
         dot_desktop_text.format(
