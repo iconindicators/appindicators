@@ -16,6 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO For the actual release to PyPI, the version to use is 1.0.17 as per pyproject.toml.
+#
+# For testPyPI, the version to use it 1.0.23
+# So temporarily update the pyproject.toml and CHANGELOG.md 
+
+
 # Application indicator to test stuff.
 
 
