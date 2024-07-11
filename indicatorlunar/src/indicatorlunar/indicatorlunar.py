@@ -1413,8 +1413,8 @@ class IndicatorLunar( IndicatorBase ):
         COLUMN_MODEL_TRANSLATED_TAG = 1
         COLUMN_MODEL_VALUE = 2
 
-        COLUMN_VIEW_TRANSLATED_TAG = 1
-        COLUMN_VIEW_VALUE = 2
+        COLUMN_VIEW_TAG = 0
+        COLUMN_VIEW_VALUE = 1
 
         display_tags_store = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialise_display_tags_store( display_tags_store )
@@ -1432,8 +1432,8 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.CellRendererText(), "text", COLUMN_MODEL_TRANSLATED_TAG ),
                     ( Gtk.CellRendererText(), "text", COLUMN_MODEL_VALUE ) ),
-                sortcolumnviewids_columnmodelids = (  #TODO Only the value column is sorted...why?
-                    ( COLUMN_VIEW_TRANSLATED_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
+                sortcolumnviewids_columnmodelids = (
+                    ( COLUMN_VIEW_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
                     ( COLUMN_VIEW_VALUE, COLUMN_MODEL_VALUE ) ),
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
                 rowactivatedfunctionandarguments = ( self.on_tags_values_double_click, COLUMN_MODEL_TRANSLATED_TAG, indicator_text ) )
