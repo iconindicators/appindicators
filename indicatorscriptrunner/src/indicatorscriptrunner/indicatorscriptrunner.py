@@ -16,7 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Delete does not update the table.
+#TODO Check/test with a couple of groups with background scripts.
+# In fact, at least one group with a mix of background and non-background scripts.
 
 
 # Application indicator to run a terminal command or script from an indicator.
@@ -65,7 +66,6 @@ class IndicatorScriptRunner( IndicatorBase ):
     COLUMN_MODEL_TERMINAL = 5 # Icon name for the APPLY icon; None otherwise.
     COLUMN_MODEL_INTERVAL = 6 # Numeric amount as a string.
     COLUMN_MODEL_FORCE_UPDATE = 7 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_MODEL_REMOVE = 8 # Icon name for the REMOVE icon; None otherwise.   #TODO If this is the flip side of interval, maybe swap this column with force update...and comment???
 
     COLUMN_VIEW_SCRIPTS_ALL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
     COLUMN_VIEW_SCRIPTS_ALL_NAME = 1 # Script name.
@@ -328,9 +328,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "The terminal script/command, along with any arguments." ),
                 editable = False )
 
+        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str )
+
+        treestore_background_scripts_filter = treestore.filter_new()
+        treestore_background_scripts_filter.set_visible_func( self.background_scripts_filter_func, copy_of_scripts )
+
         background_scripts_treeview, background_scripts_scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                Gtk.TreeStore( str, str, str, str, str, str, str, str, str ),
+                treestore_background_scripts_filter,
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -341,26 +346,25 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_GROUP ),
                     ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_NAME ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
                     ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_NOTIFICATION ),
-                    ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL ),
+                    ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL ),  #TODO The text is left aligned instead of centred...why?  
+                    # Ditto for other columns...what is going on?
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE) ),
                 tooltip_text = _( "Double click on a script to add to the icon text." ),
                 rowactivatedfunctionandarguments = (
                     self.on_background_script_double_click, indicator_text_entry ), )
 
-        renderer_text_column_name = Gtk.CellRendererText()
-        renderer_text_column_interval = Gtk.CellRendererText()
-        renderer_pixbuf_column_remove = Gtk.CellRendererPixbuf()
+        renderer_column_name_text = Gtk.CellRendererText()
 
         scripts_treeview, scripts_scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                Gtk.TreeStore( str, str, str, str, str, str, str, str, str ),
+                treestore,
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -372,15 +376,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                     _( "Force Update" ) ),
                 (
                     ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_GROUP ),
-                    ( renderer_text_column_name, "text", IndicatorScriptRunner.COLUMN_MODEL_NAME ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                    (
-                        ( renderer_text_column_interval, "text", IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                        ( renderer_pixbuf_column_remove, "icon_name", IndicatorScriptRunner.COLUMN_MODEL_REMOVE ) ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
+                    ( renderer_column_name_text, "text", IndicatorScriptRunner.COLUMN_MODEL_NAME ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+                    ( Gtk.CellRendererText(), "text", IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_SOUND ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NOTIFICATION ),
@@ -389,9 +391,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_FORCE_UPDATE ) ),
                 celldatafunctionandarguments_renderers_columnviewids = (
-                    ( ( self.data_function_column_name_renderer, copy_of_scripts ), renderer_text_column_name, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ),
-                    ( ( self.data_function_column_interval_renderer, ), renderer_text_column_interval, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ),
-                    ( ( self.data_function_column_interval_renderer, ), renderer_pixbuf_column_remove, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ) ),
+                    ( ( self.data_function_column_name_renderer, copy_of_scripts ), renderer_column_name_text, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ), ),
                 tooltip_text = _(
                     "Double-click to edit a script.\n\n" +
                     "If an attribute does not apply to a script,\n" +
@@ -410,8 +410,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 ( ( Gtk.Label.new( _( "Command" ) ), False ), ),
                 halign = Gtk.Align.START ),
              0, 20, 1, 1 )
-
-        self.populate_scripts_treestore( scripts_treeview, copy_of_scripts, "", "" )
 
         grid.attach(
             self.create_box(
@@ -514,7 +512,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( indicator_text_separator_entry, False ) ) ),
             0, 1, 1, 1 )
 
-        self.populate_scripts_treestore( background_scripts_treeview, copy_of_scripts, "", "", False, True )
+        self.populate_treestore_and_select_script(
+            scripts_treeview, background_scripts_treeview, copy_of_scripts, "", "" )
 
         grid.attach( background_scripts_scrolledwindow, 0, 2, 1, 20 )
 
@@ -545,8 +544,25 @@ class IndicatorScriptRunner( IndicatorBase ):
         return response_type
 
 
-    # Renders the script name bold when the (non-background) script is default.
-    # Otherwise normal style is used.
+    def background_scripts_filter_func( self, model, treeiter, scripts ):
+        group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
+        if group is None:
+            show = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ] == '✔'
+
+        else:
+            background_scripts_by_group = \
+                self.get_scripts_by_group( scripts, non_background = False, background = True )
+
+            if group in background_scripts_by_group:
+                show = len( background_scripts_by_group[ group ] ) > 0
+
+            else:
+                show = False
+
+        return show
+
+
+    # If/when a non-background script is default, render the script name bold.
     def data_function_column_name_renderer(
         self,
         treeviewcolumn,
@@ -568,136 +584,99 @@ class IndicatorScriptRunner( IndicatorBase ):
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-    # Renders the interval column.
-    #   For a background script, the value will be a number (as text) for the interval in minutes.
-    #   For a group or non-background script, the interval does not apply and so a dash icon is rendered.
-    def data_function_column_interval_renderer(
-        self,
-        treeviewcolumn,
-        cell_renderer,
-        treemodel,
-        treeiter,
-        data ):
-
-#TODO Below is original...
-# I think it was slighly wrong (but didn't show up)
-# as the group and non-background script rendering should be different.
-        # cell_renderer.set_visible( True )
-        # if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
-        #     if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
-        #         cell_renderer.set_visible( False )
-        #
-        #     else:
-        #         cell_renderer.set_visible( True )
-        #         cell_renderer.set_property( "xalign", 0.5 )
-        #
-        # else:
-        #     if isinstance( cell_renderer, Gtk.CellRendererText ):
-        #         print( treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
-        #         cell_renderer.set_visible( False )
-
-        if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) is None:
-            if treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) == Gtk.STOCK_APPLY: # This is a background script.
-                if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
-                    cell_renderer.set_visible( False )
-    
-                if isinstance( cell_renderer, Gtk.CellRendererText ):
-                    cell_renderer.set_visible( True )
-                    cell_renderer.set_property( "xalign", 0.5 )
-    
-            else:
-                if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
-                    cell_renderer.set_visible( True )
-
-                if isinstance( cell_renderer, Gtk.CellRendererText ):
-                    cell_renderer.set_visible( False )
-
-        else:
-            if isinstance( cell_renderer, Gtk.CellRendererPixbuf ):
-                cell_renderer.set_visible( False )
-
-            if isinstance( cell_renderer, Gtk.CellRendererText ):
-                cell_renderer.set_visible( True )
-
-
 #TODO Might be helpful later...
 #    https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
-    def populate_scripts_treestore(
+    def populate_treestore_and_select_script(
         self,
-        treeview,
+        treeview_all_scripts,
+        treeview_background_scripts,
         scripts,
         select_group,
-        select_script,
-        non_background = True,
-        background = True ):
+        select_script ):
 
-        treestore = treeview.get_model()
+        treestore = treeview_all_scripts.get_model()
         treestore.clear()
 
-        scripts_by_group = self.get_scripts_by_group( scripts, non_background, background )
+        scripts_by_group = self.get_scripts_by_group( scripts, non_background = True, background = True )
         groups = sorted( scripts_by_group.keys(), key = str.lower )
         for group in groups:
-            row = [ group, None, None, None, None, None, None, None, None ]
+            row = [ group, None, None, None, None, None, None, None ]
             parent = treestore.append( None, row )
             for script in sorted( scripts_by_group[ group ], key = lambda script: script.get_name().lower() ):
-                play_sound = Gtk.STOCK_APPLY if script.get_play_sound() else None
-                show_notification = Gtk.STOCK_APPLY if script.get_show_notification() else None
-                is_background = Gtk.STOCK_APPLY if type( script ) is Background else None
-
-                if type( script ) is Background:
-                    terminal_open = Gtk.STOCK_REMOVE
-                    interval_in_minutes = str( script.get_interval_in_minutes() )
-                    interval_in_minutes_dash = None
-                    force_update = Gtk.STOCK_APPLY if script.get_force_update() else None
-
-                else:
-                    terminal_open = Gtk.STOCK_APPLY if script.get_terminal_open() else None
-                    interval_in_minutes = ""
-                    interval_in_minutes_dash = Gtk.STOCK_REMOVE
-                    force_update = Gtk.STOCK_REMOVE
-
                 row = [
                    None, # Don't add in the group name here as it will be displayed.
                    script.get_name(),
-                   play_sound,
-                   show_notification,
-                   is_background,
-                   terminal_open,
-                   interval_in_minutes,
-                   force_update,
-                   interval_in_minutes_dash ]
+                   '✔' if script.get_play_sound() else None,
+                   '✔' if script.get_show_notification() else None,
+                   '✔' if type( script ) is Background else None,
+                   '—'
+                   if type( script ) is Background else
+                   ( '✔' if script.get_terminal_open() else None ),
+                   str( script.get_interval_in_minutes() ) 
+                   if type( script ) is Background else
+                   '—',
+                   ( '✔' if script.get_force_update() else None ) 
+                   if type( script ) is Background else
+                   '—' ]
 
                 treestore.append( parent, row )
 
+        treeview_background_scripts.get_model().refilter()
+
         if scripts:
-            self.expand_tree_and_select( treeview, select_group, select_script, scripts_by_group, groups )
+            background_scripts_by_group = self.get_scripts_by_group( scripts, non_background = False, background = True )
+            background_groups = sorted( background_scripts_by_group.keys(), key = str.lower )
+            self.__expand_trees_and_select(
+                treeview_all_scripts,
+                treeview_background_scripts,
+                select_group,
+                select_script,
+                scripts_by_group,
+                groups,
+                background_groups )
 
 
-    def expand_tree_and_select(
+    def __expand_trees_and_select(
             self,
-            treeview,
+            treeview_all_scripts,
+            treeview_background_scripts,
             select_group,
             select_script,
             scripts_by_group,
-            groups ):
+            groups,
+            background_groups ):
 
-        path_as_string = "0:0"
-        if select_group:
-            group_index = groups.index( select_group )
-            i = 0
-            for script in sorted( scripts_by_group[ select_group ], key = lambda script: script.get_name().lower() ):
-                if select_script == script.get_name():
-                    path_as_string = str( group_index ) + ":" + str( i )
-                    break
 
-                i += 1
+        def build_path_and_select_group_and_script( treeview, groups ):
+            path_as_string = "0:0"
+            if select_group:
+                try:
+                    group_index = groups.index( select_group )
+                    scripts_for_group = scripts_by_group[ select_group ]
+                    i = 0
+                    for script in sorted( scripts_for_group, key = lambda script: script.get_name().lower() ):
+                        if select_script == script.get_name():
+                            path_as_string = str( group_index ) + ":" + str( i )
+                            break
 
-        treeview.expand_all()
-        treepath = Gtk.TreePath.new_from_string( path_as_string )
-        treeview.get_selection().select_path( treepath )
-        treeview.set_cursor( treepath, None, False )
-        if len( treeview.get_model() ):
-            treeview.scroll_to_cell( treepath ) # Doesn't like to be called when empty.
+                        i += 1
+
+                except ValueError:
+                    # Occurs when a group/script selected in the all scripts treeview
+                    # does not exist in the background scripts treeview,
+                    # so accept the default (select first item using 0:0).
+                    pass
+
+
+            treeview.expand_all()
+            treepath = Gtk.TreePath.new_from_string( path_as_string )
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+            if len( treeview.get_model() ):
+                treeview.scroll_to_cell( treepath ) # Doesn't like to be called when empty.
+
+        build_path_and_select_group_and_script( treeview_all_scripts, groups )
+        build_path_and_select_group_and_script( treeview_background_scripts, background_groups )
 
 
     def on_script_selection( self, treeview, textview, scripts ):
@@ -827,14 +806,12 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     scripts.append( new_script )
 
-                    self.populate_scripts_treestore( scripts, scripts_treeview, "", "" )
-                    self.populate_scripts_treestore(
-                        scripts,
+                    self.populate_treestore_and_select_script(
+                        scripts_treeview,
                         background_scripts_treeview,
-                        new_script.get_group() if type( new_script ) is Background else "",
-                        new_script.get_name() if type( new_script ) is Background else "",
-                        False,
-                        True )
+                        scripts,
+                        new_script.get_group(),
+                        new_script.get_name() )
 
                 break
 
@@ -864,8 +841,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 for script in scripts:
                     if script.get_group() == group and script.get_name() == name:
                         del scripts[ i ]
-                        self.populate_scripts_treestore( scripts, scripts_treeview, "", "" )
-                        self.populate_scripts_treestore( scripts, background_scripts_treeview, "", "", False, True )
+                        self.populate_treestore_and_select_script(
+                            scripts_treeview,
+                            background_scripts_treeview,
+                            scripts,
+                            "",
+                            "" )
+
                         self.update_indicator_textentry( textentry, self.__create_key( group, name ), "" )
                         break
 
@@ -925,6 +907,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             model, treeiter = scripts_treeview.get_selection().get_selected()
             if treeiter:
                 group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
+                if group is None: # A script is selected, so find the parent group.
+                    parent = scripts_treeview.get_model().iter_parent( treeiter )
+                    group = model[ parent ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
+
                 index = groups.index( group )
 
         else:
@@ -1193,19 +1179,12 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 scripts.append( new_script )
 
-                self.populate_scripts_treestore(
-                    scripts,
+                self.populate_treestore_and_select_script(
                     scripts_treeview,
+                    background_scripts_treeview,
+                    scripts,
                     new_script.get_group(),
                     new_script.get_name() )
-
-                self.populate_scripts_treestore(
-                    scripts,
-                    background_scripts_treeview,
-                    new_script.get_group() if type( new_script ) is Background else "",
-                    new_script.get_name() if type( new_script ) is Background else "",
-                    False,
-                    True )
 
             break
 

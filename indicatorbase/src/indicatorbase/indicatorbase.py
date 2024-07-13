@@ -1311,10 +1311,10 @@ class IndicatorBase( ABC ):
 # can be single tuples or a tuple of tuples (as in script runner main treeview).
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
-        for title, renderer_attribute_columnmodelid in zip( titles, renderers_attributes_columnmodelids ):
+        for index, ( title, renderer_attribute_columnmodelid ) in enumerate( zip( titles, renderers_attributes_columnmodelids ) ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
 
-            # Expand all columns unless the column contains a single checkbox and no column header title.
+            # Expand the column unless the column contains a single checkbox and no column header title.
             is_checkbox_column = \
                 type( renderer_attribute_columnmodelid[ 0 ] ) == Gtk.CellRendererToggle and not title
 
@@ -1332,13 +1332,17 @@ class IndicatorBase( ABC ):
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
 
-            treeview.append_column( treeviewcolumn )
+            alignment = [
+                alignment_columnviewid[ 0 ]
+                for alignment_columnviewid in alignments_columnviewids
+                if alignment_columnviewid[ 1 ] == index ]
 
-        if alignments_columnviewids:
-            for alignment, columnviewid in alignments_columnviewids:
-                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
-                    if columnviewid == index:
-                        treeviewcolumn.set_alignment( alignment )
+            if alignment:
+                treeviewcolumn.set_alignment( alignment[ 0 ] )
+                current_alignment = renderer_attribute_columnmodelid[ 0 ].get_alignment()
+                renderer_attribute_columnmodelid[ 0 ].set_alignment( alignment[ 0 ], current_alignment[ 1 ] )
+
+            treeview.append_column( treeviewcolumn )
 
         if sortcolumnviewids_columnmodelids:
             for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
