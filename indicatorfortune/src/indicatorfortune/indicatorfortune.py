@@ -244,6 +244,9 @@ class IndicatorFortune( IndicatorBase ):
             else:
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
+#TODO Still not convinced when using a modelsort that I shouldn't be also doing a
+# conversion of the row in modelsort space to modelchild space...
+# ...look at all uses of treemodelsort (and other sorts for TreeView) in all indicators.
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = store ),
