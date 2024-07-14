@@ -985,7 +985,6 @@ class IndicatorBase( ABC ):
 
     # Listens to radio/checkbox "toggled" events and toggles the visibility
     # of the widgets according to the boolean value of 'sense'.
-#TODO UNCHECKED
     def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
         for widget in widgets:
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
@@ -1282,22 +1281,22 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-#TODO UNCHECKED
+#TODO Figure out how to do a proper header comment/docstring/whatever it is called...
+#...and document each argument...notably the renderers_attributes_columnmodelids
+# can be single tuples or a tuple of tuples (as in script runner main treeview).
     def create_treeview_within_scrolledwindow(
         self,
-        treemodel, # Must be a sorted store if columns are to be sorted.
+        treemodel,
         titles,
         renderers_attributes_columnmodelids, # Columns will not be expanded: treeviewcolumn.pack_start( renderer, False )
         alignments_columnviewids = None,
         sortcolumnviewids_columnmodelids = None, # First column will be set as default sorted ascendingly.
-        celldatafunctionandarguments_renderers_columnviewids = None, # Function and arguments must be a nested tuple.
+        celldatafunctionandarguments_renderers_columnviewids = None,
         clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
         cursorchangedfunctionandarguments = None,
         rowactivatedfunctionandarguments = None ):
-#TODO Figure out how to do a proper header comment/docstring/whatever it is called...
-#...and document each argument...notably the renderers_attributes_columnmodelids
-# can be single tuples or a tuple of tuples (as in script runner main treeview).
+
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
         for index, ( title, renderer_attribute_columnmodelid ) in enumerate( zip( titles, renderers_attributes_columnmodelids ) ):
@@ -1460,8 +1459,6 @@ class IndicatorBase( ABC ):
         return logging
 
 
-#TODO UNCHECKED
-#TODO Who calls this?
     def is_number( self, number_as_string ):
         try:
             float( number_as_string )
