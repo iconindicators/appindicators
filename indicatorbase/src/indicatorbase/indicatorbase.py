@@ -24,14 +24,6 @@
 # Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
 
 
-#TODO On desktop, indicatortide does not run on startup.
-# Desktop file, run shell script all have same permissions for other indicators.
-# Starts up fine on laptop!
-#
-# Also on desktop, PPA and Punycode don't autostart...what else...and why?
-# They seem to have correct permissions.
-
-
 #TODO Add changelog entry for each indicator about moving closer to PEP8
 # or whatever the Python code standard is?
 
@@ -1327,7 +1319,6 @@ class IndicatorBase( ABC ):
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
             else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
-#TODO This clause should happen for script runner when we have interval with two possible renderers...
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
