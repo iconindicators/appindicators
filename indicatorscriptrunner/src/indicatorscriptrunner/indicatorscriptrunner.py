@@ -353,8 +353,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 alignments_columnviewids = (
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_NOTIFICATION ),
-                    ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL ),  #TODO The text is left aligned instead of centred...why?  
-                    # Ditto for other columns...what is going on?
+                    ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE) ),
                 tooltip_text = _( "Double click on a script to add to the icon text." ),
                 rowactivatedfunctionandarguments = (
