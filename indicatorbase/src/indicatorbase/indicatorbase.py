@@ -564,7 +564,6 @@ class IndicatorBase( ABC ):
         Notify.Notification.new( summary, message, _icon ).show()
 
 
-#TODO UNCHECKED
     def set_secondary_activate_target( self, menuitem ):
         self.secondary_activate_target = menuitem
 
@@ -824,7 +823,6 @@ class IndicatorBase( ABC ):
                 title = title )
 
 
-#TODO UNCHECKED
     def show_dialog_ok(
             self,
             parent_widget,
@@ -976,7 +974,6 @@ class IndicatorBase( ABC ):
     
     # Takes a Gtk.TextView and returns the containing text,
     # avoiding the additional calls to get the start/end positions.
-#TODO UNCHECKED
     def get_textview_text( self, textview ):
         textview_buffer = textview.get_buffer()
         return \
@@ -1323,15 +1320,16 @@ class IndicatorBase( ABC ):
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
 
-            alignment = [
-                alignment_columnviewid[ 0 ]
-                for alignment_columnviewid in alignments_columnviewids
-                if alignment_columnviewid[ 1 ] == index ]
+            if alignments_columnviewids:
+                alignment = [
+                    alignment_columnviewid[ 0 ]
+                    for alignment_columnviewid in alignments_columnviewids
+                    if alignment_columnviewid[ 1 ] == index ]
 
-            if alignment:
-                treeviewcolumn.set_alignment( alignment[ 0 ] )
-                current_alignment = renderer_attribute_columnmodelid[ 0 ].get_alignment()
-                renderer_attribute_columnmodelid[ 0 ].set_alignment( alignment[ 0 ], current_alignment[ 1 ] )
+                if alignment:
+                    treeviewcolumn.set_alignment( alignment[ 0 ] )
+                    current_alignment = renderer_attribute_columnmodelid[ 0 ].get_alignment()
+                    renderer_attribute_columnmodelid[ 0 ].set_alignment( alignment[ 0 ], current_alignment[ 1 ] )
 
             treeview.append_column( treeviewcolumn )
 
