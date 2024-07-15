@@ -16,6 +16,67 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Check the flow of code,
+# from init to update loops,
+# to about/preferences,
+# to interupting an update (if possible or should be allowed),
+# to stopping an update and then kicking off later.
+#
+# When About/Preferences is showing,
+# is it possible to click anything else in the indicator menu?
+# 
+# Check Debian 12 et al!
+#
+# Run punycode.  Open About dialog.
+# Highlight some punycode on a browser page.
+# Click convert.
+# This is blocked on Ubuntu 20.04.
+# What about Debian et al?  
+# Try for both clipboard and primary input sources.
+#
+# If an update is underway, is it possible for the user to select About/Prefs?
+# Hopefully not as the menu should be disabled during the update.
+# All good on Ubuntu 20.04...what about Debian et al?
+#
+# By doing an update (after the Preferences/About are closed)
+#
+#    self.request_update()
+#
+# (and probably only do this "if responseType != Gtk.ResponseType.OK" because when OK
+# an update is kicked off any way)
+#
+# gets around the Debian/Fedora issue when clicking the icon
+# when the About/Preferences are open (see TODO below). 
+# Is this viable...perhaps only do it for Debian 11 / 12 and Fedora 38 / 39?
+#
+# Maybe call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
+#
+# Does this issue happen under Debian/Fedora under xorg (rather than default wayland)?
+#
+# Might be able to use this to determine the os/platform/distro:
+# desktop_environment = os.environ.get('DESKTOP_SESSION')
+#         if desktop_environment:
+#             if desktop_environment.lower()[:8] == 'cinnamon':
+#                 svg = indicator_icon
+#             if desktop_environment.lower()[:7] == 'xubuntu':
+#                 svg = indicator_icon
+#             if desktop_environment.lower()[:4] == 'xfce':
+#                 svg = indicator_icon
+
+
+#TODO Run any indicator under Debian 12 and open About dialog.
+# Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
+# Clicking the red X on the About dialog (or hitting the escape key)
+# closes the dialog but the About/Preferences/Quit items remain greyed out.
+# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al and NOT on Fedora 40.
+# Occurs on Debian 11 on all graphics variants;
+# Debian 12 on GNOME, presumably all other graphics variants;
+# Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
+# Check on other distros.
+#
+# Double check Manjaro 22.1; openSUSE Tumbleweed.
+
+
 #TODO Got 
 #   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
 #
@@ -66,19 +127,6 @@
 #   https://pypi.org/project/indicatorstardate/
 #   https://pypi.org/project/indicatortide/
 #   https://pypi.org/project/indicatorvirtualbox/
-
-
-#TODO Run any indicator under Debian 12 and open About dialog.
-# Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
-# Clicking the red X on the About dialog (or hitting the escape key)
-# closes the dialog but the About/Preferences/Quit items remain greyed out.
-# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al and NOT on Fedora 40.
-# Occurs on Debian 11 on all graphics variants;
-# Debian 12 on GNOME, presumably all other graphics variants;
-# Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
-# Check on other distros.
-#
-# Double check Manjaro 22.1; openSUSE Tumbleweed.
 
 
 #TODO Is it feasible for an indicator to check, say weekly,
@@ -240,27 +288,6 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
 
-#TODO Check the flow of code, from init to update loops,
-# to about/preferences,
-# to interupting an update (if possible)
-# to stopping an update and then kicking off later.
-#
-#TODO Check that when About/Preferences is showing,
-# is it possible to click anything else in the indicator menu?
-# If not, may need to go back to using GLib.idle_add()
-# or maybe just disable entire menu?
-# 
-# On Ubuntu 20.04, does not block when About/Prefs open.
-# 
-# What about Debian 12?
-#
-# Run punycode.  Open About dialog.
-# Highlight some punycode on a browser page.
-# Click convert.  Menu is rebuilt!!!  Not good.
-# So maybe have to disable menu...also the secondary menu item and mouse wheel scroll.
-#
-#Need to guarentee that when a user kicks off Abuot/Prefs that an update is not underway
-# and also to prevent an update from happening.
     # The comments argument is used in two places:
     #
     #   1) The first letter of the comments is capitalised and incorporated
@@ -513,7 +540,8 @@ class IndicatorBase( ABC ):
 
         if next_update_in_seconds: # Some indicators don't return a next update time.
             self.update_timer_id = GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
-            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds ) #TODO Hopefully no longer need self.nextUpdateTime
+            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
+            #TODO Hopefully no longer need self.nextUpdateTime
 
         self.lock.release()
 
@@ -604,9 +632,6 @@ class IndicatorBase( ABC ):
         if self.lock.acquire( blocking = False ):
             self.__on_about_internal( menuitem )
 
-        else:
-            pass #TODO Show notification to user?  How to tell if we're blocked due to update or Preferences?
-
 
     def __on_about_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
@@ -662,25 +687,6 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
         self.lock.release()
 
-        #TODO By doing an update gets around the Debian/Fedora issue
-        # when clicking the icon when the About/Preferences are open. 
-        # Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
-        #
-        # Is there some other way to try?
-        # Call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
-        #
-        #Does this issue happen under Debian/Fedora under xorg (rather than default wayland)?
-        # self.request_update()
-#TODO May be able to use this to determine the os/platform/distro:
-# desktop_environment = os.environ.get('DESKTOP_SESSION')
-#         if desktop_environment:
-#             if desktop_environment.lower()[:8] == 'cinnamon':
-#                 svg = indicator_icon
-#             if desktop_environment.lower()[:7] == 'xubuntu':
-#                 svg = indicator_icon
-#             if desktop_environment.lower()[:4] == 'xfce':
-#                 svg = indicator_icon
-
 
     def __add_hyperlink_label(
             self,
@@ -706,9 +712,6 @@ class IndicatorBase( ABC ):
     def __on_preferences( self, menuitem ):
         if self.lock.acquire( blocking = False ):
             self.__on_preferences_internal( menuitem )
-
-        else:
-            pass #TODO Show notification to user?  How to tell if we're blocked due to update or About?
 
 
     def __on_preferences_internal( self, menuitem ):
@@ -747,12 +750,6 @@ class IndicatorBase( ABC ):
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
         self.lock.release()
-
-#        self.request_update() #TODO By doing an update gets around the Debian/Fedora issue
-# when clicking the icon when the About/Preferences are open. 
-# Not sure if this should stay...but needs to be only done for Debian 11 / 12 and Fedora 38 / 39.
-# But...only do this "if responseType != Gtk.ResponseType.OK" because when OK,
-# an update is kicked off any way.
 
 
     def set_menu_sensitivity( self, toggle ):
