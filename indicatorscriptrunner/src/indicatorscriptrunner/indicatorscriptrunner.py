@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check/test with a couple of groups with background scripts.
-# In fact, at least one group with a mix of background and non-background scripts.
-
-
 # Application indicator to run a terminal command or script from an indicator.
 
 
