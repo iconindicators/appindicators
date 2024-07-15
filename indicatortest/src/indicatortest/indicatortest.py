@@ -76,8 +76,6 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __build_menu( self, menu ):
-        menu.append( Gtk.SeparatorMenuItem() )
-
         self.create_and_append_menuitem( menu, _( "Information" ) )
         self.__build_menu_platform_uname( menu )
         self.__build_menu_desktop( menu )

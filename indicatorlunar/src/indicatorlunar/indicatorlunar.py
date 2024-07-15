@@ -178,7 +178,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            debug = False,
+            debug = True,#TODO Remove on release.
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
@@ -273,6 +273,8 @@ class IndicatorLunar( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 IndicatorLunar.astro_backend_name + ": " + IndicatorLunar.astro_backend.get_version() )
+
+            menu.append( Gtk.SeparatorMenuItem() )
 
         self.update_menu( menu, utc_now )
         self.set_label( self.process_tags() )

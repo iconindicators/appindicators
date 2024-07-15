@@ -24,10 +24,6 @@
 # Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
 
 
-#TODO Add changelog entry for each indicator about moving closer to PEP8
-# or whatever the Python code standard is?
-
-
 #TODO Given clipboard and wmctrl don't seem to work under Wayland...
 # figure out if this is the case/scenarios...
 # then figure out if things like in virtualbox need to handle when middle mouse click
@@ -178,7 +174,6 @@ import logging.handlers
 import os
 from pathlib import Path
 import pickle
-import re  #TODO No longer used?
 import shutil
 import signal
 import subprocess
@@ -487,6 +482,10 @@ class IndicatorBase( ABC ):
         next_update_in_seconds = self.update( menu ) # Call to implementation in indicator.
 
         if self.is_debug():
+            menu_has_children = len( menu.get_children() ) > 0
+
+            menu.prepend( Gtk.SeparatorMenuItem() )
+
             if next_update_in_seconds:
                 next_update_date_time = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
                 label = "Next update: " + str( next_update_date_time ).split( '.' )[ 0 ]
@@ -495,10 +494,12 @@ class IndicatorBase( ABC ):
             label = "Time to update: " + str( datetime.datetime.now() - update_start )
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
-#TODO Ensure this works for indicatortest (with one menu item) and
-# indicatorlunar with two menu items.
-        if len( menu.get_children() ) > 0:
-            menu.append( Gtk.SeparatorMenuItem() )
+            if menu_has_children:
+                menu.append( Gtk.SeparatorMenuItem() )
+
+        else:
+            if len( menu.get_children() ) > 0:
+                menu.append( Gtk.SeparatorMenuItem() )
 
         titles = ( _( "Preferences" ), _( "About" ), _( "Quit" ) )
         functions = ( self.__on_preferences, self.__on_about, Gtk.main_quit )
