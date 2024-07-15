@@ -194,7 +194,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += script.get_command()
 
             if script.get_show_notification():
-                command += "; " + self.command_notify_nonbackground.replace( IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME, script.get_name() )
+                notification = \
+                    self.command_notify_nonbackground.replace(
+                        IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
+                        script.get_name() )
+
+                command += "; " + notification
 
             if script.get_play_sound():
                 command += "; " + IndicatorScriptRunner.COMMAND_SOUND

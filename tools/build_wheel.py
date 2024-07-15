@@ -313,7 +313,10 @@ def _create_dot_desktop(
         names += f"\nName[{ language }]={ _name }"
 
     newline = '\\n'
-    comment = comments.replace( newline, ' ' ) # If an indicator uses a \n to break up the comments (to fit the About dialog), replace with ' '.
+
+    # If the comments are broken up by '\n' to fit the About dialog, replace with ' '.
+    comment = comments.replace( newline, ' ' )
+
     for language, _comment in comments_from_mo_files.items():
         comment += f"\nComment[{ language }]={ _comment.replace( newline, ' ' ) }"
 
@@ -337,7 +340,7 @@ def _create_dot_desktop(
         stat.S_IROTH )
 
 
-def _copy_indicator_directory_and_build_release( directory_dist, indicator_name ):
+def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     # By using copytree, the ENTIRE project is copied across;
     # however, the pyproject.toml explicitly defines what files/folders
     # are included in the build (and conversely what is excluded).
@@ -442,7 +445,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             directory_dist.mkdir( parents = True )
 
-            if _copy_indicator_directory_and_build_release( directory_dist, indicator_name ):
+            if _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                 _intialise_virtual_environment( "build", "pip", "PyGObject" )
 
                 command = \

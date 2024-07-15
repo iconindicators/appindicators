@@ -1559,38 +1559,6 @@ class IndicatorBase( ABC ):
         return terminal, execution_flag
 
 
-    # Converts a list of lists to a GTK ListStore.
-    #
-    # If the list of lists is of the form below,
-    # each inner list must be of the same length.
-    #
-    #    [
-    #        [ dataA, dataB, dataC, ... ],
-    #        ...
-    #        ...
-    #        ...
-    #        [ dataX, dataY, dataZ, ... ]
-    #    ]
-    #
-    # Corresponding indices of elements of each inner list must be of the same data type:
-    #
-    #    type( dataA ) == type( dataX ) and type( dataB ) == type( dataY ) and type( dataC ) == type( dataZ ).
-    #
-    # Each row of the returned ListStore contain one inner list.
-#TODO UNCHECKED
-    def list_of_lists_to_liststore( self, list_of_lists ): #TODO Check how this function works...if all good, maybe move back into Lunar?
-        types = [ ]
-        for item in list_of_lists[ 0 ]:
-            types.append( type( item[ 0 ] ) )
-
-        liststore = Gtk.ListStore()
-        liststore.set_column_types( types )
-        for item in list_of_lists:
-            liststore.append( item )
-
-        return liststore
-
-
     # Download the contents of the given URL and save to file.
     @staticmethod
     def download( url, filename, logging ):
@@ -1613,6 +1581,7 @@ class IndicatorBase( ABC ):
         return GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 
+    # Copies .config using the old indicator name format (using hyphens) to the new format, sans hyphens.
     def __copy_config_to_new_directory( self ):
         mapping = {
             "indicatorfortune":                 "indicator-fortune",
@@ -1626,7 +1595,11 @@ class IndicatorBase( ABC ):
             "indicatortest":                    "indicator-test",
             "indicatorvirtualbox":              "indicator-virtual-box" }
 
-        config_file = self.__get_config_directory() + self.indicator_name + IndicatorBase.__EXTENSION_JSON
+        config_file = \
+            self.__get_config_directory() + \
+            self.indicator_name + \
+            IndicatorBase.__EXTENSION_JSON
+
         config_file_old = config_file.replace( self.indicator_name, mapping[ self.indicator_name ] )
         if not os.path.isfile( config_file ) and os.path.isfile( config_file_old ):
             shutil.copyfile( config_file_old, config_file )
@@ -1685,7 +1658,6 @@ class IndicatorBase( ABC ):
     # and if the timestamp is older than the current date/time
     # plus the maximum age, returns True, otherwise False.
     # If no file can be found, returns True.
-#TODO UNCHECKED
     def is_cache_stale( self, utc_now, basename, maximum_age_in_hours ):
         cache_date_time = self.get_cache_date_time( basename )
         if cache_date_time is None:
@@ -1702,7 +1674,6 @@ class IndicatorBase( ABC ):
     # basename: The text used to form the file name, typically the name of the calling application.
     #
     # Returns the datetime of the newest file in the cache; None if no file can be found.
-#TODO UNCHECKED
     def get_cache_date_time( self, basename ):
         expiry = None
         the_file = ""
@@ -1711,9 +1682,8 @@ class IndicatorBase( ABC ):
                 the_file = file
 
         if the_file: # A value of "" evaluates to False.
-            date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
+            date_time_component = the_file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
 
-            # YYYYMMDDHHMMSS is 14 characters.
             expiry = \
                 datetime.datetime.strptime(
                     date_time_component,
@@ -1725,7 +1695,6 @@ class IndicatorBase( ABC ):
 
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
-#TODO UNCHECKED
     def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
         return \
             self.get_cache_directory() + \
@@ -1737,7 +1706,6 @@ class IndicatorBase( ABC ):
     # Search through the cache for all files matching the basename.
     #
     # Returns the newest filename matching the basename on success; None otherwise.
-#TODO UNCHECKED
     def get_cache_newest_filename( self, basename ):
         cache_directory = self.get_cache_directory()
         cache_file = ""
@@ -1786,9 +1754,10 @@ class IndicatorBase( ABC ):
     # Any file extension is ignored in determining if the file should be deleted or not.
     def flush_cache( self, basename, maximum_age_in_hours ):
         cache_directory = self.get_cache_directory()
-        cache_maximum_age_date_time = datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
+        cache_maximum_age_date_time = \
+            datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
+
         for file in os.listdir( cache_directory ):
-#TODO Test with something like indicatorlunar to ensure only appropriate files are cleared from the cache.
             if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
                 date_time = file[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
                 if date_time.isdigit():
@@ -1817,16 +1786,16 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the binary object; None when no suitable cache file exists; None on error and logs.
-#TODO UNCHECKED
     def read_cache_binary( self, basename ):
-        data = None
-        the_file = ""
-        for file in os.listdir( self.get_cache_directory() ):
-            if file.startswith( basename ) and file > the_file:
-                the_file = file
+        cache_file = ""
+        cache_directory = self.get_cache_directory()
+        for file in os.listdir( cache_directory ):
+            if file.startswith( basename ) and file > cache_file:
+                cache_file = file
 
-        if the_file: # A value of "" evaluates to False.
-            filename = self.get_cache_directory() + the_file
+        data = None
+        if cache_file: # A value of "" evaluates to False.
+            filename = cache_directory + cache_file
             try:
                 with open( filename, 'rb' ) as f_in:
                     data = pickle.load( f_in )
@@ -1851,7 +1820,6 @@ class IndicatorBase( ABC ):
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # Returns True on success; False otherwise.
-#TODO UNCHECKED
     def write_cache_binary( self, binary_data, basename, extension = "" ):
         success = True
         cache_file = \
@@ -1897,10 +1865,9 @@ class IndicatorBase( ABC ):
     # Files which pass the filter are sorted by date/time and the most recent file is read.
     #
     # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
-#TODO UNCHECKED
     def read_cache_text( self, basename ):
-        cache_directory = self.get_cache_directory()
         cache_file = ""
+        cache_directory = self.get_cache_directory()
         for file in os.listdir( cache_directory ):
             if file.startswith( basename ) and file > cache_file:
                 cache_file = file
@@ -2053,7 +2020,6 @@ class IndicatorBase( ABC ):
 #   https://docs.python.org/3/library/logging.handlers.html
 #   https://stackoverflow.com/questions/24157278/limit-python-log-file
 #   https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
-#TODO UNCHECKED
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
 
     def __init__( self, filename, maxBytes = 10000 ):
