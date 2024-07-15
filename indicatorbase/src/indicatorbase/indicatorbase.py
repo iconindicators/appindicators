@@ -780,8 +780,6 @@ class IndicatorBase( ABC ):
             *clipboard_text_received_functionandarguments )
 
 
-#TODO Seems Gtk.STOCK_OK et al are deprecated:
-#   https://lazka.github.io/pgi-docs/Gtk-3.0/constants.html#Gtk.STOCK_OK
     def create_dialog(
             self,
             parent_widget,
@@ -1272,22 +1270,54 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-#TODO Figure out how to do a proper header comment/docstring/whatever it is called...
-#...and document each argument...notably the renderers_attributes_columnmodelids
-# can be single tuples or a tuple of tuples (as in script runner main treeview).
     def create_treeview_within_scrolledwindow(
         self,
         treemodel,
         titles,
-        renderers_attributes_columnmodelids, # Columns will not be expanded: treeviewcolumn.pack_start( renderer, False )
+        renderers_attributes_columnmodelids,
         alignments_columnviewids = None,
-        sortcolumnviewids_columnmodelids = None, # First column will be set as default sorted ascendingly.
+        sortcolumnviewids_columnmodelids = None,
         celldatafunctionandarguments_renderers_columnviewids = None,
         clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
         cursorchangedfunctionandarguments = None,
         rowactivatedfunctionandarguments = None ):
+        '''
+        Creates a Gtk.TreeView encapsulated within a Gtk.ScrolledWindow.
 
+        Parameters:
+
+        treemodel: The Gtk.TreeModel (may be a filter and/or sort).
+
+        titles: Tuple of strings for each column's title.
+
+        renderers_attributes_columnmodelids:
+            Tuple of tuples, each of which contains the Gtk.CellRenderer, data type and model column id
+            for the column view.
+            Columns will not be expanded: treeviewcolumn.pack_start( renderer, False ).
+            A tuple (for a given model column id) may contain tuples, each of which is for a different renderer.
+
+        alignments_columnviewids: Tuple of tuples, each of which contains the xalign and view column id.
+
+        sortcolumnviewids_columnmodelids:
+            Tuple of tuples, each of which contains the view column id and corresponding model column id.
+            The first column will be set as default sorted ascendingly.
+
+        celldatafunctionandarguments_renderers_columnviewids:
+            Tuple of tuples, each of which contains a cell data renderer function, parameters to the function,
+            a cell data renderer (the SAME renderer passed in to the renderers_attributes_columnmodelids) and
+            the view column id.
+
+        clickablecolumnviewids_functionsandarguments:
+            Tuple of tuples, each of which contains the view column id and a corresponding function (and parameters)
+            to be called on column header click.
+
+        tooltip_text: Tooltip text for the entire TreeView.
+
+        cursorchangedfunctionandarguments: A function (and parameters) to call on row selection.
+
+        rowactivatedfunctionandarguments: A function (and parameters) to call on row double click.      
+        '''
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
         for index, ( title, renderer_attribute_columnmodelid ) in enumerate( zip( titles, renderers_attributes_columnmodelids ) ):
