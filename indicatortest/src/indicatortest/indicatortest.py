@@ -137,12 +137,12 @@ class IndicatorTest( IndicatorBase ):
 
         command = "gsettings get org.gnome.desktop.interface "
 
-        result = self.process_get( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
+        result = self.process_get( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() * 2 + command + "icon-theme: " + result )
 
-        result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' ).strip()
+        result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             self.get_menu_indent() * 2 + command + "gtk-theme: " + result )

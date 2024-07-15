@@ -260,12 +260,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
         command_result = self.process_get( script.get_command(), log_non_zero_error_code = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
-        if command_result:
-            command_result = command_result.strip()
-
-        else:
-            command_result = None # Indicate downstream an error occurred when running the script.
-
         key = self.__create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = \

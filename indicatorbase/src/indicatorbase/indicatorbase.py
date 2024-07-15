@@ -547,7 +547,10 @@ class IndicatorBase( ABC ):
 
 
     def request_update( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__update )  #TODO Should the default delay be 1?  Is 0 too fast?  Could some race condition arise?
+        GLib.timeout_add_seconds( delay, self.__update )
+        #TODO Should the default delay be 1? 
+        # Is 0 too fast?
+        # Could some race condition arise?
 
 
     def set_label( self, text ):
@@ -725,12 +728,6 @@ class IndicatorBase( ABC ):
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
         response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
-
-#TODO Don't think I need this here...if we OK the Preferences,
-# then an update will be kicked off and will disable the menu, 
-# so no need to enable the menu.
-# If we cancel the Preferences, then enable the menu.
-#        self.__setMenuSensitivity( True )
 
         if response_type == Gtk.ResponseType.OK:
             self.__save_config()
@@ -1408,6 +1405,9 @@ class IndicatorBase( ABC ):
         return dialog
 
 
+#TODO This calls get_desktop_env each time...which spawns a process
+# Maybe compute something once at the top of this module or in the init
+# and use that each time?
     def get_menu_indent( self, indent = 1 ):
         indent_amount = "      " * indent
         if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
@@ -1486,10 +1486,8 @@ class IndicatorBase( ABC ):
             return False
 
 
-#TODO This returns a \n at the end of the result...should this be trimmed at all...
-# and if so, here or by process_get?  Who else calls process_get?
     def get_desktop_environment( self ):
-        return self.process_get( "echo $XDG_CURRENT_DESKTOP" ).strip()
+        return self.process_get( "echo $XDG_CURRENT_DESKTOP" )
 
 
 #TODO UNCHECKED
@@ -1497,7 +1495,7 @@ class IndicatorBase( ABC ):
         ubuntu_variant_2004 = False
         try:
             ubuntu_variant_2004 = (
-                True if self.process_get( "lsb_release -rs" ).strip() == "20.04"
+                True if self.process_get( "lsb_release -rs" ) == "20.04"
                 else False )
 
         except:
@@ -2019,7 +2017,10 @@ class IndicatorBase( ABC ):
                     shell = True,
                     check = log_non_zero_error_code ).stdout.decode()
 
-            if not result:
+            if result:
+                result = result.strip()
+
+            else:
                 result = None
 
         except subprocess.CalledProcessError as e:

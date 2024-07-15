@@ -217,7 +217,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def start_virtual_machine( self, uuid ):
-        result = self.process_get( "VBoxManage list vms | grep " + uuid )
+        result = self.process_get( "VBoxManage list vms | grep " + uuid ) #TODO Does this end with a \n?
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
             self.show_notification( _( "Error" ), message )
@@ -227,7 +227,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
-        number_of_windows_with_the_same_name = self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' ).strip()
+        number_of_windows_with_the_same_name = \
+            self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
+
         if number_of_windows_with_the_same_name == "0":
             message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
             summary = _( "Warning" )
@@ -280,7 +282,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_launch_virtual_box_manager( self ):
         # The executable VirtualBox may exist in different locations, depending on how it was installed.
         # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
-        virtual_box_executable = self.process_get( "which VirtualBox" ).strip()
+        virtual_box_executable = self.process_get( "which VirtualBox" )
 
         # The executable for VirtualBox manager was not always appearing in the process list
         # because the executable might be a script which calls another executable.
