@@ -1038,27 +1038,23 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid.attach( script_background_radio, 0, 18, 1, 1 )
 
-#TODO THis is referred to down in the .connect functions...so is there way around that?
-        label = Gtk.Label.new( _( "Interval" ) )
-        label.set_sensitive( False if add else type( script ) is Background )
-
         interval_spinner = \
             self.create_spinbutton(
                 script.get_interval_in_minutes() if type( script ) is Background else 60,
                 1,
                 10000,
                 page_increment = 100,
-                tooltip_text = _( "Interval, in minutes, between runs." ),
-                sensitive = False if add else type( script ) is Background )
+                tooltip_text = _( "Interval, in minutes, between runs." ) )
 
-        grid.attach(
+        label_and_interval_spinner_box = \
             self.create_box(
                 (
-                    ( label, False ),
+                    ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
-                sensitive = False if add else type( script ) is Background, #TODO Ensure this works for both label and spinner as above!  OR maybe this is not needed as I set sensitive on the label and spinner.  Is there a .connect function also?
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ), # Approximate alignment with the checkboxes above.
-            0, 19, 1, 1 )
+                sensitive = False if add else type( script ) is Background,
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
+
+        grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
 
         force_update_checkbutton = \
             self.create_checkbutton(
@@ -1073,11 +1069,21 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
 
-#TODO Worthwhile adding these to the general function?
-        script_non_background_radio.connect( "toggled", self.on_radio_or_checkbox, True, terminal_checkbutton, default_script_checkbutton )
-        script_non_background_radio.connect( "toggled", self.on_radio_or_checkbox, False, label, interval_spinner, force_update_checkbutton )
-        script_background_radio.connect( "toggled", self.on_radio_or_checkbox, True, label, interval_spinner, force_update_checkbutton )
-        script_background_radio.connect( "toggled", self.on_radio_or_checkbox, False, terminal_checkbutton, default_script_checkbutton )
+        script_non_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox, True, terminal_checkbutton, default_script_checkbutton )
+
+        script_non_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox, False, label_and_interval_spinner_box, force_update_checkbutton )
+
+        script_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox, True, label_and_interval_spinner_box, force_update_checkbutton )
+
+        script_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox, False, terminal_checkbutton, default_script_checkbutton )
 
         dialog = \
             self.create_dialog(
