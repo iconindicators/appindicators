@@ -279,8 +279,7 @@ class IndicatorLunar( IndicatorBase ):
         self.update_menu( menu, utc_now )
         self.set_label( self.process_tags() )
 
-        if self.is_icon_update_supported():
-            self.update_icon()
+        self.update_icon()
 
         if self.show_werewolf_warning:
             self.notification_full_moon()

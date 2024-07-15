@@ -217,7 +217,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def start_virtual_machine( self, uuid ):
-        result = self.process_get( "VBoxManage list vms | grep " + uuid ) #TODO Does this end with a \n?
+        result = self.process_get( "VBoxManage list vms | grep " + uuid )
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
             self.show_notification( _( "Error" ), message )

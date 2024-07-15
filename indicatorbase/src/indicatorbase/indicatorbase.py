@@ -326,6 +326,8 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
+        self.desktop_environment = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
+        
         self.version = project_metadata[ "Version" ]
         self.comments = comments
 
@@ -554,12 +556,14 @@ class IndicatorBase( ABC ):
 
 
     def set_label( self, text ):
-        self.indicator.set_label( text, text )
-        self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.
+        if self.__is_label_update_supported():
+            self.indicator.set_label( text, text )
+            self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.  #TODO Check this comment.
 
 
     def set_icon( self, icon ):
-        self.indicator.set_icon_full( icon, "" )
+        if self.__is_icon_update_supported():
+            self.indicator.set_icon_full( icon, "" )
 
 
     # Get the name of the icon for the indicator
@@ -1405,9 +1409,6 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-#TODO This calls get_desktop_env each time...which spawns a process
-# Maybe compute something once at the top of this module or in the init
-# and use that each time?
     def get_menu_indent( self, indent = 1 ):
         indent_amount = "      " * indent
         if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
@@ -1487,11 +1488,11 @@ class IndicatorBase( ABC ):
 
 
     def get_desktop_environment( self ):
-        return self.process_get( "echo $XDG_CURRENT_DESKTOP" )
+        return self.desktop_environment
 
 
 #TODO UNCHECKED
-    def is_ubuntu_variant_2004( self ):
+    def __is_ubuntu_variant_2004( self ):
         ubuntu_variant_2004 = False
         try:
             ubuntu_variant_2004 = (
@@ -1510,21 +1511,22 @@ class IndicatorBase( ABC ):
     # Ubuntu MATE 20.04 truncates the icon when changed,
     # despite the icon being fine when clicked.
 #TODO UNCHECKED
-    def is_icon_update_supported( self ):
+    def __is_icon_update_supported( self ):
         icon_update_supported = True
         desktop_environment = self.get_desktop_environment()
 
 #TODO Tidy up
         if desktop_environment is None or \
            desktop_environment == IndicatorBase.__DESKTOP_LXQT or \
-           ( desktop_environment == IndicatorBase.__DESKTOP_MATE and self.is_ubuntu_variant_2004() ):
+           ( desktop_environment == IndicatorBase.__DESKTOP_MATE and self.__is_ubuntu_variant_2004() ):
             icon_update_supported = False
 
         return icon_update_supported
 
 
+#TODO Is this needed?
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
-    def is_label_update_supported( self ):
+    def __is_label_update_supported( self ):
         label_update_supported = True
         desktop_environment = self.get_desktop_environment()
 
@@ -1540,17 +1542,8 @@ class IndicatorBase( ABC ):
     #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
 #TODO UNCHECKED
-#TODO In indicatortest (maybe elsewhere too)
-# first get the terminal and execution flag,
-# then call this function (which also calls the get the terminal and execution flag function)...
-#...is there a smarter way to do this (maybe pass in the 'terminal' return value)?
-    def is_terminal_qterminal( self ):
-        terminal_is_qterminal = False
-        terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
-        if terminal is not None and "qterminal" in terminal:
-            terminal_is_qterminal = True
-
-        return terminal_is_qterminal
+    def is_terminal_qterminal( self, terminal ):
+        return ( terminal is not None ) and ( "qterminal" in terminal )
 
 
     # Return the full path and name of the executable for the
