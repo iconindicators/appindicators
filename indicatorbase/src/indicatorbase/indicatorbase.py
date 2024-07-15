@@ -1083,33 +1083,28 @@ class IndicatorBase( ABC ):
         return box
 
 
-#TODO Not sure if this should be absorbed into create_box
-# (but would need to take tooltips and click arguments in the tuple I suppose)
-# or if not absorbed and this function stays,
-# call create_box internally.
     def create_buttons_in_box(
             self,
             labels,
             tooltip_texts,
             clicked_functionandarguments ):
 
-        box = Gtk.Box( spacing = 6 )
-        box.set_homogeneous( True )
-
+        buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
         for label, tooltip_text, clicked_functionandargument in z:
-            box.pack_start(
+            button = \
                 self.create_button(
                     label,
                     tooltip_text = tooltip_text,
-                    clicked_functionandarguments = clicked_functionandargument ),
-                True,
-                True,
-                0 )
+                    clicked_functionandarguments = clicked_functionandargument )
 
-        box.set_halign( Gtk.Align.CENTER )
+            buttons_and_expands.append( [ button, True ] )
 
-        return box
+        return \
+            self.create_box(
+                tuple( buttons_and_expands ),
+                halign = Gtk.Align.CENTER,
+                homogeneous = True )
 
 
     def create_entry(
@@ -1133,17 +1128,13 @@ class IndicatorBase( ABC ):
         entry.set_text( text )
         entry.set_editable( editable )
 
-#TODO Check this again...
-# Check for when doing an 'add' so the entry is empty
-# and for doing an 'edit' so the entry has text.
+        # Give a little more space; sometimes too short due to packing.
         if make_longer and text:
-            # Give a little more space; sometimes too short due to packing.
             entry.set_width_chars( len( text ) * 5 / 4 )
 
         return entry
 
 
-#TODO UNCHECKED
     def create_comboboxtext(
             self,
             data,
@@ -1160,7 +1151,6 @@ class IndicatorBase( ABC ):
         return comboboxtext
 
 
-#TODO UNCHECKED
     def create_textview(
             self,
             text = "",
@@ -1170,7 +1160,7 @@ class IndicatorBase( ABC ):
 
         textview = Gtk.TextView()
         textview.get_buffer().set_text( text )
-        textview.set_tooltip_text( tooltip_text ) #TODO Test that if a tooltip of "" (or no tooltip) actually shows no tooltip.
+        textview.set_tooltip_text( tooltip_text )
         textview.set_editable( editable )
         textview.set_wrap_mode( wrap_mode )
         return textview
