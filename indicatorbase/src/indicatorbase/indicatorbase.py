@@ -566,8 +566,12 @@ class IndicatorBase( ABC ):
 
 
     def set_icon( self, icon ):
+        icon_set = False
         if self.__is_icon_update_supported():
             self.indicator.set_icon_full( icon, "" )
+            icon_set = True
+
+        return icon_set
 
 
     # Get the name of the icon for the indicator
