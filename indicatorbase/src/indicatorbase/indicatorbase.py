@@ -357,7 +357,6 @@ class IndicatorBase( ABC ):
             level = logging.DEBUG,
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
-        self.update_timer_id = None
         self.lock = Lock()
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
@@ -480,7 +479,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-        GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that the Gtk main executes to show initialisation.
+        GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that Gtk main executes to show initialisation.
         Gtk.main()
 
 
@@ -490,12 +489,9 @@ class IndicatorBase( ABC ):
             GLib.idle_add( self.__update_internal )
 
         else:
-#TODO Test this clause.
             GLib.timeout_add_seconds(
                 IndicatorBase.__UPDATE_PERIOD_IN_SECONDS,
                 self.__update )
-            #TODO This call returns an ID...need to keep it?
-            #TODO Keep the About/Prefernces open and see if we keep trying to do an update every 60 seconds.
 
 
     def __update_internal( self ):
@@ -541,9 +537,7 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         if next_update_in_seconds: # Some indicators don't return a next update time.
-            self.update_timer_id = GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
-            # self.nextUpdateTime = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
-            #TODO Hopefully no longer need self.nextUpdateTime
+            GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
 
         self.lock.release()
 
@@ -733,9 +727,9 @@ class IndicatorBase( ABC ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
-        if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
-            GLib.source_remove( self.update_timer_id )
-            self.update_timer_id = None
+        # if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
+        #     GLib.source_remove( self.update_timer_id )
+        #     self.update_timer_id = None
 
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
         response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
@@ -745,16 +739,6 @@ class IndicatorBase( ABC ):
             self.__save_config()
             GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release and so the update will proceed.
 
-        #TODO May not need this...If the update keeps trying every minute, then no need for the code below.
-        '''
-        elif self.nextUpdateTime: # User cancelled and there is a next update time present...
-            secondsToNextUpdate = ( self.nextUpdateTime - datetime.datetime.now() ).total_seconds()
-            if secondsToNextUpdate > 10: # Scheduled update is still in the future (10 seconds or more), so reschedule...
-                GLib.timeout_add_seconds( int( secondsToNextUpdate ), self.__update )
-
-            else: # Scheduled update would have already happened, so kick one off now.
-                self.__update()
-        '''
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
