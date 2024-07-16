@@ -556,9 +556,13 @@ class IndicatorBase( ABC ):
 
 
     def set_label( self, text ):
+        label_set = False
         if self.__is_label_update_supported():
             self.indicator.set_label( text, text )
             self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.  #TODO Check this comment.
+            label_set = True
+
+        return label_set
 
 
     def set_icon( self, icon ):

@@ -78,9 +78,7 @@ class IndicatorStardate( IndicatorBase ):
                 self.show_issue,
                 self.pad_integer )
 
-        self.set_label( stardate_string )
-
-        else:
+        if not self.set_label( stardate_string ):
             menu.append( Gtk.MenuItem.new_with_label( stardate_string ) )
             menu.append( Gtk.SeparatorMenuItem() )
 
