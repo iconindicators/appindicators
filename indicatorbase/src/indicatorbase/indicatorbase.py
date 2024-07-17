@@ -16,6 +16,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Testing indicatortest
+
+# Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll.
+# Kubuntu 22.04 - Ubuntu on X.org - no OSD (and no notify-send).
+# Kubuntu 22.04 - Ubuntu - no clipboard; no OSD (and no notify-send).
+# Kubuntu 22.04 - Ubuntu on Wayland (Wayland) - no clipboard; no OSD (and no notify-send).
+# Kubuntu 22.04 - Ubuntu (Wayland) - No clipboard; no OSD (and no notify-send).
+
+# Ubuntu 20.04 - - All good.
+# Ubuntu 20.04 - GNOME Classic - Does not run.
+# Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
+
+# Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
+# Ubuntu 22.04 - Ubuntu on X.org - all good.
+
+
+# Ubuntu 24.04 X.org - Unable to test.
+# Ubuntu 24.04 Wayland - no wmctrl, no clipboard.
+
+
 #TODO Check the flow of code,
 # from init to update loops,
 # to about/preferences,
