@@ -17,6 +17,16 @@
 
 
 #TODO Testing indicatortest
+# I think need to determine all functionality that does NOT work or is MISSING.
+# Determine for each if there is a common thread...
+# For example, for all Wayland, perhaps wmctrl does not work.
+# Then can make a single statement about wmctrl not working on Wayland
+# rather than on a per distribution/desktop/version basis.
+# Then work within which indicator(s) the missing functionality 
+# and determine how, if necessary to work around.
+#
+# Further, if there is a workaround, say for wmctrl,
+# no need then for a wmctrl test in indicatortest perhaps...
 
 # Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll.
 # Kubuntu 22.04 - Ubuntu on X.org - no OSD (and no notify-send).

@@ -290,9 +290,37 @@ class IndicatorVirtualBox( IndicatorBase ):
         # Instead, now have the user type in the title of the window into the preferences and find the window by that.
         result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
         window_id = None
+#TODO Need to distinguish between no results from 'wmctrl grep' 
+# and no results because we're running on Wayland (or simply, wmctrl does not work).
+# If 'wmctrl grep' gives no result (because running on Wayland)
+# code below will run a new instance of VBoxManage on each mouse middle button click.
+#
+# On Debian 12:
+'''
+wmctrl -m
+    Name: GNOME Shell
+    Class: N/A
+    PID: N/A
+    Window manager's "showing the desktop" mode: OFF
+'''
         if result:
             window_id = result.split()[ 0 ]
-
+#TODO Maybe compare a valid window_id under x.org 
+# with whatever wayland gives (see above)...
+# If window_id is not a number...that's bad.
+#
+# But still doesn't stop from running vboxmanage multiple times!
+# Maybe detect if we are running wayland?
+# Or maybe determine if result of wmctrl is valid
+# (either no window_id/no result  OR a valid window id)?
+#
+#
+#echo $XDG_SESSION_TYPE
+#wayland
+#
+# What happes on xorg?
+#Maybe if not on xorg, hide the virtualbox menuitem
+# and do nothing on mouse middle button click...
         if window_id is None or window_id == "":
             self.process_call( virtual_box_executable + " &" )
 
