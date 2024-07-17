@@ -238,9 +238,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             self.get_menu_indent() * 2 + _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: (
-                    print( "clipboard" ),
-                    self.copy_to_selection( self.__get_current_time() ) ), ) )
+                lambda menuitem: ( self.copy_to_selection( self.__get_current_time() ) ), ) )
 
         label = self.get_menu_indent() + _( "Clipboard" )
         self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
