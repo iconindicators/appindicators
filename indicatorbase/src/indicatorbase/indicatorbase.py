@@ -315,6 +315,9 @@ class IndicatorBase( ABC ):
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
+    SESSION_TYPE_WAYLAND = "wayland"
+    SESSION_TYPE_X11 = "x11"
+
     URL_TIMEOUT_IN_SECONDS = 20
 
 
@@ -356,7 +359,8 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
-        self.desktop_environment = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
+        self.session_type = self.process_get( "echo $XDG_SESSION_TYPE" )
+        self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
         
         self.version = project_metadata[ "Version" ]
         self.comments = comments
@@ -1433,7 +1437,7 @@ class IndicatorBase( ABC ):
 
     def get_menu_indent( self, indent = 1 ):
         indent_amount = "      " * indent
-        if self.get_desktop_environment() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+        if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
             indent_amount = "      " * ( indent - 1 )
 
         return indent_amount
@@ -1509,8 +1513,12 @@ class IndicatorBase( ABC ):
             return False
 
 
-    def get_desktop_environment( self ):
-        return self.desktop_environment
+    def get_session_type( self ):
+        return self.session_type
+
+
+    def get_current_desktop( self ):
+        return self.current_desktop
 
 
 #TODO UNCHECKED
@@ -1535,7 +1543,7 @@ class IndicatorBase( ABC ):
 #TODO UNCHECKED
     def __is_icon_update_supported( self ):
         icon_update_supported = True
-        desktop_environment = self.get_desktop_environment()
+        desktop_environment = self.get_current_desktop()
 
 #TODO Tidy up
         if desktop_environment is None or \
@@ -1550,7 +1558,7 @@ class IndicatorBase( ABC ):
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
     def __is_label_update_supported( self ):
         label_update_supported = True
-        desktop_environment = self.get_desktop_environment()
+        desktop_environment = self.get_current_desktop()
 
 #TODO Tidy up        
         if desktop_environment is None or \

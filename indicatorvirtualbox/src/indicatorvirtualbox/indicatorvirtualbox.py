@@ -16,6 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Need to amend the changelog.md and/or readme.md
+# to mention that
+#    mouse wheel scroll to cycle through running vms
+#    mouse middle button click to launch vbox manager
+#    menu item click launching only one vbox manager
+# only work in X11.
+
+
 # Application indicator for VirtualBox™ virtual machines.
 
 
@@ -227,25 +235,26 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
-        number_of_windows_with_the_same_name = \
-            self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
+        if self.get_session_type() == IndicatorBase.SESSION_TYPE_X11:
+            number_of_windows_with_the_same_name = \
+                self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
 
-        if number_of_windows_with_the_same_name == "0":
-            message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
-            summary = _( "Warning" )
-            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+            if number_of_windows_with_the_same_name == "0":
+                message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
+                summary = _( "Warning" )
+                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
-        elif number_of_windows_with_the_same_name == "1":
-            for line in self.process_get( "wmctrl -l" ).splitlines():
-                if virtual_machine_name in line:
-                    window_id = line[ 0 : line.find( " " ) ]
-                    self.process_call( "wmctrl -i -a " + window_id )
-                    break
+            elif number_of_windows_with_the_same_name == "1":
+                for line in self.process_get( "wmctrl -l" ).splitlines():
+                    if virtual_machine_name in line:
+                        window_id = line[ 0 : line.find( " " ) ]
+                        self.process_call( "wmctrl -i -a " + window_id )
+                        break
 
-        else:
-            message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
-            summary = _( "Warning" )
-            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+            else:
+                message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
+                summary = _( "Warning" )
+                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
 
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
@@ -280,52 +289,29 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
-        # The executable VirtualBox may exist in different locations, depending on how it was installed.
-        # No need to check for a None value as this function will never be called if VBoxManage (VirtualBox) is not installed.
-        virtual_box_executable = self.process_get( "which VirtualBox" )
 
-        # The executable for VirtualBox manager was not always appearing in the process list
-        # because the executable might be a script which calls another executable.
-        # So using processes to find the window kept failing.
-        # Instead, now have the user type in the title of the window into the preferences and find the window by that.
-        result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
-        window_id = None
-#TODO Need to distinguish between no results from 'wmctrl grep' 
-# and no results because we're running on Wayland (or simply, wmctrl does not work).
-# If 'wmctrl grep' gives no result (because running on Wayland)
-# code below will run a new instance of VBoxManage on each mouse middle button click.
-#
-# On Debian 12:
-'''
-wmctrl -m
-    Name: GNOME Shell
-    Class: N/A
-    PID: N/A
-    Window manager's "showing the desktop" mode: OFF
-'''
-        if result:
-            window_id = result.split()[ 0 ]
-#TODO Maybe compare a valid window_id under x.org 
-# with whatever wayland gives (see above)...
-# If window_id is not a number...that's bad.
-#
-# But still doesn't stop from running vboxmanage multiple times!
-# Maybe detect if we are running wayland?
-# Or maybe determine if result of wmctrl is valid
-# (either no window_id/no result  OR a valid window id)?
-#
-#
-#echo $XDG_SESSION_TYPE
-#wayland
-#
-# What happes on xorg?
-#Maybe if not on xorg, hide the virtualbox menuitem
-# and do nothing on mouse middle button click...
-        if window_id is None or window_id == "":
-            self.process_call( virtual_box_executable + " &" )
+        def launch_virtual_box_manager():
+            self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
-        else:
-            self.process_call( "wmctrl -ia " + window_id )
+
+        if self.get_session_type() == IndicatorBase.SESSION_TYPE_X11:
+            # The executable for VirtualBox manager does not necessarily appear in the process list
+            # because the executable might be a script which calls another executable.
+            # Instead, have the user type in the title of the window into the preferences
+            # and find the window by the window title.
+            result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
+            window_id = None
+            if result:
+                window_id = result.split()[ 0 ]
+
+            if window_id is None or window_id == "":
+                launch_virtual_box_manager()
+
+            else:
+                self.process_call( "wmctrl -ia " + window_id )
+
+        else: # Assume to be Wayland.
+            launch_virtual_box_manager()
 
 
     # Returns a list of running VM names and list of corresponding running VM UUIDs.
@@ -445,7 +431,10 @@ wmctrl -m
                 self.virtualbox_manager_window_name,
                 tooltip_text = _(
                     "The window title of VirtualBox™ Manager.\n" +
-                    "You may have to adjust for your local language." ) )
+                    "You may have to adjust for your local language.\n\n" +
+                    "This is used to bring the VirtualBox™ Manager\n" +
+                    "window to the front if already running.\n\n" +
+                    "Only works under X Window System (X11)." ) )
 
         grid.attach(
             self.create_box(

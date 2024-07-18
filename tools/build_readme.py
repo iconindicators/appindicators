@@ -71,6 +71,8 @@ class Indicator_Name( Enum ):
     INDICATORVIRTUALBOX = auto()
 
 
+#TODO Can these be obtained from somewhere else?
+# Does build_wheel do this...?
 indicator_names = {
     "indicatorfortune"               : "Indicator Fortune",
     "indicatorlunar"                 : "Indicator Lunar",
@@ -477,30 +479,58 @@ def _get_distributions_tested():
         f"Distributions Tested\n"
         f"--------------------\n"
 
-        f"Distributions/versions with full functionality:\n"
-        f"- `Debian 11 / 12 GNOME on Xorg`\n"
-        f"- `Fedora 38 / 39 GNOME on Xorg`\n"
-        f"- `Kubuntu 20.04 / 22.04`\n"
-        f"- `Ubuntu 20.04`\n"
-        f"- `Ubuntu 22.04 on Xorg`\n"
-        f"- `Ubuntu Budgie 22.04`\n"
-        f"- `Ubuntu Unity 20.04 / 22.04`\n"
-        f"- `Xubuntu 20.04 / 22.04`\n\n"
+        f"Distributions/versions:\n"
+        f"- `Debian 11+`\n"
+        f"- `Fedora 38+`\n"
+        f"- `Kubuntu 20.04+`\n"
+        f"- `Linux Mint 21 Cinnamon+`\n" #TODO Check if Cannamon is the only desktop and if putting a + makes sense.
+        f"- `Lubuntu 20.04+`\n"
+        f"- `Manjaro 22.1 GNOME+`\n" #TODO  Is there a non GNOME version?
+        f"- `openSUSE Tumbleweed GNOME`.\n" #TODO What other versions/desktops are there? 
+        f"- `Ubuntu 20.04+`\n"
+        f"- `Ubuntu Budgie 20.04+`\n"
+        f"- `Ubuntu MATE 20.04+`\n"
+        f"- `Ubuntu Unity 20.04+`\n"
+        f"- `Xubuntu 20.04+`\n\n" )
+#TODO Need to mention that some things don't work...
+#   wmctrl on wayland (but only for indicatortest and indicatorvirtualbox)
+#   mouse wheel scroll
+#   tooltip instead of label
+#   no label and tooltip is not dynamic 
+#   no clipboard on wayland
+#   no mouse middle button click
+#   dynamic icon truncated
+#
+# Maybe mention these things in a top paragraph or at least a paragraph
+# specific to each indicator...
+# So only mention wmctrl for indicatortest and indicatorvirtualbox  (if at all???).
 
-        f"Distributions/versions with limited functionality:\n"
-        f"- `Debian 11 / 12 GNOME` No clipboard; no `wmctrl`.\n"
-        f"- `Fedora 38 / 39 GNOME` No clipboard; no `wmctrl`.\n"
-        f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
-        f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
-        f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
-        f"- `Manjaro 22.1 GNOME` No `calendar`.\n"
-        f"- `openSUSE Tumbleweed` No clipboard; no `wmctrl`; no `calendar`.\n"
-        f"- `openSUSE Tumbleweed GNOME on Xorg` No `calendar`.\n"
-        f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
-        f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
-        f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
-        f"- `Ubuntu MATE 22.04` Dynamic icon for NEW MOON is truncated.\n"
-        f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
+
+#TODO Original
+        # f"Distributions/versions with full functionality:\n"
+        # f"- `Debian 11 / 12 GNOME on Xorg`\n"
+        # f"- `Fedora 38 / 39 GNOME on Xorg`\n"
+        # f"- `Kubuntu 20.04 / 22.04`\n"
+        # f"- `Ubuntu 20.04`\n"
+        # f"- `Ubuntu 22.04 on Xorg`\n"
+        # f"- `Ubuntu Budgie 22.04`\n"
+        # f"- `Ubuntu Unity 20.04 / 22.04`\n"
+        # f"- `Xubuntu 20.04 / 22.04`\n\n"
+        #
+        # f"Distributions/versions with limited functionality:\n"
+        # f"- `Debian 11 / 12 GNOME` No clipboard; no `wmctrl`.\n"
+        # f"- `Fedora 38 / 39 GNOME` No clipboard; no `wmctrl`.\n"
+        # f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
+        # f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
+        # f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
+        # f"- `Manjaro 22.1 GNOME` No `calendar`.\n"
+        # f"- `openSUSE Tumbleweed` No clipboard; no `wmctrl`; no `calendar`.\n"
+        # f"- `openSUSE Tumbleweed GNOME on Xorg` No `calendar`.\n"
+        # f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
+        # f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
+        # f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
+        # f"- `Ubuntu MATE 22.04` Dynamic icon for NEW MOON is truncated.\n"
+        # f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
 
 
 def _get_removal_for_operating_system(

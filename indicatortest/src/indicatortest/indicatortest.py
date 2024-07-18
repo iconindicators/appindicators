@@ -16,6 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Amend the changelog.md and/or readme.md
+# to mention that wmctrl only works under X11?
+# Already part of the menu item label...
+
+
 #TODO For the actual release to PyPI, the version to use is 1.0.17 as per pyproject.toml.
 #
 # For testPyPI, the version to use it 1.0.23
@@ -113,7 +118,7 @@ class IndicatorTest( IndicatorBase ):
     def __build_menu_desktop( self, menu ):
         submenu = Gtk.Menu()
 
-        text = self.get_menu_indent() * 2 + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_desktop_environment()
+        text = self.get_menu_indent() * 2 + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
         self.create_and_append_menuitem( submenu, text )
 
         self.create_and_append_menuitem(
@@ -253,7 +258,7 @@ class IndicatorTest( IndicatorBase ):
             "ls",
             "notify-send",
             "paplay",
-            "wmctrl" )
+            "wmctrl (X11)" )
 
         commands = (
             "calendar -f /usr/share/calendar/calendar.all -A 3",
