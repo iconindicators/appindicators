@@ -16,34 +16,61 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Testing indicatortest
-# I think need to determine all functionality that does NOT work or is MISSING.
-# Determine for each if there is a common thread...
-# For example, for all Wayland, perhaps wmctrl does not work.
-# Then can make a single statement about wmctrl not working on Wayland
-# rather than on a per distribution/desktop/version basis.
-# Then work within which indicator(s) the missing functionality 
-# and determine how, if necessary to work around.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#TODO Testing indicatortest on distros/desktops...
 #
-# Further, if there is a workaround, say for wmctrl,
-# no need then for a wmctrl test in indicatortest perhaps...
+    # Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll over icon.
+    # Kubuntu 22.04 - Ubuntu on Xorg.
+    # Kubuntu 22.04 - Ubuntu - no clipboard.  wmctrl?
+    # Kubuntu 22.04 - Ubuntu on Wayland (Wayland) - no clipboard.  wmctrl?
+    # Kubuntu 22.04 - Ubuntu (Wayland) - No clipboard.  wmctrl?
+    #
+    #
+    # Linux Mint 21 - Cinnamon (Default) - Tooltip in lieu of label.  No dynamic icon.
+    #                                    - Other sessions: Cinnamon (Software Rendering), Ubuntu, Ubuntu, Ubuntu on Wayland.
+    #
+    # Lubuntu 22.04 - - No label only tooltip which shows the source code name and cannot be changed 
+    #                 - Cannot change icon.
+    #                 - Hitting the qtterminal problem, so cannot run commands.
+    #                 - There are many other types of sessions (Lubuntu, LXQT Desktop, Openbox, Ubuntu onXorg, Ubuntu, Ubuntu on Wayland (Wayland), Ubuntu (Wayland))...sure I'm not going to test all of these?  Maybe just test on the non-wayland and non-xorg sessions?
+    #
+    # Ubuntu 20.04 - Ubuntu - All good.
+    # Ubuntu 20.04 - GNOME Classic - Does not run.
+    # Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
+    #
+    # Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
+    # Ubuntu 22.04 - Ubuntu on Xorg - All good.
+    #
+    # Ubuntu 24.04 - Ubuntu on Xorg - Fails to log in. Perhaps test from a live USB?  But can I install?
+    # Ubuntu 24.04 - Ubuntu - no wmctrl, no clipboard.
+    #
+    # Ubuntu Budgie 22.04 - Budgie Desktop (Default) - All good.
+    #                                                - Other sessions: Ubuntu, Ubuntu, Ubuntu on Wayland
+    #
+    # Ubuntu MATE 22.04 - MATE - All good.
+    #                        - Other sessions: Ubuntu (Default), Ubuntu (Default), Ubuntu on Wayland, Ubuntu on Xorg.
+    #
+    # Ubuntu Unity 22.04 - Unity (Default) - All good.
+    #                        - Other sessions: Ubuntu , Ubuntu, Ubuntu on Wayland, Ubuntu on Xorg.
+    #
+    # Xubuntu 22.04 - - No mouse wheel scroll; tooltip in lieu of label.
 
-# Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll.
-# Kubuntu 22.04 - Ubuntu on X.org - no OSD (and no notify-send).
-# Kubuntu 22.04 - Ubuntu - no clipboard; no OSD (and no notify-send).
-# Kubuntu 22.04 - Ubuntu on Wayland (Wayland) - no clipboard; no OSD (and no notify-send).
-# Kubuntu 22.04 - Ubuntu (Wayland) - No clipboard; no OSD (and no notify-send).
 
-# Ubuntu 20.04 - - All good.
-# Ubuntu 20.04 - GNOME Classic - Does not run.
-# Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
-
-# Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
-# Ubuntu 22.04 - Ubuntu on X.org - all good.
-
-
-# Ubuntu 24.04 X.org - Unable to test.
-# Ubuntu 24.04 Wayland - no wmctrl, no clipboard.
+#TODO
+# Can/should some tooltips be conditional on desktop/distro name?
 
 
 #TODO Check the flow of code,
@@ -271,9 +298,16 @@ class IndicatorBase( ABC ):
 
 #TODO Are these still relevant?
 # Check if we need to add others given the variety of distros now supported.
+# Also, not sure where the actual values came from...either 'echo $XDG_CURRENT_DESKTOP` or `os.environ.get( "DESKTOP_SESSION" )`
     __DESKTOP_LXQT = "LXQt"
     __DESKTOP_MATE = "MATE"
     __DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
+
+#TODO Obtained from 
+#	self.desktop_environment = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
+    __DESKTOP_KDE = "KDE"
+# and still not sure which values will ultimately be needed.
+
 
     __EXTENSION_JSON = ".json"
 
@@ -315,6 +349,9 @@ class IndicatorBase( ABC ):
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
+#TODO Need a comment about what command was used to obtain these...
+# Likely was...
+#	echo $XDG_SESSION_TYPE
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
@@ -929,7 +966,146 @@ class IndicatorBase( ABC ):
         return autostart_checkbox, autostart_spinner, box
 
 
+#TODO The menu items in a submenu on default Kubuntu
+# should NOT have indents applied.
+#
+# The issue is more complex as not all indicators have neat layouts
+# for menu items and submenus.
+# Indicatorlunar has various levels of indent of menu items within a submenu.
+# Indicatortest has various levels of indent in the main menu.
+#
+# Figure out some sort of solution if possible...
+# ...having to get the callers of createmenuitem et al
+# should NOT have to know about GNOME layout of menus versus Kubuntu.
+# 
+# indicatorfortune
+#   Menuitems with no indent.
+# 
+# indicatorlunar
+#   Top level: submenus with no indent.
+#   Within submenus
+#       Under GNOME, menuitems with one or two levels of indent.
+#       Under Kubuntu, menuitems with zero or one levels of indent.
+# 
+# indicatoronthisday
+#   Menuitems with no indent or one level of indent.
+# 
+# indicatorppadownloadstatistics
+#   Top level:
+#       menuitems with no indent or one level of indent
+#       OR
+#       submenus with no indent.
+#   Within submenus
+#       Under GNOME
+#           menuitems with one level of indent.
+#       Under Kubuntu
+#           menuitems with no indent.
+# 
+# indicatorpunycode
+#   Menuitems with no indent or one level of indent.
+# 
+# indicatorscriptrunner
+#   Top level:
+#       menuitems with no indent or one level of indent
+#       OR
+#       submenus with no indent.
+#   Within submenus
+#       Under GNOME
+#           menuitems with one level of indent.
+#       Under Kubuntu
+#           menuitems with no indent.
+# 
+# indicatorstardate
+#   Menuitems with no indent.
+# 
+# indicatortest
+#   Top level: menuitems with no indent and submenus with one level of indent.
+#   Within submenus
+#       Under GNOME, menuitems with two levels of indent.
+#       Under Kubuntu, menuitems with no indent.
+#
+# indicatortide
+#   Top level:
+#       menuitems with no indent or one level of indent or two levels of indent
+#       OR
+#       submenus with one level of indent
+#       OR
+#       combination of the above.
+#   Within submenus
+#       Under GNOME
+#           menuitems with two levels of indent.
+#       Under Kubuntu
+#           menuitems with no indent.
+#
+# indicatorvirtualbox
+#   Top level:
+#       Mix of submenus and menuitems, none of which with indent
+#       OR
+#       menuitems with zero or more levels of indent.
+#   Within submenus
+#       Under GNOME
+#           menuitems with one level or more of indent.
+#       Under Kubuntu
+#           menuitems with zero or more levels of indent.
+# 
     def create_and_append_menuitem(
+        self,
+        menu,
+        label,
+        name = None,
+        activate_functionandarguments = None,
+        is_top_level = True,
+        indent = 0,
+        is_secondary_activate_target = False ):
+
+        indent_amount = self.__get_menu_indent_amount( indent, desktop_agnositic = is_top_level )
+        menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
+
+        if name:
+            menuitem.set_name( name )
+
+        if activate_functionandarguments:
+            menuitem.connect( "activate", *activate_functionandarguments )
+
+        if is_secondary_activate_target:
+            self.secondary_activate_target = menuitem
+
+        menu.append( menuitem )
+        return menuitem
+
+
+    def create_and_append_menuitem_differing_indent(
+        self,
+        menu,
+        label,
+        name = None,
+        activate_functionandarguments = None,
+        indent = 0,
+        indent_detachable = 0,
+        is_secondary_activate_target = False ):
+
+        indent_amount = \
+            self.__get_menu_indent_amount_differing(
+                indent = indent,
+                indent_detachable = indent_detachable )
+
+        menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
+
+        if name:
+            menuitem.set_name( name )
+
+        if activate_functionandarguments:
+            menuitem.connect( "activate", *activate_functionandarguments )
+
+        if is_secondary_activate_target:
+            self.secondary_activate_target = menuitem
+
+        menu.append( menuitem )
+        return menuitem
+
+
+#TODO Might eventually go...
+    def create_and_append_menuitem_ORIGINAL(
         self,
         menu,
         label,
@@ -952,6 +1128,7 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
+#TODO Will need to accept indent...
     def create_and_insert_menuitem(
         self,
         menu,
@@ -973,6 +1150,7 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
+#TODO Will need to accept indent...
     # Creates a single (isolated, not part of a group)
     # RadioMenuItem that is enabled/active.
     def create_and_append_radiomenuitem(
@@ -989,6 +1167,51 @@ class IndicatorBase( ABC ):
 
         menu.append( menuitem )
         return menuitem
+
+
+    def __get_menu_indent_amount( self, indent = 0, desktop_agnositic = True ):
+        spacing = self.__get_menu_indent_spacing()
+        if desktop_agnositic:
+            indent_amount = spacing * indent
+
+        else:
+            desktop_detaches_submenus = False # TODO Need to call a function to determine this.
+            if desktop_detaches_submenus:
+                indent_amount = spacing * indent
+
+            else:
+                indent_amount = spacing * ( indent - 1 )
+
+#TODO Not sure if this is needed or some variation...
+        # if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+        #     indent = "      " * ( indent_amount - 1 )
+
+        return indent_amount
+
+
+    def __get_menu_indent_amount_differing( self, indent = 0, indent_detachable = 0 ):
+        spacing = self.__get_menu_indent_spacing()
+        desktop_detaches_submenus = False # TODO Need to call a function to determine this.
+        if desktop_detaches_submenus:
+            indent_amount = spacing * indent_detachable
+
+        else:
+            indent_amount = spacing * indent
+
+        return indent_amount
+
+
+    def __get_menu_indent_spacing( self  ):
+        return "      "
+
+
+#TODO Will eventually go...
+    def get_menu_indent( self, indent = 1 ):
+        indent_amount = "      " * indent
+        if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+            indent_amount = "      " * ( indent - 1 )
+
+        return indent_amount
 
 
     def get_on_click_menuitem_open_browser_function( self ):
@@ -1433,14 +1656,6 @@ class IndicatorBase( ABC ):
         dialog.set_transient_for( parent )
         dialog.set_filename( filename )
         return dialog
-
-
-    def get_menu_indent( self, indent = 1 ):
-        indent_amount = "      " * indent
-        if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
-            indent_amount = "      " * ( indent - 1 )
-
-        return indent_amount
 
 
     def get_autostart_and_delay( self ):
