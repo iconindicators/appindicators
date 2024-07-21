@@ -71,6 +71,16 @@ class Indicator_Name( Enum ):
     INDICATORVIRTUALBOX = auto()
 
 
+def is_indicator( indicator_name, *indicator_names ):
+    is_indicator = False
+    for indicator_name_ in indicator_names:
+        if indicator_name.upper() == indicator_name_.name:
+            is_indicator = True
+            break
+        
+    return is_indicator
+
+
 #TODO Can these be obtained from somewhere else?
 # Does build_wheel do this...?
 indicator_names = {
@@ -101,7 +111,7 @@ def _get_introduction( indicator_name ):
         f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
 
-    if indicator_name.upper() != Indicator_Name.INDICATORONTHISDAY.name:
+    if is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`, `Manjaro` "
 
     introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
@@ -159,6 +169,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
         dependencies.append( "wmctrl" )
 
@@ -357,7 +368,7 @@ def _get_installation_for_operating_system(
         operating_system == Operating_System.MANJARO_221 or \
         operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
-    if opensuse_or_manjaro and indicator_name.upper() == Indicator_Name.INDICATORONTHISDAY.name:
+    if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         dependencies = ''
 
     else:
@@ -390,8 +401,7 @@ def _get_installation_for_operating_system(
         dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
 
         n += 1
-        if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name or \
-           indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+        if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
             dependencies += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
 
         dependencies += f"</details>\n\n"
@@ -473,37 +483,103 @@ def _get_usage( indicator_name ):
         f"```\n\n" )
 
 
-
-def _get_distributions_tested():
-    return (
-        f"Distributions Tested\n"
-        f"--------------------\n"
+def _get_distributions_supported( indicator_name ):
+    message_one = (
+        f"Distributions Supported\n"
+        f"-----------------------\n"
 
         f"Distributions/versions:\n"
         f"- `Debian 11+`\n"
         f"- `Fedora 38+`\n"
         f"- `Kubuntu 20.04+`\n"
-        f"- `Linux Mint 21 Cinnamon+`\n" #TODO Check if Cannamon is the only desktop and if putting a + makes sense.
+        f"- `Linux Mint 21 Cinnamon`\n" #TODO Check if Cinnamon is the only desktop and if putting a + makes sense.
         f"- `Lubuntu 20.04+`\n"
         f"- `Manjaro 22.1 GNOME+`\n" #TODO  Is there a non GNOME version?
         f"- `openSUSE Tumbleweed GNOME`.\n" #TODO What other versions/desktops are there? 
-        f"- `Ubuntu 20.04+`\n"
+        f"- `Ubuntu 20.04+`\n" # TODO Try to combine all the Ubuntu derivatives into Ubuntu somehow...
+                               # or maybe just don't list them or mention?
+                               # Or maybe say Ubuntu 20.04+ (and derivatives)?
         f"- `Ubuntu Budgie 20.04+`\n"
         f"- `Ubuntu MATE 20.04+`\n"
         f"- `Ubuntu Unity 20.04+`\n"
-        f"- `Xubuntu 20.04+`\n\n" )
-#TODO Need to mention that some things don't work...
-#   wmctrl on wayland (but only for indicatortest and indicatorvirtualbox)
-#   mouse wheel scroll
-#   tooltip instead of label
-#   no label and tooltip is not dynamic 
-#   no clipboard on wayland
-#   no mouse middle button click
+        f"- `Xubuntu 20.04+`\n"
+        f"\n\n" )
+
+#TODO Should I include indicatortest? 
+# Maybe just add comments/tooltips to labels/menuitems when something might not work instead? 
+
+    message_two = ""
+
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORFORTUNE,
+        Indicator_Name.INDICATORONTHISDAY,
+        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORTEST ):
+        message_two += (
+            f"- Under `Wayland`, the clipboard does not function.\n" )
+
+#TODO The message doesn't exactly apply to indicatortest...
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORVIRTUALBOX ):
+        message_two += (
+            f"- Under `Wayland`, the command `wmctrl` does not function, "
+            f"which used to bring windows to the front.\n" )
+
+#TODO On Kubuntu, this only happens under Plasma (X11)...
+# This is a greater issue...
+# Need to check every desktop shipped with each supported/mentioned distro and version!
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORSTARDATE,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORVIRTUALBOX ):
+        message_two += (
+            f"- On `Kubuntu 20.04 / 22.04` and `Xubuntu 20.04 / 22.04`, "
+            f"mouse wheel scroll over icon does not function.\n" )
+
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORFORTUNE,
+        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
+        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORSCRIPTRUNNER,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORVIRTUALBOX ):
+        message_two += (
+            f"- On `Ubuntu Budgie 20.04`, "
+            f"mouse middle button click does not function.\n" )
+
+#TODO If also applies to Lubuntu 24.04, change to 20.04+  ?
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORFORTUNE,
+        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
+        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORSCRIPTRUNNER,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORVIRTUALBOX ):
+        message_two += (
+            f"- On `Lubuntu 20.04 / 22.04`, "
+            f"labels next to the icon are unsupported and so a tooltip is used. "
+            f"However, the tooltip cannot be changed once set.\n" )
+
+#TODO If also applies to Lubuntu 24.04, change to 20.04+  ?
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORLUNAR,
+        Indicator_Name.INDICATORTEST ):
+        message_two += ( f"- Icons are not dynamic on `Lubuntu 20.04 / 22.04`.\n" )
+
+#TODO Need a message for 
 #   dynamic icon truncated
-#
-# Maybe mention these things in a top paragraph or at least a paragraph
-# specific to each indicator...
-# So only mention wmctrl for indicatortest and indicatorvirtualbox  (if at all???).
+
+    if message_two:
+        message_two = f"Limitations:\n" + message_two + f"\n\n"
+
+    return message_one + message_two
 
 
 #TODO Original
@@ -546,7 +622,7 @@ def _get_removal_for_operating_system(
         operating_system == Operating_System.MANJARO_221 or \
         operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
-    if opensuse_or_manjaro and indicator_name.upper() == Indicator_Name.INDICATORONTHISDAY.name:
+    if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         removal = ''
 
     else:
@@ -655,7 +731,7 @@ def _create_readme( directory_out, indicator_name ):
         f.write( _get_introduction( indicator_name ) )
         f.write( _get_installation( indicator_name ) )
         f.write( _get_usage( indicator_name ) )
-        f.write( _get_distributions_tested() )
+        f.write( _get_distributions_supported( indicator_name ) )
         f.write( _get_removal( indicator_name ) )
         f.write( _get_license( indicator_name ) )
 
