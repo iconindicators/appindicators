@@ -111,51 +111,58 @@ class IndicatorTest( IndicatorBase ):
             _( "Version: " ) + str( uname.version ) )
 
         for label in labels:
-            self.create_and_append_menuitem( submenu, self.get_menu_indent() * 2 + label )
+            self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Platform | Uname" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Platform | Uname" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_desktop( self, menu ):
         submenu = Gtk.Menu()
 
-        text = self.get_menu_indent() * 2 + "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
-        self.create_and_append_menuitem( submenu, text )
+        text = "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
+        self.create_and_append_menuitem( submenu, text, indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 +
-            "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ) )
+            "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ),
+            indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Desktop" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Desktop" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_icon_theme( self, menu ):
         submenu = Gtk.Menu()
 
         text = \
-            self.get_menu_indent() * 2 + \
             "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + \
             Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
 
-        self.create_and_append_menuitem( submenu, text )
+        self.create_and_append_menuitem( submenu, text, indent = ( 2, 0 ) )
 
         command = "gsettings get org.gnome.desktop.interface "
 
         result = self.process_get( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + command + "icon-theme: " + result )
+            command + "icon-theme: " + result,
+            indent = ( 2, 0 ) )
 
         result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + command + "gtk-theme: " + result )
+            command + "gtk-theme: " + result,
+            indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Icon Theme" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Icon Theme" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_terminal( self, menu ):
@@ -165,14 +172,18 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Terminal: " ) + str( terminal ) )
+            _( "Terminal: " ) + str( terminal ),
+            indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Execution flag: " ) + str( execution_flag ) )
+            _( "Execution flag: " ) + str( execution_flag ),
+            indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Terminal" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Terminal" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_icon( self, menu ):
@@ -180,10 +191,11 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Reset icon" ),
+            _( "Reset icon" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.set_icon( self.get_icon_name() ), ) )
+                    self.set_icon( self.get_icon_name() ), ),
+            indent = ( 2, 0 ) )
 
         icons = (
             "FULL_MOON",
@@ -200,12 +212,15 @@ class IndicatorTest( IndicatorBase ):
 
             self.create_and_append_menuitem(
                 submenu,
-                self.get_menu_indent() * 2 + label,
+                label,
                 name = icon,
-                activate_functionandarguments = ( self.__use_icon_dynamically_created, ) )
+                activate_functionandarguments = ( self.__use_icon_dynamically_created, ),
+                indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Icon" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Icon" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_label_tooltip_osd( self, menu ):
@@ -213,29 +228,34 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Reset label" ),
+            _( "Reset label" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.set_label( IndicatorTest.LABEL ), ) )
+                    self.set_label( IndicatorTest.LABEL ), ),
+            indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Show current time in label" ),
+            _( "Show current time in label" ),
             activate_functionandarguments = (
                 lambda menuitem: (
                     print( "secondary activate target / mouse middle click" ),
                     self.set_label( self.__get_current_time() ) ), ),
+            indent = ( 2, 0 ),
             is_secondary_activate_target = True )
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Show current time in OSD" ),
+            _( "Show current time in OSD" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.show_notification( _( "Current time..." ), self.__get_current_time() ), ) )
+                    self.show_notification( _( "Current time..." ), self.__get_current_time() ), ),
+            indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Label / Tooltip / OSD" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Label | Tooltip | OSD" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_clipboard( self, menu ):
@@ -243,12 +263,15 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            self.get_menu_indent() * 2 + _( "Copy current time to clipboard" ),
+            _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: ( self.copy_to_selection( self.__get_current_time() ) ), ) )
+                lambda menuitem: ( self.copy_to_selection( self.__get_current_time() ) ), ),
+            indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Clipboard" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Clipboard" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_execute_command( self, menu ):
@@ -273,13 +296,16 @@ class IndicatorTest( IndicatorBase ):
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(
                 submenu,
-                self.get_menu_indent() * 2 + label,
+                label,
                 activate_functionandarguments = (
                     lambda menuitem, command = command:  # Need command = command to handle lambda late binding.
-                        self.__execute_command( command ), ) )
+                        self.__execute_command( command ), ),
+                indent = ( 2, 0 ) )
 
-        label = self.get_menu_indent() + _( "Execute Terminal Command" )
-        self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
+        self.create_and_append_menuitem(
+            menu,
+            _( "Execute Terminal Command" ),
+            indent = ( True, 1 ) ).set_submenu( submenu )
 
 
     def __get_current_time( self ):

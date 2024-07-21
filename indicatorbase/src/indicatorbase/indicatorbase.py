@@ -307,6 +307,11 @@ class IndicatorBase( ABC ):
 #	self.desktop_environment = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
     __DESKTOP_KDE = "KDE"
 # and still not sure which values will ultimately be needed.
+#
+# Should I be using 
+#   echo $XDG_CURRENT_DESKTOP
+# or
+#   os.environ.get( "DESKTOP_SESSION" )
 
 
     __EXTENSION_JSON = ".json"
@@ -1039,7 +1044,7 @@ class IndicatorBase( ABC ):
 #
 # indicatorvirtualbox
 #   Top level:
-#       Mix of submenus and menuitems, none of which with indent
+#       menuitems/submenus with no indent
 #       OR
 #       menuitems with zero or more levels of indent.
 #   Within submenus
@@ -1054,42 +1059,12 @@ class IndicatorBase( ABC ):
         label,
         name = None,
         activate_functionandarguments = None,
-        is_top_level = True,
-        indent = 0,
+        indent = ( True, 0 ),  #TODO Document: ( True, n ), ( False, n ), ( n, m )
         is_secondary_activate_target = False ):
 
-        indent_amount = self.__get_menu_indent_amount( indent, desktop_agnositic = is_top_level )
+        indent_amount = self.__get_menu_indent_amount( indent )
         menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
-
-        if name:
-            menuitem.set_name( name )
-
-        if activate_functionandarguments:
-            menuitem.connect( "activate", *activate_functionandarguments )
-
-        if is_secondary_activate_target:
-            self.secondary_activate_target = menuitem
-
-        menu.append( menuitem )
-        return menuitem
-
-
-    def create_and_append_menuitem_differing_indent(
-        self,
-        menu,
-        label,
-        name = None,
-        activate_functionandarguments = None,
-        indent = 0,
-        indent_detachable = 0,
-        is_secondary_activate_target = False ):
-
-        indent_amount = \
-            self.__get_menu_indent_amount_differing(
-                indent = indent,
-                indent_detachable = indent_detachable )
-
-        menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
+        print( indent_amount + label )
 
         if name:
             menuitem.set_name( name )
@@ -1128,8 +1103,31 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO Will need to accept indent...
     def create_and_insert_menuitem(
+        self,
+        menu,
+        label,
+        index,
+        name = None,
+        activate_functionandarguments = None,
+        indent = ( True, 0 ),  #TODO Document: ( True, n ), ( False, n ), ( n, m )
+        is_secondary_activate_target = False ):
+
+        menuitem = \
+            self.create_and_append_menuitem(
+                menu,
+                label,
+                name = name,
+                activate_functionandarguments = activate_functionandarguments,
+                indent = indent,
+                is_secondary_activate_target = is_secondary_activate_target )
+
+        menu.reorder_child( menuitem, index )
+        return menuitem
+
+
+#TODO Will go maybe
+    def create_and_insert_menuitem_ORIGINAL(
         self,
         menu,
         label,
@@ -1150,10 +1148,33 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO Will need to accept indent...
+#TODO Test this with indicatorvirtualbox
+# and a virtualmachine that is three levels deep and is running
+# on both Ubuntu and Kubuntu.
     # Creates a single (isolated, not part of a group)
     # RadioMenuItem that is enabled/active.
     def create_and_append_radiomenuitem(
+        self,
+        menu,
+        label,
+        activate_functionandarguments = None,
+        indent = ( True, 0 ) ):  #TODO Document: ( True, n ), ( False, n ), ( n, m )
+
+        indent_amount = self.__get_menu_indent_amount( indent )
+        menuitem = Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label )
+        menuitem.set_active( True )
+
+        if activate_functionandarguments:
+            menuitem.connect( "activate", *activate_functionandarguments )
+
+        menu.append( menuitem )
+        return menuitem
+
+
+#TODO Will go maybe
+    # Creates a single (isolated, not part of a group)
+    # RadioMenuItem that is enabled/active.
+    def create_and_append_radiomenuitem_ORIGINAL(
         self,
         menu,
         label,
@@ -1169,7 +1190,34 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-    def __get_menu_indent_amount( self, indent = 0, desktop_agnositic = True ):
+#TODO Document: ( True, n ), ( False, n ), ( n, m )
+    def __get_menu_indent_amount( self, indent = ( True, 0 ) ):
+        spacing = "      "
+        if type( indent[ 0 ] ) == bool:
+            if indent[ 0 ]: # Want the indent for a top level menu item or submenu.
+                indent_amount = spacing * indent[ 1 ]
+
+            else: # Want the indent for a submenu menu item.
+                submenus_are_detatched = False # TODO Need to call a function to determine this.
+                if submenus_are_detatched:
+                    indent_amount = spacing * ( indent[ 1 ] - 1 )
+
+                else:
+                    indent_amount = spacing * indent[ 1 ]
+
+        else: # Want the indent for a submenu menu item which depends on the current desktop.
+            submenus_are_detatched = False # TODO Need to call a function to determine this.
+            if submenus_are_detatched:
+                indent_amount = spacing * indent[ 1 ]
+
+            else:
+                indent_amount = spacing * indent[ 0 ]
+
+        return indent_amount
+
+
+#TODO Keep?
+    def __get_menu_indent_amount_ORIGINAL( self, indent = 0, desktop_agnositic = True ):
         spacing = self.__get_menu_indent_spacing()
         if desktop_agnositic:
             indent_amount = spacing * indent
@@ -1189,18 +1237,7 @@ class IndicatorBase( ABC ):
         return indent_amount
 
 
-    def __get_menu_indent_amount_differing( self, indent = 0, indent_detachable = 0 ):
-        spacing = self.__get_menu_indent_spacing()
-        desktop_detaches_submenus = False # TODO Need to call a function to determine this.
-        if desktop_detaches_submenus:
-            indent_amount = spacing * indent_detachable
-
-        else:
-            indent_amount = spacing * indent
-
-        return indent_amount
-
-
+#TODO Maybe will go.
     def __get_menu_indent_spacing( self  ):
         return "      "
 
