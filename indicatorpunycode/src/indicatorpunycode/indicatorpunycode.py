@@ -16,6 +16,33 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO
+# 2024-07-21 12:07:37,131 - root - ERROR - label empty or too long
+# Traceback (most recent call last):
+#   File "/home/bernard/.local/venv_indicatorpunycode/lib/python3.8/site-packages/indicatorpunycode/indicatorpunycode.py", line 129, in __do_conversion
+#     labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
+#   File "/usr/lib/python3.8/encodings/idna.py", line 71, in ToASCII
+#     raise UnicodeError("label empty or too long")
+# UnicodeError: label empty or too long
+# 2024-07-21 12:07:37,148 - root - ERROR - Error converting '    # indicatorppadownloadstatistics
+#     #   Top level: menuitems with NO indent or one level of indent needed; OR
+#     #              submenus with NO indent needed.
+#     #   Within submenus
+#     #       Under GNOME, need one level of indent for menuitems.
+#     #       Under Kubuntu, need NO indent for menuitems with submenus; one level of indent with no submenus.
+#     # 
+# '.
+#
+#
+#
+# I selected some text and clicked convert and got an OSD message and the above log message.
+# But the preference for the input was clipboard...so maybe need to guard against an empty clipboard.
+
+
+
+#TODO Amend the changelog.md and/or readme.md
+# to mention the clipboard only works under X11?
+
 
 #TODO On Debian 12, when selecting text and either middle mouse click or select convert
 # (from primary, not clipboard), get a message "no text is highlight/selected".
@@ -183,7 +210,9 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_radiobutton(
                 None,
                 _( "Clipboard" ),
-                tooltip_text = _( "Input is taken from the clipboard." ),
+                tooltip_text = _(
+                    "Input is taken from the clipboard.\n\n" +
+                    "Only works under X11." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.input_clipboard )
 
@@ -206,7 +235,9 @@ class IndicatorPunycode( IndicatorBase ):
                     "If checked, the converted text is sent\n" +
                     "to both the clipboard and primary.\n\n" +
                     "Otherwise the converted text is sent\n" +
-                    "only to the input source." ),
+                    "only to the input source.\n\n" +
+                    "Sending the output to the clipboard\n" +
+                    "only works under X11." ),
                 margin_top = 10,
                 active = self.output_both )
 

@@ -235,6 +235,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
+#TODO Maybe have an 'else' clause showing a notification that we cannot do so...?
         if self.get_session_type() == IndicatorBase.SESSION_TYPE_X11:
             number_of_windows_with_the_same_name = \
                 self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )

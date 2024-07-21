@@ -19,6 +19,8 @@
 #TODO Amend the changelog.md and/or readme.md
 # to mention that wmctrl only works under X11?
 # Already part of the menu item label...
+#
+# Similarly for clipboard.
 
 
 #TODO For the actual release to PyPI, the version to use is 1.0.17 as per pyproject.toml.

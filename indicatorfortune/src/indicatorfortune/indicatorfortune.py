@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Amend the changelog.md and/or readme.md
+# to mention the clipboard only works under X11?
+
+
 # Application indicator which displays fortunes.
 
 
@@ -359,6 +363,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Copy current fortune to clipboard" ),
+                tooltip_text = _( "Only works under X11." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
                     self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )

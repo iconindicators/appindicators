@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Amend the changelog.md and/or readme.md
+# to mention the clipboard only works under X11?
+
+
 # Application indicator which displays calendar events.
 
 
@@ -124,9 +128,6 @@ class IndicatorOnThisDay( IndicatorBase ):
                     activate_functionandarguments = ( 
                         lambda menuitem:
                             self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ) )
-                #TODO The copy to clipboard does not work on Debian 12;
-                # does work on Ubuntu 20.04; test on Ubuntu 22.04/24.04. 
-                # Also document in the README.md for the indicators (via the build_readme.py).
 
             elif len( self.search_url ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 date_and_description = self.remove_leading_zero_from_date( event.get_date() ) + ' ' + event.get_description()
@@ -300,7 +301,9 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_radiobutton(
                 None,
                 _( "Copy event to clipboard" ),
-                tooltip_text = _( "Copy the event text and date to the clipboard." ),
+                 tooltip_text = _(
+                     "Copy the event text and date to the clipboard.\n\n" +
+                     "Only works under X11." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.copy_to_clipboard )
 
