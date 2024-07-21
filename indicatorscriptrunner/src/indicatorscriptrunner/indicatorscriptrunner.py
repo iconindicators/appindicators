@@ -16,6 +16,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO
+# Got this in the error log on the laptop...
+# don't know if caused when there was no internet connection.
+#
+'''
+2024-07-21 18:40:28,274 - root - ERROR - Command 'python3 /home/bernard/Programming/checkHotmail.py' returned non-zero exit status 1.
+2024-07-21 18:40:28,300 - root - ERROR - b'Traceback (most recent call last):\n  File "/home/bernard/Programming/checkHotmail.py", line 72, in <module>\n    connection.logout()\n    ^^^^^^^^^^\nNameError: name \'connection\' is not defined\n'
+'''
+
+
 # Application indicator to run a terminal command or script from an indicator.
 
 
@@ -1241,7 +1251,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self.background_script_next_update_time = { }
         today = datetime.datetime.now()
         for script in self.scripts:
-            if type( script ) is Background:
+            if type( script ) is Background: #TODO CHeck ALL .py file for 'type'...should it be == or is?
                 key = self.__create_key( script.get_group(), script.get_name() )
                 self.background_script_results[ key ] = None
                 self.background_script_next_update_time[ key ] = today
