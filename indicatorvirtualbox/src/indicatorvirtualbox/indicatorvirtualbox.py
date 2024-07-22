@@ -138,14 +138,14 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.__build_menu(
                     self.__add_group_to_menu( menu, item, indent ),
                     item.get_items(),
-                    ( False, indent[ 1 ] + 1 ), #TODO Check
+                    ( False, indent[ 1 ] + 1 ),
                     running_uuids )
 
             else:
                 self.__add_virtual_machine_to_menu(
                     menu,
                     item,
-                    ( False, indent[ 1 ] + 1 ), #TODO Check
+                    indent,
                     item.get_uuid() in running_uuids )
 
 
