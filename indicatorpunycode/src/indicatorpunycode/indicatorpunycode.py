@@ -93,23 +93,24 @@ class IndicatorPunycode( IndicatorBase ):
             activate_functionandarguments = ( lambda menuitem: self.on_convert(), ),
             is_secondary_activate_target = True )
 
-        indent = self.get_menu_indent()
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
 
             self.create_and_append_menuitem(
                 menu,
-                indent + _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
+                _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
                 activate_functionandarguments = (
                     lambda menuitem, result = result: # Need result = result to handle lambda late binding.
-                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ) )
+                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
+                indent = ( True, 1 ) )
 
             self.create_and_append_menuitem(
                 menu,
-                indent + _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
+                _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
                 activate_functionandarguments = (
                     lambda menuitem, result = result:
-                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ) )
+                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
+                indent = ( True, 1 ) )
 
 
     def on_convert( self ):

@@ -120,24 +120,34 @@ class IndicatorOnThisDay( IndicatorBase ):
                 else:
                     break # Don't add the menu item for the new date and don't add a subsequent event.
 
+#TODO Check the logic behind the if/elif below...
             if self.copy_to_clipboard:
                 self.create_and_append_menuitem(
                     menu,
-                    self.get_menu_indent() + event.get_description(),
+                    event.get_description(),
                     name = self.remove_leading_zero_from_date( event.get_date() ), # Allows the month/day to be passed to the copy/search functions below.
                     activate_functionandarguments = ( 
                         lambda menuitem:
-                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ) )
+                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ),
+                    indent = ( True, 1 ) )
 
             elif len( self.search_url ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
-                date_and_description = self.remove_leading_zero_from_date( event.get_date() ) + ' ' + event.get_description()
-                url = self.search_url.replace( IndicatorOnThisDay.TAG_EVENT, date_and_description.replace( ' ', '+' ) )
+                date_and_description = \
+                    self.remove_leading_zero_from_date( event.get_date() ) + \
+                    ' ' + \
+                    event.get_description()
+
+                url = \
+                    self.search_url.replace(
+                        IndicatorOnThisDay.TAG_EVENT,
+                        date_and_description.replace( ' ', '+' ) )
 
                 self.create_and_append_menuitem(
                     menu,
-                    self.get_menu_indent() + event.get_description(),
+                    event.get_description(),
                     name = url,
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ) )
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( True, 1 ) )
 
             menu_item_count += 1
             if menu_item_count == menu_item_maximum:

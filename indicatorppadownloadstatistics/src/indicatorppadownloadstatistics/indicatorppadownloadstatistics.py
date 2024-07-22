@@ -129,23 +129,21 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.sort_published_binaries_by_download_count_and_clip( self.sort_by_download_amount )
 
         if self.show_submenu:
-            indent = self.get_menu_indent()
             for ppa in ppas:
-                menuitem = self.create_and_append_menuitem( menu, ppa.get_descriptor() )
-
                 submenu = Gtk.Menu()
+                self.create_and_append_menuitem( menu, ppa.get_descriptor() ).set_submenu( submenu )
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
                     for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary( submenu, indent, ppa, published_binary )
-                        menuitem.set_submenu( submenu )
+                        self.create_menuitem_for_published_binary( submenu, ( False, 1 ), ppa, published_binary )
 
                 else:
-                    self.create_menuitem_for_status_message( submenu, indent, ppa )
-                    menuitem.set_submenu( submenu )
+                    self.create_and_append_menuitem(
+                        submenu,
+                        self.get_status_message( ppa ),
+                        indent = ( False, 1 ) )
 
         else:
-            indent = self.get_menu_indent()
             for ppa in ppas:
                 self.create_and_append_menuitem(
                     menu,
@@ -156,10 +154,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
                     for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary( menu, indent, ppa, published_binary )
+                        self.create_menuitem_for_published_binary( menu, ( True, 1 ), ppa, published_binary )
 
                 else:
-                    self.create_menuitem_for_status_message( menu, indent, ppa )
+                    self.create_and_append_menuitem(
+                        menu,
+                        self.get_status_message( ppa ),
+                        indent = ( True, 1 ) )
 
             # When only one PPA is present, enable a middle mouse click
             # on the icon to open the PPA in the browser.
@@ -168,7 +169,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def create_menuitem_for_published_binary( self, menu, indent, ppa, published_binary ):
-        label = indent + published_binary.get_package_name()
+        label = published_binary.get_package_name()
         if published_binary.get_package_version() is None:
             label += ":  " + str( published_binary.get_download_count() )
 
@@ -181,10 +182,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             menu,
             label,
             name = ppa.get_descriptor(),
-            activate_functionandarguments = ( self.on_ppa, ) )
+            activate_functionandarguments = ( self.on_ppa, ),
+            indent = indent )
 
 
-    def create_menuitem_for_status_message( self, menu, indent, ppa ):
+    def get_status_message( self, ppa ):
         if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
@@ -197,7 +199,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.get_status() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_PUBLISHED_BINARIES_COMPLETELY_FILTERED
 
-        self.create_and_append_menuitem( menu, indent + message )
+        return message
 
 
     def combine( self, ppas ):

@@ -143,24 +143,22 @@ class IndicatorScriptRunner( IndicatorBase ):
     def update_menu( self, menu ):
         if self.show_scripts_in_submenus:
             scripts_by_group = self.get_scripts_by_group( self.scripts, True, False )
-            indent = self.get_menu_indent()
             for group in sorted( scripts_by_group.keys(), key = str.lower ):
                 submenu = Gtk.Menu()
                 self.create_and_append_menuitem( menu, group ).set_submenu( submenu )
-                self.add_scripts_to_menu( scripts_by_group[ group ], submenu, indent )
+                self.add_scripts_to_menu( scripts_by_group[ group ], submenu, indent = ( False, 1 ) )
 
         else:
             if self.hide_groups:
                 for script in sorted( self.scripts, key = lambda script: script.get_name().lower() ):
                     if type( script ) is NonBackground:
-                        self.add_scripts_to_menu( [ script ], menu, "" )
+                        self.add_scripts_to_menu( [ script ], menu, indent = ( True, 0 ) )
 
             else:
                 scripts_by_group = self.get_scripts_by_group( self.scripts, True, False )
-                indent = self.get_menu_indent()
                 for group in sorted( scripts_by_group.keys(), key = str.lower ):
-                    self.create_and_append_menuitem( menu, group + "..." )
-                    self.add_scripts_to_menu( scripts_by_group[ group ], menu, indent )
+                    self.create_and_append_menuitem( menu, group )
+                    self.add_scripts_to_menu( scripts_by_group[ group ], menu, indent = ( True, 1 ) )
 
 
     def add_scripts_to_menu( self, scripts, menu, indent ):
@@ -169,10 +167,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             menuitem = \
                 self.create_and_append_menuitem(
                     menu,
-                    indent + script.get_name(),
+                    script.get_name(),
                     activate_functionandarguments = (
                         lambda menuitem, script = script:
-                            self.on_script_menuitem( script ), ) ) # Note script = script to handle lambda late binding.
+                            self.on_script_menuitem( script ), ), # Note script = script to handle lambda late binding.
+                    indent = indent )
 
             if script.get_default():
                 self.set_secondary_activate_target( menuitem )

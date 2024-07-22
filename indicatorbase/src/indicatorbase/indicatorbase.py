@@ -296,23 +296,19 @@ class IndicatorBase( ABC ):
 
     __CONFIG_VERSION = "version"
 
-#TODO Are these still relevant?
-# Check if we need to add others given the variety of distros now supported.
-# Also, not sure where the actual values came from...either 'echo $XDG_CURRENT_DESKTOP` or `os.environ.get( "DESKTOP_SESSION" )`
-    __DESKTOP_LXQT = "LXQt"
-    __DESKTOP_MATE = "MATE"
-    __DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
-
-#TODO Obtained from 
-#	self.desktop_environment = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
-    __DESKTOP_KDE = "KDE"
-# and still not sure which values will ultimately be needed.
+#TODO To get the current "desktop", there are two ways:
+#   print( os.environ.get( "DESKTOP_SESSION" ) ) # Gives 'plasma' on  'Plasma (X11)'.
+#   print( self.process_get( "echo $XDG_CURRENT_DESKTOP" ) ) # Gives 'KDE' on  'Plasma (X11)'.
+# giving two different results.
+# Perhaps best to use the os.environ way as it is a Python call.
 #
-# Should I be using 
-#   echo $XDG_CURRENT_DESKTOP
-# or
-#   os.environ.get( "DESKTOP_SESSION" )
-
+# Need to recheck values using os.environ
+# and see where/how they are used.
+# Also need to get the values for all supported distros/versions...
+    __DESKTOP_SESSION_LXQT = "LXQt" #TODO Check
+    __DESKTOP_SESSION_MATE = "MATE" #TODO Check
+    __DESKTOP_SESSION_PLASMA = "plasma"
+    __DESKTOP_SESSION_UNITY7 = "Unity:Unity7:ubuntu" #TODO Check
 
     __EXTENSION_JSON = ".json"
 
@@ -359,6 +355,7 @@ class IndicatorBase( ABC ):
 #	echo $XDG_SESSION_TYPE
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
+#TODO Also, where/how are the above used?
 
     URL_TIMEOUT_IN_SECONDS = 20
 
@@ -401,6 +398,13 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
+#TODO Testing
+        print( os.environ.get( "DESKTOP_SESSION" ) ) # Gives 'plasma' on  'Plasma (X11)'.
+        print( self.process_get( "echo $XDG_CURRENT_DESKTOP" ) ) # Gives 'KDE' on  'Plasma (X11)'.
+
+#TODO I'm using "echo $XDG_SESSION_TYPE" here to get session type (x11 or wayland).
+# But for desktop session (or whatever it is called) I'm using os.environ.get().
+# Need to standardise. 
         self.session_type = self.process_get( "echo $XDG_SESSION_TYPE" )
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
         
@@ -1080,27 +1084,27 @@ class IndicatorBase( ABC ):
 
 
 #TODO Might eventually go...
-    def create_and_append_menuitem_ORIGINAL(
-        self,
-        menu,
-        label,
-        name = None,
-        activate_functionandarguments = None,
-        is_secondary_activate_target = False ):
-
-        menuitem = Gtk.MenuItem.new_with_label( label )
-
-        if name:
-            menuitem.set_name( name )
-
-        if activate_functionandarguments:
-            menuitem.connect( "activate", *activate_functionandarguments )
-
-        if is_secondary_activate_target:
-            self.secondary_activate_target = menuitem
-
-        menu.append( menuitem )
-        return menuitem
+    # def create_and_append_menuitem_ORIGINAL(
+    #     self,
+    #     menu,
+    #     label,
+    #     name = None,
+    #     activate_functionandarguments = None,
+    #     is_secondary_activate_target = False ):
+    #
+    #     menuitem = Gtk.MenuItem.new_with_label( label )
+    #
+    #     if name:
+    #         menuitem.set_name( name )
+    #
+    #     if activate_functionandarguments:
+    #         menuitem.connect( "activate", *activate_functionandarguments )
+    #
+    #     if is_secondary_activate_target:
+    #         self.secondary_activate_target = menuitem
+    #
+    #     menu.append( menuitem )
+    #     return menuitem
 
 
     def create_and_insert_menuitem(
@@ -1127,25 +1131,25 @@ class IndicatorBase( ABC ):
 
 
 #TODO Will go maybe
-    def create_and_insert_menuitem_ORIGINAL(
-        self,
-        menu,
-        label,
-        index,
-        name = None,
-        activate_functionandarguments = None,
-        is_secondary_activate_target = False ):
-
-        menuitem = \
-            self.create_and_append_menuitem(
-                menu,
-                label,
-                name = name,
-                activate_functionandarguments = activate_functionandarguments,
-                is_secondary_activate_target = is_secondary_activate_target )
-
-        menu.reorder_child( menuitem, index )
-        return menuitem
+    # def create_and_insert_menuitem_ORIGINAL(
+    #     self,
+    #     menu,
+    #     label,
+    #     index,
+    #     name = None,
+    #     activate_functionandarguments = None,
+    #     is_secondary_activate_target = False ):
+    #
+    #     menuitem = \
+    #         self.create_and_append_menuitem(
+    #             menu,
+    #             label,
+    #             name = name,
+    #             activate_functionandarguments = activate_functionandarguments,
+    #             is_secondary_activate_target = is_secondary_activate_target )
+    #
+    #     menu.reorder_child( menuitem, index )
+    #     return menuitem
 
 
 #TODO Test this with indicatorvirtualbox
@@ -1174,81 +1178,88 @@ class IndicatorBase( ABC ):
 #TODO Will go maybe
     # Creates a single (isolated, not part of a group)
     # RadioMenuItem that is enabled/active.
-    def create_and_append_radiomenuitem_ORIGINAL(
-        self,
-        menu,
-        label,
-        activate_functionandarguments = None ):
-
-        menuitem = Gtk.RadioMenuItem.new_with_label( [ ], label ) # Always set the group to empty.
-        menuitem.set_active( True )
-
-        if activate_functionandarguments:
-            menuitem.connect( "activate", *activate_functionandarguments )
-
-        menu.append( menuitem )
-        return menuitem
+    # def create_and_append_radiomenuitem_ORIGINAL(
+    #     self,
+    #     menu,
+    #     label,
+    #     activate_functionandarguments = None ):
+    #
+    #     menuitem = Gtk.RadioMenuItem.new_with_label( [ ], label ) # Always set the group to empty.
+    #     menuitem.set_active( True )
+    #
+    #     if activate_functionandarguments:
+    #         menuitem.connect( "activate", *activate_functionandarguments )
+    #
+    #     menu.append( menuitem )
+    #     return menuitem
 
 
 #TODO Document: ( True, n ), ( False, n ), ( n, m )
     def __get_menu_indent_amount( self, indent = ( True, 0 ) ):
-        spacing = "      "
+        indent_amount = "      "
+        indent_small = \
+            self.get_current_desktop() == IndicatorBase.__DESKTOP_SESSION_PLASMA
+
+        if indent_small:
+            indent_amount = "   "
+
+        detatched_submenus = \
+            self.get_current_desktop() == IndicatorBase.__DESKTOP_SESSION_PLASMA
+
         if type( indent[ 0 ] ) == bool:
             if indent[ 0 ]: # Want the indent for a top level menu item or submenu.
-                indent_amount = spacing * indent[ 1 ]
+                indent_amount = indent_amount * indent[ 1 ]
 
             else: # Want the indent for a submenu menu item.
-                submenus_are_detatched = False # TODO Need to call a function to determine this.
-                if submenus_are_detatched:
-                    indent_amount = spacing * ( indent[ 1 ] - 1 )
+                if detatched_submenus:
+                    indent_amount = indent_amount * ( indent[ 1 ] - 1 )
 
                 else:
-                    indent_amount = spacing * indent[ 1 ]
+                    indent_amount = indent_amount * indent[ 1 ]
 
         else: # Want the indent for a submenu menu item which depends on the current desktop.
-            submenus_are_detatched = False # TODO Need to call a function to determine this.
-            if submenus_are_detatched:
-                indent_amount = spacing * indent[ 1 ]
+            if detatched_submenus:
+                indent_amount = indent_amount * indent[ 1 ]
 
             else:
-                indent_amount = spacing * indent[ 0 ]
+                indent_amount = indent_amount * indent[ 0 ]
 
         return indent_amount
 
 
 #TODO Keep?
-    def __get_menu_indent_amount_ORIGINAL( self, indent = 0, desktop_agnositic = True ):
-        spacing = self.__get_menu_indent_spacing()
-        if desktop_agnositic:
-            indent_amount = spacing * indent
-
-        else:
-            desktop_detaches_submenus = False # TODO Need to call a function to determine this.
-            if desktop_detaches_submenus:
-                indent_amount = spacing * indent
-
-            else:
-                indent_amount = spacing * ( indent - 1 )
-
-#TODO Not sure if this is needed or some variation...
-        # if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
-        #     indent = "      " * ( indent_amount - 1 )
-
-        return indent_amount
+#     def __get_menu_indent_amount_ORIGINAL( self, indent = 0, desktop_agnositic = True ):
+#         spacing = self.__get_menu_indent_spacing()
+#         if desktop_agnositic:
+#             indent_amount = spacing * indent
+#
+#         else:
+#             desktop_detaches_submenus = False # TODO Need to call a function to determine this.
+#             if desktop_detaches_submenus:
+#                 indent_amount = spacing * indent
+#
+#             else:
+#                 indent_amount = spacing * ( indent - 1 )
+#
+# #TODO Not sure if this is needed or some variation...
+#         # if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+#         #     indent = "      " * ( indent_amount - 1 )
+#
+#         return indent_amount
 
 
 #TODO Maybe will go.
-    def __get_menu_indent_spacing( self  ):
-        return "      "
+    # def __get_menu_indent_spacing( self  ):
+    #     return "      "
 
 
 #TODO Will eventually go...
-    def get_menu_indent( self, indent = 1 ):
-        indent_amount = "      " * indent
-        if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
-            indent_amount = "      " * ( indent - 1 )
-
-        return indent_amount
+    # def get_menu_indent( self, indent = 1 ):
+    #     indent_amount = "      " * indent
+    #     if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+    #         indent_amount = "      " * ( indent - 1 )
+    #
+    #     return indent_amount
 
 
     def get_on_click_menuitem_open_browser_function( self ):
@@ -1765,10 +1776,15 @@ class IndicatorBase( ABC ):
             return False
 
 
+#TODO Document!
+# Needed to differentiate between wayland and xll.
     def get_session_type( self ):
         return self.session_type
 
 
+#TODO Rename to get_desktop_session()...or not.
+# Need to sort out at the top what we need/have for desktop session or whatever is used
+# in the call to os.environ() to get 'plasma' on Kubuntu.
     def get_current_desktop( self ):
         return self.current_desktop
 
@@ -1799,8 +1815,8 @@ class IndicatorBase( ABC ):
 
 #TODO Tidy up
         if desktop_environment is None or \
-           desktop_environment == IndicatorBase.__DESKTOP_LXQT or \
-           ( desktop_environment == IndicatorBase.__DESKTOP_MATE and self.__is_ubuntu_variant_2004() ):
+           desktop_environment == IndicatorBase.__DESKTOP_SESSION_LXQT or \
+           ( desktop_environment == IndicatorBase.__DESKTOP_SESSION_MATE and self.__is_ubuntu_variant_2004() ):
             icon_update_supported = False
 
         return icon_update_supported
@@ -1814,7 +1830,7 @@ class IndicatorBase( ABC ):
 
 #TODO Tidy up        
         if desktop_environment is None or \
-           desktop_environment == IndicatorBase.__DESKTOP_LXQT:
+           desktop_environment == IndicatorBase.__DESKTOP_SESSION_LXQT:
             label_update_supported = False
 
         return label_update_supported
