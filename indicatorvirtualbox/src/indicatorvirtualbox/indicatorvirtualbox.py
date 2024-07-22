@@ -99,7 +99,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
                 self.__build_menu(
                     menu, self.get_virtual_machines(),
-                    0,
+                    ( True, 0 ), #TODO CHeck
                     running_uuids )
 
             else:
@@ -138,22 +138,23 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.__build_menu(
                     self.__add_group_to_menu( menu, item, indent ),
                     item.get_items(),
-                    indent + 1,
+                    ( False, indent[ 1 ] + 1 ), #TODO Check
                     running_uuids )
 
             else:
                 self.__add_virtual_machine_to_menu(
                     menu,
                     item,
-                    indent,
+                    ( False, indent[ 1 ] + 1 ), #TODO Check
                     item.get_uuid() in running_uuids )
 
 
-    def __add_group_to_menu( self, menu, group, level ):
+    def __add_group_to_menu( self, menu, group, indent ):
         menuitem = \
             self.create_and_append_menuitem(
                 menu,
-                level * self.get_menu_indent() + group.get_name() )
+                group.get_name(),
+                indent = indent )
 
         if self.show_submenu:
             menu = Gtk.Menu()
@@ -162,19 +163,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         return menu
 
 
-    def __add_virtual_machine_to_menu( self, menu, virtual_machine, level, is_running ):
-        indent = level * self.get_menu_indent()
+    def __add_virtual_machine_to_menu( self, menu, virtual_machine, indent, is_running ):
         if is_running:
             self.create_and_append_radiomenuitem(
                 menu,
-                indent + virtual_machine.get_name(),
-                activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ) )
+                virtual_machine.get_name(),
+                activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ),
+                indent = indent )
 
         else:
             self.create_and_append_menuitem(
                 menu,
-                indent + virtual_machine.get_name(),
-                activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ) )
+                virtual_machine.get_name(),
+                activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ),
+                indent = indent )
 
 
     def _on_virtual_machine( self, menuitem, virtual_machine ):
