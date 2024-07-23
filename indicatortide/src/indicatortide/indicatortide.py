@@ -115,7 +115,7 @@ class IndicatorTide( IndicatorBase ):
 
 
     def build_menu( self, menu, tidal_readings ):
-        indent = ""
+        indent = ( True, 0 )
         self.port_name = tidal_readings[ 0 ].get_location()
         if self.port_name:
             self.create_and_append_menuitem(
@@ -125,7 +125,7 @@ class IndicatorTide( IndicatorBase ):
                 activate_functionandarguments = (
                     self.get_on_click_menuitem_open_browser_function(), ) )
 
-            indent = self.get_menu_indent()
+            indent = ( False, 1 )
 
         if self.show_as_submenus:
             if self.show_as_submenus_except_first_day:
@@ -149,7 +149,6 @@ class IndicatorTide( IndicatorBase ):
                 shown_today = False
 
             menu_text = \
-                indent + self.get_menu_indent() + \
                 ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) + "  " + \
                 tidal_reading.get_time() + "  " + tidal_reading.get_level()
 
@@ -159,22 +158,25 @@ class IndicatorTide( IndicatorBase ):
                     menu_text,
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
-                        self.get_on_click_menuitem_open_browser_function(), ) )
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
 
             else:
                 self.create_and_append_menuitem(
                     menu,
-                    indent + tidal_reading.get_date(),
+                    tidal_reading.get_date(),
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
-                        self.get_on_click_menuitem_open_browser_function(), ) )
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = indent )
 
                 self.create_and_append_menuitem(
                     menu,
                     menu_text,
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
-                        self.get_on_click_menuitem_open_browser_function(), ) )
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
 
                 today_date = tidal_reading.get_date()
                 shown_today = True
@@ -189,7 +191,6 @@ class IndicatorTide( IndicatorBase ):
                 shown_today = False
 
             menu_text = \
-                indent + self.get_menu_indent() + \
                 ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) + "  " + \
                 tidal_reading.get_time() + "  " + tidal_reading.get_level()
 
@@ -199,20 +200,23 @@ class IndicatorTide( IndicatorBase ):
                     menu_text,
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
-                        self.get_on_click_menuitem_open_browser_function(), ) )
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
 
             else:
                 submenu = Gtk.Menu()
                 self.create_and_append_menuitem(
                     menu,
-                    indent + tidal_reading.get_date() ).set_submenu( submenu )
+                    tidal_reading.get_date(),
+                    indent = indent ).set_submenu( submenu )
 
                 self.create_and_append_menuitem(
                     submenu,
                     menu_text,
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
-                        self.get_on_click_menuitem_open_browser_function(), ) )
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
 
                 today_date = tidal_reading.get_date()
                 shown_today = True
