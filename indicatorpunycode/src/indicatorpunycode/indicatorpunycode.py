@@ -102,7 +102,7 @@ class IndicatorPunycode( IndicatorBase ):
                 activate_functionandarguments = (
                     lambda menuitem, result = result: # Need result = result to handle lambda late binding.
                         self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
-                indent = ( True, 1 ) )
+                indent = ( 1, 1 ) )
 
             self.create_and_append_menuitem(
                 menu,
@@ -110,7 +110,7 @@ class IndicatorPunycode( IndicatorBase ):
                 activate_functionandarguments = (
                     lambda menuitem, result = result:
                         self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
-                indent = ( True, 1 ) )
+                indent = ( 1, 1 ) )
 
 
     def on_convert( self ):

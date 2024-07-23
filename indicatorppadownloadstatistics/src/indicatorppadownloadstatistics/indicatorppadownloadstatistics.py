@@ -135,13 +135,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
                     for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary( submenu, ( False, 1 ), ppa, published_binary )
+                        self.create_menuitem_for_published_binary( submenu, ( 1, 0 ), ppa, published_binary )
 
                 else:
                     self.create_and_append_menuitem(
                         submenu,
                         self.get_status_message( ppa ),
-                        indent = ( False, 1 ) )
+                        indent = ( 1, 1 ) )
 
         else:
             for ppa in ppas:
@@ -154,13 +154,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
                     for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary( menu, ( True, 1 ), ppa, published_binary )
+                        self.create_menuitem_for_published_binary( menu, ( 1, 1 ), ppa, published_binary )
 
                 else:
                     self.create_and_append_menuitem(
                         menu,
                         self.get_status_message( ppa ),
-                        indent = ( True, 1 ) )
+                        indent = ( 1, 1 ) )
 
             # When only one PPA is present, enable a middle mouse click
             # on the icon to open the PPA in the browser.

@@ -305,10 +305,15 @@ class IndicatorBase( ABC ):
 # Need to recheck values using os.environ
 # and see where/how they are used.
 # Also need to get the values for all supported distros/versions...
-    __DESKTOP_SESSION_LXQT = "LXQt" #TODO Check
-    __DESKTOP_SESSION_MATE = "MATE" #TODO Check
-    __DESKTOP_SESSION_PLASMA = "plasma"
-    __DESKTOP_SESSION_UNITY7 = "Unity:Unity7:ubuntu" #TODO Check
+#
+#TODO Incorporate some/all of the above comment here...
+# might want to mention that could also use the os.environ.get() method.
+    # Values are the result of calling
+    #   echo $XDG_CURRENT_DESKTOP
+    __CURRENT_DESKTOP_LXQT = "LXQt" #TODO Check
+    __CURRENT_DESKTOP_MATE = "MATE" #TODO Check
+    __CURRENT_DESKTOP_KDE = "KDE"
+    __CURRENT_DESKTOP_UNITY7 = "Unity:Unity7:ubuntu" #TODO Check
 
     __EXTENSION_JSON = ".json"
 
@@ -350,12 +355,12 @@ class IndicatorBase( ABC ):
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
-#TODO Need a comment about what command was used to obtain these...
-# Likely was...
-#	echo $XDG_SESSION_TYPE
+    # Commands such as wmctrl do not function under wayland.
+    # Need a way to determine whether running under wayland (or say x11).
+    # Values are the result of calling
+    #   echo $XDG_SESSION_TYPE
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
-#TODO Also, where/how are the above used?
 
     URL_TIMEOUT_IN_SECONDS = 20
 
@@ -398,16 +403,13 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
-#TODO Testing
-        print( os.environ.get( "DESKTOP_SESSION" ) ) # Gives 'plasma' on  'Plasma (X11)'.
-        print( self.process_get( "echo $XDG_CURRENT_DESKTOP" ) ) # Gives 'KDE' on  'Plasma (X11)'.
-
-#TODO I'm using "echo $XDG_SESSION_TYPE" here to get session type (x11 or wayland).
-# But for desktop session (or whatever it is called) I'm using os.environ.get().
-# Need to standardise. 
         self.session_type = self.process_get( "echo $XDG_SESSION_TYPE" )
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
-        
+
+#TODO
+        print( "echo $XDG_SESSION_TYPE = " + self.session_type )
+        print( "echo $XDG_CURRENT_DESKTOP = " + self.current_desktop )
+
         self.version = project_metadata[ "Version" ]
         self.comments = comments
 
@@ -1025,7 +1027,7 @@ class IndicatorBase( ABC ):
 #           menuitems with no indent.
 # 
 # indicatorstardate
-#   Menuitems with no indent.
+#   Menuitems with no indent or one indent if tooltip cannot be altered.
 # 
 # indicatortest
 #   Top level: menuitems with no indent and submenus with one level of indent.
@@ -1056,14 +1058,67 @@ class IndicatorBase( ABC ):
 #           menuitems with one level or more of indent.
 #       Under Kubuntu
 #           menuitems with zero or more levels of indent.
+#
+#
 # 
+# Fortune: add menuitems indent = 0
+#
+# On This Day: add menuitems indent = 0 or 1
+#
+# Punycode: add menuitems indent = 0 or 1
+#
+# Stardate: add menuitems indent = 0, or 1 if tooltip cannot be changed.
+#
+# PPA / Scriptrunner: add menuitems indent = 0 or 1
+#                     add submenus indent = 0
+#                          menuitems indent = 1 (GNOME)
+#                          menuitems indent = 0 (KDE)
+# 
+# Tide: add menuitems indent = 0 or 1 or 2
+#       add submenus indent = 1
+#           menuitems indent = 2 (GNOME)
+#           menuitems indent = 0 (KDE)
+# 
+# Test: add menuitems indent 0 or 1
+#       add submenus indent = 1
+#           menuitems indent = 2 (GNOME)
+#           menuitems indent = 0 (KDE)
+#
+# Lunar: add submenus indent = 0
+#           menuitems indent = 1 or 2 (GNOME)
+#           menuitems indent = 0 or 1 (KDE)
+#
+# VirtualBox: add menuitems / submenus indent = 0 or more
+#                 add menuitems / submenus indent = 1 or more (GNOME)
+#                 add menuitems / submenus indent = 0 or more (KDE)
+
+    def __get_menu_indent_amount( self, indent = ( 0, 0 ) ):
+        indent_amount = "      "
+        indent_small = \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
+
+        if indent_small:
+            indent_amount = "   "
+
+        detatched_submenus = \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
+
+        if detatched_submenus:
+            indent_amount = indent_amount * indent[ 1 ]
+
+        else:
+            indent_amount = indent_amount * indent[ 0 ]
+
+        return indent_amount
+
+
     def create_and_append_menuitem(
         self,
         menu,
         label,
         name = None,
         activate_functionandarguments = None,
-        indent = ( True, 0 ),  #TODO Document: ( True, n ), ( False, n ), ( n, m )
+        indent = ( 0, 0 ),  #TODO Document
         is_secondary_activate_target = False ):
 
         indent_amount = self.__get_menu_indent_amount( indent )
@@ -1114,7 +1169,7 @@ class IndicatorBase( ABC ):
         index,
         name = None,
         activate_functionandarguments = None,
-        indent = ( True, 0 ),  #TODO Document: ( True, n ), ( False, n ), ( n, m )
+        indent = ( 0, 0 ),  #TODO 
         is_secondary_activate_target = False ):
 
         menuitem = \
@@ -1162,7 +1217,7 @@ class IndicatorBase( ABC ):
         menu,
         label,
         activate_functionandarguments = None,
-        indent = ( True, 0 ) ):  #TODO Document: ( True, n ), ( False, n ), ( n, m )
+        indent = ( 0, 0 ) ):  #TODO Document
 
         indent_amount = self.__get_menu_indent_amount( indent )
         menuitem = Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label )
@@ -1195,16 +1250,20 @@ class IndicatorBase( ABC ):
 
 
 #TODO Document: ( True, n ), ( False, n ), ( n, m )
-    def __get_menu_indent_amount( self, indent = ( True, 0 ) ):
+#Wondering now if the indent using a tuple is the best/clearest way...
+# Can a number be used...?
+# Need to distinguish between menuitems and submenus at the top level
+# from those not at the top level I think...
+    def __get_menu_indent_amount2( self, indent = ( True, 0 ) ):
         indent_amount = "      "
         indent_small = \
-            self.get_current_desktop() == IndicatorBase.__DESKTOP_SESSION_PLASMA
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
 
         if indent_small:
             indent_amount = "   "
 
         detatched_submenus = \
-            self.get_current_desktop() == IndicatorBase.__DESKTOP_SESSION_PLASMA
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
 
         if type( indent[ 0 ] ) == bool:
             if indent[ 0 ]: # Want the indent for a top level menu item or submenu.
@@ -1242,7 +1301,7 @@ class IndicatorBase( ABC ):
 #                 indent_amount = spacing * ( indent - 1 )
 #
 # #TODO Not sure if this is needed or some variation...
-#         # if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+#         # if self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
 #         #     indent = "      " * ( indent_amount - 1 )
 #
 #         return indent_amount
@@ -1256,7 +1315,7 @@ class IndicatorBase( ABC ):
 #TODO Will eventually go...
     # def get_menu_indent( self, indent = 1 ):
     #     indent_amount = "      " * indent
-    #     if self.get_current_desktop() == IndicatorBase.__DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
+    #     if self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
     #         indent_amount = "      " * ( indent - 1 )
     #
     #     return indent_amount
@@ -1776,8 +1835,7 @@ class IndicatorBase( ABC ):
             return False
 
 
-#TODO Document!
-# Needed to differentiate between wayland and xll.
+    # Returns the name of the session, either wayland or x11.
     def get_session_type( self ):
         return self.session_type
 
@@ -1815,8 +1873,8 @@ class IndicatorBase( ABC ):
 
 #TODO Tidy up
         if desktop_environment is None or \
-           desktop_environment == IndicatorBase.__DESKTOP_SESSION_LXQT or \
-           ( desktop_environment == IndicatorBase.__DESKTOP_SESSION_MATE and self.__is_ubuntu_variant_2004() ):
+           desktop_environment == IndicatorBase.__CURRENT_DESKTOP_LXQT or \
+           ( desktop_environment == IndicatorBase.__CURRENT_DESKTOP_MATE and self.__is_ubuntu_variant_2004() ):
             icon_update_supported = False
 
         return icon_update_supported
@@ -1830,7 +1888,7 @@ class IndicatorBase( ABC ):
 
 #TODO Tidy up        
         if desktop_environment is None or \
-           desktop_environment == IndicatorBase.__DESKTOP_SESSION_LXQT:
+           desktop_environment == IndicatorBase.__CURRENT_DESKTOP_LXQT:
             label_update_supported = False
 
         return label_update_supported

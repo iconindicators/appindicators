@@ -129,7 +129,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     activate_functionandarguments = ( 
                         lambda menuitem:
                             self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ),
-                    indent = ( True, 1 ) )
+                    indent = ( 1, 1 ) )
 
             elif len( self.search_url ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
                 date_and_description = \
@@ -147,7 +147,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     event.get_description(),
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                    indent = ( True, 1 ) )
+                    indent = ( 1, 1 ) )
 
             menu_item_count += 1
             if menu_item_count == menu_item_maximum:

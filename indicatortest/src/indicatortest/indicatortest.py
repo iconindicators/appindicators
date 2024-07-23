@@ -116,7 +116,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Platform | Uname" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_desktop( self, menu ):
@@ -133,7 +133,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Desktop" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_icon_theme( self, menu ):
@@ -162,7 +162,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Icon Theme" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_terminal( self, menu ):
@@ -183,7 +183,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Terminal" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_icon( self, menu ):
@@ -220,7 +220,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Icon" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_label_tooltip_osd( self, menu ):
@@ -255,7 +255,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Label | Tooltip | OSD" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_clipboard( self, menu ):
@@ -271,7 +271,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Clipboard" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __build_menu_execute_command( self, menu ):
@@ -305,7 +305,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Execute Terminal Command" ),
-            indent = ( True, 1 ) ).set_submenu( submenu )
+            indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
     def __get_current_time( self ):

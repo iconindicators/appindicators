@@ -146,19 +146,19 @@ class IndicatorScriptRunner( IndicatorBase ):
             for group in sorted( scripts_by_group.keys(), key = str.lower ):
                 submenu = Gtk.Menu()
                 self.create_and_append_menuitem( menu, group ).set_submenu( submenu )
-                self.add_scripts_to_menu( scripts_by_group[ group ], submenu, indent = ( False, 1 ) )
+                self.add_scripts_to_menu( scripts_by_group[ group ], submenu, indent = ( 1, 0 ) )
 
         else:
             if self.hide_groups:
                 for script in sorted( self.scripts, key = lambda script: script.get_name().lower() ):
                     if type( script ) is NonBackground:
-                        self.add_scripts_to_menu( [ script ], menu, indent = ( True, 0 ) )
+                        self.add_scripts_to_menu( [ script ], menu, indent = ( 0, 0 ) )
 
             else:
                 scripts_by_group = self.get_scripts_by_group( self.scripts, True, False )
                 for group in sorted( scripts_by_group.keys(), key = str.lower ):
                     self.create_and_append_menuitem( menu, group )
-                    self.add_scripts_to_menu( scripts_by_group[ group ], menu, indent = ( True, 1 ) )
+                    self.add_scripts_to_menu( scripts_by_group[ group ], menu, indent = ( 1, 1 ) )
 
 
     def add_scripts_to_menu( self, scripts, menu, indent ):

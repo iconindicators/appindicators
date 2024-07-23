@@ -115,7 +115,7 @@ class IndicatorTide( IndicatorBase ):
 
 
     def build_menu( self, menu, tidal_readings ):
-        indent = ( True, 0 )
+        indent = ( 0, 0 )
         self.port_name = tidal_readings[ 0 ].get_location()
         if self.port_name:
             self.create_and_append_menuitem(
@@ -125,7 +125,7 @@ class IndicatorTide( IndicatorBase ):
                 activate_functionandarguments = (
                     self.get_on_click_menuitem_open_browser_function(), ) )
 
-            indent = ( False, 1 )
+            indent = ( 1, 1 )
 
         if self.show_as_submenus:
             if self.show_as_submenus_except_first_day:
@@ -159,7 +159,7 @@ class IndicatorTide( IndicatorBase ):
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
                         self.get_on_click_menuitem_open_browser_function(), ),
-                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
+                    indent = ( indent[ 0 ] + 1, indent[ 1 ] + 1 ) )
 
             else:
                 self.create_and_append_menuitem(
@@ -176,7 +176,7 @@ class IndicatorTide( IndicatorBase ):
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
                         self.get_on_click_menuitem_open_browser_function(), ),
-                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
+                    indent = ( indent[ 0 ] + 1, indent[ 1 ] + 1 ) )
 
                 today_date = tidal_reading.get_date()
                 shown_today = True
@@ -201,7 +201,7 @@ class IndicatorTide( IndicatorBase ):
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
                         self.get_on_click_menuitem_open_browser_function(), ),
-                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
+                    indent = ( indent[ 0 ] + 1, 0 ) )
 
             else:
                 submenu = Gtk.Menu()
@@ -216,7 +216,7 @@ class IndicatorTide( IndicatorBase ):
                     name = tidal_reading.get_url(),
                     activate_functionandarguments = (
                         self.get_on_click_menuitem_open_browser_function(), ),
-                    indent = ( indent[ 0 ], indent[ 1 ] + 1 ) )
+                    indent = ( indent[ 0 ] + 1, 0 ) )
 
                 today_date = tidal_reading.get_date()
                 shown_today = True

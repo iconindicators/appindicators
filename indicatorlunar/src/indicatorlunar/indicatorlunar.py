@@ -738,14 +738,14 @@ class IndicatorLunar( IndicatorBase ):
                     self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
                 activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
             self.create_and_append_menuitem(
                 submenu,
                 _( "Next Phases" ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
                 activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
             # The phase (illumination) is rounded and so a given phase is entered earlier than what occurs in reality.
             next_phases = [ ]
@@ -775,7 +775,7 @@ class IndicatorLunar( IndicatorBase ):
                     label,
                     name = IndicatorLunar.SEARCH_URL_MOON,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
             self.__update_menu_eclipse(
                 submenu,
@@ -817,14 +817,14 @@ class IndicatorLunar( IndicatorBase ):
                     equinox_label,
                     name = IndicatorLunar.SEARCH_URL_SUN,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
                 self.create_and_append_menuitem(
                     submenu,
                     solstice_label,
                     name = IndicatorLunar.SEARCH_URL_SUN,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
             else:
                 self.create_and_append_menuitem(
@@ -832,14 +832,14 @@ class IndicatorLunar( IndicatorBase ):
                     solstice_label,
                     name = IndicatorLunar.SEARCH_URL_SUN,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
                 self.create_and_append_menuitem(
                     submenu,
                     equinox_label,
                     name = IndicatorLunar.SEARCH_URL_SUN,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
             self.__update_menu_eclipse(
                 submenu,
@@ -857,7 +857,7 @@ class IndicatorLunar( IndicatorBase ):
             _( "Eclipse" ),
             name = url,
             activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -867,7 +867,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             name = url,
             activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -877,7 +877,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
             name = url,
             activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
         if key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
             latitude = \
@@ -895,7 +895,7 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Latitude/Longitude: " ) + latitude + " " + longitude,
                 name = url,
                 activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
 
     def get_on_click_function_comet( self ):
@@ -986,7 +986,7 @@ class IndicatorLunar( IndicatorBase ):
                     current,
                     name = menuitem_name,
                     activate_functionandarguments = on_click_function,
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
                 submenu.append( Gtk.SeparatorMenuItem() )
 
@@ -1154,10 +1154,10 @@ class IndicatorLunar( IndicatorBase ):
             key[ 0 ] == IndicatorLunar.astro_backend.BodyType.SUN
 
         if is_moon_or_sun:
-            indent = ( False, 1 )
+            indent = ( 1, 0 )
 
         else:
-            indent = ( False, 2 )
+            indent = ( 2, 1 )
 
         if is_rise:
             self.create_and_append_menuitem(
@@ -1332,7 +1332,7 @@ class IndicatorLunar( IndicatorBase ):
                 label,
                 name = url,
                 activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 1 ) )
+                indent = ( 1, 0 ) )
 
             if len( info ) == 3: # Satellite yet to rise.
                 data = \
@@ -1345,7 +1345,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Rise Date/Time: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
             elif len( info ) == 4: # Circumpolar (always up).
                 data = \
@@ -1358,7 +1358,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Azimuth: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
                 data = \
                     self.format_data(
@@ -1370,7 +1370,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Altitude: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
             else: # Satellite is in transit.
                 self.create_and_append_menuitem(
@@ -1378,7 +1378,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Rise" ),
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
                 data = \
                     self.format_data(
@@ -1390,7 +1390,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Date/Time: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 3 ) )
+                indent = ( 3, 2 ) )
 
                 data = \
                     self.format_data(
@@ -1402,14 +1402,14 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Azimuth: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 3 ) )
+                indent = ( 3, 2 ) )
 
                 self.create_and_append_menuitem(
                     submenu,
                     _( "Set" ),
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 2 ) )
+                indent = ( 2, 1 ) )
 
                 data = \
                     self.format_data(
@@ -1421,7 +1421,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Date/Time: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 3 ) )
+                indent = ( 3, 2 ) )
 
                 data = \
                     self.format_data(
@@ -1433,7 +1433,7 @@ class IndicatorLunar( IndicatorBase ):
                     _( "Azimuth: " ) + data,
                     name = url,
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                indent = ( False, 3 ) )
+                indent = ( 3, 2 ) )
 
             separator = Gtk.SeparatorMenuItem()
             submenu.append( separator )

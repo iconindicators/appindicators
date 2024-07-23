@@ -94,12 +94,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.is_vbox_manage_installed():
             virtual_machines = self.get_virtual_machines()
             if virtual_machines:
-                running_names, running_uuids = \
-                    self.get_running_virtual_machines()
+                running_names, running_uuids = self.get_running_virtual_machines()
 
                 self.__build_menu(
                     menu, self.get_virtual_machines(),
-                    ( True, 0 ), #TODO CHeck
+                    ( 0, 0 ),
                     running_uuids )
 
             else:
@@ -138,7 +137,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.__build_menu(
                     self.__add_group_to_menu( menu, item, indent ),
                     item.get_items(),
-                    ( False, indent[ 1 ] + 1 ),
+                    ( indent[ 0 ] + 1, indent[ 1 ] + 1 ),
                     running_uuids )
 
             else:
