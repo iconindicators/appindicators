@@ -16,61 +16,118 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+#TODO Best to regenerate all POT files.
+# Should this be done as part of the build script?
+# What about editing the headers, etc?
 
 
 #TODO Testing indicatortest on distros/desktops...
 #
-    # Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll over icon.
-    # Kubuntu 22.04 - Ubuntu on Xorg.
-    # Kubuntu 22.04 - Ubuntu - no clipboard.  wmctrl?
-    # Kubuntu 22.04 - Ubuntu on Wayland (Wayland) - no clipboard.  wmctrl?
-    # Kubuntu 22.04 - Ubuntu (Wayland) - No clipboard.  wmctrl?
-    #
-    #
-    # Linux Mint 21 - Cinnamon (Default) - Tooltip in lieu of label.  No dynamic icon.
-    #                                    - Other sessions: Cinnamon (Software Rendering), Ubuntu, Ubuntu, Ubuntu on Wayland.
-    #
-    # Lubuntu 22.04 - - No label only tooltip which shows the source code name and cannot be changed 
-    #                 - Cannot change icon.
-    #                 - Hitting the qtterminal problem, so cannot run commands.
-    #                 - There are many other types of sessions (Lubuntu, LXQT Desktop, Openbox, Ubuntu onXorg, Ubuntu, Ubuntu on Wayland (Wayland), Ubuntu (Wayland))...sure I'm not going to test all of these?  Maybe just test on the non-wayland and non-xorg sessions?
-    #
-    # Ubuntu 20.04 - Ubuntu - All good.
-    # Ubuntu 20.04 - GNOME Classic - Does not run.
-    # Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
-    #
-    # Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
-    # Ubuntu 22.04 - Ubuntu on Xorg - All good.
-    #
-    # Ubuntu 24.04 - Ubuntu on Xorg - Fails to log in. Perhaps test from a live USB?  But can I install?
-    # Ubuntu 24.04 - Ubuntu - no wmctrl, no clipboard.
-    #
-    # Ubuntu Budgie 22.04 - Budgie Desktop (Default) - All good.
-    #                                                - Other sessions: Ubuntu, Ubuntu, Ubuntu on Wayland
-    #
-    # Ubuntu MATE 22.04 - MATE - All good.
-    #                        - Other sessions: Ubuntu (Default), Ubuntu (Default), Ubuntu on Wayland, Ubuntu on Xorg.
-    #
-    # Ubuntu Unity 22.04 - Unity (Default) - All good.
-    #                        - Other sessions: Ubuntu , Ubuntu, Ubuntu on Wayland, Ubuntu on Xorg.
-    #
-    # Xubuntu 22.04 - - No mouse wheel scroll; tooltip in lieu of label.
+# Debian 11 - GNOME - No wmctrl, no clipboard.
+#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - System X11 Default - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#
+# Debian 12 - GNOME - No wmctrl, no clipboard.
+#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic - No wmctrl, no clipboard.
+#                           - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#
+# Fedora 38 - GNOME - No wmctrl, no clipboard.
+#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic - No wmctrl, no clipboard.
+#                           - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#
+# Fedora 39 - GNOME - No wmctrl, no clipboard.
+#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic - No wmctrl, no clipboard.
+#                           - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME Classic on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#
+# Fedora 40 - GNOME - No wmctrl, no clipboard.
+#           - GNOME Classic - No wmctrl, no clipboard.
+#           - GNOME Classic on Xorg - All good.
+#           - GNOME on Xorg - All good.
+#
+# Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll over icon.
+# Kubuntu 22.04 - Ubuntu on Xorg - All good.
+# Kubuntu 22.04 - Ubuntu - All good.
+# Kubuntu 22.04 - Ubuntu on Wayland (Wayland) - No clipboard.     wmctrl WORKS!  I think because of konsole...so using 'wayland' as the session is not good enough.
+# Kubuntu 22.04 - Ubuntu (Wayland) - No clipboard.
+#
+# Linux Mint 21 - Cinnamon (Default) - Tooltip in lieu of label.  No dynamic icon.
+#               - Cinnamon (Software Rendering) - Tooltip in lieu of label.  No dynamic icon.
+#               - Ubuntu - All good.
+#               - Ubuntu on Wayland - No clipboard; no wmctrl; no notify-send/notification.    WHY no notify?
+#
+# Lubuntu 22.04 - Lubuntu - No label only tooltip which shows the source code name and cannot be changed.
+#                         - Cannot change icon.
+#                         - Hitting the qterminal problem, so cannot run commands.
+#               - LXQt Desktop - No label only tooltip which shows the source code name and cannot be changed.
+#                              - Cannot change icon.
+#                              - Hitting the qterminal problem, so cannot run commands.
+#               - Openbox - Will not boot.
+#               - Ubuntu on Xorg - Hitting the qterminal problem, so cannot run commands.
+#                                - notify-send does not work.
+#               - Ubuntu - Hitting the qterminal problem, so cannot run commands.
+#                        - notify-send does not work.
+#               - Ubuntu on Wayland (Wayland) - Would not log in. 
+#               - Ubuntu (Wayland) - Hitting the qterminal problem, so cannot run commands.
+#                                  - notify-send does not work.
+#
+# Manjaro 22.1 Talos - GNOME - All good.
+#                    - GNOME Classic - All good.
+# Manjaro 22.1 is already obsolete.  Try perhaps 24.0.0 Wynsdey?
+#
+# Ubuntu 20.04 - Ubuntu - All good.
+# Ubuntu 20.04 - GNOME Classic - Need to Run "Applications - Utilities - Tweaks: Extensions: Enable  Ubuntu appindicators.
+# Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
+#
+# openSUSE Tumbleweed - GNOME - No wmctrl, no clipboard.
+#                     - GNOME Classic - No wmctrl, no clipboard.
+#                     - GNOME Classic on Xorg - All good.
+#                     - GNOME on Xorg - No wmctrl, no clipboard.
+#                     - IceWM Session - No label/tooltip.  No notify-send / OSD.
+#
+# Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
+# Ubuntu 22.04 - Ubuntu on Xorg - All good.
+#
+# Ubuntu 24.04 - Ubuntu on Xorg - Fails to log in.  Test from a live USB?  How to install the indicator/packages?
+# Ubuntu 24.04 - Ubuntu - no wmctrl, no clipboard.
+#                       - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
+#
+# Ubuntu Budgie 22.04 - Budgie Desktop (Default) - All good.
+#                     - Ubuntu - All good.
+#                     - Ubuntu on Wayland - No clipboard; no wmctrl.
+#                     - Ubuntu on Xorg - All good. 
+#
+# Ubuntu MATE 22.04 - MATE - All good.
+#                   - Ubuntu (Default) - All good.
+#                   - Ubuntu on Wayland - No clipboard; no wmctrl.
+#                   - Ubuntu on Xorg - All good.
+#
+# Ubuntu Unity 22.04 - Unity (Default) - All good.
+#                    - Ubuntu - All good.
+#                    - Ubuntu on Wayland - No notify-send. No clipboard; no wmctrl.
+#                    - Ubuntu on Xorg - All good.
+#
+# Xubuntu 22.04 - - No mouse wheel scroll; tooltip in lieu of label.
+#
 
 
-#TODO
-# Can/should some tooltips be conditional on desktop/distro name?
+#TODO There are newer versions of distros to be tested.
+
+
+#TODO 
+# Given many distros have multiple session types, 
+# maybe just list the distro and default session
+# in the readme script's section for testing/supported?
 
 
 #TODO Check the flow of code,
@@ -129,6 +186,7 @@
 # Occurs on Debian 11 on all graphics variants;
 # Debian 12 on GNOME, presumably all other graphics variants;
 # Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
+# Happens on Ubuntu 24.04 (Ubuntu session default).  Cannot test on Ubuntu 24.04 Xorg session as it won't boot.
 # Check on other distros.
 #
 # Double check Manjaro 22.1; openSUSE Tumbleweed.
@@ -140,12 +198,6 @@
 # on the laptop...
 # Happens when the screen is locked.
 # Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
-
-
-#TODO Given clipboard and wmctrl don't seem to work under Wayland...
-# figure out if this is the case/scenarios...
-# then figure out if things like in virtualbox need to handle when middle mouse click
-# or mouse wheel scroll is used...is there an issue?
 
 
 #TODO Update the PPA description at
@@ -310,10 +362,14 @@ class IndicatorBase( ABC ):
 # might want to mention that could also use the os.environ.get() method.
     # Values are the result of calling
     #   echo $XDG_CURRENT_DESKTOP
-    __CURRENT_DESKTOP_LXQT = "LXQt" #TODO Check
-    __CURRENT_DESKTOP_MATE = "MATE" #TODO Check
+    __CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
+    __CURRENT_DESKTOP_ICEWM = "ICEWM"
     __CURRENT_DESKTOP_KDE = "KDE"
-    __CURRENT_DESKTOP_UNITY7 = "Unity:Unity7:ubuntu" #TODO Check
+    __CURRENT_DESKTOP_LXQT = "LXQt"
+    __CURRENT_DESKTOP_MATE = "MATE"
+    __CURRENT_DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
+    __CURRENT_DESKTOP_X_CINNAMON = "X-Cinnamon"
+    __CURRENT_DESKTOP_XFCE = "XFCE"
 
     __EXTENSION_JSON = ".json"
 
@@ -1101,7 +1157,14 @@ class IndicatorBase( ABC ):
             indent_amount = "   "
 
         detatched_submenus = \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_BUDGIE_GNOME or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_ICEWM or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_LXQT or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_MATE or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_UNITY7 or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_X_CINNAMON or \
+            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_XFCE
 
         if detatched_submenus:
             indent_amount = indent_amount * indent[ 1 ]
@@ -1835,6 +1898,7 @@ class IndicatorBase( ABC ):
             return False
 
 
+#TODO May not be of use in the end...
     # Returns the name of the session, either wayland or x11.
     def get_session_type( self ):
         return self.session_type
