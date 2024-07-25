@@ -1177,12 +1177,11 @@ class IndicatorBase( ABC ):
         label,
         name = None,
         activate_functionandarguments = None,
-        indent = ( 0, 0 ),  #TODO Document
+        indent = ( 0, 0 ), # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
         is_secondary_activate_target = False ):
 
         indent_amount = self.__get_menu_indent_amount( indent )
         menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
-        print( indent_amount + label )
 
         if name:
             menuitem.set_name( name )
@@ -1197,30 +1196,6 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO Might eventually go...
-    # def create_and_append_menuitem_ORIGINAL(
-    #     self,
-    #     menu,
-    #     label,
-    #     name = None,
-    #     activate_functionandarguments = None,
-    #     is_secondary_activate_target = False ):
-    #
-    #     menuitem = Gtk.MenuItem.new_with_label( label )
-    #
-    #     if name:
-    #         menuitem.set_name( name )
-    #
-    #     if activate_functionandarguments:
-    #         menuitem.connect( "activate", *activate_functionandarguments )
-    #
-    #     if is_secondary_activate_target:
-    #         self.secondary_activate_target = menuitem
-    #
-    #     menu.append( menuitem )
-    #     return menuitem
-
-
     def create_and_insert_menuitem(
         self,
         menu,
@@ -1228,7 +1203,7 @@ class IndicatorBase( ABC ):
         index,
         name = None,
         activate_functionandarguments = None,
-        indent = ( 0, 0 ),  #TODO 
+        indent = ( 0, 0 ), # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
         is_secondary_activate_target = False ):
 
         menuitem = \
@@ -1244,28 +1219,6 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO Will go maybe
-    # def create_and_insert_menuitem_ORIGINAL(
-    #     self,
-    #     menu,
-    #     label,
-    #     index,
-    #     name = None,
-    #     activate_functionandarguments = None,
-    #     is_secondary_activate_target = False ):
-    #
-    #     menuitem = \
-    #         self.create_and_append_menuitem(
-    #             menu,
-    #             label,
-    #             name = name,
-    #             activate_functionandarguments = activate_functionandarguments,
-    #             is_secondary_activate_target = is_secondary_activate_target )
-    #
-    #     menu.reorder_child( menuitem, index )
-    #     return menuitem
-
-
 #TODO Test this with indicatorvirtualbox
 # and a virtualmachine that is three levels deep and is running
 # on both Ubuntu and Kubuntu.
@@ -1276,7 +1229,7 @@ class IndicatorBase( ABC ):
         menu,
         label,
         activate_functionandarguments = None,
-        indent = ( 0, 0 ) ):  #TODO Document
+        indent = ( 0, 0 ) ): # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
 
         indent_amount = self.__get_menu_indent_amount( indent )
         menuitem = Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label )
@@ -1287,97 +1240,6 @@ class IndicatorBase( ABC ):
 
         menu.append( menuitem )
         return menuitem
-
-
-#TODO Will go maybe
-    # Creates a single (isolated, not part of a group)
-    # RadioMenuItem that is enabled/active.
-    # def create_and_append_radiomenuitem_ORIGINAL(
-    #     self,
-    #     menu,
-    #     label,
-    #     activate_functionandarguments = None ):
-    #
-    #     menuitem = Gtk.RadioMenuItem.new_with_label( [ ], label ) # Always set the group to empty.
-    #     menuitem.set_active( True )
-    #
-    #     if activate_functionandarguments:
-    #         menuitem.connect( "activate", *activate_functionandarguments )
-    #
-    #     menu.append( menuitem )
-    #     return menuitem
-
-
-#TODO Document: ( True, n ), ( False, n ), ( n, m )
-#Wondering now if the indent using a tuple is the best/clearest way...
-# Can a number be used...?
-# Need to distinguish between menuitems and submenus at the top level
-# from those not at the top level I think...
-    def __get_menu_indent_amount2( self, indent = ( True, 0 ) ):
-        indent_amount = "      "
-        indent_small = \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
-
-        if indent_small:
-            indent_amount = "   "
-
-        detatched_submenus = \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
-
-        if type( indent[ 0 ] ) is bool:
-            if indent[ 0 ]: # Want the indent for a top level menu item or submenu.
-                indent_amount = indent_amount * indent[ 1 ]
-
-            else: # Want the indent for a submenu menu item.
-                if detatched_submenus:
-                    indent_amount = indent_amount * ( indent[ 1 ] - 1 )
-
-                else:
-                    indent_amount = indent_amount * indent[ 1 ]
-
-        else: # Want the indent for a submenu menu item which depends on the current desktop.
-            if detatched_submenus:
-                indent_amount = indent_amount * indent[ 1 ]
-
-            else:
-                indent_amount = indent_amount * indent[ 0 ]
-
-        return indent_amount
-
-
-#TODO Keep?
-#     def __get_menu_indent_amount_ORIGINAL( self, indent = 0, desktop_agnositic = True ):
-#         spacing = self.__get_menu_indent_spacing()
-#         if desktop_agnositic:
-#             indent_amount = spacing * indent
-#
-#         else:
-#             desktop_detaches_submenus = False # TODO Need to call a function to determine this.
-#             if desktop_detaches_submenus:
-#                 indent_amount = spacing * indent
-#
-#             else:
-#                 indent_amount = spacing * ( indent - 1 )
-#
-# #TODO Not sure if this is needed or some variation...
-#         # if self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
-#         #     indent = "      " * ( indent_amount - 1 )
-#
-#         return indent_amount
-
-
-#TODO Maybe will go.
-    # def __get_menu_indent_spacing( self  ):
-    #     return "      "
-
-
-#TODO Will eventually go...
-    # def get_menu_indent( self, indent = 1 ):
-    #     indent_amount = "      " * indent
-    #     if self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_UNITY7:  #TODO What about the Ubuntu Unity OS...what desktop is that?
-    #         indent_amount = "      " * ( indent - 1 )
-    #
-    #     return indent_amount
 
 
     def get_on_click_menuitem_open_browser_function( self ):
@@ -1894,14 +1756,13 @@ class IndicatorBase( ABC ):
             return False
 
 
-#TODO Rename to get_desktop_session()...or not.
-# Need to sort out at the top what we need/have for desktop session or whatever is used
-# in the call to os.environ() to get 'plasma' on Kubuntu.
     def get_current_desktop( self ):
         return self.current_desktop
 
 
 #TODO UNCHECKED
+#TOD Maybe this can go as it is only used below 
+# for ubuntu mate 20.04 which is EOL.
     def __is_ubuntu_variant_2004( self ):
         ubuntu_variant_2004 = False
         try:
@@ -1915,6 +1776,9 @@ class IndicatorBase( ABC ):
         return ubuntu_variant_2004
 
 
+#TODO Check which distros/versions we now support and
+# then update this function and comment header
+# according to which distros/versions support icon updating.
     # Lubuntu 20.04/22.04 ignores any change to the icon after initialisation.
     # If the icon is changed, the icon is replaced with a strange grey/white circle.
     #
@@ -1934,7 +1798,11 @@ class IndicatorBase( ABC ):
         return icon_update_supported
 
 
-#TODO Is this needed?
+#TODO Check which distros/versions we now support and
+# then update this function and comment header
+# according to which distros/versions support label updating (or even have a label).
+#
+# Maybe rename to __is_label_or_tooltip_update_supported?
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
     def __is_label_update_supported( self ):
         label_update_supported = True
@@ -1948,6 +1816,7 @@ class IndicatorBase( ABC ):
         return label_update_supported
 
 
+#TODO Check with latest distro (whichever uses qterminal) if this is still an issue.
     # As a result of
     #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
