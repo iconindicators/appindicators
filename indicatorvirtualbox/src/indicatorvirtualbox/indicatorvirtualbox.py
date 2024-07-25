@@ -26,6 +26,9 @@
 # Hold off on the above...might not apply to kubuntu/konsole.
 # Need to figure out the wording...
 # ...might be a general statement about wayland.
+#
+# Also mention the mouse middle click will launch multiple 
+# vboxmanage windows/instance because wmctrl does not work in general under wayland.
 
 
 # Application indicator for VirtualBox™ virtual machines.
@@ -297,28 +300,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         def launch_virtual_box_manager():
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
-#TODO Need to remove the session type check.
-# Then figure out what happens under wayland...
-#...or even if it is possible to launch VBox manager never or multiple times.
-# Might be the best choice of a bad bunch.
-        if self.get_session_type() == IndicatorBase.SESSION_TYPE_X11:
-            # The executable for VirtualBox manager does not necessarily appear in the process list
-            # because the executable might be a script which calls another executable.
-            # Instead, have the user type in the title of the window into the preferences
-            # and find the window by the window title.
-            result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
-            window_id = None
-            if result:
-                window_id = result.split()[ 0 ]
+        # The executable for VirtualBox manager does not necessarily appear in the process list
+        # because the executable might be a script which calls another executable.
+        # Instead, have the user type in the title of the window into the preferences
+        # and find the window by the window title.
+        result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
+        window_id = None
+        if result:
+            window_id = result.split()[ 0 ]
 
-            if window_id is None or window_id == "":
-                launch_virtual_box_manager()
-
-            else:
-                self.process_call( "wmctrl -ia " + window_id )
-
-        else: # Assume to be Wayland.
+        if window_id is None or window_id == "":
             launch_virtual_box_manager()
+
+        else:
+            self.process_call( "wmctrl -ia " + window_id )
 
 
     # Returns a list of running VM names and list of corresponding running VM UUIDs.
