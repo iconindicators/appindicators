@@ -518,6 +518,13 @@ def _get_distributions_supported( indicator_name ):
 # Issue is resolved for Fedora 40.
 # How to determine the GNOME version?
 
+
+#TODO 
+# Given many distros have multiple session types, 
+# maybe just list the distro and default session
+# rather than all sessions across all distros?
+
+
     message_two = ""
 
     if is_indicator(
