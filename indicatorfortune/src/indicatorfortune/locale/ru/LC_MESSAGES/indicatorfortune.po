@@ -1,5 +1,5 @@
 # Russian translation for indicatorfortune.
-# Copyright (C) 2015-2022 Bernard Giannetti
+# Copyright (C) 2015-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorfortune package.
 # Oleg Moiseichuk <berroll@mail.ru>, 2015-2024.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.41\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 22:20+1000\n"
+"POT-Creation-Date: 2024-07-25 16:50+1000\n"
 "PO-Revision-Date: 2024-07-09 16:04+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -18,14 +18,15 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+#: indicatorfortune.py:40
 msgid "Indicator Fortune"
 msgstr "Индикатор изречений"
 
-#: indicatorfortune.py:50
+#: indicatorfortune.py:61
 msgid "Fortune. . ."
 msgstr "Изречение. . ."
 
-#: indicatorfortune.py:59
+#: indicatorfortune.py:74
 msgid ""
 "Calls the 'fortune' program displaying the result in the on-screen "
 "notification."
@@ -33,47 +34,52 @@ msgstr ""
 "Вызывает программу 'fortune', показывающую изречения в виде всплывающих "
 "сообщений."
 
-#: indicatorfortune.py:71
+#: indicatorfortune.py:88
 msgid "New Fortune"
 msgstr "Новое изречение"
 
-#: indicatorfortune.py:77
+#: indicatorfortune.py:96
 msgid "Copy Last Fortune"
 msgstr "Скопировать последнее"
 
-#: indicatorfortune.py:83
+#: indicatorfortune.py:104
 msgid "Show Last Fortune"
 msgstr "Показать последнее"
 
-#: indicatorfortune.py:91
+#: indicatorfortune.py:114
 msgid "History"
 msgstr "История"
 
-#: indicatorfortune.py:121
+#: indicatorfortune.py:145
 msgid "Fortune History for Session"
 msgstr "История изречений"
 
-#: indicatorfortune.py:135
+#: indicatorfortune.py:172
+#, fuzzy
+msgid "No enabled fortunes!"
+msgstr "Неверно заданы пути у включённых файлов изречений!"
+
+#: indicatorfortune.py:178
 msgid "No enabled fortunes have a valid location!"
 msgstr "Неверно заданы пути у включённых файлов изречений!"
 
-#: indicatorfortune.py:141
+#: indicatorfortune.py:186
 msgid "Ensure enabled fortunes contain fortune data!"
 msgstr "Убедитесь в правильности формата файлов включённых изречений!"
 
-#: indicatorfortune.py:155
+#: indicatorfortune.py:220
 msgid "WARNING. . ."
 msgstr "ПРЕДУПРЕЖДЕНИЕ. . ."
 
-#: indicatorfortune.py:192
+#: indicatorfortune.py:257
 msgid "Fortune File/Directory"
 msgstr "Файл/Папка с изречениями"
 
-#: indicatorfortune.py:196 indicatorfortune.py:438
+#: indicatorfortune.py:257 indicatorfortune.py:533
 msgid "Enabled"
 msgstr "Включен"
 
-#: indicatorfortune.py:203
+#: indicatorfortune.py:266
 msgid ""
 "Double click to edit a fortune.\n"
 "\n"
@@ -94,55 +100,51 @@ msgstr ""
 "могут быть доступны\n"
 "на вашем родном языке."
 
-#: indicatorfortune.py:219
+#: indicatorfortune.py:279
 msgid "Add"
 msgstr "Добавить"
 
-#: indicatorfortune.py:220
-msgid "Add a new fortune location."
-msgstr "Добавить новые изречения."
-
-#: indicatorfortune.py:224
+#: indicatorfortune.py:280
 msgid "Remove"
 msgstr "Удалить"
 
-#: indicatorfortune.py:225
-msgid "Remove the selected fortune location."
-msgstr "Удалить выбранные изречения."
-
-#: indicatorfortune.py:229
+#: indicatorfortune.py:281
 msgid "Reset"
 msgstr "Сброс"
 
-#: indicatorfortune.py:230
+#: indicatorfortune.py:283
+msgid "Add a new fortune location."
+msgstr "Добавить новые изречения."
+
+#: indicatorfortune.py:284
+msgid "Remove the selected fortune location."
+msgstr "Удалить выбранные изречения."
+
+#: indicatorfortune.py:285
 msgid "Reset to factory default."
 msgstr "Сбросить к начальным настройкам."
 
-#: indicatorfortune.py:237
+#: indicatorfortune.py:293
 msgid "Fortunes"
 msgstr "Файлы изречений"
 
-#: indicatorfortune.py:244
-msgid "Refresh interval (minutes)"
-msgstr "Интервал обновления (в минутах)"
-
-#: indicatorfortune.py:249
+#: indicatorfortune.py:303
 msgid "How often a fortune is displayed."
 msgstr "Насколько часто показываются изречения."
 
-#: indicatorfortune.py:257
-msgid "Notification summary"
-msgstr "Заголовок сообщения"
+#: indicatorfortune.py:308
+msgid "Refresh interval (minutes)"
+msgstr "Интервал обновления (в минутах)"
 
-#: indicatorfortune.py:261
+#: indicatorfortune.py:315
 msgid "The summary text for the notification."
 msgstr "Текст заголовка всплывающего сообщения."
 
-#: indicatorfortune.py:270
-msgid "Message character limit"
-msgstr "Лимит количества символов"
+#: indicatorfortune.py:320
+msgid "Notification summary"
+msgstr "Заголовок сообщения"
 
-#: indicatorfortune.py:276
+#: indicatorfortune.py:331
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -160,51 +162,55 @@ msgstr ""
 "будут отброшены, что вызовет чрезмерное\n"
 "обращение к программе 'fortune'."
 
-#: indicatorfortune.py:286
+#: indicatorfortune.py:341
+msgid "Message character limit"
+msgstr "Лимит количества символов"
+
+#: indicatorfortune.py:348
 msgid "Middle mouse click of the icon"
 msgstr "Щелчок средней кнопкой мыши по значку"
 
-#: indicatorfortune.py:287
-msgid "Not supported on all versions/derivatives of Ubuntu."
-msgstr "Поддерживается не во всех версиях/производных Ubuntu."
-
-#: indicatorfortune.py:292
+#: indicatorfortune.py:355
 msgid "Show a new fortune"
 msgstr "Показать новое изречение"
 
-#: indicatorfortune.py:297
+#: indicatorfortune.py:365
 msgid "Copy current fortune to clipboard"
 msgstr "Скопировать последнее изречение в буфер"
 
-#: indicatorfortune.py:302
+#: indicatorfortune.py:375
 msgid "Show current fortune"
 msgstr "Показать последнее изречение"
 
-#: indicatorfortune.py:310
+#: indicatorfortune.py:385
 msgid "General"
 msgstr "Общие"
 
-#: indicatorfortune.py:347
+#: indicatorfortune.py:422
 msgid "Reset fortunes to factory default?"
 msgstr "Очистить список и вернуть начальные настройки?"
 
-#: indicatorfortune.py:356
+#: indicatorfortune.py:431
 msgid "No fortune has been selected for removal."
 msgstr "Не выбран элемент списка для удаления."
 
-#: indicatorfortune.py:359
+#: indicatorfortune.py:443
 msgid "This is the default fortune and cannot be deleted."
 msgstr "Стандартный файл с изречениями не может быть удалён."
 
-#: indicatorfortune.py:361
+#: indicatorfortune.py:450
 msgid "Remove the selected fortune?"
 msgstr "Удалить выбранный элемент?"
 
-#: indicatorfortune.py:375
-msgid "Fortune file/directory"
-msgstr "Файл/папка с изречениями"
+#: indicatorfortune.py:465
+msgid "Add Fortune"
+msgstr "Добавить изречения"
 
-#: indicatorfortune.py:386
+#: indicatorfortune.py:467
+msgid "Edit Fortune"
+msgstr "Редактировать свойства"
+
+#: indicatorfortune.py:475
 msgid ""
 "The path to a fortune .dat file,\n"
 "or a directory containing\n"
@@ -220,11 +226,15 @@ msgstr ""
 "Убедитесь, что надлежащие\n"
 "текстовые файлы существуют."
 
-#: indicatorfortune.py:403
+#: indicatorfortune.py:486
+msgid "Fortune file/directory"
+msgstr "Файл/папка с изречениями"
+
+#: indicatorfortune.py:497
 msgid "File"
 msgstr "Файл"
 
-#: indicatorfortune.py:407 indicatorfortune.py:422
+#: indicatorfortune.py:499 indicatorfortune.py:512
 msgid ""
 "This fortune is part of your\n"
 "system and cannot be modified."
@@ -233,7 +243,7 @@ msgstr ""
 "является частью системы\n"
 "и не может быть изменён."
 
-#: indicatorfortune.py:412
+#: indicatorfortune.py:502
 msgid ""
 "Choose a fortune .dat file.\n"
 "\n"
@@ -245,11 +255,11 @@ msgstr ""
 "Убедитесь, что надлежащий\n"
 "текстовый файл существует."
 
-#: indicatorfortune.py:418
+#: indicatorfortune.py:510
 msgid "Directory"
 msgstr "Папка"
 
-#: indicatorfortune.py:427
+#: indicatorfortune.py:515
 msgid ""
 "Choose a directory containing\n"
 "a fortune .dat file(s).\n"
@@ -263,7 +273,7 @@ msgstr ""
 "Убедитесь, что надлежащие\n"
 "текстовые файлы существуют."
 
-#: indicatorfortune.py:440
+#: indicatorfortune.py:535
 msgid ""
 "Ensure the fortune file/directory\n"
 "works by running through 'fortune'\n"
@@ -273,26 +283,21 @@ msgstr ""
 "работает, используя команду 'fortune'\n"
 "в терминале."
 
-#: indicatorfortune.py:450
-msgid "Add Fortune"
-msgstr "Добавить изречения"
-
-#: indicatorfortune.py:452
-msgid "Edit Fortune"
-msgstr "Редактировать свойства"
-
-#: indicatorfortune.py:464
+#: indicatorfortune.py:549
 msgid "The fortune path cannot be empty."
 msgstr "Путь не может быть пустым."
 
-#: indicatorfortune.py:479
-msgid "Choose a directory containing a fortune .dat file(s)"
-msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
-
-#: indicatorfortune.py:482
+#: indicatorfortune.py:573
 msgid "Choose a fortune .dat file"
 msgstr "Выберите файл .dat с изречениями"
 
-#: indicatorfortune.py:492
+#: indicatorfortune.py:577
+msgid "Choose a directory containing a fortune .dat file(s)"
+msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
+
+#: indicatorfortune.py:593
 msgid "The fortune is part of your system and is already included."
 msgstr "Этот файл с изречениями является частью системы и уже подключён."
+
+#~ msgid "Not supported on all versions/derivatives of Ubuntu."
+#~ msgstr "Поддерживается не во всех версиях/производных Ubuntu."
