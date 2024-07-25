@@ -48,6 +48,17 @@
 # (from primary, not clipboard), get a message "no text is highlight/selected".
 # HOwever this seems intermittent...seemed to get it to work once...
 # maybe switching from primary to clipboard and back again via the preferences.
+#
+# Below is copied from indicatorbase...
+#
+# Check Debian 12 et al!
+#
+# Run punycode.  Open About dialog.
+# Highlight some punycode on a browser page.
+# Click convert.
+# This is blocked on Ubuntu 20.04.
+# What about Debian et al?  
+# Try for both clipboard and primary input sources.
 
 
 #TODO In labels/tooltips, should 'primary' be renamed to 'selected text'?
