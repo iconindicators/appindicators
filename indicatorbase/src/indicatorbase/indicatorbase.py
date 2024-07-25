@@ -179,6 +179,15 @@
 # on the laptop...
 # Happens when the screen is locked.
 # Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
+# Does this happen with other indicators?
+# Need to run from the terminal presumably to see the error message.
+#
+# On Debian 12 laptop, ran indicatortest via terminal.
+# Then did a lock screen, then unlock and got an identical message as above.
+# Noticed also the label disappeared.
+# Does this happen for say punycode or stardate?
+#
+# So, does this happen on another distro?
 
 
 #TODO Update the PPA description at

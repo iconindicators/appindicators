@@ -33,11 +33,9 @@
 #     # 
 # '.
 #
-#
-#
 # I selected some text and clicked convert and got an OSD message and the above log message.
 # But the preference for the input was clipboard...so maybe need to guard against an empty clipboard.
-
+# What about really long text, either in the clipboard or selected?  Need to guard against those?
 
 
 #TODO Amend the changelog.md and/or readme.md
@@ -46,9 +44,16 @@
 
 #TODO On Debian 12, when selecting text and either middle mouse click or select convert
 # (from primary, not clipboard), get a message "no text is highlight/selected".
-# HOwever this seems intermittent...seemed to get it to work once...
+# However this seems intermittent...seemed to get it to work once...
 # maybe switching from primary to clipboard and back again via the preferences.
 #
+# Once it does work, always keeps the same text in memory and converts that
+# regardless of selecting new text.
+#
+# Does this also happen on Ubuntu 20.04/24.04 or Fedora 40?
+
+
+#TODO
 # Below is copied from indicatorbase...
 #
 # Check Debian 12 et al!
@@ -142,6 +147,7 @@ class IndicatorPunycode( IndicatorBase ):
         else:
             # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
             def clipboard_text_received_function( clipboard, text, data ):
+                print( text )
                 if text is None:
                     self.show_notification( summary, _( "No text is highlighted/selected." ) )
 

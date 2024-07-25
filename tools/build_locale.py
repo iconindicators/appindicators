@@ -58,6 +58,11 @@
 #
 # Maybe search in the file system for pot/po files and then can do a mass revert.
 # But still need a way to determine if a file differs only by date/time.
+#
+# Need to check/verify that doing the update of a POT or PO
+# where there are no changes from the source .py file
+# that the updated/generated POT/PO files are the same as the originals
+# and so that won't trigger a need to do a commit.
 
 
 # Create a README.md for an indicator from text common to all indicators and text
