@@ -21,6 +21,8 @@
 # Already part of the menu item label...
 #
 # Similarly for clipboard.
+#
+# wmctrl works on kubuntu/konsole...so might need a more general statement for wmctrl.
 
 
 #TODO For the actual release to PyPI, the version to use is 1.0.17 as per pyproject.toml.
@@ -283,7 +285,7 @@ class IndicatorTest( IndicatorBase ):
             "ls",
             "notify-send",
             "paplay",
-            "wmctrl (X11)" )
+            "wmctrl" )
 
         commands = (
             "calendar -f /usr/share/calendar/calendar.all -A 3",
