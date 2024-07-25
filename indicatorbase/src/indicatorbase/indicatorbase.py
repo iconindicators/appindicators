@@ -18,6 +18,8 @@
 
 #TODO Testing indicatortest on distros/desktops...
 #
+# Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
+#
 # Debian 11 - GNOME - No wmctrl, no clipboard.
 #                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
 #           - System X11 Default - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
@@ -113,16 +115,9 @@
 #                    - Ubuntu on Xorg - All good.
 #
 # Xubuntu 22.04 - - No mouse wheel scroll; tooltip in lieu of label.
-#
 
 
 #TODO There are newer versions of distros to be tested.
-
-
-#TODO 
-# Given many distros have multiple session types, 
-# maybe just list the distro and default session
-# in the readme script's section for testing/supported?
 
 
 #TODO Check the flow of code,
@@ -134,7 +129,8 @@
 # When About/Preferences is showing,
 # is it possible to click anything else in the indicator menu?
 # 
-# Check Debian 12 et al!
+# Seems okay on Ubuntu 20.04.
+# Check Debian 12, Febora 39, Fedora 40 and Ubuntu 24.04.
 #
 # Run punycode.  Open About dialog.
 # Highlight some punycode on a browser page.
@@ -161,16 +157,6 @@
 # Maybe call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
 #
 # Does this issue happen under Debian/Fedora under xorg (rather than default wayland)?
-#
-# Might be able to use this to determine the os/platform/distro:
-# desktop_environment = os.environ.get('DESKTOP_SESSION')
-#         if desktop_environment:
-#             if desktop_environment.lower()[:8] == 'cinnamon':
-#                 svg = indicator_icon
-#             if desktop_environment.lower()[:7] == 'xubuntu':
-#                 svg = indicator_icon
-#             if desktop_environment.lower()[:4] == 'xfce':
-#                 svg = indicator_icon
 
 
 #TODO Run any indicator under Debian 12 and open About dialog.
@@ -254,10 +240,6 @@
 #	pycairo       1.26.0
 #	PyGObject     3.48.2
 #
-
-
-#TODO Before release, perhaps check out:
-# Xubuntu, Ubuntu Unity, Ubuntu Budgie, Kubuntu 24.04
 
 
 # Base class for application indicators.
