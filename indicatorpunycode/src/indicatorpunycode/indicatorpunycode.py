@@ -50,6 +50,11 @@
 # maybe switching from primary to clipboard and back again via the preferences.
 
 
+#TODO In labels/tooltips, should 'primary' be renamed to 'selected text'?
+# Also check if set to primary and have text selected, does the window
+# in which that text is selected also have to be selected?
+
+
 # Application indicator which converts domain names between Unicode and ASCII.
 
 
@@ -212,8 +217,7 @@ class IndicatorPunycode( IndicatorBase ):
                 None,
                 _( "Clipboard" ),
                 tooltip_text = _(
-                    "Input is taken from the clipboard.\n\n" +
-                    "Only works under X11." ),
+                    "Input is taken from the clipboard." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.input_clipboard )
 
@@ -236,9 +240,7 @@ class IndicatorPunycode( IndicatorBase ):
                     "If checked, the converted text is sent\n" +
                     "to both the clipboard and primary.\n\n" +
                     "Otherwise the converted text is sent\n" +
-                    "only to the input source.\n\n" +
-                    "Sending the output to the clipboard\n" +
-                    "only works under X11." ),
+                    "only to the input source." ),
                 margin_top = 10,
                 active = self.output_both )
 
