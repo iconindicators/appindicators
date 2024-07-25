@@ -20,8 +20,12 @@
 # to mention that
 #    mouse wheel scroll to cycle through running vms
 #    mouse middle button click to launch vbox manager
-#    menu item click launching only one vbox manager
+#    menu item click launching only one vbox manager (what is this?)
 # only work in X11.
+#
+# Hold off on the above...might not apply to kubuntu/konsole.
+# Need to figure out the wording...
+# ...might be a general statement about wayland.
 
 
 # Application indicator for VirtualBox™ virtual machines.
@@ -236,27 +240,25 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
-#TODO Maybe have an 'else' clause showing a notification that we cannot do so...?
-        if self.get_session_type() == IndicatorBase.SESSION_TYPE_X11:
-            number_of_windows_with_the_same_name = \
-                self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
+        number_of_windows_with_the_same_name = \
+            self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
 
-            if number_of_windows_with_the_same_name == "0":
-                message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
-                summary = _( "Warning" )
-                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+        if number_of_windows_with_the_same_name == "0":
+            message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
+            summary = _( "Warning" )
+            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
-            elif number_of_windows_with_the_same_name == "1":
-                for line in self.process_get( "wmctrl -l" ).splitlines():
-                    if virtual_machine_name in line:
-                        window_id = line[ 0 : line.find( " " ) ]
-                        self.process_call( "wmctrl -i -a " + window_id )
-                        break
+        elif number_of_windows_with_the_same_name == "1":
+            for line in self.process_get( "wmctrl -l" ).splitlines():
+                if virtual_machine_name in line:
+                    window_id = line[ 0 : line.find( " " ) ]
+                    self.process_call( "wmctrl -i -a " + window_id )
+                    break
 
-            else:
-                message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
-                summary = _( "Warning" )
-                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+        else:
+            message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
+            summary = _( "Warning" )
+            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
 
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
@@ -435,8 +437,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "The window title of VirtualBox™ Manager.\n" +
                     "You may have to adjust for your local language.\n\n" +
                     "This is used to bring the VirtualBox™ Manager\n" +
-                    "window to the front if already running.\n\n" +
-                    "Only works under X Window System (X11)." ) )
+                    "window to the front if already running." ) )
 
         grid.attach(
             self.create_box(
