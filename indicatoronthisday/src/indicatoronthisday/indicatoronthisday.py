@@ -109,10 +109,58 @@ class IndicatorOnThisDay( IndicatorBase ):
         last_date = ""
         for event in events:
             if event.get_date() != last_date:
+                if ( menu_item_count + 2 ) > menu_item_maximum: # Ensure there is room for the date menu item and an event menu item.
+                    break # Don't add the menu item for the new date and don't add a subsequent event.
+
+                event_date = self.remove_leading_zero_from_date( event.get_date() )
+                self.create_and_append_menuitem( menu, event_date )
+
+                last_date = event.get_date()
+                menu_item_count += 1
+
+            if self.copy_to_clipboard:
+                name = event_date
+                activate_functionandarguments = ( 
+                    lambda menuitem:
+                        self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), )
+
+            else:
+                if len( self.search_url ) > 0:
+                    date_and_description = event_date + ' ' + event.get_description()
+                    name = self.search_url.replace( IndicatorOnThisDay.TAG_EVENT, date_and_description )
+                    name = name.replace( ' ', '+' )
+                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), )
+
+                else: # The user has entered an empty URL this means "no internet search".
+                    name = ""
+                    activate_functionandarguments = None
+
+            self.create_and_append_menuitem(
+                menu,
+                event.get_description(),
+                name = name,
+                activate_functionandarguments = activate_functionandarguments,
+                indent = ( 1, 1 ) )
+
+            menu_item_count += 1
+            if menu_item_count == menu_item_maximum:
+                break
+
+
+#TODO Maybe delete
+    def build_menuORIGINAL( self, menu, events ):
+        menu_item_maximum = self.lines - 3 # Less three to account for About, Preferences and Quit.
+        menu_item_count = 0
+        last_date = ""
+        for event in events:
+            if event.get_date() != last_date:
                 if ( menu_item_count + 2 ) <= menu_item_maximum: # Ensure there is room for the date menu item and an event menu item.
-                    self.create_and_append_menuitem(
-                        menu,
-                        self.remove_leading_zero_from_date( event.get_date() ) )
+                    event_date = self.remove_leading_zero_from_date( event.get_date() ) #TODO Should this be one level up?
+                    self.create_and_append_menuitem( menu, event_date )
+
+                    # self.create_and_append_menuitem(
+                    #     menu,
+                    #     self.remove_leading_zero_from_date( event.get_date() ) )
 
                     last_date = event.get_date()
                     menu_item_count += 1
@@ -122,32 +170,63 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 #TODO Check the logic behind the if/elif below...
             if self.copy_to_clipboard:
-                self.create_and_append_menuitem(
-                    menu,
-                    event.get_description(),
-                    name = self.remove_leading_zero_from_date( event.get_date() ), # Allows the month/day to be passed to the copy/search functions below.
-                    activate_functionandarguments = ( 
-                        lambda menuitem:
-                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ),
-                    indent = ( 1, 1 ) )
+                name = event_date
+                activate_functionandarguments = ( 
+                    lambda menuitem:
+                        self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), )
+
+                # self.create_and_append_menuitem(
+                #     menu,
+                #     event.get_description(),
+                #     name = name,
+                #     activate_functionandarguments = ( 
+                #         lambda menuitem:
+                #             self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ),
+                #     indent = ( 1, 1 ) )
+                
+                # self.create_and_append_menuitem(
+                #     menu,
+                #     event.get_description(),
+                #     # name = self.remove_leading_zero_from_date( event.get_date() ), # Allows the month/day to be passed to the copy/search functions below.
+                #     name = event_date,  #TODO NOt sure about this comment --->   # Allows the month/day to be passed to the copy/search functions below.
+                #     activate_functionandarguments = ( 
+                #         lambda menuitem:
+                #             self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), ),
+                #     indent = ( 1, 1 ) )
 
             elif len( self.search_url ) > 0: # If the user enters an empty URL this means "no internet search" but also means the clipboard will not be modified.
-                date_and_description = \
-                    self.remove_leading_zero_from_date( event.get_date() ) + \
-                    ' ' + \
-                    event.get_description()
+                # date_and_description = \
+                #     self.remove_leading_zero_from_date( event.get_date() ) + \
+                #     ' ' + \
+                #     event.get_description()
+                #
+                # url = \
+                #     self.search_url.replace(
+                #         IndicatorOnThisDay.TAG_EVENT,
+                #         date_and_description.replace( ' ', '+' ) )
 
-                url = \
+                date_and_description = event_date + ' ' + event.get_description()
+
+                name = \
                     self.search_url.replace(
                         IndicatorOnThisDay.TAG_EVENT,
                         date_and_description.replace( ' ', '+' ) )
 
-                self.create_and_append_menuitem(
-                    menu,
-                    event.get_description(),
-                    name = url,
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
-                    indent = ( 1, 1 ) )
+                activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), )
+
+                # self.create_and_append_menuitem(
+                #     menu,
+                #     event.get_description(),
+                #     name = url,
+                #     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
+                #     indent = ( 1, 1 ) )
+
+            self.create_and_append_menuitem(
+                menu,
+                event.get_description(),
+                name = name,
+                activate_functionandarguments = activate_functionandarguments,
+                indent = ( 1, 1 ) )
 
             menu_item_count += 1
             if menu_item_count == menu_item_maximum:
@@ -311,9 +390,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_radiobutton(
                 None,
                 _( "Copy event to clipboard" ),
-                 tooltip_text = _(
-                     "Copy the event text and date to the clipboard.\n\n" +
-                     "Only works under X11." ),
+                 tooltip_text = _( "Copy the event text and date to the clipboard." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.copy_to_clipboard )
 
