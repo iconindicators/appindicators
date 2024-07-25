@@ -297,7 +297,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         def launch_virtual_box_manager():
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
-
+#TODO Need to remove the session type check.
+# Then figure out what happens under wayland...
+#...or even if it is possible to launch VBox manager never or multiple times.
+# Might be the best choice of a bad bunch.
         if self.get_session_type() == IndicatorBase.SESSION_TYPE_X11:
             # The executable for VirtualBox manager does not necessarily appear in the process list
             # because the executable might be a script which calls another executable.
