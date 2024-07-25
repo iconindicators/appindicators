@@ -137,6 +137,8 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-pip",
         "python3-venv" ]
 
+#TODO Where I have python3-notify2, should I also have libnotify-bin?
+
     if operating_system == Operating_System.UBUNTU_2004 or \
        operating_system == Operating_System.UBUNTU_2204:
         dependencies.append( "gnome-shell-extension-appindicator" )
