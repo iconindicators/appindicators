@@ -1250,7 +1250,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self.background_script_next_update_time = { }
         today = datetime.datetime.now()
         for script in self.scripts:
-            if type( script ) is Background: #TODO CHeck ALL .py file for 'type'...should it be == or is?
+            if type( script ) is Background:
                 key = self.__create_key( script.get_group(), script.get_name() )
                 self.background_script_results[ key ] = None
                 self.background_script_next_update_time[ key ] = today
@@ -1351,7 +1351,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts_background = [ ]
         scripts_non_background = [ ]
         for script in self.scripts:
-            if type( script ) == Background:
+            if type( script ) is Background:
                 scripts_background.append( [
                     script.get_group(),
                     script.get_name(),

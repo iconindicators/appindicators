@@ -1328,7 +1328,7 @@ class IndicatorBase( ABC ):
         detatched_submenus = \
             self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
 
-        if type( indent[ 0 ] ) == bool:
+        if type( indent[ 0 ] ) is bool:
             if indent[ 0 ]: # Want the indent for a top level menu item or submenu.
                 indent_amount = indent_amount * indent[ 1 ]
 
@@ -1742,12 +1742,12 @@ class IndicatorBase( ABC ):
 
             # Expand the column unless the column contains a single checkbox and no column header title.
             is_checkbox_column = \
-                type( renderer_attribute_columnmodelid[ 0 ] ) == Gtk.CellRendererToggle and not title
+                type( renderer_attribute_columnmodelid[ 0 ] ) is Gtk.CellRendererToggle and not title
 
             treeviewcolumn.set_expand( not is_checkbox_column )
 
             # Add the renderer / attribute / column model id for each column.
-            is_single_tuple = not type( renderer_attribute_columnmodelid[ 0 ] ) is tuple
+            is_single_tuple = type( renderer_attribute_columnmodelid[ 0 ] ) is not tuple
             if is_single_tuple:
                 treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
