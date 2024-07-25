@@ -510,6 +510,14 @@ def _get_distributions_supported( indicator_name ):
 #TODO Should I include indicatortest? 
 # Maybe just add comments/tooltips to labels/menuitems when something might not work instead? 
 
+
+#TODO In regards about/preferences locking up when clicking on the indicator icon,
+# is there a range of GNOME releases to check against this?
+# Issue occurs on Debian 11 which is the earliest I think.
+# Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.
+# Issue is resolved for Fedora 40.
+# How to determine the GNOME version?
+
     message_two = ""
 
     if is_indicator(
