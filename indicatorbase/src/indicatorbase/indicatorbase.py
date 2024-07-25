@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Best to regenerate all POT files.
-# Should this be done as part of the build script?
-# What about editing the headers, etc?
-
-
 #TODO Testing indicatortest on distros/desktops...
 #
 # Debian 11 - GNOME - No wmctrl, no clipboard.
@@ -348,20 +343,12 @@ class IndicatorBase( ABC ):
 
     __CONFIG_VERSION = "version"
 
-#TODO To get the current "desktop", there are two ways:
-#   print( os.environ.get( "DESKTOP_SESSION" ) ) # Gives 'plasma' on  'Plasma (X11)'.
-#   print( self.process_get( "echo $XDG_CURRENT_DESKTOP" ) ) # Gives 'KDE' on  'Plasma (X11)'.
-# giving two different results.
-# Perhaps best to use the os.environ way as it is a Python call.
-#
-# Need to recheck values using os.environ
-# and see where/how they are used.
-# Also need to get the values for all supported distros/versions...
-#
-#TODO Incorporate some/all of the above comment here...
-# might want to mention that could also use the os.environ.get() method.
     # Values are the result of calling
     #   echo $XDG_CURRENT_DESKTOP
+    #
+    # An alternative (with different results) is calling
+    #   os.environ.get( "DESKTOP_SESSION" )
+    # which gives 'plasma' on  'Plasma (X11)' rather than 'KDE' on Kubuntu.
     __CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
     __CURRENT_DESKTOP_ICEWM = "ICEWM"
     __CURRENT_DESKTOP_KDE = "KDE"
@@ -1029,121 +1016,17 @@ class IndicatorBase( ABC ):
         return autostart_checkbox, autostart_spinner, box
 
 
-#TODO The menu items in a submenu on default Kubuntu
-# should NOT have indents applied.
-#
-# The issue is more complex as not all indicators have neat layouts
-# for menu items and submenus.
-# Indicatorlunar has various levels of indent of menu items within a submenu.
-# Indicatortest has various levels of indent in the main menu.
-#
-# Figure out some sort of solution if possible...
-# ...having to get the callers of createmenuitem et al
-# should NOT have to know about GNOME layout of menus versus Kubuntu.
-# 
-# indicatorfortune
-#   Menuitems with no indent.
-# 
-# indicatorlunar
-#   Top level: submenus with no indent.
-#   Within submenus
-#       Under GNOME, menuitems with one or two levels of indent.
-#       Under Kubuntu, menuitems with zero or one levels of indent.
-# 
-# indicatoronthisday
-#   Menuitems with no indent or one level of indent.
-# 
-# indicatorppadownloadstatistics
-#   Top level:
-#       menuitems with no indent or one level of indent
-#       OR
-#       submenus with no indent.
-#   Within submenus
-#       Under GNOME
-#           menuitems with one level of indent.
-#       Under Kubuntu
-#           menuitems with no indent.
-# 
-# indicatorpunycode
-#   Menuitems with no indent or one level of indent.
-# 
-# indicatorscriptrunner
-#   Top level:
-#       menuitems with no indent or one level of indent
-#       OR
-#       submenus with no indent.
-#   Within submenus
-#       Under GNOME
-#           menuitems with one level of indent.
-#       Under Kubuntu
-#           menuitems with no indent.
-# 
-# indicatorstardate
-#   Menuitems with no indent or one indent if tooltip cannot be altered.
-# 
-# indicatortest
-#   Top level: menuitems with no indent and submenus with one level of indent.
-#   Within submenus
-#       Under GNOME, menuitems with two levels of indent.
-#       Under Kubuntu, menuitems with no indent.
-#
-# indicatortide
-#   Top level:
-#       menuitems with no indent or one level of indent or two levels of indent
-#       OR
-#       submenus with one level of indent
-#       OR
-#       combination of the above.
-#   Within submenus
-#       Under GNOME
-#           menuitems with two levels of indent.
-#       Under Kubuntu
-#           menuitems with no indent.
-#
-# indicatorvirtualbox
-#   Top level:
-#       menuitems/submenus with no indent
-#       OR
-#       menuitems with zero or more levels of indent.
-#   Within submenus
-#       Under GNOME
-#           menuitems with one level or more of indent.
-#       Under Kubuntu
-#           menuitems with zero or more levels of indent.
-#
-#
-# 
-# Fortune: add menuitems indent = 0
-#
-# On This Day: add menuitems indent = 0 or 1
-#
-# Punycode: add menuitems indent = 0 or 1
-#
-# Stardate: add menuitems indent = 0, or 1 if tooltip cannot be changed.
-#
-# PPA / Scriptrunner: add menuitems indent = 0 or 1
-#                     add submenus indent = 0
-#                          menuitems indent = 1 (GNOME)
-#                          menuitems indent = 0 (KDE)
-# 
-# Tide: add menuitems indent = 0 or 1 or 2
-#       add submenus indent = 1
-#           menuitems indent = 2 (GNOME)
-#           menuitems indent = 0 (KDE)
-# 
-# Test: add menuitems indent 0 or 1
-#       add submenus indent = 1
-#           menuitems indent = 2 (GNOME)
-#           menuitems indent = 0 (KDE)
-#
-# Lunar: add submenus indent = 0
-#           menuitems indent = 1 or 2 (GNOME)
-#           menuitems indent = 0 or 1 (KDE)
-#
-# VirtualBox: add menuitems / submenus indent = 0 or more
-#                 add menuitems / submenus indent = 1 or more (GNOME)
-#                 add menuitems / submenus indent = 0 or more (KDE)
-
+    # When adding a menuitem to a submenu,
+    # under GNOME the menuitem appears in the same menu as the submenu
+    # and requires an indent added to look correct.
+    #
+    # Under Kubuntu et al, menuitems of a submenu appear as a separate,
+    # detached menu and so require no indent.
+    #
+    # The first value of the indent argument refers to the indent for
+    # a submenu's menuitems under GNOME and similar layouts.
+    # The second value of the indent argument refers to the indent for
+    # a submenu's menuitems under Kubuntu and similar layouts.
     def __get_menu_indent_amount( self, indent = ( 0, 0 ) ):
         indent_amount = "      "
         indent_small = \
