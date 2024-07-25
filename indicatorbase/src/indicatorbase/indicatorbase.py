@@ -459,12 +459,8 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
-        self.session_type = self.process_get( "echo $XDG_SESSION_TYPE" )
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
-
-#TODO
-        print( "echo $XDG_SESSION_TYPE = " + self.session_type )
-        print( "echo $XDG_CURRENT_DESKTOP = " + self.current_desktop )
+        print( "echo $XDG_CURRENT_DESKTOP = " + self.current_desktop )#TODO Test
 
         self.version = project_metadata[ "Version" ]
         self.comments = comments
@@ -1896,12 +1892,6 @@ class IndicatorBase( ABC ):
 
         except ValueError:
             return False
-
-
-#TODO May not be of use in the end...
-    # Returns the name of the session, either wayland or x11.
-    def get_session_type( self ):
-        return self.session_type
 
 
 #TODO Rename to get_desktop_session()...or not.
