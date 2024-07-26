@@ -517,6 +517,9 @@ def _get_distributions_supported( indicator_name ):
 # Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.
 # Issue is resolved for Fedora 40.
 # How to determine the GNOME version?
+#
+# gnome-shell --version
+#     Ubuntu 20.04   GNOME Shell 3.36.9
 
 
 #TODO 
