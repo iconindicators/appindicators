@@ -185,9 +185,11 @@
 # On Debian 12 laptop, ran indicatortest via terminal.
 # Then did a lock screen, then unlock and got an identical message as above.
 # Noticed also the label disappeared.
-# Does this happen for say punycode or stardate?
+# Does this gtk error message happen for say punycode or stardate?
 #
 # So, does this happen on another distro?
+#
+# Does not happen with punycode on Ubuntu 20.04.
 
 
 #TODO Update the PPA description at
