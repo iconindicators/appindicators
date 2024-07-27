@@ -427,7 +427,7 @@ class IndicatorBase( ABC ):
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
-        project_metadata, error_message = self._get_project_metadata()
+        project_metadata, error_message = IndicatorBase.get_project_metadata( self.indicator_name )
         if error_message:
             self.show_dialog_ok(
                 None,
@@ -453,15 +453,7 @@ class IndicatorBase( ABC ):
         self.version = project_metadata[ "Version" ]
         self.comments = comments
 
-        # https://stackoverflow.com/a/75803208/2156453
-        email_message_object = \
-            email.message_from_string(
-                f'To: { project_metadata[ "Author-email" ] }',
-                policy = email.policy.default, )
-
-        self.copyright_names = [ ]
-        for address in email_message_object[ "to" ].addresses:
-            self.copyright_names.append( address.display_name )
+        self.copyright_names = IndicatorBase.get_copyright_names( project_metadata )
 
         self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
@@ -500,19 +492,13 @@ class IndicatorBase( ABC ):
         self.__load_config()
 
 
-    def _get_project_metadata( self ):
-        # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
-        # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
-        project_metadata = None
-        error_message = None
-        try:
-            # Obtain pyproject.toml information from pip.
-            project_metadata = metadata.metadata( self.indicator_name )
+    @staticmethod
+    def get_project_metadata( indicator_name, from_build_script = False ):
 
-        except metadata.PackageNotFoundError:
-            # No pip information found; assume in development/testing.
-            # Look for a .whl file in the same directory as the indicator.
-            first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
+        def get_first_wheel( path ):
+            project_metadata = None
+            error_message = None
+            first_wheel = next( path.glob( "*.whl" ), None )
             if first_wheel is None:
                 error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }"
 
@@ -523,6 +509,31 @@ class IndicatorBase( ABC ):
 
                 else:
                     project_metadata = first_metadata.metadata
+
+            return project_metadata, error_message
+
+        
+        # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
+        # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+        try:
+            # Obtain pyproject.toml information from pip.
+            project_metadata = metadata.metadata( indicator_name )
+            error_message = None
+
+        except metadata.PackageNotFoundError:
+            if from_build_script:
+                # Looking for a .whl within the indicator directory,
+                # but coming from a build script so the path is different.
+                # first_wheel = next( ( Path( '.' ) / indicator_name / "src" / indicator_name ).glob( "*.whl" ), None )
+                path = Path( '.' ) / indicator_name / "src" / indicator_name
+                project_metadata, error_message = get_first_wheel( path )
+
+            else:
+                # No pip information found; assume in development/testing.
+                # Look for a .whl file in the same directory as the indicator.
+                # first_wheel = next( path.glob( "*.whl" ), None )
+                path = Path( '.' )
+                project_metadata, error_message = get_first_wheel( path )
 
         return project_metadata, error_message
 
@@ -570,6 +581,39 @@ class IndicatorBase( ABC ):
                 z.close()
 
         return error_message
+
+
+#TODO Need to add a dummy author/email to the pyproject.toml
+# so there are now two and see what this function gives back.
+    @staticmethod
+    def get_authors_emails( project_metadata ):
+        # https://stackoverflow.com/a/75803208/2156453
+        email_message_object = \
+            email.message_from_string(
+                f'To: { project_metadata[ "Author-email" ] }',
+                policy = email.policy.default, )
+
+        authors_emails = [ ]
+        for address in email_message_object[ "to" ].addresses:
+            authors_emails.append( [ address.display_name, address.addr_spec ] )
+
+        return authors_emails
+
+
+#TODO I think this should be replaced for the function above...
+    @staticmethod
+    def get_copyright_names( project_metadata ):
+        # https://stackoverflow.com/a/75803208/2156453
+        email_message_object = \
+            email.message_from_string(
+                f'To: { project_metadata[ "Author-email" ] }',
+                policy = email.policy.default, )
+
+        copyright_names = [ ]
+        for address in email_message_object[ "to" ].addresses:
+            copyright_names.append( address.display_name )
+
+        return copyright_names
 
 
     @staticmethod
