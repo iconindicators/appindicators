@@ -18,17 +18,8 @@
 
 
 #TODO Update indicatorbase/src/indicatorbase/locale/README.
+# I think the wording and some commands may be out of date.
 
-
-
-'''
-cd indicatorfortune/src/indicatorfortune
-
-xgettext --files-from=locale/POTFILES.in --copyright-holder="Bernard Giannetti" --package-name="indicatorfortune" --package-version="1.0.44" --msgid-bugs-address="<thebernmeister@hotmail.com>" --no-location --output=locale/POTFILES.pot && \
-sed -i  's/SOME DESCRIPTIVE TITLE/Portable Object Template for indicatorfortune/' locale/POTFILES.pot && \
-sed -i 's/YEAR Bernard Giannetti/2014-2024 Bernard Giannetti/' locale/POTFILES.pot && \
-sed -i 's/CHARSET/UTF-8/' locale/POTFILES.pot 
-'''
 
 #TODO This is a new script...a copy of build_readme.py
 # Idea is to update POT and PO files as part of the build_wheel.py process...
@@ -95,49 +86,41 @@ sed -i 's/CHARSET/UTF-8/' locale/POTFILES.pot
 
 
 import argparse
-# import datetime
+import datetime
 # import re
-# import sys
+import sys
 
-import os
+# import os
 from pathlib import Path
 
 import subprocess
 
 
-# sys.path.append( "indicatorbase/src" )
+#TODO I think this works in both eclipse and from terminal...
+# double check and if all good, fix also in build_readme.py and elsewhere.
+sys.path.append( "indicatorbase/src/indicatorbase" )
+try:
+    # from indicatorbase import indicatorbase
+    import indicatorbase
+
+except ModuleNotFoundError as e:
+    # print( "from indicatorbase import indicatorbase" )
+    print( e )
+    # pass # Occurs as the script is run from the incorrect directory and will be caught in main.
+
 # try:
-#     from indicatorbase import indicatorbase
+#     import indicatorbase
 #
-# except ModuleNotFoundError:
+# except ModuleNotFoundError as e:
+#     print( "import indicatorbase" )
+#     print( e )
 #     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
-#TODO This function does more than create the pot...
-# It creates a new pot where there is an existing pot and checks for differences
-# and if the new pot is different, replaces the old pot,
-# otherwise leaves the old pot in place.
-#
-# Maybe write the function such that if there is no existing pot,
-# just make the new pot the current pot?
-def _create_pot( indicator_name ):
-    print( Path.cwd() )
-    # base_directory = Path.cwd() / indicator_name / "src" / indicator_name / "locale"
-    # os.chdir( base_directory )
-    # print( base_directory )
+def _create_update_pot( indicator_name, project_metadata ):
+    author_email = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
+
     locale_directory = Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
-    # base_directory2 = Path( indicator_name ) / "src" / indicator_name
-    # base_directory2 = Path( '.' ) / indicator_name / "src" / indicator_name
-
-    # os.chdir( base_directory )
-    # print( base_directory )
-    potfiles_in = locale_directory / "POTFILES.in"
-
-    copyright_holder = "Bernard Giannetti" #TODO
-    package_version = "1.0.44" #TODO
-    msgid_bugs_address = "thebernmeister@hotmail.com" #TODO
-    start_year = "2014" #TODO
-    end_year = "2024" #TODO
 
     pot_file = f"{ locale_directory / indicator_name }.pot"
     if Path( pot_file ).exists():
@@ -146,24 +129,24 @@ def _create_pot( indicator_name ):
     else:
         new_pot_file = pot_file
 
-    some_descriptive_title = f"Portable Object Template for { indicator_name }"
-    copyright_ = f"{ start_year }-{ end_year } { copyright_holder }"
+    potfiles_in = locale_directory / "POTFILES.in"
+    input_files_search_directory = Path( '.' ) / indicator_name / "src" / indicator_name
 
-    d = Path( '.' ) / indicator_name / "src" / indicator_name # TODO Better name
-
+    # Use xgettext to create a new POT file and sed to insert some other text.
     command = [
         f"xgettext",
         f"--files-from={ potfiles_in }",
-        f"--directory={ d }",
-        f"--copyright-holder={ copyright_holder }",
+        f"--directory={ input_files_search_directory }",
+        f"--copyright-holder={ author_email[ 0 ] }",
         f"--package-name={ indicator_name }",
-        f"--package-version={ package_version }",
-        f"--msgid-bugs-address=<{ msgid_bugs_address }>",
+        f"--package-version={ project_metadata[ 'Version' ] }",
+        f"--msgid-bugs-address=<{ author_email[ 1 ] }>",
         f"--no-location",
         f"--output={ new_pot_file }" ]
 
-    print( ' '.join( command ) )
     subprocess.run( command )
+
+    some_descriptive_title = f"Portable Object Template for { indicator_name }"
 
     command = [
         f"sed",
@@ -171,16 +154,21 @@ def _create_pot( indicator_name ):
         f"s/SOME DESCRIPTIVE TITLE/{ some_descriptive_title }/",
         f"{ new_pot_file }" ]
 
-    print( ' '.join( command ) )
     subprocess.run( command )
 
+    start_year = \
+        indicatorbase.IndicatorBase.get_first_year_or_last_year_in_changelog_markdown(
+            indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+
+    end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
+
+    copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
     command = [
         f"sed",
         f"--in-place",
-        f"s/YEAR { copyright_holder }/{ copyright_ }/",
+        f"s/YEAR { author_email[ 0 ] }/{ copyright_ }/",
         f"{ new_pot_file }" ]
 
-    print( ' '.join( command ) )
     subprocess.run( command )
 
     command = [
@@ -189,92 +177,161 @@ def _create_pot( indicator_name ):
         f"s/CHARSET/UTF-8/",
         f"{ new_pot_file }" ]
 
-    print( ' '.join( command ) )
     subprocess.run( command )
 
+    # If originally there was no POT file, a POT is created and job done.
+    # Otherwise, need to compare the old POT to the new POT...
+    if new_pot_file.endswith( ".new.pot" ):
+        command = [
+            f"sed",
+            f"--in-place=.bak",
+            f"/POT-Creation-Date/d",
+            f"{ pot_file }" ]
 
-    if Path( pot_file ).exists():
-        pass #TODO Diff
+        subprocess.run( command )
 
-    else:
-        pass # Done
+        command = [
+            f"sed",
+            f"--in-place=.bak",
+            f"/POT-Creation-Date/d",
+            f"{ new_pot_file }" ]
 
+        subprocess.run( command )
 
-    command = \
-        f"xgettext " + \
-        f"--files-from=locale/POTFILES.in " + \
-        f"--copyright-holder=\"{ copyright_holder }\" " + \
-        f"--package-name=\"{ indicator_name }\" " + \
-        f"--package-version=\"{ package_version }\" " + \
-        f"--msgid-bugs-address=\"<{ msgid_bugs_address }>\" " + \
-        f"--no-location " + \
-        f"--output=locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place 's/SOME DESCRIPTIVE TITLE/Portable Object Template for { indicator_name }/' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place 's/YEAR { copyright_holder }/{ start_year }-{ end_year } { copyright_holder }/' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place 's/CHARSET/UTF-8/' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.pot && " + \
-        f"diff locale/{ indicator_name }.pot locale/{ indicator_name }.new.pot"
+        command = [
+            f"diff",
+            f"{ pot_file }",
+            f"{ new_pot_file }" ]
 
-    # if Path( f"locale/{ indicator_name }.pot" ).exists():
-    #     print( "exists" )
-    #
-    # else:
-    #     print( "does not exist" )
+        result = subprocess.run( command, capture_output = True, text = True )
+        if result.stdout:
+            command = [
+                f"rm",
+                f"{ pot_file }",
+                f"{ pot_file }.bak",
+                f"{ new_pot_file }" ]
 
-    command = \
-        f"xgettext " + \
-        f"--files-from=locale/POTFILES.in " + \
-        f"--copyright-holder=\"{ copyright_holder }\" " + \
-        f"--package-name=\"{ indicator_name }\" " + \
-        f"--package-version=\"{ package_version }\" " + \
-        f"--msgid-bugs-address=\"<{ msgid_bugs_address }>\" " + \
-        f"--no-location " + \
-        f"--output=locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place 's/SOME DESCRIPTIVE TITLE/Portable Object Template for { indicator_name }/' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place 's/YEAR { copyright_holder }/{ start_year }-{ end_year } { copyright_holder }/' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place 's/CHARSET/UTF-8/' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.new.pot && " + \
-        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.pot && " + \
-        f"diff locale/{ indicator_name }.pot locale/{ indicator_name }.new.pot"
+            subprocess.run( command )
 
-#    subprocess.call( command, shell = True )
-    # diff = subprocess.getoutput( command )
-    # if diff:
-    #     command = \
-    #         f""
-    #
-    # else:
-    #     command = \
-    #         f""
-    #
-    # subprocess.run( command )
+            command = [
+                f"mv",
+                f"{ new_pot_file }.bak",
+                f"{ pot_file }" ]
 
+            subprocess.run( command )
+
+        else:
+            command = [
+                f"rm",
+                f"{ pot_file }",
+                f"{ new_pot_file }",
+                f"{ new_pot_file }.bak" ]
+
+            subprocess.run( command )
+
+            command = [
+                f"mv",
+                f"{ pot_file }.bak",
+                f"{ pot_file }" ]
+
+            subprocess.run( command )
 
 
-def _get_potfiles_dot_in_and_linguas( indicator_name ):
-    potfiles_dot_in = Path.cwd() / indicator_name / "src" / indicator_name / "locale/POTFILES.in"
-    linguas = Path.cwd() / indicator_name / "src" / indicator_name / "locale/LINGUAS"
-    return potfiles_dot_in, linguas
+def _get_linguas_codes( indicator_name ):
+    lingua_codes = [ ]
+    with open( _get_linguas( indicator_name ), 'r' ) as f:
+        for line in f:
+            if not line.startswith( '#' ):
+                lingua_codes = line.split()
 
+    return lingua_codes
+
+
+def _get_locale_directory( indicator_name ):
+    return Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
+
+
+def _get_linguas( indicator_name ):
+    return _get_locale_directory( indicator_name ) / "LINGUAS"
+
+
+def _get_potfiles_dot_in( indicator_name ):
+    return _get_locale_directory( indicator_name ) / "POTFILES.in"
+
+
+def _create_update_po( indicator_name ):
+    linguas_codes = _get_linguas_codes( indicator_name )
+    for linguas_code in linguas_codes:
+        po_file = _get_locale_directory( indicator_name ) / linguas_code / "LC_MESSAGES" / ( indicator_name + ".po" )
+        if ( po_file ).exists():
+            print( "found " + str( po_file ) )
+            pass#TODO Update po...!
+
+        else:
+            print( "missing " + str( po_file ) )
+            #TODO Create the po...!
+
+            pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
+            command = [
+                f"msginit",
+                f"--input={ pot_file }",
+                f"--output-file={ po_file }",
+                f"--locale={ linguas_code }",
+                f"--no-translator" ]
+
+            print( command )
+
+        pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
+        command = [
+            f"msginit",
+            f"--input={ pot_file }",
+            f"--output-file={ po_file }",
+            f"--locale={ linguas_code }",
+            f"--no-translator" ]
+
+        print( ' '.join( command ) )
+# msginit --input=indicatorfortune/src/indicatorfortune/locale/indicatorfortune.pot --output-file=indicatorfortune/src/indicatorfortune/locale/ru/LC_MESSAGES/indicatorfortune.po --locale=ru --no-translator
+# msginit
+#   --input=indicatorfortune/src/indicatorfortune/locale/indicatorfortune.pot 
+#   --output-file=indicatorfortune/src/indicatorfortune/locale/ru/LC_MESSAGES/indicatorfortune.po
+#   --locale=ru 
+#   --no-translator
+
+
+        # f"--files-from={ potfiles_in }",
+        # f"--directory={ input_files_search_directory }",
+        # f"--copyright-holder={ author_email[ 0 ] }",
+        # f"--package-name={ indicator_name }",
+        # f"--package-version={ project_metadata[ 'Version' ] }",
+        # f"--msgid-bugs-address=<{ author_email[ 1 ] }>",
+        # f"--no-location",
+
+                
 
 def _precheck( indicator_name ):
-    potfiles_dot_in, linguas = _get_potfiles_dot_in_and_linguas( indicator_name )
-
     message = ""
 
+    potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
     if not potfiles_dot_in.exists():
         message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
 
+    linguas = _get_linguas( indicator_name )
     if not linguas.exists():
         message += f"ERROR: Cannot find { linguas }\n" 
 
-#TODO Check LINGUAS is not empty.
+#TODO Check there are no directories under locale NOT in LINGUAS (this is a warning).
+# This could be a missing language not present in LINGUAS.
 
-#TODO Maybe check that there are no other directories under locale NOT in LINGUAS (this is a warning).
-# This would be a missing language not present in LINGUAS. 
+    project_metadata, error_message = \
+        indicatorbase.IndicatorBase.get_project_metadata(
+            indicator_name,
+            from_build_script = True )
 
-    return message
+    if error_message:
+        #TODO Check this message being printed.
+        message += f"ERROR:\n{ error_message }\n" 
+
+    return project_metadata, message
 
 
 def _initialise_parser():
@@ -289,17 +346,26 @@ def _initialise_parser():
     return parser
 
 
+#TODO This will not work with indicatorbase as there is no wheel file.
+#
+# Maybe when the pot is created for a given indicator,
+# do a create/update for indicatorbase?
+# But indicatorbase should already exist...?
+#
+# Then similarly for the po files for the indicator;
+# update the po files for indicatorbase.
 if __name__ == "__main__":
     parser = _initialise_parser()
     script_path_and_name = "tools/build_locale.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
-        message = _precheck( args.indicator_name )
+        project_metadata, message = _precheck( args.indicator_name )
         if message:
             print( message )
 
         else:
-            _create_pot( args.indicator_name )
+            _create_update_pot( args.indicator_name, project_metadata )
+            _create_update_po( args.indicator_name )
 
     else:
         print(
