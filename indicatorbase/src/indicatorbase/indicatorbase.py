@@ -447,39 +447,41 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
+        self.comments = comments
+        self.artwork = artwork
+        self.creditz = creditz
+        self.debug = debug
+
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
         print( "echo $XDG_CURRENT_DESKTOP = " + self.current_desktop )#TODO Test
-
-        self.version = project_metadata[ "Version" ]
-        self.comments = comments
 
 #TODO Remove comments code after double checking new code!
 #        self.copyright_names = IndicatorBase.get_copyright_names( project_metadata )
 #        print( self.copyright_names )
-        self.authors_and_emails = self.get_authors_emails( project_metadata )
+        # self.authors_and_emails = self.get_authors_emails( project_metadata )
 #        authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
 #        print( authors_and_emails )
 #        print( authors )
 #        print( authors[ 0 ] )
 
+        self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
+        self.version = project_metadata[ "Version" ]
 
 #        self.authors = [ ]
 #        for author in self.copyright_names:
 #            self.authors.append( author + " " + self.website )
 
  #       print( self.authors )
-        self.authors_and_websites = [ ]
- #       print()
-        for author_and_email in self.authors_and_emails:
-            self.authors_and_websites.append( author_and_email[ 0 ] + " " + self.website )
+#        self.authors_and_websites = [ ]
+# #       print()
+#        for author_and_email in self.authors_and_emails:
+#            self.authors_and_websites.append( author_and_email[ 0 ] + " " + self.website )
 
   #      print( self.authors )
 
 
-        self.artwork = artwork if artwork else self.authors_and_websites
-        self.creditz = creditz
-        self.debug = debug
+        # self.artwork = artwork if artwork else self.authors_and_websites
 
         self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
         logging.basicConfig(
@@ -633,7 +635,11 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_first_year_or_last_year_in_changelog_markdown( changelog_markdown, first_year = True ):
+    def get_year_in_changelog_markdown( changelog_markdown, first_year = True ):
+        '''
+        If first_year = True, retrieves the first/earliest year from CHANGELOG.md
+        otherwise retrieves the most recent year.
+        '''
         first_or_last_year = ""
         with open( changelog_markdown, 'r' ) as f:
             if first_year:
@@ -830,19 +836,23 @@ class IndicatorBase( ABC ):
 
         about_dialog = Gtk.AboutDialog()
         about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
-        about_dialog.set_artists( self.artwork )
-        about_dialog.set_authors( self.authors_and_websites )
+
+        authors_and_websites = [ ]
+        for author_and_email in self.authors_and_emails:
+            authors_and_websites.append( author_and_email[ 0 ] + " " + self.website )
+
+        about_dialog.set_authors( authors_and_websites )
+        about_dialog.set_artists( self.artwork if self.artwork else authors_and_websites )
+
         about_dialog.set_comments( self.comments )
 
         changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
 
-        copyright_start_year = \
-            IndicatorBase.get_first_year_or_last_year_in_changelog_markdown( changelog_markdown_path )
-
         authors = [ author_and_email[ 0 ] for author_and_email in self.authors_and_emails ]
         about_dialog.set_copyright(
             "Copyright \xa9 " + \
-            copyright_start_year + '-' + str( datetime.datetime.now().year ) + " " + \
+            IndicatorBase.get_year_in_changelog_markdown( changelog_markdown_path ) + \
+            '-' + str( datetime.datetime.now().year ) + " " + \
             ' '.join( authors ) )
 
         about_dialog.set_license_type( Gtk.License.GPL_3_0 )

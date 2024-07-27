@@ -730,7 +730,7 @@ def _get_removal( indicator_name ):
 
 def _get_license( indicator_name ):
     start_year = \
-        indicatorbase.IndicatorBase.get_first_year_or_last_year_in_changelog_markdown(
+        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
             indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
 
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
