@@ -455,33 +455,9 @@ class IndicatorBase( ABC ):
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
         print( "echo $XDG_CURRENT_DESKTOP = " + self.current_desktop )#TODO Test
 
-#TODO Remove comments code after double checking new code!
-#        self.copyright_names = IndicatorBase.get_copyright_names( project_metadata )
-#        print( self.copyright_names )
-        # self.authors_and_emails = self.get_authors_emails( project_metadata )
-#        authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
-#        print( authors_and_emails )
-#        print( authors )
-#        print( authors[ 0 ] )
-
         self.authors_and_emails = self.get_authors_emails( project_metadata )
-        self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
         self.version = project_metadata[ "Version" ]
-
-#        self.authors = [ ]
-#        for author in self.copyright_names:
-#            self.authors.append( author + " " + self.website )
-
- #       print( self.authors )
-#        self.authors_and_websites = [ ]
-# #       print()
-#        for author_and_email in self.authors_and_emails:
-#            self.authors_and_websites.append( author_and_email[ 0 ] + " " + self.website )
-
-  #      print( self.authors )
-
-
-        # self.artwork = artwork if artwork else self.authors_and_websites
+        self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
         self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
         logging.basicConfig(
@@ -616,22 +592,6 @@ class IndicatorBase( ABC ):
             authors_emails.append( [ address.display_name, address.addr_spec ] )
 
         return authors_emails
-
-
-#TODO I think this should be replaced for the function above...
-    @staticmethod
-    def get_copyright_names( project_metadata ):
-        # https://stackoverflow.com/a/75803208/2156453
-        email_message_object = \
-            email.message_from_string(
-                f'To: { project_metadata[ "Author-email" ] }',
-                policy = email.policy.default, )
-
-        copyright_names = [ ]
-        for address in email_message_object[ "to" ].addresses:
-            copyright_names.append( address.display_name )
-
-        return copyright_names
 
 
     @staticmethod
