@@ -17,6 +17,8 @@
 
 
 
+#TODO Update indicatorbase/src/indicatorbase/locale/README.
+
 
 
 '''
@@ -111,27 +113,114 @@ import subprocess
 #     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
 
 
-'''
-cd indicatorfortune/src/indicatorfortune
-
-xgettext --files-from=locale/POTFILES.in --copyright-holder="Bernard Giannetti" --package-name="indicatorfortune" --package-version="1.0.44" --msgid-bugs-address="<thebernmeister@hotmail.com>" --no-location --output=locale/POTFILES.pot && \
-sed -i  's/SOME DESCRIPTIVE TITLE/Portable Object Template for indicatorfortune/' locale/POTFILES.pot && \
-sed -i 's/YEAR Bernard Giannetti/2014-2024 Bernard Giannetti/' locale/POTFILES.pot && \
-sed -i 's/CHARSET/UTF-8/' locale/POTFILES.pot 
-'''
-
-#TODO Above in sed, try  --in-plance instead of -i 
-
-
+#TODO This function does more than create the pot...
+# It creates a new pot where there is an existing pot and checks for differences
+# and if the new pot is different, replaces the old pot,
+# otherwise leaves the old pot in place.
+#
+# Maybe write the function such that if there is no existing pot,
+# just make the new pot the current pot?
 def _create_pot( indicator_name ):
-    base_directory = Path.cwd() / indicator_name / "src" / indicator_name
-    os.chdir( base_directory )
+    print( Path.cwd() )
+    # base_directory = Path.cwd() / indicator_name / "src" / indicator_name / "locale"
+    # os.chdir( base_directory )
+    # print( base_directory )
+    locale_directory = Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
+    # base_directory2 = Path( indicator_name ) / "src" / indicator_name
+    # base_directory2 = Path( '.' ) / indicator_name / "src" / indicator_name
+
+    # os.chdir( base_directory )
+    # print( base_directory )
+    potfiles_in = locale_directory / "POTFILES.in"
 
     copyright_holder = "Bernard Giannetti" #TODO
     package_version = "1.0.44" #TODO
     msgid_bugs_address = "thebernmeister@hotmail.com" #TODO
     start_year = "2014" #TODO
     end_year = "2024" #TODO
+
+    pot_file = f"{ locale_directory / indicator_name }.pot"
+    if Path( pot_file ).exists():
+        new_pot_file = f"{ locale_directory / indicator_name }.new.pot"
+
+    else:
+        new_pot_file = pot_file
+
+    some_descriptive_title = f"Portable Object Template for { indicator_name }"
+    copyright_ = f"{ start_year }-{ end_year } { copyright_holder }"
+
+    d = Path( '.' ) / indicator_name / "src" / indicator_name # TODO Better name
+
+    command = [
+        f"xgettext",
+        f"--files-from={ potfiles_in }",
+        f"--directory={ d }",
+        f"--copyright-holder={ copyright_holder }",
+        f"--package-name={ indicator_name }",
+        f"--package-version={ package_version }",
+        f"--msgid-bugs-address=<{ msgid_bugs_address }>",
+        f"--no-location",
+        f"--output={ new_pot_file }" ]
+
+    print( ' '.join( command ) )
+    subprocess.run( command )
+
+    command = [
+        f"sed",
+        f"--in-place",
+        f"s/SOME DESCRIPTIVE TITLE/{ some_descriptive_title }/",
+        f"{ new_pot_file }" ]
+
+    print( ' '.join( command ) )
+    subprocess.run( command )
+
+    command = [
+        f"sed",
+        f"--in-place",
+        f"s/YEAR { copyright_holder }/{ copyright_ }/",
+        f"{ new_pot_file }" ]
+
+    print( ' '.join( command ) )
+    subprocess.run( command )
+
+    command = [
+        f"sed",
+        f"--in-place",
+        f"s/CHARSET/UTF-8/",
+        f"{ new_pot_file }" ]
+
+    print( ' '.join( command ) )
+    subprocess.run( command )
+
+
+    if Path( pot_file ).exists():
+        pass #TODO Diff
+
+    else:
+        pass # Done
+
+
+    command = \
+        f"xgettext " + \
+        f"--files-from=locale/POTFILES.in " + \
+        f"--copyright-holder=\"{ copyright_holder }\" " + \
+        f"--package-name=\"{ indicator_name }\" " + \
+        f"--package-version=\"{ package_version }\" " + \
+        f"--msgid-bugs-address=\"<{ msgid_bugs_address }>\" " + \
+        f"--no-location " + \
+        f"--output=locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place 's/SOME DESCRIPTIVE TITLE/Portable Object Template for { indicator_name }/' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place 's/YEAR { copyright_holder }/{ start_year }-{ end_year } { copyright_holder }/' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place 's/CHARSET/UTF-8/' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.pot && " + \
+        f"diff locale/{ indicator_name }.pot locale/{ indicator_name }.new.pot"
+
+    # if Path( f"locale/{ indicator_name }.pot" ).exists():
+    #     print( "exists" )
+    #
+    # else:
+    #     print( "does not exist" )
 
     command = \
         f"xgettext " + \
@@ -150,16 +239,16 @@ def _create_pot( indicator_name ):
         f"diff locale/{ indicator_name }.pot locale/{ indicator_name }.new.pot"
 
 #    subprocess.call( command, shell = True )
-    diff = subprocess.getoutput( command )
-    if diff:
-        command = \
-            f""
-
-    else:
-        command = \
-            f""
-
-    subprocess.run( command )
+    # diff = subprocess.getoutput( command )
+    # if diff:
+    #     command = \
+    #         f""
+    #
+    # else:
+    #     command = \
+    #         f""
+    #
+    # subprocess.run( command )
 
 
 
