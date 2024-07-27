@@ -19,6 +19,11 @@
 #TODO Check subprocess call/get...they may be deprecated.
 
 
+#TODO Maybe look at ALL PATHS in all files/scripts
+# and see if I can use this method below to create a path...
+#   base_directory = Path.cwd() / indicator_name / "src" / indicator_name / "locale"
+
+
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
