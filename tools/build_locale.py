@@ -133,30 +133,33 @@ def _create_pot( indicator_name ):
     start_year = "2014" #TODO
     end_year = "2024" #TODO
 
-#TODO Replace { indicator_name }_NEW with { indicator_name }
     command = \
         f"xgettext " + \
         f"--files-from=locale/POTFILES.in " + \
         f"--copyright-holder=\"{ copyright_holder }\" " + \
-        f"--package-name=\"{ indicator_name }\"" + \
+        f"--package-name=\"{ indicator_name }\" " + \
         f"--package-version=\"{ package_version }\" " + \
         f"--msgid-bugs-address=\"<{ msgid_bugs_address }>\" " + \
         f"--no-location " + \
-        f"--output=locale/{ indicator_name }_NEW.pot "
-        #  + \
-        # f"sed --in-place 's/SOME DESCRIPTIVE TITLE/Portable Object Template for { indicator_name }/' locale/{ indicator_name }_NEW.pot && " + \
-        # f"sed --in-place 's/YEAR { copyright_holder }/{ start_year }-{ end_year } { copyright_holder }/' locale/{ indicator_name }_NEW.pot && " + \
-        # f"sed --in-place 's/CHARSET/UTF-8/' locale/{ indicator_name }_NEW.pot"
+        f"--output=locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place 's/SOME DESCRIPTIVE TITLE/Portable Object Template for { indicator_name }/' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place 's/YEAR { copyright_holder }/{ start_year }-{ end_year } { copyright_holder }/' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place 's/CHARSET/UTF-8/' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.new.pot && " + \
+        f"sed --in-place=.bak '/POT-Creation-Date/d' locale/{ indicator_name }.pot && " + \
+        f"diff locale/{ indicator_name }.pot locale/{ indicator_name }.new.pot"
 
-    subprocess.call( command, shell = True )
+#    subprocess.call( command, shell = True )
+    diff = subprocess.getoutput( command )
+    if diff:
+        command = \
+            f""
 
-    # command = f"sed '/POT-Creation-Date/d' locale/POTFILES.pot > locale/POTFILES_D.pot"
-    # subprocess.call( command, shell = True )
+    else:
+        command = \
+            f""
 
-    # command = f"sed '/POT-Creation-Date/d' locale/POTFILES.in > locale/POTFILES_D.in"
-    # subprocess.call( command, shell = True )
-
-    print(Path.cwd())
+    subprocess.run( command )
 
 
 
@@ -208,7 +211,6 @@ if __name__ == "__main__":
 
         else:
             _create_pot( args.indicator_name )
-            print( Path.cwd())
 
     else:
         print(
