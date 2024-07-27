@@ -453,15 +453,31 @@ class IndicatorBase( ABC ):
         self.version = project_metadata[ "Version" ]
         self.comments = comments
 
-        self.copyright_names = IndicatorBase.get_copyright_names( project_metadata )
+#TODO Remove comments code after double checking new code!
+#        self.copyright_names = IndicatorBase.get_copyright_names( project_metadata )
+#        print( self.copyright_names )
+        self.authors_and_emails = self.get_authors_emails( project_metadata )
+#        authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
+#        print( authors_and_emails )
+#        print( authors )
+#        print( authors[ 0 ] )
 
         self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
-        self.authors = [ ]
-        for author in self.copyright_names:
-            self.authors.append( author + " " + self.website )
+#        self.authors = [ ]
+#        for author in self.copyright_names:
+#            self.authors.append( author + " " + self.website )
 
-        self.artwork = artwork if artwork else self.authors
+ #       print( self.authors )
+        self.authors_and_websites = [ ]
+ #       print()
+        for author_and_email in self.authors_and_emails:
+            self.authors_and_websites.append( author_and_email[ 0 ] + " " + self.website )
+
+  #      print( self.authors )
+
+
+        self.artwork = artwork if artwork else self.authors_and_websites
         self.creditz = creditz
         self.debug = debug
 
@@ -815,7 +831,7 @@ class IndicatorBase( ABC ):
         about_dialog = Gtk.AboutDialog()
         about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
         about_dialog.set_artists( self.artwork )
-        about_dialog.set_authors( self.authors )
+        about_dialog.set_authors( self.authors_and_websites )
         about_dialog.set_comments( self.comments )
 
         changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
@@ -823,10 +839,11 @@ class IndicatorBase( ABC ):
         copyright_start_year = \
             IndicatorBase.get_first_year_or_last_year_in_changelog_markdown( changelog_markdown_path )
 
+        authors = [ author_and_email[ 0 ] for author_and_email in self.authors_and_emails ]
         about_dialog.set_copyright(
             "Copyright \xa9 " + \
             copyright_start_year + '-' + str( datetime.datetime.now().year ) + " " + \
-            ' '.join( self.copyright_names ) )
+            ' '.join( authors ) )
 
         about_dialog.set_license_type( Gtk.License.GPL_3_0 )
         about_dialog.set_logo_icon_name( self.get_icon_name() )
