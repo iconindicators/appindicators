@@ -33,18 +33,13 @@
 
 import argparse
 import datetime
+from enum import auto, Enum
+from pathlib import Path
 import re
 import sys
 
-from enum import auto, Enum
-from pathlib import Path
-
-sys.path.append( "indicatorbase/src" )
-try:
-    from indicatorbase import indicatorbase
-
-except ModuleNotFoundError:
-    pass # Occurs as the script is run from the incorrect directory and will be caught in main.
+sys.path.append( "indicatorbase/src/indicatorbase" )
+import indicatorbase
 
 
 class Operating_System( Enum ):
