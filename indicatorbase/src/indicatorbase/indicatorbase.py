@@ -577,8 +577,6 @@ class IndicatorBase( ABC ):
         return error_message
 
 
-#TODO Need to add a dummy author/email to the pyproject.toml
-# so there are now two and see what this function gives back.
     @staticmethod
     def get_authors_emails( project_metadata ):
         # https://stackoverflow.com/a/75803208/2156453
