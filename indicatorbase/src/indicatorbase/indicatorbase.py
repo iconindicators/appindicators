@@ -349,7 +349,7 @@ class IndicatorBase( ABC ):
     #
     # An alternative (with different results) is calling
     #   os.environ.get( "DESKTOP_SESSION" )
-    # which gives 'plasma' on  'Plasma (X11)' rather than 'KDE' on Kubuntu.
+    # which gives 'plasma' rather than 'KDE' on 'Plasma (X11)' on Kubuntu.
     __CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
     __CURRENT_DESKTOP_ICEWM = "ICEWM"
     __CURRENT_DESKTOP_KDE = "KDE"
@@ -494,12 +494,12 @@ class IndicatorBase( ABC ):
             error_message = None
             first_wheel = next( path.glob( "*.whl" ), None )
             if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }"
+                error_message = f"Unable to locate a .whl in { os.path.realpath( path ) }"
 
             else:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
                 if first_metadata is None:
-                    error_message = f"No metadata was found in { first_wheel.absolute() }!"
+                    error_message = f"No metadata was found in { first_wheel.absolute() }!" #TODO Make sure the path printed is correct.
 
                 else:
                     project_metadata = first_metadata.metadata
@@ -552,7 +552,7 @@ class IndicatorBase( ABC ):
             # from (the first) wheel located in the development folder.
             first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
             if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }"
+                error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }" #TODO Make sure the path printed is correct.
 
             else:
                 desktop_file_in_wheel = \
@@ -562,7 +562,7 @@ class IndicatorBase( ABC ):
 
                 with ZipFile( first_wheel, 'r' ) as z:
                     if desktop_file_in_wheel not in z.namelist():
-                        error_message = f"Unable to locate { desktop_file_in_wheel } in { first_wheel }."
+                        error_message = f"Unable to locate { desktop_file_in_wheel } in { first_wheel }." #TODO Make sure the path printed is correct.
 
                     else:
                         z.extract( desktop_file_in_wheel, path = "/tmp" )
@@ -598,21 +598,19 @@ class IndicatorBase( ABC ):
         If first_year = True, retrieves the first/earliest year from CHANGELOG.md
         otherwise retrieves the most recent year.
         '''
-        first_or_last_year = ""
+        year = ""
         with open( changelog_markdown, 'r' ) as f:
+            lines = f.readlines()
             if first_year:
-                lines = reversed( f.readlines() )
-
-            else:
-                lines = f.readlines()
+                lines = reversed( lines )
 
             for line in lines:
                 if line.startswith( "## v" ):
                     left_parenthesis = line.find( '(' )
-                    first_or_last_year = line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ]
+                    year = line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ]
                     break
 
-        return first_or_last_year
+        return year
 
 
     @staticmethod
