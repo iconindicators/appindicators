@@ -209,21 +209,23 @@ def _create_update_po( indicator_name ):
 #   "Project-Id-Version: indicatorfortune 1.0.41\n"   <---- version
 
 
-    start_year = \
-        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-            indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+            # start_year = \
+            #     indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+            #         indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+            #
+            # end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
-    end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
+
 # Copyright (C) 2013-2024 Bernard Giannetti
 
-    copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
-    command = [
-        f"sed",
-        f"--in-place",
-        f"s/YEAR { author_email[ 0 ] }/{ copyright_ }/",
-        f"{ new_pot_file }" ]
-
-    subprocess.run( command )
+            # copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
+            # command = [
+            #     f"sed",
+            #     f"--in-place",
+            #     f"s/YEAR { author_email[ 0 ] }/{ copyright_ }/",
+            #     f"{ new_pot_file }" ]
+            #
+            # subprocess.run( command )
 
 
 #TODO The
