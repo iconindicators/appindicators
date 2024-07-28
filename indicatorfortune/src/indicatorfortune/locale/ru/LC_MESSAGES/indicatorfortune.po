@@ -18,15 +18,12 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicatorfortune.py:40
 msgid "Indicator Fortune"
 msgstr "Индикатор изречений"
 
-#: indicatorfortune.py:61
 msgid "Fortune. . ."
 msgstr "Изречение. . ."
 
-#: indicatorfortune.py:74
 msgid ""
 "Calls the 'fortune' program displaying the result in the on-screen "
 "notification."
@@ -34,52 +31,40 @@ msgstr ""
 "Вызывает программу 'fortune', показывающую изречения в виде всплывающих "
 "сообщений."
 
-#: indicatorfortune.py:88
 msgid "New Fortune"
 msgstr "Новое изречение"
 
-#: indicatorfortune.py:96
 msgid "Copy Last Fortune"
 msgstr "Скопировать последнее"
 
-#: indicatorfortune.py:104
 msgid "Show Last Fortune"
 msgstr "Показать последнее"
 
-#: indicatorfortune.py:114
 msgid "History"
 msgstr "История"
 
-#: indicatorfortune.py:145
 msgid "Fortune History for Session"
 msgstr "История изречений"
 
-#: indicatorfortune.py:172
 #, fuzzy
 msgid "No enabled fortunes!"
 msgstr "Неверно заданы пути у включённых файлов изречений!"
 
-#: indicatorfortune.py:178
 msgid "No enabled fortunes have a valid location!"
 msgstr "Неверно заданы пути у включённых файлов изречений!"
 
-#: indicatorfortune.py:186
 msgid "Ensure enabled fortunes contain fortune data!"
 msgstr "Убедитесь в правильности формата файлов включённых изречений!"
 
-#: indicatorfortune.py:220
 msgid "WARNING. . ."
 msgstr "ПРЕДУПРЕЖДЕНИЕ. . ."
 
-#: indicatorfortune.py:257
 msgid "Fortune File/Directory"
 msgstr "Файл/Папка с изречениями"
 
-#: indicatorfortune.py:257 indicatorfortune.py:533
 msgid "Enabled"
 msgstr "Включен"
 
-#: indicatorfortune.py:266
 msgid ""
 "Double click to edit a fortune.\n"
 "\n"
@@ -100,51 +85,39 @@ msgstr ""
 "могут быть доступны\n"
 "на вашем родном языке."
 
-#: indicatorfortune.py:279
 msgid "Add"
 msgstr "Добавить"
 
-#: indicatorfortune.py:280
 msgid "Remove"
 msgstr "Удалить"
 
-#: indicatorfortune.py:281
 msgid "Reset"
 msgstr "Сброс"
 
-#: indicatorfortune.py:283
 msgid "Add a new fortune location."
 msgstr "Добавить новые изречения."
 
-#: indicatorfortune.py:284
 msgid "Remove the selected fortune location."
 msgstr "Удалить выбранные изречения."
 
-#: indicatorfortune.py:285
 msgid "Reset to factory default."
 msgstr "Сбросить к начальным настройкам."
 
-#: indicatorfortune.py:293
 msgid "Fortunes"
 msgstr "Файлы изречений"
 
-#: indicatorfortune.py:303
 msgid "How often a fortune is displayed."
 msgstr "Насколько часто показываются изречения."
 
-#: indicatorfortune.py:308
 msgid "Refresh interval (minutes)"
 msgstr "Интервал обновления (в минутах)"
 
-#: indicatorfortune.py:315
 msgid "The summary text for the notification."
 msgstr "Текст заголовка всплывающего сообщения."
 
-#: indicatorfortune.py:320
 msgid "Notification summary"
 msgstr "Заголовок сообщения"
 
-#: indicatorfortune.py:331
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -162,55 +135,42 @@ msgstr ""
 "будут отброшены, что вызовет чрезмерное\n"
 "обращение к программе 'fortune'."
 
-#: indicatorfortune.py:341
 msgid "Message character limit"
 msgstr "Лимит количества символов"
 
-#: indicatorfortune.py:348
 msgid "Middle mouse click of the icon"
 msgstr "Щелчок средней кнопкой мыши по значку"
 
-#: indicatorfortune.py:355
 msgid "Show a new fortune"
 msgstr "Показать новое изречение"
 
-#: indicatorfortune.py:365
 msgid "Copy current fortune to clipboard"
 msgstr "Скопировать последнее изречение в буфер"
 
-#: indicatorfortune.py:375
 msgid "Show current fortune"
 msgstr "Показать последнее изречение"
 
-#: indicatorfortune.py:385
 msgid "General"
 msgstr "Общие"
 
-#: indicatorfortune.py:422
 msgid "Reset fortunes to factory default?"
 msgstr "Очистить список и вернуть начальные настройки?"
 
-#: indicatorfortune.py:431
 msgid "No fortune has been selected for removal."
 msgstr "Не выбран элемент списка для удаления."
 
-#: indicatorfortune.py:443
 msgid "This is the default fortune and cannot be deleted."
 msgstr "Стандартный файл с изречениями не может быть удалён."
 
-#: indicatorfortune.py:450
 msgid "Remove the selected fortune?"
 msgstr "Удалить выбранный элемент?"
 
-#: indicatorfortune.py:465
 msgid "Add Fortune"
 msgstr "Добавить изречения"
 
-#: indicatorfortune.py:467
 msgid "Edit Fortune"
 msgstr "Редактировать свойства"
 
-#: indicatorfortune.py:475
 msgid ""
 "The path to a fortune .dat file,\n"
 "or a directory containing\n"
@@ -226,15 +186,12 @@ msgstr ""
 "Убедитесь, что надлежащие\n"
 "текстовые файлы существуют."
 
-#: indicatorfortune.py:486
 msgid "Fortune file/directory"
 msgstr "Файл/папка с изречениями"
 
-#: indicatorfortune.py:497
 msgid "File"
 msgstr "Файл"
 
-#: indicatorfortune.py:499 indicatorfortune.py:512
 msgid ""
 "This fortune is part of your\n"
 "system and cannot be modified."
@@ -243,7 +200,6 @@ msgstr ""
 "является частью системы\n"
 "и не может быть изменён."
 
-#: indicatorfortune.py:502
 msgid ""
 "Choose a fortune .dat file.\n"
 "\n"
@@ -255,11 +211,9 @@ msgstr ""
 "Убедитесь, что надлежащий\n"
 "текстовый файл существует."
 
-#: indicatorfortune.py:510
 msgid "Directory"
 msgstr "Папка"
 
-#: indicatorfortune.py:515
 msgid ""
 "Choose a directory containing\n"
 "a fortune .dat file(s).\n"
@@ -273,7 +227,6 @@ msgstr ""
 "Убедитесь, что надлежащие\n"
 "текстовые файлы существуют."
 
-#: indicatorfortune.py:535
 msgid ""
 "Ensure the fortune file/directory\n"
 "works by running through 'fortune'\n"
@@ -283,21 +236,14 @@ msgstr ""
 "работает, используя команду 'fortune'\n"
 "в терминале."
 
-#: indicatorfortune.py:549
 msgid "The fortune path cannot be empty."
 msgstr "Путь не может быть пустым."
 
-#: indicatorfortune.py:573
 msgid "Choose a fortune .dat file"
 msgstr "Выберите файл .dat с изречениями"
 
-#: indicatorfortune.py:577
 msgid "Choose a directory containing a fortune .dat file(s)"
 msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
 
-#: indicatorfortune.py:593
 msgid "The fortune is part of your system and is already included."
 msgstr "Этот файл с изречениями является частью системы и уже подключён."
-
-#~ msgid "Not supported on all versions/derivatives of Ubuntu."
-#~ msgstr "Поддерживается не во всех версиях/производных Ubuntu."
