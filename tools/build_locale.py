@@ -209,52 +209,83 @@ def _get_potfiles_dot_in( indicator_name ):
 
 def _create_update_po( indicator_name ):
     linguas_codes = _get_linguas_codes( indicator_name )
-    for linguas_code in linguas_codes:
-        po_file = _get_locale_directory( indicator_name ) / linguas_code / "LC_MESSAGES" / ( indicator_name + ".po" )
-        if ( po_file ).exists():
+    for lingua_code in linguas_codes:
+        po_file = _get_locale_directory( indicator_name ) / lingua_code / "LC_MESSAGES" / ( indicator_name + ".po" )
+        if po_file.exists():
             print( "found " + str( po_file ) )
-            pass#TODO Update po...!
+# msgmerge
+#     ru/LC_MESSAGES/indicatorfortune.po
+#     indicatorfortune.pot
+#     -o ru/LC_MESSAGES/indicatorfortune.po
+            pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
+            command = [
+                f"msgmerge",
+                f"{ po_file }",
+                f"{ pot_file }",
+                f"--no-location",
+                f"--output-file={ po_file }.new.po" ]
+
+            print( command )
+            subprocess.run( command )
+
+
+#TODO Because field values come across from the original PO file to the merged version,
+# ensure particular fields have current values.
+#   # Copyright (C) 2013-2024 Bernard Giannetti    <---- End year
+#   # Oleg Moiseichuk <berroll@mail.ru>, 2015-2024.   <--- End year....maybe not.
+#   "Project-Id-Version: indicatorfortune 1.0.41\n"   <---- version
+
+
+#TODO The
+#   "PO-Revision-Date: 2024-07-09 16:04+0300\n"
+# will have to change if and only if the merged version is taken over the original...right?
+
+
+            command = [
+                f"diff",
+                f"{ po_file }",
+                f"{ po_file }.new.po" ]
+    
+            result = subprocess.run( command, capture_output = True, text = True )
+            print( result.stdout )
+
+#TODO Do we first or last or at all update...
+#
+#    # Copyright (C) 2013-2024 Bernard Giannetti          <---- check/refresh the end date?
+#    "Project-Id-Version: indicatorfortune 1.0.44\n"     <------ update version number?
+#     "POT-Creation-Date: 2024-07-27 13:15+1000\n"       <---- update date?
+#     "PO-Revision-Date: 2024-07-27 13:15+1000\n"       <---- update date?  Maybe ONLY if other changes happen...?
+
+
+#TODO After all pot/po files are updated,
+# maybe look for
+#  #~
+# and remove.
+
 
         else:
-            print( "missing " + str( po_file ) )
-            #TODO Create the po...!
-
             pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
             command = [
                 f"msginit",
                 f"--input={ pot_file }",
-                f"--output-file={ po_file }",
-                f"--locale={ linguas_code }",
+                f"--output-file={ po_file }.NEW.po",
+                f"--locale={ lingua_code }",
                 f"--no-translator" ]
 
-            print( command )
+            subprocess.run( command )
 
-        pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
-        command = [
-            f"msginit",
-            f"--input={ pot_file }",
-            f"--output-file={ po_file }",
-            f"--locale={ linguas_code }",
-            f"--no-translator" ]
+#TODO Maybe make this message more explicit about what to change...see the README.
+            message = f"INFO:\n"
+            message += f"\tCreated { po_file } for lingua code '{ lingua_code }'.\n"
+            message += f"\tUpdate lines 1, 4, 12, and 13.\n"
+            print( message )
 
-        print( ' '.join( command ) )
-# msginit --input=indicatorfortune/src/indicatorfortune/locale/indicatorfortune.pot --output-file=indicatorfortune/src/indicatorfortune/locale/ru/LC_MESSAGES/indicatorfortune.po --locale=ru --no-translator
 # msginit
 #   --input=indicatorfortune/src/indicatorfortune/locale/indicatorfortune.pot 
 #   --output-file=indicatorfortune/src/indicatorfortune/locale/ru/LC_MESSAGES/indicatorfortune.po
 #   --locale=ru 
 #   --no-translator
 
-
-        # f"--files-from={ potfiles_in }",
-        # f"--directory={ input_files_search_directory }",
-        # f"--copyright-holder={ author_email[ 0 ] }",
-        # f"--package-name={ indicator_name }",
-        # f"--package-version={ project_metadata[ 'Version' ] }",
-        # f"--msgid-bugs-address=<{ author_email[ 1 ] }>",
-        # f"--no-location",
-
-                
 
 def _precheck( indicator_name ):
     message = ""
