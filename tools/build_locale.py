@@ -22,48 +22,26 @@
 
 
 #TODO
-# To update each the .po file for each locale:
-#   cd ~/Programming/Indicators/indicatorfortune/src/indicatorfortune/locale
-#   msgmerge ru/LC_MESSAGES/indicatorfortune.po indicatorfortune.pot -o ru/LC_MESSAGES/indicatorfortune.po
-#
 # What about looking at the LINGUAS file;
 # if there is no po file for a given language, create it.
 # Or instead write a message saying there is no PO file for a given LINGUA entry?
-#
+
+#TODO
 #This script should be called as part of the build_wheel in the same way the build_readme.
-#
+
+#TODO
 # Once this script is sorted, maybe update the indicatorbase/locale/README
 # to say the README is a historical document.
 
 
 import argparse
 import datetime
-
 from pathlib import Path
-
 import subprocess
 import sys
 
-
-#TODO I think this works in both eclipse and from terminal...
-# double check and if all good, fix also in build_readme.py and elsewhere.
 sys.path.append( "indicatorbase/src/indicatorbase" )
-try:
-    # from indicatorbase import indicatorbase
-    import indicatorbase
-
-except ModuleNotFoundError as e:
-    # print( "from indicatorbase import indicatorbase" )
-    print( e )
-    # pass # Occurs as the script is run from the incorrect directory and will be caught in main.
-
-# try:
-#     import indicatorbase
-#
-# except ModuleNotFoundError as e:
-#     print( "import indicatorbase" )
-#     print( e )
-#     pass # Occurs as the script is run from the incorrect directory and will be caught in main.
+import indicatorbase
 
 
 def _create_update_pot( indicator_name, project_metadata ):
@@ -91,6 +69,7 @@ def _create_update_pot( indicator_name, project_metadata ):
         f"--package-version={ project_metadata[ 'Version' ] }",
         f"--msgid-bugs-address=<{ author_email[ 1 ] }>",
         f"--no-location",
+        f"--no-wrap",
         f"--output={ new_pot_file }" ]
 
     subprocess.run( command )
@@ -212,28 +191,39 @@ def _create_update_po( indicator_name ):
     for lingua_code in linguas_codes:
         po_file = _get_locale_directory( indicator_name ) / lingua_code / "LC_MESSAGES" / ( indicator_name + ".po" )
         if po_file.exists():
-            print( "found " + str( po_file ) )
-# msgmerge
-#     ru/LC_MESSAGES/indicatorfortune.po
-#     indicatorfortune.pot
-#     -o ru/LC_MESSAGES/indicatorfortune.po
             pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
             command = [
                 f"msgmerge",
                 f"{ po_file }",
                 f"{ pot_file }",
                 f"--no-location",
+                f"--no-wrap",
                 f"--output-file={ po_file }.new.po" ]
 
-            print( command )
+#            print( command )
             subprocess.run( command )
-
 
 #TODO Because field values come across from the original PO file to the merged version,
 # ensure particular fields have current values.
 #   # Copyright (C) 2013-2024 Bernard Giannetti    <---- End year
-#   # Oleg Moiseichuk <berroll@mail.ru>, 2015-2024.   <--- End year....maybe not.
 #   "Project-Id-Version: indicatorfortune 1.0.41\n"   <---- version
+
+
+    start_year = \
+        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+            indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+
+    end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
+# Copyright (C) 2013-2024 Bernard Giannetti
+
+    copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
+    command = [
+        f"sed",
+        f"--in-place",
+        f"s/YEAR { author_email[ 0 ] }/{ copyright_ }/",
+        f"{ new_pot_file }" ]
+
+    subprocess.run( command )
 
 
 #TODO The
@@ -246,8 +236,8 @@ def _create_update_po( indicator_name ):
                 f"{ po_file }",
                 f"{ po_file }.new.po" ]
     
-            result = subprocess.run( command, capture_output = True, text = True )
-            print( result.stdout )
+#            result = subprocess.run( command, capture_output = True, text = True )
+#            print( result.stdout )
 
 #TODO Do we first or last or at all update...
 #
@@ -262,14 +252,14 @@ def _create_update_po( indicator_name ):
 #  #~
 # and remove.
 
-
         else:
             pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
             command = [
                 f"msginit",
                 f"--input={ pot_file }",
-                f"--output-file={ po_file }.NEW.po",
+                f"--output-file={ po_file }",
                 f"--locale={ lingua_code }",
+                f"--no-wrap",
                 f"--no-translator" ]
 
             subprocess.run( command )
@@ -278,13 +268,7 @@ def _create_update_po( indicator_name ):
             message = f"INFO:\n"
             message += f"\tCreated { po_file } for lingua code '{ lingua_code }'.\n"
             message += f"\tUpdate lines 1, 4, 12, and 13.\n"
-            print( message )
-
-# msginit
-#   --input=indicatorfortune/src/indicatorfortune/locale/indicatorfortune.pot 
-#   --output-file=indicatorfortune/src/indicatorfortune/locale/ru/LC_MESSAGES/indicatorfortune.po
-#   --locale=ru 
-#   --no-translator
+            print( message ) #TODO Should this message instead be returned to the caller to be printed?
 
 
 def _precheck( indicator_name ):
@@ -307,8 +291,7 @@ def _precheck( indicator_name ):
             from_build_script = True )
 
     if error_message:
-        #TODO Check this message being printed.
-        message += f"ERROR:\n{ error_message }\n" 
+        message += f"ERROR: { error_message }\n" 
 
     return project_metadata, message
 
