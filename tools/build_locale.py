@@ -16,16 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO After all pot/po files are updated for all indicators, maybe look for
-#  #~
-# and remove.
-
-
 #TODO Update indicatorbase/src/indicatorbase/locale/README.
 # I think the wording and some commands may be out of date.
-
-
-#TODO Should be called as part of the build_wheel in the same way the build_readme.
 
 
 import argparse
@@ -192,6 +184,7 @@ def _create_update_pot( indicator_name, locale_directory, author_email, version,
 
 
 def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
+    message = ""
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
         po_file = (
@@ -269,10 +262,10 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
             subprocess.run( command )
 
 #TODO Maybe make this message more explicit about what to change...see the README.
-            message = f"INFO:\n"
-            message += f"\tCreated { po_file } for lingua code '{ lingua_code }'.\n"
-            message += f"\tUpdate lines 1, 4, 12, and 13.\n"
-            print( message ) #TODO Should this message instead be returned to the caller to be printed?
+            message += f"INFO: Created { po_file } for lingua code '{ lingua_code }'. "
+            message += f"Update lines 1, 4, 12, and 13.\n"
+
+    return message
 
 
 def _precheck( indicator_name ):
@@ -328,19 +321,26 @@ if __name__ == "__main__":
                 print( message )
 
             else:
+                message = ""
+
                 author_email = _get_author_email( project_metadata )
 
                 locale_directory = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
                 version = "1.0.1"
                 copyright_ = f"2017-{ _get_current_year() } { author_email[ 0 ] }" # First year for translations of indicatorbase.
                 _create_update_pot( "indicatorbase", locale_directory, author_email, version, copyright_ )
-                _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
+                message += \
+                    _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
 
                 locale_directory = Path( '.' ) / args.indicator_name / "src" / args.indicator_name / "locale"
                 version = project_metadata[ 'Version' ]
                 copyright_ = _get_copyright( args.indicator_name, project_metadata )
                 _create_update_pot( args.indicator_name, locale_directory, author_email, version, copyright_ )
-                _create_update_po( args.indicator_name, _get_linguas_codes( args.indicator_name ), version, copyright_ )
+                message += \
+                    _create_update_po( args.indicator_name, _get_linguas_codes( args.indicator_name ), version, copyright_ )
+
+                if message:
+                    print( message )
 
     else:
         print(

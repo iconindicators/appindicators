@@ -75,6 +75,22 @@ def _run_checks_specific_to_indicator( indicator_name ):
     return message
 
 
+#TODO Possibly upgrade all calls to use subprocess.run (in all scripts and indicators?
+# Requires changing the call and capturing return.
+def _update_locale( indicator_name ):
+    message = ""
+    command = [
+        f"python3",
+        f"tools/build_locale.py",
+        f"{ indicator_name }" ]
+
+    result = subprocess.run( command, capture_output = True, text = True )
+    if result.stdout:
+        message = result.stdout
+
+    return message
+
+
 def _chmod( file, user_permission, group_permission, other_permission ):
     os.chmod( file, user_permission | group_permission | other_permission )
 
@@ -439,21 +455,23 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
     if version_from_pyproject_toml == version_from_changelog_markdown:
         message = _run_checks_specific_to_indicator( indicator_name )
         if not message:
-            directory_dist = Path( directory_release + "/wheel/dist_" + indicator_name )
-            if Path( directory_dist ).is_dir():
-                shutil.rmtree( str( directory_dist ) )
+            message = _update_locale( indicator_name )
+            if not message:
+                directory_dist = Path( directory_release + "/wheel/dist_" + indicator_name )
+                if Path( directory_dist ).is_dir():
+                    shutil.rmtree( str( directory_dist ) )
 
-            directory_dist.mkdir( parents = True )
+                directory_dist.mkdir( parents = True )
 
-            if _package_source_for_build_wheel_process( directory_dist, indicator_name ):
-                _intialise_virtual_environment( "build", "pip", "PyGObject" )
+                if _package_source_for_build_wheel_process( directory_dist, indicator_name ):
+                    _intialise_virtual_environment( "build", "pip", "PyGObject" )
 
-                command = \
-                    f". ./venv/bin/activate && " + \
-                    f"python3 -m build --outdir { str( directory_dist ) } { str( directory_dist ) }/{ indicator_name }"
+                    command = \
+                        f". ./venv/bin/activate && " + \
+                        f"python3 -m build --outdir { str( directory_dist ) } { str( directory_dist ) }/{ indicator_name }"
 
-                subprocess.call( command, shell = True )
-                shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
+                    subprocess.call( command, shell = True )
+                    shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
 
     else:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
