@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorfortune 1.0.41\n"
+"Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-25 16:50+1000\n"
+"POT-Creation-Date: 2024-07-28 23:03+1000\n"
 "PO-Revision-Date: 2024-07-09 16:04+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
