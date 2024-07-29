@@ -16,22 +16,27 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO This will not work with indicatorbase as there is no wheel file.
+#
+# Maybe when the pot is created for a given indicator,
+# do a create/update for indicatorbase?
+# But indicatorbase should already exist...?
+#
+# Then similarly for the po files for the indicator;
+# update the po files for indicatorbase.
+
+
+#TODO After all pot/po files are updated for all indicators, maybe look for
+#  #~
+# and remove.
+
 
 #TODO Update indicatorbase/src/indicatorbase/locale/README.
 # I think the wording and some commands may be out of date.
 
 
 #TODO
-# What about looking at the LINGUAS file;
-# if there is no po file for a given language, create it.
-# Or instead write a message saying there is no PO file for a given LINGUA entry?
-
-#TODO
 #This script should be called as part of the build_wheel in the same way the build_readme.
-
-#TODO
-# Once this script is sorted, maybe update the indicatorbase/locale/README
-# to say the README is a historical document.
 
 
 import argparse
@@ -44,9 +49,48 @@ sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
 
 
-def _create_update_pot( indicator_name, project_metadata ):
-    author_email = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
+def _get_linguas_codes( indicator_name ):
+    lingua_codes = [ ]
+    with open( _get_linguas( indicator_name ), 'r' ) as f:
+        for line in f:
+            if not line.startswith( '#' ):
+                lingua_codes = line.split()
 
+    return lingua_codes
+
+
+def _get_locale_directory( indicator_name ):
+    return Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
+
+
+def _get_linguas( indicator_name ):
+    return _get_locale_directory( indicator_name ) / "LINGUAS"
+
+
+def _get_potfiles_dot_in( indicator_name ):
+    return _get_locale_directory( indicator_name ) / "POTFILES.in"
+
+
+#TODO Is it worth looking at all functions in the tools script and create a utils.py?
+def _get_copyright( indicator_name, project_metadata ):
+    start_year = \
+        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+            indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+
+    end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
+
+    author_email = _get_author_email( project_metadata )
+
+    copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
+
+    return copyright_
+
+
+def _get_author_email( project_metadata ):
+    return indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
+
+
+def _create_update_pot( indicator_name, project_metadata ):
     locale_directory = Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
 
     pot_file = f"{ locale_directory / indicator_name }.pot"
@@ -58,6 +102,8 @@ def _create_update_pot( indicator_name, project_metadata ):
 
     potfiles_in = locale_directory / "POTFILES.in"
     input_files_search_directory = Path( '.' ) / indicator_name / "src" / indicator_name
+
+    author_email = _get_author_email( project_metadata )
 
     # Use xgettext to create a new POT file and sed to insert some other text.
     command = [
@@ -84,13 +130,8 @@ def _create_update_pot( indicator_name, project_metadata ):
 
     subprocess.run( command )
 
-    start_year = \
-        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-            indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+    copyright_ = _get_copyright( indicator_name, project_metadata )
 
-    end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
-
-    copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
     command = [
         f"sed",
         f"--in-place",
@@ -164,34 +205,17 @@ def _create_update_pot( indicator_name, project_metadata ):
             subprocess.run( command )
 
 
-def _get_linguas_codes( indicator_name ):
-    lingua_codes = [ ]
-    with open( _get_linguas( indicator_name ), 'r' ) as f:
-        for line in f:
-            if not line.startswith( '#' ):
-                lingua_codes = line.split()
-
-    return lingua_codes
-
-
-def _get_locale_directory( indicator_name ):
-    return Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
-
-
-def _get_linguas( indicator_name ):
-    return _get_locale_directory( indicator_name ) / "LINGUAS"
-
-
-def _get_potfiles_dot_in( indicator_name ):
-    return _get_locale_directory( indicator_name ) / "POTFILES.in"
-
-
-def _create_update_po( indicator_name ):
+def _create_update_po( indicator_name, project_metadata ):
     linguas_codes = _get_linguas_codes( indicator_name )
+    pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
-        po_file = _get_locale_directory( indicator_name ) / lingua_code / "LC_MESSAGES" / ( indicator_name + ".po" )
+        po_file = (
+            _get_locale_directory( indicator_name ) / 
+            lingua_code / 
+            "LC_MESSAGES" / 
+            ( indicator_name + ".po" ) )
+
         if po_file.exists():
-            pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
             command = [
                 f"msgmerge",
                 f"{ po_file }",
@@ -200,62 +224,58 @@ def _create_update_po( indicator_name ):
                 f"--no-wrap",
                 f"--output-file={ po_file }.new.po" ]
 
-#            print( command )
             subprocess.run( command )
 
-#TODO Because field values come across from the original PO file to the merged version,
-# ensure particular fields have current values.
-#   # Copyright (C) 2013-2024 Bernard Giannetti    <---- End year
-#   "Project-Id-Version: indicatorfortune 1.0.41\n"   <---- version
+            # Ensure the copyright line has correct start year and end year is current year.
+            copyright_ = _get_copyright( indicator_name, project_metadata )
 
+            command = [
+                f"sed",
+                f"--in-place",
+                f"/^# Copyright (C)/s/.*/# Copyright (C) { copyright_ }/",
+                f"{ po_file }.new.po" ]
 
-            # start_year = \
-            #     indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-            #         indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
-            #
-            # end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
+            subprocess.run( command )
 
+            # Ensure the Project-Id-Version is latest.
+            project_id_version = f"\"Project-Id-Version: { indicator_name } { project_metadata[ 'Version' ] }\\\\n\""
 
-# Copyright (C) 2013-2024 Bernard Giannetti
+            command = [
+                f"sed",
+                f"--in-place",
+                f"/Project-Id-Version/s/.*/{ project_id_version }/",
+                f"{ po_file }.new.po" ]
 
-            # copyright_ = f"{ start_year }-{ end_year } { author_email[ 0 ] }"
-            # command = [
-            #     f"sed",
-            #     f"--in-place",
-            #     f"s/YEAR { author_email[ 0 ] }/{ copyright_ }/",
-            #     f"{ new_pot_file }" ]
-            #
-            # subprocess.run( command )
-
-
-#TODO The
-#   "PO-Revision-Date: 2024-07-09 16:04+0300\n"
-# will have to change if and only if the merged version is taken over the original...right?
-
+            subprocess.run( command )
 
             command = [
                 f"diff",
                 f"{ po_file }",
                 f"{ po_file }.new.po" ]
-    
-#            result = subprocess.run( command, capture_output = True, text = True )
-#            print( result.stdout )
 
-#TODO Do we first or last or at all update...
-#
-#    # Copyright (C) 2013-2024 Bernard Giannetti          <---- check/refresh the end date?
-#    "Project-Id-Version: indicatorfortune 1.0.44\n"     <------ update version number?
-#     "POT-Creation-Date: 2024-07-27 13:15+1000\n"       <---- update date?
-#     "PO-Revision-Date: 2024-07-27 13:15+1000\n"       <---- update date?  Maybe ONLY if other changes happen...?
+            result = subprocess.run( command, capture_output = True, text = True )
+            if result.stdout:
+                command = [
+                    f"rm",
+                    f"{ po_file }" ]
 
+                result = subprocess.run( command )
 
-#TODO After all pot/po files are updated,
-# maybe look for
-#  #~
-# and remove.
+                command = [
+                    f"mv",
+                    f"{ po_file }.new.po",
+                    f"{ po_file }" ]
+
+                result = subprocess.run( command )
+
+            else:
+                command = [
+                    f"rm",
+                    f"{ po_file }.new.po" ]
+
+                result = subprocess.run( command )
 
         else:
-            pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
             command = [
                 f"msginit",
                 f"--input={ pot_file }",
@@ -284,9 +304,6 @@ def _precheck( indicator_name ):
     if not linguas.exists():
         message += f"ERROR: Cannot find { linguas }\n" 
 
-#TODO Check there are no directories under locale NOT in LINGUAS (this is a warning).
-# This could be a missing language not present in LINGUAS.
-
     project_metadata, error_message = \
         indicatorbase.IndicatorBase.get_project_metadata(
             indicator_name,
@@ -301,7 +318,7 @@ def _precheck( indicator_name ):
 def _initialise_parser():
     parser = \
         argparse.ArgumentParser(
-            description = "Create README.md for an indicator." ) #TODO Fix
+            description = "Create/update the .pot and .po(s) for an indicator." )
 
     parser.add_argument(
         "indicator_name",
@@ -310,14 +327,6 @@ def _initialise_parser():
     return parser
 
 
-#TODO This will not work with indicatorbase as there is no wheel file.
-#
-# Maybe when the pot is created for a given indicator,
-# do a create/update for indicatorbase?
-# But indicatorbase should already exist...?
-#
-# Then similarly for the po files for the indicator;
-# update the po files for indicatorbase.
 if __name__ == "__main__":
     parser = _initialise_parser()
     script_path_and_name = "tools/build_locale.py"
@@ -329,7 +338,7 @@ if __name__ == "__main__":
 
         else:
             _create_update_pot( args.indicator_name, project_metadata )
-            _create_update_po( args.indicator_name )
+            _create_update_po( args.indicator_name, project_metadata )
 
     else:
         print(
