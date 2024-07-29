@@ -16,16 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO This will not work with indicatorbase as there is no wheel file.
-#
-# Maybe when the pot is created for a given indicator,
-# do a create/update for indicatorbase?
-# But indicatorbase should already exist...?
-#
-# Then similarly for the po files for the indicator;
-# update the po files for indicatorbase.
-
-
 #TODO After all pot/po files are updated for all indicators, maybe look for
 #  #~
 # and remove.
@@ -35,8 +25,7 @@
 # I think the wording and some commands may be out of date.
 
 
-#TODO
-#This script should be called as part of the build_wheel in the same way the build_readme.
+#TODO Should be called as part of the build_wheel in the same way the build_readme.
 
 
 import argparse
@@ -202,121 +191,6 @@ def _create_update_pot( indicator_name, locale_directory, author_email, version,
             subprocess.run( command )
 
 
-def _create_update_potORIGINAL( indicator_name, project_metadata ):
-    locale_directory = Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
-
-    pot_file = f"{ locale_directory / indicator_name }.pot"
-    if Path( pot_file ).exists():
-        new_pot_file = f"{ locale_directory / indicator_name }.new.pot"
-
-    else:
-        new_pot_file = pot_file
-
-    potfiles_in = locale_directory / "POTFILES.in"
-    input_files_search_directory = Path( '.' ) / indicator_name / "src" / indicator_name
-
-    author_email = _get_author_email( project_metadata )
-
-    # Use xgettext to create a new POT file and sed to insert some other text.
-    command = [
-        f"xgettext",
-        f"--files-from={ potfiles_in }",
-        f"--directory={ input_files_search_directory }",
-        f"--copyright-holder={ author_email[ 0 ] }",
-        f"--package-name={ indicator_name }",
-        f"--package-version={ project_metadata[ 'Version' ] }",
-        f"--msgid-bugs-address=<{ author_email[ 1 ] }>",
-        f"--no-location",
-        f"--no-wrap",
-        f"--output={ new_pot_file }" ]
-
-    subprocess.run( command )
-
-    some_descriptive_title = f"Portable Object Template for { indicator_name }"
-
-    command = [
-        f"sed",
-        f"--in-place",
-        f"s/SOME DESCRIPTIVE TITLE/{ some_descriptive_title }/",
-        f"{ new_pot_file }" ]
-
-    subprocess.run( command )
-
-    copyright_ = _get_copyright( indicator_name, project_metadata )
-
-    command = [
-        f"sed",
-        f"--in-place",
-        f"s/YEAR { author_email[ 0 ] }/{ copyright_ }/",
-        f"{ new_pot_file }" ]
-
-    subprocess.run( command )
-
-    command = [
-        f"sed",
-        f"--in-place",
-        f"s/CHARSET/UTF-8/",
-        f"{ new_pot_file }" ]
-
-    subprocess.run( command )
-
-    # Create the POT if none exists; otherwise, compare the new POT with the original POT...
-    if new_pot_file.endswith( ".new.pot" ):
-        command = [
-            f"sed",
-            f"--in-place=.bak",
-            f"/POT-Creation-Date/d",
-            f"{ pot_file }" ]
-
-        subprocess.run( command )
-
-        command = [
-            f"sed",
-            f"--in-place=.bak",
-            f"/POT-Creation-Date/d",
-            f"{ new_pot_file }" ]
-
-        subprocess.run( command )
-
-        command = [
-            f"diff",
-            f"{ pot_file }",
-            f"{ new_pot_file }" ]
-
-        result = subprocess.run( command, capture_output = True, text = True )
-        if result.stdout:
-            command = [
-                f"rm",
-                f"{ pot_file }",
-                f"{ pot_file }.bak",
-                f"{ new_pot_file }" ]
-
-            subprocess.run( command )
-
-            command = [
-                f"mv",
-                f"{ new_pot_file }.bak",
-                f"{ pot_file }" ]
-
-            subprocess.run( command )
-
-        else:
-            command = [
-                f"rm",
-                f"{ pot_file }",
-                f"{ new_pot_file }",
-                f"{ new_pot_file }.bak" ]
-
-            subprocess.run( command )
-
-            command = [
-                f"mv",
-                f"{ pot_file }.bak",
-                f"{ pot_file }" ]
-
-            subprocess.run( command )
-
-
 def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
@@ -347,94 +221,6 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
 
             # Ensure the Project-Id-Version is latest.
             project_id_version = f"\"Project-Id-Version: { indicator_name } { version }\\\\n\""
-
-            command = [
-                f"sed",
-                f"--in-place",
-                f"/Project-Id-Version/s/.*/{ project_id_version }/",
-                f"{ po_file }.new.po" ]
-
-            subprocess.run( command )
-
-            command = [
-                f"diff",
-                f"{ po_file }",
-                f"{ po_file }.new.po" ]
-
-            result = subprocess.run( command, capture_output = True, text = True )
-            if result.stdout:
-                command = [
-                    f"rm",
-                    f"{ po_file }" ]
-
-                result = subprocess.run( command )
-
-                command = [
-                    f"mv",
-                    f"{ po_file }.new.po",
-                    f"{ po_file }" ]
-
-                result = subprocess.run( command )
-
-            else:
-                command = [
-                    f"rm",
-                    f"{ po_file }.new.po" ]
-
-                result = subprocess.run( command )
-
-        else:
-            command = [
-                f"msginit",
-                f"--input={ pot_file }",
-                f"--output-file={ po_file }",
-                f"--locale={ lingua_code }",
-                f"--no-wrap",
-                f"--no-translator" ]
-
-            subprocess.run( command )
-
-#TODO Maybe make this message more explicit about what to change...see the README.
-            message = f"INFO:\n"
-            message += f"\tCreated { po_file } for lingua code '{ lingua_code }'.\n"
-            message += f"\tUpdate lines 1, 4, 12, and 13.\n"
-            print( message ) #TODO Should this message instead be returned to the caller to be printed?
-
-
-def _create_update_poORIGINAL( indicator_name, project_metadata ):
-    linguas_codes = _get_linguas_codes( indicator_name )
-    pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
-    for lingua_code in linguas_codes:
-        po_file = (
-            _get_locale_directory( indicator_name ) / 
-            lingua_code / 
-            "LC_MESSAGES" / 
-            ( indicator_name + ".po" ) )
-
-        if po_file.exists():
-            command = [
-                f"msgmerge",
-                f"{ po_file }",
-                f"{ pot_file }",
-                f"--no-location",
-                f"--no-wrap",
-                f"--output-file={ po_file }.new.po" ]
-
-            subprocess.run( command )
-
-            # Ensure the copyright line has correct start year and end year is current year.
-            copyright_ = _get_copyright( indicator_name, project_metadata )
-
-            command = [
-                f"sed",
-                f"--in-place",
-                f"/^# Copyright (C)/s/.*/# Copyright (C) { copyright_ }/",
-                f"{ po_file }.new.po" ]
-
-            subprocess.run( command )
-
-            # Ensure the Project-Id-Version is latest.
-            project_id_version = f"\"Project-Id-Version: { indicator_name } { project_metadata[ 'Version' ] }\\\\n\""
 
             command = [
                 f"sed",
@@ -546,7 +332,7 @@ if __name__ == "__main__":
 
                 locale_directory = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
                 version = "1.0.1"
-                copyright_ = f"2017-{ _get_current_year() } { author_email[ 0 ] }"
+                copyright_ = f"2017-{ _get_current_year() } { author_email[ 0 ] }" # First year for translations of indicatorbase.
                 _create_update_pot( "indicatorbase", locale_directory, author_email, version, copyright_ )
                 _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
 
