@@ -98,6 +98,8 @@ def _chmod( file, user_permission, group_permission, other_permission ):
 def _get_name_and_comments_from_indicator( indicator_name, directory_indicator ):
     indicator_source = \
         Path( directory_indicator + "/src/" + indicator_name + '/' + indicator_name + ".py" )
+#TODO Is it feasible to look at all paths created in all scripts/indicators
+# and change to use the format above?
 
     name = ""
     comments = ""
