@@ -1,13 +1,13 @@
 # Russian translation for indicatorstardate.
-# Copyright (C) 2015-2024 Bernard Giannetti
+# Copyright (C) 2012-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorstardate package.
 # Oleg Moiseichuk <berroll@mail.ru>, 2015-2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorstardate 1.0.44\n"
+"Project-Id-Version: indicatorstardate 1.0.45\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 14:17+1100\n"
+"POT-Creation-Date: 2024-07-29 16:32+1000\n"
 "PO-Revision-Date: 2024-07-09 15:13+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -15,39 +15,30 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Indicator Stardate"
 msgstr "Индикатор звёздной даты"
 
-#: indicatorstardate.py:47
 msgid "Shows the current Star Trek™ stardate."
 msgstr "Показывает текущую звёздную дату \"Звёздного пути\"."
 
-#: indicatorstardate.py:48
-msgid ""
-"STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-"
-"trek/stardates"
-msgstr ""
-"ЧАВО ПО ЗВЁЗДНЫМ ДАТАМ В \"ЗВЁЗДНОМ ПУТИ\", автор Эндрю Мэйн. http://www."
-"faqs.org/faqs/star-trek/stardates"
+msgid "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates"
+msgstr "ЧАВО ПО ЗВЁЗДНЫМ ДАТАМ В \"ЗВЁЗДНОМ ПУТИ\", автор Эндрю Мэйн. http://www.faqs.org/faqs/star-trek/stardates"
 
-#: indicatorstardate.py:49
 msgid "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
 msgstr "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
 
-#: indicatorstardate.py:121
 msgid "Show stardate 'classic'"
 msgstr "Показывать \"классическую\" звёздную дату"
 
-#: indicatorstardate.py:124
+#, fuzzy
 msgid ""
 "If checked, show stardate 'classic' based on\n"
 "\n"
 "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n"
 "\n"
-"Otherwise show stardate '2009 revised' based on\n"
+"Otherwise, show stardate '2009 revised' based on\n"
 "\n"
 "\thttps://en.wikipedia.org/wiki/Stardate"
 msgstr ""
@@ -58,18 +49,14 @@ msgstr ""
 "Иначе показываются звёздные даты \"ревизии 2009 года\"\n"
 "https://en.wikipedia.org/wiki/Stardate"
 
-#: indicatorstardate.py:130
 msgid "Show ISSUE"
 msgstr "Показывать ВЫПУСК"
 
-#: indicatorstardate.py:134
 msgid "Show the ISSUE of the stardate 'classic'."
 msgstr "Показывать ВЫПУСК \"классической\" звёздной даты."
 
-#: indicatorstardate.py:137
 msgid "Pad INTEGER"
 msgstr "Выравнивать целую часть"
 
-#: indicatorstardate.py:141
 msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr "Дополнять нулями целую часть \"классической\" звёздной даты."

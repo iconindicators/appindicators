@@ -1,14 +1,14 @@
 # Portable Object Template for indicatorvirtualbox.
-# Copyright (C) 2015-2024 Bernard Giannetti
+# Copyright (C) 2012-2024 Bernard Giannetti
 # This file is distributed under the same license as the indicatorvirtualbox package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorvirtualbox 1.0.74\n"
+"Project-Id-Version: indicatorvirtualbox 1.0.75\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 10:23+1100\n"
+"POT-Creation-Date: 2024-07-29 16:32+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,85 +20,64 @@ msgstr ""
 msgid "Indicator VirtualBox™"
 msgstr ""
 
-#: indicatorvirtualbox.py:65
 msgid "Shows VirtualBox™ virtual machines and allows them to be started."
 msgstr ""
 
-#: indicatorvirtualbox.py:94
 msgid "(no virtual machines exist)"
 msgstr ""
 
-#: indicatorvirtualbox.py:98
 msgid "Launch VirtualBox™ Manager"
 msgstr ""
 
-#: indicatorvirtualbox.py:104
 msgid "(VirtualBox™ is not installed)"
 msgstr ""
 
-#: indicatorvirtualbox.py:192
-msgid ""
-"The virtual machine could not be found - perhaps it has been renamed or "
-"deleted.  The list of virtual machines has been refreshed - please try again."
+msgid "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again."
 msgstr ""
 
-#: indicatorvirtualbox.py:193
 msgid "Error"
 msgstr ""
 
-#: indicatorvirtualbox.py:202
 #, python-brace-format
-msgid ""
-"Unable to find the window for the virtual machine '{0}' - perhaps it is "
-"running as headless."
+msgid "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless."
 msgstr ""
 
-#: indicatorvirtualbox.py:203 indicatorvirtualbox.py:215
 msgid "Warning"
 msgstr ""
 
-#: indicatorvirtualbox.py:214
 #, python-brace-format
-msgid ""
-"Unable to bring the virtual machine '{0}' to front as there is more than one "
-"window with overlapping names."
+msgid "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names."
 msgstr ""
 
-#: indicatorvirtualbox.py:363
 msgid "Virtual Machine"
 msgstr ""
 
-#: indicatorvirtualbox.py:364 indicatorvirtualbox.py:544
 msgid "Autostart"
 msgstr ""
 
-#: indicatorvirtualbox.py:365 indicatorvirtualbox.py:526
 msgid "Start Command"
 msgstr ""
 
-#: indicatorvirtualbox.py:366
 msgid "Double click to edit a virtual machine's properties."
 msgstr ""
 
-#: indicatorvirtualbox.py:378
 msgid "Virtual Machines"
 msgstr ""
 
-#: indicatorvirtualbox.py:386
+msgid ""
+"The window title of VirtualBox™ Manager.\n"
+"You may have to adjust for your local language.\n"
+"\n"
+"This is used to bring the VirtualBox™ Manager\n"
+"window to the front if already running."
+msgstr ""
+
 msgid "VirtualBox™ Manager"
 msgstr ""
 
-#: indicatorvirtualbox.py:392
-msgid ""
-"The window title of VirtualBox™ Manager.\n"
-"You may have to adjust for your local language."
-msgstr ""
-
-#: indicatorvirtualbox.py:399
 msgid "Sort groups and virtual machines equally"
 msgstr ""
 
-#: indicatorvirtualbox.py:401
 msgid ""
 "If checked, groups and virtual machines\n"
 "are sorted without distinction.\n"
@@ -107,42 +86,34 @@ msgid ""
 "followed by virtual machines."
 msgstr ""
 
-#: indicatorvirtualbox.py:409
 msgid "Show groups as submenus"
 msgstr ""
 
-#: indicatorvirtualbox.py:411
 msgid ""
 "If checked, groups are shown using submenus.\n"
 "\n"
 "Otherwise, groups are shown as an indented list."
 msgstr ""
 
-#: indicatorvirtualbox.py:423
-msgid "Refresh interval (minutes)"
-msgstr ""
-
-#: indicatorvirtualbox.py:431
 msgid ""
 "How often the list of virtual machines\n"
 "and their running status are updated."
 msgstr ""
 
-#: indicatorvirtualbox.py:442
-msgid "Startup delay (seconds)"
+msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicatorvirtualbox.py:450
 msgid ""
 "Amount of time to wait from automatically\n"
 "starting one virtual machine to the next."
 msgstr ""
 
-#: indicatorvirtualbox.py:458
+msgid "Startup delay (seconds)"
+msgstr ""
+
 msgid "General"
 msgstr ""
 
-#: indicatorvirtualbox.py:537
 msgid ""
 "The terminal command to start the virtual machine such as\n"
 "\n"
@@ -151,20 +122,14 @@ msgid ""
 "\tVBoxHeadless --startvm %VM% --vrde off"
 msgstr ""
 
-#: indicatorvirtualbox.py:545
 msgid "Run the virtual machine when the indicator starts."
 msgstr ""
 
-#: indicatorvirtualbox.py:551
 msgid "Virtual Machine Properties"
 msgstr ""
 
-#: indicatorvirtualbox.py:559
 msgid "The start command cannot be empty."
 msgstr ""
 
-#: indicatorvirtualbox.py:564
-msgid ""
-"The start command must contain %VM% which is substituted for the virtual "
-"machine name/id."
+msgid "The start command must contain %VM% which is substituted for the virtual machine name/id."
 msgstr ""

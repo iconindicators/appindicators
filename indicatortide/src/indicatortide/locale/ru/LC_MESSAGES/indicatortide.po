@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatortide 1.0.29\n"
+"Project-Id-Version: indicatortide 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 10:15+1100\n"
+"POT-Creation-Date: 2024-07-29 16:32+1000\n"
 "PO-Revision-Date: 2024-07-09 15:28+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -15,50 +15,73 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Indicator Tide"
 msgstr "Индикатор приливов"
 
-#: indicatortide.py:50
 msgid "Displays tidal information."
 msgstr "Показывает сведения о приливах."
 
-#: indicatortide.py:79 indicatortide.py:80
-msgid "No tidal data available!"
-msgstr "Данные о приливах недоступны!"
+msgid "No user script specified!"
+msgstr ""
 
-#: indicatortide.py:81
-msgid "Check the log in your home directory."
+msgid "Please specify a user script and class name in the preferences."
+msgstr ""
+
+#, fuzzy
+msgid "User script could not be found!"
+msgstr "Пользовательский сценарий с заданным именем не найден."
+
+msgid "Please check the user script in the preferences."
+msgstr ""
+
+#, fuzzy
+msgid "User script class name could not be found!"
+msgstr "Имя класса в пользовательском сценарии не может быть пустым."
+
+#, fuzzy
+msgid "Please check the user script class name in the preferences."
+msgstr "Имя класса в пользовательском сценарии не может быть пустым."
+
+msgid "User function could not be found!"
+msgstr ""
+
+msgid "You must implement the function 'get_tide_data()'."
+msgstr ""
+
+msgid "Error running user script!"
+msgstr ""
+
+#, fuzzy
+msgid "Check the log file in your home directory."
 msgstr "Проверьте журнал в домашней папке."
 
-#: indicatortide.py:118 indicatortide.py:136
 msgid "HIGH"
 msgstr "ПРИЛИВ"
 
-#: indicatortide.py:118 indicatortide.py:136
 msgid "LOW"
 msgstr "ОТЛИВ"
 
-#: indicatortide.py:176
-msgid "User script"
+#, fuzzy
+msgid "User Script"
 msgstr "Пользовательский сценарий"
 
-#: indicatortide.py:181
-msgid "Full path and filename of user's Python3 script."
+#, fuzzy
+msgid ""
+"Full path and filename\n"
+"of user's Python3 script."
 msgstr "Полный путь и имя файла пользовательского сценария Python3."
 
-#: indicatortide.py:189
-msgid "User class"
-msgstr "Пользовательский класс"
+msgid "Path and filename"
+msgstr ""
 
-#: indicatortide.py:195
+#, fuzzy
 msgid ""
-"Class name within the user script,\n"
+"Class name within the user script\n"
 "which must contain the function\n"
 "\n"
-"    getTideData()\n"
+"    get_tide_data()\n"
 "\n"
 "implemented by the user to obtain\n"
 "the tidal data."
@@ -68,34 +91,34 @@ msgstr ""
 "\n"
 "    getTideData()\n"
 "\n"
-"разработанную пользователем, для получения"
-"данных о приливах."
+"разработанную пользователем, для полученияданных о приливах."
 
-#: indicatortide.py:207
+msgid "Class name"
+msgstr ""
+
 msgid "Show as submenus"
 msgstr "Отображать подменю"
 
-#: indicatortide.py:209
 msgid "Show each day's tides in a submenu."
 msgstr "Отображать приливы каждого дня в виде подменю."
 
-#: indicatortide.py:213
 msgid "Except first day"
 msgstr "Кроме первого дня"
 
-#: indicatortide.py:217
 msgid "Show the first day's tide in full."
 msgstr "Отображать приливы первого дня полностью."
 
-#: indicatortide.py:234
 msgid "The user script path/filename cannot be found."
 msgstr "Пользовательский сценарий с заданным именем не найден."
 
-#: indicatortide.py:240
 msgid "The user script path/filename cannot be empty."
 msgstr "Имя пользовательского сценария не может быть пустым."
 
-#: indicatortide.py:245
 msgid "The user script class name cannot be empty."
 msgstr "Имя класса в пользовательском сценарии не может быть пустым."
 
+#~ msgid "No tidal data available!"
+#~ msgstr "Данные о приливах недоступны!"
+
+#~ msgid "User class"
+#~ msgstr "Пользовательский класс"

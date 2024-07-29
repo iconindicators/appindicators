@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatortest 1.0.7\n"
+"Project-Id-Version: indicatortest 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 22:05+1100\n"
+"POT-Creation-Date: 2024-07-29 16:32+1000\n"
 "PO-Revision-Date: 2024-07-09 22:05+1100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -15,24 +15,107 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Indicator Test"
 msgstr ""
 
-msgid "Test"
-msgstr "Test (ru)"
-
-msgid ""
-"Cannot run script as no terminal and/or terminal execution flag found; "
-"please install gnome-terminal."
+msgid "Test Indicator"
 msgstr ""
 
-msgid ""
-"Cannot run script as qterminal incorrectly parses arguments; please install "
-"gnome-terminal instead."
+msgid "Exercises a range of indicator functionality."
+msgstr ""
+
+msgid "Information"
+msgstr ""
+
+msgid "Functionality"
+msgstr ""
+
+msgid "Machine: "
+msgstr ""
+
+msgid "Node: "
+msgstr ""
+
+msgid "Processor: "
+msgstr ""
+
+msgid "Release: "
+msgstr ""
+
+msgid "System: "
+msgstr ""
+
+msgid "Version: "
+msgstr ""
+
+msgid "Platform | Uname"
+msgstr ""
+
+msgid "Desktop"
+msgstr ""
+
+msgid "Icon Theme"
+msgstr ""
+
+msgid "Terminal: "
+msgstr ""
+
+msgid "Execution flag: "
+msgstr ""
+
+msgid "Terminal"
+msgstr ""
+
+msgid "Reset icon"
+msgstr ""
+
+#, python-brace-format
+msgid "Show '{0}' rendered to {1}"
+msgstr ""
+
+msgid "Icon"
+msgstr ""
+
+msgid "Reset label"
+msgstr ""
+
+msgid "Show current time in label"
+msgstr ""
+
+msgid "Show current time in OSD"
+msgstr ""
+
+msgid "Current time..."
+msgstr ""
+
+msgid "Label | Tooltip | OSD"
+msgstr ""
+
+msgid "Copy current time to clipboard"
+msgstr ""
+
+msgid "Clipboard"
+msgstr ""
+
+msgid "Execute Terminal Command"
+msgstr ""
+
+msgid "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal."
+msgstr ""
+
+msgid "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead."
 msgstr ""
 
 msgid "Enable/disable X"
 msgstr "Enable/disable X (ru)"
+
+msgid "Day of Week"
+msgstr ""
+
+msgid "Days of week containing an 'n' are bold."
+msgstr ""
+
+#~ msgid "Test"
+#~ msgstr "Test (ru)"

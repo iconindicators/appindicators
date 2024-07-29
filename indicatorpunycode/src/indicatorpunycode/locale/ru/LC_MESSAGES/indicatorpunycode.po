@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorpunycode 1.0.15\n"
+"Project-Id-Version: indicatorpunycode 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 09:48+1100\n"
+"POT-Creation-Date: 2024-07-29 16:31+1000\n"
 "PO-Revision-Date: 2024-07-09 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -15,88 +15,67 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Indicator Punycode"
 msgstr "Индикатор Punycode-конвертер"
 
-#: indicatorpunycode.py:51
 msgid "Converts domain names between Unicode and ASCII."
 msgstr "Преобразователь доменных имён, содержащих символы Уникода."
 
-#: indicatorpunycode.py:58
 msgid "Convert"
 msgstr "Преобразовать"
 
-#: indicatorpunycode.py:67
 msgid "Unicode:  "
 msgstr "Уникод:  "
 
-#: indicatorpunycode.py:71
 msgid "ASCII:  "
 msgstr "ASCII:       "
 
-#: indicatorpunycode.py:85
-msgid "No text is in the clipboard."
-msgstr "Буфер обмена пуст."
-
-#: indicatorpunycode.py:88
-msgid "No text is highlighted/selected."
-msgstr "Буфер выделения пуст."
-
-#: indicatorpunycode.py:90
 msgid "Nothing to convert..."
 msgstr "Преобразование невозможно..."
 
-#: indicatorpunycode.py:137
+msgid "No text is in the clipboard."
+msgstr "Буфер обмена пуст."
+
+msgid "No text is highlighted/selected."
+msgstr "Буфер выделения пуст."
+
 msgid "Error converting..."
 msgstr "Ошибка преобразования..."
 
-#: indicatorpunycode.py:137
 msgid "See log for more details."
 msgstr "Подробности в журнале."
 
-#: indicatorpunycode.py:156
 msgid "Input source"
 msgstr "Источник данных"
 
-#: indicatorpunycode.py:160
 msgid "Clipboard"
 msgstr "Буфер обмена"
 
-#: indicatorpunycode.py:162
-msgid ""
-"Input is taken from the clipboard after\n"
-"a CTRL-X or CTRL-C (or equivalent)."
-msgstr ""
-"Данные вводятся при помощи Ctrl-C или\n"
-"пункта \"Копировать\" в контекстном меню."
+#, fuzzy
+msgid "Input is taken from the clipboard."
+msgstr "Буфер обмена пуст."
 
-#: indicatorpunycode.py:168
 msgid "Primary"
 msgstr "Буфер выделения"
 
-#: indicatorpunycode.py:170
-msgid ""
-"Input is taken from the currently\n"
-"selected text after a middle mouse\n"
-"click of the indicator icon."
+#, fuzzy
+msgid "Input is taken from the currently selected text."
 msgstr ""
 "Данные вводятся нажатием средней\n"
 "кнопки мыши на значок индикатора\n"
 "после выделения текста."
 
-#: indicatorpunycode.py:177
 msgid "Output to clipboard and primary"
 msgstr "Поместить результат в оба буфера"
 
-#: indicatorpunycode.py:179
+#, fuzzy
 msgid ""
-"If checked, the output text is sent\n"
+"If checked, the converted text is sent\n"
 "to both the clipboard and primary.\n"
 "\n"
-"Otherwise the output is sent back\n"
+"Otherwise the converted text is sent\n"
 "only to the input source."
 msgstr ""
 "Если стоит отметка, то результат\n"
@@ -105,11 +84,9 @@ msgstr ""
 "Иначе он помещается только в буфер,\n"
 "в котором содержались исходные данные."
 
-#: indicatorpunycode.py:187
 msgid "Drop path/query in output"
 msgstr "Отбросить символы за доменным именем"
 
-#: indicatorpunycode.py:189
 msgid ""
 "If checked, the output text will not\n"
 "contain any path/query (if present)."
@@ -117,11 +94,6 @@ msgstr ""
 "Если стоит отметка, все символы, следующие\n"
 "за доменным именем, будут отброшены."
 
-#: indicatorpunycode.py:198
-msgid "Maximum results"
-msgstr "Количество результатов"
-
-#: indicatorpunycode.py:204
 msgid ""
 "The number of most recent\n"
 "results to show in the menu.\n"
@@ -136,3 +108,13 @@ msgstr ""
 "Нажатие на пункт меню, который\n"
 "содержит результат, поместит\n"
 "этот результат в буфер обмена."
+
+msgid "Maximum results"
+msgstr "Количество результатов"
+
+#~ msgid ""
+#~ "Input is taken from the clipboard after\n"
+#~ "a CTRL-X or CTRL-C (or equivalent)."
+#~ msgstr ""
+#~ "Данные вводятся при помощи Ctrl-C или\n"
+#~ "пункта \"Копировать\" в контекстном меню."
