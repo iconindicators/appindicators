@@ -60,8 +60,8 @@ def _run_checks_specific_to_indicator( indicator_name ):
         # Whilst that directory will be copied across automatically,
         # must also determine planets.bsp/stars.dat are also present.
         # The code below does just that...
-        # data_directory =  Path( indicator_name + "/src/indicatorlunar/data" )
-        # planets_bsp = Path( str( data_directory ) + "/planets.bsp" )
+        # data_directory = Path( indicator_name ) / "src" / "indicatorlunar" / "data"
+        # planets_bsp = data_directory / "planets.bsp"
         # if not planets_bsp.is_file():
         #     message += f"{ indicator_name }: Unable to locate { planets_bsp } - may need to be created - aborting.\n"
         #
@@ -100,6 +100,7 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
         Path( directory_indicator + "/src/" + indicator_name + '/' + indicator_name + ".py" )
 #TODO Is it feasible to look at all paths created in all scripts/indicators
 # and change to use the format above?
+# Would likely search for 'Path(' initially.
 
     name = ""
     comments = ""

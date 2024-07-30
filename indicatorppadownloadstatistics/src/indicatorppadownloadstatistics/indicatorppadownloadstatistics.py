@@ -21,17 +21,18 @@
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
-from copy import deepcopy
 import concurrent.futures
 import gi
+import json
+import locale
+import webbrowser
+
+from copy import deepcopy
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-import json
-import locale
 from urllib.request import urlopen
-import webbrowser
 
 from ppa import Filters, PPA, PublishedBinary
 

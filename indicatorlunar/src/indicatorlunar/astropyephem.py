@@ -24,9 +24,11 @@ import locale
 import math
 
 import ephem
+
 from ephem.cities import _city_data
 
 import eclipse
+
 from astrobase import AstroBase
 
 

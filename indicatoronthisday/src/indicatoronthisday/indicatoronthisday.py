@@ -48,14 +48,14 @@
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
-from datetime import date, datetime, timedelta
 import fnmatch
 import gi
+import os
+
+from datetime import date, datetime, timedelta
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
-
-import os
 
 from event import Event
 

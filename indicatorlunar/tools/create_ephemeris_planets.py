@@ -46,9 +46,10 @@
 
 import argparse
 import datetime
-from dateutil.relativedelta import relativedelta
 import subprocess
 import textwrap
+
+from dateutil.relativedelta import relativedelta
 
 
 def create_ephemeris_planets( in_bsp, out_bsp, years ):

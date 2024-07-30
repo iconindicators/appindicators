@@ -27,7 +27,7 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.  Multiple indicators may be specified and will be built sequentially:
+    which updates locale files (.pot and .po), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.  Multiple indicators may be specified and will be built sequentially:
 
     `python3 tools/build_wheel.py release indicatortest indicatorfortune indicatorlunar`
 

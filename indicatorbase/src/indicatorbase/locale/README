@@ -1,3 +1,6 @@
+This document is kept for posterity and is superceded as locale is created/updated via build_locale.py which is called from build_wheel.py.
+
+
 Create the PO Template (POT) file
 =================================
 

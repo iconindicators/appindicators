@@ -33,10 +33,11 @@
 
 import argparse
 import datetime
-from enum import auto, Enum
-from pathlib import Path
 import re
 import sys
+
+from enum import auto, Enum
+from pathlib import Path
 
 sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase

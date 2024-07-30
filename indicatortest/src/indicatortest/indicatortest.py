@@ -38,16 +38,15 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
 import gi
+import os
+import platform
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-import os
-
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-import platform
 from threading import Thread
 
 

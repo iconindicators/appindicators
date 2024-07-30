@@ -23,10 +23,11 @@
 import argparse
 import textwrap
 
-from ephem import stars
 from pandas import read_csv
 from skyfield.api import Star, load
 from skyfield.data import hipparcos
+
+from ephem import stars
 
 
 # Indices for columns at http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt.

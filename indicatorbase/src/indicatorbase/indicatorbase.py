@@ -286,13 +286,23 @@
 #   https://guicommits.com/organize-python-code-like-a-pro/
 
 
-from abc import ABC
-from bisect import bisect_right
 import datetime
 import email.policy
 import gettext
 import gi
+import inspect
+import json
+import logging.handlers
+import os
+import pickle
+import shutil
+import signal
+import subprocess
 import sys
+import webbrowser
+
+from abc import ABC
+from bisect import bisect_right
 
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
@@ -321,18 +331,9 @@ except ValueError:
 from gi.repository import Notify
 
 from importlib import metadata
-import inspect
-import json
-import logging.handlers
-import os
 from pathlib import Path
-import pickle
-import shutil
-import signal
-import subprocess
 from threading import Lock
 from urllib.request import urlopen
-import webbrowser
 from zipfile import ZipFile
 
 

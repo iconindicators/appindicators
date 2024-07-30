@@ -54,6 +54,7 @@ import concurrent.futures
 import copy
 import datetime
 import gi
+import math
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -61,7 +62,6 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-import math
 from threading import Thread
 
 from script import Background, NonBackground

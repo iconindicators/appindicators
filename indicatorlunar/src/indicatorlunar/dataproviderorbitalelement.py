@@ -21,8 +21,9 @@
 
 
 import datetime
-from enum import Enum
 import requests
+
+from enum import Enum
 
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase

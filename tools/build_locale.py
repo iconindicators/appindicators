@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
+# Create/update the .pot and .po files for an indicator.
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -16,15 +19,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Update indicatorbase/src/indicatorbase/locale/README.
-# I think the wording and some commands may be out of date.
-
-
 import argparse
 import datetime
-from pathlib import Path
 import subprocess
 import sys
+
+from pathlib import Path
 
 sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
@@ -56,11 +56,10 @@ def _get_current_year():
     return datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
 
-#TODO Is it worth looking at all functions in the tools script and create a utils.py?
 def _get_copyright( indicator_name, project_metadata ):
     start_year = \
         indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-            indicator_name + '/src/' + indicator_name + '/CHANGELOG.md' )
+            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
 
     author_email = _get_author_email( project_metadata )
 
@@ -261,7 +260,6 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
 
             subprocess.run( command )
 
-#TODO Maybe make this message more explicit about what to change...see the README.
             message += f"INFO: Created { po_file } for lingua code '{ lingua_code }'. "
             message += f"Update lines 1, 4, 12, and 13.\n"
 

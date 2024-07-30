@@ -38,14 +38,13 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import datetime
 import gi
+import time
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
-
-import time
 
 from virtualmachine import Group, VirtualMachine
 
