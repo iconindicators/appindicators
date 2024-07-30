@@ -19,11 +19,6 @@
 #TODO Check subprocess call/get...they may be deprecated.
 
 
-#TODO Maybe look at ALL PATHS in all files/scripts
-# and see if I can use this method below to create a path...
-#   base_directory = Path.cwd() / indicator_name / "src" / indicator_name / "locale"
-
-
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
@@ -339,7 +334,7 @@ from zipfile import ZipFile
 
 class IndicatorBase( ABC ):
 
-    __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/"
+    __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" #TODO Convert to Path
 
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
@@ -396,7 +391,7 @@ class IndicatorBase( ABC ):
 
         if found_indicatorbase_import:
             INDICATOR_NAME = Path( frame_record.filename ).stem
-            locale_directory = str( Path( __file__ ).parent ) + os.sep + "locale"
+            locale_directory = Path( __file__ ).parent / "locale" #TODO Check ths is correct after conversion.
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
@@ -460,7 +455,7 @@ class IndicatorBase( ABC ):
         self.version = project_metadata[ "Version" ]
         self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
-        self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
+        self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log" #TODO Convert to Path
         logging.basicConfig(
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             level = logging.DEBUG,
@@ -519,14 +514,14 @@ class IndicatorBase( ABC ):
             if from_build_script:
                 # Looking for a .whl within the indicator directory,
                 # but coming from a build script so the path is different.
-                # first_wheel = next( ( Path( '.' ) / indicator_name / "src" / indicator_name ).glob( "*.whl" ), None )
+                # first_wheel = next( ( Path( '.' ) / indicator_name / "src" / indicator_name ).glob( "*.whl" ), None ) #TODO Why is this commented out?
                 path = Path( '.' ) / indicator_name / "src" / indicator_name
                 project_metadata, error_message = get_first_wheel( path )
 
             else:
                 # No pip information found; assume in development/testing.
                 # Look for a .whl file in the same directory as the indicator.
-                # first_wheel = next( path.glob( "*.whl" ), None )
+                # first_wheel = next( path.glob( "*.whl" ), None ) #TODO Why is this commented out?
                 path = Path( '.' )
                 project_metadata, error_message = get_first_wheel( path )
 
@@ -545,7 +540,7 @@ class IndicatorBase( ABC ):
         self.desktop_file_virtual_environment = \
             str( Path( __file__ ).parent ) + \
             "/platform/linux/" + \
-            self.desktop_file
+            self.desktop_file #TODO Convert to path
 
         error_message = None
         if not Path( self.desktop_file_virtual_environment ).exists():
@@ -559,7 +554,7 @@ class IndicatorBase( ABC ):
                 desktop_file_in_wheel = \
                     self.indicator_name + \
                     "/platform/linux/" + \
-                    self.indicator_name + ".py.desktop"
+                    self.indicator_name + ".py.desktop" #TODO Convert to Path
 
                 with ZipFile( first_wheel, 'r' ) as z:
                     if desktop_file_in_wheel not in z.namelist():
@@ -568,7 +563,7 @@ class IndicatorBase( ABC ):
                     else:
                         z.extract( desktop_file_in_wheel, path = "/tmp" )
                         self.desktop_file_virtual_environment = \
-                            str( Path( "/tmp/" + desktop_file_in_wheel ) )
+                            str( Path( "/tmp/" + desktop_file_in_wheel ) )  #TODO Convert to Path.
 
                         if not Path( self.desktop_file_virtual_environment ).exists():
                             error_message = f"Unable to locate { self.desktop_file_virtual_environment }!"
@@ -616,6 +611,7 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_changelog_markdown_path():
+        #TODO COnvert to path
         changelog = str( Path( __file__ ).parent ) + "/CHANGELOG.md" # Path under virtual environment.
         if not Path( changelog ).exists():
             changelog = str( os.path.realpath( Path( '.' ) ) ) + "/CHANGELOG.md" # Assume running in development.
@@ -830,7 +826,7 @@ class IndicatorBase( ABC ):
             _( "changelog" ),
             _( "text file." ) )
 
-        error_log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log"
+        error_log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log" #TODO Convert to path
         if os.path.exists( error_log ):
             self.__add_hyperlink_label(
                 about_dialog,
@@ -2156,6 +2152,7 @@ class IndicatorBase( ABC ):
     # or
     #    ~/.userBaseDirectory/applicationBaseDirectory
     def __get_user_directory( self, xdg_key, user_base_directory, application_base_directory ):
+#TODO Convert to using Path( '.' )...watch the trailing os.sep...the caller needs to handle this!    
         if xdg_key in os.environ:
             directory = \
                 os.environ[ xdg_key ] + os.sep + \

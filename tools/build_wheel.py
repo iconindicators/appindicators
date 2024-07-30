@@ -40,9 +40,9 @@ def _intialise_virtual_environment( *modules_to_install ):
     if not Path( "venv" ).is_dir():
         command = "python3 -m venv venv"
         subprocess.call( command, shell = True )
-    
+
     command = \
-        f". ./venv/bin/activate && " + \
+        f". { Path( '.' ) / 'venv' / 'bin' / 'activate' } && " + \
         f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
 
     subprocess.call( command, shell = True )
@@ -81,7 +81,7 @@ def _update_locale( indicator_name ):
     message = ""
     command = [
         f"python3",
-        f"tools/build_locale.py",
+        f"{ Path( '.' ) / 'tools' / 'build_locale.py' }",
         f"{ indicator_name }" ]
 
     result = subprocess.run( command, capture_output = True, text = True )
@@ -96,11 +96,7 @@ def _chmod( file, user_permission, group_permission, other_permission ):
 
 
 def _get_name_and_comments_from_indicator( indicator_name, directory_indicator ):
-    indicator_source = \
-        Path( directory_indicator + "/src/" + indicator_name + '/' + indicator_name + ".py" )
-#TODO Is it feasible to look at all paths created in all scripts/indicators
-# and change to use the format above?
-# Would likely search for 'Path(' initially.
+    indicator_source = Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" )
 
     name = ""
     comments = ""
@@ -130,7 +126,7 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
 
 
 def _create_pyproject_dot_toml( indicator_name, directory_dist ):
-    indicator_pyproject_toml_path = str( directory_dist ) + "/" + indicator_name + "/pyproject.toml"
+    indicator_pyproject_toml_path = Path( '.' ) / directory_dist / indicator_name / "pyproject.toml"
     classifiers = ""
     dependencies = ""
     description = ""
@@ -163,7 +159,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_dist ):
                 if dependencies:
                     dependencies = ',\n' + dependencies.rstrip()
 
-    indicatorbase_pyproject_toml_path = "indicatorbase/pyprojectbase.toml"
+    indicatorbase_pyproject_toml_path = Path( '.' ) / "indicatorbase" / "pyprojectbase.toml"
     indicatorbase_pyproject_toml_text = ""
     with open( indicatorbase_pyproject_toml_path ) as f:
         for line in f:
@@ -199,16 +195,16 @@ def _create_pyproject_dot_toml( indicator_name, directory_dist ):
 
 
 def _process_locale( directory_dist, indicator_name ):
-    directory_indicator = str( directory_dist ) + os.sep + indicator_name
-    directory_indicator_locale = directory_indicator + "/src/" + indicator_name + "/locale"
-    directory_indicator_base_locale = "indicatorbase/src/indicatorbase/locale"
+    directory_indicator = Path( '.' ) / directory_dist / indicator_name
+    directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
+    directory_indicator_base_locale = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
 
     # Append translations from indicatorbase to POT.
     command = \
         "msgcat --use-first " + \
-        directory_indicator_locale + os.sep + indicator_name + ".pot " + \
-        directory_indicator_base_locale + "/indicatorbase.pot " + \
-        "--output-file=" + directory_indicator_locale + os.sep + indicator_name + ".pot"
+        str( directory_indicator_locale / ( indicator_name + ".pot" ) ) + " " + \
+        str( directory_indicator_base_locale / "indicatorbase.pot" ) + \
+        " --output-file=" + str( directory_indicator_locale / ( indicator_name + ".pot" ) )
 
     subprocess.call( command, shell = True )
 
@@ -219,8 +215,8 @@ def _process_locale( directory_dist, indicator_name ):
         command = \
             "msgcat --use-first " + \
             str( po ) + " " + \
-            directory_indicator_base_locale + os.sep + language_code + "/LC_MESSAGES/indicatorbase.po " + \
-            "--output-file=" + str( po )
+            str( directory_indicator_base_locale / language_code / "LC_MESSAGES" / "indicatorbase.po" ) + \
+            " --output-file=" + str( po )
 
         subprocess.call( command, shell = True )
 
@@ -228,7 +224,7 @@ def _process_locale( directory_dist, indicator_name ):
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         command = \
             "msgfmt " + str( po ) + \
-            " --output-file=" + str( po.parent ) + os.sep + str( po.stem ) + ".mo"
+            " --output-file=" + str( po.parent / ( str( po.stem ) + ".mo" ) )
 
         subprocess.call( command, shell = True )
 
@@ -267,13 +263,15 @@ def _get_names_and_comments_from_mo_files(
 
 
 def _create_run_script( directory_platform_linux, indicator_name ):
-    indicatorbase_run_script_path = "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.sh"
+    indicatorbase_run_script_path = \
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.sh"
+
     with open( indicatorbase_run_script_path, 'r' ) as f:
         run_script_text = f.read()
 
     run_script_text = run_script_text.format( indicator_name = indicator_name )
 
-    indicator_run_script_path = str( directory_platform_linux ) + "/" + indicator_name + ".sh"
+    indicator_run_script_path = directory_platform_linux / ( indicator_name + ".sh" )
     with open( indicator_run_script_path, 'w' ) as f:
         f.write( run_script_text + '\n' )
 
@@ -285,9 +283,9 @@ def _create_run_script( directory_platform_linux, indicator_name ):
 
 
 def _create_symbolic_icons( directory_wheel, indicator_name ):
-    directory_icons = str( directory_wheel ) + "/" + indicator_name + "/src/" + indicator_name + "/icons"
-    for hicolor_icon in list( Path( directory_icons ).glob( "*.svg" ) ):
-        symbolic_icon = directory_icons + "/" + str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg"
+    directory_icons = directory_wheel / indicator_name / "src" / indicator_name / "icons"
+    for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
+        symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
         shutil.copy( hicolor_icon, symbolic_icon )
         with open( symbolic_icon, 'r' ) as f:
             svg_text = f.read()
@@ -322,7 +320,7 @@ def _create_dot_desktop(
         "indicatorvirtualbox" : "Categories=Utility" }
 
     indicatorbase_dot_desktop_path = \
-        "indicatorbase/src/indicatorbase/platform/linux/indicatorbase.py.desktop"
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop"
 
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
         dot_desktop_text = f.read()
@@ -346,8 +344,7 @@ def _create_dot_desktop(
             comment = "Comment=" + comment,
             categories = indicator_name_to_desktop_file_categories[ indicator_name ] )
 
-    indicator_dot_desktop_path = \
-        str( directory_platform_linux ) + "/" + indicator_name + ".py.desktop"
+    indicator_dot_desktop_path = directory_platform_linux / ( indicator_name + ".py.desktop" )
 
     with open( indicator_dot_desktop_path, 'w' ) as f:
         f.write( dot_desktop_text + '\n' )
@@ -363,29 +360,27 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     # By using copytree, the ENTIRE project is copied across;
     # however, the pyproject.toml explicitly defines what files/folders
     # are included in the build (and conversely what is excluded).
-    directory_indicator = str( directory_dist ) + os.sep + indicator_name
+    directory_indicator = directory_dist / indicator_name
     shutil.copytree( indicator_name, directory_indicator )
 
     # Remove any .whl
-    for item in Path( directory_indicator + "/src/" + indicator_name ).glob( "*.whl" ):
+    for item in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "*.whl" ):
         os.remove( item )
 
     # Remove any __pycache__
-    for item in Path( directory_indicator + "/src/" + indicator_name ).glob( "__pycache__" ):
+    for item in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "__pycache__" ):
         shutil.rmtree( item )
 
     shutil.copy(
-        "indicatorbase/src/indicatorbase/indicatorbase.py",
-        directory_indicator + "/src/" + indicator_name )
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
+        Path( '.' ) / directory_indicator / "src" / indicator_name )
 
     _create_pyproject_dot_toml( indicator_name, directory_dist )
 
-    command = "python3 tools/build_readme.py " + directory_indicator + ' ' + indicator_name
+    command = "python3 " + str( Path( '.' ) / "tools" / "build_readme.py" ) + ' ' + directory_indicator + ' ' + indicator_name
     subprocess.call( command, shell = True )
 
-    directory_platform_linux = \
-        Path( str( directory_dist ) + "/" + indicator_name + "/src/" + indicator_name + "/platform/linux" )
-
+    directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"
     directory_platform_linux.mkdir( parents = True )
 
     _process_locale( directory_dist, indicator_name )
@@ -394,7 +389,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
         _get_name_and_comments_from_indicator(
             indicator_name, directory_indicator )
 
-    directory_indicator_locale = directory_indicator + "/src/" + indicator_name + "/locale"
+    directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
 
     names_from_mo_files, comments_from_mo_files = \
         _get_names_and_comments_from_mo_files(
@@ -448,19 +443,19 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
     message = ""
     version_from_pyproject_toml = \
         _get_value_for_single_line_tag_from_pyproject_toml(
-            indicator_name + '/pyproject.toml',
+            Path( '.' ) / indicator_name / 'pyproject.toml',
             "version" )
 
     version_from_changelog_markdown = \
         _get_version_in_changelog_markdown(
-            indicator_name + "/src/" + indicator_name + "/CHANGELOG.md" )
+            Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" )
 
     if version_from_pyproject_toml == version_from_changelog_markdown:
         message = _run_checks_specific_to_indicator( indicator_name )
         if not message:
             message = _update_locale( indicator_name )
             if not message:
-                directory_dist = Path( directory_release + "/wheel/dist_" + indicator_name )
+                directory_dist = Path( '.' ) / directory_release / "wheel" / ( "dist_" + indicator_name )
                 if Path( directory_dist ).is_dir():
                     shutil.rmtree( str( directory_dist ) )
 
@@ -468,13 +463,12 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
                 if _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     _intialise_virtual_environment( "build", "pip", "PyGObject" )
-
                     command = \
-                        f". ./venv/bin/activate && " + \
-                        f"python3 -m build --outdir { str( directory_dist ) } { str( directory_dist ) }/{ indicator_name }"
+                        f". { Path( '.' ) / 'venv' / 'bin' / 'activate' } && " + \
+                        f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
 
                     subprocess.call( command, shell = True )
-                    shutil.rmtree( str( directory_dist ) + os.sep + indicator_name )
+                    shutil.rmtree( directory_dist / indicator_name )
 
     else:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
@@ -504,7 +498,7 @@ def _initialise_parser():
 
 if __name__ == "__main__":
     parser = _initialise_parser()
-    script_path_and_name = "tools/build_wheel.py"
+    script_path_and_name = Path( '.' ) / "tools" / "build_wheel.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         for indicator_name in args.indicators:

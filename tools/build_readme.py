@@ -31,6 +31,9 @@
 #   https://pygobject.readthedocs.io
 
 
+#TODO Change to Path( '.' ) / ...
+
+
 import argparse
 import datetime
 import re
@@ -39,7 +42,7 @@ import sys
 from enum import auto, Enum
 from pathlib import Path
 
-sys.path.append( "indicatorbase/src/indicatorbase" )
+sys.path.append( str( Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" ) )
 import indicatorbase
 
 

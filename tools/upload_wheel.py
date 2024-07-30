@@ -54,7 +54,7 @@ def _initialise_parser():
 
 if __name__ == "__main__":
     parser = _initialise_parser()
-    script_path_and_name = "tools/upload_wheel.py"
+    script_path_and_name = Path( '.' ) / "tools" / "upload_wheel.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         _intialise_virtual_environment( "pip", "twine" )
