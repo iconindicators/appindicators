@@ -410,7 +410,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         calendars = [ ]
         for root, directories, filenames in os.walk( "/usr/share/calendar" ):
             for filename in fnmatch.filter( filenames, "calendar.*" ):
-                calendars.append( os.path.join( root, filename ) )
+                calendars.append( os.path.join( root, filename ) )  #TODO Can this be converted to using Path?
 
         calendars.sort()
         return calendars
