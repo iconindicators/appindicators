@@ -63,7 +63,7 @@ def _initialise_parser():
 
 if __name__ == "__main__":
     parser = _initialise_parser()
-    script_path_and_name = Path( '.' ) / "tools" / "install_wheel.py"
+    script_path_and_name = "./tools/install_wheel.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         for indicator_name in args.indicators:

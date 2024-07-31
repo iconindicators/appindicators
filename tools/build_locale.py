@@ -26,7 +26,7 @@ import sys
 
 from pathlib import Path
 
-sys.path.append( str( Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" ) )
+sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
 
 
@@ -306,7 +306,7 @@ def _initialise_parser():
 
 if __name__ == "__main__":
     parser = _initialise_parser()
-    script_path_and_name = Path( '.' ) / "tools" / "build_locale.py"
+    script_path_and_name = "./tools/build_locale.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         project_metadata, message = _precheck( "indicatorbase" ) # Project metadata does not apply so ignore.

@@ -31,9 +31,6 @@
 #   https://pygobject.readthedocs.io
 
 
-#TODO Change to Path( '.' ) / ...
-
-
 import argparse
 import datetime
 import re
@@ -42,7 +39,7 @@ import sys
 from enum import auto, Enum
 from pathlib import Path
 
-sys.path.append( str( Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" ) )
+sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
 
 
@@ -744,7 +741,7 @@ def _get_license( indicator_name ):
 
 def _create_readme( directory_out, indicator_name ):
     if not Path( directory_out ).exists():
-        Path( directory_out ).mkdir( parents = True )
+        Path( directory_out ).mkdir( parents = True ) #TODO Check this.
 
     with open( Path( directory_out, "README.md" ), 'w' ) as f:
         f.write( _get_introduction( indicator_name ) )

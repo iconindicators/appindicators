@@ -41,7 +41,7 @@ def _intialise_virtual_environment( *modules_to_install ):
         subprocess.call( command, shell = True )
 
     command = \
-        f". { Path( '.' ) / 'venv' / 'bin' / 'activate' } && " + \
+        f"./venv/bin/activate && " + \
         f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
 
     subprocess.call( command, shell = True )
@@ -80,7 +80,7 @@ def _update_locale( indicator_name ):
     message = ""
     command = [
         f"python3",
-        f"{ Path( '.' ) / 'tools' / 'build_locale.py' }",
+        f"./tools/build_locale.py",
         f"{ indicator_name }" ]
 
     result = subprocess.run( command, capture_output = True, text = True )
@@ -463,7 +463,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
                 if _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     _intialise_virtual_environment( "build", "pip", "PyGObject" )
                     command = \
-                        f". { Path( '.' ) / 'venv' / 'bin' / 'activate' } && " + \
+                        f". ./venv/bin/activate && " + \
                         f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
 
                     subprocess.call( command, shell = True )
@@ -497,7 +497,7 @@ def _initialise_parser():
 
 if __name__ == "__main__":
     parser = _initialise_parser()
-    script_path_and_name = Path( '.' ) / "tools" / "build_wheel.py"
+    script_path_and_name = "./tools/build_wheel.py"
     if Path( script_path_and_name ).exists():
         args = parser.parse_args()
         for indicator_name in args.indicators:
