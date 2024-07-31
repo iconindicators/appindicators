@@ -366,7 +366,7 @@ class IndicatorLunar( IndicatorBase ):
             download_data_function, download_data_additional_arguments,
             load_data_function, load_data_additional_arguments ):
 
-        if self.is_cache_stale( utc_now, cache_basename, cache_maximum_age ):
+        if self.is_cache_stale( cache_basename, cache_maximum_age ):
             fresh_data = { }
             if next_download_time < utc_now: # Download is allowed (do not want to annoy third-party data provider).
                 download_data_filename = \
@@ -591,13 +591,13 @@ class IndicatorLunar( IndicatorBase ):
                 illumination_percentage,
                 bright_limb_angle_in_degrees )
 
-        icon_filename = \
+        icon_path = \
             self.write_cache_text(
                 svg_icon_text,
                 IndicatorLunar.ICON_CACHE_BASENAME,
                 IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
-        self.set_icon( icon_filename )
+        self.set_icon( str( icon_path ) )
 
 
     def notification_full_moon( self ):

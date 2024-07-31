@@ -27,7 +27,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
 import gi
-import os
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -160,10 +159,10 @@ class IndicatorFortune( IndicatorBase ):
         for location, enabled in self.fortunes:
             if enabled:
                 no_enabled_fortunes = False
-                if os.path.isdir( location ):
+                if Path( location ).is_dir():
                     locations += "'" + location.rstrip( "/" ) + "/" + "' " # Remove all trailing slashes, then add one in as 'fortune' needs it!
 
-                elif os.path.isfile( location ):
+                elif Path( location ).is_file():
                     locations += "'" + location.replace( ".dat", "" ) + "' " # 'fortune' doesn't want the extension.
 
         if no_enabled_fortunes:
@@ -242,7 +241,7 @@ class IndicatorFortune( IndicatorBase ):
 
         store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
         for location, enabled in self.fortunes:
-            if os.path.isfile( location ) or os.path.isdir( location ):
+            if Path( location ).is_file() or Path( location ).is_dir():
                 store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
 
             else:

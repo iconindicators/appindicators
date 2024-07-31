@@ -314,13 +314,13 @@ class IndicatorTest( IndicatorBase ):
 
 
     def __use_icon_dynamically_created( self, menuitem ):
-        icon_filename = \
+        icon_path = \
             self.write_cache_text(
                 self.__get_svg_icon_text( menuitem.get_name(), 35, 65 ),
                 IndicatorTest.CACHE_ICON_BASENAME,
                 IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
-        self.set_icon( icon_filename )
+        self.set_icon( str( icon_path ) )
 
 
     # A direct copy from indicatorlunar to test dynamically created SVG icons in the user cache.

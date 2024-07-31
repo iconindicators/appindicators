@@ -18,13 +18,7 @@
 
 #TODO Check all Path()...those that are clearly only for use on Linux
 # should probably not use/need a Path.
-
-
-#TODO Might be able to replace os.path.absolute() with Path().absolute.
-
-
-#TODO Look at all calls for os.path....
-# Is there a Path() replacement?
+# Maybe also look for 'command'?
 
 
 #TODO Check subprocess call/get...they may be deprecated.
@@ -299,7 +293,6 @@ import gi
 import inspect
 import json
 import logging.handlers
-import os
 import pickle
 import shutil
 import signal
@@ -345,7 +338,7 @@ from zipfile import ZipFile
 
 class IndicatorBase( ABC ):
 
-    __AUTOSTART_PATH = os.getenv( "HOME" ) + "/.config/autostart/" #TODO Convert to Path
+    __AUTOSTART_PATH = Path.home() / ".config" / "autostart"
 
     __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
@@ -466,7 +459,7 @@ class IndicatorBase( ABC ):
         self.version = project_metadata[ "Version" ]
         self.website = project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
-        self.log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log" #TODO Convert to Path
+        self.log = Path.home() / ( self.indicator_name + ".log" )
         logging.basicConfig(
             format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             level = logging.DEBUG,
@@ -501,7 +494,7 @@ class IndicatorBase( ABC ):
             error_message = None
             first_wheel = next( path.glob( "*.whl" ), None )
             if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { os.path.realpath( path ) }"
+                error_message = f"Unable to locate a .whl in { path.absolute() }"
 
             else:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
@@ -513,11 +506,13 @@ class IndicatorBase( ABC ):
 
             return project_metadata, error_message
 
-        
+
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
         try:
             # Obtain pyproject.toml information from pip.
+#TODO Test this clause!
+# Also print out the two error messages above to see if the paths are okay.
             project_metadata = metadata.metadata( indicator_name )
             error_message = None
 
@@ -526,13 +521,13 @@ class IndicatorBase( ABC ):
                 # Looking for a .whl within the indicator directory,
                 # but coming from a build script so the path is different.
                 path = Path( '.' ) / indicator_name / "src" / indicator_name
-                project_metadata, error_message = get_first_wheel( path )
 
             else:
                 # No pip information found; assume in development/testing.
                 # Look for a .whl file in the same directory as the indicator.
                 path = Path( '.' )
-                project_metadata, error_message = get_first_wheel( path )
+
+            project_metadata, error_message = get_first_wheel( path )
 
         return project_metadata, error_message
 
@@ -540,41 +535,35 @@ class IndicatorBase( ABC ):
     def initialise_desktop_file( self ):
         # Ensure the .desktop file is present,
         # either in a virtual environment or in development.
-        self.desktop_file = self.indicator_name + ".py.desktop" #TODO I think this should be self.__desktop_file and so too for the two below.
-
-        self.desktop_file_user_home = \
-            IndicatorBase.__AUTOSTART_PATH + \
-            self.desktop_file
+        self.desktop_file = self.indicator_name + ".py.desktop"
+        self.desktop_file_user_home = IndicatorBase.__AUTOSTART_PATH / self.desktop_file
 
         self.desktop_file_virtual_environment = \
-            str( Path( __file__ ).parent ) + \
-            "/platform/linux/" + \
-            self.desktop_file #TODO Convert to path
+            Path( __file__ ).parent / "platform" / "linux" / self.desktop_file
 
         error_message = None
-        if not Path( self.desktop_file_virtual_environment ).exists():
-            # Assume running in development; extract the .desktop file
-            # from (the first) wheel located in the development folder.
+        if not self.desktop_file_virtual_environment.exists():
+            # Cannot find the desktop file in the virtual environment.
+            # Extract the .desktop file from (the first) wheel located in the development folder.
             first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
             if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { os.path.realpath( Path( '.' ) ) }" #TODO Make sure the path printed is correct.
+                error_message = f"Unable to locate a .whl in { Path( '.' ).absolute() }"
 
             else:
-                desktop_file_in_wheel = \
-                    self.indicator_name + \
-                    "/platform/linux/" + \
-                    self.indicator_name + ".py.desktop" #TODO Convert to Path
-
                 with ZipFile( first_wheel, 'r' ) as z:
+                    desktop_file_in_wheel = \
+                        self.indicator_name + \
+                        "/platform/linux/" + \
+                        self.desktop_file
+
                     if desktop_file_in_wheel not in z.namelist():
-                        error_message = f"Unable to locate { desktop_file_in_wheel } in { first_wheel }." #TODO Make sure the path printed is correct.
+                        error_message = \
+                            f"Unable to locate { desktop_file_in_wheel } in { first_wheel.absolute() }."
 
                     else:
                         z.extract( desktop_file_in_wheel, path = "/tmp" )
-                        self.desktop_file_virtual_environment = \
-                            str( Path( "/tmp/" + desktop_file_in_wheel ) )  #TODO Convert to Path.
-
-                        if not Path( self.desktop_file_virtual_environment ).exists():
+                        self.desktop_file_virtual_environment = Path( "/tmp" ) / desktop_file_in_wheel
+                        if not self.desktop_file_virtual_environment.exists():
                             error_message = f"Unable to locate { self.desktop_file_virtual_environment }!"
 
                 z.close()
@@ -834,8 +823,8 @@ class IndicatorBase( ABC ):
             _( "changelog" ),
             _( "text file." ) )
 
-        error_log = Path( os.getenv( "HOME" ) ) / ( self.indicator_name + ".log" )
-        if os.path.exists( error_log ):
+        error_log = Path.home() / ( self.indicator_name + ".log" )
+        if error_log.is_file():
             self.__add_hyperlink_label(
                 about_dialog,
                 error_log,
@@ -1606,7 +1595,7 @@ class IndicatorBase( ABC ):
         autostart = False
         delay = 0
         try:
-            if os.path.exists( self.desktop_file_user_home ):
+            if self.desktop_file_user_home.is_file():
                 with open( self.desktop_file_user_home, 'r' ) as f:
                     for line in f:
                         if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + "=true" in line:
@@ -1624,10 +1613,9 @@ class IndicatorBase( ABC ):
 
 
     def set_autostart_and_delay( self, is_set, delay ):
-        if not os.path.exists( IndicatorBase.__AUTOSTART_PATH ):
-            os.makedirs( IndicatorBase.__AUTOSTART_PATH )
+        IndicatorBase.__AUTOSTART_PATH.mkdir( exist_ok = True )
 
-        if not os.path.exists( self.desktop_file_user_home ):
+        if not self.desktop_file_user_home.is_file():
             shutil.copy( self.desktop_file_virtual_environment, self.desktop_file_user_home )
 
         try:
@@ -1785,8 +1773,9 @@ class IndicatorBase( ABC ):
         return GLib.timeout_add_seconds( delay, self.__save_config, False )
 
 
-    # Copies .config using the old indicator name format (using hyphens) to the new format, sans hyphens.
-    def __copy_config_to_new_directory( self ):
+    # Copies .config using the old indicator name format (using hyphens)
+    # to the new format, sans hyphens.
+    def __copy_config_to_new_directory( self, config_file ):
         mapping = {
             "indicatorfortune":                 "indicator-fortune",
             "indicatorlunar":                   "indicator-lunar",
@@ -1799,22 +1788,22 @@ class IndicatorBase( ABC ):
             "indicatortest":                    "indicator-test",
             "indicatorvirtualbox":              "indicator-virtual-box" }
 
-        config_file = \
-            self.__get_config_directory() + \
-            self.indicator_name + \
-            IndicatorBase.__EXTENSION_JSON
+        config_file_old = str( config_file ).replace( self.indicator_name, mapping[ self.indicator_name ] )
+        config_file_old = Path( config_file_old )
 
-        config_file_old = config_file.replace( self.indicator_name, mapping[ self.indicator_name ] )
-        if not os.path.isfile( config_file ) and os.path.isfile( config_file_old ):
+        if not config_file.is_file() and config_file_old.is_file():
             shutil.copyfile( config_file_old, config_file )
 
 
     # Read a dictionary of configuration from a JSON text file.
     def __load_config( self ):
-        self.__copy_config_to_new_directory()
-        config_file = self.__get_config_directory() + self.indicator_name + IndicatorBase.__EXTENSION_JSON
+        config_file = \
+            self.__get_config_directory() / ( self.indicator_name + IndicatorBase.__EXTENSION_JSON )
+
+        self.__copy_config_to_new_directory( config_file )
+
         config = { }
-        if os.path.isfile( config_file ):
+        if config_file.is_file():
             try:
                 with open( config_file, 'r' ) as f_in:
                     config = json.load( f_in )
@@ -1829,15 +1818,15 @@ class IndicatorBase( ABC ):
 
     # Write a dictionary of user configuration to a JSON text file.
     #
-    # returnStatus If True, will return a boolean indicating success/failure.
-    #              If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
+    # return_status 
+    #   If True, will return a boolean indicating success/failure.
+    #   If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
     def __save_config( self, return_status = True ):
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version
+
         config_file = \
-            self.__get_config_directory() + \
-            self.indicator_name + \
-            IndicatorBase.__EXTENSION_JSON
+            self.__get_config_directory() / ( self.indicator_name + IndicatorBase.__EXTENSION_JSON )
 
         success = True
         try:
@@ -1855,19 +1844,20 @@ class IndicatorBase( ABC ):
 
     # Return the full directory path to the user config directory for the current indicator.
     def __get_config_directory( self ):
-        return self.__get_user_directory( "XDG_CONFIG_HOME", ".config", self.indicator_name )
+        return self.__get_user_directory( ".config", self.indicator_name )
 
 
     # Finds the most recent file in the cache with the given basename
     # and if the timestamp is older than the current date/time
     # plus the maximum age, returns True, otherwise False.
     # If no file can be found, returns True.
-    def is_cache_stale( self, utc_now, basename, maximum_age_in_hours ):
+    def is_cache_stale( self, basename, maximum_age_in_hours ):
         cache_date_time = self.get_cache_date_time( basename )
         if cache_date_time is None:
             stale = True
 
         else:
+            utc_now = datetime.datetime.now( datetime.timezone.utc )
             stale = ( cache_date_time + datetime.timedelta( hours = maximum_age_in_hours ) ) < utc_now
 
         return stale
@@ -1881,9 +1871,9 @@ class IndicatorBase( ABC ):
     def get_cache_date_time( self, basename ):
         expiry = None
         the_file = ""
-        for file in os.listdir( self.get_cache_directory() ):
-            if file.startswith( basename ) and file > the_file:
-                the_file = file
+        for file in self.get_cache_directory().iterdir():
+            if file.name.startswith( basename ) and file.name > the_file:
+                the_file = file.name
 
         if the_file: # A value of "" evaluates to False.
             date_time_component = the_file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
@@ -1900,11 +1890,12 @@ class IndicatorBase( ABC ):
 
     # Create a filename with timestamp and extension to be used to save data to the cache.
     def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
-        return \
-            self.get_cache_directory() + \
+        filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
+
+        return self.get_cache_directory() / filename
 
 
     # Search through the cache for all files matching the basename.
@@ -1913,12 +1904,12 @@ class IndicatorBase( ABC ):
     def get_cache_newest_filename( self, basename ):
         cache_directory = self.get_cache_directory()
         cache_file = ""
-        for file in os.listdir( cache_directory ):
-            if file.startswith( basename ) and file > cache_file:
-                cache_file = file
+        for file in cache_directory.iterdir():
+            if file.name.startswith( basename ) and file.name > cache_file:
+                cache_file = file.name
 
         if cache_file:
-            cache_file = cache_directory + cache_file
+            cache_file = cache_directory / cache_file
 
         else:
             cache_file = None
@@ -1930,40 +1921,33 @@ class IndicatorBase( ABC ):
     #
     # filename: The file to remove.
     #
-    # The file removed will be either
-    #     ${XDGKey}/applicationBaseDirectory/fileName
-    # or
+    # The file removed will be
     #     ~/.cache/applicationBaseDirectory/fileName
     def remove_file_from_cache( self, filename ):
-        cache_directory = self.get_cache_directory()
-        for file in os.listdir( cache_directory ):
-            if file == filename:
-                os.remove( cache_directory + file )
+        for file in self.get_cache_directory().iterdir():
+            if file.name == filename:
+                file.unlink()
                 break
 
 
     # Removes out of date cache files for a given basename.
     #
     # basename: The text used to form the file name, typically the name of the calling application.
-    # maximumAgeInHours: Anything older than the maximum age (hours) is deleted.
+    # maximum_age_in_hours: Anything older than the maximum age (hours) is deleted.
     #
     # Any file in the cache directory matching the pattern
-    #
-    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # and is older than the cache maximum age is discarded.
     #
     # Any file extension is ignored in determining if the file should be deleted or not.
     def flush_cache( self, basename, maximum_age_in_hours ):
-        cache_directory = self.get_cache_directory()
         cache_maximum_age_date_time = \
             datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
 
-        for file in os.listdir( cache_directory ):
-            if file.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
-                date_time = file[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
+        for file in self.get_cache_directory().iterdir():
+            if file.name.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
+                date_time = file.name[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
                 if date_time.isdigit():
                     file_date_time = \
                         datetime.datetime.strptime(
@@ -1971,7 +1955,7 @@ class IndicatorBase( ABC ):
                             IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
                     if file_date_time < cache_maximum_age_date_time:
-                        os.remove( cache_directory + file )
+                        file.unlink()
 
 
     # Read the most recent binary file from the cache.
@@ -1979,8 +1963,6 @@ class IndicatorBase( ABC ):
     # basename: The text used to form the file name, typically the name of the calling application.
     #
     # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
     # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
@@ -1993,13 +1975,13 @@ class IndicatorBase( ABC ):
     def read_cache_binary( self, basename ):
         cache_file = ""
         cache_directory = self.get_cache_directory()
-        for file in os.listdir( cache_directory ):
-            if file.startswith( basename ) and file > cache_file:
-                cache_file = file
+        for file in cache_directory.iterdir():
+            if file.name.startswith( basename ) and file.name > cache_file:
+                cache_file = file.name
 
         data = None
         if cache_file: # A value of "" evaluates to False.
-            filename = cache_directory + cache_file
+            filename = cache_directory / cache_file
             try:
                 with open( filename, 'rb' ) as f_in:
                     data = pickle.load( f_in )
@@ -2014,23 +1996,21 @@ class IndicatorBase( ABC ):
 
     # Writes an object as a binary file to the cache.
     #
-    # binaryData: The object to write.
+    # binary_data: The object to write.
     # basename: The text used to form the file name, typically the name of the calling application.
     # extension: Added to the end of the basename and date/time.
     #
     # The object will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    # or
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
     #
-    # Returns True on success; False otherwise.
+    # Returns filename written on success; None otherwise.
     def write_cache_binary( self, binary_data, basename, extension = "" ):
-        success = True
-        cache_file = \
-            self.get_cache_directory() + \
+        filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
+
+        cache_file = self.get_cache_directory() / filename
 
         try:
             with open( cache_file, 'wb' ) as f_out:
@@ -2039,9 +2019,9 @@ class IndicatorBase( ABC ):
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing to cache: " + cache_file )
-            success = False
+            cache_file = None
 
-        return success
+        return cache_file
 
 
     # Read the named text file from the cache.
@@ -2050,7 +2030,7 @@ class IndicatorBase( ABC ):
     #
     # Returns the contents of the text file; None on error and logs.
     def read_cache_text_without_timestamp( self, filename ):
-        return self.__read_cache_text( self.get_cache_directory() + filename )
+        return self.__read_cache_text( self.get_cache_directory() / filename )
 
 
     # Read the most recent text file from the cache.
@@ -2058,11 +2038,10 @@ class IndicatorBase( ABC ):
     # basename: The text used to form the file name, typically the name of the calling application.
     #
     # All files in cache directory are filtered based on the pattern
-    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
-    # or
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
-    # For example, for an application 'apple', the first file will be caught, whilst the second is filtered out:
+    # For example, for an application 'apple', the first file will be caught,
+    # whilst the second is filtered out:
     #    ~/.cache/fred/apple-20170629174950
     #    ~/.cache/fred/orange-20170629174951
     #
@@ -2072,19 +2051,19 @@ class IndicatorBase( ABC ):
     def read_cache_text( self, basename ):
         cache_file = ""
         cache_directory = self.get_cache_directory()
-        for file in os.listdir( cache_directory ):
-            if file.startswith( basename ) and file > cache_file:
-                cache_file = file
+        for file in cache_directory.iterdir():
+            if file.name.startswith( basename ) and file.name > cache_file:
+                cache_file = file.name
 
         if cache_file:
-            cache_file = cache_directory + cache_file
+            cache_file = cache_directory / cache_file
 
         return self.__read_cache_text( cache_file )
 
 
     def __read_cache_text( self, cache_file ):
         text = ""
-        if os.path.isfile( cache_file ):
+        if cache_file.is_file():
             try:
                 with open( cache_file, 'r' ) as f_in:
                     text = f_in.read()
@@ -2104,7 +2083,7 @@ class IndicatorBase( ABC ):
     #
     # Returns filename written on success; None otherwise.
     def write_cache_text_without_timestamp( self, text, filename ):
-        return self.__write_cache_text( text, self.get_cache_directory() + filename )
+        return self.__write_cache_text( text, self.get_cache_directory() / filename )
 
 
     # Writes text to a file in the cache.
@@ -2114,19 +2093,16 @@ class IndicatorBase( ABC ):
     # extension: Added to the end of the basename and date/time.
     #
     # The text will be written to the cache directory using the pattern
-    #     ${XDGKey}/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
-    # or
     #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
     #
     # Returns filename written on success; None otherwise.
     def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
-        cache_file = \
-            self.get_cache_directory() + \
+        filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
-        return self.__write_cache_text( text, cache_file )
+        return self.__write_cache_text( text, self.get_cache_directory() / filename )
 
 
     def __write_cache_text( self, text, cache_file ):
@@ -2137,44 +2113,27 @@ class IndicatorBase( ABC ):
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing to cache: " + cache_file )
-            cache_file = None
 
         return cache_file
 
 
     # Return the full directory path to the user cache directory for the current indicator.
     def get_cache_directory( self ):
-        return self.__get_user_directory( "XDG_CACHE_HOME", ".cache", self.indicator_name )
+        return self.__get_user_directory( ".cache", self.indicator_name )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
     #
-    # XDGKey: The XDG environment variable used to obtain the base directory of the configuration/cache.
-    #         https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-    # userBaseDirectory: The directory name used to hold the configuration/cache
-    #                    (used when the XDGKey is not present in the environment).
-    # applicationBaseDirectory: The directory name at the end of the final user directory to specify the application.
+    # user_base_directory:
+    #   The directory name used to hold the configuration/cache.
+    # application_base_directory:
+    #   The directory name at the end of the final user directory to specify the application.
     #
-    # The full directory path will be either
-    #    ${XDGKey}/applicationBaseDirectory
-    # or
-    #    ~/.userBaseDirectory/applicationBaseDirectory
-    def __get_user_directory( self, xdg_key, user_base_directory, application_base_directory ):
-#TODO Convert to using Path( '.' )...watch the trailing os.sep...the caller needs to handle this!    
-        if xdg_key in os.environ:
-            directory = \
-                os.environ[ xdg_key ] + os.sep + \
-                application_base_directory + os.sep
-
-        else:
-            directory = \
-                os.path.expanduser( '~' ) + os.sep + \
-                user_base_directory + os.sep + \
-                application_base_directory + os.sep
-
-        if not os.path.isdir( directory ):
-            os.mkdir( directory )
-
+    # The full directory path will be
+    #    ~/user_base_directory/application_base_directory
+    def __get_user_directory( self, user_base_directory, application_base_directory ):
+        directory = Path.home() / user_base_directory / application_base_directory
+        directory.mkdir( exist_ok = True )
         return directory
 
 
@@ -2241,8 +2200,6 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
         if self.stream:
             self.stream.close()
 
-        if os.path.exists( self.baseFilename ): # self.baseFilename is defined in parent class.
-            os.remove( self.baseFilename )
-
+        Path( self.baseFilename ).unlink( missing_ok = True ) # self.baseFilename is defined in parent class.
         self.mode = 'a'
         self.stream = self._open()

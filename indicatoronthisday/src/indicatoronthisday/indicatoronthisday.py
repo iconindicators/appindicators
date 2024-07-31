@@ -53,6 +53,7 @@ import gi
 import os
 
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -161,7 +162,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Write the path of each calendar file to a temporary file - allows for one call to calendar.
         content = ""
         for calendar in self.calendars:
-            if os.path.isfile( calendar ):
+            if Path( calendar ).is_file():
                 content += "#include <" + calendar + ">\n"
 
         self.write_cache_text_without_timestamp( content, IndicatorOnThisDay.CALENDARS_FILENAME )
@@ -170,8 +171,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         events_sorted_by_date = [ ]
         command = \
             "calendar -f " + \
-            self.get_cache_directory() + \
-            IndicatorOnThisDay.CALENDARS_FILENAME + \
+            str( self.get_cache_directory() / IndicatorOnThisDay.CALENDARS_FILENAME ) + \
             " -A 366"
 
         for line in self.process_get( command ).splitlines():
@@ -236,7 +236,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 store.append( [ calendar, None ] )
 
         for calendar in self.calendars:
-            if os.path.isfile( calendar ):
+            if Path( calendar ).is_file():
                 store.append( [ calendar, Gtk.STOCK_APPLY ] )
 
             else:
@@ -408,9 +408,9 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def get_calendars( self ):
         calendars = [ ]
-        for root, directories, filenames in os.walk( "/usr/share/calendar" ):
+        for root, directories, filenames in os.walk( "/usr/share/calendar" ): # Path.walk() only available in Python 3.12.
             for filename in fnmatch.filter( filenames, "calendar.*" ):
-                calendars.append( os.path.join( root, filename ) )  #TODO Can this be converted to using Path?
+                calendars.append( str( Path( root ).joinpath( filename ) ) )
 
         calendars.sort()
         return calendars
@@ -520,8 +520,14 @@ class IndicatorOnThisDay( IndicatorBase ):
                     self.show_dialog_ok( dialog, _( "The calendar path cannot be empty." ) )
                     file_entry.grab_focus()
                     continue
+                #
+                # if not is_system_calendar and not os.path.exists( file_entry.get_text().strip() ):
+                #     self.show_dialog_ok( dialog, _( "The calendar path does not exist." ) )
+                #     file_entry.grab_focus()
+                #     continue
+                #TODO Check below
 
-                if not is_system_calendar and not os.path.exists( file_entry.get_text().strip() ):
+                if not is_system_calendar and not Path( file_entry.get_text().strip() ).is_file():
                     self.show_dialog_ok( dialog, _( "The calendar path does not exist." ) )
                     file_entry.grab_focus()
                     continue

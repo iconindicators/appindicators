@@ -27,7 +27,6 @@
 
 import argparse
 import gettext
-import os
 import re
 import shutil
 import stat
@@ -92,7 +91,7 @@ def _update_locale( indicator_name ):
 
 
 def _chmod( file, user_permission, group_permission, other_permission ):
-    os.chmod( file, user_permission | group_permission | other_permission )
+    Path( file ).chmod( user_permission | group_permission | other_permission )
 
 
 def _get_name_and_comments_from_indicator( indicator_name, directory_indicator ):
@@ -364,12 +363,12 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     shutil.copytree( indicator_name, directory_indicator )
 
     # Remove any .whl
-    for item in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "*.whl" ):
-        os.remove( item )
+    for wheel in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "*.whl" ):
+        wheel.unlink()
 
     # Remove any __pycache__
-    for item in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "__pycache__" ):
-        shutil.rmtree( item )
+    for pycache in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "__pycache__" ):
+        shutil.rmtree( pycache )
 
     shutil.copy(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
@@ -377,7 +376,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
 
     _create_pyproject_dot_toml( indicator_name, directory_dist )
 
-    command = "python3 " + str( Path( '.' ) / "tools" / "build_readme.py" ) + ' ' + directory_indicator + ' ' + indicator_name
+    command = "python3 ./tools/build_readme.py " + str( directory_indicator ) + ' ' + indicator_name
     subprocess.call( command, shell = True )
 
     directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"
@@ -409,7 +408,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     _create_run_script( directory_platform_linux, indicator_name )
 
     _create_symbolic_icons( directory_dist, indicator_name )
-    
+
     return ( name != "" ) and ( comments != "" )
 
 
