@@ -834,7 +834,6 @@ class IndicatorBase( ABC ):
             _( "changelog" ),
             _( "text file." ) )
 
-        error_log2 = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log" #TODO Convert to path
         error_log = Path( os.getenv( "HOME" ) ) / ( self.indicator_name + ".log" )
         if os.path.exists( error_log ):
             self.__add_hyperlink_label(
