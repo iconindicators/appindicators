@@ -20,6 +20,13 @@
 # should probably not use/need a Path.
 
 
+#TODO Might be able to replace os.path.absolute() with Path().absolute.
+
+
+#TODO Look at all calls for os.path....
+# Is there a Path() replacement?
+
+
 #TODO Check subprocess call/get...they may be deprecated.
 
 
@@ -533,7 +540,7 @@ class IndicatorBase( ABC ):
     def initialise_desktop_file( self ):
         # Ensure the .desktop file is present,
         # either in a virtual environment or in development.
-        self.desktop_file = self.indicator_name + ".py.desktop"
+        self.desktop_file = self.indicator_name + ".py.desktop" #TODO I think this should be self.__desktop_file and so too for the two below.
 
         self.desktop_file_user_home = \
             IndicatorBase.__AUTOSTART_PATH + \
@@ -613,10 +620,9 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_changelog_markdown_path():
-        #TODO COnvert to path
-        changelog = str( Path( __file__ ).parent ) + "/CHANGELOG.md" # Path under virtual environment.
+        changelog = Path( __file__ ).parent / "CHANGELOG.md" # Path under virtual environment.
         if not Path( changelog ).exists():
-            changelog = str( os.path.realpath( Path( '.' ) ) ) + "/CHANGELOG.md" # Assume running in development.
+            changelog = Path( '.' ).absolute() / "CHANGELOG.md" # Assume running in development.
 
         return changelog
 
@@ -828,7 +834,8 @@ class IndicatorBase( ABC ):
             _( "changelog" ),
             _( "text file." ) )
 
-        error_log = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log" #TODO Convert to path
+        error_log2 = os.getenv( "HOME" ) + '/' + self.indicator_name + ".log" #TODO Convert to path
+        error_log = Path( os.getenv( "HOME" ) ) / ( self.indicator_name + ".log" )
         if os.path.exists( error_log ):
             self.__add_hyperlink_label(
                 about_dialog,
@@ -853,10 +860,10 @@ class IndicatorBase( ABC ):
             anchor_text,
             right_text ):
 
-        tooltip = "file://" + file_path
+        tooltip = "file://" + str( file_path )
         markup = \
             left_text + \
-            " <a href=\'" + "file://" + file_path + "\' title=\'" + tooltip + "\'>" + \
+            " <a href=\'" + "file://" + str( file_path ) + "\' title=\'" + tooltip + "\'>" + \
             anchor_text + "</a> " + \
             right_text
 
