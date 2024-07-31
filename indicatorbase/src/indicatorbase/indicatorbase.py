@@ -499,7 +499,7 @@ class IndicatorBase( ABC ):
             else:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
                 if first_metadata is None:
-                    error_message = f"No metadata was found in { first_wheel.absolute() }!" #TODO Make sure the path printed is correct.
+                    error_message = f"No metadata was found in { first_wheel.absolute() }!"
 
                 else:
                     project_metadata = first_metadata.metadata
@@ -518,14 +518,12 @@ class IndicatorBase( ABC ):
             if from_build_script:
                 # Looking for a .whl within the indicator directory,
                 # but coming from a build script so the path is different.
-                # first_wheel = next( ( Path( '.' ) / indicator_name / "src" / indicator_name ).glob( "*.whl" ), None ) #TODO Why is this commented out?
                 path = Path( '.' ) / indicator_name / "src" / indicator_name
                 project_metadata, error_message = get_first_wheel( path )
 
             else:
                 # No pip information found; assume in development/testing.
                 # Look for a .whl file in the same directory as the indicator.
-                # first_wheel = next( path.glob( "*.whl" ), None ) #TODO Why is this commented out?
                 path = Path( '.' )
                 project_metadata, error_message = get_first_wheel( path )
 
