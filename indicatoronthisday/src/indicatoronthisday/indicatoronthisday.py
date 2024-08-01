@@ -464,7 +464,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             is_system_calendar = False
 
         else: # This is an edit.
-            is_system_calendar = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars()
+            is_system_calendar = \
+                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars()
 
         grid = self.create_grid()
 
@@ -520,12 +521,6 @@ class IndicatorOnThisDay( IndicatorBase ):
                     self.show_dialog_ok( dialog, _( "The calendar path cannot be empty." ) )
                     file_entry.grab_focus()
                     continue
-                #
-                # if not is_system_calendar and not os.path.exists( file_entry.get_text().strip() ):
-                #     self.show_dialog_ok( dialog, _( "The calendar path does not exist." ) )
-                #     file_entry.grab_focus()
-                #     continue
-                #TODO Check below
 
                 if not is_system_calendar and not Path( file_entry.get_text().strip() ).is_file():
                     self.show_dialog_ok( dialog, _( "The calendar path does not exist." ) )
