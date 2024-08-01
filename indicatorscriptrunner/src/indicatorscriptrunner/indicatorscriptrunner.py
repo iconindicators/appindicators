@@ -20,6 +20,15 @@
 #    notify-send "System Usage:" "RAM: $( free | grep Mem | awk ' { printf "%.0f\n", $3/$2*100 } ' )%  HDD: $( df -h /dev/sda1 | grep sda1 | awk ' { print $5 } '  )"
 #
 # See if it works also on desktop.
+#
+# Only flashes up a console on the desktop (same as laptop I think)...
+# and does not show a notification...
+#
+# Original...
+# notify-send \"System Usage:\" \"RAM: $(free | awk '\\''/Mem/ { printf \"%.0f\\n\", $3/$2*100 }'\\'')%    HDD: $(df -h /dev/sda2 | awk '\\''/sda2/ { print $5 } '\\'' ) \"
+#
+# New...
+# notify-send \"System Usage:\" \"RAM: $( free | grep Mem | awk ' { printf \"%.0f\\n\", $3/$2*100 } ' )%  HDD: $( df -h /dev/sda1 | grep sda1 | awk ' { print $5 } '  )\"
 
 
 #TODO Got this on laptop:
@@ -33,6 +42,7 @@
 #TODO On laptop
 # With a foreground script, checking "leave terminal open"
 # does not leave terminal open (on laptop Debian 12)
+# Same on desktop...at least for the ram/hdd script/command.
 
 
 #TODO
