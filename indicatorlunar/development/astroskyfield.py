@@ -84,10 +84,10 @@ from astrobase import AstroBase
 class AstroSkyfield( AstroBase ):
 
     # Planets ephemeris must be created using create_ephemeris_planets.py.
-    __EPHEMERIS_PLANETS = load( str( Path( __file__ ).parent ) + "/data/planets.bsp" ) #TODO Convert to Path( '.' ) /
+    __EPHEMERIS_PLANETS = load( str( Path( __file__ ).parent / "data" / "planets.bsp" ) )
 
     # Stars ephemeris must be created using create_ephemeris_stars.py.
-    with load.open( str( Path( __file__ ).parent ) + "/data/stars.dat" ) as f: #TODO Convert to Path( '.' ) /
+    with load.open( str( Path( __file__ ).parent / "data" / "stars.dat" ) ) as f:
         __EPHEMERIS_STARS = hipparcos.load_dataframe( f )
 
 
