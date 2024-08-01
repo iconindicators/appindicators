@@ -1922,7 +1922,7 @@ class IndicatorBase( ABC ):
     # filename: The file to remove.
     #
     # The file removed will be
-    #     ~/.cache/applicationBaseDirectory/fileName
+    #     ~/.cache/application_base_directory/filename
     def remove_file_from_cache( self, filename ):
         for file in self.get_cache_directory().iterdir():
             if file.name == filename:
