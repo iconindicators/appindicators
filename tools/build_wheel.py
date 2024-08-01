@@ -63,8 +63,6 @@ def _run_checks_specific_to_indicator( indicator_name ):
     return message
 
 
-#TODO Possibly upgrade all calls to use subprocess.run (in all scripts and indicators?
-# Requires changing the call and capturing return.
 def _update_locale( indicator_name ):
     message = ""
     command = [
