@@ -20,10 +20,9 @@
 # to a virtual environment within $HOME/.local.
 
 
-import argparse
 import subprocess
 
-from pathlib import Path
+import utils
 
 
 def _install_wheel_for_indicator( directory_release, indicator_name ):
@@ -42,35 +41,24 @@ def _install_wheel_for_indicator( directory_release, indicator_name ):
     subprocess.call( command, shell = True )
 
 
-def _initialise_parser():
-    parser = \
-        argparse.ArgumentParser(
-            description = "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local." )
-
-    parser.add_argument(
-        "directory_release",
-        help = "The directory containing the Python wheel. " +
-               "If the directory specified is 'release', " +
-               "the Python wheel must be located at 'release/wheel'." )
-
-    parser.add_argument(
-        "indicators",
-        nargs = '+',
-        help = "The list of indicators (such as indicatorfortune indicatorlunar) to install." )
-
-    return parser
-
-
 if __name__ == "__main__":
-    parser = _initialise_parser()
-    script_path_and_name = "./tools/install_wheel.py"
-    if Path( script_path_and_name ).exists():
-        args = parser.parse_args()
+    if utils.is_correct_directory( "./tools/install_wheel.py", "release indicatorfortune" ):
+        args = \
+            utils.initialiase_parser_and_get_arguments(
+                "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local.",
+                ( "directory_release", "indicators" ),
+                {
+                    "directory_release" :
+                        "The directory containing the Python wheel. " +
+                        "If the directory specified is 'release', " +
+                        "the Python wheel must be located at 'release/wheel'.",
+                    "indicators" :
+                        "The list of indicators (such as indicatorfortune indicatorlunar) to install." },
+                {
+                    "indicators" :
+                        "+" } )
+
         for indicator_name in args.indicators:
             _install_wheel_for_indicator( args.directory_release, indicator_name )
 
-    else:
-        print(
-            f"The script must be run from the top level directory (one above utils).\n"
-            f"For example:\n"
-            f"\tpython3 { script_path_and_name } release indicatorfortune" )
+        utils.intialise_virtual_environment( "pip", "twine" )

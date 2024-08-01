@@ -19,12 +19,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import argparse
 import datetime
 import subprocess
 import sys
 
 from pathlib import Path
+
+import utils
 
 sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
@@ -292,23 +293,14 @@ def _precheck( indicator_name ):
     return project_metadata, message
 
 
-def _initialise_parser():
-    parser = \
-        argparse.ArgumentParser(
-            description = "Create/update the .pot and .po(s) for an indicator." )
-
-    parser.add_argument(
-        "indicator_name",
-        help = "The name of the indicator." )
-
-    return parser
-
-
 if __name__ == "__main__":
-    parser = _initialise_parser()
-    script_path_and_name = "./tools/build_locale.py"
-    if Path( script_path_and_name ).exists():
-        args = parser.parse_args()
+    if utils.is_correct_directory( "./tools/build_locale.py", "release indicatorfortune" ):
+        args = \
+            utils.initialiase_parser_and_get_arguments(
+                "Create/update the .pot and .po(s) for an indicator.",
+                ( "indicator_name" ),
+                { "indicator_name" : "The name of the indicator." } )
+
         project_metadata, message = _precheck( "indicatorbase" ) # Project metadata does not apply so ignore.
         if message:
             print( message )
@@ -339,9 +331,3 @@ if __name__ == "__main__":
 
                 if message:
                     print( message )
-
-    else:
-        print(
-            f"The script must be run from the top level directory (one above utils).\n"
-            f"For example:\n"
-            f"\tpython3 { script_path_and_name } release indicatorfortune" )

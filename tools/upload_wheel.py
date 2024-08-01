@@ -22,42 +22,20 @@
 #   https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 
-import argparse
 import subprocess
 
-from pathlib import Path
-
-
-def _intialise_virtual_environment( *modules_to_install ):
-    if not Path( "venv" ).is_dir():
-        command = "python3 -m venv venv"
-        subprocess.call( command, shell = True )
-    
-    command = \
-        ". ./venv/bin/activate && " + \
-        f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
-    
-    subprocess.call( command, shell = True )
-
-
-def _initialise_parser():
-    parser = \
-        argparse.ArgumentParser(
-            description = "Upload to PyPI a Python .whl/.tar.gz for an indicator." )
-
-    parser.add_argument(
-        "directory_dist",
-        help = "The directory containing the indicator's .whl/.tar.gz (and NO OTHER FILES)." )
-
-    return parser
+import utils
 
 
 if __name__ == "__main__":
-    parser = _initialise_parser()
-    script_path_and_name = "./tools/upload_wheel.py"
-    if Path( script_path_and_name ).exists():
-        args = parser.parse_args()
-        _intialise_virtual_environment( "pip", "twine" )
+    if utils.is_correct_directory( "./tools/upload_wheel.py", "release/wheel/dist_indicatorfortune" ):
+        args = \
+            utils.initialiase_parser_and_get_arguments(
+                "Upload to PyPI a Python .whl/.tar.gz for an indicator.",
+                ( "directory_dist", ),
+                { "directory_dist" : "The directory containing the indicator's .whl/.tar.gz (and NO OTHER FILES)." } )
+
+        utils.intialise_virtual_environment( "pip", "twine" )
 
         print( "(the password starts with 'pypi-')" )
         command = \
@@ -65,9 +43,3 @@ if __name__ == "__main__":
             f"python3 -m twine upload --username __token__ { args.directory_dist }/*"
 
         subprocess.call( command, shell = True )
-
-    else:
-        print(
-            f"The script must be run from the top level directory (one above utils).\n"
-            f"For example:\n"
-            f"\tpython3 { script_path_and_name } release/wheel/dist_indicatorfortune" )

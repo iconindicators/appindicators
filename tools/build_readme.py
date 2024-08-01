@@ -31,13 +31,14 @@
 #   https://pygobject.readthedocs.io
 
 
-import argparse
 import datetime
 import re
 import sys
 
 from enum import auto, Enum
 from pathlib import Path
+
+import utils
 
 sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
@@ -752,31 +753,14 @@ def _create_readme( directory_out, indicator_name ):
         f.write( _get_license( indicator_name ) )
 
 
-def _initialise_parser():
-    parser = \
-        argparse.ArgumentParser(
-            description = "Create README.md for an indicator." )
-
-    parser.add_argument(
-        "directory_out",
-        help = "The output directory for the README.md." )
-
-    parser.add_argument(
-        "indicator_name",
-        help = "The name of the indicator." )
-
-    return parser
-
-
 if __name__ == "__main__":
-    parser = _initialise_parser()
-    script_path_and_name = "tools/build_readme.py"
-    if Path( script_path_and_name ).exists():
-        args = parser.parse_args()
-        _create_readme( args.directory_out, args.indicator_name )
+    if utils.is_correct_directory( "./tools/build_readme.py", "release indicatorfortune" ):
+        args = \
+            utils.initialiase_parser_and_get_arguments(
+                "Create README.md for an indicator.",
+                ( "directory_out", "indicator_name" ),
+                {
+                    "directory_out" : "The output directory for the README.md.",
+                    "indicator_name" : "The name of the indicator." } )
 
-    else:
-        print(
-            f"The script must be run from the top level directory (one above utils).\n"
-            f"For example:\n"
-            f"\tpython3 { script_path_and_name } release indicatorfortune" )
+        _create_readme( args.directory_out, args.indicator_name )

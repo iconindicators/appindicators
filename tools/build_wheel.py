@@ -25,7 +25,6 @@
 #    tar tf indicatortest-1.0.7.tar.gz
 
 
-import argparse
 import gettext
 import re
 import shutil
@@ -34,17 +33,7 @@ import subprocess
 
 from pathlib import Path
 
-
-def _intialise_virtual_environment( *modules_to_install ):
-    if not Path( "venv" ).is_dir():
-        command = "python3 -m venv venv"
-        subprocess.call( command, shell = True )
-
-    command = \
-        f"./venv/bin/activate && " + \
-        f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
-
-    subprocess.call( command, shell = True )
+import utils
 
 
 def _run_checks_specific_to_indicator( indicator_name ):
@@ -461,7 +450,6 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
                 directory_dist.mkdir( parents = True )
 
                 if _package_source_for_build_wheel_process( directory_dist, indicator_name ):
-                    _intialise_virtual_environment( "build", "pip", "PyGObject" )
                     command = \
                         f". ./venv/bin/activate && " + \
                         f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
@@ -475,38 +463,25 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
     return message
 
 
-def _initialise_parser():
-    parser = \
-        argparse.ArgumentParser(
-            description = "Create a Python wheel for one or more indicators." )
-
-    parser.add_argument(
-        "directory_release",
-        help = \
-            "The output directory for the Python wheel. " +
-            "If the directory specified is 'release', " +
-            "the Python wheel will be created in 'release/wheel'." )
-
-    parser.add_argument(
-        "indicators",
-        nargs = '+',
-        help = "The list of indicators (such as indicatorfortune indicatorlunar) to build." )
-
-    return parser
-
-
 if __name__ == "__main__":
-    parser = _initialise_parser()
-    script_path_and_name = "./tools/build_wheel.py"
-    if Path( script_path_and_name ).exists():
-        args = parser.parse_args()
+    if utils.is_correct_directory( "./tools/build_wheel.py", "release indicatorfortune" ):
+        args = \
+            utils.initialiase_parser_and_get_arguments(
+                "Create a Python wheel for one or more indicators.",
+                ( "directory_release", "indicators" ),
+                {
+                    "directory_release" :
+                        "The output directory for the Python wheel. " +
+                        "If the directory specified is 'release', " +
+                        "the Python wheel will be created in 'release/wheel'.",
+                    "indicators" :
+                        "The list of indicators (such as indicatorfortune indicatorlunar) to build." },
+                {
+                    "indicators" :
+                        "+" } )
+
+        utils.intialise_virtual_environment( "build", "pip", "PyGObject" )
         for indicator_name in args.indicators:
             message = _build_wheel_for_indicator( args.directory_release, indicator_name )
             if message:
                 print( message )
-
-    else:
-        print(
-            f"The script must be run from the top level directory (one above utils).\n"
-            f"For example:\n"
-            f"\tpython3 { script_path_and_name } release indicatorfortune" )
