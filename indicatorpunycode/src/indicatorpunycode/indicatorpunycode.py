@@ -16,47 +16,29 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO
-# 2024-07-21 12:07:37,131 - root - ERROR - label empty or too long
-# Traceback (most recent call last):
-#   File "/home/bernard/.local/venv_indicatorpunycode/lib/python3.8/site-packages/indicatorpunycode/indicatorpunycode.py", line 129, in __do_conversion
-#     labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
-#   File "/usr/lib/python3.8/encodings/idna.py", line 71, in ToASCII
-#     raise UnicodeError("label empty or too long")
-# UnicodeError: label empty or too long
-# 2024-07-21 12:07:37,148 - root - ERROR - Error converting '    # indicatorppadownloadstatistics
-#     #   Top level: menuitems with NO indent or one level of indent needed; OR
-#     #              submenus with NO indent needed.
-#     #   Within submenus
-#     #       Under GNOME, need one level of indent for menuitems.
-#     #       Under Kubuntu, need NO indent for menuitems with submenus; one level of indent with no submenus.
-#     # 
-# '.
-#
-# I selected some text and clicked convert and got an OSD message and the above log message.
-# But the preference for the input was clipboard...so maybe need to guard against an empty clipboard.
-# What about really long text, either in the clipboard or selected?  Need to guard against those?
-
-
 #TODO Amend the changelog.md and/or readme.md
 # to mention the clipboard only works under X11?
 
 
-#TODO On Debian 12, when selecting text and either middle mouse click or select convert
-# (from primary, not clipboard), get a message "no text is highlight/selected".
+#TODO On Debian 12, select/highlight text and middle mouse click or select convert from primary
+# (not clipboard), get a message "no text is highlight/selected".
 # However this seems intermittent...seemed to get it to work once...
 # maybe switching from primary to clipboard and back again via the preferences.
 #
 # Once it does work, always keeps the same text in memory and converts that
 # regardless of selecting new text.
 #
-# Does this also happen on Ubuntu 20.04/24.04 or Fedora 40?
-
-
-#TODO
-# Below is copied from indicatorbase...
+# Similarly for the input set to clipboard.  Get the message "No text is in the clipboard."
 #
-# Check Debian 12 et al!
+# Does not happen on Ubuntu 20.04.
+#
+# Does not happen on Debian 12 or Fedora 40 under Xorg but does happen under Wayland.
+#
+# Update readme in some way...
+# Does that mean the indicator does not work at all under Wayland, or intermittently?
+
+
+#TODO Check Debian 12 et al!
 #
 # Run punycode.  Open About dialog.
 # Highlight some punycode on a browser page.
@@ -64,11 +46,8 @@
 # This is blocked on Ubuntu 20.04.
 # What about Debian et al?  
 # Try for both clipboard and primary input sources.
-
-
-#TODO In labels/tooltips, should 'primary' be renamed to 'selected text'?
-# Also check if set to primary and have text selected, does the window
-# in which that text is selected also have to be selected?
+#
+# Also test on Debian 12 default/wayland and Debian 12 Xorg.
 
 
 # Application indicator which converts domain names between Unicode and ASCII.
@@ -146,7 +125,6 @@ class IndicatorPunycode( IndicatorBase ):
         else:
             # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
             def clipboard_text_received_function( clipboard, text, data ):
-                print( text )
                 if text is None:
                     self.show_notification( summary, _( "No text is highlighted/selected." ) )
 
