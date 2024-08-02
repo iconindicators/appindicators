@@ -1347,26 +1347,37 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.scripts.append(
                 NonBackground(
                     "Network",
-                    "Up or down", "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.get_icon_name() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
+                    "Up or down",
+                    "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.get_icon_name() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
                     False, False, False, True ) )
 
             self.scripts.append(
                 NonBackground(
+                    "System",
+                    "RAM + HDD (/dev/sda2)",
+                    "notify-send -i " + self.get_icon_name() + " \"System Usage:\" \"RAM: $( free | grep Mem | awk \'\\'' { printf \"%.0f\", $3/$2*100 } \'\\'' )%  HDD: $( df -h /dev/sda2 | grep sda2 | awk \'\\'' { print $5 } \'\\''  )\"",
+                    False, False, False, False ) )
+
+            self.scripts.append(
+                NonBackground(
                     "Update",
-                    "autoclean | autoremove | update | dist-upgrade", "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade",
+                    "autoclean | autoremove | update | dist-upgrade",
+                    "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade",
                     True, True, True, False ) )
 
             # Example background scripts.
             self.scripts.append(
                 Background(
                     "Network",
-                    "Internet Down", "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi",
+                    "Internet Down",
+                    "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi",
                     False, True, 60, True ) )
 
             self.scripts.append(
                 Background(
                     "System",
-                    "Available Memory", "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"",
+                    "Available Memory",
+                    "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"",
                     False, False, 5, False ) )
 
             self.indicator_text = " [Network::Internet Down][System::Available Memory]"
