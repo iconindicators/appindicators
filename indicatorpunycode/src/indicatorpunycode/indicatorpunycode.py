@@ -18,6 +18,8 @@
 
 #TODO Amend the changelog.md and/or readme.md
 # to mention the clipboard only works under X11?
+# Might have to also include primary...
+# ...see TODO below about not really working on Debian 12 and Fedora 40 (both wayland).
 
 
 #TODO On Debian 12, select/highlight text and middle mouse click or select convert from primary
@@ -36,18 +38,6 @@
 #
 # Update readme in some way...
 # Does that mean the indicator does not work at all under Wayland, or intermittently?
-
-
-#TODO Check Debian 12 et al!
-#
-# Run punycode.  Open About dialog.
-# Highlight some punycode on a browser page.
-# Click convert.
-# This is blocked on Ubuntu 20.04.
-# What about Debian et al?  
-# Try for both clipboard and primary input sources.
-#
-# Also test on Debian 12 default/wayland and Debian 12 Xorg.
 
 
 # Application indicator which converts domain names between Unicode and ASCII.
