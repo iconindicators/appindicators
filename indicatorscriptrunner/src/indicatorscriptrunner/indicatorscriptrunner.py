@@ -16,35 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO For RAM/HDD on laptop:
-#    notify-send "System Usage:" "RAM: $( free | grep Mem | awk ' { printf "%.0f\n", $3/$2*100 } ' )%  HDD: $( df -h /dev/sda1 | grep sda1 | awk ' { print $5 } '  )"
-#
-# See if it works also on desktop.
-#
-# Only flashes up a console on the desktop (same as laptop I think)...
-# and does not show a notification...
-#
-# Original...
-# notify-send \"System Usage:\" \"RAM: $(free | awk '\\''/Mem/ { printf \"%.0f\\n\", $3/$2*100 }'\\'')%    HDD: $(df -h /dev/sda2 | awk '\\''/sda2/ { print $5 } '\\'' ) \"
-#
-# New...
-# notify-send \"System Usage:\" \"RAM: $( free | grep Mem | awk ' { printf \"%.0f\\n\", $3/$2*100 } ' )%  HDD: $( df -h /dev/sda1 | grep sda1 | awk ' { print $5 } '  )\"
-
-
-#TODO Got this on laptop:
-#
-# Script runner log for check Hotmail:
-#
-# 2024-07-26 23:22:10,916 - root - ERROR - Command 'python3 /home/bernard/Programming/checkHotmail.py' returned non-zero exit status 1.
-# 2024-07-26 23:22:10,919 - root - ERROR - b'Traceback (most recent call last):\n  File "/home/bernard/Programming/checkHotmail.py", line 72, in <module>\n    connection.logout()\n    ^^^^^^^^^^\nNameError: name \'connection\' is not defined\n'
-
-
-#TODO On laptop
-# With a foreground script, checking "leave terminal open"
-# does not leave terminal open (on laptop Debian 12)
-# Same on desktop...at least for the ram/hdd script/command.
-
-
 #TODO
 # Got this in the error log on the laptop...
 # don't know if caused when there was no internet connection.
