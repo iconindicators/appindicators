@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check all Path()...those that are clearly only for use on Linux
-# should probably not use/need a Path.
-# Maybe also look for 'command'?
-
-
 #TODO Check subprocess call/get...they may be deprecated.
 
 
@@ -179,6 +174,8 @@
 # Check on other distros.
 #
 # Double check Manjaro 22.1; openSUSE Tumbleweed.
+#
+# THis also happens on Debian 12 under Xorg.
 
 
 #TODO Got 
