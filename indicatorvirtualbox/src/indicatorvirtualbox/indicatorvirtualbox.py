@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Seems to update twice when closing Prefs...or starting a VM.
+# Is this the case or my eyes?
+
+
 #TODO Need to amend the changelog.md and/or readme.md
 # to mention that
 #    mouse wheel scroll to cycle through running vms

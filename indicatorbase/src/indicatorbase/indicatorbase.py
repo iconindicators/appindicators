@@ -1101,9 +1101,6 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-#TODO Test this with indicatorvirtualbox
-# and a virtualmachine that is three levels deep and is running
-# on both Ubuntu and Kubuntu.
     # Creates a single (isolated, not part of a group)
     # RadioMenuItem that is enabled/active.
     def create_and_append_radiomenuitem(
