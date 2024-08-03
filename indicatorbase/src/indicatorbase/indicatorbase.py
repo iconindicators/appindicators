@@ -132,13 +132,6 @@
 # Seems okay on Ubuntu 20.04.
 # Check Debian 12, Febora 39, Fedora 40 and Ubuntu 24.04.
 #
-# Run punycode.  Open About dialog.
-# Highlight some punycode on a browser page.
-# Click convert.
-# This is blocked on Ubuntu 20.04.
-# What about Debian et al?  
-# Try for both clipboard and primary input sources.
-#
 # If an update is underway, is it possible for the user to select About/Prefs?
 # Hopefully not as the menu should be disabled during the update.
 # All good on Ubuntu 20.04...what about Debian et al?
@@ -157,6 +150,10 @@
 # Maybe call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
 #
 # Does this issue happen under Debian/Fedora under xorg (rather than default wayland)?
+#
+# If this is something that only occurs with a range of GTK release versions
+# (between Debian 11 and Fedora 39)
+# then can we check for that and onl do the update on those?
 
 
 #TODO Run any indicator under Debian 12 and open About dialog.
@@ -197,6 +194,16 @@
 # Test this on Fedora 40.
 # Perhaps this is a GTK specific version thing...
 # ...but then, what can/should be done? 
+# 
+# Happens on Debian 12 64 bit (Wayland, default)
+# Also the label disappears!
+#
+# Error DOES NOT occur on Debian 12 64 Xorg, but
+# label does disappear.
+#
+# Fedora 40 Wayland; error occurs.
+# Fedora 40 Xorg; error does not occurs.
+# Label if fine after return from lock for both wayland and xorg.
 
 
 #TODO Update the PPA description at
