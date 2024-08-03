@@ -1789,6 +1789,9 @@ class IndicatorLunar( IndicatorBase ):
         NATURAL_BODY_MODEL_COLUMN_NAME = 1
         NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME = 2
 
+        NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW = 0
+        NATURAL_BODY_VIEW_COLUMN_TRANSLATED_NAME = 1
+
         planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planet_name in IndicatorLunar.astro_backend.PLANETS:
             planet_store.append( [
@@ -1805,7 +1808,8 @@ class IndicatorLunar( IndicatorBase ):
                     "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
+                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
 
         minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
 
@@ -1829,7 +1833,8 @@ class IndicatorLunar( IndicatorBase ):
                     "or no data was available, or the data\n" +
                     "was completely filtered by magnitude." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
+                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
 
         comet_store = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
 
@@ -1853,7 +1858,8 @@ class IndicatorLunar( IndicatorBase ):
                     "available from the source, or the data\n" +
                     "was completely filtered by magnitude." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
+                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
 
         stars = [ ]
         for star_name in IndicatorLunar.astro_backend.get_star_names():
@@ -1875,7 +1881,8 @@ class IndicatorLunar( IndicatorBase ):
                     "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
+                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
 
         notebook.append_page(
             self.create_box(
@@ -2371,10 +2378,11 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def translate_text_using_tags( self, tags_list_store, original_to_local, text ):
-        # The tags list store contains at least two columns.
-        # First column contains the original/untranslated tags.
-        # Second column contains the translated tags.
-        # An optional third column contains the tag's corresponding value.
+        # The tags list store contains at three columns.
+        #   First column contains the original/untranslated tags.
+        #   Second column contains the translated tags.
+        #   Third column contains the tag's corresponding value.
+        # Translate the tags within the indicator label back/forth original text and local text.
         if original_to_local:
             i = 0
             j = 1
@@ -2418,10 +2426,8 @@ class IndicatorLunar( IndicatorBase ):
             title,
             tooltip_text,
             natural_body_model_column_hide_show,
-            natural_body_model_column_translated_name ):
-
-        NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW = 0
-        NATURAL_BODY_VIEW_COLUMN_TRANSLATED_NAME = 1
+            natural_body_model_column_translated_name,
+            natural_body_view_column_hide_show ):
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
@@ -2437,11 +2443,11 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( renderer_toggle, "active", natural_body_model_column_hide_show ),
                     ( Gtk.CellRendererText(), "text", natural_body_model_column_translated_name ) ),
-                alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
+                alignments_columnviewids = ( ( 0.5, natural_body_view_column_hide_show ), ),
                 tooltip_text = tooltip_text,
                 clickablecolumnviewids_functionsandarguments = (
                 (
-                    NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
+                    natural_body_view_column_hide_show,
                     ( self.on_columnheader, treemodel, natural_body_model_column_hide_show ), ), ) )
 
         return scrolledwindow
