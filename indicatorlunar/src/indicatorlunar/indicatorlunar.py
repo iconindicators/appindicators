@@ -1789,39 +1789,12 @@ class IndicatorLunar( IndicatorBase ):
         NATURAL_BODY_MODEL_COLUMN_NAME = 1
         NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME = 2
 
-        NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW = 0
-        NATURAL_BODY_VIEW_COLUMN_TRANSLATED_NAME = 1
-
         planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planet_name in IndicatorLunar.astro_backend.PLANETS:
             planet_store.append( [
                 planet_name in self.planets,
                 planet_name,
                 IndicatorLunar.astro_backend.PLANET_NAMES_TRANSLATIONS[ planet_name ] ] )
-
-        # renderer_toggle = Gtk.CellRendererToggle()
-        # renderer_toggle.connect(
-        #     "toggled",
-        #     self.on_natural_body_checkbox,
-        #     planet_store,
-        #     NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
-        #
-        # treeview, scrolledwindow_planets = \
-        #     self.create_treeview_within_scrolledwindow(
-        #         planet_store,
-        #         ( "", _( "Planets" ), ),
-        #         (
-        #             ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
-        #             ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
-        #         alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
-        #         tooltip_text = _(
-        #             "Check a planet to display in the menu.\n\n" +
-        #             "Clicking the header of the first column\n" +
-        #             "will toggle all checkboxes." ),
-        #         clickablecolumnviewids_functionsandarguments = (
-        #         (
-        #             NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
-        #             ( self.on_columnheader, planet_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         scrolledwindow_planets = \
             self.create_natural_body_treeview_within_scrolledwindow(
@@ -1832,8 +1805,7 @@ class IndicatorLunar( IndicatorBase ):
                     "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
 
         minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
 
@@ -1842,35 +1814,6 @@ class IndicatorLunar( IndicatorBase ):
                 minor_planet in self.minor_planets,
                 minor_planet,
                 self.minor_planet_orbital_element_data[ minor_planet ].get_name() ] )
-
-        # renderer_toggle = Gtk.CellRendererToggle()
-        # renderer_toggle.connect(
-        #     "toggled",
-        #     self.on_natural_body_checkbox,
-        #     minor_planet_store,
-        #     NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
-        #
-        # treeview, scrolledwindow_minor_planets = \
-        #     self.create_treeview_within_scrolledwindow(
-        #         minor_planet_store,
-        #         ( "", _( "Minor Planets" ), ),
-        #         (
-        #             ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
-        #             ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
-        #         alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
-        #         tooltip_text = _(
-        #             "Check a minor planet to display in the menu.\n\n" +
-        #             "Clicking the header of the first column\n" +
-        #             "will toggle all checkboxes." )
-        #             if self.minor_planet_orbital_element_data and self.minor_planet_apparent_magnitude_data else _(
-        #             "Minor planet data is unavailable;\n" +
-        #             "the source could not be reached,\n" +
-        #             "or no data was available, or the data\n" +
-        #             "was completely filtered by magnitude." ),
-        #         clickablecolumnviewids_functionsandarguments = (
-        #         (
-        #             NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
-        #             ( self.on_columnheader, minor_planet_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         scrolledwindow_minor_planets = \
             self.create_natural_body_treeview_within_scrolledwindow(
@@ -1886,8 +1829,7 @@ class IndicatorLunar( IndicatorBase ):
                     "or no data was available, or the data\n" +
                     "was completely filtered by magnitude." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
 
         comet_store = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
 
@@ -1896,35 +1838,6 @@ class IndicatorLunar( IndicatorBase ):
                 comet in self.comets,
                 comet,
                 self.comet_orbital_element_data[ comet ].get_name() ] )
-
-        # renderer_toggle = Gtk.CellRendererToggle()
-        # renderer_toggle.connect(
-        #     "toggled",
-        #     self.on_natural_body_checkbox,
-        #     comet_store,
-        #     NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
-        #
-        # treeview, scrolledwindow_comets = \
-        #     self.create_treeview_within_scrolledwindow(
-        #         comet_store,
-        #         ( "", _( "Comets" ), ),
-        #         (
-        #             ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
-        #             ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
-        #         alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
-        #         tooltip_text = _(
-        #             "Check a comet to display in the menu.\n\n" +
-        #             "Clicking the header of the first column\n" +
-        #             "will toggle all checkboxes." )
-        #             if self.comet_orbital_element_data else _(
-        #             "Comet data is unavailable; the source\n" +
-        #             "could not be reached, or no data was\n" +
-        #             "available from the source, or the data\n" +
-        #             "was completely filtered by magnitude." ),
-        #         clickablecolumnviewids_functionsandarguments = (
-        #         (
-        #             NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
-        #             ( self.on_columnheader, comet_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
 
         scrolledwindow_comets = \
             self.create_natural_body_treeview_within_scrolledwindow(
@@ -1940,8 +1853,7 @@ class IndicatorLunar( IndicatorBase ):
                     "available from the source, or the data\n" +
                     "was completely filtered by magnitude." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
 
         stars = [ ]
         for star_name in IndicatorLunar.astro_backend.get_star_names():
@@ -1954,30 +1866,6 @@ class IndicatorLunar( IndicatorBase ):
         for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
             star_store.append( star )
 
-        # renderer_toggle = Gtk.CellRendererToggle()
-        # renderer_toggle.connect(
-        #     "toggled",
-        #     self.on_natural_body_checkbox,
-        #     star_store,
-        #     NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW )
-        #
-        # treeview, scrolledwindow_stars = \
-        #     self.create_treeview_within_scrolledwindow(
-        #         star_store,
-        #         ( "", _( "Stars" ), ),
-        #         (
-        #             ( renderer_toggle, "active", NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ),
-        #             ( Gtk.CellRendererText(), "text", NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME ) ),
-        #         alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
-        #         tooltip_text = _(
-        #             "Check a star to display in the menu.\n\n" +
-        #             "Clicking the header of the first column\n" +
-        #             "will toggle all checkboxes." ),
-        #         clickablecolumnviewids_functionsandarguments = (
-        #         (
-        #             NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
-        #             ( self.on_columnheader, star_store, NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ), ), ) )
-
         scrolledwindow_stars = \
             self.create_natural_body_treeview_within_scrolledwindow(
                 star_store,
@@ -1987,8 +1875,7 @@ class IndicatorLunar( IndicatorBase ):
                     "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
                 NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME )
 
         notebook.append_page(
             self.create_box(
@@ -2531,8 +2418,10 @@ class IndicatorLunar( IndicatorBase ):
             title,
             tooltip_text,
             natural_body_model_column_hide_show,
-            natural_body_model_column_translated_name,
-            natural_body_view_column_hide_show ):
+            natural_body_model_column_translated_name ):
+
+        NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW = 0
+        NATURAL_BODY_VIEW_COLUMN_TRANSLATED_NAME = 1
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
@@ -2548,11 +2437,11 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( renderer_toggle, "active", natural_body_model_column_hide_show ),
                     ( Gtk.CellRendererText(), "text", natural_body_model_column_translated_name ) ),
-                alignments_columnviewids = ( ( 0.5, natural_body_view_column_hide_show ), ),
+                alignments_columnviewids = ( ( 0.5, NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW ), ),
                 tooltip_text = tooltip_text,
                 clickablecolumnviewids_functionsandarguments = (
                 (
-                    natural_body_view_column_hide_show,
+                    NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW,
                     ( self.on_columnheader, treemodel, natural_body_model_column_hide_show ), ), ) )
 
         return scrolledwindow
