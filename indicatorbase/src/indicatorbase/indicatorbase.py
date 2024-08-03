@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check subprocess call/get...they may be deprecated.
-
-
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
@@ -195,6 +192,11 @@
 # So, does this happen on another distro?
 #
 # Does not happen with punycode on Ubuntu 20.04.
+#
+# Test this on Debian 12 (virtual machine 64 bit).
+# Test this on Fedora 40.
+# Perhaps this is a GTK specific version thing...
+# ...but then, what can/should be done? 
 
 
 #TODO Update the PPA description at
@@ -255,7 +257,6 @@
 #	pip           24.0
 #	pycairo       1.26.0
 #	PyGObject     3.48.2
-#
 
 
 # Base class for application indicators.
@@ -392,7 +393,15 @@ class IndicatorBase( ABC ):
 
         if found_indicatorbase_import:
             INDICATOR_NAME = Path( frame_record.filename ).stem
-            locale_directory = Path( __file__ ).parent / "locale" #TODO Check ths is correct after conversion.
+
+            if INDICATOR_NAME == Path( __file__ ).parent.stem: # Running installed under a virtual environment.
+                locale_directory = Path( __file__ ).parent / "locale"
+
+            else:
+                # Running in development.
+                locale_directory = \
+                    Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale"
+
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
