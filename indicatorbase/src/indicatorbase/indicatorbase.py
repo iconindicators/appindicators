@@ -203,7 +203,12 @@
 #
 # Fedora 40 Wayland; error occurs.
 # Fedora 40 Xorg; error does not occurs.
-# Label if fine after return from lock for both wayland and xorg.
+# Label is fine after return from lock for both wayland and xorg.
+#
+# So what to do...?
+# Really, cannot detect if/when this occurs
+# and the error message is (apparently) not of my making.
+# Bottom line; ignore. 
 
 
 #TODO Update the PPA description at
