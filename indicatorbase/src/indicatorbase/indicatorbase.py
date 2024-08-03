@@ -172,45 +172,6 @@
 # THis also happens on Debian 12 under Xorg.
 
 
-#TODO Got 
-#   (indicatortide.py:9968): Gtk-CRITICAL **: 23:05:19.372: gtk_widget_get_scale_factor: assertion 'GTK_IS_WIDGET (widget)' failed
-#
-# on the laptop...
-# Happens when the screen is locked.
-# Is this a 32 bit thing?  Test on Debian 12 VM 64 bit.
-# Does this happen with other indicators?
-# Need to run from the terminal presumably to see the error message.
-#
-# On Debian 12 laptop, ran indicatortest via terminal.
-# Then did a lock screen, then unlock and got an identical message as above.
-# Noticed also the label disappeared.
-# Does this gtk error message happen for say punycode or stardate?
-#
-# So, does this happen on another distro?
-#
-# Does not happen with punycode on Ubuntu 20.04.
-#
-# Test this on Debian 12 (virtual machine 64 bit).
-# Test this on Fedora 40.
-# Perhaps this is a GTK specific version thing...
-# ...but then, what can/should be done? 
-# 
-# Happens on Debian 12 64 bit (Wayland, default)
-# Also the label disappears!
-#
-# Error DOES NOT occur on Debian 12 64 Xorg, but
-# label does disappear.
-#
-# Fedora 40 Wayland; error occurs.
-# Fedora 40 Xorg; error does not occurs.
-# Label is fine after return from lock for both wayland and xorg.
-#
-# So what to do...?
-# Really, cannot detect if/when this occurs
-# and the error message is (apparently) not of my making.
-# Bottom line; ignore. 
-
-
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 # with the following:
