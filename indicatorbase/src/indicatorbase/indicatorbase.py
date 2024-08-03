@@ -517,8 +517,6 @@ class IndicatorBase( ABC ):
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
         try:
             # Obtain pyproject.toml information from pip.
-#TODO Test this clause!
-# Also print out the two error messages above to see if the paths are okay.
             project_metadata = metadata.metadata( indicator_name )
             error_message = None
 
