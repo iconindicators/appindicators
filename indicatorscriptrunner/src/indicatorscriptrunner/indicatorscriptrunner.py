@@ -211,7 +211,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def update_background_scripts( self, now ):
-        if True: return # TODO Remove
         background_scripts_to_execute = [ ]
         for script in self.scripts:
             if type( script ) is Background and self.is_background_script_in_indicator_text( script ):
