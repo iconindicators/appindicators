@@ -177,7 +177,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            debug = True,#TODO Remove on release.
+            debug = False,
             comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
