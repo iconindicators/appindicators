@@ -135,6 +135,22 @@
 # If an update is underway, is it possible for the user to select About/Prefs?
 # Hopefully not as the menu should be disabled during the update.
 # All good on Ubuntu 20.04...what about Debian et al?
+
+
+#TODO Run any indicator under Debian 12 and open About dialog.
+# Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
+# Clicking the red X on the About dialog (or hitting the escape key)
+# closes the dialog but the About/Preferences/Quit items remain greyed out.
+# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al and NOT on Fedora 40.
+# Occurs on Debian 11 on all graphics variants;
+# Debian 12 on GNOME, presumably all other graphics variants;
+# Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
+# Happens on Ubuntu 24.04 (Ubuntu session default).  Cannot test on Ubuntu 24.04 Xorg session as it won't boot.
+# Check on other distros.
+#
+# Double check Manjaro 22.1; openSUSE Tumbleweed.
+#
+# THis also happens on Debian 12 under Xorg.
 #
 # By doing an update (after the Preferences/About are closed)
 #
@@ -154,22 +170,6 @@
 # If this is something that only occurs with a range of GTK release versions
 # (between Debian 11 and Fedora 39)
 # then can we check for that and onl do the update on those?
-
-
-#TODO Run any indicator under Debian 12 and open About dialog.
-# Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
-# Clicking the red X on the About dialog (or hitting the escape key)
-# closes the dialog but the About/Preferences/Quit items remain greyed out.
-# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al and NOT on Fedora 40.
-# Occurs on Debian 11 on all graphics variants;
-# Debian 12 on GNOME, presumably all other graphics variants;
-# Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
-# Happens on Ubuntu 24.04 (Ubuntu session default).  Cannot test on Ubuntu 24.04 Xorg session as it won't boot.
-# Check on other distros.
-#
-# Double check Manjaro 22.1; openSUSE Tumbleweed.
-#
-# THis also happens on Debian 12 under Xorg.
 
 
 #TODO Update the PPA description at
