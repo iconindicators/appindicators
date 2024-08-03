@@ -527,8 +527,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     file_entry.grab_focus()
                     continue
 
-                if row_number:
-                    # This is an edit...remove the old value and append new value.
+                if row_number: # This is an edit...remove the old value and append new value.
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
                 model.get_model().append( [

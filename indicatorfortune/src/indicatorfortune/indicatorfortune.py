@@ -247,14 +247,6 @@ class IndicatorFortune( IndicatorBase ):
             else:
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
-#TODO Still not convinced when using a modelsort that I shouldn't be also doing a
-# conversion of the row in modelsort space to modelchild space...
-# ...look at all uses of treemodelsort (and other sorts for TreeView) in all indicators.
-#
-# Need to first read up on how model/sort works again...
-#   https://athenajc.gitbooks.io/python-gtk-3-api/content/gtk-group/gtktreemodelsort.html
-#   https://stackoverflow.com/questions/55167884/python-gtk-3-sorting-a-treeview-by-clicking-on-column    
-#   https://stackoverflow.com/questions/12368059/a-sorted-and-filtered-treemodel-in-python-gtk3
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = store ),
@@ -557,9 +549,9 @@ class IndicatorFortune( IndicatorBase ):
                 if row_number: # This is an edit; remove the old value.
                     model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
 
-                model.get_model().append(
-                    [ fortune_file_directory.get_text().strip(),
-                     Gtk.STOCK_APPLY if enabled_checkbox.get_active() else None ] )
+                model.get_model().append( [
+                    fortune_file_directory.get_text().strip(),
+                    Gtk.STOCK_APPLY if enabled_checkbox.get_active() else None ] )
 
             break
 
