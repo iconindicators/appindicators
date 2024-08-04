@@ -303,6 +303,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_launch_virtual_box_manager( self ):
 
         #TODO Why is this an inner function????
+        # Look at the commit history/log for this file...
+        # ...maybe that will give an reason/answer to why this is an inner function
+        # when only called in one place.
         def launch_virtual_box_manager():
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
