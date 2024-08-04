@@ -128,6 +128,7 @@ class IndicatorStardate( IndicatorBase ):
 
         self.request_update()
 
+#TODO Can/should this be moved into indicatorbase as part of a timer management thing?
         if self.save_config_timer_id:
             GLib.source_remove( self.save_config_timer_id )
 
