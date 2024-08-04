@@ -453,6 +453,7 @@ class IndicatorBase( ABC ):
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
         self.lock = Lock()
+        self.id = None # ID returned when calling GLib.timeout_add_seconds() and GLib.idle_add().
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
         Notify.init( self.indicator_name )
@@ -513,6 +514,9 @@ class IndicatorBase( ABC ):
                 path = Path( '.' )
 
             project_metadata, error_message = get_first_wheel( path )
+
+            if from_script and error_message:
+                print( error_message )
 
         return project_metadata, error_message
 
@@ -612,9 +616,9 @@ class IndicatorBase( ABC ):
             GLib.idle_add( self.__update_internal )
 
         else:
-            GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS_DEFAULT, self.__update )
+            self.id = GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS_DEFAULT, self.__update )
 
-        return GLib.SOURCE_REMOVE
+        return False
 
 
     def __update_internal( self ):
@@ -661,13 +665,14 @@ class IndicatorBase( ABC ):
 
         if next_update_in_seconds: # Some indicators don't return a next update time.
             GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
+            #TODO Do I need to capture/remove the id from return value?
 
         self.lock.release()
-        return GLib.SOURCE_REMOVE
+        return False
 
 
 #TODO Because this can be called outside of the normal run,
-# I think need to remove the existing pending update.
+# I think need to remove any pre-existing pending update.
 #
 # In virtualbox, start the indicator and an update is scheduled for every 5 minutes.
 # Start a VM and another update is scheduled for every 5 minutes.
@@ -862,7 +867,7 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( None )
 
         # if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
-        #     GLib.source_remove( self.update_timer_id )
+        #     False( self.update_timer_id )
         #     self.update_timer_id = None
 
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
@@ -1600,7 +1605,7 @@ class IndicatorBase( ABC ):
 
 
     def set_autostart_and_delay( self, is_set, delay ):
-        IndicatorBase.__AUTOSTART_PATH.mkdir( exist_ok = True )
+        IndicatorBase.__AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
 
         if not self.desktop_file_user_home.is_file():
             shutil.copy( self.desktop_file_virtual_environment, self.desktop_file_user_home )
@@ -1819,7 +1824,7 @@ class IndicatorBase( ABC ):
             logging.exception( e )
             logging.error( "Error writing configuration: " + config_file )
 
-        return GLib.SOURCE_REMOVE
+        return False
 
 
     # Return the full directory path to the user config directory for the current indicator.
@@ -2113,7 +2118,7 @@ class IndicatorBase( ABC ):
     #    ~/user_base_directory/application_base_directory
     def __get_user_directory( self, user_base_directory, application_base_directory ):
         directory = Path.home() / user_base_directory / application_base_directory
-        directory.mkdir( exist_ok = True )
+        directory.mkdir( parents = True, exist_ok = True )
         return directory
 
 
