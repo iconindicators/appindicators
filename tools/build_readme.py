@@ -732,12 +732,21 @@ def _get_license( indicator_name ):
 
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
+    #TODO What about the error message?
+    project_metadata, error_message = \
+        indicatorbase.IndicatorBase.get_project_metadata(
+            indicator_name,
+            from_script = True )
+
+    authors_and_emails = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )
+    authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
+
     return (
         f"License\n"
         f"-------\n"
 
         f"This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
-        f"Copyright { start_year }-{ end_year } Bernard Giannetti.\n" )
+        f"Copyright { start_year }-{ end_year } { authors }.\n" ) #TODO Test this with one and mulitple authors.
 
 
 def _create_readme( directory_out, indicator_name ):
