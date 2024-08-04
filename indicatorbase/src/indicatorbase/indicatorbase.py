@@ -16,6 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Check the calls to 
+#     GLib.timeout_add_seconds
+# and
+#     GLib.idle_add
+# as I suspect I'm not calling these with the correct arguments
+# ( that is, the priority is incorrectly set )
+
+
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
@@ -342,7 +350,7 @@ class IndicatorBase( ABC ):
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ] )
 
-    __UPDATE_PERIOD_IN_SECONDS = 60
+    __UPDATE_PERIOD_IN_SECONDS_DEFAULT = 60
 
     __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
     __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
@@ -466,7 +474,7 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_project_metadata( indicator_name, from_build_script = False ):
+    def get_project_metadata( indicator_name, from_script = False ):
 
         def get_first_wheel( path ):
             project_metadata = None
@@ -494,7 +502,7 @@ class IndicatorBase( ABC ):
             error_message = None
 
         except metadata.PackageNotFoundError:
-            if from_build_script:
+            if from_script:
                 # Looking for a .whl within the indicator directory,
                 # but coming from a build script so the path is different.
                 path = Path( '.' ) / indicator_name / "src" / indicator_name
@@ -594,7 +602,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-        GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that Gtk main executes to show initialisation.
+        GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that Gtk main executes and initialisation is shown.
         Gtk.main()
 
 
@@ -604,9 +612,9 @@ class IndicatorBase( ABC ):
             GLib.idle_add( self.__update_internal )
 
         else:
-            GLib.timeout_add_seconds(
-                IndicatorBase.__UPDATE_PERIOD_IN_SECONDS,
-                self.__update )
+            GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS_DEFAULT, self.__update )
+
+        return GLib.SOURCE_REMOVE
 
 
     def __update_internal( self ):
@@ -655,13 +663,19 @@ class IndicatorBase( ABC ):
             GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
 
         self.lock.release()
+        return GLib.SOURCE_REMOVE
 
 
-    def request_update( self, delay = 0 ):
-        GLib.timeout_add_seconds( delay, self.__update )
-        #TODO Should the default delay be 1? 
-        # Is 0 too fast?
-        # Could some race condition arise?
+#TODO Because this can be called outside of the normal run,
+# I think need to remove the existing pending update.
+#
+# In virtualbox, start the indicator and an update is scheduled for every 5 minutes.
+# Start a VM and another update is scheduled for every 5 minutes.
+# Now have two scheduled updates and will continue and grow for each new VM start.
+# So need to track the id each time GLib is called to schedule an update
+# so the id can be removed.
+    def request_update( self, delay = 1 ):
+        GLib.timeout_add_seconds( 1 if delay < 1 else delay, self.__update )
 
 
     def set_label( self, text ):
@@ -857,8 +871,7 @@ class IndicatorBase( ABC ):
 
         if response_type == Gtk.ResponseType.OK:
             self.__save_config()
-            GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release and so the update will proceed.
-
+            GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release so the update will proceed.
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
@@ -1743,10 +1756,6 @@ class IndicatorBase( ABC ):
         return downloaded
 
 
-    def request_save_config( self, delay = 0 ):
-        return GLib.timeout_add_seconds( delay, self.__save_config, False )
-
-
     # Copies .config using the old indicator name format (using hyphens)
     # to the new format, sans hyphens.
     def __copy_config_to_new_directory( self, config_file ):
@@ -1790,19 +1799,18 @@ class IndicatorBase( ABC ):
         self.load_config( config ) # Call to implementation in indicator.
 
 
+    def request_save_config( self, delay = 0 ):
+        return GLib.timeout_add_seconds( delay, self.__save_config )
+
+
     # Write a dictionary of user configuration to a JSON text file.
-    #
-    # return_status 
-    #   If True, will return a boolean indicating success/failure.
-    #   If False, no return call is made (useful for calls to GLib idle_add/timeout_add_seconds.
-    def __save_config( self, return_status = True ):
+    def __save_config( self ):
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase.__CONFIG_VERSION ] = self.version
 
         config_file = \
             self.__get_config_directory() / ( self.indicator_name + IndicatorBase.__EXTENSION_JSON )
 
-        success = True
         try:
             with open( config_file, 'w' ) as f_out:
                 f_out.write( json.dumps( config ) )
@@ -1810,10 +1818,8 @@ class IndicatorBase( ABC ):
         except Exception as e:
             logging.exception( e )
             logging.error( "Error writing configuration: " + config_file )
-            success = False
 
-        if return_status:
-            return success
+        return GLib.SOURCE_REMOVE
 
 
     # Return the full directory path to the user config directory for the current indicator.
