@@ -285,7 +285,7 @@ def _precheck( indicator_name ):
         project_metadata, error_message = \
             indicatorbase.IndicatorBase.get_project_metadata(
                 indicator_name,
-                from_build_script = True )
+                from_script = True )
 
         if error_message:
             message += f"ERROR: { error_message }\n" 
