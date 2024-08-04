@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Seems to update twice when closing Prefs...or starting a VM.
-# Is this the case or my eyes?
+#TODO This is kicking off a repeating update each time a V starts.
+# The issue is when calling request_update and needs to be fixed in indicatorbase.
 
 
 #TODO Need to amend the changelog.md and/or readme.md
@@ -90,6 +90,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def update( self, menu ):
+        print( str( datetime.datetime.now() ) + "\t\tupdate" ) #TODO Test
         if self.auto_start_required: # Start VMs here so that the indicator icon is displayed immediately.
             self.auto_start_required = False
             if self.is_vbox_manage_installed():
@@ -189,9 +190,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def _on_virtual_machine( self, menuitem, virtual_machine ):
+        print( str( datetime.datetime.now() ) + "\t\t_on_virtual_machine" ) #TODO Test
         if self.is_virtual_machine_running( virtual_machine.get_uuid() ):
             self.bring_window_to_front( virtual_machine.get_name() )
-            self.request_update( delay = 1 )
 
         else:
             self.start_virtual_machine( virtual_machine.get_uuid() )
@@ -236,6 +237,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def start_virtual_machine( self, uuid ):
+        print( str( datetime.datetime.now() ) + "\t\tstart_virtual_machine" ) #TODO Test
         result = self.process_get( "VBoxManage list vms | grep " + uuid )
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
@@ -300,6 +302,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def on_launch_virtual_box_manager( self ):
 
+        #TODO Why is this an inner function????
         def launch_virtual_box_manager():
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
