@@ -732,7 +732,13 @@ def _get_license( indicator_name ):
 
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
-    #TODO What about the error message?
+#TODO Might have a race condition here...
+# We get the project metadata from a .whl
+# but if there is no wheel, need to build it
+# but the build script calls this script...which looks for a .whl...!
+# Maybe can get this from pyproject.toml in indicatorbase directory?
+# Maybe if just need the authors have a function for that.
+# Where else is get_project_metadata called in the scripts?
     project_metadata, error_message = \
         indicatorbase.IndicatorBase.get_project_metadata(
             indicator_name,
@@ -740,18 +746,18 @@ def _get_license( indicator_name ):
 
     authors_and_emails = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )
     authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
+    authors = ', '.join( authors )
 
     return (
         f"License\n"
         f"-------\n"
 
         f"This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
-        f"Copyright { start_year }-{ end_year } { authors }.\n" ) #TODO Test this with one and mulitple authors.
+        f"Copyright { start_year }-{ end_year } { authors }.\n" )
 
 
 def _create_readme( directory_out, indicator_name ):
-    if not Path( directory_out ).exists():
-        Path( directory_out ).mkdir( parents = True ) #TODO Check this.
+    Path( directory_out ).mkdir( parents = True, exist_ok = True )
 
     with open( Path( directory_out, "README.md" ), 'w' ) as f:
         f.write( _get_introduction( indicator_name ) )
