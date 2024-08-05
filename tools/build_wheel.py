@@ -117,6 +117,31 @@ def _create_pyproject_dot_toml( indicator_name, directory_dist ):
     dependencies = ""
     description = ""
     version = ""
+
+#TODO If the build_readme et al change to access the modified pyprojectbase.toml and pyproject.toml per indicator,
+# need to likely check this code so that the parsing works as I have moved ']' to the end of the previous line.
+#
+# OR, can I use configparser??? 
+    import configparser
+    pyproject_toml = indicator_pyproject_toml_path
+    config = configparser.ConfigParser()
+    with open( pyproject_toml ) as stream:
+        config.read_string( "[top]\n" + stream.read() ) 
+
+    version = config[ "top" ][ "version" ]
+    print( version )
+    description = config[ "top" ][ "description" ]
+    print( description )
+    classifiers = config[ "top" ][ "classifiers" ]
+    print( classifiers )
+
+    if "dependencies" in config[ "top" ]:
+        dependencies = config[ "top" ][ "dependencies" ]
+        print( dependencies )
+
+    print( "----------------------------" )
+    
+    
     with open( indicator_pyproject_toml_path, 'r' ) as f:
         for line in f:
             if line.startswith( "description" ):

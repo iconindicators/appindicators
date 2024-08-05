@@ -5,8 +5,6 @@ description = "Application indicator for the home astronomer."
 dependencies = [
   "ephem",
   "requests",
-  "sgp4"
-]
+  "sgp4" ]
 classifiers = [
-  "Topic :: Scientific/Engineering :: Astronomy"
-]
+  "Topic :: Scientific/Engineering :: Astronomy" ]

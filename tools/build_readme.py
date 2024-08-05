@@ -739,6 +739,13 @@ def _get_license( indicator_name ):
 # Maybe can get this from pyproject.toml in indicatorbase directory?
 # Maybe if just need the authors have a function for that.
 # Where else is get_project_metadata called in the scripts?
+#
+# build_readme needs author_email.
+# build_locale needs author_email and version.
+#indicatorbase needs author_email and version and website.
+#
+# For anything outside the indicator scope, 
+# have a utils function to parse the pyproject.toml and/or pyprojectbase.toml?
     project_metadata, error_message = \
         indicatorbase.IndicatorBase.get_project_metadata(
             indicator_name,
@@ -778,4 +785,20 @@ if __name__ == "__main__":
                     "directory_out" : "The output directory for the README.md.",
                     "indicator_name" : "The name of the indicator." } )
 
-        _create_readme( args.directory_out, args.indicator_name )
+        # _create_readme( args.directory_out, args.indicator_name )
+
+        import configparser
+
+        pyprojectbase_toml = Path( ' ' ).parent / "indicatorbase" / "pyprojectbase.toml"
+        config = configparser.ConfigParser()
+        config.read( pyprojectbase_toml )
+        authors_emails = config[ "project" ][ "authors" ]
+        print( authors_emails )
+
+        pyproject_toml = Path( ' ' ).parent / args.indicator_name / "pyproject.toml"
+        config = configparser.ConfigParser()
+        with open( pyproject_toml ) as stream:
+            config.read_string( "[top]\n" + stream.read() ) 
+
+        version = config[ "top" ][ "version" ]
+        print( version )

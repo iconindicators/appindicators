@@ -3,5 +3,4 @@
 version = "1.0.44"
 description = "Application indicator which displays fortunes."
 classifiers = [
-  "Topic :: Games/Entertainment :: Fortune Cookies"
-]
+  "Topic :: Games/Entertainment :: Fortune Cookies" ]
