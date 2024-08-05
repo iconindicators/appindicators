@@ -20,9 +20,77 @@
 
 
 import argparse
+import configparser
+import re
+import stat
 import subprocess
 
 from pathlib import Path
+
+
+def _chmod( file, user_permission, group_permission, other_permission ):
+    Path( file ).chmod( user_permission | group_permission | other_permission )
+
+
+def _create_pyproject_dot_toml( indicator_name, directory_out ):
+    indicator_pyproject_toml = Path( '.' ) / indicator_name / "pyproject.toml"
+
+    config = configparser.ConfigParser()
+    with open( indicator_pyproject_toml ) as stream:
+        config.read_string( "[top]\n" + stream.read() ) 
+
+    version = config[ "top" ][ "version" ].replace( '\"', '' ).strip()
+
+    # The description may contain a ' which must be replaced with "
+    # as it causes an error when parsing the pyproject.toml.
+    description = config[ "top" ][ "description" ].replace( '\"', '' ).replace( '\'', '\"' ).strip()
+
+    classifiers = config[ "top" ][ "classifiers" ].replace( '[', '' ).replace( ']', '' ).strip()
+    classifiers = ',\n' + re.sub( "^", "  ", classifiers, flags = re.M )
+
+    dependencies = ""
+    if "dependencies" in config[ "top" ]:
+        dependencies = config[ "top" ][ "dependencies" ].replace( '[', '' ).replace( ']', '' ).strip()
+        dependencies = ',\n' + re.sub( "^", "  ", dependencies, flags = re.M )
+
+    indicatorbase_pyproject_toml = Path( '.' ) / "indicatorbase" / "pyprojectbase.toml"
+    text = ""
+    with open( indicatorbase_pyproject_toml ) as f:
+        for line in f:
+            if not line.startswith( '#' ):
+                text += line
+
+    text = text.replace( "{classifiers}", classifiers )
+    text = text.replace( "{dependencies}", dependencies )
+    text = text.replace( "{indicator_name}", indicator_name )
+
+    text = \
+        text.replace(
+        "[project]", 
+        "[project]\n" + \
+        "name = \'" + indicator_name + '\'\n' + \
+        "version = \'" + version + '\'\n' + \
+        "description = \'" + description + '\'' )
+
+    out_pyproject_toml = directory_out / "pyproject.toml"
+    with open( out_pyproject_toml, 'w' ) as f:
+        f.write( text + '\n' )
+
+    _chmod(
+        out_pyproject_toml,
+        stat.S_IRUSR | stat.S_IWUSR,
+        stat.S_IRGRP,
+        stat.S_IROTH )
+
+
+def get_values_from_pyproject_toml( pyproject_dot_toml, keys ):
+    config = configparser.ConfigParser()
+    config.read( pyproject_dot_toml )
+    keys_and_values = { }
+    for key in keys:
+        keys_and_values[ key[ 1 ] ] = config[ key[ 0 ] ][ key[ 1 ] ]
+
+    return keys_and_values
 
 
 def is_correct_directory( script_path_and_name, script_example_arguments ):

@@ -57,6 +57,7 @@ def _get_current_year():
     return datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
 
+#TODO Needs access to pyproject.toml
 def _get_copyright( indicator_name, project_metadata ):
     start_year = \
         indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
@@ -69,6 +70,7 @@ def _get_copyright( indicator_name, project_metadata ):
     return copyright_
 
 
+#TODO Needs access to pyproject.toml
 def _get_author_email( project_metadata ):
     return indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
 
@@ -267,7 +269,8 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
     return message
 
 
-def _precheck( indicator_name ):
+#TODO Remove hpoefully
+def _precheckORIG( indicator_name ):
     message = ""
 
     potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
@@ -293,6 +296,28 @@ def _precheck( indicator_name ):
     return project_metadata, message
 
 
+def _precheck( indicator_name ):
+    message = ""
+
+    potfiles_dot_in = _get_potfiles_dot_in( "indicatorbase" )
+    if not potfiles_dot_in.exists():
+        message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
+
+    potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
+    if not potfiles_dot_in.exists():
+        message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
+
+    linguas = _get_linguas( "indicatorbase" )
+    if not linguas.exists():
+        message += f"ERROR: Cannot find { linguas }\n" 
+
+    linguas = _get_linguas( indicator_name )
+    if not linguas.exists():
+        message += f"ERROR: Cannot find { linguas }\n" 
+
+    return message
+
+
 if __name__ == "__main__":
     if utils.is_correct_directory( "./tools/build_locale.py", "release indicatorfortune" ):
         args = \
@@ -301,33 +326,28 @@ if __name__ == "__main__":
                 ( "indicator_name" ),
                 { "indicator_name" : "The name of the indicator." } )
 
-        project_metadata, message = _precheck( "indicatorbase" ) # Project metadata does not apply so ignore.
+        message = _precheck( args.indicator_name )
         if message:
             print( message )
 
         else:
-            project_metadata, message = _precheck( args.indicator_name )
+            message = ""
+
+            author_email = _get_author_email( project_metadata )
+
+            locale_directory = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
+            version = "1.0.1"
+            copyright_ = f"2017-{ _get_current_year() } { author_email[ 0 ] }" # First year for translations of indicatorbase.
+            _create_update_pot( "indicatorbase", locale_directory, author_email, version, copyright_ )
+            message += \
+                _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
+
+            locale_directory = Path( '.' ) / args.indicator_name / "src" / args.indicator_name / "locale"
+            version = project_metadata[ 'Version' ]
+            copyright_ = _get_copyright( args.indicator_name, project_metadata )
+            _create_update_pot( args.indicator_name, locale_directory, author_email, version, copyright_ )
+            message += \
+                _create_update_po( args.indicator_name, _get_linguas_codes( args.indicator_name ), version, copyright_ )
+
             if message:
                 print( message )
-
-            else:
-                message = ""
-
-                author_email = _get_author_email( project_metadata )
-
-                locale_directory = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
-                version = "1.0.1"
-                copyright_ = f"2017-{ _get_current_year() } { author_email[ 0 ] }" # First year for translations of indicatorbase.
-                _create_update_pot( "indicatorbase", locale_directory, author_email, version, copyright_ )
-                message += \
-                    _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
-
-                locale_directory = Path( '.' ) / args.indicator_name / "src" / args.indicator_name / "locale"
-                version = project_metadata[ 'Version' ]
-                copyright_ = _get_copyright( args.indicator_name, project_metadata )
-                _create_update_pot( args.indicator_name, locale_directory, author_email, version, copyright_ )
-                message += \
-                    _create_update_po( args.indicator_name, _get_linguas_codes( args.indicator_name ), version, copyright_ )
-
-                if message:
-                    print( message )

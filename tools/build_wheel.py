@@ -77,6 +77,7 @@ def _update_locale( indicator_name ):
     return message
 
 
+#TODO Might end up switching to utils version.
 def _chmod( file, user_permission, group_permission, other_permission ):
     Path( file ).chmod( user_permission | group_permission | other_permission )
 
@@ -424,6 +425,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     return ( name != "" ) and ( comments != "" )
 
 
+#TODO This could use ConfigParser.
 def _get_value_for_single_line_tag_from_pyproject_toml( pyproject_toml, tag ):
     # Would like to use
     #   https://docs.python.org/3/library/tomllib.html

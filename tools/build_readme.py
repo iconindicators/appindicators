@@ -787,18 +787,18 @@ if __name__ == "__main__":
 
         # _create_readme( args.directory_out, args.indicator_name )
 
-        import configparser
+        directory_out = Path( "/tmp" )
+        utils._create_pyproject_dot_toml( args.indicator_name, directory_out )
+        keys_and_values = \
+            utils.get_values_from_pyproject_toml(
+                directory_out / "pyproject.toml",
+                (
+                    ( "project", "name" ),
+                    ( "project", "version" ),
+                    ( "project", "description" ),
+                    ( "project", "authors" )
+                ) )
 
-        pyprojectbase_toml = Path( ' ' ).parent / "indicatorbase" / "pyprojectbase.toml"
-        config = configparser.ConfigParser()
-        config.read( pyprojectbase_toml )
-        authors_emails = config[ "project" ][ "authors" ]
-        print( authors_emails )
+        for k, v in keys_and_values.items():
+            print( k, v )
 
-        pyproject_toml = Path( ' ' ).parent / args.indicator_name / "pyproject.toml"
-        config = configparser.ConfigParser()
-        with open( pyproject_toml ) as stream:
-            config.read_string( "[top]\n" + stream.read() ) 
-
-        version = config[ "top" ][ "version" ]
-        print( version )

@@ -3,4 +3,8 @@
 version = "1.0.44"
 description = "Application indicator which displays fortunes."
 classifiers = [
-  "Topic :: Games/Entertainment :: Fortune Cookies" ]
+  "Topic :: Games/Entertainment :: Fortune Cookies",
+  "Topic :: 3Games/Entertainment :: 3Fortune Cookies",
+  "Topic :: 4Games/Entertainment :: 4Fortune Cookies",
+  "Topic :: 5Games/Entertainment :: 5Fortune Cookies" ]
+  
