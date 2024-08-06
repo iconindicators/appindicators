@@ -135,6 +135,7 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
 
     name = ""
     comments = ""
+    message = ""
     with open( indicator_source, 'r' ) as f:
         for line in f:
             if re.search( r"indicator_name_for_desktop_file = _\( ", line ):
@@ -144,20 +145,12 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
                 comments = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
 
     if name == "":
-        # This flags to the user that no name was found,
-        # but allows the build to continue...
-        print( "----------------------------------------------" )
-        print( f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }" )
-        print( "----------------------------------------------" )
+        message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }"
 
     if comments == "":
-        # This flags to the user that no comments was found,
-        # but allows the build to continue...
-        print( "-----------------------------------------------------------" )
-        print( f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }" )
-        print( "-----------------------------------------------------------" )
+        message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }"
 
-    return name, comments
+    return name, comments, message
 
 
 def _create_run_script( directory_platform_linux, indicator_name ):
@@ -289,9 +282,22 @@ def get_pyproject_toml_version( pyproject_toml ):
     return version.replace( '\'', '' ).strip()
 
 
+def _get_version_in_changelog_markdown( changelog_markdown ):
+    version = ""
+    with open( changelog_markdown, 'r' ) as f:
+        for line in f.readlines():
+            if line.startswith( "## v" ):
+                version = line.split( ' ' )[ 1 ][ 1 : ]
+                break
+
+    return version
+
+
 def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
-    # By using copytree, the ENTIRE project is copied across;
-    # however, the pyproject.toml explicitly defines what files/folders
+    message = ""
+
+    # Using copytree, the ENTIRE project is copied across.
+    # However, the pyproject.toml explicitly defines what files/folders
     # are included in the build (and conversely what is excluded).
     directory_indicator = directory_dist / indicator_name
     shutil.copytree( indicator_name, directory_indicator )
@@ -314,71 +320,61 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     authors = get_pyproject_toml_authors( pyproject_toml )
     version = get_pyproject_toml_version( pyproject_toml )
 
-#TODO Need to get the function below (I guess) from repository...
-    '''
     version_from_changelog_markdown = \
         _get_version_in_changelog_markdown(
             Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" )
 
-    if version_from_pyproject_toml == version_from_changelog_markdown:
+    if version != version_from_changelog_markdown:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
-    '''
 
-    start_year = \
-        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+    else:
+        start_year = \
+            indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+                Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
 
-#TODO Handle message...abort on not ""?
-    message = \
-        utils_locale.update_locale_source(
-            indicator_name,
-            authors,
-            start_year,
-            version,
-            version_indicator_base )
+        message = \
+            utils_locale.update_locale_source(
+                indicator_name,
+                authors,
+                start_year,
+                version,
+                version_indicator_base )
 
-#TODO Not sure where this should be moved to...but is in the middle of update locale and build locale.
-    utils_readme.create_readme( directory_indicator, indicator_name, authors, start_year )
+        if not message:
+            utils_readme.create_readme( directory_indicator, indicator_name, authors, start_year )
 
-    directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"
-    directory_platform_linux.mkdir( parents = True )
+            utils_locale.build_locale_release( directory_dist, indicator_name )
 
-    # _process_locale( directory_dist, indicator_name )
-    utils_locale.build_locale_release( directory_dist, indicator_name )
+            name, comments, message = \
+                _get_name_and_comments_from_indicator(
+                    indicator_name, directory_indicator )
 
-    name, comments = \
-        _get_name_and_comments_from_indicator(
-            indicator_name, directory_indicator )
+            if not message:
+                directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
 
-    directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
+                names_from_mo_files, comments_from_mo_files = \
+                    utils_locale.get_names_and_comments_from_mo_files(
+                        indicator_name,
+                        directory_indicator_locale,
+                        name,
+                        comments )
 
-    names_from_mo_files, comments_from_mo_files = \
-        utils_locale.get_names_and_comments_from_mo_files(
-            indicator_name,
-            directory_indicator_locale,
-            name,
-            comments )
+                directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"
+                directory_platform_linux.mkdir( parents = True )
 
-    _create_dot_desktop(
-        directory_platform_linux,
-        indicator_name,
-        name,
-        names_from_mo_files,
-        comments,
-        comments_from_mo_files )
+                _create_dot_desktop(
+                    directory_platform_linux,
+                    indicator_name,
+                    name,
+                    names_from_mo_files,
+                    comments,
+                    comments_from_mo_files )
 
-    _create_run_script( directory_platform_linux, indicator_name )
+                _create_run_script( directory_platform_linux, indicator_name )
 
-    _create_symbolic_icons( directory_dist, indicator_name )
+                _create_symbolic_icons( directory_dist, indicator_name )
 
-#TODO If the names/comments calculated above are so important,
-# why is the code which follows
-#   _get_name_and_comments_from_indicator
-# always run instead of checking names/comments != ""?
-    return ( name != "" ) and ( comments != "" )
-#TODO Returning a boolean, but the caller expects a string/message.
-# When/where did this change occur?
-# Look up old version in repository.
+    return message
 
 
 def _build_wheel_for_indicator( directory_release, indicator_name ):

@@ -164,7 +164,6 @@ def _create_update_pot( indicator_name, locale_directory, authors_emails, versio
 
 
 def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
-    message = ""
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
         po_file = (
@@ -241,10 +240,10 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
 
             subprocess.run( command )
 
-            message += f"INFO: Created { po_file } for lingua code '{ lingua_code }'. "
+            message = f"INFO: "
+            message += f"Created { po_file } for lingua code '{ lingua_code }'. "
             message += f"Update lines 1, 4, 12, and 13.\n"
-
-    return message
+            print( message )
 
 
 def _validate_locale_source( indicator_name ):
@@ -290,12 +289,11 @@ def update_locale_source(
             version_indicatorbase,
             copyright_ )
 
-        message += \
-            _create_update_po(
-                "indicatorbase",
-                _get_linguas_codes( "indicatorbase" ),
-                version_indicatorbase,
-                copyright_ )
+        _create_update_po(
+            "indicatorbase",
+            _get_linguas_codes( "indicatorbase" ),
+            version_indicatorbase,
+            copyright_ )
 
         copyright_ = f"{ start_year }-{ current_year_author }"
 
@@ -306,15 +304,13 @@ def update_locale_source(
             version_indicator,
             copyright_ )
 
-        message += \
-            _create_update_po(
-                indicator_name,
-                _get_linguas_codes( indicator_name ),
-                version_indicator,
-                copyright_ )
+        _create_update_po(
+            indicator_name,
+            _get_linguas_codes( indicator_name ),
+            version_indicator,
+            copyright_ )
 
-    if message:
-        print( message )
+    return message
 
 
 def get_names_and_comments_from_mo_files(
