@@ -3,5 +3,4 @@
 version = "1.0.25"
 description = "Application indicator to run a terminal command or script."
 classifiers = [
-  "Topic :: Utilities"
-]
+  "Topic :: Utilities" ]

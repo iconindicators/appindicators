@@ -3,5 +3,4 @@
 version = "1.0.81"
 description = "Application indicator which displays PPA download statistics."
 classifiers = [
-  "Topic :: Utilities"
-]
+  "Topic :: Utilities" ]
