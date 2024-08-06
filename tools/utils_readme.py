@@ -33,15 +33,9 @@
 
 import datetime
 import re
-# import sys
 
 from enum import auto, Enum
 from pathlib import Path
-
-# import utils
-
-# sys.path.append( "indicatorbase/src/indicatorbase" )
-# import indicatorbase
 
 
 class Operating_System( Enum ):
@@ -725,6 +719,7 @@ def _get_removal( indicator_name ):
             _get_operating_system_dependencies_debian ) )
 
 
+#TODO Why is indicator_name not used...is this left over from all changes?
 def _get_license( indicator_name, authors_emails, start_year ):
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 

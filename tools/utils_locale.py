@@ -23,14 +23,8 @@
 import datetime
 import gettext
 import subprocess
-import sys
 
 from pathlib import Path
-
-# import utils
-
-sys.path.append( "indicatorbase/src/indicatorbase" )
-import indicatorbase
 
 
 def _get_linguas_codes( indicator_name ):
@@ -57,24 +51,6 @@ def _get_potfiles_dot_in( indicator_name ):
 
 def _get_current_year():
     return datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
-
-
-# def _get_copyright( indicator_name, authors_emails ):
-#     start_year = \
-#         indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-#             Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
-#
-# #TODO Should this include all authors in a line?
-# # I've done this somewhere else...
-#     # authors_and_emails = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )
-#     # authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
-#     # authors = ', '.join( authors )
-#     return f"{ start_year }-{ _get_current_year() } { authors_emails[ 0 ] }"
-
-
-#TODO Needs access to pyproject.toml
-# def _get_author_email( project_metadata ):
-#     return indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
 
 
 def _create_update_pot( indicator_name, locale_directory, authors_emails, version, copyright_ ):
@@ -271,33 +247,6 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
     return message
 
 
-#TODO Remove hpoefully
-# def _precheckORIG( indicator_name ):
-#     message = ""
-#
-#     potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
-#     if not potfiles_dot_in.exists():
-#         message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
-#
-#     linguas = _get_linguas( indicator_name )
-#     if not linguas.exists():
-#         message += f"ERROR: Cannot find { linguas }\n" 
-#
-#     if indicator_name == "indicatorbase":
-#         project_metadata = None
-#
-#     else:
-#         project_metadata, error_message = \
-#             indicatorbase.IndicatorBase.get_project_metadata(
-#                 indicator_name,
-#                 from_script = True )
-#
-#         if error_message:
-#             message += f"ERROR: { error_message }\n" 
-#
-#     return project_metadata, message
-
-
 def _validate_locale_source( indicator_name ):
     message = ""
 
@@ -318,41 +267,6 @@ def _validate_locale_source( indicator_name ):
         message += f"ERROR: Cannot find { linguas }\n" 
 
     return message
-
-
-# if __name__ == "__main__":
-#     if utils.is_correct_directory( "./tools/build_locale.py", "release indicatorfortune" ):
-#         args = \
-#             utils.initialiase_parser_and_get_arguments(
-#                 "Create/update the .pot and .po(s) for an indicator.",
-#                 ( "indicator_name" ),
-#                 { "indicator_name" : "The name of the indicator." } )
-#
-#         message = _precheck( args.indicator_name )
-#         if message:
-#             print( message )
-#
-#         else:
-#             message = ""
-#
-#             author_email = _get_author_email( project_metadata )
-#
-#             locale_directory = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
-#             version = "1.0.1"
-#             copyright_ = f"2017-{ _get_current_year() } { author_email[ 0 ] }" # First year for translations of indicatorbase.
-#             _create_update_pot( "indicatorbase", locale_directory, author_email, version, copyright_ )
-#             message += \
-#                 _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
-#
-#             locale_directory = Path( '.' ) / args.indicator_name / "src" / args.indicator_name / "locale"
-#             version = project_metadata[ 'Version' ]
-#             copyright_ = _get_copyright( args.indicator_name, project_metadata )
-#             _create_update_pot( args.indicator_name, locale_directory, author_email, version, copyright_ )
-#             message += \
-#                 _create_update_po( args.indicator_name, _get_linguas_codes( args.indicator_name ), version, copyright_ )
-#
-#             if message:
-#                 print( message )
 
 
 #TODO This is now causing changes in ONLY the date to POT/PO for indicator fortune.
@@ -432,7 +346,6 @@ def get_names_and_comments_from_mo_files(
             comments_from_mo_files[ locale ] = translated_string
 
     return names_from_mo_files, comments_from_mo_files
-
 
 
 def build_locale_release( directory_release, indicator_name ):
