@@ -72,7 +72,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
         "version = \'" + version + '\'\n' + \
         "description = \'" + description + '\'' )
 
-    out_pyproject_toml = directory_out / "pyproject.toml"
+    out_pyproject_toml = directory_out / indicator_name / "pyproject.toml"
     with open( out_pyproject_toml, 'w' ) as f:
         f.write( text + '\n' )
 
@@ -82,15 +82,60 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
         stat.S_IRGRP,
         stat.S_IROTH )
 
+    return out_pyproject_toml
 
-def get_values_from_pyproject_toml( pyproject_dot_toml, keys ):
+
+def _get_value_from_pyproject_toml( pyproject_toml, key ):
     config = configparser.ConfigParser()
-    config.read( pyproject_dot_toml )
-    keys_and_values = { }
-    for key in keys:
-        keys_and_values[ key[ 1 ] ] = config[ key[ 0 ] ][ key[ 1 ] ]
+    config.read( pyproject_toml )
 
-    return keys_and_values
+#TODO HOpefully below is now old and can be deleted.    
+        # value = config[ key[ 0 ] ][ key[ 1 ] ]
+        # if '\n' in value:
+        #     print( value )
+        #     value = value.replace( '[', '' ).replace( ']', '' ).strip()
+        #     #TODO Test with multiple authors and also multiple dependencies.
+        #     # value = ',\n' + re.sub( "^", "  ", value, flags = re.M )
+        #     print( value )
+        #     print()
+        #
+        # else:
+        #     print( value )
+        #     value = value.replace( '\'', '' ).strip()
+        #     print( value )
+        #     print()
+        # keys_and_values[ key[ 1 ] ] = value
+
+    return config[ key[ 0 ] ][ key[ 1 ] ]
+
+
+def get_pyproject_toml_authors( pyproject_toml ):
+    authors = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "authors" ) )
+    authors = authors.replace( '[', '' ).replace( ']', '' )
+    authors = authors.replace( '{', '' ).replace( '},', '' ).replace( '}', '' ).strip()
+
+    names_emails = [ ]
+    for line in authors.split( '\n' ):
+        line_ = line.split( '=' )
+        if "name" in line and "email" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            email = line_[ 2 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, email ) )
+
+        elif "name" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, "" ) )
+        
+        elif "email" in line:
+            email = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( "", email ) )
+
+    return tuple( names_emails )
+
+
+def get_pyproject_toml_version( pyproject_toml ):
+    version = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "version" ) )
+    return version.replace( '\'', '' ).strip()
 
 
 def is_correct_directory( script_path_and_name, script_example_arguments ):

@@ -2,9 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-# Create/update the .pot and .po files for an indicator.
-
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -19,13 +16,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+# Create/update the .pot and .po files for an indicator.
+#TODO Update comment
+
+
 import datetime
+import gettext
 import subprocess
 import sys
 
 from pathlib import Path
 
-import utils
+# import utils
 
 sys.path.append( "indicatorbase/src/indicatorbase" )
 import indicatorbase
@@ -57,22 +59,22 @@ def _get_current_year():
     return datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
 
+# def _get_copyright( indicator_name, authors_emails ):
+#     start_year = \
+#         indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+#             Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+#
+# #TODO Should this include all authors in a line?
+# # I've done this somewhere else...
+#     # authors_and_emails = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )
+#     # authors = [ author_and_email[ 0 ] for author_and_email in authors_and_emails ]
+#     # authors = ', '.join( authors )
+#     return f"{ start_year }-{ _get_current_year() } { authors_emails[ 0 ] }"
+
+
 #TODO Needs access to pyproject.toml
-def _get_copyright( indicator_name, project_metadata ):
-    start_year = \
-        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
-
-    author_email = _get_author_email( project_metadata )
-
-    copyright_ = f"{ start_year }-{ _get_current_year() } { author_email[ 0 ] }"
-
-    return copyright_
-
-
-#TODO Needs access to pyproject.toml
-def _get_author_email( project_metadata ):
-    return indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
+# def _get_author_email( project_metadata ):
+#     return indicatorbase.IndicatorBase.get_authors_emails( project_metadata )[ 0 ]
 
 
 def _create_update_pot( indicator_name, locale_directory, authors_emails, version, copyright_ ):
@@ -270,33 +272,33 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
 
 
 #TODO Remove hpoefully
-def _precheckORIG( indicator_name ):
-    message = ""
+# def _precheckORIG( indicator_name ):
+#     message = ""
+#
+#     potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
+#     if not potfiles_dot_in.exists():
+#         message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
+#
+#     linguas = _get_linguas( indicator_name )
+#     if not linguas.exists():
+#         message += f"ERROR: Cannot find { linguas }\n" 
+#
+#     if indicator_name == "indicatorbase":
+#         project_metadata = None
+#
+#     else:
+#         project_metadata, error_message = \
+#             indicatorbase.IndicatorBase.get_project_metadata(
+#                 indicator_name,
+#                 from_script = True )
+#
+#         if error_message:
+#             message += f"ERROR: { error_message }\n" 
+#
+#     return project_metadata, message
 
-    potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
-    if not potfiles_dot_in.exists():
-        message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
 
-    linguas = _get_linguas( indicator_name )
-    if not linguas.exists():
-        message += f"ERROR: Cannot find { linguas }\n" 
-
-    if indicator_name == "indicatorbase":
-        project_metadata = None
-
-    else:
-        project_metadata, error_message = \
-            indicatorbase.IndicatorBase.get_project_metadata(
-                indicator_name,
-                from_script = True )
-
-        if error_message:
-            message += f"ERROR: { error_message }\n" 
-
-    return project_metadata, message
-
-
-def _precheck( indicator_name ):
+def _validate_locale_source( indicator_name ):
     message = ""
 
     potfiles_dot_in = _get_potfiles_dot_in( "indicatorbase" )
@@ -353,32 +355,116 @@ def _precheck( indicator_name ):
 #                 print( message )
 
 
-
-def build_locale( indicator_name, project_metadata ):
-    message = _precheck( indicator_name )
+#TODO This is now causing changes in ONLY the date to POT/PO for indicator fortune.
+def update_locale_source( indicator_name, authors_emails, start_year, version ):
+    message = _validate_locale_source( indicator_name )
     if message:
         print( message )  #TODO Really just want 'if not message' and run the build_locale...does that test work?
 
     else:
         message = ""
 
-#TODO Suspect the format of project_metadata pass in above will be different to that expected in get_authors_emails below...
-        # author_email = _get_author_email( project_metadata )
-        authors_emails = indicatorbase.IndicatorBase.get_authors_emails( project_metadata )
+        current_year_author = f"-{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }"
+        copyright_ = f"2017-{ current_year_author }"  #TODO COmment that 2017 is start year for indicatorbase.
 
-        locale_directory = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
-        version = "1.0.1"
-        copyright_ = f"2017-{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }" # First year for translations of indicatorbase.
-        _create_update_pot( "indicatorbase", locale_directory, authors_emails, version, copyright_ )
-        message += \
-            _create_update_po( "indicatorbase", _get_linguas_codes( "indicatorbase" ), version, copyright_ )
+        _create_update_pot(
+            "indicatorbase",
+            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale",
+            authors_emails,
+            "1.0.1",  #TODO Need a comment for this...should this be a variable or property somewhere?  What if it needs to be updated?
+            copyright_ )
 
-        locale_directory = Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
-        version = project_metadata[ 'Version' ]
-        copyright_ = _get_copyright( indicator_name, project_metadata )
-        _create_update_pot( indicator_name, locale_directory, authors_emails, version, copyright_ )
         message += \
-            _create_update_po( indicator_name, _get_linguas_codes( indicator_name ), version, copyright_ )
+            _create_update_po(
+                "indicatorbase",
+                _get_linguas_codes( "indicatorbase" ),
+                version,
+                copyright_ )
+
+        copyright_ = f"{ start_year }-{ current_year_author }"
+
+        _create_update_pot(
+            indicator_name,
+            Path( '.' ) / indicator_name / "src" / indicator_name / "locale",
+            authors_emails,
+            version,
+            copyright_ )
+
+        message += \
+            _create_update_po(
+                indicator_name,
+                _get_linguas_codes( indicator_name ),
+                version,
+                copyright_ )
 
         if message:
             print( message )
+
+
+def get_names_and_comments_from_mo_files(
+        indicator_name,
+        directory_indicator_locale,
+        name,
+        comments ):
+
+    names_from_mo_files = { }
+    comments_from_mo_files = { }
+    for mo in list( Path( directory_indicator_locale ).rglob( "*.mo" ) ):
+        locale = mo.parent.parent.stem
+
+        # https://stackoverflow.com/questions/54638570/extract-single-translation-from-gettext-po-file-from-shell
+        # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
+        # https://stackoverflow.com/questions/53316631/unable-to-use-gettext-to-retrieve-the-translated-string-in-mo-files
+        translation = \
+            gettext.translation(
+                indicator_name,
+                localedir = directory_indicator_locale,
+                languages = [ locale ] )
+
+        translated_string = translation.gettext( name )
+
+        if translated_string != name:
+            names_from_mo_files[ locale ] = translated_string
+
+        translated_string = translation.gettext( comments )
+
+        if translated_string != comments:
+            comments_from_mo_files[ locale ] = translated_string
+
+    return names_from_mo_files, comments_from_mo_files
+
+
+
+def build_locale_release( directory_release, indicator_name ):
+    directory_indicator = Path( '.' ) / directory_release / indicator_name
+    directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
+    directory_indicator_base_locale = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
+
+    # Append translations from indicatorbase to POT.
+    command = \
+        "msgcat --use-first " + \
+        str( directory_indicator_locale / ( indicator_name + ".pot" ) ) + " " + \
+        str( directory_indicator_base_locale / "indicatorbase.pot" ) + \
+        " --output-file=" + str( directory_indicator_locale / ( indicator_name + ".pot" ) )
+
+    subprocess.call( command, shell = True )
+
+    # Append translations from indicatorbase to PO files.
+    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+        language_code = po.parent.parts[ -2 ]
+
+        command = \
+            "msgcat --use-first " + \
+            str( po ) + " " + \
+            str( directory_indicator_base_locale / language_code / "LC_MESSAGES" / "indicatorbase.po" ) + \
+            " --output-file=" + str( po )
+
+        subprocess.call( command, shell = True )
+
+    # Create .mo files.
+    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+        command = \
+            "msgfmt " + str( po ) + \
+            " --output-file=" + str( po.parent / ( str( po.stem ) + ".mo" ) )
+
+        subprocess.call( command, shell = True )
