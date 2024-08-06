@@ -269,12 +269,15 @@ def _validate_locale_source( indicator_name ):
     return message
 
 
-def update_locale_source( indicator_name, authors_emails, start_year, version ):
-    message = _validate_locale_source( indicator_name )
-    if message:
-        print( message )  #TODO Really just want 'if not message' and run the build_locale...does that test work?
+def update_locale_source(
+    indicator_name,
+    authors_emails,
+    start_year,
+    version_indicator,
+    version_indicatorbase):
 
-    else:
+    message = _validate_locale_source( indicator_name )
+    if not message:
         message = ""
 
         current_year_author = f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }"
@@ -284,14 +287,14 @@ def update_locale_source( indicator_name, authors_emails, start_year, version ):
             "indicatorbase",
             Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale",
             authors_emails,
-            "1.0.1",  #TODO Need a comment for this...should this be a variable or property somewhere?  What if it needs to be updated?
+            version_indicatorbase,
             copyright_ )
 
         message += \
             _create_update_po(
                 "indicatorbase",
                 _get_linguas_codes( "indicatorbase" ),
-                "1.0.1",  #TODO Need a comment for this...should this be a variable or property somewhere?  What if it needs to be updated?
+                version_indicatorbase,
                 copyright_ )
 
         copyright_ = f"{ start_year }-{ current_year_author }"
@@ -300,18 +303,18 @@ def update_locale_source( indicator_name, authors_emails, start_year, version ):
             indicator_name,
             Path( '.' ) / indicator_name / "src" / indicator_name / "locale",
             authors_emails,
-            version,
+            version_indicator,
             copyright_ )
 
         message += \
             _create_update_po(
                 indicator_name,
                 _get_linguas_codes( indicator_name ),
-                version,
+                version_indicator,
                 copyright_ )
 
-        if message:
-            print( message )
+    if message:
+        print( message )
 
 
 def get_names_and_comments_from_mo_files(

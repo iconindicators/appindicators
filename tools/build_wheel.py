@@ -99,7 +99,11 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
     with open( indicatorbase_pyproject_toml ) as f:
         for line in f:
             if not line.startswith( '#' ):
-                text += line
+                if line.startswith( "version = " ):
+                    version_indicator_base = line.split( "\"" )[ 1 ]
+
+                else:
+                    text += line
 
     text = text.replace( "{classifiers}", classifiers )
     text = text.replace( "{dependencies}", dependencies )
@@ -123,7 +127,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
         stat.S_IRGRP,
         stat.S_IROTH )
 
-    return out_pyproject_toml
+    return out_pyproject_toml, version_indicator_base
 
 
 def _get_name_and_comments_from_indicator( indicator_name, directory_indicator ):
@@ -285,19 +289,6 @@ def get_pyproject_toml_version( pyproject_toml ):
     return version.replace( '\'', '' ).strip()
 
 
-
-#TODO Need to do the checks below in the function below after pyproject.toml is built.
-    # version_from_pyproject_toml = \
-    #     _get_value_for_single_line_tag_from_pyproject_toml(
-    #         Path( '.' ) / indicator_name / 'pyproject.toml',
-    #         "version" )
-    #
-    # version_from_changelog_markdown = \
-    #     _get_version_in_changelog_markdown(
-    #         Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" )
-    #
-    # if version_from_pyproject_toml == version_from_changelog_markdown:
-        # message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
 def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     # By using copytree, the ENTIRE project is copied across;
     # however, the pyproject.toml explicitly defines what files/folders
@@ -317,10 +308,21 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
         Path( '.' ) / directory_indicator / "src" / indicator_name )
 
-    pyproject_toml = _create_pyproject_dot_toml( indicator_name, directory_dist )
+    pyproject_toml, version_indicator_base = \
+        _create_pyproject_dot_toml( indicator_name, directory_dist )
 
     authors = get_pyproject_toml_authors( pyproject_toml )
     version = get_pyproject_toml_version( pyproject_toml )
+
+#TODO Need to get the function below (I guess) from repository...
+    '''
+    version_from_changelog_markdown = \
+        _get_version_in_changelog_markdown(
+            Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" )
+
+    if version_from_pyproject_toml == version_from_changelog_markdown:
+        message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
+    '''
 
     start_year = \
         indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
@@ -332,7 +334,8 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
             indicator_name,
             authors,
             start_year,
-            version )
+            version,
+            version_indicator_base )
 
 #TODO Not sure where this should be moved to...but is in the middle of update locale and build locale.
     utils_readme.create_readme( directory_indicator, indicator_name, authors, start_year )
@@ -368,7 +371,14 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
 
     _create_symbolic_icons( directory_dist, indicator_name )
 
+#TODO If the names/comments calculated above are so important,
+# why is the code which follows
+#   _get_name_and_comments_from_indicator
+# always run instead of checking names/comments != ""?
     return ( name != "" ) and ( comments != "" )
+#TODO Returning a boolean, but the caller expects a string/message.
+# When/where did this change occur?
+# Look up old version in repository.
 
 
 def _build_wheel_for_indicator( directory_release, indicator_name ):
