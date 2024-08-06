@@ -25,6 +25,7 @@
 #    tar tf indicatortest-1.0.7.tar.gz
 
 
+import configparser
 import gettext
 import re
 import shutil
@@ -85,9 +86,61 @@ def _run_checks_specific_to_indicator( indicator_name ):
 #     return message
 
 
-#TODO Might end up switching to utils version.
 def _chmod( file, user_permission, group_permission, other_permission ):
     Path( file ).chmod( user_permission | group_permission | other_permission )
+
+
+def _create_pyproject_dot_toml( indicator_name, directory_out ):
+    indicator_pyproject_toml = Path( '.' ) / indicator_name / "pyproject.toml"
+
+    config = configparser.ConfigParser()
+    with open( indicator_pyproject_toml ) as stream:
+        config.read_string( "[top]\n" + stream.read() ) 
+
+    version = config[ "top" ][ "version" ].replace( '\"', '' ).strip()
+
+    # The description may contain a ' which must be replaced with "
+    # as it causes an error when parsing the pyproject.toml.
+    description = config[ "top" ][ "description" ].replace( '\"', '' ).replace( '\'', '\"' ).strip()
+
+    classifiers = config[ "top" ][ "classifiers" ].replace( '[', '' ).replace( ']', '' ).strip()
+    classifiers = ',\n' + re.sub( "^", "  ", classifiers, flags = re.M )
+
+    dependencies = ""
+    if "dependencies" in config[ "top" ]:
+        dependencies = config[ "top" ][ "dependencies" ].replace( '[', '' ).replace( ']', '' ).strip()
+        dependencies = ',\n' + re.sub( "^", "  ", dependencies, flags = re.M )
+
+    indicatorbase_pyproject_toml = Path( '.' ) / "indicatorbase" / "pyprojectbase.toml"
+    text = ""
+    with open( indicatorbase_pyproject_toml ) as f:
+        for line in f:
+            if not line.startswith( '#' ):
+                text += line
+
+    text = text.replace( "{classifiers}", classifiers )
+    text = text.replace( "{dependencies}", dependencies )
+    text = text.replace( "{indicator_name}", indicator_name )
+
+    text = \
+        text.replace(
+        "[project]", 
+        "[project]\n" + \
+        "name = \'" + indicator_name + '\'\n' + \
+        "version = \'" + version + '\'\n' + \
+        "description = \'" + description + '\'' )
+
+    out_pyproject_toml = directory_out / indicator_name / "pyproject.toml"
+    with open( out_pyproject_toml, 'w' ) as f:
+        f.write( text + '\n' )
+
+    _chmod(
+        out_pyproject_toml,
+        stat.S_IRUSR | stat.S_IWUSR,
+        stat.S_IRGRP,
+        stat.S_IROTH )
+
+    return out_pyproject_toml
 
 
 def _get_name_and_comments_from_indicator( indicator_name, directory_indicator ):
@@ -378,6 +431,60 @@ def _create_dot_desktop(
         stat.S_IROTH )
 
 
+def _get_value_from_pyproject_toml( pyproject_toml, key ):
+    config = configparser.ConfigParser()
+    config.read( pyproject_toml )
+
+#TODO HOpefully below is now old and can be deleted.    
+        # value = config[ key[ 0 ] ][ key[ 1 ] ]
+        # if '\n' in value:
+        #     print( value )
+        #     value = value.replace( '[', '' ).replace( ']', '' ).strip()
+        #     #TODO Test with multiple authors and also multiple dependencies.
+        #     # value = ',\n' + re.sub( "^", "  ", value, flags = re.M )
+        #     print( value )
+        #     print()
+        #
+        # else:
+        #     print( value )
+        #     value = value.replace( '\'', '' ).strip()
+        #     print( value )
+        #     print()
+        # keys_and_values[ key[ 1 ] ] = value
+
+    return config[ key[ 0 ] ][ key[ 1 ] ]
+
+
+def get_pyproject_toml_authors( pyproject_toml ):
+    authors = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "authors" ) )
+    authors = authors.replace( '[', '' ).replace( ']', '' )
+    authors = authors.replace( '{', '' ).replace( '},', '' ).replace( '}', '' ).strip()
+
+    names_emails = [ ]
+    for line in authors.split( '\n' ):
+        line_ = line.split( '=' )
+        if "name" in line and "email" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            email = line_[ 2 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, email ) )
+
+        elif "name" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, "" ) )
+        
+        elif "email" in line:
+            email = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( "", email ) )
+
+    return tuple( names_emails )
+
+
+def get_pyproject_toml_version( pyproject_toml ):
+    version = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "version" ) )
+    return version.replace( '\'', '' ).strip()
+
+
+
 #TODO Need to do the checks below in the function below after pyproject.toml is built.
     # version_from_pyproject_toml = \
     #     _get_value_for_single_line_tag_from_pyproject_toml(
@@ -410,10 +517,10 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
         Path( '.' ) / directory_indicator / "src" / indicator_name )
 
     # _create_pyproject_dot_toml( indicator_name, directory_dist )
-    pyproject_toml = utils._create_pyproject_dot_toml( indicator_name, directory_dist )  #TODO This might go back into this function from utils!
+    pyproject_toml = _create_pyproject_dot_toml( indicator_name, directory_dist )  #TODO This might go back into this function from utils!
 
-    authors = utils.get_pyproject_toml_authors( pyproject_toml )
-    version = utils.get_pyproject_toml_version( pyproject_toml )
+    authors = get_pyproject_toml_authors( pyproject_toml )
+    version = get_pyproject_toml_version( pyproject_toml )
 
     start_year = \
         indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
