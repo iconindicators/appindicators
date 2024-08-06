@@ -16,8 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create/update the .pot and .po files for an indicator.
-#TODO Update comment
+# Create/update the .pot/.po files for an indicator's source.
+# Build the .pot/.po files for an indicator's wheel release.
 
 
 import datetime
@@ -269,7 +269,6 @@ def _validate_locale_source( indicator_name ):
     return message
 
 
-#TODO This is now causing changes in ONLY the date to POT/PO for indicator fortune.
 def update_locale_source( indicator_name, authors_emails, start_year, version ):
     message = _validate_locale_source( indicator_name )
     if message:
@@ -278,8 +277,8 @@ def update_locale_source( indicator_name, authors_emails, start_year, version ):
     else:
         message = ""
 
-        current_year_author = f"-{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }"
-        copyright_ = f"2017-{ current_year_author }"  #TODO COmment that 2017 is start year for indicatorbase.
+        current_year_author = f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }"
+        copyright_ = f"2017-{ current_year_author }"  # Start year for indicatorbase translations is 2017.
 
         _create_update_pot(
             "indicatorbase",
@@ -292,7 +291,7 @@ def update_locale_source( indicator_name, authors_emails, start_year, version ):
             _create_update_po(
                 "indicatorbase",
                 _get_linguas_codes( "indicatorbase" ),
-                version,
+                "1.0.1",  #TODO Need a comment for this...should this be a variable or property somewhere?  What if it needs to be updated?
                 copyright_ )
 
         copyright_ = f"{ start_year }-{ current_year_author }"

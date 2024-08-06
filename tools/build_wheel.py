@@ -334,10 +334,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
             start_year,
             version )
 
-#Not sure where this should be moved to...but is in the middle of update locale and build locale.
-# Also, needs to be a call to a function in utils_readme I think?
-    # command = "python3 ./tools/build_readme.py " + str( directory_indicator ) + ' ' + indicator_name
-    # subprocess.call( command, shell = True )
+#TODO Not sure where this should be moved to...but is in the middle of update locale and build locale.
     utils_readme.create_readme( directory_indicator, indicator_name, authors, start_year )
 
     directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"

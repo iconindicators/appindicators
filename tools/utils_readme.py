@@ -719,8 +719,7 @@ def _get_removal( indicator_name ):
             _get_operating_system_dependencies_debian ) )
 
 
-#TODO Why is indicator_name not used...is this left over from all changes?
-def _get_license( indicator_name, authors_emails, start_year ):
+def _get_license( authors_emails, start_year ):
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
     authors = [ author_email[ 0 ] for author_email in authors_emails ]
@@ -743,4 +742,4 @@ def create_readme( directory, indicator_name, authors_emails, start_year ):
         f.write( _get_usage( indicator_name ) )
         f.write( _get_distributions_supported( indicator_name ) )
         f.write( _get_removal( indicator_name ) )
-        f.write( _get_license( indicator_name, authors_emails, start_year ) )
+        f.write( _get_license( authors_emails, start_year ) )
