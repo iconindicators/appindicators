@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Look for all _ and __ uses
+# and see if I'm using them correctly.
+
+
 #TODO Check the calls to 
 #     GLib.timeout_add_seconds
 # and
