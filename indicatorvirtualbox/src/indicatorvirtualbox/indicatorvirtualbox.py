@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO This is kicking off a repeating update each time a V starts.
-# The issue is when calling request_update and needs to be fixed in indicatorbase.
-
-
 #TODO Need to amend the changelog.md and/or readme.md
 # to mention that
 #    mouse wheel scroll to cycle through running vms
