@@ -576,8 +576,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-#TODO Might be helpful later...
-#    https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
+    # For when migrating to GTK4...
+    #   https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
     def populate_treestore_and_select_script(
         self,
         treeview_all_scripts,
