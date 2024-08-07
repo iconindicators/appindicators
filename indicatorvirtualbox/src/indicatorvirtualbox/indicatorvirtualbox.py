@@ -301,25 +301,17 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
-
-        #TODO Why is this an inner function????
-        # Look at the commit history/log for this file...
-        # ...maybe that will give an reason/answer to why this is an inner function
-        # when only called in one place.
-        def launch_virtual_box_manager():
-            self.process_call( self.process_get( "which VirtualBox" ) + " &" )
-
-        # The executable for VirtualBox manager does not necessarily appear in the process list
-        # because the executable might be a script which calls another executable.
-        # Instead, have the user type in the title of the window into the preferences
-        # and find the window by the window title.
-        result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
+        # The executable for VirtualBox manager does not necessarily appear in the process
+        # list because the executable might be a script which calls another executable.
+        # Instead, have the user specify the title of the VirtualBox manager window into
+        # the preferences and find the window by the window title.
         window_id = None
+        result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
         if result:
             window_id = result.split()[ 0 ]
 
         if window_id is None or window_id == "":
-            launch_virtual_box_manager()
+            self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
         else:
             self.process_call( "wmctrl -ia " + window_id )
