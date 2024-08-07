@@ -119,7 +119,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         # Calculate next update...
         next_update = today + datetime.timedelta( hours = 100 ) # Set an update time well into the future.
         for script in self.scripts:
-            key = self.__create_key( script.get_group(), script.get_name() )
+            key = self._create_key( script.get_group(), script.get_name() )
 
             if type( script ) is Background and \
                self.background_script_next_update_time[ key ] < next_update and \
@@ -215,7 +215,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         for script in self.scripts:
             if type( script ) is Background and self.is_background_script_in_indicator_text( script ):
                 # Script is background AND present in the indicator text, so is a potential candidate to be updated...
-                key = self.__create_key( script.get_group(), script.get_name() )
+                key = self._create_key( script.get_group(), script.get_name() )
                 if ( self.background_script_next_update_time[ key ] < now ) or \
                    ( script.get_force_update() and self.background_script_results[ key ] ):
                     background_scripts_to_execute.append( script )
@@ -225,7 +225,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
             future_to_script = {
                 executor.submit(
-                    self.__update_background_script,
+                    self._update_background_script,
                     script,
                     now ): script for script in background_scripts_to_execute }
 
@@ -252,13 +252,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                     self.process_call( notification_command )
 
 
-    def __update_background_script( self, script, now ):
+    def _update_background_script( self, script, now ):
         if self.send_command_to_log:
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
         command_result = self.process_get( script.get_command(), log_non_zero_error_code = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
-        key = self.__create_key( script.get_group(), script.get_name() )
+        key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = \
             now + datetime.timedelta( minutes = script.get_interval_in_minutes() )
@@ -269,7 +269,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def process_tags( self ):
         indicator_text_processed = self.indicator_text
         for script in self.scripts:
-            key = self.__create_key( script.get_group(), script.get_name() )
+            key = self._create_key( script.get_group(), script.get_name() )
             if type( script ) is Background and "[" + key + "]" in indicator_text_processed:
                 command_result = self.background_script_results[ key ]
                 if command_result is None: # Background script failed so leave the tag in place for the user to see.
@@ -618,7 +618,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         if scripts:
             background_scripts_by_group = self.get_scripts_by_group( scripts, non_background = False, background = True )
             background_groups = sorted( background_scripts_by_group.keys(), key = str.lower )
-            self.__expand_trees_and_select(
+            self._expand_trees_and_select(
                 treeview_all_scripts,
                 treeview_background_scripts,
                 select_group,
@@ -628,7 +628,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 background_groups )
 
 
-    def __expand_trees_and_select(
+    def _expand_trees_and_select(
             self,
             treeview_all_scripts,
             treeview_background_scripts,
@@ -672,7 +672,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def on_script_selection( self, treeview, textview, scripts ):
-        group, name = self.__get_group_name_from_treeview( treeview )
+        group, name = self._get_group_name_from_treeview( treeview )
         command_text = ""
         if group and name:
             command_text = self.get_script( scripts, group, name ).get_command()
@@ -704,10 +704,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             treeviewcolumn,
             textentry ):
 
-        group, name = self.__get_group_name_from_treeview( treeview )
+        group, name = self._get_group_name_from_treeview( treeview )
         if group and name:
             textentry.insert_text(
-                "[" + self.__create_key( group, name ) + "]", textentry.get_position() )
+                "[" + self._create_key( group, name ) + "]", textentry.get_position() )
 
 
     def on_script_copy(
@@ -717,7 +717,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             scripts_treeview,
             background_scripts_treeview ):
 
-        group, name = self.__get_group_name_from_treeview( scripts_treeview )
+        group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
             script = self.get_script( scripts, group, name )
 
@@ -826,7 +826,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             background_scripts_treeview,
             textentry ):
 
-        group, name = self.__get_group_name_from_treeview( scripts_treeview )
+        group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
             if self.show_dialog_ok_cancel( scripts_treeview, _( "Remove the selected script?" ) ) == Gtk.ResponseType.OK:
                 i = 0
@@ -840,7 +840,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                             "",
                             "" )
 
-                        self.update_indicator_textentry( textentry, self.__create_key( group, name ), "" )
+                        self.update_indicator_textentry( textentry, self._create_key( group, name ), "" )
                         break
 
                     i += 1
@@ -853,7 +853,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             scripts_treeview,
             background_scripts_treeview ):
 
-        self.__add_edit_script( None, scripts, scripts_treeview, background_scripts_treeview )
+        self._add_edit_script( None, scripts, scripts_treeview, background_scripts_treeview )
 
 
     def on_script_edit(
@@ -864,27 +864,27 @@ class IndicatorScriptRunner( IndicatorBase ):
             background_scripts_treeview,
             textentry ):
 
-        group, name = self.__get_group_name_from_treeview( scripts_treeview )
+        group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
             the_script = self.get_script( scripts, group, name )
             edited_script = \
-                self.__add_edit_script(
+                self._add_edit_script(
                     the_script,
                     scripts, scripts_treeview,
                     background_scripts_treeview )
 
             if edited_script:
                 if type( the_script ) is Background and type( edited_script ) is NonBackground:
-                    old_tag = self.__create_key( group, name )
+                    old_tag = self._create_key( group, name )
                     self.update_indicator_textentry( textentry, old_tag, "" )
 
                 if not( group == edited_script.get_group() and name == edited_script.get_name() ):
-                    old_tag = self.__create_key( group, name )
-                    new_tag = self.__create_key( edited_script.get_group(), edited_script.get_name() )
+                    old_tag = self._create_key( group, name )
+                    new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
                     self.update_indicator_textentry( textentry, old_tag, new_tag )
 
 
-    def __add_edit_script(
+    def _add_edit_script(
             self,
             script,
             scripts,
@@ -1212,7 +1212,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return scripts_by_group
 
 
-    def __get_group_name_from_treeview( self, treeview ):
+    def _get_group_name_from_treeview( self, treeview ):
         group = None
         name = None
         model, treeiter = treeview.get_selection().get_selected()
@@ -1240,17 +1240,17 @@ class IndicatorScriptRunner( IndicatorBase ):
         today = datetime.datetime.now()
         for script in self.scripts:
             if type( script ) is Background:
-                key = self.__create_key( script.get_group(), script.get_name() )
+                key = self._create_key( script.get_group(), script.get_name() )
                 self.background_script_results[ key ] = None
                 self.background_script_next_update_time[ key ] = today
 
 
-    def __create_key( self, group, name ):
+    def _create_key( self, group, name ):
         return group + "::" + name
 
 
     def is_background_script_in_indicator_text( self, script ):
-        return '[' + self.__create_key( script.get_group(), script.get_name() ) + ']' in self.indicator_text
+        return '[' + self._create_key( script.get_group(), script.get_name() ) + ']' in self.indicator_text
 
 
     def load_config( self, config ):

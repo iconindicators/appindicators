@@ -74,32 +74,32 @@ class IndicatorTest( IndicatorBase ):
 
 
     def update( self, menu ):
-        self.__build_menu( menu )
+        self._build_menu( menu )
         self.set_label( IndicatorTest.LABEL )
 
 
     def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
-        self.set_label( self.__get_current_time() )
+        self.set_label( self._get_current_time() )
         print( "Mouse wheel is scrolling..." )
 
 
-    def __build_menu( self, menu ):
+    def _build_menu( self, menu ):
         self.create_and_append_menuitem( menu, _( "Information" ) )
-        self.__build_menu_platform_uname( menu )
-        self.__build_menu_desktop( menu )
-        self.__build_menu_icon_theme( menu )
-        self.__build_menu_terminal( menu )
+        self._build_menu_platform_uname( menu )
+        self._build_menu_desktop( menu )
+        self._build_menu_icon_theme( menu )
+        self._build_menu_terminal( menu )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
         self.create_and_append_menuitem( menu, _( "Functionality" ) )
-        self.__build_menu_icon( menu )
-        self.__build_menu_label_tooltip_osd( menu )
-        self.__build_menu_clipboard( menu )
-        self.__build_menu_execute_command( menu )
+        self._build_menu_icon( menu )
+        self._build_menu_label_tooltip_osd( menu )
+        self._build_menu_clipboard( menu )
+        self._build_menu_execute_command( menu )
 
 
-    def __build_menu_platform_uname( self, menu ):
+    def _build_menu_platform_uname( self, menu ):
         submenu = Gtk.Menu()
 
         uname = platform.uname()
@@ -120,7 +120,7 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_desktop( self, menu ):
+    def _build_menu_desktop( self, menu ):
         submenu = Gtk.Menu()
 
         text = "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
@@ -137,7 +137,7 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_icon_theme( self, menu ):
+    def _build_menu_icon_theme( self, menu ):
         submenu = Gtk.Menu()
 
         text = \
@@ -166,7 +166,7 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_terminal( self, menu ):
+    def _build_menu_terminal( self, menu ):
         submenu = Gtk.Menu()
 
         terminal, execution_flag = self.get_terminal_and_execution_flag()
@@ -187,7 +187,7 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_icon( self, menu ):
+    def _build_menu_icon( self, menu ):
         submenu = Gtk.Menu()
 
         self.create_and_append_menuitem(
@@ -215,7 +215,7 @@ class IndicatorTest( IndicatorBase ):
                 submenu,
                 label,
                 name = icon,
-                activate_functionandarguments = ( self.__use_icon_dynamically_created, ),
+                activate_functionandarguments = ( self._use_icon_dynamically_created, ),
                 indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -224,7 +224,7 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_label_tooltip_osd( self, menu ):
+    def _build_menu_label_tooltip_osd( self, menu ):
         submenu = Gtk.Menu()
 
         self.create_and_append_menuitem(
@@ -241,7 +241,7 @@ class IndicatorTest( IndicatorBase ):
             activate_functionandarguments = (
                 lambda menuitem: (
                     print( "secondary activate target / mouse middle click" ),
-                    self.set_label( self.__get_current_time() ) ), ),
+                    self.set_label( self._get_current_time() ) ), ),
             indent = ( 2, 0 ),
             is_secondary_activate_target = True )
 
@@ -250,7 +250,7 @@ class IndicatorTest( IndicatorBase ):
             _( "Show current time in OSD" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.show_notification( _( "Current time..." ), self.__get_current_time() ), ),
+                    self.show_notification( _( "Current time..." ), self._get_current_time() ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -259,14 +259,14 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_clipboard( self, menu ):
+    def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: ( self.copy_to_selection( self.__get_current_time() ) ), ),
+                lambda menuitem: ( self.copy_to_selection( self._get_current_time() ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -275,7 +275,7 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __build_menu_execute_command( self, menu ):
+    def _build_menu_execute_command( self, menu ):
         submenu = Gtk.Menu()
 
         labels = (
@@ -300,7 +300,7 @@ class IndicatorTest( IndicatorBase ):
                 label,
                 activate_functionandarguments = (
                     lambda menuitem, command = command:  # Need command = command to handle lambda late binding.
-                        self.__execute_command( command ), ),
+                        self._execute_command( command ), ),
                 indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -309,14 +309,14 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def __get_current_time( self ):
+    def _get_current_time( self ):
         return datetime.datetime.now().strftime( "%H:%M:%S" )
 
 
-    def __use_icon_dynamically_created( self, menuitem ):
+    def _use_icon_dynamically_created( self, menuitem ):
         icon_path = \
             self.write_cache_text(
-                self.__get_svg_icon_text( menuitem.get_name(), 35, 65 ),
+                self._get_svg_icon_text( menuitem.get_name(), 35, 65 ),
                 IndicatorTest.CACHE_ICON_BASENAME,
                 IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
@@ -333,7 +333,7 @@ class IndicatorTest( IndicatorBase ):
     # bright limb angle in degrees
     #   Bright limb angle, relative to zenith, ranging from 0 to 360 inclusive.
     #   Ignored when phase is full/new.
-    def __get_svg_icon_text( self, phase, illumination_percentage, bright_limb_angle_in_degrees ):
+    def _get_svg_icon_text( self, phase, illumination_percentage, bright_limb_angle_in_degrees ):
         width = 100
         height = width
         radius = float( width / 2 )
@@ -375,7 +375,7 @@ class IndicatorTest( IndicatorBase ):
             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
 
 
-    def __execute_command( self, command ):
+    def _execute_command( self, command ):
         terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )

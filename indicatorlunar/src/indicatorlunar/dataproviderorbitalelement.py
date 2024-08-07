@@ -49,7 +49,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
         if is_minor_planet:
             downloaded = \
-                DataProviderOrbitalElement.__download_from_lowell_minor_planet_services(
+                DataProviderOrbitalElement._download_from_lowell_minor_planet_services(
                     filename,
                     logging,
                     orbital_element_data_type,
@@ -57,7 +57,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
         elif is_comet:
             downloaded = \
-                DataProviderOrbitalElement.__download_from_comet_observation_database(
+                DataProviderOrbitalElement._download_from_comet_observation_database(
                     filename,
                     logging,
                     orbital_element_data_type,
@@ -73,7 +73,7 @@ class DataProviderOrbitalElement( DataProvider ):
     # Download orbital element data for minor planets from
     # Lowell Minor Planet Services and save to the given filename.
     @staticmethod
-    def __download_from_lowell_minor_planet_services(
+    def _download_from_lowell_minor_planet_services(
             filename,
             logging,
             orbital_element_data_type,
@@ -276,7 +276,7 @@ class DataProviderOrbitalElement( DataProvider ):
     # Download orbital element data for comets from
     # Comet Observation Database and save to the given filename.
     @staticmethod
-    def __download_from_comet_observation_database(
+    def _download_from_comet_observation_database(
             filename,
             logging,
             orbital_element_data_type,

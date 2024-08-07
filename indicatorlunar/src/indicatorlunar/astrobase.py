@@ -226,10 +226,10 @@ class AstroBase( ABC ):
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
 
 
-    __STARS_INDEX_NAME = 0
-    __STARS_INDEX_HIP = 1
-    __STARS_INDEX_NAME_TRANSLATION = 2
-    __STARS_INDEX_TAG_TRANSLATION = 3
+    _STARS_INDEX_NAME = 0
+    _STARS_INDEX_HIP = 1
+    _STARS_INDEX_NAME_TRANSLATION = 2
+    _STARS_INDEX_TAG_TRANSLATION = 3
 
 
     # PyEphem provides a list of stars and data, whereas Skyfield does not.
@@ -460,38 +460,38 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def __get_star_row( star ):
-        return next( i for i in AstroBase.STARS if i[ AstroBase.__STARS_INDEX_NAME ] == star )
+    def _get_star_row( star ):
+        return next( i for i in AstroBase.STARS if i[ AstroBase._STARS_INDEX_NAME ] == star )
 
 
     @staticmethod
     def get_star_hip( star ):
-        return AstroBase.__get_star_row( star )[ AstroBase.__STARS_INDEX_HIP ]
+        return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_HIP ]
 
 
     @staticmethod
     def get_star_name_translation( star ):
-        return AstroBase.__get_star_row( star )[ AstroBase.__STARS_INDEX_NAME_TRANSLATION ]
+        return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_NAME_TRANSLATION ]
 
 
     @staticmethod
     def get_star_tag_translation( star ):
-        return AstroBase.__get_star_row( star )[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ]
+        return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
 
 
     @staticmethod
     def get_star_names():
-        return [ i[ AstroBase.__STARS_INDEX_NAME ] for i in AstroBase.STARS ]
+        return [ i[ AstroBase._STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
     @staticmethod
     def get_star_hips():
-        return [ i[ AstroBase.__STARS_INDEX_HIP ] for i in AstroBase.STARS ]
+        return [ i[ AstroBase._STARS_INDEX_HIP ] for i in AstroBase.STARS ]
 
 
     @staticmethod
     def get_star_tag_translations():
-        return [ i[ AstroBase.__STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
+        return [ i[ AstroBase._STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
 
 
     # Calculate apparent magnitude.

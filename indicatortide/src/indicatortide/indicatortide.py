@@ -130,19 +130,19 @@ class IndicatorTide( IndicatorBase ):
         if self.show_as_submenus:
             if self.show_as_submenus_except_first_day:
                 first_date_tidal_readings, after_first_date_tidal_readings = \
-                    self.__split_tidal_readings_after_first_date( tidal_readings )
+                    self._split_tidal_readings_after_first_date( tidal_readings )
 
-                self.__create_menu_flat( first_date_tidal_readings, menu, indent )
-                self.__create_menu_sub( after_first_date_tidal_readings, menu, indent )
+                self._create_menu_flat( first_date_tidal_readings, menu, indent )
+                self._create_menu_sub( after_first_date_tidal_readings, menu, indent )
 
             else:
-                self.__create_menu_sub( tidal_readings, menu, indent )
+                self._create_menu_sub( tidal_readings, menu, indent )
 
         else:
-            self.__create_menu_flat( tidal_readings, menu, indent )
+            self._create_menu_flat( tidal_readings, menu, indent )
 
 
-    def __create_menu_flat( self, tidal_readings, menu, indent ):
+    def _create_menu_flat( self, tidal_readings, menu, indent ):
         today_date = ""
         for tidal_reading in tidal_readings:
             if today_date != tidal_reading.get_date():
@@ -182,7 +182,7 @@ class IndicatorTide( IndicatorBase ):
                 shown_today = True
 
 
-    def __create_menu_sub( self, tidal_readings, menu, indent ):
+    def _create_menu_sub( self, tidal_readings, menu, indent ):
         today_date = ""
         shown_today = False
         submenu = None # Only declared here to keep the compiler happy.
@@ -222,7 +222,7 @@ class IndicatorTide( IndicatorBase ):
                 shown_today = True
 
 
-    def __split_tidal_readings_after_first_date( self, tidal_readings ):
+    def _split_tidal_readings_after_first_date( self, tidal_readings ):
         first_date_deadings = [ ]
         after_first_date_readings = [ ]
         for tidal_reading in tidal_readings:

@@ -103,7 +103,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             if virtual_machines:
                 running_names, running_uuids = self.get_running_virtual_machines()
 
-                self.__build_menu(
+                self._build_menu(
                     menu, self.get_virtual_machines(),
                     ( 0, 0 ),
                     running_uuids )
@@ -126,7 +126,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 _( "(VirtualBox™ is not installed)" ) )
 
 
-    def __build_menu( self, menu, items, indent, running_uuids ):
+    def _build_menu( self, menu, items, indent, running_uuids ):
         if self.sort_groups_and_virtual_machines_equally:
             sorted_items = \
                 sorted(
@@ -141,21 +141,21 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         for item in sorted_items:
             if type( item ) is Group:
-                self.__build_menu(
-                    self.__add_group_to_menu( menu, item, indent ),
+                self._build_menu(
+                    self._add_group_to_menu( menu, item, indent ),
                     item.get_items(),
                     ( indent[ 0 ] + 1, indent[ 1 ] + 1 ),
                     running_uuids )
 
             else:
-                self.__add_virtual_machine_to_menu(
+                self._add_virtual_machine_to_menu(
                     menu,
                     item,
                     indent,
                     item.get_uuid() in running_uuids )
 
 
-    def __add_group_to_menu( self, menu, group, indent ):
+    def _add_group_to_menu( self, menu, group, indent ):
         menuitem = \
             self.create_and_append_menuitem(
                 menu,
@@ -169,7 +169,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         return menu
 
 
-    def __add_virtual_machine_to_menu( self, menu, virtual_machine, indent, is_running ):
+    def _add_virtual_machine_to_menu( self, menu, virtual_machine, indent, is_running ):
         if is_running:
             self.create_and_append_radiomenuitem(
                 menu,
@@ -197,7 +197,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def auto_start_virtual_machines( self ):
         virtual_machines_for_autostart = [ ]
-        self.__get_virtual_machines_for_autostart(
+        self._get_virtual_machines_for_autostart(
             self.get_virtual_machines(),
             virtual_machines_for_autostart )
 
@@ -216,14 +216,14 @@ class IndicatorVirtualBox( IndicatorBase ):
                 previous_virtual_machine_was_already_running = False
 
 
-    def __get_virtual_machines_for_autostart(
+    def _get_virtual_machines_for_autostart(
             self,
             virtual_machines,
             virtual_machines_for_autostart ):
 
         for item in virtual_machines:
             if type( item ) is Group:
-                self.__get_virtual_machines_for_autostart(
+                self._get_virtual_machines_for_autostart(
                     item.get_items(),
                     virtual_machines_for_autostart )
 
@@ -406,7 +406,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.is_vbox_manage_installed():
             items = self.get_virtual_machines()
 
-        groups_exist = self.__add_items_to_store( treestore, None, items )
+        groups_exist = self._add_items_to_store( treestore, None, items )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -521,13 +521,13 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.sort_groups_and_virtual_machines_equally = sort_groups_and_virtual_machines_equally_checkbox.get_active()
             self.refresh_interval_in_minutes = spinner_refresh_interval.get_value_as_int()
             self.virtual_machine_preferences.clear()
-            self.__update_virtual_machine_preferences( treestore, treeview.get_model().get_iter_first() )
+            self._update_virtual_machine_preferences( treestore, treeview.get_model().get_iter_first() )
             self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
 
         return response_type
 
 
-    def __add_items_to_store( self, treestore, parent, items ):
+    def _add_items_to_store( self, treestore, parent, items ):
         groups_exist = False
         if self.sort_groups_and_virtual_machines_equally:
             sorted_items = sorted( items, key = lambda x: ( x.get_name().lower() ) )
@@ -538,7 +538,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         for item in sorted_items:
             if type( item ) is Group:
                 groups_exist = True
-                self.__add_items_to_store(
+                self._add_items_to_store(
                     treestore,
                     treestore.append( parent, [ item.get_name(), None, None, None ] ),
                     item.get_items() )
@@ -554,7 +554,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         return groups_exist
 
 
-    def __update_virtual_machine_preferences( self, treestore, treeiter ):
+    def _update_virtual_machine_preferences( self, treestore, treeiter ):
         while treeiter:
             is_virtual_machine = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
             is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY
@@ -566,7 +566,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             if treestore.iter_has_child( treeiter ):
                 childiter = treestore.iter_children( treeiter )
-                self.__update_virtual_machine_preferences( treestore, childiter )
+                self._update_virtual_machine_preferences( treestore, childiter )
 
             treeiter = treestore.iter_next( treeiter )
 

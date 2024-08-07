@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Look for all _ and __ uses
-# and see if I'm using them correctly.
-
-
 #TODO Check the calls to 
 #     GLib.timeout_add_seconds
 # and
@@ -321,11 +317,11 @@ from zipfile import ZipFile
 
 class IndicatorBase( ABC ):
 
-    __AUTOSTART_PATH = Path.home() / ".config" / "autostart"
+    _AUTOSTART_PATH = Path.home() / ".config" / "autostart"
 
-    __CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
+    _CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
-    __CONFIG_VERSION = "version"
+    _CONFIG_VERSION = "version"
 
     # Values are the result of calling
     #   echo $XDG_CURRENT_DESKTOP
@@ -333,20 +329,20 @@ class IndicatorBase( ABC ):
     # An alternative (with different results) is calling
     #   os.environ.get( "DESKTOP_SESSION" )
     # which gives 'plasma' rather than 'KDE' on 'Plasma (X11)' on Kubuntu.
-    __CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
-    __CURRENT_DESKTOP_ICEWM = "ICEWM"
-    __CURRENT_DESKTOP_KDE = "KDE"
-    __CURRENT_DESKTOP_LXQT = "LXQt"
-    __CURRENT_DESKTOP_MATE = "MATE"
-    __CURRENT_DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
-    __CURRENT_DESKTOP_X_CINNAMON = "X-Cinnamon"
-    __CURRENT_DESKTOP_XFCE = "XFCE"
+    _CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
+    _CURRENT_DESKTOP_ICEWM = "ICEWM"
+    _CURRENT_DESKTOP_KDE = "KDE"
+    _CURRENT_DESKTOP_LXQT = "LXQt"
+    _CURRENT_DESKTOP_MATE = "MATE"
+    _CURRENT_DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
+    _CURRENT_DESKTOP_X_CINNAMON = "X-Cinnamon"
+    _CURRENT_DESKTOP_XFCE = "XFCE"
 
-    __EXTENSION_JSON = ".json"
+    _EXTENSION_JSON = ".json"
 
 #TODO Check all terminals on all supported distros.
-    __TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS list first so as to be the "default".
-    __TERMINALS_AND_EXECUTION_FLAGS.extend( [
+    _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS list first so as to be the "default".
+    _TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
         [ "lxterminal", "-e" ],
         [ "mate-terminal", "-x" ],
@@ -354,10 +350,10 @@ class IndicatorBase( ABC ):
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ] )
 
-    __UPDATE_PERIOD_IN_SECONDS_DEFAULT = 60
+    _UPDATE_PERIOD_IN_SECONDS_DEFAULT = 60
 
-    __X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
-    __X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
+    _X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
+    _X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
     DIALOG_DEFAULT_HEIGHT = 480
     DIALOG_DEFAULT_WIDTH = 640
@@ -475,7 +471,7 @@ class IndicatorBase( ABC ):
         menu.show_all()
         self.indicator.set_menu( menu )
 
-        self.__load_config()
+        self._load_config()
 
 
     @staticmethod
@@ -529,7 +525,7 @@ class IndicatorBase( ABC ):
         # Ensure the .desktop file is present,
         # either in a virtual environment or in development.
         self.desktop_file = self.indicator_name + ".py.desktop"
-        self.desktop_file_user_home = IndicatorBase.__AUTOSTART_PATH / self.desktop_file
+        self.desktop_file_user_home = IndicatorBase._AUTOSTART_PATH / self.desktop_file
 
         self.desktop_file_virtual_environment = \
             Path( __file__ ).parent / "platform" / "linux" / self.desktop_file
@@ -610,22 +606,22 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-        GLib.timeout_add_seconds( 1, self.__update ) # Delay update so that Gtk main executes and initialisation is shown.
+        GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
         Gtk.main()
 
 
-    def __update( self ):
+    def _update( self ):
         if self.lock.acquire( blocking = False ):
             self.set_menu_sensitivity( False )
-            GLib.idle_add( self.__update_internal )
+            GLib.idle_add( self._update_internal )
 
         else:
-            self.id = GLib.timeout_add_seconds( IndicatorBase.__UPDATE_PERIOD_IN_SECONDS_DEFAULT, self.__update )
+            self.id = GLib.timeout_add_seconds( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT, self._update )
 
         return False
 
 
-    def __update_internal( self ):
+    def _update_internal( self ):
         update_start = datetime.datetime.now()
 
         # The user can nominate any menuitem as a secondary activate target during menu construction.
@@ -658,7 +654,7 @@ class IndicatorBase( ABC ):
                 menu.append( Gtk.SeparatorMenuItem() )
 
         titles = ( _( "Preferences" ), _( "About" ), _( "Quit" ) )
-        functions = ( self.__on_preferences, self.__on_about, Gtk.main_quit )
+        functions = ( self._on_preferences, self._on_about, Gtk.main_quit )
         for title, function in zip( titles, functions ):
             self.create_and_append_menuitem( menu, title, activate_functionandarguments = ( function, ) )
 
@@ -668,7 +664,7 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         if next_update_in_seconds: # Some indicators don't return a next update time.
-            GLib.timeout_add_seconds( next_update_in_seconds, self.__update )
+            GLib.timeout_add_seconds( next_update_in_seconds, self._update )
             #TODO Do I need to capture/remove the id from return value?
 
         self.lock.release()
@@ -684,12 +680,12 @@ class IndicatorBase( ABC ):
 # So need to track the id each time GLib is called to schedule an update
 # so the id can be removed.
     def request_update( self, delay = 1 ):
-        GLib.timeout_add_seconds( 1 if delay < 1 else delay, self.__update )
+        GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
 
 
     def set_label( self, text ):
         label_set = False
-        if self.__is_label_update_supported():
+        if self._is_label_update_supported():
             self.indicator.set_label( text, text )
             self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.  #TODO Check this comment.
             label_set = True
@@ -699,7 +695,7 @@ class IndicatorBase( ABC ):
 
     def set_icon( self, icon ):
         icon_set = False
-        if self.__is_icon_update_supported():
+        if self._is_icon_update_supported():
             self.indicator.set_icon_full( icon, "" )
             icon_set = True
 
@@ -756,11 +752,11 @@ class IndicatorBase( ABC ):
     def request_mouse_wheel_scroll_events( self, functionandarguments ):
         self.indicator.connect(
             "scroll-event",
-            self.__on_mouse_wheel_scroll,
+            self._on_mouse_wheel_scroll,
             functionandarguments )
 
 
-    def __on_mouse_wheel_scroll(
+    def _on_mouse_wheel_scroll(
             self,
             indicator,
             delta,
@@ -775,12 +771,12 @@ class IndicatorBase( ABC ):
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
 
-    def __on_about( self, menuitem ):
+    def _on_about( self, menuitem ):
         if self.lock.acquire( blocking = False ):
-            self.__on_about_internal( menuitem )
+            self._on_about_internal( menuitem )
 
 
-    def __on_about_internal( self, menuitem ):
+    def _on_about_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
@@ -816,7 +812,7 @@ class IndicatorBase( ABC ):
         if self.creditz:
             about_dialog.add_credit_section( _( "Credits" ), self.creditz )
 
-        self.__add_hyperlink_label(
+        self._add_hyperlink_label(
             about_dialog,
             changelog_markdown_path,
             _( "View the" ),
@@ -825,7 +821,7 @@ class IndicatorBase( ABC ):
 
         error_log = Path.home() / ( self.indicator_name + ".log" )
         if error_log.is_file():
-            self.__add_hyperlink_label(
+            self._add_hyperlink_label(
                 about_dialog,
                 error_log,
                 _( "View the" ),
@@ -840,7 +836,7 @@ class IndicatorBase( ABC ):
         self.lock.release()
 
 
-    def __add_hyperlink_label(
+    def _add_hyperlink_label(
             self,
             about_dialog,
             file_path,
@@ -861,12 +857,12 @@ class IndicatorBase( ABC ):
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-    def __on_preferences( self, menuitem ):
+    def _on_preferences( self, menuitem ):
         if self.lock.acquire( blocking = False ):
-            self.__on_preferences_internal( menuitem )
+            self._on_preferences_internal( menuitem )
 
 
-    def __on_preferences_internal( self, menuitem ):
+    def _on_preferences_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
@@ -879,8 +875,8 @@ class IndicatorBase( ABC ):
         dialog.destroy()
 
         if response_type == Gtk.ResponseType.OK:
-            self.__save_config()
-            GLib.timeout_add_seconds( 1, self.__update ) # Allow one second for the lock to release so the update will proceed.
+            self._save_config()
+            GLib.timeout_add_seconds( 1, self._update ) # Allow one second for the lock to release so the update will proceed.
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
@@ -923,7 +919,7 @@ class IndicatorBase( ABC ):
         dialog = \
             Gtk.Dialog(
                 title,
-                self.__get_parent( parent_widget ),
+                self._get_parent( parent_widget ),
                 Gtk.DialogFlags.MODAL )
 
         dialog.add_buttons( *buttons_responsetypes )
@@ -946,7 +942,7 @@ class IndicatorBase( ABC ):
             title = None ):
 
         return \
-            self.__show_dialog(
+            self._show_dialog(
                 parent_widget,
                 message,
                 Gtk.MessageType.QUESTION,
@@ -962,7 +958,7 @@ class IndicatorBase( ABC ):
             message_type = Gtk.MessageType.ERROR ):
 
         return \
-            self.__show_dialog(
+            self._show_dialog(
                 parent_widget,
                 message,
                 message_type,
@@ -970,7 +966,7 @@ class IndicatorBase( ABC ):
                 title = title )
 
 
-    def __show_dialog(
+    def _show_dialog(
             self,
             parent_widget,
             message,
@@ -980,7 +976,7 @@ class IndicatorBase( ABC ):
 
         dialog = \
             Gtk.MessageDialog(
-                self.__get_parent( parent_widget ),
+                self._get_parent( parent_widget ),
                 Gtk.DialogFlags.MODAL,
                 message_type,
                 buttons_type,
@@ -997,7 +993,7 @@ class IndicatorBase( ABC ):
         return response
 
 
-    def __get_parent( self, widget ):
+    def _get_parent( self, widget ):
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
         while( parent is not None ):
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
@@ -1048,23 +1044,23 @@ class IndicatorBase( ABC ):
     # a submenu's menuitems under GNOME and similar layouts.
     # The second value of the indent argument refers to the indent for
     # a submenu's menuitems under Kubuntu and similar layouts.
-    def __get_menu_indent_amount( self, indent = ( 0, 0 ) ):
+    def _get_menu_indent_amount( self, indent = ( 0, 0 ) ):
         indent_amount = "      "
         indent_small = \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE
 
         if indent_small:
             indent_amount = "   "
 
         detatched_submenus = \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_BUDGIE_GNOME or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_ICEWM or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_KDE or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_LXQT or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_MATE or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_UNITY7 or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_X_CINNAMON or \
-            self.get_current_desktop() == IndicatorBase.__CURRENT_DESKTOP_XFCE
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_BUDGIE_GNOME or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_ICEWM or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_LXQT or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_MATE or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_UNITY7 or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_X_CINNAMON or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_XFCE
 
         if detatched_submenus:
             indent_amount = indent_amount * indent[ 1 ]
@@ -1084,7 +1080,7 @@ class IndicatorBase( ABC ):
         indent = ( 0, 0 ), # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
         is_secondary_activate_target = False ):
 
-        indent_amount = self.__get_menu_indent_amount( indent )
+        indent_amount = self._get_menu_indent_amount( indent )
         menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
 
         if name:
@@ -1132,7 +1128,7 @@ class IndicatorBase( ABC ):
         activate_functionandarguments = None,
         indent = ( 0, 0 ) ): # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
 
-        indent_amount = self.__get_menu_indent_amount( indent )
+        indent_amount = self._get_menu_indent_amount( indent )
         menuitem = Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label )
         menuitem.set_active( True )
 
@@ -1292,7 +1288,7 @@ class IndicatorBase( ABC ):
         make_longer = False ):
 
         entry = Gtk.Entry()
-        self.__set_widget_common_attributes(
+        self._set_widget_common_attributes(
             entry,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -1350,7 +1346,7 @@ class IndicatorBase( ABC ):
         clicked_functionandarguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
 
         button = Gtk.Button.new_with_label( label )
-        self.__set_widget_common_attributes(
+        self._set_widget_common_attributes(
             button,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -1376,7 +1372,7 @@ class IndicatorBase( ABC ):
         margin_left = 0 ):
 
         spinner = Gtk.SpinButton()
-        self.__set_widget_common_attributes(
+        self._set_widget_common_attributes(
             spinner,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -1399,7 +1395,7 @@ class IndicatorBase( ABC ):
         active = True ):
 
         checkbutton = Gtk.CheckButton.new_with_label( label )
-        self.__set_widget_common_attributes(
+        self._set_widget_common_attributes(
             checkbutton,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -1421,7 +1417,7 @@ class IndicatorBase( ABC ):
         active = True ):
 
         radiobutton = Gtk.RadioButton.new_with_label_from_widget( radio_group_member, label )
-        self.__set_widget_common_attributes(
+        self._set_widget_common_attributes(
             radiobutton,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -1432,7 +1428,7 @@ class IndicatorBase( ABC ):
         return radiobutton
 
 
-    def __set_widget_common_attributes(
+    def _set_widget_common_attributes(
         self,
         widget,
         tooltip_text = "",
@@ -1594,10 +1590,10 @@ class IndicatorBase( ABC ):
             if self.desktop_file_user_home.is_file():
                 with open( self.desktop_file_user_home, 'r' ) as f:
                     for line in f:
-                        if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + "=true" in line:
+                        if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
                             autostart = True
 
-                        if IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' in line:
+                        if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
                             delay = int( line.split( '=' )[ 1 ].strip() )
 
         except Exception as e:
@@ -1609,7 +1605,7 @@ class IndicatorBase( ABC ):
 
 
     def set_autostart_and_delay( self, is_set, delay ):
-        IndicatorBase.__AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
+        IndicatorBase._AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
 
         if not self.desktop_file_user_home.is_file():
             shutil.copy( self.desktop_file_virtual_environment, self.desktop_file_user_home )
@@ -1618,11 +1614,11 @@ class IndicatorBase( ABC ):
             output = ""
             with open( self.desktop_file_user_home, 'r' ) as f:
                 for line in f:
-                    if IndicatorBase.__X_GNOME_AUTOSTART_DELAY in line:
-                        output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
+                    if IndicatorBase._X_GNOME_AUTOSTART_DELAY in line:
+                        output += IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
-                    elif IndicatorBase.__X_GNOME_AUTOSTART_ENABLED in line:
-                        output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
+                    elif IndicatorBase._X_GNOME_AUTOSTART_ENABLED in line:
+                        output += IndicatorBase._X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
                     else:
                         output += line
@@ -1630,11 +1626,11 @@ class IndicatorBase( ABC ):
             # If the user has an old .desktop file,
             # there may not be an autostart enable field and/or
             # an autostart delay field, so manually add in.
-            if IndicatorBase.__X_GNOME_AUTOSTART_DELAY not in output:
-                output += IndicatorBase.__X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
+            if IndicatorBase._X_GNOME_AUTOSTART_DELAY not in output:
+                output += IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
-            if IndicatorBase.__X_GNOME_AUTOSTART_ENABLED not in output:
-                output += IndicatorBase.__X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
+            if IndicatorBase._X_GNOME_AUTOSTART_ENABLED not in output:
+                output += IndicatorBase._X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
             with open( self.desktop_file_user_home, 'w' ) as f:
                 f.write( output )
@@ -1663,7 +1659,7 @@ class IndicatorBase( ABC ):
 #TODO UNCHECKED
 #TOD Maybe this can go as it is only used below 
 # for ubuntu mate 20.04 which is EOL.
-    def __is_ubuntu_variant_2004( self ):
+    def _is_ubuntu_variant_2004( self ):
         ubuntu_variant_2004 = False
         try:
             ubuntu_variant_2004 = (
@@ -1685,14 +1681,14 @@ class IndicatorBase( ABC ):
     # Ubuntu MATE 20.04 truncates the icon when changed,
     # despite the icon being fine when clicked.
 #TODO UNCHECKED
-    def __is_icon_update_supported( self ):
+    def _is_icon_update_supported( self ):
         icon_update_supported = True
         desktop_environment = self.get_current_desktop()
 
 #TODO Tidy up
         if desktop_environment is None or \
-           desktop_environment == IndicatorBase.__CURRENT_DESKTOP_LXQT or \
-           ( desktop_environment == IndicatorBase.__CURRENT_DESKTOP_MATE and self.__is_ubuntu_variant_2004() ):
+           desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT or \
+           ( desktop_environment == IndicatorBase._CURRENT_DESKTOP_MATE and self._is_ubuntu_variant_2004() ):
             icon_update_supported = False
 
         return icon_update_supported
@@ -1702,15 +1698,15 @@ class IndicatorBase( ABC ):
 # then update this function and comment header
 # according to which distros/versions support label updating (or even have a label).
 #
-# Maybe rename to __is_label_or_tooltip_update_supported?
+# Maybe rename to _is_label_or_tooltip_update_supported?
     # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
-    def __is_label_update_supported( self ):
+    def _is_label_update_supported( self ):
         label_update_supported = True
         desktop_environment = self.get_current_desktop()
 
 #TODO Tidy up        
         if desktop_environment is None or \
-           desktop_environment == IndicatorBase.__CURRENT_DESKTOP_LXQT:
+           desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT:
             label_update_supported = False
 
         return label_update_supported
@@ -1731,7 +1727,7 @@ class IndicatorBase( ABC ):
     def get_terminal_and_execution_flag( self ):
         terminal = None
         execution_flag = None
-        for _terminal, _execution_flag in IndicatorBase.__TERMINALS_AND_EXECUTION_FLAGS:
+        for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
             terminal = self.process_get( "which " + _terminal )
             if terminal is not None:
                 execution_flag = _execution_flag
@@ -1767,7 +1763,7 @@ class IndicatorBase( ABC ):
 
     # Copies .config using the old indicator name format (using hyphens)
     # to the new format, sans hyphens.
-    def __copy_config_to_new_directory( self, config_file ):
+    def _copy_config_to_new_directory( self, config_file ):
         mapping = {
             "indicatorfortune":                 "indicator-fortune",
             "indicatorlunar":                   "indicator-lunar",
@@ -1788,11 +1784,11 @@ class IndicatorBase( ABC ):
 
 
     # Read a dictionary of configuration from a JSON text file.
-    def __load_config( self ):
+    def _load_config( self ):
         config_file = \
-            self.__get_config_directory() / ( self.indicator_name + IndicatorBase.__EXTENSION_JSON )
+            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
-        self.__copy_config_to_new_directory( config_file )
+        self._copy_config_to_new_directory( config_file )
 
         config = { }
         if config_file.is_file():
@@ -1809,16 +1805,16 @@ class IndicatorBase( ABC ):
 
 
     def request_save_config( self, delay = 0 ):
-        return GLib.timeout_add_seconds( delay, self.__save_config )
+        return GLib.timeout_add_seconds( delay, self._save_config )
 
 
     # Write a dictionary of user configuration to a JSON text file.
-    def __save_config( self ):
+    def _save_config( self ):
         config = self.save_config() # Call to implementation in indicator.
-        config[ IndicatorBase.__CONFIG_VERSION ] = self.version
+        config[ IndicatorBase._CONFIG_VERSION ] = self.version
 
         config_file = \
-            self.__get_config_directory() / ( self.indicator_name + IndicatorBase.__EXTENSION_JSON )
+            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
         try:
             with open( config_file, 'w' ) as f_out:
@@ -1832,8 +1828,8 @@ class IndicatorBase( ABC ):
 
 
     # Return the full directory path to the user config directory for the current indicator.
-    def __get_config_directory( self ):
-        return self.__get_user_directory( ".config", self.indicator_name )
+    def _get_config_directory( self ):
+        return self._get_user_directory( ".config", self.indicator_name )
 
 
     # Finds the most recent file in the cache with the given basename
@@ -1870,7 +1866,7 @@ class IndicatorBase( ABC ):
             expiry = \
                 datetime.datetime.strptime(
                     date_time_component,
-                    IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                    IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
             expiry = expiry.replace( tzinfo = datetime.timezone.utc )
 
@@ -1881,7 +1877,7 @@ class IndicatorBase( ABC ):
     def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
         filename = \
             basename + \
-            datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
         return self.get_cache_directory() / filename
@@ -1941,7 +1937,7 @@ class IndicatorBase( ABC ):
                     file_date_time = \
                         datetime.datetime.strptime(
                             date_time,
-                            IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                            IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
 
                     if file_date_time < cache_maximum_age_date_time:
                         file.unlink()
@@ -1996,7 +1992,7 @@ class IndicatorBase( ABC ):
     def write_cache_binary( self, binary_data, basename, extension = "" ):
         filename = \
             basename + \
-            datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
         cache_file = self.get_cache_directory() / filename
@@ -2019,7 +2015,7 @@ class IndicatorBase( ABC ):
     #
     # Returns the contents of the text file; None on error and logs.
     def read_cache_text_without_timestamp( self, filename ):
-        return self.__read_cache_text( self.get_cache_directory() / filename )
+        return self._read_cache_text( self.get_cache_directory() / filename )
 
 
     # Read the most recent text file from the cache.
@@ -2047,10 +2043,10 @@ class IndicatorBase( ABC ):
         if cache_file:
             cache_file = cache_directory / cache_file
 
-        return self.__read_cache_text( cache_file )
+        return self._read_cache_text( cache_file )
 
 
-    def __read_cache_text( self, cache_file ):
+    def _read_cache_text( self, cache_file ):
         text = ""
         if cache_file.is_file():
             try:
@@ -2072,7 +2068,7 @@ class IndicatorBase( ABC ):
     #
     # Returns filename written on success; None otherwise.
     def write_cache_text_without_timestamp( self, text, filename ):
-        return self.__write_cache_text( text, self.get_cache_directory() / filename )
+        return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
     # Writes text to a file in the cache.
@@ -2088,13 +2084,13 @@ class IndicatorBase( ABC ):
     def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
         filename = \
             basename + \
-            datetime.datetime.now().strftime( IndicatorBase.__CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
+            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
-        return self.__write_cache_text( text, self.get_cache_directory() / filename )
+        return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
-    def __write_cache_text( self, text, cache_file ):
+    def _write_cache_text( self, text, cache_file ):
         try:
             with open( cache_file, 'w' ) as f_out:
                 f_out.write( text )
@@ -2108,7 +2104,7 @@ class IndicatorBase( ABC ):
 
     # Return the full directory path to the user cache directory for the current indicator.
     def get_cache_directory( self ):
-        return self.__get_user_directory( ".cache", self.indicator_name )
+        return self._get_user_directory( ".cache", self.indicator_name )
 
 
     # Obtain (and create if not present) the directory for configuration, cache or similar.
@@ -2120,7 +2116,7 @@ class IndicatorBase( ABC ):
     #
     # The full directory path will be
     #    ~/user_base_directory/application_base_directory
-    def __get_user_directory( self, user_base_directory, application_base_directory ):
+    def _get_user_directory( self, user_base_directory, application_base_directory ):
         directory = Path.home() / user_base_directory / application_base_directory
         directory.mkdir( parents = True, exist_ok = True )
         return directory

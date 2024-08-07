@@ -34,7 +34,7 @@ class EclipseType( Enum ):
     TOTAL = 4
 
 
-__months = {
+_months = {
     "Jan" : "01",
     "Feb" : "02",
     "Mar" : "03",
@@ -51,7 +51,7 @@ __months = {
 
 # https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
-__eclipses_lunar = \
+_eclipses_lunar = \
 ''' 09705   2024 Sep 18  02:45:25     74    305  118   P   -a  -0.9792  1.0372  0.0848  246.3   62.8    -      3S   42W
     09706   2025 Mar 14  06:59:56     75    311  123   T   -p   0.3484  2.2595  1.1784  362.6  218.3   65.4    3N  102W
     09707   2025 Sep 07  18:12:58     75    317  128   T   -p  -0.2752  2.3440  1.3619  326.7  209.4   82.1    6S   87E
@@ -94,7 +94,7 @@ __eclipses_lunar = \
 
 # https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
-__eclipses_solar = \
+_eclipses_solar = \
 '''  9562  479   2024 Oct 02  18:46:13     74    306  144   A   p-  -0.3509  0.9326  22.0S 114.5W  69   31  266  07m25s
      9563  479   2025 Mar 29  10:48:36     75    312  149   P   t-   1.0405  0.9376  61.1N  77.1W   0   83
      9564  479   2025 Sep 21  19:43:04     75    318  154   P   t-  -1.0651  0.8550  60.9S 153.5E   0   89
@@ -142,7 +142,7 @@ __eclipses_solar = \
 #    latitude (south is negative)
 #    longitude (east is negative)
 def get_eclipse_lunar( utc_now ):
-    return __get_eclipse( utc_now, __eclipses_lunar, 1, 2, 3, 4, 5, 8, 16, 17 )
+    return _get_eclipse( utc_now, _eclipses_lunar, 1, 2, 3, 4, 5, 8, 16, 17 )
 
 
 # Gets the upcoming solar eclipse.
@@ -153,10 +153,10 @@ def get_eclipse_lunar( utc_now ):
 #    latitude (south is negative)
 #    longitude (east is negative)
 def get_eclipse_solar( utc_now ):
-    return __get_eclipse( utc_now, __eclipses_solar, 2, 3, 4, 5, 6, 9, 13, 14 )
+    return _get_eclipse( utc_now, _eclipses_solar, 2, 3, 4, 5, 6, 9, 13, 14 )
 
 
-def __get_eclipse(
+def _get_eclipse(
         utc_now,
         eclipses,
         field_year,
@@ -179,7 +179,7 @@ def __get_eclipse(
         delta_t = fields[ field_delta_t ]
 
         # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
-        date_string = year + ", " + __months[ month ] + ", " + day + ", " + time_utc
+        date_string = year + ", " + _months[ month ] + ", " + day + ", " + time_utc
         date_time = \
             datetime.datetime.strptime( date_string, "%Y, %m, %d, %H:%M:%S" ).replace( tzinfo = datetime.timezone.utc ) - \
             datetime.timedelta( seconds = int( delta_t ) )
@@ -199,7 +199,7 @@ def __get_eclipse(
 
             eclipse_information = ( 
                 date_time,
-                __get_eclipse_type_from_table_value( eclipse_type ),
+                _get_eclipse_type_from_table_value( eclipse_type ),
                 the_latitude,
                 the_longitude )
 
@@ -230,20 +230,20 @@ def get_eclipse_type_as_text( eclipse_type ):
 
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
-def __get_eclipse_type_from_table_value( eclipse_type_from_table_value ):
+def _get_eclipse_type_from_table_value( eclipse_type_from_table_value ):
     if eclipse_type_from_table_value == 'A':
-        __eclipse_type = EclipseType.ANNULAR
+        _eclipse_type = EclipseType.ANNULAR
 
     elif eclipse_type_from_table_value == 'H':
-        __eclipse_type = EclipseType.HYBRID
+        _eclipse_type = EclipseType.HYBRID
 
     elif eclipse_type_from_table_value == 'P':
-        __eclipse_type = EclipseType.PARTIAL
+        _eclipse_type = EclipseType.PARTIAL
 
     elif eclipse_type_from_table_value == 'N':
-        __eclipse_type = EclipseType.PENUMBRAL
+        _eclipse_type = EclipseType.PENUMBRAL
 
     else: # T
-        __eclipse_type = EclipseType.TOTAL
+        _eclipse_type = EclipseType.TOTAL
 
-    return __eclipse_type
+    return _eclipse_type

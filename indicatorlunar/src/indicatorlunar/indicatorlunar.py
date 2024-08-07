@@ -292,7 +292,7 @@ class IndicatorLunar( IndicatorBase ):
     def update_data( self, utc_now ):
         # Update comet data.
         self.comet_orbital_element_data, self.download_count_comet, self.next_download_time_comet = \
-            self.__update_data(
+            self._update_data(
                 utc_now,
                 self.comet_orbital_element_data,
                 IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME,
@@ -310,7 +310,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # Update minor planet data.
         self.minor_planet_orbital_element_data, self.download_count_minor_planet, self.next_download_time_minor_planet = \
-            self.__update_data(
+            self._update_data(
                 utc_now,
                 self.minor_planet_orbital_element_data,
                 IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME,
@@ -327,7 +327,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # Update minor planet apparent magnitudes.
         self.minor_planet_apparent_magnitude_data, self.download_count_apparent_magnitude, self.next_download_time_apparent_magnitude = \
-            self.__update_data(
+            self._update_data(
                 utc_now,
                 self.minor_planet_apparent_magnitude_data,
                 IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME,
@@ -341,7 +341,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # Update satellite data.
         self.satellite_general_perturbation_data, self.download_count_satellite, self.next_download_time_satellite = \
-            self.__update_data(
+            self._update_data(
                 utc_now,
                 self.satellite_general_perturbation_data,
                 IndicatorLunar.SATELLITE_CACHE_BASENAME,
@@ -359,7 +359,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     # Get the data from the cache, or if stale, download from the source.
-    def __update_data(
+    def _update_data(
             self, utc_now, current_data,
             cache_basename, cache_extension, cache_maximum_age,
             download_count, next_download_time,
@@ -391,7 +391,7 @@ class IndicatorLunar( IndicatorBase ):
 
                 else:
                     download_count += 1
-                    next_download_time = self.__get_next_download_time( utc_now, download_count ) # Download failed for some reason; retry at a later time.
+                    next_download_time = self._get_next_download_time( utc_now, download_count ) # Download failed for some reason; retry at a later time.
 
         else:
             # Cache is not stale; only load off disk as necessary.
@@ -408,7 +408,7 @@ class IndicatorLunar( IndicatorBase ):
         return fresh_data, download_count, next_download_time
 
 
-    def __get_next_download_time( self, utc_now, download_count ):
+    def _get_next_download_time( self, utc_now, download_count ):
         next_download_time = utc_now + datetime.timedelta( minutes = 60 * 24 ) # Worst case scenario for retrying downloads: every 24 hours.
         time_interval_in_minutes = {
             1 : 5,
@@ -660,10 +660,10 @@ class IndicatorLunar( IndicatorBase ):
                 key = lambda x: ( x[ INDEX_RISE_TIME ], x[ INDEX_NUMBER ] ) )
 
         for number, rise_time in satellite_current_notifications:
-            self.__notification_satellite( number )
+            self._notification_satellite( number )
 
 
-    def __notification_satellite( self, number ):
+    def _notification_satellite( self, number ):
         key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, number )
 
         rise_time = \
@@ -717,7 +717,7 @@ class IndicatorLunar( IndicatorBase ):
     def update_menu_moon( self, menu ):
         submenu = Gtk.Menu()
         updated = \
-            self.__update_menu_common(
+            self._update_menu_common(
                 submenu,
                 IndicatorLunar.astro_backend.BodyType.MOON,
                 IndicatorLunar.astro_backend.NAME_TAG_MOON,
@@ -776,7 +776,7 @@ class IndicatorLunar( IndicatorBase ):
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
                 indent = ( 2, 1 ) )
 
-            self.__update_menu_eclipse(
+            self._update_menu_eclipse(
                 submenu,
                 IndicatorLunar.astro_backend.BodyType.MOON,
                 IndicatorLunar.astro_backend.NAME_TAG_MOON,
@@ -786,7 +786,7 @@ class IndicatorLunar( IndicatorBase ):
     def update_menu_sun( self, menu ):
         submenu = Gtk.Menu()
         updated = \
-            self.__update_menu_common(
+            self._update_menu_common(
                 submenu,
                 IndicatorLunar.astro_backend.BodyType.SUN,
                 IndicatorLunar.astro_backend.NAME_TAG_SUN,
@@ -840,14 +840,14 @@ class IndicatorLunar( IndicatorBase ):
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
                 indent = ( 1, 0 ) )
 
-            self.__update_menu_eclipse(
+            self._update_menu_eclipse(
                 submenu,
                 IndicatorLunar.astro_backend.BodyType.SUN,
                 IndicatorLunar.astro_backend.NAME_TAG_SUN,
                 IndicatorLunar.SEARCH_URL_SUN )
 
 
-    def __update_menu_eclipse( self, menu, body_type, name_tag, url ):
+    def _update_menu_eclipse( self, menu, body_type, name_tag, url ):
         menu.append( Gtk.SeparatorMenuItem() )
         key = ( body_type, name_tag )
 
@@ -919,13 +919,13 @@ class IndicatorLunar( IndicatorBase ):
                 menuitem_name_function = (
                     lambda name:
                         IndicatorLunar.SEARCH_URL_MINOR_PLANET +
-                        IndicatorLunar.__get_minor_planet_designation_for_lowell_lookup( name ) )
+                        IndicatorLunar._get_minor_planet_designation_for_lowell_lookup( name ) )
 
             elif body_type == IndicatorLunar.astro_backend.BodyType.COMET:
                 menuitem_name_function = (
                     lambda name:
                         IndicatorLunar.SEARCH_URL_COMET_DATABASE +
-                        IndicatorLunar.__get_comet_designation_for_cobs_lookup( name, self.get_logging() ) )
+                        IndicatorLunar._get_comet_designation_for_cobs_lookup( name, self.get_logging() ) )
 
             elif body_type == IndicatorLunar.astro_backend.BodyType.STAR:
                 menuitem_name_function = (
@@ -970,7 +970,7 @@ class IndicatorLunar( IndicatorBase ):
             current = len( submenu )
             menuitem_name = menuitem_name_function( name )
             updated = \
-                self.__update_menu_common(
+                self._update_menu_common(
                     submenu,
                     body_type,
                     name,
@@ -1001,7 +1001,7 @@ class IndicatorLunar( IndicatorBase ):
     # https://en.wikipedia.org/wiki/Naming_of_comets
     # https://slate.com/technology/2013/11/comet-naming-a-quick-guide.html
     @staticmethod
-    def __get_comet_designation_for_cobs_lookup( name, logging ):
+    def _get_comet_designation_for_cobs_lookup( name, logging ):
         if name[ 0 ].isnumeric():
             # Examples:
                 # 1P/Halley
@@ -1044,7 +1044,7 @@ class IndicatorLunar( IndicatorBase ):
     # https://minorplanetcenter.net/iau/info/DesDoc.html
     # https://minorplanetcenter.net/iau/info/PackedDes.html
     @staticmethod
-    def __get_minor_planet_designation_for_lowell_lookup( name ):
+    def _get_minor_planet_designation_for_lowell_lookup( name ):
         # Examples:
         #   55 Pandora
         #   84 Klio
@@ -1053,7 +1053,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     # For the given body, creates the menu items relating to rise/set/azimuth/altitude.
-    def __update_menu_common(
+    def _update_menu_common(
             self,
             menu,
             body_type,
@@ -1066,7 +1066,7 @@ class IndicatorLunar( IndicatorBase ):
         if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # This body rises/sets.
             if self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ]: # Body will rise.
                 if not self.hide_bodies_below_horizon:
-                    self.__update_menuitems_rise_azimuth_altitude_set(
+                    self._update_menuitems_rise_azimuth_altitude_set(
                         menu,
                         key,
                         menuitem_name,
@@ -1093,7 +1093,7 @@ class IndicatorLunar( IndicatorBase ):
                         self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] < sun_set:
 
                         if not self.hide_bodies_below_horizon:
-                            self.__update_menuitems_rise_azimuth_altitude_set(
+                            self._update_menuitems_rise_azimuth_altitude_set(
                                 menu,
                                 key,
                                 menuitem_name,
@@ -1104,7 +1104,7 @@ class IndicatorLunar( IndicatorBase ):
                             appended = True
 
                     else:
-                        self.__update_menuitems_rise_azimuth_altitude_set(
+                        self._update_menuitems_rise_azimuth_altitude_set(
                             menu,
                             key,
                             menuitem_name,
@@ -1115,7 +1115,7 @@ class IndicatorLunar( IndicatorBase ):
                         appended = True
 
                 else:
-                    self.__update_menuitems_rise_azimuth_altitude_set(
+                    self._update_menuitems_rise_azimuth_altitude_set(
                         menu,
                         key,
                         menuitem_name,
@@ -1126,7 +1126,7 @@ class IndicatorLunar( IndicatorBase ):
                     appended = True
 
         elif key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) in self.data: # Body is 'always up'.
-            self.__update_menuitems_rise_azimuth_altitude_set(
+            self._update_menuitems_rise_azimuth_altitude_set(
                 menu,
                 key,
                 menuitem_name,
@@ -1139,7 +1139,7 @@ class IndicatorLunar( IndicatorBase ):
         return appended
 
 
-    def __update_menuitems_rise_azimuth_altitude_set(
+    def _update_menuitems_rise_azimuth_altitude_set(
             self,
             menu,
             key,
@@ -1297,7 +1297,7 @@ class IndicatorLunar( IndicatorBase ):
                         x[ IndicatorLunar.SATELLITE_MENU_NAME ],
                         x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
-            self.__update_menu_satellites( menu, _( "Satellites" ), satellites )
+            self._update_menu_satellites( menu, _( "Satellites" ), satellites )
 
         if satellites_polar:
             satellites_polar = sorted(
@@ -1306,10 +1306,10 @@ class IndicatorLunar( IndicatorBase ):
                     x[ IndicatorLunar.SATELLITE_MENU_NAME ],
                     x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
 
-            self.__update_menu_satellites( menu, _( "Satellites (Polar)" ), satellites_polar )
+            self._update_menu_satellites( menu, _( "Satellites (Polar)" ), satellites_polar )
 
 
-    def __update_menu_satellites( self, menu, label, satellites ):
+    def _update_menu_satellites( self, menu, label, satellites ):
         submenu = Gtk.Menu()
         self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
         for info in satellites:

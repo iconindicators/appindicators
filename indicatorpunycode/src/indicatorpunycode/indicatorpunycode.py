@@ -110,7 +110,7 @@ class IndicatorPunycode( IndicatorBase ):
                 self.show_notification( summary, _( "No text is in the clipboard." ) )
 
             else:
-                self.__do_conversion( text )
+                self._do_conversion( text )
 
         else:
             # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
@@ -119,12 +119,12 @@ class IndicatorPunycode( IndicatorBase ):
                     self.show_notification( summary, _( "No text is highlighted/selected." ) )
 
                 else:
-                    self.__do_conversion( text )
+                    self._do_conversion( text )
 
             self.copy_from_selection_primary( ( clipboard_text_received_function, None ) )
 
 
-    def __do_conversion( self, text ):
+    def _do_conversion( self, text ):
         protocol = ""
         result = re.split( r"(^.*//)", text )
         if len( result ) == 3:

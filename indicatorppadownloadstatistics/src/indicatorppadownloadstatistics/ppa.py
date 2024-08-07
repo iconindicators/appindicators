@@ -37,15 +37,15 @@ class Filters( object ):
 
 
     def add_filter( self, user, name, series, architecture, text = [ ] ):
-        self.filters[ self.__get_key( user, name, series, architecture ) ] = text
+        self.filters[ self._get_key( user, name, series, architecture ) ] = text
 
 
     def has_filter( self, user, name, series, architecture ):
-        return self.__get_key( user, name, series, architecture ) in self.filters
+        return self._get_key( user, name, series, architecture ) in self.filters
 
 
     def get_filter_text( self, user, name, series, architecture ):
-        return self.filters[ self.__get_key( user, name, series, architecture ) ]
+        return self.filters[ self._get_key( user, name, series, architecture ) ]
 
 
     def get_user_name_series_architecture( self ):
@@ -57,7 +57,7 @@ class Filters( object ):
                   key_components[ Filters.INDEX_ARCHITECTURE ]
 
 
-    def __get_key( self, user, name, series, architecture ):
+    def _get_key( self, user, name, series, architecture ):
         return user + " | " + name + " | " + series + " | " + architecture
 
 

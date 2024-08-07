@@ -41,7 +41,7 @@ class DataProviderApparentMagnitude( DataProvider ):
             downloaded = False # COBS does not directly provide apparent magnitude data.
 
         else:
-            downloaded = DataProviderApparentMagnitude.__download_from_lowell_minor_planet_services(
+            downloaded = DataProviderApparentMagnitude._download_from_lowell_minor_planet_services(
                 filename, logging, apparent_magnitude_maximum )
 
         return downloaded
@@ -50,7 +50,7 @@ class DataProviderApparentMagnitude( DataProvider ):
     # Download apparent magnitude data for minor planets from Lowell Minor Planet Services
     # and saves to the given filename.
     @staticmethod
-    def __download_from_lowell_minor_planet_services( filename, logging, apparent_magnitude_maximum ):
+    def _download_from_lowell_minor_planet_services( filename, logging, apparent_magnitude_maximum ):
         try:
             variables = {
                 "date": datetime.date.today().isoformat(),
