@@ -159,8 +159,8 @@
 # (and probably only do this "if responseType != Gtk.ResponseType.OK" because when OK
 # an update is kicked off any way)
 #
-# gets around the Debian/Fedora issue when clicking the icon
-# when the About/Preferences are open (see TODO below). 
+# gets around the Debian/Fedora issue when clicking
+# the icon when the About/Preferences are open.
 # Is this viable...perhaps only do it for Debian 11 / 12 and Fedora 38 / 39?
 #
 # Maybe call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
