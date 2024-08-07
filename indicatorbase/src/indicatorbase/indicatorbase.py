@@ -16,14 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check the calls to 
-#     GLib.timeout_add_seconds
-# and
-#     GLib.idle_add
-# as I suspect I'm not calling these with the correct arguments
-# ( that is, the priority is incorrectly set )
-
-
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
