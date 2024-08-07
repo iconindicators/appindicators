@@ -452,7 +452,7 @@ class IndicatorBase( ABC ):
 
         self.indicator = \
             AppIndicator.Indicator.new(
-                self.indicator_name, #ID
+                self.indicator_name, # ID
                 self.get_icon_name(), # Icon name
                 AppIndicator.IndicatorCategory.APPLICATION_STATUS )
 
@@ -467,26 +467,7 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_project_metadata( indicator_name, from_script = False ):
-
-        def get_first_wheel( path ):
-            project_metadata = None
-            error_message = None
-            first_wheel = next( path.glob( "*.whl" ), None )
-            if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { path.absolute() }"
-
-            else:
-                first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
-                if first_metadata is None:
-                    error_message = f"No metadata was found in { first_wheel.absolute() }!"
-
-                else:
-                    project_metadata = first_metadata.metadata
-
-            return project_metadata, error_message
-
-
+    def get_project_metadata( indicator_name ):
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
         try:
@@ -495,20 +476,22 @@ class IndicatorBase( ABC ):
             error_message = None
 
         except metadata.PackageNotFoundError:
-            if from_script:
-                # Looking for a .whl within the indicator directory,
-                # but coming from a build script so the path is different.
-                path = Path( '.' ) / indicator_name / "src" / indicator_name
+            # No pip information found; assume in development/testing.
+            # Look for a .whl file in the same directory as the indicator.
+            first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
+            if first_wheel is None:
+                project_metadata = None
+                error_message = f"Unable to locate a .whl in { path.absolute() }"
 
             else:
-                # No pip information found; assume in development/testing.
-                # Look for a .whl file in the same directory as the indicator.
-                path = Path( '.' )
+                first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
+                if first_metadata is None:
+                    project_metadata = None
+                    error_message = f"No metadata was found in { first_wheel.absolute() }!"
 
-            project_metadata, error_message = get_first_wheel( path )
-
-            if from_script and error_message:
-                print( error_message )
+                else:
+                    project_metadata = first_metadata.metadata
+                    error_message = None
 
         return project_metadata, error_message
 
