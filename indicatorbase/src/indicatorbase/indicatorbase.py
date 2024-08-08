@@ -641,17 +641,18 @@ class IndicatorBase( ABC ):
             self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
-    def _update( self ):
-        if self.lock.acquire( blocking = False ):
-            self.set_menu_sensitivity( False )
-            GLib.source_remove( self.id )
-            self.id = 0
-            GLib.idle_add( self._update_internal )
-
-        else:
-            self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
-
-        return False
+#TODO I think this can go.
+    # def _update( self ):
+    #     if self.lock.acquire( blocking = False ):
+    #         self.set_menu_sensitivity( False )
+    #         GLib.source_remove( self.id )
+    #         self.id = 0
+    #         GLib.idle_add( self._update_internal )
+    #
+    #     else:
+    #         self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
+    #
+    #     return False
 
 
     def _update_internal( self ):
@@ -780,6 +781,8 @@ class IndicatorBase( ABC ):
             functionandarguments )
 
 
+#TODO Does this need to be disabled during update (along with about/pref)?
+# How to do this?
     def _on_mouse_wheel_scroll(
             self,
             indicator,
@@ -787,7 +790,8 @@ class IndicatorBase( ABC ):
             scroll_direction,
             functionandarguments ):
 
-        if not self.lock.locked():
+        # if not self.lock.locked():
+        if self.indicator.get_menu().get_children()[ 0 ].get_sensitive():
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
 
@@ -795,12 +799,20 @@ class IndicatorBase( ABC ):
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
 
+#TODO Not sure if this stays.
+    # def _toggle_user_interface( self, toggle ):
+    #     self.set_menu_sensitivity( toggle )
+    #     self.indicator.set_secondary_activate_target(
+    #         self.secondary_activate_target if self.secondary_activate_target else None )
+
+
+    # def _on_about( self, menuitem ):
+    #     if self.lock.acquire( blocking = False ):
+    #         self._on_about_internal( menuitem )
+
+
+    # def _on_about_internal( self, menuitem ):
     def _on_about( self, menuitem ):
-        if self.lock.acquire( blocking = False ):
-            self._on_about_internal( menuitem )
-
-
-    def _on_about_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
@@ -857,7 +869,7 @@ class IndicatorBase( ABC ):
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
-        self.lock.release()
+        # self.lock.release()#TODO Hopefully not neded.
 
 
     def _add_hyperlink_label(
@@ -881,14 +893,15 @@ class IndicatorBase( ABC ):
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
+#     def _on_preferences( self, menuitem ):
+# #TODO Do we need another lock for about/preferences or can we use the update lock?
+# # Don't we want to prevent about/prefernces from being enabled when doing an update?
+#         if self.lock.acquire( blocking = False ):
+#             self._on_preferences_internal( menuitem )
+
+
+    # def _on_preferences_internal( self, menuitem ):
     def _on_preferences( self, menuitem ):
-#TODO Do we need another lock for about/preferences or can we use the update lock?
-# Don't we want to prevent about/prefernces from being enabled when doing an update?
-        if self.lock.acquire( blocking = False ):
-            self._on_preferences_internal( menuitem )
-
-
-    def _on_preferences_internal( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
@@ -1876,6 +1889,7 @@ class IndicatorBase( ABC ):
             logging.exception( e )
             logging.error( "Error writing configuration: " + config_file )
 
+        self.id_save_config = 0 #TODO Does this stay?
         return False
 
 
