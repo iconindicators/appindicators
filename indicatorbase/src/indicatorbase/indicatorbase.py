@@ -63,6 +63,8 @@ ERROR: ERROR: Failed to build installable wheels for some pyproject.toml based p
 #
 # Despite the error the indicator actually runs.
 # Is it possible to tell pip not install twine or ignore errors?
+#
+# Does NOT occur on Debian 12 64 bit...so looks to be a 32 bit issue.
 
 
 #TODO Testing indicatortest on distros/desktops...
