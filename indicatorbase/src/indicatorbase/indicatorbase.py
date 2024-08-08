@@ -16,6 +16,55 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+'''
+Building wheels for collected packages: cryptography
+  Building wheel for cryptography (pyproject.toml) ... error
+  error: subprocess-exited-with-error
+  
+  × Building wheel for cryptography (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [14 lines of output]
+      Running `maturin pep517 build-wheel -i /home/bernard/Programming/Indicators/venv/bin/python3 --compatibility off`
+      📦 Including license file "/tmp/pip-install-dyfea59q/cryptography_f4f404043e2242728e2abe7fa83fc3f5/LICENSE"
+      📦 Including license file "/tmp/pip-install-dyfea59q/cryptography_f4f404043e2242728e2abe7fa83fc3f5/LICENSE.APACHE"
+      📦 Including license file "/tmp/pip-install-dyfea59q/cryptography_f4f404043e2242728e2abe7fa83fc3f5/LICENSE.BSD"
+      🍹 Building a mixed python/rust project
+      🔗 Found pyo3 bindings with abi3 support for Python ≥ 3.7
+      🐍 Not using a specific python interpreter
+      📡 Using build options features, locked from pyproject.toml
+      error: package `cryptography-key-parsing v0.1.0 (/tmp/pip-install-dyfea59q/cryptography_f4f404043e2242728e2abe7fa83fc3f5/src/rust/cryptography-key-parsing)` cannot be built because it requires rustc 1.65.0 or newer, while the currently active rustc version is 1.63.0
+      
+      💥 maturin failed
+        Caused by: Failed to build a native library through cargo
+        Caused by: Cargo build finished with "exit status: 101": `env -u CARGO PYO3_ENVIRONMENT_SIGNATURE="cpython-3.11-64bit" PYO3_PYTHON="/home/bernard/Programming/Indicators/venv/bin/python3" PYTHON_SYS_EXECUTABLE="/home/bernard/Programming/Indicators/venv/bin/python3" "cargo" "rustc" "--features" "pyo3/abi3-py37" "--message-format" "json-render-diagnostics" "--locked" "--manifest-path" "/tmp/pip-install-dyfea59q/cryptography_f4f404043e2242728e2abe7fa83fc3f5/src/rust/Cargo.toml" "--release" "--lib"`
+      Error: command ['maturin', 'pep517', 'build-wheel', '-i', '/home/bernard/Programming/Indicators/venv/bin/python3', '--compatibility', 'off'] returned non-zero exit status 1
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for cryptography
+Failed to build cryptography
+ERROR: ERROR: Failed to build installable wheels for some pyproject.toml based projects (cryptography)
+'''
+#TODO The above error occurs on Debian 12 32 bit.
+# I think 32 bit is no longer supported for the cryptography package.
+# Have tried the install instructions (needed curl and then rust something to compile)
+# but the rust thing would not work.
+#
+# So not sure if this is a show stopper.
+#
+# One thing to try is amend the installation.
+# For whatever reason, twine is always installed, which pulls in cryptography.
+# So could try to install without the --upgrade option and also specify
+# an older version of twine and/or cryptography.
+# Perhaps
+#   pip install pip twine==5.0.0 cryptography==42.0.8
+# Tried above and same error...now what?
+#
+# Despite the error the indicator actually runs.
+# Is it possible to tell pip not install twine or ignore errors?
+
+
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
