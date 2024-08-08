@@ -526,6 +526,13 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
+    def _get_path_to_wheel_in_release( indicator_name ):
+        path_release = Path( __file__ ).parent.parent.parent.parent
+        path_wheel = path_release / "release" / "wheel" / f"dist_{ indicator_name }"
+        return path_wheel
+
+
+    @staticmethod
     def get_project_metadata( indicator_name ):
         # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
@@ -536,12 +543,12 @@ class IndicatorBase( ABC ):
 
         except metadata.PackageNotFoundError:
             # No pip information found; assume in development/testing.
-            # Look for a .whl file in the same directory as the indicator.
-            path = Path( '.' )
-            first_wheel = next( path.glob( "*.whl" ), None )
+            # Look for a .whl file in the release folder.
+            path_wheel = IndicatorBase._get_path_to_wheel_in_release( indicator_name )
+            first_wheel = next( path_wheel.glob( "*.whl" ), None )
             if first_wheel is None:
                 project_metadata = None
-                error_message = f"Unable to locate a .whl in { path.absolute() }"
+                error_message = f"Unable to locate a .whl in { path_wheel.absolute() }"
 
             else:
                 first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
@@ -557,21 +564,25 @@ class IndicatorBase( ABC ):
 
 
     def initialise_desktop_file( self ):
-        # Ensure the .desktop file is present,
-        # either in a virtual environment or in development.
         self.desktop_file = self.indicator_name + ".py.desktop"
         self.desktop_file_user_home = IndicatorBase._AUTOSTART_PATH / self.desktop_file
 
+        # This resolves to the .desktop in the virtual environment
+        # when running within virtual environment.
+        #
+        # If running in development, this resolves to a file in
+        # indicatorbase which does not exist.
+        # To ensure Preferences work under development, extract
+        # the .desktop file from the indicator's .whl to /tmp.
         self.desktop_file_virtual_environment = \
             Path( __file__ ).parent / "platform" / "linux" / self.desktop_file
 
         error_message = None
         if not self.desktop_file_virtual_environment.exists():
-            # Cannot find the desktop file in the virtual environment.
-            # Extract the .desktop file from (the first) wheel located in the development folder.
-            first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
+            path_wheel = IndicatorBase._get_path_to_wheel_in_release( self.indicator_name )
+            first_wheel = next( path_wheel.glob( "*.whl" ), None )
             if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { Path( '.' ).absolute() }"
+                error_message = f"Unable to locate a .whl in { path_wheel.absolute() }"
 
             else:
                 with ZipFile( first_wheel, 'r' ) as z:

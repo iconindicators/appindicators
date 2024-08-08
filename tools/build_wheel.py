@@ -302,10 +302,6 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     directory_indicator = directory_dist / indicator_name
     shutil.copytree( indicator_name, directory_indicator )
 
-    # Remove any .whl
-    for wheel in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "*.whl" ):
-        wheel.unlink()
-
     # Remove any __pycache__
     for pycache in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "__pycache__" ):
         shutil.rmtree( pycache )
