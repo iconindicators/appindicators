@@ -446,6 +446,11 @@ class IndicatorBase( ABC ):
 
         self.lock = Lock()
         self.id = 0 # ID returned when scheduling an update.
+
+        # TODO
+        self.lock_save_config = Lock()
+        self.id_save_config = 0 # ID returned when scheduling a save of the config.
+
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
         Notify.init( self.indicator_name )
@@ -582,6 +587,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
+#TODO Why not call request_update here?        
         self.id = GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
         Gtk.main()
 
@@ -663,6 +669,14 @@ class IndicatorBase( ABC ):
     #
     #   If there is a pending (future) update and a request for an update
     #   comes along, need to remove the "old" pending update (referred as self.id).
+#TODO Wondering if this function also needs a mutex/lock?
+# What happens if we start a VM one after another...
+# ...could this function be interrupted with more calls to this function
+# ...and if so, is that bad? 
+#
+# Also wondering if the lock blocks a call and we immediately ask for a scheduled call later
+# will that call for the schedule later happen over and over?
+# Maybe put in print statements to see...
     def request_update( self, delay = 1 ):
         if self.id > 0:
             GLib.source_remove( self.id )
@@ -879,7 +893,8 @@ class IndicatorBase( ABC ):
 # This is internal to stardate.
 # So handle it there...
 # ...unless there is a smart way to handle it here! 
-            self._save_config()
+            # self._save_config()#TODO Original
+            self.request_save_config()
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
         self.set_menu_sensitivity( True )
@@ -1809,7 +1824,15 @@ class IndicatorBase( ABC ):
 
 
     def request_save_config( self, delay = 0 ):
-        return GLib.timeout_add_seconds( delay, self._save_config )
+        if self.lock_save_config.acquire( blocking = False ):
+            if self.id_save_config > 0:
+                GLib.source_remove( self.id_save_config )
+
+            self.id_save_config = GLib.timeout_add_seconds( delay, self._save_config )
+            self.lock_save_config.release()
+
+        else:
+            self.request_save_config( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
     # Write a dictionary of user configuration to a JSON text file.
