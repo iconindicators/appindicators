@@ -86,7 +86,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def update( self, menu ):
-        print( str( datetime.datetime.now() ) + "\t\tupdate" ) #TODO Test
         if self.auto_start_required: # Start VMs here so that the indicator icon is displayed immediately.
             self.auto_start_required = False
             if self.is_vbox_manage_installed():
@@ -94,8 +93,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         self.build_menu( menu )
 
-        # return int( 60 * self.refresh_interval_in_minutes )
-        return int( 60 * 2 )#TODO Test
+        return int( 60 * self.refresh_interval_in_minutes )
 
 
     def build_menu( self, menu ):
@@ -187,7 +185,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def _on_virtual_machine( self, menuitem, virtual_machine ):
-        print( str( datetime.datetime.now() ) + "\t\t_on_virtual_machine" ) #TODO Test
         if self.is_virtual_machine_running( virtual_machine.get_uuid() ):
             self.bring_window_to_front( virtual_machine.get_name() )
 
@@ -234,7 +231,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def start_virtual_machine( self, uuid ):
-        print( str( datetime.datetime.now() ) + "\t\tstart_virtual_machine" ) #TODO Test
         result = self.process_get( "VBoxManage list vms | grep " + uuid )
         if result is None or uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
