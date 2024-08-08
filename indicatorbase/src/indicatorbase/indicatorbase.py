@@ -619,11 +619,12 @@ class IndicatorBase( ABC ):
 # Also wondering if the lock blocks a call and we immediately ask for a scheduled call later
 # will that call for the schedule later happen over and over?
 # Maybe put in print statements to see...
-    def request_update_ORIG( self, delay = 1 ):
-        if self.id > 0:
-            GLib.source_remove( self.id )
+    # def request_update_ORIG( self, delay = 1 ):
+    #     if self.id > 0:
+    #         GLib.source_remove( self.id )
+    #
+    #     self.id = GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
 
-        self.id = GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
 
 #TODO Consider
 #    virtualbox starting a vm every 30s or every 5s (think the lock in _update_internal is a problem here)
@@ -633,8 +634,10 @@ class IndicatorBase( ABC ):
         if self.lock_update.acquire( blocking = False ):
             if self.id_update > 0:
                 GLib.source_remove( self.id_update )
+                print( f"{ datetime.datetime.now() } request_update (remove): { self.id_update }" ) #TODO Test
 
             self.id_update = GLib.timeout_add_seconds( delay, self._update_internal ) #TODO If this works, rename to _update.
+            print( f"{ datetime.datetime.now() } request_update (add): { self.id_update }" ) #TODO Test
             self.lock_update.release()
 
         else:
@@ -699,6 +702,7 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
+        print( f"{ datetime.datetime.now() } _update_internal: { self.id_update }" ) #TODO Test
         self.id_update = 0 #TODO Does this stay?
         if next_update_in_seconds: # Some indicators don't return a next update time.
             self.request_update( next_update_in_seconds )
@@ -937,7 +941,7 @@ class IndicatorBase( ABC ):
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
-        self.lock.release()
+        # self.lock.release()#TODO THink this goes.
 
 
     def set_menu_sensitivity( self, toggle ):
@@ -1861,12 +1865,15 @@ class IndicatorBase( ABC ):
         self.load_config( config ) # Call to implementation in indicator.
 
 
+#TODO COmpare these two functions with update above.
     def request_save_config( self, delay = 0 ):
         if self.lock_save_config.acquire( blocking = False ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
+                print( f"{ datetime.datetime.now() } request_save_config (remove): { self.id_save_config }" ) #TODO Test
 
             self.id_save_config = GLib.timeout_add_seconds( delay, self._save_config )
+            print( f"{ datetime.datetime.now() } request_save_config (add): { self.id_save_config }" ) #TODO Test
             self.lock_save_config.release()
 
         else:
@@ -1889,6 +1896,7 @@ class IndicatorBase( ABC ):
             logging.exception( e )
             logging.error( "Error writing configuration: " + config_file )
 
+        print( f"{ datetime.datetime.now() } _save_config: { self.id_save_config }" ) #TODO Test
         self.id_save_config = 0 #TODO Does this stay?
         return False
 
