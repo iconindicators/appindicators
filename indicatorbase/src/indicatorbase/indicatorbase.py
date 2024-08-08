@@ -448,6 +448,9 @@ class IndicatorBase( ABC ):
         self.id = 0 # ID returned when scheduling an update.
 
         # TODO
+        self.lock_update = Lock()
+        self.id_update = 0 # ID returned when scheduling an update.
+
         self.lock_save_config = Lock()
         self.id_save_config = 0 # ID returned when scheduling a save of the config.
 
@@ -588,8 +591,54 @@ class IndicatorBase( ABC ):
 
     def main( self ):
 #TODO Why not call request_update here?        
-        self.id = GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
+        # self.id = GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
+        self.request_update()
         Gtk.main()
+
+
+    # The typical flow of events is:
+    #   Indicator starts up and kicks off an initial update.
+    #
+    #   Subsequent updates are scheduled either by:
+    #       The indicator returning the amount of seconds from
+    #       now until the next update needs to occur.
+    #
+    #       The user clicks OK in the Preferences.
+    #
+    #       An indicator experiences and event and requests an update
+    #       (for example starting a virtual machine will request an
+    #       update to refresh the menu).
+    #
+    #   If there is a pending (future) update and a request for an update
+    #   comes along, need to remove the "old" pending update (referred as self.id).
+#TODO Wondering if this function also needs a mutex/lock?
+# What happens if we start a VM one after another...
+# ...could this function be interrupted with more calls to this function
+# ...and if so, is that bad? 
+#
+# Also wondering if the lock blocks a call and we immediately ask for a scheduled call later
+# will that call for the schedule later happen over and over?
+# Maybe put in print statements to see...
+    def request_update_ORIG( self, delay = 1 ):
+        if self.id > 0:
+            GLib.source_remove( self.id )
+
+        self.id = GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
+
+#TODO Consider
+#    virtualbox starting a vm every 30s or every 5s (think the lock in _update_internal is a problem here)
+#    stardate scrolling mouse wheel
+# What about a long update taking place and another update wants to happen...is this possible?
+    def request_update( self, delay = 1 ):
+        if self.lock_update.acquire( blocking = False ):
+            if self.id_update > 0:
+                GLib.source_remove( self.id_update )
+
+            self.id_update = GLib.timeout_add_seconds( delay, self._update_internal ) #TODO If this works, rename to _update.
+            self.lock_update.release()
+
+        else:
+            self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
     def _update( self ):
@@ -607,6 +656,8 @@ class IndicatorBase( ABC ):
 
     def _update_internal( self ):
         update_start = datetime.datetime.now()
+
+        self.set_menu_sensitivity( False ) # Menu will be rebuilt as part of the update, so no need to set back to True.
 
         # The user can nominate any menuitem as a secondary activate target during menu construction.
         # However the secondary activate target can only be set once the menu is built.
@@ -647,41 +698,13 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
+        self.id_update = 0 #TODO Does this stay?
         if next_update_in_seconds: # Some indicators don't return a next update time.
             self.request_update( next_update_in_seconds )
 
-        self.lock.release()
+        # self.lock.release()#TODO Think this needs to go...or not...more thinking.  SHould it be in the caller?
+        # self.id_update = 0 #TODO Does this stay?
         return False
-
-
-    # The typical flow of events is:
-    #   Indicator starts up and kicks off an initial update.
-    #
-    #   Subsequent updates are scheduled either by:
-    #       The indicator returning the amount of seconds from
-    #       now until the next update needs to occur.
-    #
-    #       The user clicks OK in the Preferences.
-    #
-    #       An indicator experiences and event and requests an update
-    #       (for example starting a virtual machine will request an
-    #       update to refresh the menu).
-    #
-    #   If there is a pending (future) update and a request for an update
-    #   comes along, need to remove the "old" pending update (referred as self.id).
-#TODO Wondering if this function also needs a mutex/lock?
-# What happens if we start a VM one after another...
-# ...could this function be interrupted with more calls to this function
-# ...and if so, is that bad? 
-#
-# Also wondering if the lock blocks a call and we immediately ask for a scheduled call later
-# will that call for the schedule later happen over and over?
-# Maybe put in print statements to see...
-    def request_update( self, delay = 1 ):
-        if self.id > 0:
-            GLib.source_remove( self.id )
-
-        self.id = GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
 
 
     def set_label( self, text ):
@@ -859,6 +882,8 @@ class IndicatorBase( ABC ):
 
 
     def _on_preferences( self, menuitem ):
+#TODO Do we need another lock for about/preferences or can we use the update lock?
+# Don't we want to prevent about/prefernces from being enabled when doing an update?
         if self.lock.acquire( blocking = False ):
             self._on_preferences_internal( menuitem )
 

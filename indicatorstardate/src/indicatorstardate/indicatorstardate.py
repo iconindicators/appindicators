@@ -127,8 +127,11 @@ class IndicatorStardate( IndicatorBase ):
             self.show_classic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
 
-        print( f"{ datetime.datetime.now() }" )
+        # print( f"{ datetime.datetime.now() }" )
+        self.request_update( delay = 0 ) #TODO Check all calls to this ... ensure all non default specify as delay = ...
         # self.request_update()
+
+        self.request_save_config( delay = 10 )
 
 #TODO Can/should this be moved into indicatorbase as part of a timer management thing?
         # if self.save_config_timer_id:
