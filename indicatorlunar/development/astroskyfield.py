@@ -19,6 +19,11 @@
 # Calculate astronomical information using Skyfield.
 
 
+#TODO If/when this is included in the release,
+# obviosly move to the src/indicatorlunar folder...
+# ...BUT ALSO add to the locale/POTFILES.in.
+
+
 #TODO Might be able to use new OMM method to load satellite data:
 #   https://github.com/skyfielders/python-skyfield/commit/9d4087bb2b8515b6441362fddff8bfe83142de6b
 

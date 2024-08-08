@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorlunar 1.0.101\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-08 09:53+1100\n"
+"POT-Creation-Date: 2024-08-08 19:00+1000\n"
 "PO-Revision-Date: 2024-07-09 14:35+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -16,9 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-
-msgid "Indicator Lunar"
-msgstr "Лунный индикатор"
 
 msgid "ALTITUDE"
 msgstr "ВЫСОТА"
@@ -803,39 +800,6 @@ msgstr "ВРЕМЯ ЗАХОДА"
 msgid "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem"
 msgstr "Расчёты выполняются благодаря использованию PyEphem/XEphem. https://rhodesmill.org/pyephem"
 
-msgid ""
-"PyEphem could not be found. Install using:\n"
-"\n"
-msgstr ""
-"Библиотека PyEphem не найдена. Установите с помощью:\n"
-"\n"
-
-#, python-brace-format
-msgid ""
-"PyEphem must be version {0} or greater. Please upgrade:\n"
-"\n"
-msgstr ""
-"Библиотека PyEphem должна иметь версию {0} или выше. Пожалуйста, обновите:\n"
-"\n"
-
-msgid "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield"
-msgstr "Расчёты выполняются благодаря использованию Skyfield. https://rhodesmill.org/skyfield"
-
-msgid ""
-"Skyfield could not be found. Install using:\n"
-"\n"
-msgstr ""
-"Библиотека Skyfield не найдена. Установите с помощью:\n"
-"\n"
-
-#, python-brace-format
-msgid ""
-"Skyfield must be version {0} or greater. Please upgrade:\n"
-"\n"
-msgstr ""
-"Библиотека Skyfield должна иметь версию {0} или выше. Пожалуйста, обновите:\n"
-"\n"
-
 msgid "Annular"
 msgstr "Кольцеобразное"
 
@@ -850,6 +814,9 @@ msgstr "Полутеневое"
 
 msgid "Total"
 msgstr "Полное"
+
+msgid "Indicator Lunar"
+msgstr "Лунный индикатор"
 
 msgid "Comet data by Comet Observation Database. https://cobs.si"
 msgstr "Данные о кометах предоставлены Comet Observation Database. https://cobs.si"
@@ -881,7 +848,8 @@ msgstr "Время захода: "
 msgid "Set Azimuth: "
 msgstr "Азимут захода: "
 
-msgid " now rising..."
+#, fuzzy
+msgid "now rising..."
 msgstr " восходит"
 
 msgid "                                          ...werewolves about ! ! !"
@@ -986,9 +954,6 @@ msgstr "В"
 msgid "W"
 msgstr "З"
 
-msgid "Icon Text"
-msgstr "Текст возле значка"
-
 #, fuzzy
 msgid ""
 "The text shown next to the indicator icon,\n"
@@ -1008,7 +973,9 @@ msgid ""
 "the tag will be removed.\n"
 "\n"
 "If a removed tag is within { }, the tag and\n"
-"text will be removed."
+"text will be removed.\n"
+"\n"
+"Not supported on all desktops."
 msgstr ""
 "Текст, отображаемый рядом со значком индикатора\n"
 "или во всплывающей подсказке, если есть возможность.\n"
@@ -1029,11 +996,14 @@ msgstr ""
 "Если такая метка заключена в скобки { }, метка будет\n"
 "удалена с панели вместе со связанным текстом."
 
-msgid "Separator"
-msgstr "Разделитель"
+msgid "Icon Text"
+msgstr "Текст возле значка"
 
 msgid "The separator will be added between pairs of { }."
 msgstr "Разделитель, добавляемый между парами скобок { }."
+
+msgid "Separator"
+msgstr "Разделитель"
 
 msgid "Tag"
 msgstr "Метка"
@@ -1072,13 +1042,13 @@ msgstr ""
 "Если стоит отметка, то все объекты ниже горизонта\n"
 "будут скрыты (исключая спутники)."
 
-msgid "Hide bodies fainter than magnitude"
-msgstr "Скрыть объекты с величиной, меньшей, чем"
-
 msgid ""
 "A body with a fainter magnitude will be hidden\n"
 "(excludes satellites)."
 msgstr ""
+
+msgid "Hide bodies fainter than magnitude"
+msgstr "Скрыть объекты с величиной, меньшей, чем"
 
 msgid "Add new minor planets"
 msgstr "Добавить новые малые планеты"
@@ -1117,33 +1087,40 @@ msgstr ""
 "Иначе спутники будут отсортированы\n"
 "по названию, а затем по номеру."
 
-msgid "Show satellites passes from"
-msgstr "Отображать пролёты спутников с"
-
 msgid "Show satellite passes after this hour (inclusive)"
 msgstr "Отображать пролёты спутников, начиная с этого часа (включительно)"
-
-msgid "to"
-msgstr "до"
 
 msgid "Show satellite passes before this hour (inclusive)"
 msgstr "Отображать пролёты спутников, заканчивая этим часом (включительно)"
 
+msgid "Show satellites passes from"
+msgstr "Отображать пролёты спутников с"
+
+msgid "to"
+msgstr "до"
+
 msgid "Menu"
 msgstr "Меню"
 
-msgid "Check a planet to display in the menu."
-msgstr "Выберите планеты, отображаемые в меню."
-
+#, fuzzy
 msgid ""
+"Check a planet to display in the menu.\n"
+"\n"
 "Clicking the header of the first column\n"
 "will toggle all checkboxes."
 msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включит все отметки."
 
-msgid "Check a minor planet to display in the menu."
-msgstr "Выберите малые планеты, отображаемые в меню."
+#, fuzzy
+msgid ""
+"Check a minor planet to display in the menu.\n"
+"\n"
+"Clicking the header of the first column\n"
+"will toggle all checkboxes."
+msgstr ""
+"Щелчок по заголовку первого столбца\n"
+"включит все отметки."
 
 msgid ""
 "Minor planet data is unavailable;\n"
@@ -1156,8 +1133,15 @@ msgstr ""
 "из источника, либо звёздная величина всех объектов\n"
 "превышает заданную."
 
-msgid "Check a comet to display in the menu."
-msgstr "Выберите кометы, отображаемые в меню."
+#, fuzzy
+msgid ""
+"Check a comet to display in the menu.\n"
+"\n"
+"Clicking the header of the first column\n"
+"will toggle all checkboxes."
+msgstr ""
+"Щелчок по заголовку первого столбца\n"
+"включит все отметки."
 
 msgid ""
 "Comet data is unavailable; the source\n"
@@ -1170,23 +1154,18 @@ msgstr ""
 "получить из источника, либо звёздная величина\n"
 "всех объектов превышает заданную."
 
-msgid "Check a star to display in the menu."
-msgstr "Выберите звёзды, отображаемые в меню."
+#, fuzzy
+msgid ""
+"Check a star to display in the menu.\n"
+"\n"
+"Clicking the header of the first column\n"
+"will toggle all checkboxes."
+msgstr ""
+"Щелчок по заголовку первого столбца\n"
+"включит все отметки."
 
 msgid "Natural Bodies"
 msgstr "Природные объекты"
-
-msgid "Check a satellite to display in the menu."
-msgstr "Выберите спутники, отображаемые в меню."
-
-msgid ""
-"Satellite data is unavailable;\n"
-"the source could not be reached,\n"
-"or data was available."
-msgstr ""
-"Данные о спутниках отсутствуют: недоступен\n"
-"источник данных, либо данные невозможно\n"
-"получить из источника."
 
 msgid "Name"
 msgstr "Название"
@@ -1196,6 +1175,25 @@ msgstr "Номер"
 
 msgid "International Designator"
 msgstr "Международное обозначение"
+
+#, fuzzy
+msgid ""
+"Check a satellite to display in the menu.\n"
+"\n"
+"Clicking the header of the first column\n"
+"will toggle all checkboxes."
+msgstr ""
+"Щелчок по заголовку первого столбца\n"
+"включит все отметки."
+
+msgid ""
+"Satellite data is unavailable;\n"
+"the source could not be reached,\n"
+"or data was available."
+msgstr ""
+"Данные о спутниках отсутствуют: недоступен\n"
+"источник данных, либо данные невозможно\n"
+"получить из источника."
 
 msgid "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD"
 msgstr "Справка по форматированию: https://wiki.ubuntu.com/NotifyOSD"
@@ -1260,9 +1258,6 @@ msgstr ""
 msgid "Notifications"
 msgstr "Уведомления"
 
-msgid "City"
-msgstr "Город"
-
 msgid ""
 "Choose a city from the list.\n"
 "Or, add in your own city name."
@@ -1270,23 +1265,26 @@ msgstr ""
 "Выберите город из списка. Или\n"
 "добавьте желаемое название города."
 
-msgid "Latitude"
-msgstr "Широта"
+msgid "City"
+msgstr "Город"
 
 msgid "Latitude of your location in decimal degrees."
 msgstr "Широта вашей местности в десятичных градусах."
 
-msgid "Longitude"
-msgstr "Долгота"
+msgid "Latitude"
+msgstr "Широта"
 
 msgid "Longitude of your location in decimal degrees."
 msgstr "Долгота вашей местности в десятичных градусах."
 
-msgid "Elevation"
-msgstr "Высота"
+msgid "Longitude"
+msgstr "Долгота"
 
 msgid "Height in metres above sea level."
 msgstr "Высота над уровнем моря в метрах."
+
+msgid "Elevation"
+msgstr "Высота"
 
 msgid "Location"
 msgstr "Расположение"
@@ -1305,6 +1303,52 @@ msgstr "Высота должна быть числом от 0 до 10000 вкл
 
 msgid "The start hour for satellite passes must be lower than the end hour."
 msgstr "Начальный час для пролётов спутников должен быть меньше конечного."
+
+#~ msgid ""
+#~ "PyEphem could not be found. Install using:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Библиотека PyEphem не найдена. Установите с помощью:\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "PyEphem must be version {0} or greater. Please upgrade:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Библиотека PyEphem должна иметь версию {0} или выше. Пожалуйста, обновите:\n"
+#~ "\n"
+
+#~ msgid "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield"
+#~ msgstr "Расчёты выполняются благодаря использованию Skyfield. https://rhodesmill.org/skyfield"
+
+#~ msgid ""
+#~ "Skyfield could not be found. Install using:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Библиотека Skyfield не найдена. Установите с помощью:\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "Skyfield must be version {0} or greater. Please upgrade:\n"
+#~ "\n"
+#~ msgstr ""
+#~ "Библиотека Skyfield должна иметь версию {0} или выше. Пожалуйста, обновите:\n"
+#~ "\n"
+
+#~ msgid "Check a planet to display in the menu."
+#~ msgstr "Выберите планеты, отображаемые в меню."
+
+#~ msgid "Check a minor planet to display in the menu."
+#~ msgstr "Выберите малые планеты, отображаемые в меню."
+
+#~ msgid "Check a comet to display in the menu."
+#~ msgstr "Выберите кометы, отображаемые в меню."
+
+#~ msgid "Check a star to display in the menu."
+#~ msgstr "Выберите звёзды, отображаемые в меню."
+
+#~ msgid "Check a satellite to display in the menu."
+#~ msgstr "Выберите спутники, отображаемые в меню."
 
 #~ msgid "Adara"
 #~ msgstr "Адара"
