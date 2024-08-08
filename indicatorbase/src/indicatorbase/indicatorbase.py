@@ -671,6 +671,22 @@ class IndicatorBase( ABC ):
 # If the preferences were open and the user clicks OK,
 # another update will be scheduled (along with the pending update)
 # causing multiple updates to be scheduled.
+
+    # The typical flow of events is:
+    #   Indicator starts up and kicks off an initial update.
+    #
+    #   Subsequent updates are scheduled either by:
+    #       The indicator returning the amount of seconds from
+    #       now until the next update needs to occur.
+    #
+    #       The user clicks OK in the Preferences.
+    #
+    #       An indicator experiences and event and requests an update
+    #       (for example starting a virtual machine will request an
+    #       update to refresh the menu).
+    #
+    #   If there is a pending (future) update and a request for an update
+    #   comes along, need to remove the "old" pending update (referred as self.id).
     def request_update( self, delay = 1 ):
         if self.id > 0:
             GLib.source_remove( self.id )
