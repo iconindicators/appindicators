@@ -126,14 +126,16 @@ class IndicatorStardate( IndicatorBase ):
             self.pad_integer = True
             self.show_classic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
-        self.request_update()
+
+        print( f"{ datetime.datetime.now() }" )
+        # self.request_update()
 
 #TODO Can/should this be moved into indicatorbase as part of a timer management thing?
-        if self.save_config_timer_id:
-            GLib.source_remove( self.save_config_timer_id )
+        # if self.save_config_timer_id:
+        #     GLib.source_remove( self.save_config_timer_id )
 
         # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
-        self.save_config_timer_id = self.request_save_config( 10 )
+        # self.save_config_timer_id = self.request_save_config( 10 )
 
 
     def on_preferences( self, dialog ):

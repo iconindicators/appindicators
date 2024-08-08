@@ -478,7 +478,8 @@ class IndicatorBase( ABC ):
         except metadata.PackageNotFoundError:
             # No pip information found; assume in development/testing.
             # Look for a .whl file in the same directory as the indicator.
-            first_wheel = next( Path( '.' ).glob( "*.whl" ), None )
+            path = Path( '.' )
+            first_wheel = next( path.glob( "*.whl" ), None )
             if first_wheel is None:
                 project_metadata = None
                 error_message = f"Unable to locate a .whl in { path.absolute() }"
@@ -852,15 +853,32 @@ class IndicatorBase( ABC ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
-        # if self.update_timer_id: #TODO If the mutex works...maybe can dispense with the ID stuff.
-        #     False( self.update_timer_id )
-        #     self.update_timer_id = None
-
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
         response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
         dialog.destroy()
 
         if response_type == Gtk.ResponseType.OK:
+#TODO
+# Wonder if I really should do this:
+#   self.request_save_config()
+# rather than 
+#   self._save_config()
+# If a user scrolls and scrolls the mouse wheel in stardate,
+# there SHOULD be a final scheduled/pending save (with ID)
+# which will happen in 10 seconds.
+# If the user then (quickly) opens Preferences, makes changes
+# and saves, this new save should kill the previous save.
+#
+# Or does it actually not really matter?
+# I think it does not matter if there is a pending save and a user initiated save.
+#
+# However, in stardate, on each mouse wheel scroll,
+# a request to save occurs which can happen in rapid fire succession
+# and don't want to do a save on each scroll event.
+# So really should cancel the previous request as a new request comes in.
+# This is internal to stardate.
+# So handle it there...
+# ...unless there is a smart way to handle it here! 
             self._save_config()
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
