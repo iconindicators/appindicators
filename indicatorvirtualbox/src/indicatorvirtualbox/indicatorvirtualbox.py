@@ -94,7 +94,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         self.build_menu( menu )
 
-        return int( 60 * self.refresh_interval_in_minutes )
+        # return int( 60 * self.refresh_interval_in_minutes )
+        return int( 60 * 2 )#TODO Test
 
 
     def build_menu( self, menu ):

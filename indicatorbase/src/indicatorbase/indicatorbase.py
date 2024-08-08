@@ -445,7 +445,7 @@ class IndicatorBase( ABC ):
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
         self.lock = Lock()
-        self.id = None # ID returned when calling GLib.timeout_add_seconds() and GLib.idle_add().
+        self.id = 1 # ID returned when calling GLib.timeout_add_seconds() and GLib.idle_add().  #TODO COmment about why initialised to 1 not zero.
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
         Notify.init( self.indicator_name )
@@ -581,17 +581,23 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-        GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
+        self.id = GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
         Gtk.main()
 
 
     def _update( self ):
         if self.lock.acquire( blocking = False ):
             self.set_menu_sensitivity( False )
+
+            GLib.source_remove( self.id )
+            print( f"Removing { self.id }")#TODO Test
+            self.id = 0
+
             GLib.idle_add( self._update_internal )
 
         else:
-            self.id = GLib.timeout_add_seconds( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT, self._update )
+            self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
+            # self.id = GLib.timeout_add_seconds( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT, self._update )
 
         return False
 
@@ -639,8 +645,11 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
         if next_update_in_seconds: # Some indicators don't return a next update time.
-            GLib.timeout_add_seconds( next_update_in_seconds, self._update )
-            #TODO Do I need to capture/remove the id from return value?
+            self.request_update( next_update_in_seconds )
+            # if self.id > 0:
+            #     GLib.source_remove( self.id )
+            #
+            # self.id = GLib.timeout_add_seconds( next_update_in_seconds, self._update )
 
         self.lock.release()
         return False
@@ -654,8 +663,21 @@ class IndicatorBase( ABC ):
 # Now have two scheduled updates and will continue and grow for each new VM start.
 # So need to track the id each time GLib is called to schedule an update
 # so the id can be removed.
+#
+# For any indicator, opening the prefereces/about with an scheduled update pending
+# and that update wants to kick off whilst the preferences/about are open,
+# that update is deferred by one minute.
+# If the about was open, that update will then happen as normal.
+# If the preferences were open and the user clicks OK,
+# another update will be scheduled (along with the pending update)
+# causing multiple updates to be scheduled.
     def request_update( self, delay = 1 ):
-        GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
+        if self.id > 0:
+            GLib.source_remove( self.id )
+            print( f"Removing { self.id }")#TODO Test
+
+        self.id = GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
+        print( f"Next update in { delay } seconds with ID { self.id }.")
 
 
     def set_label( self, text ):
@@ -851,7 +873,8 @@ class IndicatorBase( ABC ):
 
         if response_type == Gtk.ResponseType.OK:
             self._save_config()
-            GLib.timeout_add_seconds( 1, self._update ) # Allow one second for the lock to release so the update will proceed.
+            # GLib.timeout_add_seconds( 1, self._update ) # Allow one second for the lock to release so the update will proceed.
+            self.request_update( 1 )  # Allow one second for the lock to release so the update will proceed.
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
