@@ -58,6 +58,9 @@ from pathlib import Path
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
+import threading
+import time
+
 from event import Event
 
 
@@ -98,10 +101,19 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.request_update( delay = five_seconds_after_midnight )
 
         if self.notify:
-            today_in_short_date_format = today.strftime( '%b %d' ) # It is assumed/hoped the dates in the calendar result are always short date format irrespective of locale.
-            for event in events:
-                if today_in_short_date_format == event.get_date():
-                    self.show_notification( _( "On this day..." ), event.get_description() )
+            # Show notifications in a thread to avoid blocking initialisation/update.
+            threading.Thread( target = self._show_notifications, args = ( events, today ) ).start()
+
+
+    def _show_notifications( self, events, today ):
+        # It is assumed/hoped the dates in the calendar result are
+        # always short date format irrespective of locale.
+        today_in_short_date_format = today.strftime( '%b %d' )
+
+        for event in events:
+            if today_in_short_date_format == event.get_date():
+                self.show_notification( _( "On this day..." ), event.get_description() )
+                time.sleep( 2 ) # Without a delay some/most of the notifications disappear too quickly.
 
 
     def build_menu( self, menu, events ):
