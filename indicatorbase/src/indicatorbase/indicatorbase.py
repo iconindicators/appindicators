@@ -498,12 +498,11 @@ class IndicatorBase( ABC ):
         self.lock = Lock()
         self.id = 0 # ID returned when scheduling an update.
 
-        # TODO
         self.lock_update = Lock()
         self.id_update = 0 # ID returned when scheduling an update.
 
         self.lock_save_config = Lock()
-        self.id_save_config = 0 # ID returned when scheduling a save of the config.
+        self.id_save_config = 0 # ID returned when scheduling a config save.
 
         signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
 
@@ -652,8 +651,6 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
-#TODO Why not call request_update here?        
-        # self.id = GLib.timeout_add_seconds( 1, self._update ) # Delay update so that Gtk main executes and initialisation is shown.
         self.request_update()
         Gtk.main()
 
@@ -673,54 +670,19 @@ class IndicatorBase( ABC ):
     #
     #   If there is a pending (future) update and a request for an update
     #   comes along, need to remove the "old" pending update (referred as self.id).
-#TODO Wondering if this function also needs a mutex/lock?
-# What happens if we start a VM one after another...
-# ...could this function be interrupted with more calls to this function
-# ...and if so, is that bad? 
-#
-# Also wondering if the lock blocks a call and we immediately ask for a scheduled call later
-# will that call for the schedule later happen over and over?
-# Maybe put in print statements to see...
-    # def request_update_ORIG( self, delay = 1 ):
-    #     if self.id > 0:
-    #         GLib.source_remove( self.id )
-    #
-    #     self.id = GLib.timeout_add_seconds( 1 if delay < 1 else delay, self._update )
-
-
-#TODO Consider
-#    virtualbox starting a vm every 30s or every 5s (think the lock in _update_internal is a problem here)
-#    stardate scrolling mouse wheel
-# What about a long update taking place and another update wants to happen...is this possible?
     def request_update( self, delay = 1 ):
         if self.lock_update.acquire( blocking = False ):
             if self.id_update > 0:
                 GLib.source_remove( self.id_update )
-                print( f"{ datetime.datetime.now() } request_update (remove): { self.id_update }" ) #TODO Test
 
-            self.id_update = GLib.timeout_add_seconds( delay, self._update_internal ) #TODO If this works, rename to _update.
-            print( f"{ datetime.datetime.now() } request_update (add): { self.id_update }" ) #TODO Test
+            self.id_update = GLib.timeout_add_seconds( delay, self._update )
             self.lock_update.release()
 
         else:
             self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
-#TODO I think this can go.
-    # def _update( self ):
-    #     if self.lock.acquire( blocking = False ):
-    #         self.set_menu_sensitivity( False )
-    #         GLib.source_remove( self.id )
-    #         self.id = 0
-    #         GLib.idle_add( self._update_internal )
-    #
-    #     else:
-    #         self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
-    #
-    #     return False
-
-
-    def _update_internal( self ):
+    def _update( self ):
         update_start = datetime.datetime.now()
 
         self.set_menu_sensitivity( False ) # Menu will be rebuilt as part of the update, so no need to set back to True.
@@ -764,13 +726,10 @@ class IndicatorBase( ABC ):
 
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
-        print( f"{ datetime.datetime.now() } _update_internal: { self.id_update }" ) #TODO Test
-        self.id_update = 0 #TODO Does this stay?
+        self.id_update = 0
         if next_update_in_seconds: # Some indicators don't return a next update time.
             self.request_update( next_update_in_seconds )
 
-        # self.lock.release()#TODO Think this needs to go...or not...more thinking.  SHould it be in the caller?
-        # self.id_update = 0 #TODO Does this stay?
         return False
 
 
@@ -847,8 +806,6 @@ class IndicatorBase( ABC ):
             functionandarguments )
 
 
-#TODO Does this need to be disabled during update (along with about/pref)?
-# How to do this?
     def _on_mouse_wheel_scroll(
             self,
             indicator,
@@ -856,8 +813,7 @@ class IndicatorBase( ABC ):
             scroll_direction,
             functionandarguments ):
 
-        # if not self.lock.locked():
-        if self.indicator.get_menu().get_children()[ 0 ].get_sensitive():
+        if self.indicator.get_menu().get_children()[ 0 ].get_sensitive(): # Disable during update/Preferences/About
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
 
@@ -865,19 +821,6 @@ class IndicatorBase( ABC ):
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
 
-#TODO Not sure if this stays.
-    # def _toggle_user_interface( self, toggle ):
-    #     self.set_menu_sensitivity( toggle )
-    #     self.indicator.set_secondary_activate_target(
-    #         self.secondary_activate_target if self.secondary_activate_target else None )
-
-
-    # def _on_about( self, menuitem ):
-    #     if self.lock.acquire( blocking = False ):
-    #         self._on_about_internal( menuitem )
-
-
-    # def _on_about_internal( self, menuitem ):
     def _on_about( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
@@ -935,7 +878,6 @@ class IndicatorBase( ABC ):
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
-        # self.lock.release()#TODO Hopefully not neded.
 
 
     def _add_hyperlink_label(
@@ -959,14 +901,6 @@ class IndicatorBase( ABC ):
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
-#     def _on_preferences( self, menuitem ):
-# #TODO Do we need another lock for about/preferences or can we use the update lock?
-# # Don't we want to prevent about/prefernces from being enabled when doing an update?
-#         if self.lock.acquire( blocking = False ):
-#             self._on_preferences_internal( menuitem )
-
-
-    # def _on_preferences_internal( self, menuitem ):
     def _on_preferences( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
@@ -976,34 +910,11 @@ class IndicatorBase( ABC ):
         dialog.destroy()
 
         if response_type == Gtk.ResponseType.OK:
-#TODO
-# Wonder if I really should do this:
-#   self.request_save_config()
-# rather than 
-#   self._save_config()
-# If a user scrolls and scrolls the mouse wheel in stardate,
-# there SHOULD be a final scheduled/pending save (with ID)
-# which will happen in 10 seconds.
-# If the user then (quickly) opens Preferences, makes changes
-# and saves, this new save should kill the previous save.
-#
-# Or does it actually not really matter?
-# I think it does not matter if there is a pending save and a user initiated save.
-#
-# However, in stardate, on each mouse wheel scroll,
-# a request to save occurs which can happen in rapid fire succession
-# and don't want to do a save on each scroll event.
-# So really should cancel the previous request as a new request comes in.
-# This is internal to stardate.
-# So handle it there...
-# ...unless there is a smart way to handle it here! 
-            # self._save_config()#TODO Original
             self.request_save_config()
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
         self.set_menu_sensitivity( True )
         self.indicator.set_secondary_activate_target( self.secondary_activate_target )
-        # self.lock.release()#TODO THink this goes.
 
 
     def set_menu_sensitivity( self, toggle ):
@@ -1927,15 +1838,12 @@ class IndicatorBase( ABC ):
         self.load_config( config ) # Call to implementation in indicator.
 
 
-#TODO COmpare these two functions with update above.
     def request_save_config( self, delay = 0 ):
         if self.lock_save_config.acquire( blocking = False ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
-                print( f"{ datetime.datetime.now() } request_save_config (remove): { self.id_save_config }" ) #TODO Test
 
             self.id_save_config = GLib.timeout_add_seconds( delay, self._save_config )
-            print( f"{ datetime.datetime.now() } request_save_config (add): { self.id_save_config }" ) #TODO Test
             self.lock_save_config.release()
 
         else:
@@ -1958,8 +1866,7 @@ class IndicatorBase( ABC ):
             logging.exception( e )
             logging.error( "Error writing configuration: " + config_file )
 
-        print( f"{ datetime.datetime.now() } _save_config: { self.id_save_config }" ) #TODO Test
-        self.id_save_config = 0 #TODO Does this stay?
+        self.id_save_config = 0
         return False
 
 

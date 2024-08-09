@@ -75,7 +75,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            debug = True, #TODO test
             comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
 
         self.auto_start_required = True

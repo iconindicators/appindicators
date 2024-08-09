@@ -44,7 +44,6 @@ class IndicatorStardate( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            debug = True,#TODO Test
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [
                 _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
@@ -127,19 +126,10 @@ class IndicatorStardate( IndicatorBase ):
             self.pad_integer = True
             self.show_classic = True # Have shown the '2009 revised' version, now move on to 'classic'.
 
+        self.request_update( delay = 0 )
 
-        # print( f"{ datetime.datetime.now() }" )
-        self.request_update( delay = 0 ) #TODO Check all calls to this ... ensure all non default specify as delay = ...
-        # self.request_update()
-
+        # Defer the save; avoids multiple saves when scrolling the mouse wheel like crazy!
         self.request_save_config( delay = 10 )
-
-#TODO Can/should this be moved into indicatorbase as part of a timer management thing?
-        # if self.save_config_timer_id:
-        #     GLib.source_remove( self.save_config_timer_id )
-
-        # Defer the save; this avoids multiple saves when scrolling the mouse wheel like crazy!
-        # self.save_config_timer_id = self.request_save_config( 10 )
 
 
     def on_preferences( self, dialog ):
