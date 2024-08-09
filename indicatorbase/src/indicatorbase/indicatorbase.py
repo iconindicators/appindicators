@@ -467,7 +467,7 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
-        error_message = self.initialise_desktop_file()
+        error_message = self._initialise_desktop_file()
         if error_message:
             self.show_dialog_ok(
                 None,
@@ -562,7 +562,7 @@ class IndicatorBase( ABC ):
         return project_metadata, error_message
 
 
-    def initialise_desktop_file( self ):
+    def _initialise_desktop_file( self ):
         self.desktop_file = self.indicator_name + ".py.desktop"
         self.desktop_file_user_home = IndicatorBase._AUTOSTART_PATH / self.desktop_file
 
