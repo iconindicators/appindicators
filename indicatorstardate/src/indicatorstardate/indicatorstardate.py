@@ -44,6 +44,7 @@ class IndicatorStardate( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            debug = True,#TODO Test
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [
                 _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
