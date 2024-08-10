@@ -593,7 +593,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.lines = \
             config.get(
                 IndicatorOnThisDay.CONFIG_LINES,
-                self.get_menuitems_guess() )
+                IndicatorBase.get_menuitems_guess() )
 
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
 
