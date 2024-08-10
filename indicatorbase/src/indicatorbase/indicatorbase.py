@@ -281,6 +281,15 @@ ERROR: ERROR: Failed to build installable wheels for some pyproject.toml based p
 #	pip           24.0
 #	pycairo       1.26.0
 #	PyGObject     3.48.2
+#
+# Use this to get latest version from pip homepage:
+    # def _test( self ):
+    #     from urllib.request import urlopen
+    #     import json
+    #     url = "https://pypi.org/pypi/ephem/json"
+    #     response = urlopen( url )
+    #     data_json = json.loads( response.read() )
+    #     print( data_json[ "info" ][ "version" ] )
 
 
 # Base class for application indicators.
