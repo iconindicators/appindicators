@@ -24,24 +24,28 @@
 
 from abc import ABC, abstractmethod
 
-import tide
-
 
 class TideDataGetterBase( ABC ):
 
-    # Returns a list of tidal readings.
-    #
-    # This function is abstract and must be implemented by the end user.
-    # In the users's implementation, remove the @abstractmethod from the function header.
     @staticmethod
     @abstractmethod
     def get_tide_data( logging = None, url_timeout_in_seconds = 20 ):
-        # Example data returned by this function, to be implemented by the end user in their own script and class.
         '''
+        User must implement this function within their own class
+        to retrieve tidal data (from whatever source)
+        and return a list of tidal readings.
+        For example:
+
+        import tide
         url = "http://url-used-to-obtain-tidal-information"
+
+        # Convert tidal data from your URL to tide.Reading().
+
         return [
             tide.Reading( "Tuesday August 3rd", "4:07 AM", "The port", True, 1.6, url ),
             tide.Reading( "Tuesday August 3rd", "10:31 AM", "The port", False, 0.3, url ),
             tide.Reading( "Wednesday August 4th", "5:26 AM", "The port", True, 1.5, url ) ]
+
+        Do not include @abstractmethod at the top of your own function.
         '''
         raise NotImplementedError()
