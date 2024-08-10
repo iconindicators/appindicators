@@ -174,7 +174,9 @@ class IndicatorStardate( IndicatorBase ):
             show_issue_checkbutton,
             pad_integer_checkbutton )
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         grid.attach( box, 0, 3, 1, 1 )
 
         dialog.get_content_area().pack_start( grid, True, True, 0 )
@@ -185,7 +187,11 @@ class IndicatorStardate( IndicatorBase ):
             self.pad_integer = pad_integer_checkbutton.get_active()
             self.show_classic = show_classic_checkbutton.get_active()
             self.show_issue = show_issue_checkbutton.get_active()
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
 
         return response_type
 

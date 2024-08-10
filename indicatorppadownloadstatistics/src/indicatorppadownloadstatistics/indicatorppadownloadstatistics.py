@@ -719,7 +719,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( low_bandwidth_checkbutton, 0, 5, 1, 1 )
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         grid.attach( box, 0, 6, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
@@ -762,7 +764,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 treeiter = filter_store.iter_next( treeiter )
 
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
 
         return response_type
 

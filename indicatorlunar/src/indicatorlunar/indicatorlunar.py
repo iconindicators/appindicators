@@ -2104,7 +2104,9 @@ class IndicatorLunar( IndicatorBase ):
         longitude.set_text( str( self.longitude ) )
         elevation.set_text( str( self.elevation ) )
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         box.set_margin_top( 30 ) # Put some distance from the prior section.
         grid.attach( box, 0, 4, 1, 1 )
 
@@ -2251,7 +2253,11 @@ class IndicatorLunar( IndicatorBase ):
             self.longitude = float( longitude_value )
             self.elevation = float( elevation_value )
 
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
+
             break
 
         return response_type

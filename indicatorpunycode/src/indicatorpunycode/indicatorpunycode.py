@@ -261,7 +261,9 @@ class IndicatorPunycode( IndicatorBase ):
                 margin_top = 10 ),
             0, 5, 1, 1 )
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         grid.attach( box, 0, 6, 1, 1 )
 
         dialog.get_content_area().pack_start( grid, True, True, 0 )
@@ -273,7 +275,12 @@ class IndicatorPunycode( IndicatorBase ):
             self.output_both = output_both_checkbutton.get_active()
             self.drop_path_query = drop_path_query_checkbutton.get_active()
             self.result_history_length = results_amount_spinner.get_value_as_int()
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
+
             self.cull_results()
 
         return response_type

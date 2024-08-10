@@ -476,7 +476,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid.attach( hide_groups_checkbutton, 0, 2, 1, 1 )
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         box.set_margin_top( 30 ) # Put some distance from the prior section.
         grid.attach( box, 0, 3, 1, 1 )
 
@@ -531,7 +533,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.indicator_text = indicator_text_entry.get_text()
             self.indicator_text_separator = indicator_text_separator_entry.get_text()
             self.initialise_background_scripts()
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
 
         return response_type
 

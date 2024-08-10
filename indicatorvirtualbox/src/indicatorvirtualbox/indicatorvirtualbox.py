@@ -501,7 +501,9 @@ class IndicatorVirtualBox( IndicatorBase ):
             0, row, 1, 1 )
         row += 1
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         grid.attach( box, 0, row, 1, 1 )
         row += 1
 
@@ -519,7 +521,11 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.refresh_interval_in_minutes = spinner_refresh_interval.get_value_as_int()
             self.virtual_machine_preferences.clear()
             self._update_virtual_machine_preferences( treestore, treeview.get_model().get_iter_first() )
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
 
         return response_type
 

@@ -260,37 +260,6 @@ ERROR: ERROR: Failed to build installable wheels for some pyproject.toml based p
 #   https://pypi.org/project/indicatorvirtualbox/
 
 
-#TODO Is it feasible for an indicator to check, say weekly,
-# if there is an update available at its respective PyPI page?
-# Can we use 'pip list -o' or something via pip to do the check?
-#
-# Could use either a list of outdated or uptodate packages:
-# https://pip.pypa.io/en/stable/cli/pip_list/
-# (see other formatting options too)
-#
-#	. $HOME/.local/venv_indicatortest/bin/activate && python3 -m pip list -o && deactivate
-#	Package    Version Latest Type
-#	---------- ------- ------ -----
-#	setuptools 44.0.0  69.5.1 wheel
-#
-#	. $HOME/.local/venv_indicatortest/bin/activate && python3 -m pip list -u && deactivate
-#	Package       Version
-#	------------- -------
-#	indicatortest 1.0.16
-#	pip           24.0
-#	pycairo       1.26.0
-#	PyGObject     3.48.2
-#
-# Use this to get latest version from pip homepage:
-    # def _test( self ):
-    #     from urllib.request import urlopen
-    #     import json
-    #     url = "https://pypi.org/pypi/ephem/json"
-    #     response = urlopen( url )
-    #     data_json = json.loads( response.read() )
-    #     print( data_json[ "info" ][ "version" ] )
-
-
 # Base class for application indicators.
 #
 # References:
@@ -373,7 +342,7 @@ class IndicatorBase( ABC ):
 
     _CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
-    _CONFIG_CHECK_LATEST_VERSION = "checklatestversion" #TODO Not sure yet.
+    _CONFIG_CHECK_LATEST_VERSION = "checklatestversion"
     _CONFIG_VERSION = "version"
 
     # Values are the result of calling
@@ -536,11 +505,9 @@ class IndicatorBase( ABC ):
         threading.Thread( target = self._check_for_newer_version ).start()
 
 
-#TODO Testing
     def _check_for_newer_version( self ):
         if self.check_latest_version: #TODO Remove not
-            url = f"https://pypi.org/pypi/ { self.indicator_name } /json"
-            url = f"https://pypi.org/pypi/ephem/json" #TODO Testing
+            url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
             try:
                 response = urlopen( url )
                 data_json = json.loads( response.read() )
@@ -1066,36 +1033,6 @@ class IndicatorBase( ABC ):
             parent = parent.get_parent()
 
         return parent
-
-
-#TODO Delete hopefully
-    def create_autostart_checkbox_and_delay_spinnerORIG( self ):
-        autostart, delay = self._get_autostart_and_delay()
-
-        autostart_checkbox = \
-            self.create_checkbutton(
-                _( "Autostart" ),
-                tooltip_text = _( "Run the indicator automatically." ),
-                active = autostart )
-
-        autostart_spinner = \
-            self.create_spinbutton(
-                delay,
-                0,
-                1000,
-                tooltip_text = _( "Start up delay (seconds)." ),
-                sensitive = autostart_checkbox.get_active() )
-
-        autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
-
-        box = \
-            self.create_box(
-                (
-                    ( autostart_checkbox, False ),
-                    ( autostart_spinner, False ) ),
-                margin_top = 10 )
-
-        return autostart_checkbox, autostart_spinner, box
 
 
     def create_preferences_common_widgets( self ):
@@ -1906,12 +1843,10 @@ class IndicatorBase( ABC ):
 
         self.load_config( config ) # Call to implementation in indicator.
 
-#TODO Start
         if IndicatorBase._CONFIG_CHECK_LATEST_VERSION not in config:
             config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = False
 
         self.check_latest_version = config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ]
-#TODO End
 
 
     # Copies .config using the old indicator name format (using hyphens)
