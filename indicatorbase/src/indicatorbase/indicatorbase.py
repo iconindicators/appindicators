@@ -541,8 +541,8 @@ class IndicatorBase( ABC ):
             error_message = None
 
         except metadata.PackageNotFoundError:
-            # No pip information found; assume in development/testing.
-            # Look for a .whl file in the release folder.
+            # No pip information found; assume running in development;
+            # look for a .whl file in the release folder.
             path_wheel = IndicatorBase._get_path_to_wheel_in_release( indicator_name )
             first_wheel = next( path_wheel.glob( "*.whl" ), None )
             if first_wheel is None:
@@ -1067,44 +1067,6 @@ class IndicatorBase( ABC ):
         return autostart_checkbox, autostart_spinner, box
 
 
-    # When adding a menuitem to a submenu,
-    # under GNOME the menuitem appears in the same menu as the submenu
-    # and requires an indent added to look correct.
-    #
-    # Under Kubuntu et al, menuitems of a submenu appear as a separate,
-    # detached menu and so require no indent.
-    #
-    # The first value of the indent argument refers to the indent for
-    # a submenu's menuitems under GNOME and similar layouts.
-    # The second value of the indent argument refers to the indent for
-    # a submenu's menuitems under Kubuntu and similar layouts.
-    def _get_menu_indent_amount( self, indent = ( 0, 0 ) ):
-        indent_amount = "      "
-        indent_small = \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE
-
-        if indent_small:
-            indent_amount = "   "
-
-        detatched_submenus = \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_BUDGIE_GNOME or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_ICEWM or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_LXQT or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_MATE or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_UNITY7 or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_X_CINNAMON or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_XFCE
-
-        if detatched_submenus:
-            indent_amount = indent_amount * indent[ 1 ]
-
-        else:
-            indent_amount = indent_amount * indent[ 0 ]
-
-        return indent_amount
-
-
     def create_and_append_menuitem(
         self,
         menu,
@@ -1173,6 +1135,47 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
+    def _get_menu_indent_amount( self, indent = ( 0, 0 ) ):
+        '''
+        When adding a menuitem to a submenu,
+        under GNOME the menuitem appears in the same menu as the submenu
+        and requires an indent added to look correct.
+        
+        Under Kubuntu et al, menuitems of a submenu appear as a separate,
+        detached menu and so require no indent.
+        
+        The first value of the indent argument refers to the indent for
+        a submenu's menuitems under GNOME and similar layouts.
+        The second value of the indent argument refers to the indent for
+        a submenu's menuitems under Kubuntu and similar layouts.
+        '''
+
+        indent_amount = "      "
+        indent_small = \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE
+
+        if indent_small:
+            indent_amount = "   "
+
+        detatched_submenus = \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_BUDGIE_GNOME or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_ICEWM or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_LXQT or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_MATE or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_UNITY7 or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_X_CINNAMON or \
+            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_XFCE
+
+        if detatched_submenus:
+            indent_amount = indent_amount * indent[ 1 ]
+
+        else:
+            indent_amount = indent_amount * indent[ 0 ]
+
+        return indent_amount
+
+
     def get_on_click_menuitem_open_browser_function( self ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
@@ -1193,53 +1196,6 @@ class IndicatorBase( ABC ):
     def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
         for widget in widgets:
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
-
-
-    # Estimate the number of menu items which will fit into an indicator menu
-    # without exceeding the screen height.
-    def get_menuitems_guess( self ):
-        screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
-        numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
-
-        screen_height_in_pixels = Gtk.Window().get_screen().get_height()
-        if screen_height_in_pixels < screen_heights_in_pixels[ 0 ]:
-            number_of_menuitems = \
-                numbers_of_menuitems[ 0 ] * screen_height_in_pixels / screen_heights_in_pixels[ 0 ] # Best guess.
-
-        elif screen_height_in_pixels > screen_heights_in_pixels[ -1 ]:
-            number_of_menuitems = \
-                numbers_of_menuitems[ -1 ] * screen_height_in_pixels / screen_heights_in_pixels[ -1 ] # Best guess.
-
-        else:
-            number_of_menuitems = \
-                IndicatorBase.interpolate(
-                    screen_heights_in_pixels,
-                    numbers_of_menuitems,
-                    screen_height_in_pixels )
-
-        return number_of_menuitems
-
-
-    # Reference: https://stackoverflow.com/a/56233642/2156453
-    @staticmethod
-    def interpolate( x_values, y_values, x ):
-        if not ( x_values[ 0 ] <= x <= x_values[ -1 ] ):
-            raise ValueError( "x out of bounds!" )
-
-        if any( y - x <= 0 for x, y in zip( x_values, x_values[ 1 : ] ) ):
-            raise ValueError( "xValues must be in strictly ascending order!" )
-
-        intervals = zip( x_values, x_values[ 1 : ], y_values, y_values[ 1 : ] )
-        slopes = [ ( y2 - y1 ) / ( x2 - x1 ) for x1, x2, y1, y2 in intervals ]
-
-        if x == x_values[ -1 ]:
-            y = y_values[ -1 ]
-
-        else:
-            i = bisect_right( x_values, x ) - 1
-            y = y_values[ i ] + slopes[ i ] * ( x - x_values[ i ] )
-
-        return y
 
 
     def create_grid( self ):
@@ -1673,6 +1629,60 @@ class IndicatorBase( ABC ):
             logging.exception( e )
 
 
+    @staticmethod
+    def get_menuitems_guess():
+        '''
+        Estimate the number of menu items which will fit into an indicator menu
+        without exceeding the screen height.
+        '''
+
+        screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
+        numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
+
+        screen_height_in_pixels = Gtk.Window().get_screen().get_height()
+        if screen_height_in_pixels < screen_heights_in_pixels[ 0 ]:
+            number_of_menuitems = \
+                numbers_of_menuitems[ 0 ] * screen_height_in_pixels / screen_heights_in_pixels[ 0 ] # Best guess.
+
+        elif screen_height_in_pixels > screen_heights_in_pixels[ -1 ]:
+            number_of_menuitems = \
+                numbers_of_menuitems[ -1 ] * screen_height_in_pixels / screen_heights_in_pixels[ -1 ] # Best guess.
+
+        else:
+            number_of_menuitems = \
+                IndicatorBase.interpolate(
+                    screen_heights_in_pixels,
+                    numbers_of_menuitems,
+                    screen_height_in_pixels )
+
+        return number_of_menuitems
+
+
+    @staticmethod
+    def interpolate( x_values, y_values, x ):
+        '''
+        Reference: https://stackoverflow.com/a/56233642/2156453
+        '''
+
+        if not ( x_values[ 0 ] <= x <= x_values[ -1 ] ):
+            raise ValueError( "x out of bounds!" )
+
+        if any( y - x <= 0 for x, y in zip( x_values, x_values[ 1 : ] ) ):
+            raise ValueError( "xValues must be in strictly ascending order!" )
+
+        intervals = zip( x_values, x_values[ 1 : ], y_values, y_values[ 1 : ] )
+        slopes = [ ( y2 - y1 ) / ( x2 - x1 ) for x1, x2, y1, y2 in intervals ]
+
+        if x == x_values[ -1 ]:
+            y = y_values[ -1 ]
+
+        else:
+            i = bisect_right( x_values, x ) - 1
+            y = y_values[ i ] + slopes[ i ] * ( x - x_values[ i ] )
+
+        return y
+
+
     def get_logging( self ):
         return logging
 
@@ -1795,6 +1805,27 @@ class IndicatorBase( ABC ):
         return downloaded
 
 
+    # Read a dictionary of configuration from a JSON text file.
+    def _load_config( self ):
+        config_file = \
+            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
+
+        self._copy_config_to_new_directory( config_file )
+
+        config = { }
+        if config_file.is_file():
+            try:
+                with open( config_file, 'r' ) as f_in:
+                    config = json.load( f_in )
+
+            except Exception as e:
+                config = { }
+                logging.exception( e )
+                logging.error( "Error reading configuration: " + config_file )
+
+        self.load_config( config ) # Call to implementation in indicator.
+
+
     # Copies .config using the old indicator name format (using hyphens)
     # to the new format, sans hyphens.
     def _copy_config_to_new_directory( self, config_file ):
@@ -1815,27 +1846,6 @@ class IndicatorBase( ABC ):
 
         if not config_file.is_file() and config_file_old.is_file():
             shutil.copyfile( config_file_old, config_file )
-
-
-    # Read a dictionary of configuration from a JSON text file.
-    def _load_config( self ):
-        config_file = \
-            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
-
-        self._copy_config_to_new_directory( config_file )
-
-        config = { }
-        if config_file.is_file():
-            try:
-                with open( config_file, 'r' ) as f_in:
-                    config = json.load( f_in )
-
-            except Exception as e:
-                config = { }
-                logging.exception( e )
-                logging.error( "Error reading configuration: " + config_file )
-
-        self.load_config( config ) # Call to implementation in indicator.
 
 
     def request_save_config( self, delay = 0 ):
