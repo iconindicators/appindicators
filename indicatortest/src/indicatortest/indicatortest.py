@@ -433,7 +433,9 @@ class IndicatorTest( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 1, 1, 10 )
 
-        autostart_checkbox, delay_spinner, box = self.create_autostart_checkbox_and_delay_spinner()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
         grid.attach( box, 0, 11, 1, 1 )
 
         dialog.get_content_area().pack_start( grid, True, True, 0 )
@@ -442,7 +444,11 @@ class IndicatorTest( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.x = x_checkbutton.get_active()
-            self.set_autostart_and_delay( autostart_checkbox.get_active(), delay_spinner.get_value_as_int() )
+
+            self.set_preferences_common_attributes(
+                autostart_checkbox.get_active(),
+                delay_spinner.get_value_as_int(),
+                latest_version_checkbox.get_active() )
 
         return response_type
 

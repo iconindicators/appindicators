@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
 '''
 Building wheels for collected packages: cryptography
   Building wheel for cryptography (pyproject.toml) ... error
@@ -329,6 +328,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 import webbrowser
 
 from abc import ABC
@@ -373,6 +373,7 @@ class IndicatorBase( ABC ):
 
     _CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
+    _CONFIG_CHECK_LATEST_VERSION = "checklatestversion" #TODO Not sure yet.
     _CONFIG_VERSION = "version"
 
     # Values are the result of calling
@@ -531,6 +532,26 @@ class IndicatorBase( ABC ):
         self.indicator.set_menu( menu )
 
         self._load_config()
+
+        threading.Thread( target = self._check_for_newer_version ).start()
+
+
+#TODO Testing
+    def _check_for_newer_version( self ):
+        if self.check_latest_version: #TODO Remove not
+            url = f"https://pypi.org/pypi/ { self.indicator_name } /json"
+            url = f"https://pypi.org/pypi/ephem/json" #TODO Testing
+            try:
+                response = urlopen( url )
+                data_json = json.loads( response.read() )
+                version_latest = data_json[ "info" ][ "version" ]
+                if version_latest != str( self.version ):
+                    self.show_notification(
+                        _( "New version of {0}..." ).format( self.indicator_name ),
+                        _( "See {0} for latest version." ).format( self.website ) )
+
+            except Exception as e:
+                logging.exception( e )
 
 
     @staticmethod
@@ -1047,8 +1068,9 @@ class IndicatorBase( ABC ):
         return parent
 
 
-    def create_autostart_checkbox_and_delay_spinner( self ):
-        autostart, delay = self.get_autostart_and_delay()
+#TODO Delete hopefully
+    def create_autostart_checkbox_and_delay_spinnerORIG( self ):
+        autostart, delay = self._get_autostart_and_delay()
 
         autostart_checkbox = \
             self.create_checkbutton(
@@ -1074,6 +1096,74 @@ class IndicatorBase( ABC ):
                 margin_top = 10 )
 
         return autostart_checkbox, autostart_spinner, box
+
+
+    def create_preferences_common_widgets( self ):
+        autostart, delay = self._get_autostart_and_delay()
+
+        autostart_checkbox = \
+            self.create_checkbutton(
+                _( "Autostart" ),
+                tooltip_text = _( "Run the indicator automatically." ),
+                active = autostart )
+
+        autostart_spinner = \
+            self.create_spinbutton(
+                delay,
+                0,
+                1000,
+                tooltip_text = _( "Start up delay (seconds)." ),
+                sensitive = autostart_checkbox.get_active() )
+
+        autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
+
+        box_one = \
+            self.create_box(
+                (
+                    ( autostart_checkbox, False ),
+                    ( autostart_spinner, False ) ),
+                margin_top = 10 )
+
+        latest_version_checkbox = \
+            self.create_checkbutton(
+                _( "Check Latest Version" ),
+                tooltip_text = _( "Check for the latest version of the indicator on start up." ),
+                active = self.check_latest_version )
+
+        box_two = \
+            self.create_box(
+                ( ( latest_version_checkbox, False ), ),
+                margin_top = 10 )
+
+        box = \
+            self.create_box(
+                (
+                    ( box_one, False ),
+                    ( box_two, False ) ),
+                orientation = Gtk.Orientation.VERTICAL )
+
+        return autostart_checkbox, autostart_spinner, latest_version_checkbox, box
+
+
+    def _get_autostart_and_delay( self ):
+        autostart = False
+        delay = 0
+        try:
+            if self.desktop_file_user_home.is_file():
+                with open( self.desktop_file_user_home, 'r' ) as f:
+                    for line in f:
+                        if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
+                            autostart = True
+
+                        if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
+                            delay = int( line.split( '=' )[ 1 ].strip() )
+
+        except Exception as e:
+            logging.exception( e )
+            autostart = False
+            delay = 0
+
+        return autostart, delay
 
 
     def create_and_append_menuitem(
@@ -1234,10 +1324,11 @@ class IndicatorBase( ABC ):
             margin_top = 0,
             margin_left = 0,
             spacing = 6,
+            orientation = Gtk.Orientation.HORIZONTAL,
             halign = Gtk.Align.FILL,
             homogeneous = False ):
 
-        box = Gtk.Box( spacing = spacing, orientation = Gtk.Orientation.HORIZONTAL )
+        box = Gtk.Box( spacing = spacing, orientation = orientation )
         box.set_sensitive( sensitive )
         box.set_margin_top( margin_top )
         box.set_margin_left( margin_left )
@@ -1582,28 +1673,9 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-    def get_autostart_and_delay( self ):
-        autostart = False
-        delay = 0
-        try:
-            if self.desktop_file_user_home.is_file():
-                with open( self.desktop_file_user_home, 'r' ) as f:
-                    for line in f:
-                        if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
-                            autostart = True
+    def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
+        self.check_latest_version = check_latest_version
 
-                        if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
-                            delay = int( line.split( '=' )[ 1 ].strip() )
-
-        except Exception as e:
-            logging.exception( e )
-            autostart = False
-            delay = 0
-
-        return autostart, delay
-
-
-    def set_autostart_and_delay( self, is_set, delay ):
         IndicatorBase._AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
 
         if not self.desktop_file_user_home.is_file():
@@ -1834,6 +1906,13 @@ class IndicatorBase( ABC ):
 
         self.load_config( config ) # Call to implementation in indicator.
 
+#TODO Start
+        if IndicatorBase._CONFIG_CHECK_LATEST_VERSION not in config:
+            config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = False
+
+        self.check_latest_version = config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ]
+#TODO End
+
 
     # Copies .config using the old indicator name format (using hyphens)
     # to the new format, sans hyphens.
@@ -1873,6 +1952,7 @@ class IndicatorBase( ABC ):
     def _save_config( self ):
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase._CONFIG_VERSION ] = self.version
+        config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = self.check_latest_version
 
         config_file = \
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
