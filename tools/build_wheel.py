@@ -199,11 +199,17 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
     indicatorbase_platform_linux_path = \
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux"
 
-    read_format_write( indicatorbase_platform_linux_path, "indicatorbase.sh", indicator_name + ".sh" )
+    read_format_write(
+        indicatorbase_platform_linux_path,
+        "run.sh",
+        indicator_name + ".sh" )
 
 #TODO Check that post_install.sh actually works!
     post_install_script = "post_install.sh"
-    read_format_write( indicatorbase_platform_linux_path, post_install_script, post_install_script )
+    read_format_write(
+        indicatorbase_platform_linux_path,
+        post_install_script,
+        post_install_script )
 
 #TODO Check that remove.sh actually works!
 # Might have a problem running the remove.sh script and then trying to delete the directory containing that script!
@@ -212,7 +218,10 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 # Might have to copy the remove.sh to .local/bin/{indicator_name}_remove.sh,
 # run that, then remove that script (from .local/bin).
     remove_script = "remove.sh"
-    read_format_write( indicatorbase_platform_linux_path, remove_script, remove_script )
+    read_format_write(
+        indicatorbase_platform_linux_path,
+        remove_script,
+        f"{ indicator_name }_{ remove_script } ")
 
 
 def _create_symbolic_icons( directory_wheel, indicator_name ):

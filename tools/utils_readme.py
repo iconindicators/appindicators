@@ -647,6 +647,10 @@ def _get_removal_for_operating_system(
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
+#TODO Change this to run .local/bin/{ indicator_name }_remove.sh script...
+# then needs run
+#   rm -f $HOME/.local/bin/{indicator_name}.sh
+ 
             f"2. Remove `Python` virtual environment and support files:\n"
             f"    ```\n"
             f"    rm -f $HOME/.local/bin/{ indicator_name }.sh && \\\n"
