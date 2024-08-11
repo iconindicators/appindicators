@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 14:10+1000\n"
+"POT-Creation-Date: 2024-08-11 10:05+1000\n"
 "PO-Revision-Date: 2020-11-13 07:21+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language-Team: Czech\n"
@@ -18,6 +18,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 msgid "Initialising..."
+msgstr ""
+
+#, python-brace-format
+msgid "New version of {0}..."
+msgstr ""
+
+#, python-brace-format
+msgid "See {0} for latest version."
 msgstr ""
 
 msgid "Preferences"
@@ -54,4 +62,10 @@ msgid "Run the indicator automatically."
 msgstr ""
 
 msgid "Start up delay (seconds)."
+msgstr ""
+
+msgid "Check Latest Version"
+msgstr ""
+
+msgid "Check for the latest version of the indicator on start up."
 msgstr ""
