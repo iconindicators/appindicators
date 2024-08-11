@@ -63,11 +63,11 @@ Because the `Python` dependencies (listed in `pyproject.toml`) will be likely un
     deactivate
 ```
 
-You will likely need to also install various operating system packages; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
+Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
 
 ## Installing a Wheel Directly
-Rather than install via `PyPI` or `TestPyPI`, you may install a wheel in the local file system:
+Rather than install via `PyPI` or `TestPyPI`, a wheel may be installed in the local file system:
 
 ```
     if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
@@ -86,7 +86,7 @@ Copy icon, run script and desktop file to `$HOME/.local`:
     cp --remove-destination $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps
 ```
 
-You will likely need to also install various operating system packages; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
+Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
 To install the wheel for multiple indicators, use the script:
 ```
