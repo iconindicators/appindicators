@@ -153,27 +153,6 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
     return name, comments, message
 
 
-#TODO Delete
-def _create_run_script( directory_platform_linux, indicator_name ):
-    indicatorbase_run_script_path = \
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.sh"
-
-    with open( indicatorbase_run_script_path, 'r' ) as f:
-        run_script_text = f.read()
-
-    run_script_text = run_script_text.format( indicator_name = indicator_name )
-
-    indicator_run_script_path = directory_platform_linux / ( indicator_name + ".sh" )
-    with open( indicator_run_script_path, 'w' ) as f:
-        f.write( run_script_text + '\n' )
-
-    _chmod(
-        indicator_run_script_path,
-        stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
-        stat.S_IRGRP | stat.S_IXGRP,
-        stat.S_IROTH | stat.S_IXOTH )
-
-
 def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 
     def read_format_write( 
@@ -217,11 +196,11 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 # https://stackoverflow.com/questions/54924642/how-can-i-delete-folder-which-contains-the-script
 # Might have to copy the remove.sh to .local/bin/{indicator_name}_remove.sh,
 # run that, then remove that script (from .local/bin).
-    remove_script = "remove.sh"
+    uninstall_script = "uninstall.sh"
     read_format_write(
         indicatorbase_platform_linux_path,
-        remove_script,
-        f"{ indicator_name }_{ remove_script } ")
+        uninstall_script,
+        uninstall_script )
 
 
 def _create_symbolic_icons( directory_wheel, indicator_name ):
@@ -417,7 +396,6 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     comments,
                     comments_from_mo_files )
 
-                # _create_run_script( directory_platform_linux, indicator_name )#TODO Delete
                 _create_scripts_for_linux( directory_platform_linux, indicator_name )
 
                 _create_symbolic_icons( directory_dist, indicator_name )

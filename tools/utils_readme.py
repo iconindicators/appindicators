@@ -288,7 +288,8 @@ def _get_installation_python_virtual_environment( indicator_name ):
         f"    if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade --force-reinstall pip { indicator_name } && \\\n"
-        f"    deactivate\n"
+        f"    deactivate && \\\n"
+        f"    . $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh\n"
         f"    ```\n" )
 
 
@@ -390,8 +391,8 @@ def _get_installation_for_operating_system(
         n += 1
         dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
 
-        n += 1
-        dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
+        # n += 1
+        # dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
 
         n += 1
         if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
@@ -620,11 +621,11 @@ def _get_distributions_supported( indicator_name ):
         # f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
 
 
-def _get_removal_for_operating_system(
+def _get_uninstall_for_operating_system(
         operating_system,
         indicator_name,
         summary,
-        remove_command,
+        uninstall_command,
         _get_operating_system_dependencies_function_name ):
 
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
@@ -634,92 +635,85 @@ def _get_removal_for_operating_system(
         operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
     if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
-        removal = ''
+        uninstall = ''
 
     else:
-        removal = (
+        uninstall = (
             f"<details>"
             f"<summary><b>{ summary }</b></summary>\n\n"
 
-            f"1. Remove operating system packages:\n\n"
+            f"1. Uninstall operating system packages:\n\n"
             f"    ```\n"
-            f"    { remove_command } "
+            f"    { uninstall_command } "
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
-#TODO Change this to run .local/bin/{ indicator_name }_remove.sh script...
-# then needs run
-#   rm -f $HOME/.local/bin/{indicator_name}.sh
- 
-            f"2. Remove `Python` virtual environment and support files:\n"
+#TODO Test the uninstall of venv and icons/.desktop, etc.
+            f"2. Uninstall `Python` virtual environment and support files:\n"
             f"    ```\n"
-            f"    rm -f $HOME/.local/bin/{ indicator_name }.sh && \\\n"
-            f"    rm -f $HOME/.local/share/applications/{ indicator_name }.py.desktop && \\\n"
-            f"    rm -f $HOME/.local/share/icons/hicolor/scalable/apps/{ indicator_name }*.svg && \\\n"
-            f"    rm -f -r $HOME/.local/venv_{ indicator_name } && \\\n"
-            f"    rm -f -r $HOME/.cache/{ indicator_name } && \\\n"
-            f"    rm -f -r $HOME/.config/{ indicator_name }\n"
+            f"    . $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/uninstall.sh && \\\n"
+            f"    rm -f -r $HOME/.local/venv_{indicator_name}\n"
             f"    ```\n\n"
 
             f"</details>\n\n" )
 
-    return removal
+    return uninstall
 
 
-def _get_removal( indicator_name ):
-    remove_command_debian = "sudo apt-get -y remove"
+def _get_uninstall( indicator_name ):
+    uninstall_command_debian = "sudo apt-get -y remove"
 
     return (
-        "Removal\n" +
-        "-------\n" +
+        "Uninstall\n" +
+        "---------\n" +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.DEBIAN_11_DEBIAN_12,
             indicator_name,
             "Debian 11 / 12",
-            remove_command_debian,
+            uninstall_command_debian,
             _get_operating_system_dependencies_debian ) +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.FEDORA_38_FEDORA_39,
             indicator_name,
             "Fedora 38 / 39",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.FEDORA_40,
             indicator_name,
             "Fedora 40",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.MANJARO_221,
             indicator_name,
             "Manjaro 22.1",
             "sudo pacman -R --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.OPENSUSE_TUMBLEWEED,
             indicator_name,
             "openSUSE Tumbleweed",
             "sudo zypper remove -y",
             _get_operating_system_dependencies_opensuse ) +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.UBUNTU_2004,
             indicator_name,
             "Ubuntu 20.04",
-            remove_command_debian,
+            uninstall_command_debian,
             _get_operating_system_dependencies_debian ) +
 
-        _get_removal_for_operating_system(
+        _get_uninstall_for_operating_system(
             Operating_System.UBUNTU_2204,
             indicator_name,
             "Ubuntu 22.04",
-            remove_command_debian,
+            uninstall_command_debian,
             _get_operating_system_dependencies_debian ) )
 
 
@@ -745,5 +739,5 @@ def create_readme( directory, indicator_name, authors_emails, start_year ):
         f.write( _get_installation( indicator_name ) )
         f.write( _get_usage( indicator_name ) )
         f.write( _get_distributions_supported( indicator_name ) )
-        f.write( _get_removal( indicator_name ) )
+        f.write( _get_uninstall( indicator_name ) )
         f.write( _get_license( authors_emails, start_year ) )

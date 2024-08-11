@@ -27,7 +27,7 @@ import utils
 
 
 #TODO Test this command...maybe print it out first.
-def _install_wheel_for_indicator( directory_release, indicator_name ):
+def _install( directory_release, indicator_name ):
     command = \
         f"if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && " + \
         f". $HOME/.local/venv_{ indicator_name }/bin/activate && " + \
@@ -56,6 +56,6 @@ if __name__ == "__main__":
                         "+" } )
 
         for indicator_name in args.indicators:
-            _install_wheel_for_indicator( args.directory_release, indicator_name )
+            _install( args.directory_release, indicator_name )
 
         utils.intialise_virtual_environment( "pip", "twine" )
