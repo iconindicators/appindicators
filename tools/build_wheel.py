@@ -153,6 +153,7 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
     return name, comments, message
 
 
+#TODO Delete
 def _create_run_script( directory_platform_linux, indicator_name ):
     indicatorbase_run_script_path = \
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.sh"
@@ -171,6 +172,44 @@ def _create_run_script( directory_platform_linux, indicator_name ):
         stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
         stat.S_IRGRP | stat.S_IXGRP,
         stat.S_IROTH | stat.S_IXOTH )
+
+
+def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
+
+    def read_format_write( 
+            indicatorbase_platform_linux_path,
+            source_script_name,
+            destination_script_name ):
+
+        with open( indicatorbase_platform_linux_path / source_script_name, 'r' ) as f:
+            script_text = f.read()
+        
+        script_text = script_text.format( indicator_name = indicator_name )
+
+        with open( directory_platform_linux / destination_script_name, 'w' ) as f:
+            f.write( script_text + '\n' )
+
+        _chmod(
+            directory_platform_linux / destination_script_name,
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
+            stat.S_IRGRP | stat.S_IXGRP,
+            stat.S_IROTH | stat.S_IXOTH )
+
+
+    indicatorbase_platform_linux_path = \
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux"
+
+    read_format_write( indicatorbase_platform_linux_path, "indicatorbase.sh", indicator_name + ".sh" )
+
+#TODO Check that post_install.sh actually works!
+    post_install_script = "post_install.sh"
+    read_format_write( indicatorbase_platform_linux_path, post_install_script, post_install_script )
+
+#TODO Check that remove.sh actually works!
+# Might have a problem running the remove.sh script and then trying to delete the directory containing that script!
+# https://unix.stackexchange.com/questions/361318/bash-delete-folder-while-running-a-script
+    remove_script = "remove.sh"
+    read_format_write( indicatorbase_platform_linux_path, remove_script, remove_script )
 
 
 def _create_symbolic_icons( directory_wheel, indicator_name ):
@@ -366,7 +405,8 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     comments,
                     comments_from_mo_files )
 
-                _create_run_script( directory_platform_linux, indicator_name )
+                # _create_run_script( directory_platform_linux, indicator_name )#TODO Delete
+                _create_scripts_for_linux( directory_platform_linux, indicator_name )
 
                 _create_symbolic_icons( directory_dist, indicator_name )
 
@@ -389,7 +429,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
 
             subprocess.call( command, shell = True )
-            shutil.rmtree( directory_dist / indicator_name )
+            # shutil.rmtree( directory_dist / indicator_name ) #TODO Put back
 
     return message
 
