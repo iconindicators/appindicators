@@ -209,6 +209,8 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 # Might have a problem running the remove.sh script and then trying to delete the directory containing that script!
 # https://unix.stackexchange.com/questions/361318/bash-delete-folder-while-running-a-script
 # https://stackoverflow.com/questions/54924642/how-can-i-delete-folder-which-contains-the-script
+# Might have to copy the remove.sh to .local/bin/{indicator_name}_remove.sh,
+# run that, then remove that script (from .local/bin).
     remove_script = "remove.sh"
     read_format_write( indicatorbase_platform_linux_path, remove_script, remove_script )
 

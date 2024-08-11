@@ -25,6 +25,7 @@ import subprocess
 import utils
 
 
+#TODO Is some/all of this redundant given the post_install.sh script?
 def _install_wheel_for_indicator( directory_release, indicator_name ):
     command = \
         f"if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && " + \

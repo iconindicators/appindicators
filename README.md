@@ -76,6 +76,7 @@ Rather than install via `PyPI` or `TestPyPI`, a wheel may be installed in the lo
     deactivate
 ```
 
+#TODO Maybe instead, refer to the post_install.sh script?
 Copy icon, run script and desktop file to `$HOME/.local`:
 ```
     mkdir -p $HOME/.local/bin && \
@@ -111,6 +112,8 @@ To install the wheel for multiple indicators, use the script:
     python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
+
+#TODO What about uninstall/removal?
 
 
 ## License
