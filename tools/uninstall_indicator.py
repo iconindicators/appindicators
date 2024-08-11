@@ -66,4 +66,4 @@ if __name__ == "__main__":
         for indicator_name in args.indicators:
             _uninstall( args.directory_release, indicator_name )
 
-        utils.intialise_virtual_environment( "pip", "twine" )
+        utils.intialise_virtual_environment( "venv", "pip", "twine" )

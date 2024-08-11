@@ -23,23 +23,13 @@
 
 import subprocess
 
+from pathlib import Path
+
 import utils
 
 
-#TODO Test this command...maybe print it out first.
-def _install( directory_release, indicator_name ):
-    command = \
-        f"if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && " + \
-        f". $HOME/.local/venv_{ indicator_name }/bin/activate && " + \
-        f"python3 -m pip install --upgrade --force-reinstall pip $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
-        f"deactivate && " + \
-        f". $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh"
-
-    subprocess.call( command, shell = True )
-
-
 if __name__ == "__main__":
-    if utils.is_correct_directory( "./tools/install_wheel.py", "release indicatorfortune" ):
+    if utils.is_correct_directory( "./tools/install_indicator_from_wheel.py", "release indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
                 "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local and copies across icons, .desktop and scripts.",
@@ -56,6 +46,13 @@ if __name__ == "__main__":
                         "+" } )
 
         for indicator_name in args.indicators:
-            _install( args.directory_release, indicator_name )
+            utils.intialise_virtual_environment(
+                Path.home() / ".local" / ( f"venv_{ indicator_name }" ),
+                f"pip",
+                f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
 
-        utils.intialise_virtual_environment( "pip", "twine" )
+f"python3 -m pip install --upgrade --force-reinstall pip $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
+
+command = f". $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh"
+            print( command )
+            # subprocess.call( command, shell = True )

@@ -419,6 +419,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
 
             subprocess.call( command, shell = True )
+
             # shutil.rmtree( directory_dist / indicator_name ) #TODO Put back
 
     return message
@@ -441,7 +442,7 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } )
 
-        utils.intialise_virtual_environment( "build", "pip", "PyGObject" )
+        utils.intialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
         for indicator_name in args.indicators:
             message = _build_wheel_for_indicator( args.directory_release, indicator_name )
             if message:

@@ -35,7 +35,7 @@ if __name__ == "__main__":
                 ( "directory_dist", ),
                 { "directory_dist" : "The directory containing the indicator's .whl/.tar.gz (and NO OTHER FILES)." } )
 
-        utils.intialise_virtual_environment( "pip", "twine" )
+        utils.intialise_virtual_environment( "venv", "pip", "twine" )
 
         print( "(the password starts with 'pypi-')" )
         command = \
