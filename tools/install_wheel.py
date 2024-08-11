@@ -17,7 +17,8 @@
 
 
 # Install a Python wheel package for one or more indicators
-# to a virtual environment within $HOME/.local.
+# to a virtual environment within $HOME/.local
+# and copies across icons, .desktop and scripts.
 
 
 import subprocess
@@ -25,19 +26,14 @@ import subprocess
 import utils
 
 
-#TODO Is some/all of this redundant given the post_install.sh script?
+#TODO Test this command...maybe print it out first.
 def _install_wheel_for_indicator( directory_release, indicator_name ):
     command = \
         f"if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && " + \
         f". $HOME/.local/venv_{ indicator_name }/bin/activate && " + \
         f"python3 -m pip install --upgrade --force-reinstall pip $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
         f"deactivate && " + \
-        f"mkdir -p $HOME/.local/bin && " + \
-        f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.sh $HOME/.local/bin && " + \
-        f"mkdir -p $HOME/.local/share/applications && " + \
-        f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/{ indicator_name }.py.desktop $HOME/.local/share/applications && " + \
-        f"mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && " + \
-        f"cp --remove-destination $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps"
+        f". $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh"
 
     subprocess.call( command, shell = True )
 
@@ -46,7 +42,7 @@ if __name__ == "__main__":
     if utils.is_correct_directory( "./tools/install_wheel.py", "release indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
-                "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local.",
+                "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local and copies across icons, .desktop and scripts.",
                 ( "directory_release", "indicators" ),
                 {
                     "directory_release" :
