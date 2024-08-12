@@ -729,6 +729,10 @@ def _get_license( authors_emails, start_year ):
         f"This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
         f"Copyright { start_year }-{ end_year } { authors }.\n" )
 
+#TODO According to 
+#   https://www.markdownguide.org/basic-syntax/#headings
+# put a line between each heading and the next line.
+
 
 def create_readme( directory, indicator_name, authors_emails, start_year ):
     Path( directory ).mkdir( parents = True, exist_ok = True )
