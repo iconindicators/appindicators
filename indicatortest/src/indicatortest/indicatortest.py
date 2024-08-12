@@ -2,11 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-#TODO Have installed the version from TestPyPI...
-# Runs, but no indicator icon and icon does not appear Applications overview.
-# May need to log out / log in...so check all is okay on next reboot.
- 
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
