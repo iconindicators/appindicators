@@ -24,9 +24,6 @@ from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 import datetime
 import gi
 
-gi.require_version( "GLib", "2.0" )
-from gi.repository import GLib
-
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
