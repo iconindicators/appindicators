@@ -408,7 +408,7 @@ def _get_installation( indicator_name ):
 
     return (
         "Installation / Upgrading\n" +
-        "------------------------\n" +
+        "------------------------\n\n" +
 
         _get_installation_for_operating_system(
             Operating_System.DEBIAN_11_DEBIAN_12,
@@ -463,7 +463,7 @@ def _get_installation( indicator_name ):
 def _get_usage( indicator_name ):
     return (
         f"Usage\n"
-        f"-----\n"
+        f"-----\n\n"
 
         f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
         f"type `{ indicator_names[ indicator_name ].split( ' ', 1 )[ 1 ].lower() }` "
@@ -480,7 +480,7 @@ def _get_usage( indicator_name ):
 def _get_distributions_supported( indicator_name ):
     message_one = (
         f"Distributions Supported\n"
-        f"-----------------------\n"
+        f"-----------------------\n\n"
 
         f"Distributions/versions:\n"
         f"- `Debian 11+`\n"
@@ -664,7 +664,7 @@ def _get_uninstall( indicator_name ):
 
     return (
         "Uninstall\n" +
-        "---------\n" +
+        "---------\n\n" +
 
         _get_uninstall_for_operating_system(
             Operating_System.DEBIAN_11_DEBIAN_12,
@@ -724,14 +724,10 @@ def _get_license( authors_emails, start_year ):
 
     return (
         f"License\n"
-        f"-------\n"
+        f"-------\n\n"
 
         f"This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
         f"Copyright { start_year }-{ end_year } { authors }.\n" )
-
-#TODO According to 
-#   https://www.markdownguide.org/basic-syntax/#headings
-# put a line between each heading and the next line.
 
 
 def create_readme( directory, indicator_name, authors_emails, start_year ):
