@@ -27,6 +27,9 @@ import subprocess
 import utils
 
 
+#TODO Change this if possible to allow upload to TestPyPI.
+#
+# TODO THIS SCRIPT MAY IN FACT BE DELETED...
 if __name__ == "__main__":
     if utils.is_correct_directory( "./tools/upload_wheel.py", "release/wheel/dist_indicatorfortune" ):
         args = \
@@ -42,4 +45,5 @@ if __name__ == "__main__":
             f". ./venv/bin/activate && " + \
             f"python3 -m twine upload --username __token__ { args.directory_dist }/*"
 
-        subprocess.call( command, shell = True )d
+        print( command )
+        # subprocess.call( command, shell = True )

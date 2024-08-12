@@ -648,10 +648,9 @@ def _get_uninstall_for_operating_system(
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
-#TODO Test the uninstall of venv and icons/.desktop, etc.
-            f"2. Uninstall `Python` virtual environment and support files:\n"
+            f"2. Uninstall `Python` virtual environment and files:\n"
             f"    ```\n"
-            f"    . $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/uninstall.sh && \\\n"
+            f"    $(ls -d $HOME/.local/venv_{indicator_name}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && \\\n"
             f"    rm -f -r $HOME/.local/venv_{indicator_name}\n"
             f"    ```\n\n"
 

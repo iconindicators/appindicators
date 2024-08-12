@@ -2,7 +2,7 @@
 
 
 ## Introduction
-This project contains application indicators written in `Python3` for `Ubuntu 20.04` or equivalent as follows:
+This project contains application indicators written in `Python3` for `Ubuntu 20.04` or equivalent:
 - `indicatorfortune` - [https://pypi.org/project/indicatorfortune](https://pypi.org/project/indicatorfortune)
 - `indicatorlunar` - [https://pypi.org/project/indicatorlunar](https://pypi.org/project/indicatorlunar)
 - `indicatoronthisday` - [https://pypi.org/project/indicatoronthisday](https://pypi.org/project/indicatoronthisday)
@@ -27,34 +27,36 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which updates locale files (.pot and .po), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.  Additional indicators may be specified:
-
-    `python3 tools/build_wheel.py release indicatortest indicatorfortune indicatorlunar`
+    which updates locale files (`.pot` and `.po`), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
 2. Upload the wheel to `PyPI`:
 
-    `python3 tools/upload_wheel.py release/wheel/dist_indicatortest`
+    ```
+    if [ ! -d venv ]; then python3 -m venv venv; fi && \
+    . ./venv/bin/activate && \
+    python3 -m pip install --upgrade pip twine && \
+    python3 -m twine upload --username __token__ release/wheel/dist_indicatortest/* && \
+    deactivate
+    ```
 
-    which (assumes the username \_\_token\_\_ and) prompts for the password (which starts with 'pypi-') and uploads the `.whl` and `.tar.gz` to `PyPI`.
+    which assumes the username \_\_token\_\_ and prompts for the password (starts with 'pypi-') and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
 
-The build/upload will create a virtual environment in `venv` which may be deleted, or otherwise will be reused on the next build/upload.
+The build/upload creates a virtual environment in `venv` which may be deleted afterwards; otherwise, will be reused on subsequent builds/uploads.
 
 
 ## Release to TestPyPI (and then Installing)
-For testing purposes, a wheel may be uploaded to `TestPyPI`:
+For testing purposes, a wheel for `indicatortest` may be uploaded to `TestPyPI`:
 
 ```
-    python3 tools/build_wheel.py release indicatortest && \
+    if [ ! -d venv ]; then python3 -m venv venv; fi && \
     . ./venv/bin/activate && \
-    python3 -m pip install --upgrade twine && \
+    python3 -m pip install --upgrade pip twine && \
     python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/* && \
     deactivate
 ```
 
-As this is a compound command, only one indicator may be built and uploaded at a time. Replace `indicatortest` with the indicator to be build/uploaded.
-
-Because the `Python` dependencies (listed in `pyproject.toml`) are likely to be unavailable at `TestPyPI`, the install command is modified slightly:
+To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicatortest`:
 
 ```
     if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
@@ -63,11 +65,15 @@ Because the `Python` dependencies (listed in `pyproject.toml`) are likely to be 
     deactivate
 ```
 
+TODO Check the command above...how do the dependencies get pulled in?
+I think best to delete $HOME/.local/venv_indicatortest and then install from TestPyPI
+to see if all Python dependenices get installed. 
+
 Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
 
 ## Installing a Wheel Directly
-Rather than install via `PyPI` or `TestPyPI`, a wheel may be installed in the local file system:
+A wheel may be installed from the local file system.  For `indicatortest`, the `.whl` is assumed to be in `release/wheel/dist_indicatortest` and will be installed into a virtual environment at `$HOME/.local/venv_indicatortest`.
 
 ```
     python3 tools/install_indicator_from_wheel.py release indicatortest
@@ -75,16 +81,13 @@ Rather than install via `PyPI` or `TestPyPI`, a wheel may be installed in the lo
 
 Additional indicators may be appended.
 
-To complete the installation (copy .desktop, script and icons):
-
-```
-    . $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/post_install.sh
-```
-
 Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
 
 
 ## Run an Indicator
+To run the indicator, open the applications menu (via the `Super` / `Windows` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out and log in.
+
+To run from a terminal (so that any errors or messages may be observed):
 
 ```
     . $HOME/.local/venv_indicatortest/bin/activate && \
@@ -92,7 +95,7 @@ Various operating system packages will likely need to be installed; refer to the
     deactivate
 ```
 
-Alternatively, edit `$HOME/.local/share/applications/indicatortest.py.desktop` such that `Terminal=false` is changed to `Terminal=true` and then logout and login.  Run the indicator as normal from the applications menu and a terminal window will/should display.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` such that `Terminal=false` is changed to `Terminal=true` and then log out and log in.  Run the indicator as normal from the applications menu and a terminal window should display.
 
 
 ## Uninstall an Indicator

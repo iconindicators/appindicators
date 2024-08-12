@@ -16,9 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Uninstall a Python wheel package for one or more indicators,
-# removing the virtual environment within $HOME/.local 
-# and .desktop, run script and icons.
+# Uninstall one or more indicators, removing the virtual environment
+# within $HOME/.local and .desktop, run script and icons and .config/.cache.
 
 
 import subprocess
@@ -30,7 +29,7 @@ if __name__ == "__main__":
     if utils.is_correct_directory( "./tools/uninstall_indicator.py", "indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
-                "Uninstall an indicator installed to a virtual environment in $HOME/.local and remove .desktop run script and icons.",
+                "Uninstall one or more indicators, removing the virtual environment within $HOME/.local and .desktop, run script and icons and .config/.cache.",
                 ( "indicators", ),
                 {
                     "indicators" :
