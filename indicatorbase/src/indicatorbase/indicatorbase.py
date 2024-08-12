@@ -456,7 +456,7 @@ class IndicatorBase( ABC ):
 
 
     def _check_for_newer_version( self ):
-        if self.check_latest_version: #TODO Remove not
+        if self.check_latest_version:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
             try:
                 response = urlopen( url )
