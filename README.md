@@ -1,3 +1,5 @@
+#TODO Need to see how this renders on TestPyPI!
+
 # AppIndicators for Ubuntu et al...
 
 
@@ -43,6 +45,10 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
     which assumes the username \_\_token\_\_ and prompts for the password (starts with 'pypi-') and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
 
 The build/upload creates a virtual environment in `venv` which may be deleted afterwards; otherwise, will be reused on subsequent builds/uploads.
+
+References:
+- [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
+- [https://packaging.python.org/en/latest/tutorials/packaging-projects](https://packaging.python.org/en/latest/tutorials/packaging-projects)
 
 
 ## Release to TestPyPI (and then Installing)
