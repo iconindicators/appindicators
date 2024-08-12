@@ -1,9 +1,8 @@
-#TODO Need to see how this renders on TestPyPI!
-
 # AppIndicators for Ubuntu et al...
 
 
 ## Introduction
+
 This project contains application indicators written in `Python3` for `Ubuntu 20.04` or equivalent:
 - `indicatorfortune` - [https://pypi.org/project/indicatorfortune](https://pypi.org/project/indicatorfortune)
 - `indicatorlunar` - [https://pypi.org/project/indicatorlunar](https://pypi.org/project/indicatorlunar)
@@ -20,10 +19,12 @@ Each indicator shares the common code base `indicatorbase`.
 
 
 ## Reminder
+
 - `indicatorppadownloadstatistics` - requires updating approximately every six months with the latest `Ubuntu` series name.
 
 
 ## Release Procedure
+
 A release involves building a `Python` wheel and uploading to `PyPI`.
 1. To build a wheel for `indicatortest`:
 
@@ -42,9 +43,11 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
     deactivate
     ```
 
-    which assumes the username \_\_token\_\_ and prompts for the password (starts with 'pypi-') and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
+    which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
 
-The build/upload creates a virtual environment in `venv` which may be deleted afterwards; otherwise, will be reused on subsequent builds/uploads.
+The build/upload creates a virtual environment in `venv` which may be deleted afterwards; otherwise, the virtual environment will be reused on subsequent builds/uploads.
+
+To install the indicator, refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
 
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
@@ -52,6 +55,7 @@ References:
 
 
 ## Release to TestPyPI (and then Installing)
+
 For testing purposes, a wheel for `indicatortest` may be uploaded to `TestPyPI`:
 
 ```
@@ -68,17 +72,15 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
     if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
     . $HOME/.local/venv_indicatortest/bin/activate && \
     python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest && \
-    deactivate
+    deactivate && \
+    $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/post_install.sh
 ```
 
-TODO Check the command above...how do the dependencies get pulled in?
-I think best to delete $HOME/.local/venv_indicatortest and then install from TestPyPI
-to see if all Python dependenices get installed. 
-
-Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
+Various operating system packages will likely need to be installed; refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
 
 
 ## Installing a Wheel Directly
+
 A wheel may be installed from the local file system.  For `indicatortest`, the `.whl` is assumed to be in `release/wheel/dist_indicatortest` and will be installed into a virtual environment at `$HOME/.local/venv_indicatortest`.
 
 ```
@@ -87,10 +89,11 @@ A wheel may be installed from the local file system.  For `indicatortest`, the `
 
 Additional indicators may be appended.
 
-Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
+Various operating system packages will likely need to be installed; refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
 
 
 ## Run an Indicator
+
 To run the indicator, open the applications menu (via the `Super` / `Windows` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out and log in.
 
 To run from a terminal (so that any errors or messages may be observed):
@@ -105,6 +108,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 
 ## Uninstall an Indicator
+
 ```
     python3 tools/uninstall_indicator.py indicatortest
 ```
@@ -113,6 +117,7 @@ Additional indicators may be appended to the above command.
 
 
 ## Convert this Document from MD to HTML
+
 ```
     if [ ! -d venv ]; then python3 -m venv venv; fi && \
     . ./venv/bin/activate && \
@@ -123,6 +128,7 @@ Additional indicators may be appended to the above command.
 
 
 ## License
+
 This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
 
 Copyright 2012-2024 Bernard Giannetti.
