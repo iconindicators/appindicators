@@ -183,19 +183,12 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
         "run.sh",
         indicator_name + ".sh" )
 
-#TODO Check that post_install.sh actually works!
     post_install_script = "post_install.sh"
     read_format_write(
         indicatorbase_platform_linux_path,
         post_install_script,
         post_install_script )
 
-#TODO Check that remove.sh actually works!
-# Might have a problem running the remove.sh script and then trying to delete the directory containing that script!
-# https://unix.stackexchange.com/questions/361318/bash-delete-folder-while-running-a-script
-# https://stackoverflow.com/questions/54924642/how-can-i-delete-folder-which-contains-the-script
-# Might have to copy the remove.sh to .local/bin/{indicator_name}_remove.sh,
-# run that, then remove that script (from .local/bin).
     uninstall_script = "uninstall.sh"
     read_format_write(
         indicatorbase_platform_linux_path,
@@ -420,7 +413,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             subprocess.call( command, shell = True )
 
-            # shutil.rmtree( directory_dist / indicator_name ) #TODO Put back
+            shutil.rmtree( directory_dist / indicator_name )
 
     return message
 
@@ -442,7 +435,7 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } )
 
-        utils.intialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
+        utils.initialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
         for indicator_name in args.indicators:
             message = _build_wheel_for_indicator( args.directory_release, indicator_name )
             if message:

@@ -18,7 +18,7 @@
 
 # Install a Python wheel package for one or more indicators
 # to a virtual environment within $HOME/.local
-# and copies across icons, .desktop and scripts.
+# and copies across .desktop, run script and icons.
 
 
 import subprocess
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     if utils.is_correct_directory( "./tools/install_indicator_from_wheel.py", "release indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
-                "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local and copies across icons, .desktop and scripts.",
+                "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local and copies across .desktop, run script and icons.",
                 ( "directory_release", "indicators" ),
                 {
                     "directory_release" :
@@ -46,13 +46,11 @@ if __name__ == "__main__":
                         "+" } )
 
         for indicator_name in args.indicators:
-            utils.intialise_virtual_environment(
-                Path.home() / ".local" / ( f"venv_{ indicator_name }" ),
+            utils.initialise_virtual_environment(
+                Path.home() / ".local" / f"venv_{ indicator_name }",
                 f"pip",
                 f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
 
-f"python3 -m pip install --upgrade --force-reinstall pip $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
+            command = f"$(ls -d $HOME/.local/venv_{indicator_name}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/post_install.sh"
 
-command = f". $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh"
-            print( command )
-            # subprocess.call( command, shell = True )
+            subprocess.call( command, shell = True )

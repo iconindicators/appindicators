@@ -17,8 +17,8 @@
 
 
 # Uninstall a Python wheel package for one or more indicators,
-# removing the virtual environment within $HOME/.local and
-# icons, .desktop and scripts.",
+# removing the virtual environment within $HOME/.local 
+# and .desktop, run script and icons.
 
 
 import subprocess
@@ -26,44 +26,22 @@ import subprocess
 import utils
 
 
-#TODO Test this command...maybe print it out first.
-def _uninstall( directory_release, indicator_name ):
-#TODO Fix this command for 
-    command = \
-cp --remove-destination INDICATOR_PATH/platform/linux/{indicator_name}_uninstall.sh $HOME/.local/bin && \
-        f". $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh"
-
-        f". $HOME/.local/venv_{ indicator_name }/bin/activate && " + \
-    
-        f" && " + \
-        f" && " + \
-        f"if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && " + \
-        f". $HOME/.local/venv_{ indicator_name }/bin/activate && " + \
-        f"python3 -m pip install --upgrade --force-reinstall pip $(ls -d { directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1) && " + \
-        f"deactivate && " + \
-        f". $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh"
-
-    subprocess.call( command, shell = True )
-
-
 if __name__ == "__main__":
-    if utils.is_correct_directory( "./tools/install_wheel.py", "release indicatorfortune" ):
+    if utils.is_correct_directory( "./tools/uninstall_indicator.py", "indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
-                "Uninstall a Python wheel package for one or more indicators, removing the virtual environment within $HOME/.local and icons, .desktop and scripts.",
-                ( "directory_release", "indicators" ),
+                "Uninstall an indicator installed to a virtual environment in $HOME/.local and remove .desktop run script and icons.",
+                ( "indicators", ),
                 {
-                    "directory_release" :
-                        "The directory containing the Python wheel. " +
-                        "If the directory specified is 'release', " +
-                        "the Python wheel must be located at 'release/wheel'.",
                     "indicators" :
-                        "The list of indicators (such as indicatorfortune indicatorlunar) to install." },
+                        "The list of indicators (such as indicatorfortune indicatorlunar) to uninstall." },
                 {
                     "indicators" :
                         "+" } )
 
         for indicator_name in args.indicators:
-            _uninstall( args.directory_release, indicator_name )
+            command = \
+                f"$(ls -d $HOME/.local/venv_{indicator_name}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && " + \
+                f"rm -f -r $HOME/.local/venv_{indicator_name}"
 
-        utils.intialise_virtual_environment( "venv", "pip", "twine" )
+            subprocess.call( command, shell = True )

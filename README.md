@@ -27,7 +27,7 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which updates locale files (.pot and .po), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.  Multiple indicators may be specified and will be built sequentially:
+    which updates locale files (.pot and .po), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.  Additional indicators may be specified:
 
     `python3 tools/build_wheel.py release indicatortest indicatorfortune indicatorlunar`
 
@@ -38,7 +38,7 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
     which (assumes the username \_\_token\_\_ and) prompts for the password (which starts with 'pypi-') and uploads the `.whl` and `.tar.gz` to `PyPI`.
 
-A directory called `venv` will be created and may be deleted, or otherwise will be reused on the next build/upload.
+The build/upload will create a virtual environment in `venv` which may be deleted, or otherwise will be reused on the next build/upload.
 
 
 ## Release to TestPyPI (and then Installing)
@@ -54,7 +54,7 @@ For testing purposes, a wheel may be uploaded to `TestPyPI`:
 
 As this is a compound command, only one indicator may be built and uploaded at a time. Replace `indicatortest` with the indicator to be build/uploaded.
 
-Because the `Python` dependencies (listed in `pyproject.toml`) will be likely unavailable at `TestPyPI`, the install command is slightly modified:
+Because the `Python` dependencies (listed in `pyproject.toml`) are likely to be unavailable at `TestPyPI`, the install command is modified slightly:
 
 ```
     if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
@@ -70,29 +70,18 @@ Various operating system packages will likely need to be installed; refer to the
 Rather than install via `PyPI` or `TestPyPI`, a wheel may be installed in the local file system:
 
 ```
-    if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
-    . $HOME/.local/venv_indicatortest/bin/activate && \
-    python3 -m pip install --upgrade --force-reinstall pip $(ls -d release/wheel/dist_indicatortest/indicatortest*.whl | head -1) && \
-    deactivate
+    python3 tools/install_indicator_from_wheel.py release indicatortest
 ```
 
-#TODO Maybe instead, refer to the post_install.sh script?
-Copy icon, run script and desktop file to `$HOME/.local`:
+Additional indicators may be appended.
+
+To complete the installation (copy .desktop, script and icons):
+
 ```
-    mkdir -p $HOME/.local/bin && \
-    cp --remove-destination $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.sh $HOME/.local/bin && \
-    mkdir -p $HOME/.local/share/applications && \
-    cp --remove-destination $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/indicatortest.py.desktop $HOME/.local/share/applications && \
-    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \
-    cp --remove-destination $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/icons/*.svg $HOME/.local/share/icons/hicolor/scalable/apps
+    . $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/post_install.sh
 ```
 
 Various operating system packages will likely need to be installed; refer to the installation instructions for the given indicator at [https://pypi.org](https://pypi.org).
-
-To install the wheel for multiple indicators, use the script:
-```
-    python3 tools/install_wheel.py release indicatortest indicatorfortune`.
-```
 
 
 ## Run an Indicator
@@ -103,6 +92,16 @@ To install the wheel for multiple indicators, use the script:
     deactivate
 ```
 
+Alternatively, edit `$HOME/.local/share/applications/indicatortest.py.desktop` such that `Terminal=false` is changed to `Terminal=true` and then logout and login.  Run the indicator as normal from the applications menu and a terminal window will/should display.
+
+
+## Uninstall an Indicator
+```
+    python3 tools/uninstall_indicator.py indicatortest
+```
+
+Additional indicators may be appended to the above command.
+
 
 ## Convert this Document from MD to HTML
 ```
@@ -112,8 +111,6 @@ To install the wheel for multiple indicators, use the script:
     python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
-
-#TODO What about uninstall/removal?
 
 
 ## License
