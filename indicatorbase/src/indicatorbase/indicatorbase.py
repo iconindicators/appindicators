@@ -697,7 +697,6 @@ class IndicatorBase( ABC ):
         label_set = False
         if self._is_label_update_supported():
             self.indicator.set_label( text, text )
-            self.indicator.set_title( text ) # Needed for Lubuntu/Xubuntu.  #TODO Check this comment.
             label_set = True
 
         return label_set
