@@ -325,7 +325,10 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-#TODO Check all terminals on all supported distros.
+#TODO Check terminal on
+#   Manjaro
+#   OpenSUSE
+#   Ubuntu MATE
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS list first so as to be the "default".
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],

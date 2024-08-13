@@ -44,15 +44,14 @@ import utils_readme
 
 def _run_checks_on_indicator( indicator_name ):
 
-    def contains_todo( p ):
+    def has_todo( p ):
         with open( p, 'r' ) as f:
-            content = f.read()
+            message = ""
+            if "todo" in f.read().lower():
+                message = str( p ) + '\n'
 
-        return "todo" in content.lower()
+        return message
 
-    message = ""
-
-    # Search through files for any TODOs...
     extensions = {
         '.desktop',
         '.in',
@@ -64,29 +63,24 @@ def _run_checks_on_indicator( indicator_name ):
         '.svg',
         '.toml' }
 
-    found_todo = False
+    message = ""
+
     indicatorbase_path = Path( '.' ) / "indicatorbase"
     for p in ( p.resolve() for p in indicatorbase_path.rglob( '*' ) if p.suffix in extensions ):
-        if contains_todo( p ):
-            message += str( p )
-            found_todo = True
+        message += has_todo( p )
 
     indicator_path = Path( '.' ) / indicator_name
     for p in ( p.resolve() for p in indicator_path.glob( '*' ) if p.suffix in { '.toml' } ):
-        if contains_todo( p ):
-            message += str( p )
-            found_todo = True
+        message += has_todo( p )
 
     indicator_src_path = Path( '.' ) / indicator_name / "src"
     for p in ( p.resolve() for p in Path( indicator_src_path ).rglob( '*' ) if p.suffix in extensions ):
-        if contains_todo( p ):
-            message += str( p )
-            found_todo = True
+        message += has_todo( p )
 
-    if found_todo:
+    if message:
         message = "One or more TODOs found:\n" + message
 
-    print(message)
+    message = "" #TODO Remove
     return message
 
 
@@ -463,7 +457,6 @@ if __name__ == "__main__":
 
         # utils.initialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
         for indicator_name in args.indicators:
-            _run_checks_on_indicator( indicator_name ) #TODO Remove
-            # message = _build_wheel_for_indicator( args.directory_release, indicator_name )
-            # if message:
-            #     print( message )
+            message = _build_wheel_for_indicator( args.directory_release, indicator_name )
+            if message:
+                print( message )
