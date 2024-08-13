@@ -20,6 +20,31 @@
 
 
 #TODO If/when this is included in the release,
+# add to the build_wheel.py :: run_checks_on_indicator()
+    #
+    #
+    # if "indicatorlunar" in indicator_name:
+    #     #TODO If/when astroskyfield.py is included in the release,
+    #     # (and ephem is dropped),
+    #     # need to include the planets.bsp and stars.dat in the wheel.
+    #     #
+    #     # The astroskyfield.py code assumes planets.bsp/stars.dat are in
+    #     #     indicatorlunar/src/indicatorlunar/data
+    #     # Whilst that directory will be copied across automatically,
+    #     # must also determine planets.bsp/stars.dat are also present.
+    #     # The code below does just that...
+    #     # data_directory = Path( indicator_name ) / "src" / "indicatorlunar" / "data"
+    #     # planets_bsp = data_directory / "planets.bsp"
+    #     # if not planets_bsp.is_file():
+    #     #     message += f"{ indicator_name }: Unable to locate { planets_bsp } - may need to be created - aborting.\n"
+    #     #
+    #     # stars_dat = Path( str( data_directory ) + "/stars.dat" )
+    #     # if not stars_dat.is_file():
+    #     #     message += f"{ indicator_name }: Unable to locate { stars_dat } - may need to be created - aborting.\n"
+    #     #     checks_pass = False
+
+
+#TODO If/when this is included in the release,
 # obviosly move to the src/indicatorlunar folder...
 # ...BUT ALSO add to the locale/POTFILES.in.
 
