@@ -22,6 +22,7 @@
   - Manjaro 22.1 GNOME No calendar.
   - openSUSE Tumbleweed No clipboard; no wmctrl; no calendar.
   - openSUSE Tumbleweed GNOME on Xorg No calendar.
+- Now includes an opt-in check during indicator start up for the latest version at PyPI.
 
 
 ## v1.0.100 (2023-01-09)

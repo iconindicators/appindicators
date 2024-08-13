@@ -506,11 +506,21 @@ def _get_distributions_supported( indicator_name ):
 
     if is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message_limitations += (
             f"- `Wayland`: the command `wmctrl` does not function "
-            f"(used to list windows and bring to the front).\n" )
+            f"(used to list windows, uniquely identify and bring to the front).\n" )
+
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORFORTUNE,
+        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
+        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORSCRIPTRUNNER,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORVIRTUALBOX ):
+        message_limitations += (
+            f"- `Wayland`: middle mouse click does not work.\n" )
 
     if is_indicator(
         indicator_name,

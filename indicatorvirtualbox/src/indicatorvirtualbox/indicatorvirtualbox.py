@@ -16,21 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Need to amend the changelog.md and/or readme.md
-# to mention that
-#    mouse wheel scroll to cycle through running vms
-#    mouse middle button click to launch vbox manager
-#    menu item click launching only one vbox manager (what is this?)
-# only work in X11.
-#
-# Hold off on the above...might not apply to kubuntu/konsole.
-# Need to figure out the wording...
-# ...might be a general statement about wayland.
-#
-# Also mention the mouse middle click will launch multiple 
-# vboxmanage windows/instance because wmctrl does not work in general under wayland.
-
-
 # Application indicator for VirtualBox™ virtual machines.
 
 

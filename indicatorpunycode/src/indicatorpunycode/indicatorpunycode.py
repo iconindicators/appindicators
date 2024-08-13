@@ -17,15 +17,17 @@
 
 
 #TODO Amend the changelog.md and/or readme.md
-# to mention the clipboard only works under X11?
-# Might have to also include primary...
-# ...see TODO below about not really working on Debian 12 and Fedora 40 (both wayland).
-
-
-#TODO On Debian 12, select/highlight text and middle mouse click or select convert from primary
-# (not clipboard), get a message "no text is highlight/selected".
-# However this seems intermittent...seemed to get it to work once...
-# maybe switching from primary to clipboard and back again via the preferences.
+# there is a problem with the primary input/output on Wayland.
+#
+# Seems to be an issue at least on Debian 12 and Fedora 40 (both wayland).
+#
+# Select/highlight text and middle mouse click or
+# select convert from primary (not clipboard), 
+# get a message "no text is highlight/selected".
+# However this seems intermittent...
+# ...seemed to get it to work once...
+# ...maybe switching from primary to clipboard and
+# back again via the preferences.
 #
 # Once it does work, always keeps the same text in memory and converts that
 # regardless of selecting new text.

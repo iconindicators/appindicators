@@ -4,6 +4,9 @@
 
 - Consolidated menu options.
 - Updated README.md.
+- Now includes an opt-in check during indicator start up for the latest version at PyPI.
+- On Wayland, the clipboard does not work.
+- On Wayland, wmctrl does not work.
 
 
 ## v1.0.16 (2023-12-22)

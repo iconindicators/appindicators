@@ -12,6 +12,8 @@
   - Manjaro 22.1 GNOME No calendar.
   - openSUSE Tumbleweed No clipboard; no wmctrl; no calendar.
   - openSUSE Tumbleweed GNOME on Xorg No calendar.
+- Now includes an opt-in check during indicator start up for the latest version at PyPI.
+- On Wayland, wmctrl does not work and as such, if a virtual machine is already running, cannot be brought to front by scrolling the mouse wheel over the icon.  Further, the VirtualBox Manager will be launched each and every time of a mouse middle click of the icon (or selection via the menu).
 
 
 ## v1.0.74 (2023-01-09)
