@@ -425,7 +425,6 @@ class IndicatorBase( ABC ):
         self.debug = debug
 
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
-        print( "echo $XDG_CURRENT_DESKTOP = " + self.current_desktop )#TODO Test
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
