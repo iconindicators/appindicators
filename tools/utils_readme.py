@@ -542,7 +542,8 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
             f"- `Lubuntu / LXQt`: arguments are not [preserved]"
-            f"(https://github.com/lxqt/qterminal/issues/335) in `qterminal`.\n" )
+            f"(https://github.com/lxqt/qterminal/issues/335) in `qterminal`. "
+            f"Alternatively, install `gnome-terminal`.\n" )
 
     if message_limitations:
         message_limitations = f"Limitations:\n" + message_limitations + f"\n\n"
