@@ -72,19 +72,14 @@ def is_indicator( indicator_name, *indicator_names ):
     return is_indicator
 
 
-#TODO Can these be obtained from somewhere else?
-# Does build_wheel do this...?
-indicator_names = {
-    "indicatorfortune"               : "Indicator Fortune",
-    "indicatorlunar"                 : "Indicator Lunar",
-    "indicatoronthisday"             : "Indicator On This Day",
-    "indicatorppadownloadstatistics" : "Indicator PPA Download Statistics",
-    "indicatorpunycode"              : "Indicator Punycode",
-    "indicatorscriptrunner"          : "Indicator Script Runner",
-    "indicatorstardate"              : "Indicator Stardate",
-    "indicatortest"                  : "Indicator Test",
-    "indicatortide"                  : "Indicator Tide",
-    "indicatorvirtualbox"            : "Indicator VirtualBox™" }
+def _get_indicator_names_minus_current( indicator_name ):
+    indicators = [ str( x ) for x in Path( '.' ).iterdir() if x.is_dir() and str( x ).startswith( "indicator" ) ]
+
+    indicators.remove( indicator_name )
+    indicators.remove( "indicatorbase" )
+    indicators.sort()
+
+    return indicators
 
 
 def _get_introduction( indicator_name ):
@@ -108,9 +103,10 @@ def _get_introduction( indicator_name ):
     introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
 
     introduction += f"Other indicators in this series are:\n"
-    indicators = ( list( indicator_names.keys() ) )
-    indicators.remove( indicator_name )
-    introduction += "- `" + '`\n- `'.join( indicators ) + "`\n\n"
+    
+    _get_indicator_names_minus_current( indicator_name )
+    
+    introduction += "- `" + '`\n- `'.join( _get_indicator_names_minus_current( indicator_name ) ) + "`\n\n"
 
     return introduction
 
@@ -460,13 +456,13 @@ def _get_installation( indicator_name ):
             _get_operating_system_dependencies_debian ) )
 
 
-def _get_usage( indicator_name ):
+def _get_usage( indicator_name, indicator_name_human_readable ):
     return (
         f"Usage\n"
         f"-----\n\n"
 
         f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
-        f"type `{ indicator_names[ indicator_name ].split( ' ', 1 )[ 1 ].lower() }` "
+        f"type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower() }` "
         f"into the search bar and the icon should be present for you to click.  "
         f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
@@ -730,13 +726,19 @@ def _get_license( authors_emails, start_year ):
         f"Copyright { start_year }-{ end_year } { authors }.\n" )
 
 
-def create_readme( directory, indicator_name, authors_emails, start_year ):
+def create_readme(
+    directory,
+    indicator_name,
+    authors_emails,
+    start_year,
+    indicator_name_human_readable ):
+
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
     with open( Path( directory, "README.md" ), 'w' ) as f:
         f.write( _get_introduction( indicator_name ) )
         f.write( _get_installation( indicator_name ) )
-        f.write( _get_usage( indicator_name ) )
+        f.write( _get_usage( indicator_name, indicator_name_human_readable ) )
         f.write( _get_distributions_supported( indicator_name ) )
         f.write( _get_uninstall( indicator_name ) )
         f.write( _get_license( authors_emails, start_year ) )

@@ -360,15 +360,23 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                 version_indicator_base )
 
         if not message:
-            utils_readme.create_readme( directory_indicator, indicator_name, authors, start_year )
-
             utils_locale.build_locale_release( directory_dist, indicator_name )
 
             name, comments, message = \
                 _get_name_and_comments_from_indicator(
                     indicator_name, directory_indicator )
 
+#TODO The name obtained below for virtualbox contains  ™ .
+# Where is 'name' subsequently used and should ™ be present or not in each case?
+# Need to strip  ™  from name before passing to create_readme.
             if not message:
+                utils_readme.create_readme(
+                    directory_indicator,
+                    indicator_name,
+                    authors,
+                    start_year,
+                    name )
+
                 directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
 
                 names_from_mo_files, comments_from_mo_files = \
