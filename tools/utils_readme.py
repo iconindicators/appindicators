@@ -474,7 +474,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
 
 
 def _get_distributions_supported( indicator_name ):
-    message_one = (
+    message_distributions_supported = (
         f"Distributions Supported\n"
         f"-----------------------\n\n"
 
@@ -482,41 +482,31 @@ def _get_distributions_supported( indicator_name ):
         f"- `Debian 11+`\n"
         f"- `Fedora 38+`\n"
         f"- `Kubuntu 20.04+`\n"
-        f"- `Linux Mint 21 Cinnamon`\n" #TODO Check if Cinnamon is the only desktop and if putting a + makes sense.
+        f"- `Linux Mint 21`\n"
         f"- `Lubuntu 20.04+`\n"
-        f"- `Manjaro 22.1 GNOME+`\n" #TODO  Is there a non GNOME version?
-        f"- `openSUSE Tumbleweed GNOME`.\n" #TODO What other versions/desktops are there? 
-        f"- `Ubuntu 20.04+`\n" # TODO Try to combine all the Ubuntu derivatives into Ubuntu somehow...
-                               # or maybe just don't list them or mention?
-                               # Or maybe say Ubuntu 20.04+ (and derivatives)?
-        f"- `Ubuntu Budgie 20.04+`\n"
+        f"- `Manjaro 22.1`\n"
+        f"- `openSUSE Tumbleweed`.\n"
+        f"- `Ubuntu 20.04+`\n"
+        f"- `Ubuntu Budgie 22.04+`\n"
         f"- `Ubuntu MATE 20.04+`\n"
         f"- `Ubuntu Unity 20.04+`\n"
         f"- `Xubuntu 20.04+`\n"
         f"\n\n" )
 
-#TODO Should I include indicatortest? 
-# Maybe just add comments/tooltips to labels/menuitems when something might not work instead? 
-
-
 #TODO In regards about/preferences locking up when clicking on the indicator icon,
 # is there a range of GNOME releases to check against this?
 # Issue occurs on Debian 11 which is the earliest I think.
-# Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.
+# Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.   <---- is that ubuntu 22.04 or 24.04?
 # Issue is resolved for Fedora 40.
 # How to determine the GNOME version?
 #
 # gnome-shell --version
 #     Ubuntu 20.04   GNOME Shell 3.36.9
+#
+# Maybe also have a known issues section?
 
 
-#TODO 
-# Given many distros have multiple session types, 
-# maybe just list the distro and default session
-# rather than all sessions across all distros?
-
-
-    message_two = ""
+    message_limitations = ""
 
     if is_indicator(
         indicator_name,
@@ -524,70 +514,54 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORONTHISDAY,
         Indicator_Name.INDICATORPUNYCODE,
         Indicator_Name.INDICATORTEST ):
-        message_two += (
+        message_limitations += (
             f"- Under `Wayland`, the clipboard does not function.\n" )
 
-#TODO The message doesn't exactly apply to indicatortest...
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message_two += (
+        message_limitations += (
             f"- Under `Wayland`, the command `wmctrl` does not function, "
-            f"which used to bring windows to the front.\n" )
+            f"which used to list windows and bring to the front.\n" )
 
-#TODO On Kubuntu, this only happens under Plasma (X11)...
-# This is a greater issue...
-# Need to check every desktop shipped with each supported/mentioned distro and version!
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message_two += (
-            f"- On `Kubuntu 20.04 / 22.04` and `Xubuntu 20.04 / 22.04`, "
+        message_limitations += (
+            f"- On `Plasma (X11)` and `XFCE`, "
             f"mouse wheel scroll over icon does not function.\n" )
 
     if is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORFORTUNE,
-        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
-        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORVIRTUALBOX ):
-        message_two += (
-            f"- On `Ubuntu Budgie 20.04`, "
-            f"mouse middle button click does not function.\n" )
+        Indicator_Name.INDICATORSTARDATE,
+        Indicator_Name.INDICATORTEST ):
+        message_limitations += (
+            f"- On `Lubuntu / LXQt`, labels next to the icon are unsupported.\n" )
 
-#TODO If also applies to Lubuntu 24.04, change to 20.04+  ?
-    if is_indicator(
-        indicator_name,
-        Indicator_Name.INDICATORFORTUNE,
-        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
-        Indicator_Name.INDICATORPUNYCODE,
-        Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORVIRTUALBOX ):
-        message_two += (
-            f"- On `Lubuntu 20.04 / 22.04`, "
-            f"labels next to the icon are unsupported and so a tooltip is used. "
-            f"However, the tooltip cannot be changed once set.\n" )
-
-#TODO If also applies to Lubuntu 24.04, change to 20.04+  ?
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
-        message_two += ( f"- Icons are not dynamic on `Lubuntu 20.04 / 22.04`.\n" )
+        message_limitations += (
+            f"- On `Lubuntu / LXQt`, the icon cannot be changed once set set.\n" )
 
-#TODO Need a message for 
-#   dynamic icon truncated
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORSCRIPTRUNNER,
+        Indicator_Name.INDICATORTEST ):
+        message_limitations += (
+            f"- On `Lubuntu / LXQt`, `qterminal` [does not preserve arguments]"
+            f"(https://github.com/lxqt/qterminal/issues/335).\n" )
 
-    if message_two:
-        message_two = f"Limitations:\n" + message_two + f"\n\n"
+    if message_limitations:
+        message_limitations = f"Limitations:\n" + message_limitations + f"\n\n"
 
-    return message_one + message_two
+    return message_distributions_supported + message_limitations
 
 
 #TODO Original
