@@ -702,12 +702,7 @@ class IndicatorBase( ABC ):
 
 
     def set_icon( self, icon ):
-        icon_set = False
-        if self._is_icon_update_supported():
-            self.indicator.set_icon_full( icon, "" )
-            icon_set = True
-
-        return icon_set
+        self.indicator.set_icon_full( icon, "" )
 
 
     # Get the name of the icon for the indicator
@@ -1679,68 +1674,20 @@ class IndicatorBase( ABC ):
         return self.current_desktop
 
 
-#TODO UNCHECKED
-#TOD Maybe this can go as it is only used below 
-# for ubuntu mate 20.04 which is EOL.
-    def _is_ubuntu_variant_2004( self ):
-        ubuntu_variant_2004 = False
-        try:
-            ubuntu_variant_2004 = (
-                True if self.process_get( "lsb_release -rs" ) == "20.04"
-                else False )
-
-        except:
-            pass
-
-        return ubuntu_variant_2004
-
-
-#TODO Check which distros/versions we now support and
-# then update this function and comment header
-# according to which distros/versions support icon updating.
-    # Lubuntu 20.04/22.04 ignores any change to the icon after initialisation.
-    # If the icon is changed, the icon is replaced with a strange grey/white circle.
-    #
-    # Ubuntu MATE 20.04 truncates the icon when changed,
-    # despite the icon being fine when clicked.
-    # Seems fine now in MATE 22.04.
-#TODO UNCHECKED
-    def _is_icon_update_supported( self ):
-        icon_update_supported = True
-        desktop_environment = self.get_current_desktop()
-
-#TODO Tidy up
-        if desktop_environment is None or \
-           desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT or \
-           ( desktop_environment == IndicatorBase._CURRENT_DESKTOP_MATE and self._is_ubuntu_variant_2004() ):
-            icon_update_supported = False
-
-        return icon_update_supported
-
-
-#TODO Check which distros/versions we now support and
-# then update this function and comment header
-# according to which distros/versions support label updating (or even have a label).
-#
-# Maybe rename to _is_label_or_tooltip_update_supported?
-    # Lubuntu 20.04/22.04 ignores any change to the label/tooltip after initialisation.
+    # Lubuntu 20.04/22.04 no longer supports icon labels, nor when it did,
+    # supported changes to the icon label/tooltip after initialisation.
     def _is_label_update_supported( self ):
-        label_update_supported = True
         desktop_environment = self.get_current_desktop()
+        label_update_unsupported = \
+            desktop_environment is None or \
+            desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT
 
-#TODO Tidy up        
-        if desktop_environment is None or \
-           desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT:
-            label_update_supported = False
-
-        return label_update_supported
+        return not label_update_unsupported
 
 
-#TODO Check with latest distro (whichever uses qterminal) if this is still an issue.
     # As a result of
     #   https://github.com/lxqt/qterminal/issues/335
     # provide a way to determine if qterminal is the current terminal.
-#TODO UNCHECKED
     def is_terminal_qterminal( self, terminal ):
         return ( terminal is not None ) and ( "qterminal" in terminal )
 
