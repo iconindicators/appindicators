@@ -493,19 +493,6 @@ def _get_distributions_supported( indicator_name ):
         f"- `Xubuntu 20.04+`\n"
         f"\n\n" )
 
-#TODO In regards about/preferences locking up when clicking on the indicator icon,
-# is there a range of GNOME releases to check against this?
-# Issue occurs on Debian 11 which is the earliest I think.
-# Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.   <---- is that ubuntu 22.04 or 24.04?
-# Issue is resolved for Fedora 40.
-# How to determine the GNOME version?
-#
-# gnome-shell --version
-#     Ubuntu 20.04   GNOME Shell 3.36.9
-#
-# Maybe also have a known issues section?
-
-
     message_limitations = ""
 
     if is_indicator(
@@ -515,15 +502,15 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORPUNYCODE,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- Under `Wayland`, the clipboard does not function.\n" )
+            f"- `Wayland`: the clipboard does not function.\n" )
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message_limitations += (
-            f"- Under `Wayland`, the command `wmctrl` does not function, "
-            f"which used to list windows and bring to the front.\n" )
+            f"- `Wayland`: the command `wmctrl` does not function "
+            f"(used to list windows and bring to the front).\n" )
 
     if is_indicator(
         indicator_name,
@@ -531,8 +518,7 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message_limitations += (
-            f"- On `Plasma (X11)` and `XFCE`, "
-            f"mouse wheel scroll over icon does not function.\n" )
+            f"- `Plasma (X11) / XFCE`: mouse wheel scroll over icon does not function.\n" )
 
     if is_indicator(
         indicator_name,
@@ -541,22 +527,22 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- On `Lubuntu / LXQt`, labels next to the icon are unsupported.\n" )
+            f"- `Lubuntu / LXQt`: labels next to the icon are unsupported.\n" )
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- On `Lubuntu / LXQt`, the icon cannot be changed once set set.\n" )
+            f"- `Lubuntu / LXQt`: the icon cannot be changed once set set.\n" )
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- On `Lubuntu / LXQt`, `qterminal` [does not preserve arguments]"
-            f"(https://github.com/lxqt/qterminal/issues/335).\n" )
+            f"- `Lubuntu / LXQt`: arguments are not [preserved]"
+            f"(https://github.com/lxqt/qterminal/issues/335) in `qterminal`.\n" )
 
     if message_limitations:
         message_limitations = f"Limitations:\n" + message_limitations + f"\n\n"
