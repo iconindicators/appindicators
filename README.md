@@ -121,7 +121,8 @@ Additional indicators may be appended to the above command.
 ```
     if [ ! -d venv ]; then python3 -m venv venv; fi && \
     . ./venv/bin/activate && \
-    python3 -m pip install --upgrade readme_renderer readme_renderer[md] && \
+    python3 -m pip install --upgrade readme_renderer && \
+    python3 -m pip install --upgrade readme_renderer[md] && \
     python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
