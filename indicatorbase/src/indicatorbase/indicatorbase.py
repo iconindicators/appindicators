@@ -82,15 +82,15 @@
 #                    - GNOME Classic - All good.
 # Manjaro 22.1 is already obsolete.  Try perhaps 24.0.0 Wynsdey?
 #
-# Ubuntu 20.04 - Ubuntu - All good.
-# Ubuntu 20.04 - GNOME Classic - Need to Run "Applications - Utilities - Tweaks: Extensions: Enable  Ubuntu appindicators.
-# Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
-#
 # openSUSE Tumbleweed - GNOME - No wmctrl, no clipboard.
 #                     - GNOME Classic - No wmctrl, no clipboard.
 #                     - GNOME Classic on Xorg - All good.
 #                     - GNOME on Xorg - No wmctrl, no clipboard.
 #                     - IceWM Session - No label/tooltip.  No notify-send / OSD.
+#
+# Ubuntu 20.04 - Ubuntu - All good.
+# Ubuntu 20.04 - GNOME Classic - Need to Run "Applications - Utilities - Tweaks: Extensions: Enable  Ubuntu appindicators.
+# Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
 #
 # Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
 # Ubuntu 22.04 - Ubuntu on Xorg - All good.
@@ -1692,6 +1692,7 @@ class IndicatorBase( ABC ):
     #
     # Ubuntu MATE 20.04 truncates the icon when changed,
     # despite the icon being fine when clicked.
+    # Seems fine now in MATE 22.04.
 #TODO UNCHECKED
     def _is_icon_update_supported( self ):
         icon_update_supported = True
