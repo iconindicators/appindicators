@@ -170,6 +170,19 @@
 # If this is something that only occurs with a range of GTK release versions
 # (between Debian 11 and Fedora 39)
 # then can we check for that and onl do the update on those?
+#
+#
+# In regards about/preferences locking up when clicking on the indicator icon,
+# is there a range of GNOME releases to check against this?
+# Issue occurs on Debian 11 which is the earliest I think.
+# Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.   <---- is that ubuntu 22.04 or 24.04?
+# Issue is resolved for Fedora 40.
+# How to determine the GNOME version?
+#
+# gnome-shell --version
+#     Ubuntu 20.04   GNOME Shell 3.36.9
+#
+# Maybe also have a known issues section in the README.md for each indicator (under limitations)?
 
 
 #TODO Update the PPA description at
