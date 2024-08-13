@@ -119,8 +119,6 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-pip",
         "python3-venv" ]
 
-#TODO Where I have python3-notify2, should I also have libnotify-bin?
-
     if operating_system == Operating_System.UBUNTU_2004 or \
        operating_system == Operating_System.UBUNTU_2204:
         dependencies.append( "gnome-shell-extension-appindicator" )
@@ -131,12 +129,15 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORLUNAR:
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
 
         if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
@@ -144,6 +145,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
@@ -162,9 +164,11 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORTIDE:
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )
         dependencies.append( "wmctrl" )
 
