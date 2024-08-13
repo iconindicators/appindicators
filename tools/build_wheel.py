@@ -366,16 +366,13 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                 _get_name_and_comments_from_indicator(
                     indicator_name, directory_indicator )
 
-#TODO The name obtained below for virtualbox contains  ™ .
-# Where is 'name' subsequently used and should ™ be present or not in each case?
-# Need to strip  ™  from name before passing to create_readme.
             if not message:
                 utils_readme.create_readme(
                     directory_indicator,
                     indicator_name,
+                    name,
                     authors,
-                    start_year,
-                    name )
+                    start_year )
 
                 directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
 

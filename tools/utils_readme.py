@@ -72,13 +72,11 @@ def is_indicator( indicator_name, *indicator_names ):
     return is_indicator
 
 
-def _get_indicator_names_minus_current( indicator_name ):
+def _get_indicator_names_sans_current( indicator_name ):
     indicators = [ str( x ) for x in Path( '.' ).iterdir() if x.is_dir() and str( x ).startswith( "indicator" ) ]
-
     indicators.remove( indicator_name )
     indicators.remove( "indicatorbase" )
     indicators.sort()
-
     return indicators
 
 
@@ -103,10 +101,7 @@ def _get_introduction( indicator_name ):
     introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
 
     introduction += f"Other indicators in this series are:\n"
-    
-    _get_indicator_names_minus_current( indicator_name )
-    
-    introduction += "- `" + '`\n- `'.join( _get_indicator_names_minus_current( indicator_name ) ) + "`\n\n"
+    introduction += "- `" + '`\n- `'.join( _get_indicator_names_sans_current( indicator_name ) ) + "`\n\n"
 
     return introduction
 
@@ -457,12 +452,13 @@ def _get_installation( indicator_name ):
 
 
 def _get_usage( indicator_name, indicator_name_human_readable ):
+    # The human readable name is VirtualBox™ and so need to remove '™' below.
     return (
         f"Usage\n"
         f"-----\n\n"
 
         f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
-        f"type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower() }` "
+        f"type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` "
         f"into the search bar and the icon should be present for you to click.  "
         f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
@@ -729,9 +725,9 @@ def _get_license( authors_emails, start_year ):
 def create_readme(
     directory,
     indicator_name,
+    indicator_name_human_readable,
     authors_emails,
-    start_year,
-    indicator_name_human_readable ):
+    start_year ):
 
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
