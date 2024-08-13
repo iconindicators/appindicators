@@ -16,15 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Amend the changelog.md and/or readme.md
-# to mention that wmctrl only works under X11?
-# Already part of the menu item label...
-#
-# Similarly for clipboard.
-#
-# wmctrl works on kubuntu/konsole...so might need a more general statement for wmctrl.
-
-
 #TODO For the actual release to PyPI, the version to use is 1.0.17 as per pyproject.toml.
 #
 # For testPyPI, the version to use it 1.0.24

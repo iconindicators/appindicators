@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Amend the changelog.md and/or readme.md
-# to mention the clipboard only works under X11?
-
-
 # Application indicator which displays fortunes.
 
 
