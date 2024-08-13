@@ -42,30 +42,51 @@ import utils_locale
 import utils_readme
 
 
-def _run_checks_specific_to_indicator( indicator_name ):
+def _run_checks_on_indicator( indicator_name ):
+
+    def contains_todo( p ):
+        with open( p, 'r' ) as f:
+            content = f.read()
+
+        return "todo" in content.lower()
+
     message = ""
-    if "indicatorlunar" in indicator_name:
-        #TODO If/when astroskyfield.py is included in the release,
-        # (and ephem is dropped),
-        # need to include the planets.bsp and stars.dat in the wheel.
-        #
-        # The astroskyfield.py code assumes planets.bsp/stars.dat are in
-        #     indicatorlunar/src/indicatorlunar/data
-        # Whilst that directory will be copied across automatically,
-        # must also determine planets.bsp/stars.dat are also present.
-        # The code below does just that...
-        # data_directory = Path( indicator_name ) / "src" / "indicatorlunar" / "data"
-        # planets_bsp = data_directory / "planets.bsp"
-        # if not planets_bsp.is_file():
-        #     message += f"{ indicator_name }: Unable to locate { planets_bsp } - may need to be created - aborting.\n"
-        #
-        # stars_dat = Path( str( data_directory ) + "/stars.dat" )
-        # if not stars_dat.is_file():
-        #     message += f"{ indicator_name }: Unable to locate { stars_dat } - may need to be created - aborting.\n"
-        #     checks_pass = False
 
-        pass
+    # Search through files for any TODOs...
+    extensions = {
+        '.desktop',
+        '.in',
+        '.md',
+        '.po',
+        '.pot',
+        '.py',
+        '.sh',
+        '.svg',
+        '.toml' }
 
+    found_todo = False
+    indicatorbase_path = Path( '.' ) / "indicatorbase"
+    for p in ( p.resolve() for p in indicatorbase_path.rglob( '*' ) if p.suffix in extensions ):
+        if contains_todo( p ):
+            message += str( p )
+            found_todo = True
+
+    indicator_path = Path( '.' ) / indicator_name
+    for p in ( p.resolve() for p in indicator_path.glob( '*' ) if p.suffix in { '.toml' } ):
+        if contains_todo( p ):
+            message += str( p )
+            found_todo = True
+
+    indicator_src_path = Path( '.' ) / indicator_name / "src"
+    for p in ( p.resolve() for p in Path( indicator_src_path ).rglob( '*' ) if p.suffix in extensions ):
+        if contains_todo( p ):
+            message += str( p )
+            found_todo = True
+
+    if found_todo:
+        message = "One or more TODOs found:\n" + message
+
+    print(message)
     return message
 
 
@@ -402,7 +423,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
 
 
 def _build_wheel_for_indicator( directory_release, indicator_name ):
-    message = _run_checks_specific_to_indicator( indicator_name )
+    message = _run_checks_on_indicator( indicator_name )
     if not message:
         directory_dist = Path( '.' ) / directory_release / "wheel" / ( "dist_" + indicator_name )
         if Path( directory_dist ).exists():
@@ -440,8 +461,9 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } )
 
-        utils.initialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
+        # utils.initialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
         for indicator_name in args.indicators:
-            message = _build_wheel_for_indicator( args.directory_release, indicator_name )
-            if message:
-                print( message )
+            _run_checks_on_indicator( indicator_name ) #TODO Remove
+            # message = _build_wheel_for_indicator( args.directory_release, indicator_name )
+            # if message:
+            #     print( message )
