@@ -527,14 +527,14 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Lubuntu / LXQt`: labels next to the icon are unsupported.\n" )
+            f"- `Lubuntu / LXQt`: icon label is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Lubuntu / LXQt`: the icon cannot be changed once set set.\n" )
+            f"- `Lubuntu / LXQt`: once set, the icon cannot be changed.\n" )
 
     if is_indicator(
         indicator_name,
