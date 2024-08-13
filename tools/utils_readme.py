@@ -550,33 +550,6 @@ def _get_distributions_supported( indicator_name ):
     return message_distributions_supported + message_limitations
 
 
-#TODO Original
-        # f"Distributions/versions with full functionality:\n"
-        # f"- `Debian 11 / 12 GNOME on Xorg`\n"
-        # f"- `Fedora 38 / 39 GNOME on Xorg`\n"
-        # f"- `Kubuntu 20.04 / 22.04`\n"
-        # f"- `Ubuntu 20.04`\n"
-        # f"- `Ubuntu 22.04 on Xorg`\n"
-        # f"- `Ubuntu Budgie 22.04`\n"
-        # f"- `Ubuntu Unity 20.04 / 22.04`\n"
-        # f"- `Xubuntu 20.04 / 22.04`\n\n"
-        #
-        # f"Distributions/versions with limited functionality:\n"
-        # f"- `Debian 11 / 12 GNOME` No clipboard; no `wmctrl`.\n"
-        # f"- `Fedora 38 / 39 GNOME` No clipboard; no `wmctrl`.\n"
-        # f"- `Kubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n"
-        # f"- `Linux Mint 21 Cinnamon` Tooltip in lieu of label.\n"
-        # f"- `Lubuntu 20.04 / 22.04` No label; tooltip is not dynamic; icon is not dynamic.\n"
-        # f"- `Manjaro 22.1 GNOME` No `calendar`.\n"
-        # f"- `openSUSE Tumbleweed` No clipboard; no `wmctrl`; no `calendar`.\n"
-        # f"- `openSUSE Tumbleweed GNOME on Xorg` No `calendar`.\n"
-        # f"- `Ubuntu 22.04` No clipboard; no `wmctrl`.\n"
-        # f"- `Ubuntu Budgie 20.04` No mouse middle click.\n"
-        # f"- `Ubuntu MATE 20.04` Dynamic icon is truncated, but fine whilst being clicked.\n"
-        # f"- `Ubuntu MATE 22.04` Dynamic icon for NEW MOON is truncated.\n"
-        # f"- `Xubuntu 20.04 / 22.04` No mouse wheel scroll; tooltip in lieu of label.\n\n" )
-
-
 def _get_uninstall_for_operating_system(
         operating_system,
         indicator_name,
