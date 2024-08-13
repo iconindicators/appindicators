@@ -175,9 +175,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.show_notification( "Cannot run script", message )
 
         elif self.is_terminal_qterminal( terminal ):
-            # As a result of this issue
-            #    https://github.com/lxqt/qterminal/issues/335
-            # the default terminal in Lubuntu (qterminal) fails to parse argument.
+            # As a result of
+            #   https://github.com/lxqt/qterminal/issues/335
+            # the default terminal in Lubuntu (qterminal) fails to parse arguments.
             # Although a fix has been made, it is unlikely the repository will be updated any time soon.
             # So the quickest/easiest workaround is to install gnome-terminal.
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
