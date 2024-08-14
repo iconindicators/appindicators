@@ -78,51 +78,6 @@ def _run_checks_on_indicator( indicator_name ):
     return message
 
 
-def _run_checks_on_indicatorORIG( indicator_name ):
-
-    def has_todo( p ):
-        with open( p, 'r' ) as f:
-            message = ""
-            if "todo" in f.read().lower():
-                message = str( p ) + '\n'
-
-        return message
-
-    extensions_toml = {
-        '.toml' }
-
-    extensions = {
-        '.desktop',
-        '.in',
-        '.md',
-        '.po',
-        '.pot',
-        '.py',
-        '.sh',
-        '.svg',
-        '.toml' }
-
-    message = ""
-
-    indicatorbase_path = Path( '.' ) / "indicatorbase"
-    for p in ( p.resolve() for p in indicatorbase_path.rglob( '*' ) if p.suffix in extensions ):
-        message += has_todo( p )
-
-    indicator_path = Path( '.' ) / indicator_name
-    for p in ( p.resolve() for p in indicator_path.glob( '*' ) if p.suffix in { '.toml' } ):
-        message += has_todo( p )
-
-    indicator_src_path = Path( '.' ) / indicator_name / "src"
-    for p in ( p.resolve() for p in Path( indicator_src_path ).rglob( '*' ) if p.suffix in extensions ):
-        message += has_todo( p )
-
-    if message:
-        message = "One or more TODOs found:\n" + message
-
-    message = "" #TODO Remove
-    return message
-
-
 def _chmod( file, user_permission, group_permission, other_permission ):
     Path( file ).chmod( user_permission | group_permission | other_permission )
 
