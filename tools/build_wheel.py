@@ -83,7 +83,7 @@ def _run_checks_on_indicator( indicator_name ):
     if message:
         message = "One or more TODOs found:\n" + message
 
-    # message = "" #TODO Remove
+#    message = "" #TODO Remove
     return message
 
 
