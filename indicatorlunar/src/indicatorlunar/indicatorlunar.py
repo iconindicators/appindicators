@@ -972,17 +972,18 @@ class IndicatorLunar( IndicatorBase ):
             body_type == IndicatorLunar.astro_backend.BodyType.COMET or \
             body_type == IndicatorLunar.astro_backend.BodyType.STAR
 
-        bodies_sorted = bodies
-        print( body_type )
         if need_to_sort:
+            bodies_sorted = [ ]
             for name in bodies:
                 bodies_sorted.append( [ name, display_name_function( name ) ] )
 
             bodies_sorted = sorted( bodies_sorted, key = lambda x: ( x[ 1 ] ) )
             bodies_sorted = [ x[ 0 ] for x in bodies_sorted ]
 
+        else:
+            bodies_sorted = bodies # Don't sort the planets.
+
         for name in bodies_sorted:
-            print( body_type )
             current = len( submenu )
             menuitem_name = menuitem_name_function( name )
             updated = \
