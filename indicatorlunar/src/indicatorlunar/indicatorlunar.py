@@ -966,7 +966,23 @@ class IndicatorLunar( IndicatorBase ):
         on_click_function = get_on_click_function()
         display_name_function = get_display_name_function()
         submenu = Gtk.Menu()
-        for name in bodies:
+
+        need_to_sort = \
+            body_type == IndicatorLunar.astro_backend.BodyType.MINOR_PLANET or \
+            body_type == IndicatorLunar.astro_backend.BodyType.COMET or \
+            body_type == IndicatorLunar.astro_backend.BodyType.STAR
+
+        bodies_sorted = bodies
+        print( body_type )
+        if need_to_sort:
+            for name in bodies:
+                bodies_sorted.append( [ name, display_name_function( name ) ] )
+
+            bodies_sorted = sorted( bodies_sorted, key = lambda x: ( x[ 1 ] ) )
+            bodies_sorted = [ x[ 0 ] for x in bodies_sorted ]
+
+        for name in bodies_sorted:
+            print( body_type )
             current = len( submenu )
             menuitem_name = menuitem_name_function( name )
             updated = \
@@ -1209,11 +1225,11 @@ class IndicatorLunar( IndicatorBase ):
     #
     # Next rise/set:
     #
-    #                            R       S                           Satellite will rise within the five minute window; display next rise/set.
-    #                            R               S                   Satellite will rise within the five minute window; display next rise/set.
-    #                                            R       S           Satellite will rise after five minute window; display next rise; check if in previous transit.
-    #                   ^                    ^
-    #                utc_now             utc_now + 5
+    #                  R       S                           Satellite will rise within the five minute window; display next rise/set.
+    #                  R               S                   Satellite will rise within the five minute window; display next rise/set.
+    #                                  R       S           Satellite will rise after five minute window; display next rise; check if in previous transit.
+    #         ^                    ^
+    #      utc_now             utc_now + 5
     #
     # When ( R < utc_now + 5 ) display next rise/set.
     # Otherwise, display next rise and check previous transit in case still underway.
@@ -1283,28 +1299,31 @@ class IndicatorLunar( IndicatorBase ):
 
         if satellites:
             if self.satellites_sort_by_date_time:
-                satellites = sorted(
-                    satellites,
-                    key = lambda x: (
-                        x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ],
-                        x[ IndicatorLunar.SATELLITE_MENU_NAME ],
-                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
+                satellites = \
+                    sorted(
+                        satellites,
+                        key = lambda x: (
+                            x[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ],
+                            x[ IndicatorLunar.SATELLITE_MENU_NAME ],
+                            x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
             else: # Sort by name then number.
-                satellites = sorted(
-                    satellites,
-                    key = lambda x: (
-                        x[ IndicatorLunar.SATELLITE_MENU_NAME ],
-                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
+                satellites = \
+                    sorted(
+                        satellites,
+                        key = lambda x: (
+                            x[ IndicatorLunar.SATELLITE_MENU_NAME ],
+                            x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) )
 
             self._update_menu_satellites( menu, _( "Satellites" ), satellites )
 
         if satellites_polar:
-            satellites_polar = sorted(
-                satellites_polar,
-                key = lambda x: (
-                    x[ IndicatorLunar.SATELLITE_MENU_NAME ],
-                    x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
+            satellites_polar = \
+                sorted(
+                    satellites_polar,
+                    key = lambda x: (
+                        x[ IndicatorLunar.SATELLITE_MENU_NAME ],
+                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) # Sort by name then number.
 
             self._update_menu_satellites( menu, _( "Satellites (Polar)" ), satellites_polar )
 
