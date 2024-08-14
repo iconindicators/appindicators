@@ -43,6 +43,42 @@ import utils_readme
 
 
 def _run_checks_on_indicator( indicator_name ):
+    paths = [
+        Path( '.' ) / "indicatorbase",
+        Path( '.' ) / indicator_name,
+        Path( '.' ) / indicator_name / "src" ]
+
+    extensions_toml = {
+        '.toml' }
+
+    extensions_all = {
+        '.desktop',
+        '.in',
+        '.md',
+        '.po',
+        '.pot',
+        '.py',
+        '.sh',
+        '.svg',
+        '.toml' }
+
+    extensions = [ extensions_all, extensions_toml, extensions_all ]
+
+    message = ""
+    for path, extensions_ in zip( paths, extensions ):
+        for p in ( p.resolve() for p in path.glob( '**/*' ) if p.suffix in extensions_ ):
+            with open( p, 'r' ) as f:
+                if "todo" in f.read().lower():
+                    message += str( p ) + '\n'
+
+    if message:
+        message = "One or more TODOs found:\n" + message
+
+    # message = "" #TODO Remove
+    return message
+
+
+def _run_checks_on_indicatorORIG( indicator_name ):
 
     def has_todo( p ):
         with open( p, 'r' ) as f:
@@ -51,6 +87,9 @@ def _run_checks_on_indicator( indicator_name ):
                 message = str( p ) + '\n'
 
         return message
+
+    extensions_toml = {
+        '.toml' }
 
     extensions = {
         '.desktop',
