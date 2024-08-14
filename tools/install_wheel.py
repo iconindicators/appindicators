@@ -29,7 +29,7 @@ import utils
 
 
 if __name__ == "__main__":
-    if utils.is_correct_directory( "./tools/install_wheel.py", "release indicatorfortune" ):
+    if utils.is_correct_directory( example_arguments = "release indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
                 "Install a Python wheel package for one or more indicators to a virtual environment within $HOME/.local and copies across .desktop, run script and icons.",

@@ -20,18 +20,21 @@
 
 
 import argparse
+import inspect
 import subprocess
 
 from pathlib import Path
 
 
-def is_correct_directory( script_path_and_name, script_example_arguments ):
-    correct_directory = Path( script_path_and_name ).exists()
+def is_correct_directory( example_arguments = None ):
+    correct_directory = Path.cwd() == Path( inspect.stack()[ 1 ].filename ).parent.parent
     if not correct_directory:
+        path_of_caller_parts = Path( inspect.stack()[ 1 ].filename ).parts
+        script_path_and_name = Path( '.' ) / path_of_caller_parts[ -2 ] / path_of_caller_parts[ -1 ]
         print(
             f"The script must be run from the top level directory (one above tools).\n"
             f"For example:\n"
-            f"\tpython3 { script_path_and_name } { script_example_arguments }" )
+            f"\tpython3 { script_path_and_name } { '' if example_arguments is None else example_arguments }" )
 
     return correct_directory
 

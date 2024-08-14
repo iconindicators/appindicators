@@ -34,9 +34,6 @@ import sys
 
 from pathlib import Path
 
-sys.path.append( "indicatorbase/src/indicatorbase" )
-import indicatorbase
-
 import utils
 import utils_locale
 import utils_readme
@@ -433,7 +430,15 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
 
 if __name__ == "__main__":
-    if utils.is_correct_directory( "./tools/build_wheel.py", "release indicatorfortune" ):
+    if utils.is_correct_directory( example_arguments = "release indicatorfortune" ):
+
+        # Ideally, this import should be at the top.
+        # However, if the script is called from a directory other than the correct directory,
+        # the import will fail before the check above can be done, giving the message
+        # "ModuleNotFoundError: No module named 'indicatorbase'" which is a red herring...
+        sys.path.append( "indicatorbase/src/indicatorbase" )
+        import indicatorbase
+
         args = \
             utils.initialiase_parser_and_get_arguments(
                 "Create a Python wheel for one or more indicators.",
