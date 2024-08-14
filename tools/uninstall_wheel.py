@@ -26,7 +26,7 @@ import utils
 
 
 if __name__ == "__main__":
-    if utils.is_correct_directory( "./tools/uninstall_indicator.py", "indicatorfortune" ):
+    if utils.is_correct_directory( "./tools/uninstall_wheel.py", "indicatorfortune" ):
         args = \
             utils.initialiase_parser_and_get_arguments(
                 "Uninstall one or more indicators, removing the virtual environment within $HOME/.local and .desktop, run script and icons and .config/.cache.",
