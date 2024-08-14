@@ -38,6 +38,18 @@ import utils
 import utils_locale
 import utils_readme
 
+sys.path.append( "indicatorbase/src/indicatorbase" )
+try:
+    import indicatorbase
+except ModuleNotFoundError:
+    # If the script is called from a directory other than the correct directory,
+    # this import will fail before the check for the correct directory can be done,
+    # resulting in a "ModuleNotFoundError: No module named 'indicatorbase'"
+    # which is a red herring...
+    print( 
+        "indicatorbase could not be found;" + \
+        "ensure you are running this script from the correct directory!" )
+
 
 def _run_checks_on_indicator( indicator_name ):
     paths = [
@@ -431,14 +443,6 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
 if __name__ == "__main__":
     if utils.is_correct_directory( example_arguments = "release indicatorfortune" ):
-
-        # Ideally, this import should be at the top.
-        # However, if the script is called from a directory other than the correct directory,
-        # the import will fail before the check above can be done, giving the message
-        # "ModuleNotFoundError: No module named 'indicatorbase'" which is a red herring...
-        sys.path.append( "indicatorbase/src/indicatorbase" )
-        import indicatorbase
-
         args = \
             utils.initialiase_parser_and_get_arguments(
                 "Create a Python wheel for one or more indicators.",
