@@ -16,6 +16,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO Good idea to figure out if the apt-get (or equivalent) )install command for each distro
+# requires all the packages that are specified.
+# For example, on Kubuntu 24.04, I omitted python3-dev and the indicator seems to have been installed.
+# Perhaps python3-dev was pulled in though...
+#
+# So perhaps test on Ubuntu 24.04, Fedora 40, Debian 12, Ubuntu 22.04 (requires 'calendar' whereas 20.04 does not), Manjaro, openSUSE.
+
+
+#TODO On Kubuntu 22.04/24.04, there is no icon label and tooltip is the source file name.
+# On 24.04, console commands DO work...but emit an error message too which I think can be ignored.
+
+
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
@@ -325,11 +338,7 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-#TODO Check terminal on
-#   Manjaro
-#   OpenSUSE
-#   Ubuntu MATE
-    _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS list first so as to be the "default".
+    _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS first to be the default.
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
         [ "lxterminal", "-e" ],

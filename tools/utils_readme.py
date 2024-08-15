@@ -142,7 +142,9 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
 
         if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
            operating_system == Operating_System.UBUNTU_2204:
-            dependencies.append( "calendar" )
+            dependencies.append( "calendar" )  #TODO If calendar here and a few lines below
+            # are the only difference between Ubuntu 20.04 and 22.04, maybe just include
+            # calendar for 20.04?  What about 24.04?
 
     if indicator_name == Indicator_Name.INDICATORPUNYCODE:
         dependencies.append( "libnotify-bin" )
@@ -537,7 +539,7 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Lubuntu / LXQt`: icon label is unsupported.\n" )
+            f"- `Plasma (X11) / XFCE/ Lubuntu / LXQt`: icon label is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
@@ -551,7 +553,7 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Lubuntu / LXQt`: arguments are not [preserved]"
+            f"- `Lubuntu / LXQt 20.04`: arguments are not [preserved]"
             f"(https://github.com/lxqt/qterminal/issues/335) in `qterminal`. "
             f"Alternatively, install `gnome-terminal`.\n" )
 
