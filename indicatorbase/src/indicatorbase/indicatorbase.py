@@ -869,8 +869,9 @@ class IndicatorBase( ABC ):
             self.request_save_config()
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
-        self.set_menu_sensitivity( True )
-        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+        else:
+            self.set_menu_sensitivity( True )
+            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
     def set_menu_sensitivity( self, toggle ):
