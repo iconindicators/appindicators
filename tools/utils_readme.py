@@ -16,13 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create a README.md for an indicator from text common to all indicators and text
-# specific to the indicator, drawn from the indicator's CHANGELOG.md and pyproject.toml.
+# Create a README.md for an indicator.
 #
 #   https://github.github.com/gfm
 #
 # When testing/editing, to render out in HTML:
-#   python3 -m pip install --upgrade readme_renderer readme_renderer[md]
+#   python3 -m pip install --upgrade readme_renderer[md]
 #   python3 tools/build_readme.py release indicatortest
 #   python3 -m readme_renderer release/README.md -o release/README.html
 #
@@ -142,6 +141,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
+#TODO Check these...
 def _get_operating_system_dependencies_fedora( operating_system, indicator_name ):
     dependencies = [
         "cairo-devel",
@@ -188,6 +188,7 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
+#TODO Check these...
 def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
     dependencies = [
         "cairo",
@@ -209,6 +210,7 @@ def _get_operating_system_dependencies_manjaro( operating_system, indicator_name
     return ' '.join( sorted( dependencies ) )
 
 
+#TODO Check these...
 def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
     dependencies = [
         "cairo-devel",
@@ -404,6 +406,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"```\n\n" )
 
 
+#TODO Check these...
 def _get_distributions_supported( indicator_name ):
     message_distributions_supported = (
         f"Distributions Supported\n"
