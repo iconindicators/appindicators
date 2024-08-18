@@ -39,14 +39,13 @@ from pathlib import Path
 
 
 class Operating_System( Enum ):
-    DEBIAN_11_DEBIAN_12 = auto()
-    FEDORA_38_FEDORA_39 = auto()
-    FEDORA_40 = auto()
+    DEBIAN_11_12 = auto() 
+    FEDORA_38_39 = auto()
+    FEDORA_40 = auto() #TODO After testing on new VMs...can this be absorbed into the above?
     MANJARO_221 = auto()
     OPENSUSE_TUMBLEWEED = auto()
-    UBUNTU_2004 = auto() #TODO I think these three can be combined as debian is above.  If so, adjust the install and remove.
-    UBUNTU_2204 = auto()
-    UBUNTU_2404 = auto()
+    UBUNTU_2004 = auto()
+    UBUNTU_2204_2404 = auto()
 
 
 class Indicator_Name( Enum ):
@@ -110,20 +109,7 @@ def _get_introduction( indicator_name ):
 
 
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
-#TODO Original and now old.    
-    # dependencies = [
-    #     "gir1.2-ayatanaappindicator3-0.1",
-    #     "gir1.2-gtk-3.0",
-    #     "libcairo2-dev",
-    #     "libgirepository1.0-dev",
-    #     "pkg-config",
-    #     "python3-dev",
-    #     "python3-gi",
-    #     "python3-gi-cairo",
-    #     "python3-pip",
-    #     "python3-venv" ]
-
-#TODO New
+#TODO Eventually delete
     dependencies_ubuntu_2004 = [
         "fortune-mod", # indicatortest
         "fortunes", # indicatortest
@@ -134,7 +120,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-venv",
         "wmctrl" ] # indicatortest
 
-#TODO New
+#TODO Eventually delete
     dependencies_ubuntu_2204 = [
         "calendar", # indicatortest
         "fortune-mod", # indicatortest
@@ -146,7 +132,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-venv",
         "wmctrl" ] # indicatortest
 
-#TODO New
+#TODO Eventually delete
     dependencies_ubuntu_2404 = [
         "calendar", # indicatortest
         "fortune-mod", # indicatortest
@@ -159,7 +145,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-venv",
         "wmctrl" ] # indicatortest
 
-#TODO New
+#TODO Eventually delete
     dependencies_debian_11 = [
         "calendar", # indicatortest
         "fortune-mod", # indicatortest
@@ -172,7 +158,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-venv",
         "wmctrl" ] # indicatortest
 
-#TODO New
+#TODO Eventually delete
     dependencies_debian_12 = [
         "calendar", # indicatortest
         "fortune-mod", # indicatortest
@@ -186,24 +172,12 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-venv",
         "wmctrl" ] # indicatortest
 
-
-#TODO New
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
         "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
-
-
-#TODO Don't think this is needed.
-    # if operating_system == Operating_System.UBUNTU_2004 or \
-    #    operating_system == Operating_System.UBUNTU_2204:
-    #     dependencies.append( "gnome-shell-extension-appindicator" )
-
-#TODO Don't think this is needed.
-    # if operating_system == Operating_System.UBUNTU_2404:
-    #     dependencies.append( "gnome-shell-extension-manager" )
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
@@ -216,19 +190,11 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
-
         if operating_system != Operating_System.UBUNTU_2004:
             dependencies.append( "calendar" )
 
-#TODO Old
-        # if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
-        #    operating_system == Operating_System.UBUNTU_2204:
-        #     dependencies.append( "calendar" )  #TODO If calendar here and a few lines below
-        #     # are the only difference between Ubuntu 20.04 and 22.04, maybe just include
-        #     # calendar for 20.04?  What about 24.04?
-        #     # Rethink this AFTER dependencies are sorted for Ubuntu/Debian.
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORPUNYCODE:
         dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
@@ -239,19 +205,14 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORTEST:
+        if operating_system != Operating_System.UBUNTU_2004:
+            dependencies.append( "calendar" )
+
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
         dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
         dependencies.append( "wmctrl" )
-
-        if operating_system != Operating_System.UBUNTU_2004:
-            dependencies.append( "calendar" )
-#TODO Old
-
-        # if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
-        #    operating_system == Operating_System.UBUNTU_2204:
-        #     dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORTIDE:
         dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
@@ -352,16 +313,12 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
 
 def _get_extension( operating_system ):
     extension = ''
-    if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+    if operating_system == Operating_System.DEBIAN_11_12 or \
        operating_system == Operating_System.FEDORA_40 or \
        operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
-
-    if operating_system == Operating_System.UBUNTU_2404:
-        extension = (
-            f"Run the `Extension Manager` and browse for the `AppIndicator and KStatusNotifierItem Support` extension and then enable/install.  You may have to log out/in or reboot for the extension to take effect.\n\n" )
 
     return extension
 
@@ -464,14 +421,14 @@ def _get_installation( indicator_name ):
         "------------------------\n\n" +
 
         _get_installation_for_operating_system(
-            Operating_System.DEBIAN_11_DEBIAN_12,
+            Operating_System.DEBIAN_11_12,
             indicator_name,
             "Debian 11 / 12",
             install_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_installation_for_operating_system(
-            Operating_System.FEDORA_38_FEDORA_39,
+            Operating_System.FEDORA_38_39,
             indicator_name,
             "Fedora 38 / 39",
             "sudo dnf -y install",
@@ -506,9 +463,9 @@ def _get_installation( indicator_name ):
             _get_operating_system_dependencies_debian ) +
 
         _get_installation_for_operating_system(
-            Operating_System.UBUNTU_2204,
+            Operating_System.UBUNTU_2204_2404,
             indicator_name,
-            "Ubuntu 22.04",
+            "Ubuntu 22.04 / 24.04",
             install_command_debian,
             _get_operating_system_dependencies_debian ) )
 
@@ -665,14 +622,14 @@ def _get_uninstall( indicator_name ):
         "---------\n\n" +
 
         _get_uninstall_for_operating_system(
-            Operating_System.DEBIAN_11_DEBIAN_12,
+            Operating_System.DEBIAN_11_12,
             indicator_name,
             "Debian 11 / 12",
             uninstall_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.FEDORA_38_FEDORA_39,
+            Operating_System.FEDORA_38_39,
             indicator_name,
             "Fedora 38 / 39",
             "sudo dnf -y remove",
@@ -707,9 +664,9 @@ def _get_uninstall( indicator_name ):
             _get_operating_system_dependencies_debian ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.UBUNTU_2204,
+            Operating_System.UBUNTU_2204_2404,
             indicator_name,
-            "Ubuntu 22.04",
+            "Ubuntu 22.04 / 24.04",
             uninstall_command_debian,
             _get_operating_system_dependencies_debian ) )
 
