@@ -44,7 +44,7 @@ class Operating_System( Enum ):
     FEDORA_40 = auto()
     MANJARO_221 = auto()
     OPENSUSE_TUMBLEWEED = auto()
-    UBUNTU_2004 = auto()
+    UBUNTU_2004 = auto() #TODO I think these three can be combined as debian is above.  If so, adjust the install and remove.
     UBUNTU_2204 = auto()
     UBUNTU_2404 = auto()
 
@@ -110,17 +110,18 @@ def _get_introduction( indicator_name ):
 
 
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
-    dependencies = [
-        "gir1.2-ayatanaappindicator3-0.1",
-        "gir1.2-gtk-3.0",
-        "libcairo2-dev",
-        "libgirepository1.0-dev",
-        "pkg-config",
-        "python3-dev",
-        "python3-gi",
-        "python3-gi-cairo",
-        "python3-pip",
-        "python3-venv" ]
+#TODO Original and now old.    
+    # dependencies = [
+    #     "gir1.2-ayatanaappindicator3-0.1",
+    #     "gir1.2-gtk-3.0",
+    #     "libcairo2-dev",
+    #     "libgirepository1.0-dev",
+    #     "pkg-config",
+    #     "python3-dev",
+    #     "python3-gi",
+    #     "python3-gi-cairo",
+    #     "python3-pip",
+    #     "python3-venv" ]
 
 #TODO New
     dependencies_ubuntu_2004 = [
@@ -159,6 +160,19 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "wmctrl" ] # indicatortest
 
 #TODO New
+    dependencies_debian_11 = [
+        "calendar", # indicatortest
+        "fortune-mod", # indicatortest
+        "fortunes", # indicatortest
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libnotify-bin", # indicatortest
+        "libgirepository1.0-dev",
+        "python3-pip",
+        "python3-venv",
+        "wmctrl" ] # indicatortest
+
+#TODO New
     dependencies_debian_12 = [
         "calendar", # indicatortest
         "fortune-mod", # indicatortest
@@ -173,60 +187,79 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "wmctrl" ] # indicatortest
 
 
-    if operating_system == Operating_System.UBUNTU_2004 or \
-       operating_system == Operating_System.UBUNTU_2204:
-        dependencies.append( "gnome-shell-extension-appindicator" )
+#TODO New
+    dependencies = [
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "python3-pip",
+        "python3-venv" ]
 
-    if operating_system == Operating_System.UBUNTU_2404:
-        dependencies.append( "gnome-shell-extension-manager" )
+
+#TODO Don't think this is needed.
+    # if operating_system == Operating_System.UBUNTU_2004 or \
+    #    operating_system == Operating_System.UBUNTU_2204:
+    #     dependencies.append( "gnome-shell-extension-appindicator" )
+
+#TODO Don't think this is needed.
+    # if operating_system == Operating_System.UBUNTU_2404:
+    #     dependencies.append( "gnome-shell-extension-manager" )
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORLUNAR:
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
-        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
-           operating_system == Operating_System.UBUNTU_2204:
-            dependencies.append( "calendar" )  #TODO If calendar here and a few lines below
-            # are the only difference between Ubuntu 20.04 and 22.04, maybe just include
-            # calendar for 20.04?  What about 24.04?
-            # Rethink this AFTER dependencies are sorted for Ubuntu/Debian.
+        if operating_system != Operating_System.UBUNTU_2004:
+            dependencies.append( "calendar" )
+
+#TODO Old
+        # if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+        #    operating_system == Operating_System.UBUNTU_2204:
+        #     dependencies.append( "calendar" )  #TODO If calendar here and a few lines below
+        #     # are the only difference between Ubuntu 20.04 and 22.04, maybe just include
+        #     # calendar for 20.04?  What about 24.04?
+        #     # Rethink this AFTER dependencies are sorted for Ubuntu/Debian.
 
     if indicator_name == Indicator_Name.INDICATORPUNYCODE:
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" ) #TODO I think this IS needed to as it is optionally used when a script finishes.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
         dependencies.append( "wmctrl" )
 
-        if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
-           operating_system == Operating_System.UBUNTU_2204:
+        if operating_system != Operating_System.UBUNTU_2004:
             dependencies.append( "calendar" )
+#TODO Old
+
+        # if operating_system == Operating_System.DEBIAN_11_DEBIAN_12 or \
+        #    operating_system == Operating_System.UBUNTU_2204:
+        #     dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORTIDE:
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )
+        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
+        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
