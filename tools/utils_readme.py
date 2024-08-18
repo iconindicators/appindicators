@@ -95,13 +95,19 @@ def _get_introduction( indicator_name ):
         f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
 
-    if is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
-        introduction += f", `openSUSE`, `Manjaro` "
+    if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+        introduction += f", `openSUSE`, `Manjaro`"
 
     introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
 
     introduction += f"Other indicators in this series are:\n"
-    introduction += "- `" + '`\n- `'.join( _get_indicator_names_sans_current( indicator_name ) ) + "`\n\n"
+#TODO I think this will go...
+#    introduction += "- `" + '`\n- `'.join( _get_indicator_names_sans_current( indicator_name ) ) + "`\n\n"
+
+    for indicator in _get_indicator_names_sans_current( indicator_name ):
+        introduction += f"- [{ indicator }](https://pypi.org/project/{ indicator })\n"
+
+    introduction += '\n'
 
     return introduction
 
@@ -118,6 +124,57 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-gi-cairo",
         "python3-pip",
         "python3-venv" ]
+
+#TODO New
+    dependencies_ubuntu_2004 = [
+        "fortune-mod", # indicatortest
+        "fortunes", # indicatortest
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "python3-pip",
+        "python3-venv",
+        "wmctrl" ] # indicatortest
+
+#TODO New
+    dependencies_ubuntu_2204 = [
+        "calendar", # indicatortest
+        "fortune-mod", # indicatortest
+        "fortunes", # indicatortest
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "python3-pip",
+        "python3-venv",
+        "wmctrl" ] # indicatortest
+
+#TODO New
+    dependencies_ubuntu_2404 = [
+        "calendar", # indicatortest
+        "fortune-mod", # indicatortest
+        "fortunes", # indicatortest
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "pulseaudio-utils", # indicatortest
+        "python3-pip",
+        "python3-venv",
+        "wmctrl" ] # indicatortest
+
+#TODO New
+    dependencies_debian_12 = [
+        "calendar", # indicatortest
+        "fortune-mod", # indicatortest
+        "fortunes", # indicatortest
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libnotify-bin", # indicatortest
+        "libgirepository1.0-dev",
+        "pulseaudio-utils", # indicatortest
+        "python3-pip",
+        "python3-venv",
+        "wmctrl" ] # indicatortest
+
 
     if operating_system == Operating_System.UBUNTU_2004 or \
        operating_system == Operating_System.UBUNTU_2204:
@@ -145,6 +202,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             dependencies.append( "calendar" )  #TODO If calendar here and a few lines below
             # are the only difference between Ubuntu 20.04 and 22.04, maybe just include
             # calendar for 20.04?  What about 24.04?
+            # Rethink this AFTER dependencies are sorted for Ubuntu/Debian.
 
     if indicator_name == Indicator_Name.INDICATORPUNYCODE:
         dependencies.append( "libnotify-bin" )
@@ -280,7 +338,7 @@ def _get_extension( operating_system ):
 
 def _get_installation_python_virtual_environment( indicator_name ):
     return (
-        f"Create a `Python` virtual environment, activate and install the indicator package:\n"
+        f"Install the indicator into a `Python` virtual environment:\n"
         f"    ```\n"
         f"    if [ ! -d $HOME/.local/venv_{ indicator_name } ]; then python3 -m venv $HOME/.local/venv_{ indicator_name }; fi && \\\n"
         f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
@@ -388,6 +446,9 @@ def _get_installation_for_operating_system(
         n += 1
         dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
 
+#TODO Why is this commented out...?
+# I think because the copy files is now part of the post_install.py script.
+# Double check to make sure...!
         # n += 1
         # dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
 
@@ -465,7 +526,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
 
         f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
         f"type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` "
-        f"into the search bar and the icon should be present for you to click.  "
+        f"into the search bar and the icon should be present for you to select.  "
         f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
         f"```\n"
