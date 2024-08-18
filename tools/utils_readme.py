@@ -17,17 +17,6 @@
 
 
 # Create a README.md for an indicator.
-#
-#   https://github.github.com/gfm
-#
-# When testing/editing, to render out in HTML:
-#   python3 -m pip install --upgrade readme_renderer[md]
-#   python3 tools/build_readme.py release indicatortest
-#   python3 -m readme_renderer release/README.md -o release/README.html
-#
-# References
-#   https://pycairo.readthedocs.io
-#   https://pygobject.readthedocs.io
 
 
 import datetime
