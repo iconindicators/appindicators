@@ -101,9 +101,6 @@ def _get_introduction( indicator_name ):
     introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
 
     introduction += f"Other indicators in this series are:\n"
-#TODO I think this will go...
-#    introduction += "- `" + '`\n- `'.join( _get_indicator_names_sans_current( indicator_name ) ) + "`\n\n"
-
     for indicator in _get_indicator_names_sans_current( indicator_name ):
         introduction += f"- [{ indicator }](https://pypi.org/project/{ indicator })\n"
 
@@ -348,35 +345,6 @@ def _get_installation_python_virtual_environment( indicator_name ):
         f"    ```\n" )
 
 
-def _get_installation_copy_files( indicator_name ):
-    venv_indicator_home = \
-        f"$(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }"
-
-    return (
-        f"Copy icon, run script and desktop file to `$HOME/.local`:\n"
-        f"    ```\n"
-
-        f"    mkdir -p $HOME/.local/bin && \\\n"
-
-        f"    cp -f "
-        f"{ venv_indicator_home }/platform/linux/{ indicator_name }.sh "
-        f"$HOME/.local/bin && \\\n"
-
-        f"    mkdir -p $HOME/.local/share/applications && \\\n"
-
-        f"    cp -f "
-        f"{ venv_indicator_home }/platform/linux/{ indicator_name }.py.desktop "
-        f"$HOME/.local/share/applications && \\\n"
-
-        f"    mkdir -p $HOME/.local/share/icons/hicolor/scalable/apps && \\\n"
-
-        f"    cp -f "
-        f"{ venv_indicator_home }/icons/*.svg "
-        f"$HOME/.local/share/icons/hicolor/scalable/apps\n"
-
-        f"    ```\n\n" )
-
-
 def _get_installation_additional_python_modules( indicator_name ):
     message = ''
 
@@ -445,12 +413,6 @@ def _get_installation_for_operating_system(
 
         n += 1
         dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
-
-#TODO Why is this commented out...?
-# I think because the copy files is now part of the post_install.py script.
-# Double check to make sure...!
-        # n += 1
-        # dependencies += f"{ str( n ) }. { _get_installation_copy_files( indicator_name ) }"
 
         n += 1
         if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
