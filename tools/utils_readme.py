@@ -109,69 +109,6 @@ def _get_introduction( indicator_name ):
 
 
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
-#TODO Eventually delete
-    dependencies_ubuntu_2004 = [
-        "fortune-mod", # indicatortest
-        "fortunes", # indicatortest
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libgirepository1.0-dev",
-        "python3-pip",
-        "python3-venv",
-        "wmctrl" ] # indicatortest
-
-#TODO Eventually delete
-    dependencies_ubuntu_2204 = [
-        "calendar", # indicatortest
-        "fortune-mod", # indicatortest
-        "fortunes", # indicatortest
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libgirepository1.0-dev",
-        "python3-pip",
-        "python3-venv",
-        "wmctrl" ] # indicatortest
-
-#TODO Eventually delete
-    dependencies_ubuntu_2404 = [
-        "calendar", # indicatortest
-        "fortune-mod", # indicatortest
-        "fortunes", # indicatortest
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libgirepository1.0-dev",
-        "pulseaudio-utils", # indicatortest
-        "python3-pip",
-        "python3-venv",
-        "wmctrl" ] # indicatortest
-
-#TODO Eventually delete
-    dependencies_debian_11 = [
-        "calendar", # indicatortest
-        "fortune-mod", # indicatortest
-        "fortunes", # indicatortest
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libnotify-bin", # indicatortest
-        "libgirepository1.0-dev",
-        "python3-pip",
-        "python3-venv",
-        "wmctrl" ] # indicatortest
-
-#TODO Eventually delete
-    dependencies_debian_12 = [
-        "calendar", # indicatortest
-        "fortune-mod", # indicatortest
-        "fortunes", # indicatortest
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libnotify-bin", # indicatortest
-        "libgirepository1.0-dev",
-        "pulseaudio-utils", # indicatortest
-        "python3-pip",
-        "python3-venv",
-        "wmctrl" ] # indicatortest
-
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
@@ -179,50 +116,16 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-pip",
         "python3-venv" ]
 
-
-#TODO indicatortest and indicatorscriptrunner are the only indicators
-# which call notify-send directly and therefore libnotify-bin is required by 
-# only those indicators.
-
-
-#TODO What about python3-notify2?
-# Is this installed by default?
-# Not listed in Ubuntu manifest.
-# Using reverse-depends does not shed light on what other package installed it.
-# What about Debian?
-#
-# When running
-#   apt-cache policy python3-notify2
-# the result is that for all Ubuntu/Debian
-# python3-notify2 is not installed.
-# So not sure what this was ever required...
-# ...so maybe safe to drop???
-
-
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
-
-    if indicator_name == Indicator_Name.INDICATORLUNAR:
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
         if operating_system != Operating_System.UBUNTU_2004:
             dependencies.append( "calendar" )
 
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
-
-    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
-
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
-        dependencies.append( "libnotify-bin" ) #TODO I think this IS needed to as it is optionally used when a script finishes.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
+        dependencies.append( "libnotify-bin" )
 
     if indicator_name == Indicator_Name.INDICATORTEST:
         if operating_system != Operating_System.UBUNTU_2004:
@@ -231,16 +134,9 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
         dependencies.append( "wmctrl" )
 
-    if indicator_name == Indicator_Name.INDICATORTIDE:
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
-
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
-        dependencies.append( "libnotify-bin" )  #TODO Don't think this is needed.
-        dependencies.append( "python3-notify2" )  #TODO I think this is installed by default.
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
