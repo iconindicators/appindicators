@@ -179,6 +179,26 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-pip",
         "python3-venv" ]
 
+
+#TODO indicatortest and indicatorscriptrunner are the only indicators
+# which call notify-send directly and therefore libnotify-bin is required by 
+# only those indicators.
+
+
+#TODO What about python3-notify2?
+# Is this installed by default?
+# Not listed in Ubuntu manifest.
+# Using reverse-depends does not shed light on what other package installed it.
+# What about Debian?
+#
+# When running
+#   apt-cache policy python3-notify2
+# the result is that for all Ubuntu/Debian
+# python3-notify2 is not installed.
+# So not sure what this was ever required...
+# ...so maybe safe to drop???
+
+
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
