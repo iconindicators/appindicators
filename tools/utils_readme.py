@@ -96,10 +96,19 @@ def _get_introduction( indicator_name ):
     return introduction
 
 
+#TODO Because indicatortest uses Pango,
+# which I think pulls in the cairo stuff,
+# wonder if I should try installing on a clean (or cleaned) VM
+# stardate or punycode which have minimal imports...?
+# Will have to do this for all distros.
+#
+# For indicatorstardate, removed libcairo2-dev from Ubuntu 20.04
+# and installed/ran indicatorstardate...all good.
+# 
+# So only need libcairo2-dev for script runner and test.
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
         "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
@@ -113,6 +122,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+        dependencies.append( "libcairo2-dev" )
         dependencies.append( "libnotify-bin" )
 
     if indicator_name == Indicator_Name.INDICATORTEST:
@@ -121,6 +131,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
 
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
+        dependencies.append( "libcairo2-dev" )
         dependencies.append( "libnotify-bin" )
         dependencies.append( "wmctrl" )
 
@@ -128,6 +139,13 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
+
+
+#TODO
+# For the old Fedora 38 or 39 or 40 VM,
+# grab the history and see how installs happen...that is,
+# do we install a package by name and no version number,
+# or the package name AND version number?
 
 
 #TODO Check these...
