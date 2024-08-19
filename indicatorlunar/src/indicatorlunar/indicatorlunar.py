@@ -622,7 +622,7 @@ class IndicatorLunar( IndicatorBase ):
             self.show_notification(
                 summary,
                 self.werewolf_warning_message,
-                icon = self.create_full_moon_icon() )
+                icon = str( self.create_full_moon_icon() ) )
 
             self.last_full_moon_notfication = utc_now
 
@@ -2603,7 +2603,10 @@ class IndicatorLunar( IndicatorBase ):
         message = self.get_textview_text( message_text_view )
 
         if is_moon_notification:
-            self.show_notification( summary, message, icon = self.create_full_moon_icon() )
+            self.show_notification(
+                summary,
+                message,
+                icon = str( self.create_full_moon_icon() ) )
 
         else:
             def replace_tags( text ):
