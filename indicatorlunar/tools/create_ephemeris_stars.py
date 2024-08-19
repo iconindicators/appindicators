@@ -141,9 +141,11 @@ if __name__ == "__main__":
         
             For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat
 
-            ------------------------------------------------------------------------
-            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST BE DOUBLE QUOTED ---
-            ------------------------------------------------------------------------''' )
+            -------------------------------------------------------
+            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST ---
+            ---     BE DOUBLE QUOTED                            ---
+            ---     HAVE SPACES ESCAPED WITH A \                ---
+            -------------------------------------------------------''' )
 
     parser = \
         argparse.ArgumentParser(

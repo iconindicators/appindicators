@@ -73,9 +73,11 @@ if __name__ == "__main__":
         textwrap.dedent( '''\
             Reduce the date range of a .bsp from today to a specified number of years from today.
 
-            ------------------------------------------------------------------------
-            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST BE DOUBLE QUOTED ---
-            ------------------------------------------------------------------------''' )
+            -------------------------------------------------------
+            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST ---
+            ---     BE DOUBLE QUOTED                            ---
+            ---     HAVE SPACES ESCAPED WITH A \                ---
+            -------------------------------------------------------''' )
 
     parser = \
         argparse.ArgumentParser(
