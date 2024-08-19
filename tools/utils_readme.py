@@ -76,12 +76,12 @@ def _get_introduction( indicator_name ):
             comments = comments[ 0 ].lower() + comments[ 1 : ] # Lower case leading char
             break
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     introduction = (
         f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
 
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`, `Manjaro`"
 
@@ -96,16 +96,6 @@ def _get_introduction( indicator_name ):
     return introduction
 
 
-#TODO Because indicatortest uses Pango,
-# which I think pulls in the cairo stuff,
-# wonder if I should try installing on a clean (or cleaned) VM
-# stardate or punycode which have minimal imports...?
-# Will have to do this for all distros.
-#
-# For indicatorstardate, removed libcairo2-dev from Ubuntu 20.04
-# and installed/ran indicatorstardate...all good.
-# 
-# So only need libcairo2-dev for script runner and test.
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
@@ -142,8 +132,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
 
 
 #TODO
-# For the old Fedora 38 or 39 or 40 VM,
-# grab the history and see how installs happen...that is,
+# Looking at the history for the old Fedora 38 or 39 or 40 VM,
 # do we install a package by name and no version number,
 # or the package name AND version number?
 
