@@ -306,7 +306,7 @@ except ValueError:
 from gi.repository import Notify
 
 from importlib import metadata
-from pathlib import Path
+from pathlib import Path, PosixPath
 from threading import Lock
 from urllib.request import urlopen
 from zipfile import ZipFile
@@ -747,6 +747,9 @@ class IndicatorBase( ABC ):
         _icon = icon
         if icon is None:
             _icon = self.get_icon_name()
+
+        if type( _icon ) is PosixPath:
+            _icon = str( _icon )
 
         Notify.Notification.new( summary, message, _icon ).show()
 

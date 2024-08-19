@@ -622,7 +622,7 @@ class IndicatorLunar( IndicatorBase ):
             self.show_notification(
                 summary,
                 self.werewolf_warning_message,
-                icon = str( self.create_full_moon_icon() ) )
+                icon = self.create_full_moon_icon() )
 
             self.last_full_moon_notfication = utc_now
 
@@ -2603,20 +2603,11 @@ class IndicatorLunar( IndicatorBase ):
         message = self.get_textview_text( message_text_view )
 
         if is_moon_notification:
-            self.show_notification(
-                summary,
-                message,
-                icon = str( self.create_full_moon_icon() ) )
+            icon = self.create_full_moon_icon()
 
         else:
-            def replace_tags( text ):
-                utc_now = datetime.datetime.now( datetime.timezone.utc ).replace( tzinfo = None )
-                now = self.to_local_date_time_string( utc_now, IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
-                now_plus_ten_minutes = \
-                    self.to_local_date_time_string(
-                        utc_now,
-                        IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
 
+            def replace_tags( text, rise_time, set_time ):
                 return \
                     text. \
                     replace(
@@ -2632,17 +2623,31 @@ class IndicatorLunar( IndicatorBase ):
                         IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION, "123°" ). \
                     replace(
                         IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_TIME_TRANSLATION,
-                        now ). \
+                        rise_time ). \
                     replace(
                         IndicatorLunar.astro_backend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION,
                         "321°" ). \
                     replace(
                         IndicatorLunar.astro_backend.SATELLITE_TAG_SET_TIME_TRANSLATION,
-                        now_plus_ten_minutes )
+                        set_time )
 
-            summary = replace_tags( summary ) + " " # The notification summary text must not be empty (at least on Unity).
-            message = replace_tags( message )
-            self.show_notification( summary, message, icon = self.icon_satellite )
+            utc_now = datetime.datetime.now( datetime.timezone.utc )
+
+            now_plus_one_minute = \
+                self.to_local_date_time_string(
+                    utc_now + datetime.timedelta( minutes = 1 ),
+                    IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+
+            now_plus_ten_minutes = \
+                self.to_local_date_time_string(
+                    utc_now + datetime.timedelta( minutes = 10 ),
+                    IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM )
+
+            summary = replace_tags( summary, now_plus_one_minute, now_plus_ten_minutes ) + " " # The notification summary text must not be empty (at least on Unity).
+            message = replace_tags( message, now_plus_one_minute, now_plus_ten_minutes )
+            icon = self.icon_satellite
+
+        self.show_notification( summary, message, icon = icon )
 
 
     def on_city_changed( self, combobox, latitude, longitude, elevation ):
