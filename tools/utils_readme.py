@@ -17,6 +17,10 @@
 
 
 # Create a README.md for an indicator.
+#
+# References:
+#   Dependences for all distros for PyGObject
+#   https://pygobject.gnome.org/getting_started.html
 
 
 import datetime
@@ -28,8 +32,8 @@ from pathlib import Path
 
 class Operating_System( Enum ):
     DEBIAN_11_12 = auto() 
-    FEDORA_38_39 = auto()
-    FEDORA_40 = auto() #TODO After testing on new VMs...can this be absorbed into the above?
+    FEDORA_38 = auto()
+    FEDORA_39_40 = auto()
     MANJARO_221 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
@@ -99,6 +103,7 @@ def _get_introduction( indicator_name ):
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
         "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
@@ -112,18 +117,18 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
-        dependencies.append( "libcairo2-dev" )
         dependencies.append( "libnotify-bin" )
+        dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == Indicator_Name.INDICATORTEST:
-        if operating_system != Operating_System.UBUNTU_2004:
-            dependencies.append( "calendar" )
-
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
-        dependencies.append( "libcairo2-dev" )
         dependencies.append( "libnotify-bin" )
+        dependencies.append( "pulseaudio-utils" )
         dependencies.append( "wmctrl" )
+
+        if operating_system != Operating_System.UBUNTU_2004:
+            dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
@@ -131,54 +136,34 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
-#TODO
-# Looking at the history for the old Fedora 38 or 39 or 40 VM,
-# do we install a package by name and no version number,
-# or the package name AND version number?
-
-
-#TODO Check these...
 def _get_operating_system_dependencies_fedora( operating_system, indicator_name ):
     dependencies = [
-        "cairo-devel",
         "cairo-gobject-devel",
-        "gnome-extensions-app",
-        "gnome-shell-extension-appindicator",
+        "gcc",
         "gobject-introspection-devel",
         "libappindicator-gtk3",
-        "pkgconf-pkg-config",
         "python3-devel",
-        "python3-gobject",
         "python3-pip" ]
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
-        dependencies.append( "python3-notify2" )
-
-    if indicator_name == Indicator_Name.INDICATORLUNAR:
-        dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
         dependencies.append( "calendar" )
-        dependencies.append( "python3-notify2" )
-
-    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
-        dependencies.append( "python3-notify2" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
-        dependencies.append( "python3-notify2" )
+        if operating_system == Operating_System.FEDORA_39_40:
+            dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "calendar" )
         dependencies.append( "fortune-mod" )
-        dependencies.append( "python3-notify2" )
         dependencies.append( "wmctrl" )
 
-    if indicator_name == Indicator_Name.INDICATORTIDE:
-        dependencies.append( "python3-notify2" )
+        if operating_system == Operating_System.FEDORA_39_40:
+            dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
-        dependencies.append( "python3-notify2" )
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -186,6 +171,7 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
 
 #TODO Check these...
 def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
+#TODO Check these...
     dependencies = [
         "cairo",
         "gobject-introspection",
@@ -193,6 +179,7 @@ def _get_operating_system_dependencies_manjaro( operating_system, indicator_name
         "libayatana-appindicator",
         "pkgconf" ]
 
+#TODO Check these...
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
 
@@ -206,8 +193,8 @@ def _get_operating_system_dependencies_manjaro( operating_system, indicator_name
     return ' '.join( sorted( dependencies ) )
 
 
-#TODO Check these...
 def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
+#TODO Check these...
     dependencies = [
         "cairo-devel",
         "gcc",
@@ -216,6 +203,7 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
         "python3-devel",
         "typelib-1_0-AyatanaAppIndicator3-0_1" ]
 
+#TODO Check these...
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune" )
 
@@ -227,9 +215,11 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
 
 def _get_extension( operating_system ):
     extension = ''
+#TODO Verify for Manjaro!
     if operating_system == Operating_System.DEBIAN_11_12 or \
-       operating_system == Operating_System.FEDORA_40 or \
-       operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
+       operating_system == Operating_System.FEDORA_38 or \
+       operating_system == Operating_System.FEDORA_39_40 or \
+       operating_system == Operating_System.OPENSUSE_TUMBLEWEED:  #TODO Verify!
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
@@ -298,27 +288,30 @@ def _get_installation_for_operating_system(
                 operating_system,
                 Indicator_Name[ indicator_name.upper() ] )
 
+        n = 1 # Dynamically number each section.
+
         # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
+        #   https://pygobject.gnome.org/getting_started.html
         dependencies = (
             f"<details>"
             f"<summary><b>{ summary }</b></summary>\n\n"
 
-            f"1. Install operating system packages:\n\n"
+            f"{ str( n ) }. Install operating system packages:\n\n"
             f"    ```\n"
             f"    { install_command } { operating_system_packages }\n"
             f"    ```\n\n" )
 
-        n = 1
+        n += 1
+
         extension = _get_extension( operating_system )
         if extension:
-            n += 1
             dependencies += f"{ str( n ) }. { extension }"
+            n += 1
 
-        n += 1
         dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
-
         n += 1
+
         if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
             dependencies += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
 
@@ -342,14 +335,14 @@ def _get_installation( indicator_name ):
             _get_operating_system_dependencies_debian ) +
 
         _get_installation_for_operating_system(
-            Operating_System.FEDORA_38_39,
+            Operating_System.FEDORA_38,
             indicator_name,
             "Fedora 38 / 39",
             "sudo dnf -y install",
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
-            Operating_System.FEDORA_40,
+            Operating_System.FEDORA_39_40,
             indicator_name,
             "Fedora 40",
             "sudo dnf -y install",
@@ -385,7 +378,7 @@ def _get_installation( indicator_name ):
 
 
 def _get_usage( indicator_name, indicator_name_human_readable ):
-    # The human readable name is VirtualBox™ and so need to remove '™' below.
+    # Remove the '™' from the human readable name VirtualBox™ below.
     return (
         f"Usage\n"
         f"-----\n\n"
@@ -544,14 +537,14 @@ def _get_uninstall( indicator_name ):
             _get_operating_system_dependencies_debian ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.FEDORA_38_39,
+            Operating_System.FEDORA_38,
             indicator_name,
             "Fedora 38 / 39",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.FEDORA_40,
+            Operating_System.FEDORA_39_40,
             indicator_name,
             "Fedora 40",
             "sudo dnf -y remove",
