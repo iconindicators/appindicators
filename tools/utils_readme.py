@@ -16,10 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Possible other distros to test...
+# Mageia
+
+
 # Create a README.md for an indicator.
 #
 # References:
-#   Dependences for all distros for PyGObject
 #   https://pygobject.gnome.org/getting_started.html
 
 
@@ -34,7 +37,7 @@ class Operating_System( Enum ):
     DEBIAN_11_12 = auto() 
     FEDORA_38 = auto()
     FEDORA_39_40 = auto()
-    MANJARO_221 = auto()
+    MANJARO_231 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204_2404 = auto()
@@ -170,6 +173,9 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
 
 
 #TODO Check these...
+# Manjaro is a rolling release, except the kernel versions are LTS for particular versions.
+# So only test for a version of Manjaro with an LTS kernel.
+# Most recent version is 23.1 Vulcan.
 def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
 #TODO Check these...
     dependencies = [
@@ -276,7 +282,7 @@ def _get_installation_for_operating_system(
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
     opensuse_or_manjaro = \
-        operating_system == Operating_System.MANJARO_221 or \
+        operating_system == Operating_System.MANJARO_231 or \
         operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
     if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
@@ -337,21 +343,21 @@ def _get_installation( indicator_name ):
         _get_installation_for_operating_system(
             Operating_System.FEDORA_38,
             indicator_name,
-            "Fedora 38 / 39",
+            "Fedora 38",
             "sudo dnf -y install",
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
             Operating_System.FEDORA_39_40,
             indicator_name,
-            "Fedora 40",
+            "Fedora 39 / 40",
             "sudo dnf -y install",
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
-            Operating_System.MANJARO_221,
+            Operating_System.MANJARO_231,
             indicator_name,
-            "Manjaro 22.1",
+            "Manjaro 23.1",
             "sudo pacman -S --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
 
@@ -383,7 +389,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"Usage\n"
         f"-----\n\n"
 
-        f"To run `{ indicator_name }`, press the `Super`/`Windows` key to open the `Show Applications` overlay (or similar), "
+        f"To run `{ indicator_name }`, press the `Super` key to open the `Show Applications` overlay (or similar), "
         f"type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` "
         f"into the search bar and the icon should be present for you to select.  "
         f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
@@ -407,7 +413,7 @@ def _get_distributions_supported( indicator_name ):
         f"- `Kubuntu 20.04+`\n"
         f"- `Linux Mint 21`\n"
         f"- `Lubuntu 20.04+`\n"
-        f"- `Manjaro 22.1`\n"
+        f"- `Manjaro 23.1`\n"
         f"- `openSUSE Tumbleweed`.\n"
         f"- `Ubuntu 20.04+`\n"
         f"- `Ubuntu Budgie 22.04+`\n"
@@ -494,7 +500,7 @@ def _get_uninstall_for_operating_system(
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
     opensuse_or_manjaro = \
-        operating_system == Operating_System.MANJARO_221 or \
+        operating_system == Operating_System.MANJARO_231 or \
         operating_system == Operating_System.OPENSUSE_TUMBLEWEED
 
     if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
@@ -539,21 +545,21 @@ def _get_uninstall( indicator_name ):
         _get_uninstall_for_operating_system(
             Operating_System.FEDORA_38,
             indicator_name,
-            "Fedora 38 / 39",
+            "Fedora 38",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
 
         _get_uninstall_for_operating_system(
             Operating_System.FEDORA_39_40,
             indicator_name,
-            "Fedora 40",
+            "Fedora 39 / 40",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.MANJARO_221,
+            Operating_System.MANJARO_231,
             indicator_name,
-            "Manjaro 22.1",
+            "Manjaro 23.1",
             "sudo pacman -R --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
 
