@@ -305,7 +305,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         grid.attach(
             self.create_box(
                 ( ( Gtk.Label.new( _( "On event click" ) ), False ), ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
         radio_copy_to_clipboard = \
@@ -369,7 +369,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 tooltip_text = _(
                     "On startup or when saving preferences,\n" +
                     "show a notification for each of today's events." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.notify )
 
         grid.attach( notify_checkbutton, 0, 5, 1, 1 )

@@ -227,7 +227,7 @@ class IndicatorPunycode( IndicatorBase ):
                     "to both the clipboard and primary.\n\n" +
                     "Otherwise the converted text is sent\n" +
                     "only to the input source." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.output_both )
 
         grid.attach( output_both_checkbutton, 0, 3, 1, 1 )
@@ -238,7 +238,7 @@ class IndicatorPunycode( IndicatorBase ):
                 tooltip_text = _(
                     "If checked, the output text will not\n" +
                     "contain any path/query (if present)." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.drop_path_query )
 
         grid.attach( drop_path_query_checkbutton, 0, 4, 1, 1 )
@@ -260,7 +260,7 @@ class IndicatorPunycode( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Maximum results" ) ), False ),
                     ( results_amount_spinner, False ) ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 5, 1, 1 )
 
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = \

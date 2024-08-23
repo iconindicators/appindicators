@@ -426,7 +426,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( self.on_script_copy, copy_of_scripts, scripts_treeview, background_scripts_treeview ),
                     ( self.on_script_remove, copy_of_scripts, scripts_treeview, background_scripts_treeview, indicator_text_entry ) ) )
 
-        box.set_margin_top( 10 )
+        box.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
         grid.attach( box, 0, 31, 1, 1 )
 
         send_command_to_log_checkbutton = \
@@ -765,7 +765,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     (
                         ( Gtk.Label.new( _( "Name" ) ), False ),
                         ( script_name_entry, True ) ),
-                    margin_top = 10 ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
                 0, 1, 1, 1 )
 
             dialog = \
@@ -951,13 +951,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Name" ) ), False ),
                     ( name_entry, True ) ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
         grid.attach(
             self.create_box(
                 ( ( Gtk.Label.new( _( "Command" ) ), False ), ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
         command_text_view = \

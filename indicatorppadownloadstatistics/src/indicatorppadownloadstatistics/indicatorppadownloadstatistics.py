@@ -634,7 +634,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "counts ARE summed.\n" +
                     "Packages such as compiled C fall into\n" +
                     "this category." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.combine_ppas )
 
         grid.attach( combine_ppas_checkbutton, 0, 1, 1, 1 )
@@ -675,7 +675,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_checkbutton(
                 _( "Sort by download" ),
                 tooltip_text = _( "Sort by download count within each PPA." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.sort_by_download )
 
         grid.attach( sort_by_download_checkbutton, 0, 3, 1, 1 )
@@ -714,7 +714,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_checkbutton(
                 _( "Low bandwidth" ),
                 tooltip_text = _( "Enable if your internet connection is slow." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.low_bandwidth )
 
         grid.attach( low_bandwidth_checkbutton, 0, 5, 1, 1 )

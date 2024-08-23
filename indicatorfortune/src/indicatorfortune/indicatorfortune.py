@@ -311,7 +311,7 @@ class IndicatorFortune( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Notification summary" ) ), False ),
                     ( notification_summary, True ) ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
         spinner_character_count = \
@@ -332,13 +332,13 @@ class IndicatorFortune( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Message character limit" ) ), False ),
                     ( spinner_character_count, False ) ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
         grid.attach(
             self.create_box(
                 ( ( Gtk.Label.new( _( "Middle mouse click of the icon" ) ), False ), ),
-                margin_top = 10 ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 3, 1, 1 )
 
         radio_middle_mouse_click_new_fortune = \

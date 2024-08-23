@@ -1730,7 +1730,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Hide bodies fainter than magnitude" ) ), False ),
                     ( spinner_magnitude, False ) ),
-                    margin_top = 5,
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                     margin_left = 5 ),
             0, 2, 1, 1 )
 
@@ -1738,7 +1738,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Add new minor planets" ),
                 tooltip_text = _( "All minor planets are automatically added." ),
-                margin_top = 5,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                 active = self.minor_planets_add_new )
 
         grid.attach( minor_planets_add_new_checkbutton, 0, 3, 1, 1 )
@@ -1747,7 +1747,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Add new comets" ),
                 tooltip_text = _( "All comets are automatically added." ),
-                margin_top = 5,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                 active = self.comets_add_new )
 
         grid.attach( comets_add_new_checkbutton, 0, 4, 1, 1 )
@@ -1756,7 +1756,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Add new satellites" ),
                 tooltip_text = _( "All satellites are automatically added." ),
-                margin_top = 5,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                 active = self.satellites_add_new )
 
         grid.attach( satellites_add_new_checkbox, 0, 5, 1, 1 )
@@ -1769,7 +1769,7 @@ class IndicatorLunar( IndicatorBase ):
                     "by rise date/time.\n\n" +
                     "Otherwise, satellites are sorted\n" +
                     "by Name then Number." ),
-                margin_top = 5,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                 active = self.satellites_sort_by_date_time )
 
         grid.attach( sort_satellites_by_date_time_checkbutton, 0, 6, 1, 1 )
@@ -1797,7 +1797,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( spinner_satellite_limit_start, False ),
                     ( Gtk.Label.new( _( "to" ) ), False ),
                     ( spinner_satellite_limit_end, False ) ),
-                margin_top = 5,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                 margin_left = 5 ),
             0, 7, 1, 1 )
 
@@ -2046,7 +2046,7 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Test" ), _( "Show the notification using the current summary/message." ),
                 True )
 
-        show_werewolf_warning_checkbox.set_margin_top( 10 )
+        show_werewolf_warning_checkbox.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Notifications" ) ) )
 
@@ -2070,7 +2070,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "City" ) ), False ),
                     ( city, False ) ),
-                    margin_top = 5 ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
             0, 0, 1, 1 )
         
         latitude = \
@@ -2083,7 +2083,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Latitude" ) ), False ),
                     ( latitude, False ) ),
-                    margin_top = 5 ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
             0, 1, 1, 1 )
 
         longitude = \
@@ -2096,7 +2096,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Longitude" ) ), False ),
                     ( longitude, False ) ),
-                    margin_top = 5 ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
             0, 2, 1, 1 )
 
         elevation = \
@@ -2109,7 +2109,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Elevation" ) ), False ),
                     ( elevation, False ) ),
-                    margin_top = 5 ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
             0, 3, 1, 1 )
 
         city.connect( "changed", self.on_city_changed, latitude, longitude, elevation )

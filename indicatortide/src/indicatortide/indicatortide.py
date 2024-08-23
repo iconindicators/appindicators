@@ -277,7 +277,7 @@ class IndicatorTide( IndicatorBase ):
             self.create_checkbutton(
                 _( "Show as submenus" ),
                 tooltip_text = _( "Show each day's tides in a submenu." ),
-                margin_top = 10,
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.show_as_submenus )
 
         grid.attach( show_as_submenus_checkbutton, 0, 3, 1, 1 )

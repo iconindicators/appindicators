@@ -360,6 +360,7 @@ class IndicatorBase( ABC ):
     EXTENSION_TEXT = ".txt"
 
     INDENT_WIDGET_LEFT = 25
+    INDENT_WIDGET_TOP = 10
 
     # Obtain name of indicator from the call stack and initialise gettext.
     # For a given indicator, indicatorbase MUST be imported FIRST!
@@ -1031,7 +1032,7 @@ class IndicatorBase( ABC ):
                 (
                     ( autostart_checkbox, False ),
                     ( autostart_spinner, False ) ),
-                margin_top = 10 )
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP )
 
         latest_version_checkbox = \
             self.create_checkbutton(
@@ -1042,7 +1043,7 @@ class IndicatorBase( ABC ):
         box_two = \
             self.create_box(
                 ( ( latest_version_checkbox, False ), ),
-                margin_top = 10 )
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP )
 
         box = \
             self.create_box(
