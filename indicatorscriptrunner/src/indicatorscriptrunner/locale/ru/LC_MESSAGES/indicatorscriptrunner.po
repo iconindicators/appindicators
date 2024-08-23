@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorscriptrunner 1.0.25\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 16:31+1000\n"
+"POT-Creation-Date: 2024-08-23 13:24+1000\n"
 "PO-Revision-Date: 2024-07-09 11:59+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -188,6 +188,9 @@ msgstr "Разделитель"
 
 msgid "Icon"
 msgstr "Значок"
+
+msgid "General"
+msgstr ""
 
 msgid ""
 "The group to which the script belongs.\n"

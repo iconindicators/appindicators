@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorlunar 1.0.101\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-08-08 19:00+1000\n"
+"POT-Creation-Date: 2024-08-23 13:24+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1206,6 +1206,9 @@ msgid "Elevation"
 msgstr ""
 
 msgid "Location"
+msgstr ""
+
+msgid "General"
 msgstr ""
 
 msgid "City cannot be empty."

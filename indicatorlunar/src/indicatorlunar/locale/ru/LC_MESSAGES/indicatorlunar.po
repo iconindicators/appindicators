@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorlunar 1.0.101\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-08-08 19:00+1000\n"
+"POT-Creation-Date: 2024-08-23 13:24+1000\n"
 "PO-Revision-Date: 2024-07-09 14:35+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -1288,6 +1288,9 @@ msgstr "Высота"
 
 msgid "Location"
 msgstr "Расположение"
+
+msgid "General"
+msgstr ""
 
 msgid "City cannot be empty."
 msgstr "Название города не может быть пустым."
