@@ -476,12 +476,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         grid.attach( hide_groups_checkbutton, 0, 2, 1, 1 )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
-
-        box.set_margin_top( 30 ) # Put some distance from the prior section.
-        grid.attach( box, 0, 3, 1, 1 )
-
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Icon text settings.
@@ -512,6 +506,16 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid.attach( background_scripts_scrolledwindow, 0, 2, 1, 20 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
+
+        # General settings.
+        grid = self.create_grid()
+
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
+            self.create_preferences_common_widgets()
+
+        grid.attach( box, 0, 0, 1, 1 )
+
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         # Workaround for odd focus behaviour; in the Preferences dialog, when
         # switching tabs, the TextEntry on the third tab would have the focus and

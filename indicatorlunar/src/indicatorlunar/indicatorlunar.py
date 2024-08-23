@@ -1804,7 +1804,6 @@ class IndicatorLunar( IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Planets / minor planets / comets / stars.
-
         NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW = 0
         NATURAL_BODY_MODEL_COLUMN_NAME = 1
         NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME = 2
@@ -1915,7 +1914,6 @@ class IndicatorLunar( IndicatorBase ):
             Gtk.Label.new( _( "Natural Bodies" ) ) )
 
         # Satellites.
-
         SATELLITE_MODEL_COLUMN_HIDE_SHOW = 0
         SATELLITE_MODEL_COLUMN_NAME = 1
         SATELLITE_MODEL_COLUMN_NUMBER = 2
@@ -2124,13 +2122,17 @@ class IndicatorLunar( IndicatorBase ):
         longitude.set_text( str( self.longitude ) )
         elevation.set_text( str( self.elevation ) )
 
+        notebook.append_page( grid, Gtk.Label.new( _( "Location" ) ) )
+
+        # General.
+        grid = self.create_grid()
+
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
             self.create_preferences_common_widgets()
 
-        box.set_margin_top( 30 ) # Put some distance from the prior section.
-        grid.attach( box, 0, 4, 1, 1 )
+        grid.attach( box, 0, 0, 1, 1 )
 
-        notebook.append_page( grid, Gtk.Label.new( _( "Location" ) ) )
+        notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
         dialog.get_content_area().pack_start( notebook, True, True, 0 )
         dialog.show_all()
