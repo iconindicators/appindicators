@@ -445,21 +445,27 @@ class IndicatorScriptRunner( IndicatorBase ):
         # Menu settings.
         grid = self.create_grid()
 
+        grid.attach(
+            self.create_box( ( ( Gtk.Label.new( _( "Show non-background scripts" ) ), False ), ) ),
+            0, 0, 1, 1 )
+
         radio_show_scripts_submenu = \
             self.create_radiobutton(
                 None,
-                _( "Show non-background scripts in sub-menus" ),
+                _( "In sub-menus" ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.show_scripts_in_submenus )
 
-        grid.attach( radio_show_scripts_submenu, 0, 0, 1, 1 )
+        grid.attach( radio_show_scripts_submenu, 0, 1, 1, 1 )
 
         radio_show_scripts_indented = \
             self.create_radiobutton(
                 radio_show_scripts_submenu,
-                _( "Show non-background scripts indented by group" ),
+                _( "Indented by group" ),
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = not self.show_scripts_in_submenus )
 
-        grid.attach( radio_show_scripts_indented, 0, 1, 1, 1 )
+        grid.attach( radio_show_scripts_indented, 0, 2, 1, 1 )
 
         hide_groups_checkbutton = \
             self.create_checkbutton(
@@ -469,12 +475,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Otherwise, script names are indented\n" +
                     "within their respective group." ),
                 sensitive = not self.show_scripts_in_submenus,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2,
                 active = self.hide_groups )
 
         radio_show_scripts_indented.connect( "toggled", self.on_radio_or_checkbox, True, hide_groups_checkbutton )
 
-        grid.attach( hide_groups_checkbutton, 0, 2, 1, 1 )
+        grid.attach( hide_groups_checkbutton, 0, 3, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
