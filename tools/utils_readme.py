@@ -38,8 +38,6 @@ class Operating_System( Enum ):
     DEBIAN_11_12 = auto() 
     FEDORA_38 = auto()
     FEDORA_39_40 = auto()
-    MANJARO_231 = auto() #TODO Remove this and all references completely with a good comment in the commit...?
-    # Perhaps also put in a comment at the top of this Enum about having Manjaro 23.1 but had issues?
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204_2404 = auto()
@@ -93,7 +91,6 @@ def _get_introduction( indicator_name ):
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`"
-#        introduction += f", `openSUSE`, `Manjaro`" #TODO Reinstate if/when can deploy to Manjaro.
 
     introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
 
@@ -168,40 +165,6 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
 
         if operating_system == Operating_System.FEDORA_39_40:
             dependencies.append( "pulseaudio-utils" )
-
-    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
-        dependencies.append( "wmctrl" )
-
-    return ' '.join( sorted( dependencies ) )
-
-
-#TODO
-# Manjaro is a rolling release, except the kernel versions are LTS for particular versions.
-# So only test for a version of Manjaro with an LTS kernel.
-# So have installed most recent LTS version 23.1 Vulcan.
-#
-# Unfortunately, when doing an system update, there are package conflicts
-# which I do not know how to resolve.
-# Although I tried to install indicatorstardate, packages were missing
-# (suspect gtk3) which could not be installed and therefore blocked the
-# indicator installation.
-# For now, put Manjaro on hold.
-def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
-#TODO Check these...
-    dependencies = [
-        "cairo",
-        "gobject-introspection",
-        "gtk3",  #TODO Needed?
-        "libayatana-appindicator",
-        "pkgconf" ]
-
-#TODO Check these...
-    if indicator_name == Indicator_Name.INDICATORFORTUNE:
-        dependencies.append( "fortune-mod" )
-
-    if indicator_name == Indicator_Name.INDICATORTEST:
-        dependencies.append( "fortune-mod" )
-        dependencies.append( "wmctrl" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
@@ -360,14 +323,6 @@ def _get_installation( indicator_name ):
             "sudo dnf -y install",
             _get_operating_system_dependencies_fedora ) +
 
-#TODO Manjaro currently unsupported.
-#        _get_installation_for_operating_system(
-#            Operating_System.MANJARO_231,
-#            indicator_name,
-#            "Manjaro 23.1",
-#            "sudo pacman -S --noconfirm",
-#            _get_operating_system_dependencies_manjaro ) +
-
         _get_installation_for_operating_system(
             Operating_System.OPENSUSE_TUMBLEWEED,
             indicator_name,
@@ -420,7 +375,6 @@ def _get_distributions_supported( indicator_name ):
         f"- `Kubuntu 20.04+`\n"
         f"- `Linux Mint 21`\n"
         f"- `Lubuntu 20.04+`\n"
-#        f"- `Manjaro 23.1`\n" #TODO Currently unsupported.
         f"- `openSUSE Tumbleweed`.\n"
         f"- `Ubuntu 20.04+`\n"
         f"- `Ubuntu Budgie 22.04+`\n"
@@ -562,14 +516,6 @@ def _get_uninstall( indicator_name ):
             "Fedora 39 / 40",
             "sudo dnf -y remove",
             _get_operating_system_dependencies_fedora ) +
-
-#TODO Currently unsupported.
-#        _get_uninstall_for_operating_system(
-#            Operating_System.MANJARO_231,
-#            indicator_name,
-#            "Manjaro 23.1",
-#            "sudo pacman -R --noconfirm",
-#            _get_operating_system_dependencies_manjaro ) +
 
         _get_uninstall_for_operating_system(
             Operating_System.OPENSUSE_TUMBLEWEED,
