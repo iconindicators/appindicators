@@ -321,12 +321,12 @@ class IndicatorBase( ABC ):
     _CONFIG_CHECK_LATEST_VERSION = "checklatestversion"
     _CONFIG_VERSION = "version"
 
-    # Values are the result of calling
+    # Recognised desktops; values are the result of calling
     #   echo $XDG_CURRENT_DESKTOP
     #
-    # An alternative (with different results) is calling
+    # Different results come from calling
     #   os.environ.get( "DESKTOP_SESSION" )
-    # which gives 'plasma' rather than 'KDE' on 'Plasma (X11)' on Kubuntu.
+    # giving 'plasma' rather than 'KDE' on 'Plasma (X11)' on Kubuntu.
     _CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
     _CURRENT_DESKTOP_ICEWM = "ICEWM"
     _CURRENT_DESKTOP_KDE = "KDE"
