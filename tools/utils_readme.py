@@ -20,6 +20,9 @@
 # Mageia
 
 
+#TODO How/where to mention Kubuntu, Xubuntu, Linux Mint and all the Ubuntu derivatives?
+
+
 # Create a README.md for an indicator.
 #
 # References:
@@ -83,6 +86,7 @@ def _get_introduction( indicator_name ):
             comments = comments[ 0 ].lower() + comments[ 1 : ] # Lower case leading char
             break
 
+#TODO Add Mageia if it passes muster.
     introduction = (
         f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
@@ -175,13 +179,20 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
 #TODO Check these...
 # Manjaro is a rolling release, except the kernel versions are LTS for particular versions.
 # So only test for a version of Manjaro with an LTS kernel.
-# Most recent version is 23.1 Vulcan.
+# So have installed most recent LTS version 23.1 Vulcan.
+#
+# Unfortunately, when doing an system update, there are package conflicts
+# which I do not know how to resolve.
+# Although I tried to install indicatorstardate, packages were missing
+# (suspect gtk3) which could not be installed and therefore blocked the
+# indicator installation.
+# For now, put Manjaro on hold.
 def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
 #TODO Check these...
     dependencies = [
         "cairo",
         "gobject-introspection",
-        "gtk3",
+        "gtk3",  #TODO Needed?
         "libayatana-appindicator",
         "pkgconf" ]
 
