@@ -87,8 +87,8 @@ def _get_introduction( indicator_name ):
         f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE.
     if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`"
 
@@ -250,11 +250,8 @@ def _get_installation_for_operating_system(
 
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    opensuse_or_manjaro = \
-        operating_system == Operating_System.MANJARO_231 or \
-        operating_system == Operating_System.OPENSUSE_TUMBLEWEED
-
-    if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+    opensuse = operating_system == Operating_System.OPENSUSE_TUMBLEWEED
+    if opensuse and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         dependencies = ''
 
     else:
@@ -460,11 +457,8 @@ def _get_uninstall_for_operating_system(
 
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    opensuse_or_manjaro = \
-        operating_system == Operating_System.MANJARO_231 or \
-        operating_system == Operating_System.OPENSUSE_TUMBLEWEED
-
-    if opensuse_or_manjaro and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+    opensuse = operating_system == Operating_System.OPENSUSE_TUMBLEWEED
+    if opensuse and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         uninstall = ''
 
     else:
