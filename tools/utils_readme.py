@@ -111,6 +111,9 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-pip",
         "python3-venv" ]
 
+    if operating_system == Operating_System.DEBIAN_11_12:
+        dependencies.append( "gnome-shell-extension-appindicator" )
+
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
@@ -191,8 +194,16 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
 
 def _get_extension( operating_system ):
     extension = ''
-    if operating_system == Operating_System.DEBIAN_11_12 or \
-       operating_system == Operating_System.FEDORA_38 or \
+
+#TODO Is it possible once the extension is installed via apt-get to call something
+# which will refresh the list of extensions and so no need to log out/in?
+    if operating_system == Operating_System.DEBIAN_11_12:
+        extension = (
+            f"For the `appindicator` extension to take effect, log out then log in "
+            f"(or restart) and in a terminal run:"
+            f"    `gnome-extensions enable ubuntu-appindicators@ubuntu.com`\n\n" )
+
+    if operating_system == Operating_System.FEDORA_38 or \
        operating_system == Operating_System.FEDORA_39_40 or \
        operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
         extension = (
@@ -231,7 +242,7 @@ def _get_installation_additional_python_modules( indicator_name ):
             f"{ common }"
             f"    ```\n" )
 
-    elif indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+    if indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
         message = (
             f"You will need to write a `Python` script to retrieve your tidal data.\n"
             f"As such, you may need to install additional `Python` modules to the virtual environment.\n"
