@@ -109,15 +109,10 @@ class IndicatorOnThisDay( IndicatorBase ):
         # always short date format irrespective of locale.
         today_in_short_date_format = today.strftime( '%b %d' )
 
-        count = 0
         for event in events:
             if today_in_short_date_format == event.get_date():
-                count += 1
-                print( count )
                 self.show_notification( _( "On this day..." ), event.get_description() )
                 time.sleep( 3 ) # Without a delay some/most of the notifications disappear too quickly.
-                
-        print( count )
 
 
     def build_menu( self, menu, events ):
