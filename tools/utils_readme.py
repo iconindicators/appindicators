@@ -19,6 +19,9 @@
 #TODO How/where to mention Kubuntu, Xubuntu, Linux Mint and all the Ubuntu derivatives?
 
 
+#TODO Try again with Manjaro?
+
+
 # Create a README.md for an indicator.
 #
 # References:
@@ -34,6 +37,19 @@ from enum import auto, Enum
 from pathlib import Path
 
 
+#TODO Linux Mint Cinnamon 22 is same install as Ubuntu 24.04
+#TODO Lubuntu 22.04 is same install as Ubuntu 22.04
+#TODO Ubuntu Budgie 24.04 is same install as Ubuntu 24.04
+#TODO Ubuntu MATE 24.04 is same install as Ubuntu 24.04
+#TODO Ubuntu Unity 22.04 is same install as Ubuntu 22.04
+#TODO Xubuntu 24.04 is same install as Ubuntu 24.04
+#
+#TODO Given the above all share identical OS package and extension (no extension) text,
+# do we really want a long list, or can we combine these into one?
+#
+# Thinking to split all OS into singles.
+# Can then pass a tuple of OS which have a common install or extension
+# along with a new function to allow for checking of an OS present in the tuple.
 class Operating_System( Enum ):
     DEBIAN_11_12 = auto() 
     FEDORA_38 = auto()
@@ -79,8 +95,8 @@ def _get_introduction( indicator_name ):
     for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py" ).readlines():
         matches = pattern_tag.search( line )
         if matches:
-            comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ] # Remove \n and drop ending .
-            comments = comments[ 0 ].lower() + comments[ 1 : ] # Lower case leading char
+            comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ] # Remove \n and drop ending.
+            comments = comments[ 0 ].lower() + comments[ 1 : ] # Lower case leading character.
             break
 
     introduction = (
@@ -203,6 +219,11 @@ def _get_extension( operating_system ):
             f"(or restart) and in a terminal run:"
             f"    `gnome-extensions enable ubuntu-appindicators@ubuntu.com`\n\n" )
 
+#TODO Need to add Kubuntu 22.04.  How to specify?  Also need to log out/in.
+# Don't need it for Kubuntu 24.04...so do I need to list Kubuntu 24.04 with Ubuntu 24.04?
+# Maybe should split Ubuntu 22.04 from 24.04 and then can combine Ubuntu/Lubuntu/etc for 22.04 and 24.04.
+# But Kubuntu needs the extension added as below...Ubuntu does not, so cannot combine.
+# Consider also need to mention supported platforms...so maybe under that?
     if operating_system == Operating_System.FEDORA_38 or \
        operating_system == Operating_System.FEDORA_39_40 or \
        operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
@@ -305,6 +326,7 @@ def _get_installation_for_operating_system(
 
 def _get_installation( indicator_name ):
     install_command_debian = "sudo apt-get -y install"
+    install_command_fedora = "sudo dnf -y install"
 
     return (
         "Installation / Upgrading\n" +
@@ -321,14 +343,14 @@ def _get_installation( indicator_name ):
             Operating_System.FEDORA_38,
             indicator_name,
             "Fedora 38",
-            "sudo dnf -y install",
+            install_command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
             Operating_System.FEDORA_39_40,
             indicator_name,
             "Fedora 39 / 40",
-            "sudo dnf -y install",
+            install_command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
@@ -574,3 +596,32 @@ def create_readme(
         f.write( _get_distributions_supported( indicator_name ) )
         f.write( _get_uninstall( indicator_name ) )
         f.write( _get_license( authors_emails, start_year ) )
+
+
+if __name__ == "__main__":
+    # os_superset = ( Operating_System.FEDORA_38, Operating_System.UBUNTU_2004 )
+    #
+    # os_subset = ( Operating_System.FEDORA_38, Operating_System.UBUNTU_2004 )
+    # print( os_subset )
+    # print( any( os in os_superset for os in os_subset ) )
+    #
+    # os_subset = ( Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2004 )
+    # print( os_subset )
+    # print( any( os in os_superset for os in os_subset ) )
+    #
+    # os_subset = ( Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2204_2404 )
+    # print( os_subset )
+    # print( any( os in os_superset for os in os_subset ) )
+
+
+
+    os_superset = { Operating_System.FEDORA_38, Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2004 }
+
+    os_subset = { Operating_System.FEDORA_38, Operating_System.UBUNTU_2004 }
+    print( os_subset.issubset( os_superset ) )
+
+    os_subset = { Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2004 }
+    print( os_subset.issubset( os_superset ) )
+
+    os_subset = { Operating_System.UBUNTU_2204_2404 }
+    print( os_subset.issubset( os_superset ) )
