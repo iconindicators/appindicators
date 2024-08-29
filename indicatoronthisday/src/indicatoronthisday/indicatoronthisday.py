@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Always seems to only show three OSD notifications no matter how many should be shown...check.
-
-
 # Application indicator which displays calendar events.
 
 
