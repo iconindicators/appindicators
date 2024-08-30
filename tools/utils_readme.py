@@ -412,6 +412,7 @@ def _get_installation_for_operating_system(
     return dependencies
 
 
+#TODO Remove after some testing!
 def _get_installation( indicator_name ):
     install_command_debian = "sudo apt-get -y install"
     install_command_fedora = "sudo dnf -y install"
@@ -490,6 +491,9 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
 
 
 #TODO Check these...
+#
+#TODO Maybe remove the list of supported distirbutions as these are listed in the install?
+# If so, rename this function to _get_limitations or _get_known_knowns or ...?
 def _get_distributions_supported( indicator_name ):
     message_distributions_supported = (
         f"Distributions Supported\n"
@@ -612,10 +616,7 @@ def _get_uninstall_for_operating_system(
     return uninstall
 
 
-#TODO Can this function and _get_installation above be combined into one function
-# which takes a boolean (true for install, false for uninstall)
-# and switches on the boolean to either call _get_installation_for_operating_system
-# or _get_uninstall_for_operating_system and so on?
+#TODO Remove after some testing!
 def _get_uninstall( indicator_name ):
     uninstall_command_debian = "sudo apt-get -y remove"
     uninstall_command_fedora = "sudo dnf -y remove"
@@ -675,6 +676,77 @@ def _get_uninstall( indicator_name ):
             _get_operating_system_dependencies_debian ) )
 
 
+def _get_install_uninstall( indicator_name, install = True ):
+    if install:
+        function = _get_installation_for_operating_system
+        command_debian = "sudo apt-get -y install"
+        command_fedora = "sudo dnf -y install"
+        title = \
+            "Installation / Upgrading\n" + \
+            "------------------------\n\n"
+
+    else:
+        function = _get_uninstall_for_operating_system
+        command_debian = "sudo apt-get -y remove"
+        command_fedora = "sudo dnf -y remove"
+        title = \
+            "Uninstall\n" + \
+            "---------\n\n"
+
+    return (
+        title +
+
+        function(
+            {
+                Operating_System.DEBIAN_11,
+                Operating_System.DEBIAN_12 },
+            indicator_name,
+            command_debian,
+            _get_operating_system_dependencies_debian ) +
+
+        function(
+            { Operating_System.FEDORA_38 },
+            indicator_name,
+            command_fedora,
+            _get_operating_system_dependencies_fedora ) +
+
+        function(
+            {
+                Operating_System.FEDORA_39,
+                Operating_System.FEDORA_40 },
+            indicator_name,
+            command_fedora,
+            _get_operating_system_dependencies_fedora ) +
+
+        function(
+            { Operating_System.OPENSUSE_TUMBLEWEED },
+            indicator_name,
+            "sudo zypper install -y" if install else "sudo zypper remove -y",
+            _get_operating_system_dependencies_opensuse ) +
+
+        function(
+            { Operating_System.UBUNTU_2004 },
+            indicator_name,
+            command_debian,
+            _get_operating_system_dependencies_debian ) +
+
+        function(
+            {
+                Operating_System.KUBUNTU_2204,
+                Operating_System.KUBUNTU_2404,
+                Operating_System.LINUX_MINT_CINNAMON_22,
+                Operating_System.LUBUNTU_2204,
+                Operating_System.UBUNTU_2204,
+                Operating_System.UBUNTU_2404,
+                Operating_System.UBUNTU_BUDGIE_2404,
+                Operating_System.UBUNTU_MATE_2404,
+                Operating_System.UBUNTU_UNITY_2204,
+                Operating_System.XUBUNTU_2404 },
+            indicator_name,
+            command_debian,
+            _get_operating_system_dependencies_debian ) )
+
+
 def _get_license( authors_emails, start_year ):
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
@@ -700,8 +772,8 @@ def create_readme(
 
     with open( Path( directory, "README.md" ), 'w' ) as f:
         f.write( _get_introduction( indicator_name ) )
-        f.write( _get_installation( indicator_name ) )
+        f.write( _get_install_uninstall( indicator_name ) )
         f.write( _get_usage( indicator_name, indicator_name_human_readable ) )
         f.write( _get_distributions_supported( indicator_name ) )
-        f.write( _get_uninstall( indicator_name ) )
+        f.write( _get_install_uninstall( indicator_name, install = False ) )
         f.write( _get_license( authors_emails, start_year ) )
