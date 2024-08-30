@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO How/where to mention Kubuntu, Xubuntu, Linux Mint and all the Ubuntu derivatives?
-
-
 #TODO Try again with Manjaro?
 
 
@@ -51,12 +48,26 @@ from pathlib import Path
 # Can then pass a tuple of OS which have a common install or extension
 # along with a new function to allow for checking of an OS present in the tuple.
 class Operating_System( Enum ):
-    DEBIAN_11_12 = auto() 
+    # DEBIAN_11_12 = auto() #TODO Remove
+    DEBIAN_11 = auto() 
+    DEBIAN_12 = auto() 
     FEDORA_38 = auto()
-    FEDORA_39_40 = auto()
+    # FEDORA_39_40 = auto()#TODO Remove
+    FEDORA_39 = auto()
+    FEDORA_40 = auto()
+    KUBUNTU_2204 = auto()
+    KUBUNTU_2404 = auto()
+    LINUX_MINT_CINNAMON_22 = auto()
+    LUBUNTU_2204 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
-    UBUNTU_2204_2404 = auto()
+    # UBUNTU_2204_2404 = auto()#TODO Remove
+    UBUNTU_2204 = auto()
+    UBUNTU_2404 = auto()
+    UBUNTU_BUDGIE_2404 = auto()
+    UBUNTU_MATE_2404 = auto()
+    UBUNTU_UNITY_2204 = auto()
+    XUBUNTU_2404 = auto()
 
 
 class Indicator_Name( Enum ):
@@ -105,6 +116,7 @@ def _get_introduction( indicator_name ):
 
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
+    # Want to still have indicatortest for openSUSE!
     if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`"
 
@@ -127,15 +139,40 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-pip",
         "python3-venv" ]
 
-    if operating_system == Operating_System.DEBIAN_11_12:
+#TODO Should be obsolete.
+    # if operating_system == Operating_System.DEBIAN_11_12:
+    #     dependencies.append( "gnome-shell-extension-appindicator" )
+    applicable_operating_systems = {
+        Operating_System.DEBIAN_11,
+        Operating_System.DEBIAN_12 }
+
+    if operating_system.issubset( applicable_operating_systems ):
         dependencies.append( "gnome-shell-extension-appindicator" )
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
 
+#TODO Remove
+    # if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+    #     if operating_system != Operating_System.UBUNTU_2004:
+    #         dependencies.append( "calendar" )
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
-        if operating_system != Operating_System.UBUNTU_2004:
+        applicable_operating_systems = {
+            Operating_System.DEBIAN_11,
+            Operating_System.DEBIAN_12,
+            Operating_System.KUBUNTU_2204,
+            Operating_System.KUBUNTU_2404,
+            Operating_System.LINUX_MINT_CINNAMON_22,
+            Operating_System.LUBUNTU_2204,
+            Operating_System.UBUNTU_2204,
+            Operating_System.UBUNTU_2404,
+            Operating_System.UBUNTU_BUDGIE_2404,
+            Operating_System.UBUNTU_MATE_2404,
+            Operating_System.UBUNTU_UNITY_2204,
+            Operating_System.XUBUNTU_2404 }
+
+        if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
@@ -149,7 +186,24 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "pulseaudio-utils" )
         dependencies.append( "wmctrl" )
 
-        if operating_system != Operating_System.UBUNTU_2004:
+        #TODO Remove
+        # if operating_system != Operating_System.UBUNTU_2004:
+        #     dependencies.append( "calendar" )
+        applicable_operating_systems = {
+            Operating_System.DEBIAN_11,
+            Operating_System.DEBIAN_12,
+            Operating_System.KUBUNTU_2204,
+            Operating_System.KUBUNTU_2404,
+            Operating_System.LINUX_MINT_CINNAMON_22,
+            Operating_System.LUBUNTU_2204,
+            Operating_System.UBUNTU_2204,
+            Operating_System.UBUNTU_2404,
+            Operating_System.UBUNTU_BUDGIE_2404,
+            Operating_System.UBUNTU_MATE_2404,
+            Operating_System.UBUNTU_UNITY_2204,
+            Operating_System.XUBUNTU_2404 }
+
+        if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
@@ -174,7 +228,15 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
         dependencies.append( "calendar" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
-        if operating_system == Operating_System.FEDORA_39_40:
+        #TODO Remove
+        # if operating_system == Operating_System.FEDORA_39_40:
+        #     dependencies.append( "pulseaudio-utils" )
+
+        applicable_operating_systems = {
+            Operating_System.FEDORA_39, 
+            Operating_System.FEDORA_40 }
+
+        if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == Indicator_Name.INDICATORTEST:
@@ -182,7 +244,14 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
         dependencies.append( "fortune-mod" )
         dependencies.append( "wmctrl" )
 
-        if operating_system == Operating_System.FEDORA_39_40:
+        #TODO Remove
+        # if operating_system == Operating_System.FEDORA_39_40:
+        #     dependencies.append( "pulseaudio-utils" )
+        applicable_operating_systems = {
+            Operating_System.FEDORA_39, 
+            Operating_System.FEDORA_40 }
+
+        if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
@@ -211,22 +280,30 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
 def _get_extension( operating_system ):
     extension = ''
 
-#TODO Is it possible once the extension is installed via apt-get to call something
-# which will refresh the list of extensions and so no need to log out/in?
-    if operating_system == Operating_System.DEBIAN_11_12:
+    applicable_operating_systems = {
+        Operating_System.DEBIAN_11,
+        Operating_System.DEBIAN_12 }
+
+    if operating_system.issubset( applicable_operating_systems ):
         extension = (
             f"For the `appindicator` extension to take effect, log out then log in "
             f"(or restart) and in a terminal run:"
             f"    `gnome-extensions enable ubuntu-appindicators@ubuntu.com`\n\n" )
+#TODO See above command...
+# Is it possible once the extension is installed via apt-get to call something
+# which will refresh the list of extensions and so no need to log out/in?
+#
+# OR, maybe check again that with Debian 11 and Debian 12
+# it is possible to instead use the browser extension.
 
-#TODO Need to add Kubuntu 22.04.  How to specify?  Also need to log out/in.
-# Don't need it for Kubuntu 24.04...so do I need to list Kubuntu 24.04 with Ubuntu 24.04?
-# Maybe should split Ubuntu 22.04 from 24.04 and then can combine Ubuntu/Lubuntu/etc for 22.04 and 24.04.
-# But Kubuntu needs the extension added as below...Ubuntu does not, so cannot combine.
-# Consider also need to mention supported platforms...so maybe under that?
-    if operating_system == Operating_System.FEDORA_38 or \
-       operating_system == Operating_System.FEDORA_39_40 or \
-       operating_system == Operating_System.OPENSUSE_TUMBLEWEED:
+    applicable_operating_systems = {
+        Operating_System.FEDORA_38,
+        Operating_System.FEDORA_39,
+        Operating_System.KUBUNTU_2204,
+        Operating_System.FEDORA_40,
+        Operating_System.OPENSUSE_TUMBLEWEED }
+
+    if operating_system.issubset( applicable_operating_systems ):
         extension = (
             f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
@@ -282,9 +359,14 @@ def _get_installation_for_operating_system(
 
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    opensuse = operating_system == Operating_System.OPENSUSE_TUMBLEWEED
-    if opensuse and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+    os_has_no_calendar = operating_system.issubset( { Operating_System.OPENSUSE_TUMBLEWEED } )
+    indicator_uses_calendar = is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY )
+    if indicator_uses_calendar and os_has_no_calendar:
         dependencies = ''
+    #TODO Ensure above works as below...
+    # opensuse = operating_system == Operating_System.OPENSUSE_TUMBLEWEED
+    # if opensuse and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+        # dependencies = ''
 
     else:
         operating_system_packages = \
@@ -333,42 +415,56 @@ def _get_installation( indicator_name ):
         "------------------------\n\n" +
 
         _get_installation_for_operating_system(
-            Operating_System.DEBIAN_11_12,
+            {
+                Operating_System.DEBIAN_11,
+                Operating_System.DEBIAN_12 },
             indicator_name,
-            "Debian 11 / 12",
+            "Debian 11 / 12", #TODO Try to build this text from the OS enum using Operating_System.UBUNTU_2004.name as a basis.
             install_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_installation_for_operating_system(
-            Operating_System.FEDORA_38,
+            { Operating_System.FEDORA_38 },
             indicator_name,
             "Fedora 38",
             install_command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
-            Operating_System.FEDORA_39_40,
+            {
+                Operating_System.FEDORA_39,
+                Operating_System.FEDORA_40 },
             indicator_name,
             "Fedora 39 / 40",
             install_command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         _get_installation_for_operating_system(
-            Operating_System.OPENSUSE_TUMBLEWEED,
+            { Operating_System.OPENSUSE_TUMBLEWEED },
             indicator_name,
             "openSUSE Tumbleweed",
             "sudo zypper install -y",
             _get_operating_system_dependencies_opensuse ) +
 
         _get_installation_for_operating_system(
-            Operating_System.UBUNTU_2004,
+            { Operating_System.UBUNTU_2004 },
             indicator_name,
             "Ubuntu 20.04",
             install_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_installation_for_operating_system(
-            Operating_System.UBUNTU_2204_2404,
+            {
+                Operating_System.KUBUNTU_2204,
+                Operating_System.KUBUNTU_2404,
+                Operating_System.LINUX_MINT_CINNAMON_22,
+                Operating_System.LUBUNTU_2204,
+                Operating_System.UBUNTU_2204,
+                Operating_System.UBUNTU_2404,
+                Operating_System.UBUNTU_BUDGIE_2404,
+                Operating_System.UBUNTU_MATE_2404,
+                Operating_System.UBUNTU_UNITY_2204,
+                Operating_System.XUBUNTU_2404 },
             indicator_name,
             "Ubuntu 22.04 / 24.04",
             install_command_debian,
@@ -490,9 +586,14 @@ def _get_uninstall_for_operating_system(
 
     # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    opensuse = operating_system == Operating_System.OPENSUSE_TUMBLEWEED
-    if opensuse and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+    os_has_no_calendar = operating_system.issubset( { Operating_System.OPENSUSE_TUMBLEWEED } )
+    indicator_uses_calendar = is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY )
+    if indicator_uses_calendar and os_has_no_calendar:
         uninstall = ''
+    #TODO Ensure above works as below...
+    # opensuse = operating_system == Operating_System.OPENSUSE_TUMBLEWEED
+    # if opensuse and is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+        # uninstall = ''
 
     else:
         uninstall = (
@@ -518,48 +619,63 @@ def _get_uninstall_for_operating_system(
 
 def _get_uninstall( indicator_name ):
     uninstall_command_debian = "sudo apt-get -y remove"
+    uninstall_command_fedora = "sudo dnf -y remove"
 
     return (
         "Uninstall\n" +
         "---------\n\n" +
 
         _get_uninstall_for_operating_system(
-            Operating_System.DEBIAN_11_12,
+            {
+                Operating_System.DEBIAN_11,
+                Operating_System.DEBIAN_12 },
             indicator_name,
-            "Debian 11 / 12",
+            "Debian 11 / 12", #TODO Hopefully can dynamically create this.
             uninstall_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.FEDORA_38,
+            { Operating_System.FEDORA_38 },
             indicator_name,
             "Fedora 38",
-            "sudo dnf -y remove",
+            uninstall_command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.FEDORA_39_40,
+            {
+                Operating_System.FEDORA_39,
+                Operating_System.FEDORA_40 },
             indicator_name,
             "Fedora 39 / 40",
-            "sudo dnf -y remove",
+            uninstall_command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.OPENSUSE_TUMBLEWEED,
+            { Operating_System.OPENSUSE_TUMBLEWEED },
             indicator_name,
             "openSUSE Tumbleweed",
             "sudo zypper remove -y",
             _get_operating_system_dependencies_opensuse ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.UBUNTU_2004,
+            { Operating_System.UBUNTU_2004 },
             indicator_name,
             "Ubuntu 20.04",
             uninstall_command_debian,
             _get_operating_system_dependencies_debian ) +
 
         _get_uninstall_for_operating_system(
-            Operating_System.UBUNTU_2204_2404,
+            {
+                Operating_System.KUBUNTU_2204,
+                Operating_System.KUBUNTU_2404,
+                Operating_System.LINUX_MINT_CINNAMON_22,
+                Operating_System.LUBUNTU_2204,
+                Operating_System.UBUNTU_2204,
+                Operating_System.UBUNTU_2404,
+                Operating_System.UBUNTU_BUDGIE_2404,
+                Operating_System.UBUNTU_MATE_2404,
+                Operating_System.UBUNTU_UNITY_2204,
+                Operating_System.XUBUNTU_2404 },
             indicator_name,
             "Ubuntu 22.04 / 24.04",
             uninstall_command_debian,
@@ -596,32 +712,3 @@ def create_readme(
         f.write( _get_distributions_supported( indicator_name ) )
         f.write( _get_uninstall( indicator_name ) )
         f.write( _get_license( authors_emails, start_year ) )
-
-
-if __name__ == "__main__":
-    # os_superset = ( Operating_System.FEDORA_38, Operating_System.UBUNTU_2004 )
-    #
-    # os_subset = ( Operating_System.FEDORA_38, Operating_System.UBUNTU_2004 )
-    # print( os_subset )
-    # print( any( os in os_superset for os in os_subset ) )
-    #
-    # os_subset = ( Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2004 )
-    # print( os_subset )
-    # print( any( os in os_superset for os in os_subset ) )
-    #
-    # os_subset = ( Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2204_2404 )
-    # print( os_subset )
-    # print( any( os in os_superset for os in os_subset ) )
-
-
-
-    os_superset = { Operating_System.FEDORA_38, Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2004 }
-
-    os_subset = { Operating_System.FEDORA_38, Operating_System.UBUNTU_2004 }
-    print( os_subset.issubset( os_superset ) )
-
-    os_subset = { Operating_System.FEDORA_39_40, Operating_System.UBUNTU_2004 }
-    print( os_subset.issubset( os_superset ) )
-
-    os_subset = { Operating_System.UBUNTU_2204_2404 }
-    print( os_subset.issubset( os_superset ) )
