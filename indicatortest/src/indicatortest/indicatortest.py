@@ -60,11 +60,11 @@ class IndicatorTest( IndicatorBase ):
 
     def update( self, menu ):
         self._build_menu( menu )
-        self.set_label( IndicatorTest.LABEL )
+        self.set_label_or_tooltip( IndicatorTest.LABEL )
 
 
     def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
-        self.set_label( self._get_current_time() )
+        self.set_label_or_tooltip( self._get_current_time() )
         print( "Mouse wheel is scrolling..." )
 
 
@@ -217,7 +217,7 @@ class IndicatorTest( IndicatorBase ):
             _( "Reset label" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.set_label( IndicatorTest.LABEL ), ),
+                    self.set_label_or_tooltip( IndicatorTest.LABEL ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -226,7 +226,7 @@ class IndicatorTest( IndicatorBase ):
             activate_functionandarguments = (
                 lambda menuitem: (
                     print( "secondary activate target / mouse middle click" ),
-                    self.set_label( self._get_current_time() ) ), ),
+                    self.set_label_or_tooltip( self._get_current_time() ) ), ),
             indent = ( 2, 0 ),
             is_secondary_activate_target = True )
 

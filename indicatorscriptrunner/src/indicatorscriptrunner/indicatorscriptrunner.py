@@ -114,7 +114,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         today = datetime.datetime.now()
         self.update_menu( menu )
         self.update_background_scripts( today )
-        self.set_label( self.process_tags() )
+        self.set_label_or_tooltip( self.process_tags() )
 
         # Calculate next update...
         next_update = today + datetime.timedelta( hours = 100 ) # Set an update time well into the future.

@@ -22,6 +22,10 @@
 # What is the above saying or wanting???
 
 
+#TODO Icons for non-GNOME (I think) are not working (symbolic seems to be ignored).
+# This is the case on Kubuntu 22.04,...
+
+
 #TODO Testing indicatortest on distros/desktops...
 #
 # Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
@@ -189,6 +193,10 @@
 #     Ubuntu 20.04   GNOME Shell 3.36.9
 #
 # Maybe also have a known issues section in the README.md for each indicator (under limitations)?
+#
+# With latest updates to Fedora 39 and 40, does not seem to happen!
+# Still an issue with Fedora 38.
+# Does not happen on Debian 11/12!
 
 
 #TODO Update the PPA description at
@@ -698,17 +706,24 @@ class IndicatorBase( ABC ):
         return False
 
 
-    def set_label( self, text ):
-        label_set = False
-        if self._is_label_update_supported():
+    def set_label_or_tooltip( self, text ):
+#TODO Add comment here about the return value.
+        label_or_tooltip_update_supported = self._is_label_or_tooltip_update_supported()
+        if label_or_tooltip_update_supported:
             self.indicator.set_label( text, text )
-            label_set = True
+            self.indicator.set_title( text ) #TODO COmment here for Lubuntu (LXQt) or whatever desktops need this.
 
-        return label_set
+        return label_or_tooltip_update_supported
 
 
     def set_icon( self, icon ):
-        self.indicator.set_icon_full( icon, "" )
+#TODO For Lubuntu 22.04 LXQt, cannot change the icon once set.
+# Add comment here about the return value.
+        icon_update_supported = self._is_icon_update_supported()
+        if icon_update_supported:
+            self.indicator.set_icon_full( icon, "" )
+
+        return icon_update_supported
 
 
     # Get the name of the icon for the indicator
@@ -1684,15 +1699,24 @@ class IndicatorBase( ABC ):
         return self.current_desktop
 
 
-    # Lubuntu 20.04/22.04 no longer supports icon labels, nor when it did,
-    # supported changes to the icon label/tooltip after initialisation.
-    def _is_label_update_supported( self ):
+    # Lubuntu 20.04/22.04 does not support setting/updating of icon label/tooltip.
+    def _is_label_or_tooltip_update_supported( self ):
         desktop_environment = self.get_current_desktop()
-        label_update_unsupported = \
+        label_or_tooltip_update_unsupported = \
             desktop_environment is None or \
             desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT
 
-        return not label_update_unsupported
+        return not label_or_tooltip_update_unsupported
+
+
+    # Lubuntu 20.04/22.04 does not support updating of icon once set.
+    def _is_icon_update_supported( self ):
+        desktop_environment = self.get_current_desktop()
+        icon_update_unsupported = \
+            desktop_environment is None or \
+            desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT
+
+        return not icon_update_unsupported
 
 
     # As a result of

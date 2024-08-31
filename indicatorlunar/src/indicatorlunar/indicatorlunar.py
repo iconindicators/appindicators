@@ -276,7 +276,7 @@ class IndicatorLunar( IndicatorBase ):
             menu.append( Gtk.SeparatorMenuItem() )
 
         self.update_menu( menu, utc_now )
-        self.set_label( self.process_tags() )
+        self.set_label_or_tooltip( self.process_tags() )
 
         self.update_icon()
 
