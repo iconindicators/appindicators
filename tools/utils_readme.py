@@ -430,9 +430,8 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"```\n\n" )
 
 
-#TODO Check these...
 def _get_limitations( indicator_name ):
-    message_limitations = ""
+    message = ""
 
     if is_indicator(
         indicator_name,
@@ -440,36 +439,36 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORONTHISDAY,
         Indicator_Name.INDICATORPUNYCODE,
         Indicator_Name.INDICATORTEST ):
-        message_limitations += (
+        message += (
             f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message_limitations += (
+        message += (
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
-    if is_indicator(
-        indicator_name,
-        Indicator_Name.INDICATORFORTUNE,
-        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
-        Indicator_Name.INDICATORPUNYCODE,
-        Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORVIRTUALBOX ):
-        message_limitations += (
-            f"- `Wayland`: Mouse middle button click of the icon is unsupported.\n" )
-        #TODO THIS IS WRONG...works on Debian 11 / 12, Fedora 38 / 39 / 40...
-        # Must be another desktop type...
+    # if is_indicator(
+    #     indicator_name,
+    #     Indicator_Name.INDICATORFORTUNE,
+    #     Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
+    #     Indicator_Name.INDICATORPUNYCODE,
+    #     Indicator_Name.INDICATORSCRIPTRUNNER,
+    #     Indicator_Name.INDICATORTEST,
+    #     Indicator_Name.INDICATORVIRTUALBOX ):
+    #     message += (
+    #         f"- `Wayland`: Mouse middle button click of the icon is unsupported.\n" )
+    #     #TODO THIS IS WRONG...works on Debian 11 / 12, Fedora 38 / 39 / 40...
+    #     # Must be another desktop type...
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message_limitations += (
-            f"- `Plasma (X11) / XFCE`: Mouse wheel scroll over icon is unsupported.\n" )  #TODO Check
+        message += (
+            f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 # Kubuntu 22.04  KDE   No mouse wheel scroll.            
 # Kubuntu 24.04  KDE   No mouse wheel scroll.            
 
@@ -479,63 +478,59 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
-        message_limitations += (
-            f"- `Plasma (X11) / XFCE/ Lubuntu / LXQt`: The icon label is unsupported.\n" )  #TODO Check
-# Kubuntu 22.04     KDE         Tooltip in lieu of label.
-# Kubuntu 24.04     KDE         Tooltip in lieu of label.
-# Linux Mint 22     X-Cinnamon  Tooltip in lieu of label.
-# Lubuntu 22.04     LXQt        No label; tooltip is indicator filename.
-# openSUSE Tumbleweed    ICEWM        No label/tooltip.
-# Xubuntu 24.04     XFCE         Tooltip in lieu of label.
+        message += (
+            f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip used in lieu.\n"
+            f"- `LXQt`: The icon label is unsupported; icon tooltip shows only the indicator filename.\n"
+            f"- `ICEWM`: The icon label/tooltip is unsupported.\n" )
+# Kubuntu 22.04          KDE         Tooltip in lieu of label.
+# Kubuntu 24.04          KDE         Tooltip in lieu of label.
+# Xubuntu 24.04          XFCE        Tooltip in lieu of label.
+# Linux Mint 22          X-Cinnamon  Tooltip in lieu of label.
+# openSUSE Tumbleweed    ICEWM  No label/tooltip.
+# Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
-        message_limitations += (
-            f"- `Lubuntu / LXQt`: Once the icon is set cannot be changed.\n" )  #TODO Check
+        message += (
+            f"- `LXQt`: The icon cannot be changed after initially set."
+            f"- `X-Cinnamon`: The icon disappears when changed.\n" )
 # Lubuntu 22.04     LXQt    Cannot change the icon once initially set.
-
-    if is_indicator(
-        indicator_name,
-        Indicator_Name.INDICATORLUNAR,
-        Indicator_Name.INDICATORTEST ):
-        message_limitations += (
-            f"- `.\n" )  #TODO Flesh out...
 # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
-        message_limitations += (
-            f"- `Lubuntu / LXQt 20.04`: Arguments are not [preserved]"
-            f"(https://github.com/lxqt/qterminal/issues/335) in `qterminal`. "
-            f"A workaround is to install `gnome-terminal`.\n" )
+        message += (
+            f"- `LXQt`: Commands cannot be sent to `qterminal` as the arguments are not [preserved]"
+            f"(https://github.com/lxqt/qterminal/issues/335). "
+            f"Install `gnome-terminal` as a workaround.\n" )
 # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST ):
-        message_limitations += (
-            f"- .\n" )
+        message += (
+            f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
 #TODO openSUSE does not have the `calendar` command. 
 
 #TODO Add indicators which use notifications and also libnotify
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST ):
-        message_limitations += (
+        message += (
             f"- .\n" )
-#TODO ICEWM No notifications.
+# openSUSE Tumbleweed    ICEWM    No notifications.
 
-    if message_limitations:
-        message_limitations = (
+    if message:
+        message = (
             f"Limitations\n"
             f"-----------\n\n"
-            f"{ message_limitations }\n\n" )
+            f"{ message }\n\n" )
 
-    return message_limitations
+    return message
 
 
 def _get_uninstall_for_operating_system(
