@@ -412,66 +412,6 @@ def _get_installation_for_operating_system(
     return dependencies
 
 
-#TODO Remove after some testing!
-def _get_installation( indicator_name ):
-    install_command_debian = "sudo apt-get -y install"
-    install_command_fedora = "sudo dnf -y install"
-
-    return (
-        "Installation / Upgrading\n" +
-        "------------------------\n\n" +
-
-        _get_installation_for_operating_system(
-            {
-                Operating_System.DEBIAN_11,
-                Operating_System.DEBIAN_12 },
-            indicator_name,
-            install_command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        _get_installation_for_operating_system(
-            { Operating_System.FEDORA_38 },
-            indicator_name,
-            install_command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        _get_installation_for_operating_system(
-            {
-                Operating_System.FEDORA_39,
-                Operating_System.FEDORA_40 },
-            indicator_name,
-            install_command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        _get_installation_for_operating_system(
-            { Operating_System.OPENSUSE_TUMBLEWEED },
-            indicator_name,
-            "sudo zypper install -y",
-            _get_operating_system_dependencies_opensuse ) +
-
-        _get_installation_for_operating_system(
-            { Operating_System.UBUNTU_2004 },
-            indicator_name,
-            install_command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        _get_installation_for_operating_system(
-            {
-                Operating_System.KUBUNTU_2204,
-                Operating_System.KUBUNTU_2404,
-                Operating_System.LINUX_MINT_CINNAMON_22,
-                Operating_System.LUBUNTU_2204,
-                Operating_System.UBUNTU_2204,
-                Operating_System.UBUNTU_2404,
-                Operating_System.UBUNTU_BUDGIE_2404,
-                Operating_System.UBUNTU_MATE_2404,
-                Operating_System.UBUNTU_UNITY_2204,
-                Operating_System.XUBUNTU_2404 },
-            indicator_name,
-            install_command_debian,
-            _get_operating_system_dependencies_debian ) )
-
-
 def _get_usage( indicator_name, indicator_name_human_readable ):
     # Remove the '™' from the human readable name VirtualBox™ below.
     return (
@@ -491,28 +431,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
 
 
 #TODO Check these...
-#
-#TODO Maybe remove the list of supported distirbutions as these are listed in the install?
-# If so, rename this function to _get_limitations or _get_known_knowns or ...?
-def _get_distributions_supported( indicator_name ):
-    message_distributions_supported = (
-        f"Distributions Supported\n"
-        f"-----------------------\n\n"
-
-        f"Distributions/versions:\n"
-        f"- `Debian 11+`\n"
-        f"- `Fedora 38+`\n"
-        f"- `Kubuntu 20.04+`\n"
-        f"- `Linux Mint 21`\n"
-        f"- `Lubuntu 20.04+`\n"
-        f"- `openSUSE Tumbleweed`.\n"
-        f"- `Ubuntu 20.04+`\n"
-        f"- `Ubuntu Budgie 22.04+`\n"
-        f"- `Ubuntu MATE 20.04+`\n"
-        f"- `Ubuntu Unity 20.04+`\n"
-        f"- `Xubuntu 20.04+`\n"
-        f"\n\n" )
-
+def _get_limitations( indicator_name ):
     message_limitations = ""
 
     if is_indicator(
@@ -522,14 +441,14 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORPUNYCODE,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Wayland`: the clipboard does not function.\n" )
+            f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
+        Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message_limitations += (
-            f"- `Wayland`: the command `wmctrl` does not function "
-            f"(used to list windows, uniquely identify and bring to the front).\n" )
+            f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
@@ -540,7 +459,9 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message_limitations += (
-            f"- `Wayland`: middle mouse click does not work.\n" )
+            f"- `Wayland`: Mouse middle button click of the icon is unsupported.\n" )
+        #TODO THIS IS WRONG...works on Debian 11 / 12, Fedora 38 / 39 / 40...
+        # Must be another desktop type...
 
     if is_indicator(
         indicator_name,
@@ -548,7 +469,9 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message_limitations += (
-            f"- `Plasma (X11) / XFCE`: mouse wheel scroll over icon does not function.\n" )
+            f"- `Plasma (X11) / XFCE`: Mouse wheel scroll over icon is unsupported.\n" )  #TODO Check
+# Kubuntu 22.04  KDE   No mouse wheel scroll.            
+# Kubuntu 24.04  KDE   No mouse wheel scroll.            
 
     if is_indicator(
         indicator_name,
@@ -557,28 +480,62 @@ def _get_distributions_supported( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Plasma (X11) / XFCE/ Lubuntu / LXQt`: icon label is unsupported.\n" )
+            f"- `Plasma (X11) / XFCE/ Lubuntu / LXQt`: The icon label is unsupported.\n" )  #TODO Check
+# Kubuntu 22.04     KDE         Tooltip in lieu of label.
+# Kubuntu 24.04     KDE         Tooltip in lieu of label.
+# Linux Mint 22     X-Cinnamon  Tooltip in lieu of label.
+# Lubuntu 22.04     LXQt        No label; tooltip is indicator filename.
+# openSUSE Tumbleweed    ICEWM        No label/tooltip.
+# Xubuntu 24.04     XFCE         Tooltip in lieu of label.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Lubuntu / LXQt`: once set, the icon cannot be changed.\n" )
+            f"- `Lubuntu / LXQt`: Once the icon is set cannot be changed.\n" )  #TODO Check
+# Lubuntu 22.04     LXQt    Cannot change the icon once initially set.
+
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORLUNAR,
+        Indicator_Name.INDICATORTEST ):
+        message_limitations += (
+            f"- `.\n" )  #TODO Flesh out...
+# Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
         message_limitations += (
-            f"- `Lubuntu / LXQt 20.04`: arguments are not [preserved]"
+            f"- `Lubuntu / LXQt 20.04`: Arguments are not [preserved]"
             f"(https://github.com/lxqt/qterminal/issues/335) in `qterminal`. "
-            f"Alternatively, install `gnome-terminal`.\n" )
+            f"A workaround is to install `gnome-terminal`.\n" )
+# Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
+
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORTEST ):
+        message_limitations += (
+            f"- .\n" )
+#TODO openSUSE does not have the `calendar` command. 
+
+#TODO Add indicators which use notifications and also libnotify
+    if is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORTEST ):
+        message_limitations += (
+            f"- .\n" )
+#TODO ICEWM No notifications.
 
     if message_limitations:
-        message_limitations = f"Limitations:\n" + message_limitations + f"\n\n"
+        message_limitations = (
+            f"Limitations\n"
+            f"-----------\n\n"
+            f"{ message_limitations }\n\n" )
 
-    return message_distributions_supported + message_limitations
+    return message_limitations
 
 
 def _get_uninstall_for_operating_system(
@@ -614,66 +571,6 @@ def _get_uninstall_for_operating_system(
             f"</details>\n\n" )
 
     return uninstall
-
-
-#TODO Remove after some testing!
-def _get_uninstall( indicator_name ):
-    uninstall_command_debian = "sudo apt-get -y remove"
-    uninstall_command_fedora = "sudo dnf -y remove"
-
-    return (
-        "Uninstall\n" +
-        "---------\n\n" +
-
-        _get_uninstall_for_operating_system(
-            {
-                Operating_System.DEBIAN_11,
-                Operating_System.DEBIAN_12 },
-            indicator_name,
-            uninstall_command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        _get_uninstall_for_operating_system(
-            { Operating_System.FEDORA_38 },
-            indicator_name,
-            uninstall_command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        _get_uninstall_for_operating_system(
-            {
-                Operating_System.FEDORA_39,
-                Operating_System.FEDORA_40 },
-            indicator_name,
-            uninstall_command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        _get_uninstall_for_operating_system(
-            { Operating_System.OPENSUSE_TUMBLEWEED },
-            indicator_name,
-            "sudo zypper remove -y",
-            _get_operating_system_dependencies_opensuse ) +
-
-        _get_uninstall_for_operating_system(
-            { Operating_System.UBUNTU_2004 },
-            indicator_name,
-            uninstall_command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        _get_uninstall_for_operating_system(
-            {
-                Operating_System.KUBUNTU_2204,
-                Operating_System.KUBUNTU_2404,
-                Operating_System.LINUX_MINT_CINNAMON_22,
-                Operating_System.LUBUNTU_2204,
-                Operating_System.UBUNTU_2204,
-                Operating_System.UBUNTU_2404,
-                Operating_System.UBUNTU_BUDGIE_2404,
-                Operating_System.UBUNTU_MATE_2404,
-                Operating_System.UBUNTU_UNITY_2204,
-                Operating_System.XUBUNTU_2404 },
-            indicator_name,
-            uninstall_command_debian,
-            _get_operating_system_dependencies_debian ) )
 
 
 def _get_install_uninstall( indicator_name, install = True ):
@@ -774,6 +671,6 @@ def create_readme(
         f.write( _get_introduction( indicator_name ) )
         f.write( _get_install_uninstall( indicator_name ) )
         f.write( _get_usage( indicator_name, indicator_name_human_readable ) )
-        f.write( _get_distributions_supported( indicator_name ) )
+        f.write( _get_limitations( indicator_name ) )
         f.write( _get_install_uninstall( indicator_name, install = False ) )
         f.write( _get_license( authors_emails, start_year ) )
