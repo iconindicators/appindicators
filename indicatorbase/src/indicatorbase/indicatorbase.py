@@ -1704,6 +1704,7 @@ class IndicatorBase( ABC ):
         desktop_environment = self.get_current_desktop()
         label_or_tooltip_update_unsupported = \
             desktop_environment is None or \
+            desktop_environment == IndicatorBase._CURRENT_DESKTOP_ICEWM or \
             desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT
 
         return not label_or_tooltip_update_unsupported
