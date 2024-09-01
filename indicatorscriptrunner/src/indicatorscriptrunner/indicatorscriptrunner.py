@@ -174,7 +174,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().error( message )
             self.show_notification( "Cannot run script", message )
 
-        elif self.is_terminal_qterminal( terminal ):
+        elif self.is_qterminal_and_broken( terminal ):
             # As a result of
             #   https://github.com/lxqt/qterminal/issues/335
             # the default terminal in Lubuntu (qterminal) fails to parse arguments.

@@ -16,6 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO When finally released, or at least indicatortest is released,
+# post a note to 
+#   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
+# to help the guy out.
+
+
 #TODO Icons for non-GNOME (I think) are not working (symbolic seems to be ignored).
 # Icons look odd on
 #   Kubuntu 22.04
@@ -1589,9 +1595,15 @@ class IndicatorBase( ABC ):
 
     # As a result of
     #   https://github.com/lxqt/qterminal/issues/335
-    # provide a way to determine if qterminal is the current terminal.
-    def is_terminal_qterminal( self, terminal ):
-        return ( terminal is not None ) and ( "qterminal" in terminal )
+    # determine if qterminal is the current terminal and of a broken version.
+    # Fixed in version 1.2.0
+    #   https://github.com/lxqt/qterminal/releases
+    def is_qterminal_and_broken( self, terminal ):
+        qterminal_and_broken = False
+        if terminal is not None and "qterminal" in terminal:
+            qterminal_and_broken = self.process_get( "qterminal --version" ) < "1.2.0"
+
+        return qterminal_and_broken
 
 
     # Return the full path and name of the executable for the
