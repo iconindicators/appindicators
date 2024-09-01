@@ -29,6 +29,7 @@
 #   Ubuntu Budgie 24.04
 #   Ubuntu MATE 24.04
 #   Ubuntu Unity 22.04
+#   Ubuntu Unity 24.04
 #   Xubuntu 24.04
 # Perhaps check all distros not Debian, Fedora or Ubuntu.
 

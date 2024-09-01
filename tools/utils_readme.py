@@ -23,9 +23,6 @@
 # What to do...?
 
 
-#TODO Try Ubuntu Unity 24.04
-
-
 # Create a README.md for an indicator.
 #
 # References:
@@ -59,6 +56,7 @@ class Operating_System( Enum ):
     UBUNTU_BUDGIE_2404 = auto()
     UBUNTU_MATE_2404 = auto()
     UBUNTU_UNITY_2204 = auto()
+    UBUNTU_UNITY_2404 = auto()
     XUBUNTU_2404 = auto()
 
 
@@ -186,6 +184,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             Operating_System.UBUNTU_BUDGIE_2404,
             Operating_System.UBUNTU_MATE_2404,
             Operating_System.UBUNTU_UNITY_2204,
+            Operating_System.UBUNTU_UNITY_2404,
             Operating_System.XUBUNTU_2404 }
 
         if operating_system.issubset( applicable_operating_systems ):
@@ -215,6 +214,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             Operating_System.UBUNTU_BUDGIE_2404,
             Operating_System.UBUNTU_MATE_2404,
             Operating_System.UBUNTU_UNITY_2204,
+            Operating_System.UBUNTU_UNITY_2404,
             Operating_System.XUBUNTU_2404 }
 
         if operating_system.issubset( applicable_operating_systems ):
@@ -627,6 +627,7 @@ def _get_install_uninstall( indicator_name, install = True ):
                 Operating_System.UBUNTU_BUDGIE_2404,
                 Operating_System.UBUNTU_MATE_2404,
                 Operating_System.UBUNTU_UNITY_2204,
+                Operating_System.UBUNTU_UNITY_2404,
                 Operating_System.XUBUNTU_2404 },
             indicator_name,
             command_debian,
