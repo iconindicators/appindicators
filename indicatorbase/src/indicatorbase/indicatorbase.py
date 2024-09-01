@@ -16,14 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO On Kubuntu 22.04/24.04, there is no icon label and tooltip is the source file name.
-# On 24.04, console commands DO work...but emit an error message too which I think can be ignored.
-#
-# What is the above saying or wanting???
-
-
 #TODO Icons for non-GNOME (I think) are not working (symbolic seems to be ignored).
-# This is the case on Kubuntu 22.04,...
+# Icons look odd on
+#   Kubuntu 22.04
+#   Kubuntu 24.04
+#   Ubuntu Budgie 24.04
+#   Ubuntu MATE 24.04
+#   Ubuntu Unity 22.04
+#   Xubuntu 24.04
 
 
 #TODO Testing indicatortest on distros/desktops...
