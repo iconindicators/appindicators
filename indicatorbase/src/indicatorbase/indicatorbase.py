@@ -24,179 +24,37 @@
 #   Ubuntu MATE 24.04
 #   Ubuntu Unity 22.04
 #   Xubuntu 24.04
+# Perhaps check all distros not Debian, Fedora or Ubuntu.
 
 
-#TODO Testing indicatortest on distros/desktops...
-#
-# Somehow clean this up and keep for posterity...maybe put into build_readme.py as a comment?
-#
-# Debian 11 - GNOME - No wmctrl, no clipboard.
-#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - System X11 Default - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#
-# Debian 12 - GNOME - No wmctrl, no clipboard.
-#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic - No wmctrl, no clipboard.
-#                           - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#
-# Fedora 38 - GNOME - No wmctrl, no clipboard.
-#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic - No wmctrl, no clipboard.
-#                           - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#
-# Fedora 39 - GNOME - No wmctrl, no clipboard.
-#                   - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic - No wmctrl, no clipboard.
-#                           - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME Classic on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#           - GNOME on Xorg - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#
-# Fedora 40 - GNOME - No wmctrl, no clipboard.
-#           - GNOME Classic - No wmctrl, no clipboard.
-#           - GNOME Classic on Xorg - All good.
-#           - GNOME on Xorg - All good.
-#
-# Kubuntu 22.04 - Plasma (X11) - no mouse wheel scroll over icon.
-# Kubuntu 22.04 - Ubuntu on Xorg - All good.
-# Kubuntu 22.04 - Ubuntu - All good.
-# Kubuntu 22.04 - Ubuntu on Wayland (Wayland) - No clipboard.     wmctrl WORKS!  I think because of konsole...so using 'wayland' as the session is not good enough.
-# Kubuntu 22.04 - Ubuntu (Wayland) - No clipboard.
-#
-# Linux Mint 21 - Cinnamon (Default) - Tooltip in lieu of label.  No dynamic icon.
-#               - Cinnamon (Software Rendering) - Tooltip in lieu of label.  No dynamic icon.
-#               - Ubuntu - All good.
-#               - Ubuntu on Wayland - No clipboard; no wmctrl; no notify-send/notification.    WHY no notify?
-#
-# Lubuntu 22.04 - Lubuntu - No label only tooltip which shows the source code name and cannot be changed.
-#                         - Cannot change icon.
-#                         - Hitting the qterminal problem, so cannot run commands.
-#               - LXQt Desktop - No label only tooltip which shows the source code name and cannot be changed.
-#                              - Cannot change icon.
-#                              - Hitting the qterminal problem, so cannot run commands.
-#               - Openbox - Will not boot.
-#               - Ubuntu on Xorg - Hitting the qterminal problem, so cannot run commands.
-#                                - notify-send does not work.
-#               - Ubuntu - Hitting the qterminal problem, so cannot run commands.
-#                        - notify-send does not work.
-#               - Ubuntu on Wayland (Wayland) - Would not log in. 
-#               - Ubuntu (Wayland) - Hitting the qterminal problem, so cannot run commands.
-#                                  - notify-send does not work.
-#
-# Manjaro 22.1 Talos - GNOME - All good.
-#                    - GNOME Classic - All good.
-# Manjaro 22.1 is already obsolete.  Try perhaps 24.0.0 Wynsdey?
-#
-# openSUSE Tumbleweed - GNOME - No wmctrl, no clipboard.
-#                     - GNOME Classic - No wmctrl, no clipboard.
-#                     - GNOME Classic on Xorg - All good.
-#                     - GNOME on Xorg - No wmctrl, no clipboard.
-#                     - IceWM Session - No label/tooltip.  No notify-send / OSD.
-#
-# Ubuntu 20.04 - Ubuntu - All good.
-# Ubuntu 20.04 - GNOME Classic - Need to Run "Applications - Utilities - Tweaks: Extensions: Enable  Ubuntu appindicators.
-# Ubuntu 20.04 - Ubuntu on Wayland - No clipboard; no wmctrl.
-#
-# Ubuntu 22.04 - Ubuntu - no wmctrl, no clipboard.
-# Ubuntu 22.04 - Ubuntu on Xorg - All good.
-#
-# Ubuntu 24.04 - Ubuntu on Xorg - Fails to log in.  Test from a live USB?  How to install the indicator/packages?
-# Ubuntu 24.04 - Ubuntu - no wmctrl, no clipboard.
-#                       - Menu stuck on disabled after opening About/Preferences and clicking icon then ESCAPE.
-#
-# Ubuntu Budgie 22.04 - Budgie Desktop (Default) - All good.
-#                     - Ubuntu - All good.
-#                     - Ubuntu on Wayland - No clipboard; no wmctrl.
-#                     - Ubuntu on Xorg - All good. 
-#
-# Ubuntu MATE 22.04 - MATE - All good.
-#                   - Ubuntu (Default) - All good.
-#                   - Ubuntu on Wayland - No clipboard; no wmctrl.
-#                   - Ubuntu on Xorg - All good.
-#
-# Ubuntu Unity 22.04 - Unity (Default) - All good.
-#                    - Ubuntu - All good.
-#                    - Ubuntu on Wayland - No notify-send. No clipboard; no wmctrl.
-#                    - Ubuntu on Xorg - All good.
-#
-# Xubuntu 22.04 - - No mouse wheel scroll; tooltip in lieu of label.
-
-
-#TODO There are newer versions of distros to be tested.
-
-
-#TODO Check the flow of code,
-# from init to update loops,
-# to about/preferences,
-# to interupting an update (if possible or should be allowed),
-# to stopping an update and then kicking off later.
-#
-# When About/Preferences is showing,
-# is it possible to click anything else in the indicator menu?
-# 
-# Seems okay on Ubuntu 20.04.
-# Check Debian 12, Febora 39, Fedora 40 and Ubuntu 24.04.
-#
-# If an update is underway, is it possible for the user to select About/Prefs?
-# Hopefully not as the menu should be disabled during the update.
-# All good on Ubuntu 20.04...what about Debian et al?
-
-
-#TODO Run any indicator under Debian 12 and open About dialog.
-# Click on the icon and display the menu, the About/Preferences/Quit items are greyed out.
+#TODO 
+# Run any indicator under Fedora 38 and open About dialog.
+# Click on the indicator icon and display the menu;
+# the About/Preferences/Quit items are greyed out.
 # Clicking the red X on the About dialog (or hitting the escape key)
 # closes the dialog but the About/Preferences/Quit items remain greyed out.
-# Does not occur on Ubuntu 20.04 / 22.04 / 24.04 et al and NOT on Fedora 40.
-# Occurs on Debian 11 on all graphics variants;
-# Debian 12 on GNOME, presumably all other graphics variants;
-# Fedora 38 / 39; Manjaro 22.1; openSUSE Tumbleweed.
-# Happens on Ubuntu 24.04 (Ubuntu session default).  Cannot test on Ubuntu 24.04 Xorg session as it won't boot.
-# Check on other distros.
+# This is not a Wayland issue as it happened on Debian 12 Xorg.
 #
-# Double check Manjaro 22.1; openSUSE Tumbleweed.
+# Used to occur on Ubuntu 24.04, Debian 11/12 and Fedora 39/40, but not any more...
+# ...perhaps a fix was released but not to Fedora 38 as it was EOL at the time?
 #
-# THis also happens on Debian 12 under Xorg.
+# So no longer an issue, except for Fedora 38.
+# What to do if anything...?
 #
-# By doing an update (after the Preferences/About are closed)
+# Could do an update (after the Preferences/About are closed)
 #
 #    self.request_update()
 #
 # (and probably only do this "if responseType != Gtk.ResponseType.OK" because when OK
 # an update is kicked off any way)
 #
-# gets around the Debian/Fedora issue when clicking
-# the icon when the About/Preferences are open.
-# Is this viable...perhaps only do it for Debian 11 / 12 and Fedora 38 / 39?
-#
 # Maybe call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
 #
-# Does this issue happen under Debian/Fedora under xorg (rather than default wayland)?
-#
-# If this is something that only occurs with a range of GTK release versions
-# (between Debian 11 and Fedora 39)
-# then can we check for that and onl do the update on those?
-#
-#
-# In regards about/preferences locking up when clicking on the indicator icon,
-# is there a range of GNOME releases to check against this?
-# Issue occurs on Debian 11 which is the earliest I think.
-# Issue occurs on Debian 12/Ubuntu 22.04/Fedora 38/Fedora 39.   <---- is that ubuntu 22.04 or 24.04?
-# Issue is resolved for Fedora 40.
+# Only put in a fix for Fedora 38 and/or a GNOME version.
 # How to determine the GNOME version?
 #
 # gnome-shell --version
 #     Ubuntu 20.04   GNOME Shell 3.36.9
-#
-# Maybe also have a known issues section in the README.md for each indicator (under limitations)?
-#
-# With latest updates to Fedora 39 and 40, does not seem to happen!
-# Still an issue with Fedora 38.
-# Does not happen on Debian 11/12!
 
 
 #TODO Update the PPA description at
@@ -707,18 +565,27 @@ class IndicatorBase( ABC ):
 
 
     def set_label_or_tooltip( self, text ):
-#TODO Add comment here about the return value.
+        '''
+        Sets the label and tooltip assuming this is supported.
+        Returns True if the operation is supported; False otherwise.
+        For example, on Lubuntu 22.04 LXQt, there is no icon label and the tooltip
+        contains the indicator source filename and so would return a False value.
+        '''
         label_or_tooltip_update_supported = self._is_label_or_tooltip_update_supported()
         if label_or_tooltip_update_supported:
             self.indicator.set_label( text, text )
-            self.indicator.set_title( text ) #TODO COmment here for Lubuntu (LXQt) or whatever desktops need this.
+            self.indicator.set_title( text )
 
         return label_or_tooltip_update_supported
 
 
     def set_icon( self, icon ):
-#TODO For Lubuntu 22.04 LXQt, cannot change the icon once set.
-# Add comment here about the return value.
+        '''
+        Sets the icon assuming this is supported.
+        Returns True if the operation is supported; False otherwise.
+        For example, on Lubuntu 22.04 LXQt, the icon cannot be changed once set
+        and so would return a False value.
+        '''
         icon_update_supported = self._is_icon_update_supported()
         if icon_update_supported:
             self.indicator.set_icon_full( icon, "" )
