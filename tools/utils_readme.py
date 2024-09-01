@@ -83,11 +83,14 @@ def _get_summary( operating_system ):
                     print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
 
             else:
-                if "MATE" == part:
-                    human_readable_operating_system += ' ' + part
+                if human_readable_operating_system.endswith( "Manjaro" ):
+                    human_readable_operating_system += ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ]
+
+                elif "MATE" == part:
+                    human_readable_operating_system += ' ' + part # Keep capitalised.
 
                 elif "OPENSUSE" == part:
-                    human_readable_operating_system += ' ' + "openSUSE"
+                    human_readable_operating_system += ' ' + "openSUSE" # Keep partially capitalised.
 
                 else:
                     human_readable_operating_system += ' ' + part.title()
@@ -501,7 +504,7 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
         messages.append(
-            f"- `LXQt`: The icon cannot be changed once set." )
+            f"- `LXQt`: The icon cannot be changed once set.\n" )
         messages.append(
             f"- `X-Cinnamon`: The icon disappears, leaving a blank space, when changed from that originally set.\n" )
 # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
