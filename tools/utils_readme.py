@@ -23,9 +23,6 @@
 # What to do...?
 
 
-#TODO Try Lubuntu 24.04
-
-
 #TODO Try Ubuntu Unity 24.04
 
 
@@ -54,6 +51,7 @@ class Operating_System( Enum ):
     KUBUNTU_2404 = auto()
     LINUX_MINT_CINNAMON_22 = auto()
     LUBUNTU_2204 = auto()
+    LUBUNTU_2404 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
@@ -144,7 +142,7 @@ def _get_introduction( indicator_name ):
     if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`"
 
-    introduction += f" and theoretically, any platform which supports the `appindicator` library.\n\n"
+    introduction += f" and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
 
     introduction += f"Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
@@ -182,6 +180,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             Operating_System.KUBUNTU_2404,
             Operating_System.LINUX_MINT_CINNAMON_22,
             Operating_System.LUBUNTU_2204,
+            Operating_System.LUBUNTU_2404,
             Operating_System.UBUNTU_2204,
             Operating_System.UBUNTU_2404,
             Operating_System.UBUNTU_BUDGIE_2404,
@@ -210,6 +209,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
             Operating_System.KUBUNTU_2404,
             Operating_System.LINUX_MINT_CINNAMON_22,
             Operating_System.LUBUNTU_2204,
+            Operating_System.LUBUNTU_2404,
             Operating_System.UBUNTU_2204,
             Operating_System.UBUNTU_2404,
             Operating_System.UBUNTU_BUDGIE_2404,
@@ -459,7 +459,7 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         messages.append(
-            f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            f"- `KDE` | `X-Cinnamon` | `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
             f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
         messages.append(
@@ -468,6 +468,7 @@ def _get_limitations( indicator_name ):
 # Kubuntu 24.04          KDE         Tooltip in lieu of label.
 # Linux Mint 22          X-Cinnamon  Tooltip in lieu of label.
 # Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.
+# Lubuntu 24.04          LXQt        No label; tooltip is indicator filename.
 #### openSUSE Tumbleweed    ICEWM  No label/tooltip.
 # Xubuntu 24.04          XFCE        Tooltip in lieu of label.
 
@@ -481,16 +482,18 @@ def _get_limitations( indicator_name ):
             f"- `X-Cinnamon`: The icon disappears, leaving a blank space, when changed from that originally set.\n" )
 # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
 # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
+# Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
         messages.append(
-            f"- `LXQt`: Commands cannot be sent to `qterminal` as the arguments are not [preserved]"
-            f"(https://github.com/lxqt/qterminal/issues/335). "
+            f"- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
+            f"arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
             f"Install `gnome-terminal` as a workaround.\n" )
 # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
+# Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
 
     if is_indicator(
         indicator_name,
@@ -618,6 +621,7 @@ def _get_install_uninstall( indicator_name, install = True ):
                 Operating_System.KUBUNTU_2404,
                 Operating_System.LINUX_MINT_CINNAMON_22,
                 Operating_System.LUBUNTU_2204,
+                Operating_System.LUBUNTU_2404,
                 Operating_System.UBUNTU_2204,
                 Operating_System.UBUNTU_2404,
                 Operating_System.UBUNTU_BUDGIE_2404,
