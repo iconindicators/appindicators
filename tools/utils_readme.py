@@ -19,6 +19,8 @@
 #TODO Try again with Manjaro 23.1.0 ?
 # Initially was released with KDE and XFCE then later with GNOME.
 # So maybe only install the KDE version?
+# Seems that Manjaro 24 is the only version available to download.
+# What to do...?
 
 
 #TODO Try Lubuntu 24.04
@@ -422,7 +424,6 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
 
 
 def _get_limitations( indicator_name ):
-    message = ""
     messages = [ ]
 
     if is_indicator(
@@ -431,8 +432,6 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORONTHISDAY,
         Indicator_Name.INDICATORPUNYCODE,
         Indicator_Name.INDICATORTEST ):
-        message += (
-            f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
         messages.append(
             f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
@@ -440,8 +439,6 @@ def _get_limitations( indicator_name ):
         indicator_name,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message += (
-            f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
         messages.append(
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
@@ -450,8 +447,6 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message += (
-            f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
         messages.append(
             f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 # Kubuntu 22.04  KDE   No mouse wheel scroll.            
@@ -463,10 +458,6 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
-        message += (
-            f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n"
-            f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n"
-            f"- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
         messages.append(
             f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
@@ -484,9 +475,6 @@ def _get_limitations( indicator_name ):
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
-        message += (
-            f"- `LXQt`: The icon cannot be changed once set."
-            f"- `X-Cinnamon`: The icon disappears, leaving a blank space, when changed from that originally set.\n" )
         messages.append(
             f"- `LXQt`: The icon cannot be changed once set." )
         messages.append(
@@ -498,10 +486,6 @@ def _get_limitations( indicator_name ):
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
-        message += (
-            f"- `LXQt`: Commands cannot be sent to `qterminal` as the arguments are not [preserved]"
-            f"(https://github.com/lxqt/qterminal/issues/335). "
-            f"Install `gnome-terminal` as a workaround.\n" )
         messages.append(
             f"- `LXQt`: Commands cannot be sent to `qterminal` as the arguments are not [preserved]"
             f"(https://github.com/lxqt/qterminal/issues/335). "
@@ -511,8 +495,6 @@ def _get_limitations( indicator_name ):
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST ):
-        message += (
-            f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
         messages.append(
             f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
 # openSUSE Tumbleweed does not have the `calendar` command. 
@@ -527,23 +509,16 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORTIDE,
         Indicator_Name.INDICATORVIRTUALBOX ):
-        message += (
-            f"- `ICEWM`: Does not support notifications.\n" )
         messages.append(
-            f"- `ICEWM`: Does not support notifications.\n" )
+            f"- `ICEWM`: Notifications are unsupported.\n" )
 #### openSUSE Tumbleweed    ICEWM    No notifications.
 
-    if message:
-        # message = (
-        #     f"Limitations\n"
-        #     f"-----------\n\n"
-        #     f"{ message }\n\n" )
-
+    message = ""
+    if messages:
         message = (
             f"Limitations\n"
             f"-----------\n\n"
             f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n\n" )
-
 
     return message
 
