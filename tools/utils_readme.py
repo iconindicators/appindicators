@@ -21,6 +21,12 @@
 # So maybe only install the KDE version?
 
 
+#TODO Try Lubuntu 24.04
+
+
+#TODO Try Ubuntu Unity 24.04
+
+
 # Create a README.md for an indicator.
 #
 # References:
@@ -36,20 +42,6 @@ from enum import auto, Enum
 from pathlib import Path
 
 
-#TODO
-#   Linux Mint Cinnamon 22 is same install as Ubuntu 24.04
-#   Lubuntu 22.04 is same install as Ubuntu 22.04
-#   Ubuntu Budgie 24.04 is same install as Ubuntu 24.04
-#   Ubuntu MATE 24.04 is same install as Ubuntu 24.04
-#   Ubuntu Unity 22.04 is same install as Ubuntu 22.04
-#   Xubuntu 24.04 is same install as Ubuntu 24.04
-#
-# Given the above all share identical OS package and extension (no extension) text,
-# do we really want a long list, or can we combine these into one?
-#
-# Thinking to split all OS into singles.
-# Can then pass a tuple of OS which have a common install or extension
-# along with a new function to allow for checking of an OS present in the tuple.
 class Operating_System( Enum ):
     DEBIAN_11 = auto() 
     DEBIAN_12 = auto() 
@@ -431,6 +423,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
 
 def _get_limitations( indicator_name ):
     message = ""
+    messages = [ ]
 
     if is_indicator(
         indicator_name,
@@ -440,6 +433,8 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST ):
         message += (
             f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
+        messages.append(
+            f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
@@ -447,20 +442,8 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORVIRTUALBOX ):
         message += (
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
-
-    # if is_indicator(
-    #     indicator_name,
-    #     Indicator_Name.INDICATORFORTUNE,
-    #     Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
-    #     Indicator_Name.INDICATORPUNYCODE,
-    #     Indicator_Name.INDICATORSCRIPTRUNNER,
-    #     Indicator_Name.INDICATORTEST,
-    #     Indicator_Name.INDICATORVIRTUALBOX ):
-    #     message += (
-    #         f"- `Wayland`: Mouse middle button click of the icon is unsupported.\n" )
-#TODO THIS IS WRONG...works on Debian 11 / 12, Fedora 38 / 39 / 40...
-# Must be another desktop type...
-# Look at old version of this file to see the genesis of this code...
+        messages.append(
+            f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
     if is_indicator(
         indicator_name,
@@ -468,6 +451,8 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST,
         Indicator_Name.INDICATORVIRTUALBOX ):
         message += (
+            f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
+        messages.append(
             f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 # Kubuntu 22.04  KDE   No mouse wheel scroll.            
 # Kubuntu 24.04  KDE   No mouse wheel scroll.            
@@ -479,13 +464,19 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         message += (
-            f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip used in lieu.\n"
-            f"- `LXQt`: The icon label is unsupported; icon tooltip shows only the indicator filename.\n"
-            f"- `ICEWM`: The icon label/tooltip is unsupported.\n" )
+            f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n"
+            f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n"
+            f"- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
+        messages.append(
+            f"- `KDE | X-Cinnamon | XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+        messages.append(
+            f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
+        messages.append(
+            f"- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
 # Kubuntu 22.04          KDE         Tooltip in lieu of label.
 # Kubuntu 24.04          KDE         Tooltip in lieu of label.
 # Linux Mint 22          X-Cinnamon  Tooltip in lieu of label.
-# Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.   For indicatorstardate, extra menu item is used.
+# Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.
 #### openSUSE Tumbleweed    ICEWM  No label/tooltip.
 # Xubuntu 24.04          XFCE        Tooltip in lieu of label.
 
@@ -494,8 +485,12 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORLUNAR,
         Indicator_Name.INDICATORTEST ):
         message += (
-            f"- `LXQt`: The icon cannot be changed after initially set."
-            f"- `X-Cinnamon`: The icon disappears when changed from that originally set.\n" )
+            f"- `LXQt`: The icon cannot be changed once set."
+            f"- `X-Cinnamon`: The icon disappears, leaving a blank space, when changed from that originally set.\n" )
+        messages.append(
+            f"- `LXQt`: The icon cannot be changed once set." )
+        messages.append(
+            f"- `X-Cinnamon`: The icon disappears, leaving a blank space, when changed from that originally set.\n" )
 # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
 # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
 
@@ -507,6 +502,10 @@ def _get_limitations( indicator_name ):
             f"- `LXQt`: Commands cannot be sent to `qterminal` as the arguments are not [preserved]"
             f"(https://github.com/lxqt/qterminal/issues/335). "
             f"Install `gnome-terminal` as a workaround.\n" )
+        messages.append(
+            f"- `LXQt`: Commands cannot be sent to `qterminal` as the arguments are not [preserved]"
+            f"(https://github.com/lxqt/qterminal/issues/335). "
+            f"Install `gnome-terminal` as a workaround.\n" )
 # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
 
     if is_indicator(
@@ -514,21 +513,37 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST ):
         message += (
             f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
+        messages.append(
+            f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
 # openSUSE Tumbleweed does not have the `calendar` command. 
 
-#TODO Add indicators which use notifications and also libnotify
     if is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORTEST ):
+        Indicator_Name.INDICATORFORTUNE,
+        Indicator_Name.INDICATORLUNAR,
+        Indicator_Name.INDICATORONTHISDAY,
+        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORSCRIPTRUNNER,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORTIDE,
+        Indicator_Name.INDICATORVIRTUALBOX ):
         message += (
-            f"- .\n" )
+            f"- `ICEWM`: Does not support notifications.\n" )
+        messages.append(
+            f"- `ICEWM`: Does not support notifications.\n" )
 #### openSUSE Tumbleweed    ICEWM    No notifications.
 
     if message:
+        # message = (
+        #     f"Limitations\n"
+        #     f"-----------\n\n"
+        #     f"{ message }\n\n" )
+
         message = (
             f"Limitations\n"
             f"-----------\n\n"
-            f"{ message }\n\n" )
+            f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n\n" )
+
 
     return message
 
