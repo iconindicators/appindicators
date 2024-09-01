@@ -16,13 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Try again with Manjaro 23.1.0 ?
-# Initially was released with KDE and XFCE then later with GNOME.
-# So maybe only install the KDE version?
-# Seems that Manjaro 24 is the only version available to download.
-# What to do...?
-
-
 # Create a README.md for an indicator.
 #
 # References:
@@ -49,6 +42,7 @@ class Operating_System( Enum ):
     LINUX_MINT_CINNAMON_22 = auto()
     LUBUNTU_2204 = auto()
     LUBUNTU_2404 = auto()
+    MANJARO_240X = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
@@ -134,11 +128,11 @@ def _get_introduction( indicator_name ):
         f"`{ indicator_name }` { comments } on "
         f"`Debian`, `Ubuntu`, `Fedora`" )
 
-    # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    # Want to still have indicatortest for openSUSE!
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    # Want to still have indicatortest for openSUSE/Manjaro!
     if not is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
-        introduction += f", `openSUSE`"
+        introduction += f", `openSUSE`, `Manjaro`"
 
     introduction += f" and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
 
@@ -267,6 +261,26 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
+def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
+    dependencies = [
+        "cairo",
+        "gcc",
+        "libayatana-appindicator",
+        "pkgconf" ]
+
+    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+        dependencies.append( "fortune-mod" )
+
+    if indicator_name == Indicator_Name.INDICATORTEST:
+        dependencies.append( "fortune-mod" )
+        dependencies.append( "wmctrl" )
+
+    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+        dependencies.append( "wmctrl" )
+
+    return ' '.join( sorted( dependencies ) )
+
+
 def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
     dependencies = [
         "cairo-devel",
@@ -360,10 +374,18 @@ def _get_installation_for_operating_system(
         install_command,
         _get_operating_system_dependencies_function_name ):
 
-    # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    os_has_no_calendar = operating_system.issubset( { Operating_System.OPENSUSE_TUMBLEWEED } )
-    indicator_uses_calendar = is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY )
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    os_has_no_calendar = \
+        operating_system.issubset( {
+            Operating_System.MANJARO_240X,
+            Operating_System.OPENSUSE_TUMBLEWEED } )
+
+    indicator_uses_calendar = \
+        is_indicator(
+            indicator_name,
+            Indicator_Name.INDICATORONTHISDAY )
+
     if indicator_uses_calendar and os_has_no_calendar:
         dependencies = ''
 
@@ -451,6 +473,7 @@ def _get_limitations( indicator_name ):
             f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 # Kubuntu 22.04  KDE   No mouse wheel scroll.            
 # Kubuntu 24.04  KDE   No mouse wheel scroll.            
+# Manjaro 24.0.7 KDE   No mouse wheel scroll.            
 
     if is_indicator(
         indicator_name,
@@ -469,6 +492,7 @@ def _get_limitations( indicator_name ):
 # Linux Mint 22          X-Cinnamon  Tooltip in lieu of label.
 # Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.
 # Lubuntu 24.04          LXQt        No label; tooltip is indicator filename.
+# Manjaro 24.0.7         KDE         Tooltip in lieu of label.
 #### openSUSE Tumbleweed    ICEWM  No label/tooltip.
 # Xubuntu 24.04          XFCE        Tooltip in lieu of label.
 
@@ -532,10 +556,18 @@ def _get_uninstall_for_operating_system(
         uninstall_command,
         _get_operating_system_dependencies_function_name ):
 
-    # openSUSE Tumbleweed does not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE.
-    os_has_no_calendar = operating_system.issubset( { Operating_System.OPENSUSE_TUMBLEWEED } )
-    indicator_uses_calendar = is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY )
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
+    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    os_has_no_calendar = \
+        operating_system.issubset( {
+            Operating_System.MANJARO_240X,
+            Operating_System.OPENSUSE_TUMBLEWEED } )
+
+    indicator_uses_calendar = \
+        is_indicator(
+            indicator_name,
+            Indicator_Name.INDICATORONTHISDAY )
+
     if indicator_uses_calendar and os_has_no_calendar:
         uninstall = ''
 
@@ -602,6 +634,12 @@ def _get_install_uninstall( indicator_name, install = True ):
             indicator_name,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
+
+        function(
+            { Operating_System.MANJARO_240X },
+            indicator_name,
+            "sudo pacman -S --noconfirm" if install else "sudo pacman -R --noconfirm",
+            _get_operating_system_dependencies_manjaro ) +
 
         function(
             { Operating_System.OPENSUSE_TUMBLEWEED },
