@@ -16,7 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Try again with Manjaro?
+#TODO Try again with Manjaro 23.1.0 ?
+# Initially was released with KDE and XFCE then later with GNOME.
+# So maybe only install the KDE version?
 
 
 # Create a README.md for an indicator.
@@ -303,9 +305,6 @@ def _get_extension( operating_system ):
 #TODO See above command...
 # Is it possible once the extension is installed via apt-get to call something
 # which will refresh the list of extensions and so no need to log out/in?
-#
-# OR, maybe check again that with Debian 11 and Debian 12
-# it is possible to instead use the browser extension.
 
     applicable_operating_systems = {
         Operating_System.FEDORA_38,
@@ -459,8 +458,9 @@ def _get_limitations( indicator_name ):
     #     Indicator_Name.INDICATORVIRTUALBOX ):
     #     message += (
     #         f"- `Wayland`: Mouse middle button click of the icon is unsupported.\n" )
-    #     #TODO THIS IS WRONG...works on Debian 11 / 12, Fedora 38 / 39 / 40...
-    #     # Must be another desktop type...
+#TODO THIS IS WRONG...works on Debian 11 / 12, Fedora 38 / 39 / 40...
+# Must be another desktop type...
+# Look at old version of this file to see the genesis of this code...
 
     if is_indicator(
         indicator_name,
@@ -484,10 +484,10 @@ def _get_limitations( indicator_name ):
             f"- `ICEWM`: The icon label/tooltip is unsupported.\n" )
 # Kubuntu 22.04          KDE         Tooltip in lieu of label.
 # Kubuntu 24.04          KDE         Tooltip in lieu of label.
-# Xubuntu 24.04          XFCE        Tooltip in lieu of label.
 # Linux Mint 22          X-Cinnamon  Tooltip in lieu of label.
-# openSUSE Tumbleweed    ICEWM  No label/tooltip.
-# Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.
+# Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.   For indicatorstardate, extra menu item is used.
+#### openSUSE Tumbleweed    ICEWM  No label/tooltip.
+# Xubuntu 24.04          XFCE        Tooltip in lieu of label.
 
     if is_indicator(
         indicator_name,
@@ -495,9 +495,9 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST ):
         message += (
             f"- `LXQt`: The icon cannot be changed after initially set."
-            f"- `X-Cinnamon`: The icon disappears when changed.\n" )
-# Lubuntu 22.04     LXQt    Cannot change the icon once initially set.
+            f"- `X-Cinnamon`: The icon disappears when changed from that originally set.\n" )
 # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
+# Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
 
     if is_indicator(
         indicator_name,
@@ -514,7 +514,7 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST ):
         message += (
             f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
-#TODO openSUSE does not have the `calendar` command. 
+# openSUSE Tumbleweed does not have the `calendar` command. 
 
 #TODO Add indicators which use notifications and also libnotify
     if is_indicator(
@@ -522,7 +522,7 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORTEST ):
         message += (
             f"- .\n" )
-# openSUSE Tumbleweed    ICEWM    No notifications.
+#### openSUSE Tumbleweed    ICEWM    No notifications.
 
     if message:
         message = (
