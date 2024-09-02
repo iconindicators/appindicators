@@ -458,7 +458,7 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } )
 
-        # utils.initialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
+        utils.initialise_virtual_environment( Path( '.' ) / "venv", "build", "pip", "PyGObject" )
         for indicator_name in args.indicators:
             message = _build_wheel_for_indicator( args.directory_release, indicator_name )
             if message:
