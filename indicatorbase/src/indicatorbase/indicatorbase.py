@@ -275,9 +275,6 @@ class IndicatorBase( ABC ):
             level = logging.DEBUG,
             handlers = [ TruncatedFileHandler( self.log ) ] )
 
-        self.lock = Lock()
-        self.id = 0 # ID returned when scheduling an update.
-
         self.lock_update = Lock()
         self.id_update = 0 # ID returned when scheduling an update.
 
