@@ -2,20 +2,12 @@
 
 ## v1.0.17 (2023-11-22)
 
-- When show event notifcations is enabled, a two second delay between each notification is now included.
+- When show event notifcations is enabled, a three second delay between each notification is now included.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
-- Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AppIndicator library.
+- Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AyatanaAppIndicator3 / AppIndicator3 library.
 - Fixed PyGObject 3.11 deprecation warnings.
-- Now works (full or in part) on the following distributions/versions:
-  - Debian 11 / 12
-  - Fedora 38 / 39
-  - Linux Mint 21 Cinnamon
-  - Manjaro 22.1 GNOME No calendar.
-  - openSUSE Tumbleweed No clipboard; no wmctrl; no calendar.
-  - openSUSE Tumbleweed GNOME on Xorg No calendar.
 - Now includes an opt-in check during indicator start up for the latest version at PyPI.
-- On Wayland, the clipboard does not work.
 
 
 ## v1.0.16 (2023-11-08)
