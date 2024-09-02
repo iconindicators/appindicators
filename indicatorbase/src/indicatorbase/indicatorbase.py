@@ -34,36 +34,6 @@
 # Perhaps check all distros not Debian, Fedora or Ubuntu.
 
 
-#TODO 
-# Run any indicator under Fedora 38 and open About dialog.
-# Click on the indicator icon and display the menu;
-# the About/Preferences/Quit items are greyed out.
-# Clicking the red X on the About dialog (or hitting the escape key)
-# closes the dialog but the About/Preferences/Quit items remain greyed out.
-# This is not a Wayland issue as it happened on Debian 12 Xorg.
-#
-# Used to occur on Ubuntu 24.04, Debian 11/12 and Fedora 39/40, but not any more...
-# ...perhaps a fix was released but not to Fedora 38 as it was EOL at the time?
-#
-# So no longer an issue, except for Fedora 38.
-# What to do if anything...?
-#
-# Could do an update (after the Preferences/About are closed)
-#
-#    self.request_update()
-#
-# (and probably only do this "if responseType != Gtk.ResponseType.OK" because when OK
-# an update is kicked off any way)
-#
-# Maybe call self.set_menu_sensitivity( True ) in a thread 1 sec later? 
-#
-# Only put in a fix for Fedora 38 and/or a GNOME version.
-# How to determine the GNOME version?
-#
-# gnome-shell --version
-#     Ubuntu 20.04   GNOME Shell 3.36.9
-
-
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 # with the following:
@@ -727,8 +697,12 @@ class IndicatorBase( ABC ):
         about_dialog.run()
         about_dialog.destroy()
 
-        self.set_menu_sensitivity( True )
-        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+        if self._is_fedora_38():
+            self.request_update()
+
+        else:
+            self.set_menu_sensitivity( True )
+            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
     def _add_hyperlink_label(
@@ -765,8 +739,43 @@ class IndicatorBase( ABC ):
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
         else:
-            self.set_menu_sensitivity( True )
-            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+            if self._is_fedora_38():
+                self.request_update()
+
+            else:
+                self.set_menu_sensitivity( True )
+                self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+
+
+    def _is_fedora_38( self ):
+        '''
+        When running under Debian 11 / 12, Fedora 38 / 39 / 40 and Ubuntu 24.04
+        and the About or Preferences dialogs are opened,
+        if the user clicks on the indicator icon and then closes the dialog
+        (by hitting the ESCAPE key or clicking the X or CANCEL button)
+        the menu would not reset back to sensitive, locking out the user.
+
+        However this mysteriously is fixed in all but Fedora 38.
+
+        As a workaround, when on Fedora 38 and the user has not clicked OK,
+        kick off an update.
+
+        This is not a Wayland issue as the issue was observed on Debian 12 Xorg.
+        '''
+        etc_os_release = self.process_get( "cat /etc/os-release" )
+        if etc_os_release is None:
+            etc_os_release = ""
+
+        is_fedora = False
+        is_version_38 = False
+        for line in etc_os_release.split():
+            if "ID=fedora" in line:
+                is_fedora = True
+
+            if "VERSION_ID=38" in line:
+                is_version_38 = True
+
+        return is_fedora and is_version_38
 
 
     def set_menu_sensitivity( self, toggle ):
