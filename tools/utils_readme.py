@@ -84,7 +84,7 @@ def _get_summary( operating_system ):
 
             else:
                 if human_readable_operating_system.endswith( "Manjaro" ):
-                    human_readable_operating_system += ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ]
+                    human_readable_operating_system += ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower()
 
                 elif "MATE" == part:
                     human_readable_operating_system += ' ' + part # Keep capitalised.
@@ -436,15 +436,15 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"Usage\n"
         f"-----\n\n"
 
-        f"To run `{ indicator_name }`, press the `Super` key to open the `Show Applications` overlay (or similar), "
-        f"type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` "
+        f"To run `{ indicator_name }`, press the `Super` key to show the applications overlay or similar "
+        f"and type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` "
         f"into the search bar and the icon should be present for you to select.  "
         f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
         f"```\n"
-        f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"    python3 $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/{ indicator_name }.py && \\\n"
-        f"    deactivate\n"
+        f". $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
+        f"python3 $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/{ indicator_name }.py && \\\n"
+        f"deactivate\n"
         f"```\n\n" )
 
 
@@ -485,7 +485,7 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         messages.append(
-            f"- `KDE` | `X-Cinnamon` | `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            f"- `KDE`  |  `X-Cinnamon`  |  `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
             f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
         messages.append(
@@ -506,7 +506,7 @@ def _get_limitations( indicator_name ):
         messages.append(
             f"- `LXQt`: The icon cannot be changed once set.\n" )
         messages.append(
-            f"- `X-Cinnamon`: The icon disappears, leaving a blank space, when changed from that originally set.\n" )
+            f"- `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.\n" )
 # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
 # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
 # Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
@@ -526,7 +526,7 @@ def _get_limitations( indicator_name ):
         indicator_name,
         Indicator_Name.INDICATORTEST ):
         messages.append(
-            f"- `openSUSE Tumbleweed` does not contain the `calendar` command.\n" )
+            f"- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
 # openSUSE Tumbleweed does not have the `calendar` command. 
 
     if is_indicator(
@@ -684,7 +684,6 @@ def _get_license( authors_emails, start_year ):
     return (
         f"License\n"
         f"-------\n\n"
-
         f"This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
         f"Copyright { start_year }-{ end_year } { authors }.\n" )
 
