@@ -218,13 +218,15 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
 
-    # The comments argument is used in two places:
-    #
-    #   1) The first letter of the comments is capitalised and incorporated
-    #      into the Project Description on the PyPI page.
-    #
-    #   2) The comments is used, as is, in the About dialog.
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
+        '''
+        The comments argument is used in two places:
+            1) The comments are passed directly to the About dialog.
+
+            2) The first letter of the comments is capitalised and
+               incorporated into the Project Description on the PyPI page.
+        '''
+
         if IndicatorBase.INDICATOR_NAME is None:
             self.show_dialog_ok(
                 None,
