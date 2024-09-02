@@ -111,7 +111,7 @@ except:
         gi.require_version( "AppIndicator3", "0.1" )
         from gi.repository import AppIndicator3 as AppIndicator # Needed for Fedora.
     except:
-        print( "Unable to find either AyatanaAppIndicator3 nor AppIndicator3.")
+        print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
 
 gi.require_version( "Gdk", "3.0" )
