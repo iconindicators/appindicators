@@ -151,14 +151,14 @@ class IndicatorBase( ABC ):
     # Different results come from calling
     #   os.environ.get( "DESKTOP_SESSION" )
     # giving 'plasma' rather than 'KDE' on 'Plasma (X11)' on Kubuntu.
-    _CURRENT_DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
-    _CURRENT_DESKTOP_ICEWM = "ICEWM"
-    _CURRENT_DESKTOP_KDE = "KDE"
-    _CURRENT_DESKTOP_LXQT = "LXQt"
-    _CURRENT_DESKTOP_MATE = "MATE"
-    _CURRENT_DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
-    _CURRENT_DESKTOP_X_CINNAMON = "X-Cinnamon"
-    _CURRENT_DESKTOP_XFCE = "XFCE"
+    _DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
+    _DESKTOP_ICEWM = "ICEWM"
+    _DESKTOP_KDE = "KDE"
+    _DESKTOP_LXQT = "LXQt"
+    _DESKTOP_MATE = "MATE"
+    _DESKTOP_UNITY7 = "Unity:Unity7:ubuntu"
+    _DESKTOP_X_CINNAMON = "X-Cinnamon"
+    _DESKTOP_XFCE = "XFCE"
 
     _EXTENSION_JSON = ".json"
 
@@ -1040,20 +1040,20 @@ class IndicatorBase( ABC ):
 
         indent_amount = "      "
         indent_small = \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE
+            self.get_current_desktop() == IndicatorBase._DESKTOP_KDE
 
         if indent_small:
             indent_amount = "   "
 
         detatched_submenus = \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_BUDGIE_GNOME or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_ICEWM or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_KDE or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_LXQT or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_MATE or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_UNITY7 or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_X_CINNAMON or \
-            self.get_current_desktop() == IndicatorBase._CURRENT_DESKTOP_XFCE
+            self.get_current_desktop() == IndicatorBase._DESKTOP_BUDGIE_GNOME or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_ICEWM or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_KDE or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_LXQT or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_MATE or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_UNITY7 or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_X_CINNAMON or \
+            self.get_current_desktop() == IndicatorBase._DESKTOP_XFCE
 
         if detatched_submenus:
             indent_amount = indent_amount * indent[ 1 ]
@@ -1575,8 +1575,8 @@ class IndicatorBase( ABC ):
         desktop_environment = self.get_current_desktop()
         label_or_tooltip_update_unsupported = \
             desktop_environment is None or \
-            desktop_environment == IndicatorBase._CURRENT_DESKTOP_ICEWM or \
-            desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT
+            desktop_environment == IndicatorBase._DESKTOP_ICEWM or \
+            desktop_environment == IndicatorBase._DESKTOP_LXQT
 
         return not label_or_tooltip_update_unsupported
 
@@ -1586,7 +1586,7 @@ class IndicatorBase( ABC ):
         desktop_environment = self.get_current_desktop()
         icon_update_unsupported = \
             desktop_environment is None or \
-            desktop_environment == IndicatorBase._CURRENT_DESKTOP_LXQT
+            desktop_environment == IndicatorBase._DESKTOP_LXQT
 
         return not icon_update_unsupported
 
