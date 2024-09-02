@@ -22,18 +22,6 @@
 # to help the guy out.
 
 
-#TODO Icons for non-GNOME (I think) are not working (symbolic seems to be ignored).
-# Icons look odd on
-#   Kubuntu 22.04
-#   Kubuntu 24.04
-#   Ubuntu Budgie 24.04
-#   Ubuntu MATE 24.04
-#   Ubuntu Unity 22.04
-#   Ubuntu Unity 24.04
-#   Xubuntu 24.04
-# Perhaps check all distros not Debian, Fedora or Ubuntu.
-
-
 #TODO Update the PPA description at
 #   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 # with the following:
