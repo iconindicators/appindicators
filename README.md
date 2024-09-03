@@ -84,7 +84,7 @@ Various operating system packages will likely need to be installed; refer to ins
 A wheel may be installed from the local file system.  For `indicatortest`, the `.whl` is assumed to be in `release/wheel/dist_indicatortest` and will be installed into a virtual environment at `$HOME/.local/venv_indicatortest`.
 
 ```
-    python3 tools/install_indicator_from_wheel.py release indicatortest
+    python3 tools/install_wheel.py release indicatortest
 ```
 
 Additional indicators may be appended.
@@ -94,7 +94,7 @@ Various operating system packages will likely need to be installed; refer to ins
 
 ## Run an Indicator
 
-To run the indicator, open the applications menu (via the `Super` / `Windows` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out and log in.
+To run the indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out and log in.
 
 To run from a terminal (so that any errors or messages may be observed):
 
