@@ -42,6 +42,7 @@ import eclipse
 class IndicatorLunar( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Lunar" )
+    indicator_categories = "Categories=Science;Astronomy"
 
     # Allow switching between backends.
     astro_backend_pyephem = "AstroPyEphem"

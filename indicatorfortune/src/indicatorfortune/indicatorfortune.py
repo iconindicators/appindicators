@@ -33,6 +33,7 @@ from pathlib import Path
 class IndicatorFortune( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Fortune" )
+    indicator_categories = "Categories=Utility;Amusement"
 
     CONFIG_FORTUNES = "fortunes"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"

@@ -148,16 +148,20 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
     return out_pyproject_toml, version_indicator_base
 
 
-def _get_name_and_comments_from_indicator( indicator_name, directory_indicator ):
+def _get_name_comments_categories_from_indicator( indicator_name, directory_indicator ):
     indicator_source = Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" )
 
     name = ""
+    categories = ""
     comments = ""
     message = ""
     with open( indicator_source, 'r' ) as f:
         for line in f:
             if re.search( r"indicator_name_for_desktop_file = _\( ", line ):
                 name = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
+
+            if re.search( r"indicator_categories = ", line ):
+                categories = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
 
             if re.search( r"comments = _\(", line ):
                 comments = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
@@ -168,7 +172,7 @@ def _get_name_and_comments_from_indicator( indicator_name, directory_indicator )
     if comments == "":
         message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }"
 
-    return name, comments, message
+    return name, categories, comments, message
 
 
 def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
@@ -237,19 +241,8 @@ def _create_dot_desktop(
         name,
         names_from_mo_files,
         comments,
-        comments_from_mo_files ):
-
-    indicator_name_to_desktop_file_categories = {
-        "indicatorfortune" : "Categories=Utility;Amusement",
-        "indicatorlunar" : "Categories=Science;Astronomy",
-        "indicatoronthisday" : "Categories=Utility;Amusement",
-        "indicatorppadownloadstatistics" : "Categories=Utility",
-        "indicatorpunycode" : "Categories=Utility",
-        "indicatorscriptrunner" : "Categories=Utility",
-        "indicatorstardate" : "Categories=Utility;Amusement",
-        "indicatortest" : "Categories=Utility",
-        "indicatortide" : "Categories=Utility",
-        "indicatorvirtualbox" : "Categories=Utility" }
+        comments_from_mo_files,
+        categories ):
 
     indicatorbase_dot_desktop_path = \
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop"
@@ -274,7 +267,7 @@ def _create_dot_desktop(
             indicator_name = indicator_name,
             names = "Name=" + names,
             comment = "Comment=" + comment,
-            categories = indicator_name_to_desktop_file_categories[ indicator_name ] )
+            categories = categories )
 
     indicator_dot_desktop_path = directory_platform_linux / ( indicator_name + ".py.desktop" )
 
@@ -380,8 +373,8 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
         if not message:
             utils_locale.build_locale_release( directory_dist, indicator_name )
 
-            name, comments, message = \
-                _get_name_and_comments_from_indicator(
+            name, categories, comments, message = \
+                _get_name_comments_categories_from_indicator(
                     indicator_name, directory_indicator )
 
             if not message:
@@ -410,7 +403,8 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     name,
                     names_from_mo_files,
                     comments,
-                    comments_from_mo_files )
+                    comments_from_mo_files,
+                    categories )
 
                 _create_scripts_for_linux( directory_platform_linux, indicator_name )
 

@@ -38,6 +38,7 @@ from threading import Thread
 class IndicatorTest( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Test" )
+    indicator_categories = "Categories=Utility"
 
     CACHE_ICON_BASENAME = "icon-"
     CACHE_ICON_MAXIMUM_AGE_HOURS = 0

@@ -41,6 +41,7 @@ from script import Background, NonBackground
 class IndicatorScriptRunner( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Script Runner" )
+    indicator_categories = "Categories=Utility"
 
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_INDICATOR_TEXT = "indicatorText"

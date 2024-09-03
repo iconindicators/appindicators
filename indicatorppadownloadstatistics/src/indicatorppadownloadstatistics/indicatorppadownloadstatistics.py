@@ -40,6 +40,7 @@ from ppa import Filters, PPA, PublishedBinary
 class IndicatorPPADownloadStatistics( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator PPA Download Statistics" )
+    indicator_categories = "Categories=Utility"
 
     CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"

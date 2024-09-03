@@ -58,6 +58,7 @@ from gi.repository import Gtk
 class IndicatorPunycode( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Punycode" )
+    indicator_categories = "Categories=Utility"
 
     CONFIG_DROP_PATH_QUERY = "dropPathQuery"
     CONFIG_INPUT_CLIPBOARD = "inputClipboard"

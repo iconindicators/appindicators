@@ -63,6 +63,7 @@ from event import Event
 class IndicatorOnThisDay( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator On This Day" )
+    indicator_categories = "Categories=Utility;Amusement"
 
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
