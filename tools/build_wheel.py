@@ -148,7 +148,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
     return out_pyproject_toml, version_indicator_base
 
 
-def _get_name_comments_categories_from_indicator( indicator_name, directory_indicator ):
+def _get_name_categories_comments_from_indicator( indicator_name, directory_indicator ):
     indicator_source = Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" )
 
     name = ""
@@ -374,7 +374,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
             utils_locale.build_locale_release( directory_dist, indicator_name )
 
             name, categories, comments, message = \
-                _get_name_comments_categories_from_indicator(
+                _get_name_categories_comments_from_indicator(
                     indicator_name, directory_indicator )
 
             if not message:

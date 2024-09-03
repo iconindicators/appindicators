@@ -463,8 +463,8 @@ class IndicatorBase( ABC ):
     #       (for example starting a virtual machine will request an
     #       update to refresh the menu).
     #
-    #   If there is a pending (future) update and a request for an update
-    #   comes along, need to remove the "old" pending update (referred as self.id).
+    #   If there is a pending (future) update and a request for an update comes along,
+    #   need to remove the "old" pending update.
     def request_update( self, delay = 1 ):
         if self.lock_update.acquire( blocking = False ):
             if self.id_update > 0:
