@@ -16,59 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Amend the changelog.md and/or readme.md
-# there is a problem with the primary input/output on Wayland.
-#
-# Seems to be an issue at least on Debian 12 and Fedora 40 (both wayland).
-#
-# Select/highlight text and middle mouse click or
-# select convert from primary (not clipboard), 
-# get a message "no text is highlight/selected".
-# However this seems intermittent...
-# ...seemed to get it to work once...
-# ...maybe switching from primary to clipboard and
-# back again via the preferences.
-#
-# Once it does work, always keeps the same text in memory and converts that
-# regardless of selecting new text.
-#
-# Similarly for the input set to clipboard.  Get the message "No text is in the clipboard."
-#
-# Does not happen on Ubuntu 20.04.
-#
-# Does not happen on Debian 12 or Fedora 40 under Xorg but does happen under Wayland.
-#
-# Update readme in some way...
-# Does that mean the indicator does not work at all under Wayland, or intermittently?
-#
-#
-# München                 Mnchen-3ya   
-# Mnchen-3ya              Mnchen-3ya-  
-# München-Ost             Mnchen-Ost-9db  
-# Bahnhof München-Ost     Bahnhof Mnchen-Ost-u6b  
-# abæcdöef                abcdef-qua4k   
-# правда                  80aafi6cg   
-# ยจฆฟคฏข                 22cdfh1b8fsa   
-# 도메인                        hq1bm8jm9l   
-# ドメイン名例              eckwd4c7cu47r2wf
-# MajiでKoiする5秒前        MajiKoi5-783gue6qz075azm5e  
-# 「bücher」                  bcher-kva8445foa
-#
-# Using above data, tested on....
-#   Ubuntu 20.04 (Xorg) - all good.
-#   Ubuntu 24.04 Wayland - intermittently works.
-#   Ubuntu 24.04 Xorg - unable to login so cannot test.
-#   Debian 12 Wayland - intermittently works.
-#   Debian 12 Xorg - all good.
-#   Debian 12 GNOME Classic Xorg - all good.
-#   Fedora 40 Wayland - intermittently works.
-#   Fedora 40 Xorg - all good.
-#
-# Bottom line: Wayland unsupported.
-
-
 # Application indicator which converts domain names between Unicode and ASCII.
-
+#
+# Testing on Ubuntu 22.04 / 24.04, Debian 11 / 12 and Fedora 38 / 38 / 40
+# reveals the clipboard/primary input and output works on Wayland
+# intermittently (at best) and therefore is deemed unsupported.
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 

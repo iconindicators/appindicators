@@ -6,6 +6,7 @@
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AyatanaAppIndicator3 / AppIndicator3 library.
 - Now includes an opt-in check during indicator start up for the latest version at PyPI.
+- The clipboard/primary input and output works on Wayland intermittently (at best) and therefore is deemed unsupported.
 
 
 ## v1.0.15 (2023-01-09)
