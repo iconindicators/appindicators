@@ -1,6 +1,6 @@
 # Indicator VirtualBox™ changelog
 
-## v1.0.75 (2023-12-22)
+## v1.0.75 (2024-09-04)
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.

@@ -1,6 +1,6 @@
 # Indicator Lunar changelog
 
-## v1.0.101 (2023-11-22)
+## v1.0.101 (2024-09-04)
 
 - Bug fix: Minor planets would display in the preferences despite missing apparent magnitude data.
 - Now uses

@@ -1,6 +1,6 @@
 # Indicator PPA Download Statistics changelog
 
-## v1.0.81 (2023-11-17)
+## v1.0.81 (2024-09-04)
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Added oracular to the list of series.

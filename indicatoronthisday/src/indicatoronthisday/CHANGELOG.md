@@ -1,6 +1,6 @@
 # Indicator On This Day changelog
 
-## v1.0.17 (2023-11-22)
+## v1.0.17 (2024-09-04)
 
 - When show event notifcations is enabled, a three second delay between each notification is now included.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.

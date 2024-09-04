@@ -1,6 +1,6 @@
 # Indicator Test changelog
 
-## v1.0.17 (2024-03-26)
+## v1.0.17 (2024-09-04)
 
 - Consolidated menu options.
 - Updated README.md.

@@ -1,6 +1,6 @@
 # Indicator Tide changelog
 
-## v1.0.30 (2023-11-22)
+## v1.0.30 (2024-09-04)
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
