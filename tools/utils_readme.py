@@ -313,9 +313,6 @@ def _get_extension( operating_system ):
             f"For the `appindicator` extension to take effect, log out then log in "
             f"(or restart) and in a terminal run:"
             f"    `gnome-extensions enable ubuntu-appindicators@ubuntu.com`\n\n" )
-#TODO See above command...
-# Is it possible once the extension is installed via apt-get to call something
-# which will refresh the list of extensions and so no need to log out/in?
 
     applicable_operating_systems = {
         Operating_System.FEDORA_38,
