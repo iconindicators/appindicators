@@ -450,9 +450,14 @@ def _get_limitations( indicator_name ):
 
     if is_indicator(
         indicator_name,
+        Indicator_Name.INDICATORPUNYCODE ):
+        messages.append(
+            f"- `Wayland`: Clipboard/Primary input and output function intermittently at best; effectively unsupported.\n" )
+
+    if is_indicator(
+        indicator_name,
         Indicator_Name.INDICATORFORTUNE,
         Indicator_Name.INDICATORONTHISDAY,
-        Indicator_Name.INDICATORPUNYCODE,
         Indicator_Name.INDICATORTEST ):
         messages.append(
             f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
