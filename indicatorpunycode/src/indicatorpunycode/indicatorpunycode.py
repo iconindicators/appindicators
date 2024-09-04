@@ -40,6 +40,31 @@
 #
 # Update readme in some way...
 # Does that mean the indicator does not work at all under Wayland, or intermittently?
+#
+#
+# München                 Mnchen-3ya   
+# Mnchen-3ya              Mnchen-3ya-  
+# München-Ost             Mnchen-Ost-9db  
+# Bahnhof München-Ost     Bahnhof Mnchen-Ost-u6b  
+# abæcdöef                abcdef-qua4k   
+# правда                  80aafi6cg   
+# ยจฆฟคฏข                 22cdfh1b8fsa   
+# 도메인                        hq1bm8jm9l   
+# ドメイン名例              eckwd4c7cu47r2wf
+# MajiでKoiする5秒前        MajiKoi5-783gue6qz075azm5e  
+# 「bücher」                  bcher-kva8445foa
+#
+# Using above data, tested on....
+#   Ubuntu 20.04 (Xorg) - all good.
+#   Ubuntu 24.04 Wayland - intermittently works.
+#   Ubuntu 24.04 Xorg - unable to login so cannot test.
+#   Debian 12 Wayland - intermittently works.
+#   Debian 12 Xorg - all good.
+#   Debian 12 GNOME Classic Xorg - all good.
+#   Fedora 40 Wayland - intermittently works.
+#   Fedora 40 Xorg - all good.
+#
+# Bottom line: Wayland unsupported.
 
 
 # Application indicator which converts domain names between Unicode and ASCII.
@@ -76,7 +101,6 @@ class IndicatorPunycode( IndicatorBase ):
             artwork = [ "Oleg Moiseichuk" ] )
 
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
-
 
     def update( self, menu ):
         self.create_and_append_menuitem(
