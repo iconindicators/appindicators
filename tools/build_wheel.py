@@ -52,56 +52,25 @@ except ModuleNotFoundError:
 
 
 def _run_checks_on_indicator( indicator_name ):
-
-    def find_string_in_path( string, path_ ):
-        message = ""
-        with open( path_, 'r' ) as f:
-            if string in f.read().lower():
-                message = f"\t{ path_ }\n"
-
-        return message
-
-
     paths = [
         Path( '.' ) / "indicatorbase",
         Path( '.' ) / indicator_name,
         Path( '.' ) / "tools" ]
 
-#TODO Maybe just search for all files rather than extensions?
-# What extensions are not in the list below?
-# That is, is/are there a file/files which should NOT be check for TODO?
-    extensions = {
-        '.desktop',
-        '.in',
-        '.md',
-        '.po',
-        '.pot',
-        '.py',
-        '.sh',
-        '.svg',
-        '.toml' }
+    exclusions = [
+        "__pycache__",
+        "indicatorlunar/development",
+        "indicatorlunar/frink",
+        "indicatorlunar/src/indicatorlunar/data" ]
 
     t_o_d_o = ''.join( [ 't', 'o', 'd', 'o' ] )
 
     message = ""
     for path in paths:
-        for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.suffix in extensions ):
-            message += find_string_in_path( t_o_d_o, path_ )
-
-    message += \
-        find_string_in_path(
-            t_o_d_o,
-            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" / "LINGUAS" ) 
-
-    message += \
-        find_string_in_path(
-            t_o_d_o,
-            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" / "README" )
-
-    message += \
-        find_string_in_path(
-            t_o_d_o,
-            Path( '.' ) / indicator_name / "src" / indicator_name / "locale" / "LINGUAS" )
+        for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.is_file() and not any( [ exclusion in str( path_ ) for exclusion in exclusions ] ) ):
+            with open( path_, 'r' ) as f:
+                if t_o_d_o in f.read().lower():
+                    message += f"\t{ path_ }\n"
 
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
