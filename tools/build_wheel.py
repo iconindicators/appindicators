@@ -52,15 +52,25 @@ except ModuleNotFoundError:
 
 
 def _run_checks_on_indicator( indicator_name ):
+
+    def find_string_in_path( string, path_ ):
+        message = ""
+        with open( path_, 'r' ) as f:
+            if string in f.read().lower():
+                message = f"\t{ path_ }\n"
+
+        return message
+
+
     paths = [
         Path( '.' ) / "indicatorbase",
         Path( '.' ) / indicator_name,
-        Path( '.' ) / indicator_name / "src" ]
+        Path( '.' ) / "tools" ]
 
-    extensions_toml = {
-        '.toml' }
-
-    extensions_all = {
+#TODO Maybe just search for all files rather than extensions?
+# What extensions are not in the list below?
+# That is, is/are there a file/files which should NOT be check for TODO?
+    extensions = {
         '.desktop',
         '.in',
         '.md',
@@ -71,19 +81,31 @@ def _run_checks_on_indicator( indicator_name ):
         '.svg',
         '.toml' }
 
-    extensions = [ extensions_all, extensions_toml, extensions_all ]
+    t_o_d_o = ''.join( [ 't', 'o', 'd', 'o' ] )
 
     message = ""
-    for path, extensions_ in zip( paths, extensions ):
-        for p in ( p.resolve() for p in path.glob( '**/*' ) if p.suffix in extensions_ ):
-            with open( p, 'r' ) as f:
-                if "todo" in f.read().lower():
-                    message += str( p ) + '\n'
+    for path in paths:
+        for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.suffix in extensions ):
+            message += find_string_in_path( t_o_d_o, path_ )
+
+    message += \
+        find_string_in_path(
+            t_o_d_o,
+            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" / "LINGUAS" ) 
+
+    message += \
+        find_string_in_path(
+            t_o_d_o,
+            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" / "README" )
+
+    message += \
+        find_string_in_path(
+            t_o_d_o,
+            Path( '.' ) / indicator_name / "src" / indicator_name / "locale" / "LINGUAS" )
 
     if message:
-        message = "One or more TODOs found:\n" + message
+        message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
-    message = "" #TODO Remove
     return message
 
 
