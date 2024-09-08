@@ -238,8 +238,11 @@ def _create_dot_desktop(
     indicatorbase_dot_desktop_path = \
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop"
 
+    dot_desktop_text = ""
     with open( indicatorbase_dot_desktop_path, 'r' ) as f:
-        dot_desktop_text = f.read()
+        while line := f.readline():
+            if not line.startswith( '#' ):
+                dot_desktop_text += line
 
     names = name
     for language, _name in names_from_mo_files.items():
