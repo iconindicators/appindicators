@@ -475,11 +475,10 @@ class IndicatorBase( ABC ):
 
         else:
             # The .desktop file is not present in $HOME/.config/autostart so copy
-            # from the virtual environment (when running in production) or a .whl
-            # (from the release directory when running in development).
+            # from the virtual environment (when running in production)
+            # or a .whl (from the release directory when running in development).
             # desktop_file_virtual_environment = \
-            #     Path( __file__ ).parent / "platform" / "linux" / desktop_file
-#TODO I think the above can be removed.
+            #     Path( __file__ ).parent / "platform" / "linux" / desktop_file #TODO I think this can be removed as it is defined above the if/else.
 
             if desktop_file_virtual_environment.exists():
                 shutil.copy( desktop_file_virtual_environment, self.desktop_file_user_home )
@@ -495,18 +494,13 @@ class IndicatorBase( ABC ):
                             "/platform/linux/" + \
                             desktop_file
 
-                        if desktop_file_in_wheel not in z.namelist():
-                            error_message = \
-                                f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }."
+                        if desktop_file_in_wheel in z.namelist():
+                            desktop_file_in_tmp = z.extract( desktop_file_in_wheel, path = "/tmp" )
+                            shutil.copy( desktop_file_in_tmp, self.desktop_file_user_home )
 
                         else:
-                            z.extract( desktop_file_in_wheel, path = "/tmp" )
-                            desktop_file_in_tmp = Path( "/tmp" ) / desktop_file_in_wheel
-                            if desktop_file_in_tmp.exists():
-                                shutil.copy( desktop_file_in_tmp, self.desktop_file_user_home )
-
-                            else:
-                                error_message = f"Unable to locate { desktop_file_in_tmp }!"
+                            error_message = \
+                                f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }."
 
                     z.close()
 
