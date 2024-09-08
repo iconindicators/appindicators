@@ -16,6 +16,50 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Tidy up changelog.md for each indicator.
+# Perhaps mention currently supported os/distro/versions
+# not already listed.
+
+#TODO
+# Why does the auto start delay on Debian appear to have no effect?
+#
+# Don't know why this does not work on Debian (others too?).
+#
+# Possible solutions:
+#   https://www.reddit.com/r/linuxquestions/comments/nmfkm3/how_to_make_an_application_start_with_a_delay_of/
+#
+#   https://forums.debian.net/viewtopic.php?t=149716
+#
+#   https://www.reddit.com/r/gnome/comments/oqh33f/setting_up_a_delay_for_autostart_applications/
+#
+# Need to test new solution of using bash and sleep on ALL Ubuntus,
+# Debians, Fedoras, Kubuntu, openSUSE, Manjaro, etc.
+#
+# Kubuntu 24.04 does not work.
+# Tried chmod to rw rw r but no go (works like that in Kubuntu 22.04).
+# Are 22.04 and 24.04 both same desktop (plasma or whatever)?  Yes KDE/plasma.
+# Might be just a bug in 24.04.
+# Does not work on Manjaro either (which is also KDE/plasma).
+#
+# https://docs.kde.org/stable5/en/plasma-workspace/kcontrol/autostart/index.html
+# https://www.reddit.com/r/Kubuntu/comments/ya0bb9/autostart_programs_dont_launch_in_kubuntu_2210/
+# https://bugs.kde.org/show_bug.cgi?id=433538
+# https://www.reddit.com/r/kde/comments/wlmlo1/running_a_command_on_startup/
+# https://forum.manjaro.org/t/script-put-in-autostart-doesnt-work/61007/6
+# https://askubuntu.com/questions/1490449/how-do-i-autostart-an-application-while-keeping-it-minimized
+# https://askubuntu.com/questions/1181813/how-to-get-franz-messaging-app-start-minimized-and-with-window-along-the-right-e
+# https://forum.manjaro.org/t/autostart-doesnt-work/121929/6
+# https://forum.manjaro.org/t/bash-script-wont-load-on-start/114310
+# https://forum.manjaro.org/t/autostart-script-does-not-work/124754
+#
+# Try on other KDE/plasma OS (Manjaro?)
+#
+# All good on all distros except Kubuntu 24.04 and Manjaro 24.0.x
+#
+# If the autostart works (without delay) on Kubuntu 24.04 and Manjaro 24.0.x
+# then test for those if possible and only show autostart checkbox and not the delay.
+
+
 #TODO When finally released, or at least indicatortest is released,
 # post a note to 
 #   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
@@ -160,6 +204,10 @@ class IndicatorBase( ABC ):
     _DESKTOP_X_CINNAMON = "X-Cinnamon"
     _DESKTOP_XFCE = "XFCE"
 
+    _DOT_DESKTOP_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay" # Not used by Debian (and possibly others).
+    _DOT_DESKTOP_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
+    _DOT_DESKTOP_EXEC = "Exec"
+
     _EXTENSION_JSON = ".json"
 
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS first to be the default.
@@ -173,8 +221,9 @@ class IndicatorBase( ABC ):
 
     _UPDATE_PERIOD_IN_SECONDS_DEFAULT = 60
 
-    _X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
-    _X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
+#TODO Remove
+    # _X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
+    # _X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
 
     DIALOG_DEFAULT_HEIGHT = 480
     DIALOG_DEFAULT_WIDTH = 640
@@ -248,7 +297,7 @@ class IndicatorBase( ABC ):
 
             sys.exit( 1 )
 
-        error_message = self._initialise_desktop_file()
+        error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
             self.show_dialog_ok(
                 None,
@@ -320,10 +369,15 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def _get_path_to_wheel_in_release( indicator_name ):
+    def _get_wheel_in_release( indicator_name ):
+        error_message = None
         path_release = Path( __file__ ).parent.parent.parent.parent
         path_wheel = path_release / "release" / "wheel" / f"dist_{ indicator_name }"
-        return path_wheel
+        first_wheel = next( path_wheel.glob( "*.whl" ), None )
+        if first_wheel is None:
+            error_message = f"Unable to locate a .whl in { path_wheel.absolute() }"
+
+        return first_wheel, error_message
 
 
     @staticmethod
@@ -338,64 +392,123 @@ class IndicatorBase( ABC ):
         except metadata.PackageNotFoundError:
             # No pip information found; assume running in development;
             # look for a .whl file in the release folder.
-            path_wheel = IndicatorBase._get_path_to_wheel_in_release( indicator_name )
-            first_wheel = next( path_wheel.glob( "*.whl" ), None )
-            if first_wheel is None:
+            wheel_in_release, error_message = IndicatorBase._get_wheel_in_release( indicator_name )
+            if wheel_in_release is None:
                 project_metadata = None
-                error_message = f"Unable to locate a .whl in { path_wheel.absolute() }"
 
             else:
-                first_metadata = next( metadata.distributions( path = [ first_wheel ] ), None )
+                first_metadata = next( metadata.distributions( path = [ wheel_in_release ] ), None )
                 if first_metadata is None:
                     project_metadata = None
-                    error_message = f"No metadata was found in { first_wheel.absolute() }!"
+                    error_message = f"No metadata was found in { wheel_in_release.absolute() }!"
 
                 else:
                     project_metadata = first_metadata.metadata
-                    error_message = None
 
         return project_metadata, error_message
 
 
-    def _initialise_desktop_file( self ):
-        self.desktop_file = self.indicator_name + ".py.desktop"
-        self.desktop_file_user_home = IndicatorBase._AUTOSTART_PATH / self.desktop_file
+    def _initialise_desktop_file_in_user_home( self ):
+        IndicatorBase._AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
 
-        # This resolves to the .desktop in the virtual environment
-        # when running within virtual environment.
-        #
-        # If running in development, this resolves to a file in
-        # indicatorbase which does not exist.
-        # To ensure Preferences work under development, extract
-        # the .desktop file from the indicator's .whl to /tmp.
-        self.desktop_file_virtual_environment = \
-            Path( __file__ ).parent / "platform" / "linux" / self.desktop_file
+        desktop_file = self.indicator_name + ".py.desktop"
+        self.desktop_file_user_home = IndicatorBase._AUTOSTART_PATH / desktop_file
+        desktop_file_virtual_environment = \
+            Path( __file__ ).parent / "platform" / "linux" / desktop_file
 
         error_message = None
-        if not self.desktop_file_virtual_environment.exists():
-            path_wheel = IndicatorBase._get_path_to_wheel_in_release( self.indicator_name )
-            first_wheel = next( path_wheel.glob( "*.whl" ), None )
-            if first_wheel is None:
-                error_message = f"Unable to locate a .whl in { path_wheel.absolute() }"
+        if self.desktop_file_user_home.is_file():
+            # The .desktop may be an older version with an Exec without a sleep,
+            # or tags no longer used such as X-GNOME-Autostart-Delay.
+            # Comment out unused tags and get the delay if present.
+            output = ""
+            delay = ""
+            exec_with_sleep_present = False
+            made_a_change = False
+            with open( self.desktop_file_user_home, 'r' ) as f:
+                for line in f:
+                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
+                        output += '#' + line # Don't delete but comment.
+                        delay = line.split( '=' ).strip()
+                        made_a_change = True
 
-            else:
-                with ZipFile( first_wheel, 'r' ) as z:
-                    desktop_file_in_wheel = \
-                        self.indicator_name + \
-                        "/platform/linux/" + \
-                        self.desktop_file
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ):
+                        if "sleep" in line:
+                            exec_with_sleep_present = True
 
-                    if desktop_file_in_wheel not in z.namelist():
-                        error_message = \
-                            f"Unable to locate { desktop_file_in_wheel } in { first_wheel.absolute() }."
+                        if "sleep" not in line:
+                            output += '#' + line # Don't delete but comment.
+                            made_a_change = True
 
                     else:
-                        z.extract( desktop_file_in_wheel, path = "/tmp" )
-                        self.desktop_file_virtual_environment = Path( "/tmp" ) / desktop_file_in_wheel
-                        if not self.desktop_file_virtual_environment.exists():
-                            error_message = f"Unable to locate { self.desktop_file_virtual_environment }!"
+                        output += line
 
-                z.close()
+            if not exec_with_sleep_present:
+                pass
+            if desktop_file_virtual_environment.exists():
+                with open( desktop_file_virtual_environment, 'r' ) as f:
+                    for line in f:
+                        if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                            break
+
+            else:
+                indicatorbase_desktop = \
+                    Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
+
+                with open( indicatorbase_desktop, 'r' ) as f:
+                    for line in f:
+                        if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                            break
+
+            if IndicatorBase._DOT_DESKTOP_EXEC + "= sh -c sleep " not in output:
+                exec_from_indicatorbase_desktop = 'Exec=sh -c "sleep 0 && \\$HOME/.local/bin/{indicator_name}.sh"' #TODO Need a function.
+                exec_from_indicatorbase_desktop = exec_from_indicatorbase_desktop.replace( "{indicator_name}", self.indicator.name )
+                if delay and delay.isdigit():
+                    exec_from_indicatorbase_desktop = exec_from_indicatorbase_desktop.replace( '0', delay )
+
+                output += exec_from_indicatorbase_desktop #TODO Need a new line?
+                made_a_change = True
+
+            if made_a_change:
+                with open( self.desktop_file_user_home, 'w' ) as f:
+                    f.write( output )
+
+        else:
+            # The .desktop file is not present in $HOME/.config/autostart so copy
+            # from the virtual environment (when running in production) or a .whl
+            # (from the release directory when running in development).
+            # desktop_file_virtual_environment = \
+            #     Path( __file__ ).parent / "platform" / "linux" / desktop_file
+#TODO I think the above can be removed.
+
+            if desktop_file_virtual_environment.exists():
+                shutil.copy( desktop_file_virtual_environment, self.desktop_file_user_home )
+
+            else:
+                wheel_in_release, error_message = \
+                    IndicatorBase._get_wheel_in_release( self.indicator_name )
+
+                if wheel_in_release:
+                    with ZipFile( wheel_in_release, 'r' ) as z:
+                        desktop_file_in_wheel = \
+                            self.indicator_name + \
+                            "/platform/linux/" + \
+                            desktop_file
+
+                        if desktop_file_in_wheel not in z.namelist():
+                            error_message = \
+                                f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }."
+
+                        else:
+                            z.extract( desktop_file_in_wheel, path = "/tmp" )
+                            desktop_file_in_tmp = Path( "/tmp" ) / desktop_file_in_wheel
+                            if desktop_file_in_tmp.exists():
+                                shutil.copy( desktop_file_in_tmp, self.desktop_file_user_home )
+
+                            else:
+                                error_message = f"Unable to locate { desktop_file_in_tmp }!"
+
+                    z.close()
 
         return error_message
 
@@ -886,8 +999,33 @@ class IndicatorBase( ABC ):
         return parent
 
 
+#TODO Remove
+    # _X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
+# if present in .desktop.
+# Maybe do this when writing out.
+
+
+#TODO Replace old Exec with new exec
+# Maybe do this when writing out.
     def create_preferences_common_widgets( self ):
-        autostart, delay = self._get_autostart_and_delay()
+        autostart = False
+        delay = 0
+        with open( self.desktop_file_user_home, 'r' ) as f:
+            for line in f:
+                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
+                    autostart = True
+
+#TODO Remove this as does not work on Debian (and possible other distros).
+                # if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
+                #     delay = int( line.split( '=' )[ 1 ].strip() )
+
+                if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                    if "sleep" in line:
+                        pass
+                    else:
+                        pass
+                    
+                    delay = line.split( "sleep " )[ 1 ].split( "&&" )[ 0 ].strip()
 
         autostart_checkbox = \
             self.create_checkbutton(
@@ -933,18 +1071,18 @@ class IndicatorBase( ABC ):
         return autostart_checkbox, autostart_spinner, latest_version_checkbox, box
 
 
+#TODO Maybe combine with above function.
     def _get_autostart_and_delay( self ):
         autostart = False
         delay = 0
         try:
-            if self.desktop_file_user_home.is_file():
-                with open( self.desktop_file_user_home, 'r' ) as f:
-                    for line in f:
-                        if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
-                            autostart = True
+            with open( self.desktop_file_user_home, 'r' ) as f:
+                for line in f:
+                    if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
+                        autostart = True
 
-                        if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
-                            delay = int( line.split( '=' )[ 1 ].strip() )
+                    if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
+                        delay = int( line.split( '=' )[ 1 ].strip() )
 
         except Exception as e:
             logging.exception( e )
@@ -1461,23 +1599,47 @@ class IndicatorBase( ABC ):
         return dialog
 
 
+# Debian 11  0/1/2
+# Debian 12  0/1/2
+# Fedora 38 0/1/2
+# Fedora 39  0/1/2
+# Fedora 40  0/2
+# Kubuntu 22.04 0/2
+# Kubuntu 24.04 does not autostart.
+# Linux Mint 22 Cinnamon 0/2
+# Lubuntu 22.04 0/1/2
+# Lubuntu 24.04 0/1/2
+# Manjaro does not autostart.
+# openSUSE 0/2
+# Ubuntu 20.04 0/1/2
+# Ubuntu 22.04 0/1/2
+# Ubuntu 24.04 0/2
+# Ubuntu Budgie 24.04 0/2
+# Ubuntu MATE 24.04 0/2
+# Ubuntu Unity 22.04 0/1/2
+# Ubuntu Unity 0/2
+# Xubuntu 24.04 0/1/2
+
+
+# https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
+# https://forum.manjaro.org/t/autostart-doesnt-work/121929
+# https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
+# https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
     def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
         self.check_latest_version = check_latest_version
 
-        IndicatorBase._AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
-
-        if not self.desktop_file_user_home.is_file():
-            shutil.copy( self.desktop_file_virtual_environment, self.desktop_file_user_home )
-
-        try:
+#TODO Below is reading both autostart enabled and autostart delay
+# (along with rest of file)
+# but this is done above (in part) so is that silly?
+        try: #TODO Maybe get rid of the try/except?
             output = ""
             with open( self.desktop_file_user_home, 'r' ) as f:
                 for line in f:
                     if IndicatorBase._X_GNOME_AUTOSTART_DELAY in line:
                         output += IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
-                    elif IndicatorBase._X_GNOME_AUTOSTART_ENABLED in line:
-                        output += IndicatorBase._X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
+                    elif IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED in line:
+                        output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
                     else:
                         output += line
@@ -1488,8 +1650,8 @@ class IndicatorBase( ABC ):
             if IndicatorBase._X_GNOME_AUTOSTART_DELAY not in output:
                 output += IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
 
-            if IndicatorBase._X_GNOME_AUTOSTART_ENABLED not in output:
-                output += IndicatorBase._X_GNOME_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
+            if IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED not in output:
+                output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
             with open( self.desktop_file_user_home, 'w' ) as f:
                 f.write( output )

@@ -1,17 +1,26 @@
+# https://specifications.freedesktop.org/desktop-entry-spec/
+#
 # To validate this file:
 #   desktop-file-validate {indicator_name}.py.desktop
 #
-# To install or update this file, although the
-# operating system should update by default and
-# certainly will update on a logout/login or restart:
+# The \\$HOME in the Exec is appropriate given the above specification.
+# However, the specification is somewhat confusing and so \$HOME also
+# seems appropriate.  Some Linux distributions/desktops handle no \,
+# or one or two slashes or some combination.  All handle two slashes
+# and so that is used here.
+#
+# The operating system / desktop should update the .desktop automatically,
+# but may not do so until a log out/in or a restart.
+# From a terminal:
 #   xdg-desktop-menu install --novendor {indicator_name}.py.desktop
+# may perform the update (without the log out/in or restart) but depends
+# entirely on the distribution/desktop.
 [Desktop Entry]
 Type=Application
 {names}
 {comment}
+{categories}
 Icon={indicator_name}
 Terminal=false
-Exec=sh -c "$HOME/.local/bin/{indicator_name}.sh"
-{categories}
-X-GNOME-Autostart-enabled=true
-X-GNOME-Autostart-Delay=0
+Exec=sh -c "sleep 0 && \\$HOME/.local/bin/{indicator_name}.sh"
+X-GNOME-Autostart-enabled=false
