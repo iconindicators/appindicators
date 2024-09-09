@@ -1003,14 +1003,6 @@ class IndicatorBase( ABC ):
         return parent
 
 
-#TODO Remove
-    # _X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
-# if present in .desktop.
-# Maybe do this when writing out.
-
-
-#TODO Replace old Exec with new exec
-# Maybe do this when writing out.
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
@@ -1020,7 +1012,7 @@ class IndicatorBase( ABC ):
                     autostart = True
 
                 if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and "sleep" in line:
-                    delay = int( line.split( "sleep " )[ 1 ].split( "&&" )[ 0 ].strip() )
+                    delay = int( line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
 
         autostart_checkbox = \
             self.create_checkbutton(
@@ -1064,27 +1056,6 @@ class IndicatorBase( ABC ):
                 orientation = Gtk.Orientation.VERTICAL )
 
         return autostart_checkbox, autostart_spinner, latest_version_checkbox, box
-
-
-#TODO Maybe combine with above function.
-    # def _get_autostart_and_delay( self ):
-    #     autostart = False
-    #     delay = 0
-    #     try:
-    #         with open( self.desktop_file_user_home, 'r' ) as f:
-    #             for line in f:
-    #                 if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
-    #                     autostart = True
-    #
-    #                 if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
-    #                     delay = int( line.split( '=' )[ 1 ].strip() )
-    #
-    #     except Exception as e:
-    #         logging.exception( e )
-    #         autostart = False
-    #         delay = 0
-    #
-    #     return autostart, delay
 
 
     def create_and_append_menuitem(
