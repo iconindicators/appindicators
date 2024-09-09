@@ -221,10 +221,6 @@ class IndicatorBase( ABC ):
 
     _UPDATE_PERIOD_IN_SECONDS_DEFAULT = 60
 
-#TODO Remove
-    # _X_GNOME_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
-    # _X_GNOME_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay"
-
     DIALOG_DEFAULT_HEIGHT = 480
     DIALOG_DEFAULT_WIDTH = 640
 
@@ -459,6 +455,7 @@ class IndicatorBase( ABC ):
                     desktop_file_original = desktop_file_virtual_environment
 
                 else:
+                    print( __file__ ) #TODO
                     desktop_file_original = \
                         Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
 
@@ -1594,36 +1591,22 @@ class IndicatorBase( ABC ):
     def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
         self.check_latest_version = check_latest_version
 
-#TODO Below is reading both autostart enabled and autostart delay
-# (along with rest of file)
-# but this is done above (in part) so is that silly?
-        try: #TODO Maybe get rid of the try/except?
-            output = ""
-            with open( self.desktop_file_user_home, 'r' ) as f:
-                for line in f:
-                    if IndicatorBase._X_GNOME_AUTOSTART_DELAY in line:
-                        output += IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
+        with open( self.desktop_file_user_home, 'r' ) as f:
+            for line in f:
+                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+                    output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower()
+                    #+ '\n' #TODO Need this?
 
-                    elif IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED in line:
-                        output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                    parts = line.split( "sleep" )
+                    right = parts[ 1 ].split( "&&" )[ 1 ]
+                    output += parts[ 0 ] + "sleep" + str( delay ) + " && " + right
 
-                    else:
-                        output += line
+                else:
+                    output += line
 
-            # If the user has an old .desktop file,
-            # there may not be an autostart enable field and/or
-            # an autostart delay field, so manually add in.
-            if IndicatorBase._X_GNOME_AUTOSTART_DELAY not in output:
-                output += IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' + str( delay ) + '\n'
-
-            if IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED not in output:
-                output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
-
-            with open( self.desktop_file_user_home, 'w' ) as f:
-                f.write( output )
-
-        except Exception as e:
-            logging.exception( e )
+        with open( self.desktop_file_user_home, 'w' ) as f:
+            f.write( output )
 
 
     @staticmethod
