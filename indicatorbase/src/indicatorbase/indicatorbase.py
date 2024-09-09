@@ -16,6 +16,38 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Check autostart works on the following:
+# Note that the 0/1/2 refers to the number of slashes
+# used to escape $HOME that actually work.
+# Debian 11  0/1/2
+# Debian 12  0/1/2
+# Fedora 38 0/1/2
+# Fedora 39  0/1/2
+# Fedora 40  0/2
+# Kubuntu 22.04 0/2
+# Kubuntu 24.04 does not autostart.
+# Linux Mint 22 Cinnamon 0/2
+# Lubuntu 22.04 0/1/2
+# Lubuntu 24.04 0/1/2
+# Manjaro does not autostart.
+# openSUSE 0/2
+# Ubuntu 20.04 0/1/2
+# Ubuntu 22.04 0/1/2
+# Ubuntu 24.04 0/2
+# Ubuntu Budgie 24.04 0/2
+# Ubuntu MATE 24.04 0/2
+# Ubuntu Unity 22.04 0/1/2
+# Ubuntu Unity 0/2
+# Xubuntu 24.04 0/1/2
+#
+# Need to figure out why Kubuntu 24.04 and Manjaro 24.0.x do not autostart.
+# Is it a KDE/plasma new thing?
+#
+#   https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
+#   https://forum.manjaro.org/t/autostart-doesnt-work/121929
+#   https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
+#   https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
+
 
 #TODO Try out
 #   PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
@@ -33,6 +65,7 @@
 #TODO Tidy up changelog.md for each indicator.
 # Perhaps mention currently supported os/distro/versions
 # not already listed.
+
 
 #TODO
 # Why does the auto start delay on Debian appear to have no effect?
@@ -1590,52 +1623,27 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-# Debian 11  0/1/2
-# Debian 12  0/1/2
-# Fedora 38 0/1/2
-# Fedora 39  0/1/2
-# Fedora 40  0/2
-# Kubuntu 22.04 0/2
-# Kubuntu 24.04 does not autostart.
-# Linux Mint 22 Cinnamon 0/2
-# Lubuntu 22.04 0/1/2
-# Lubuntu 24.04 0/1/2
-# Manjaro does not autostart.
-# openSUSE 0/2
-# Ubuntu 20.04 0/1/2
-# Ubuntu 22.04 0/1/2
-# Ubuntu 24.04 0/2
-# Ubuntu Budgie 24.04 0/2
-# Ubuntu MATE 24.04 0/2
-# Ubuntu Unity 22.04 0/1/2
-# Ubuntu Unity 0/2
-# Xubuntu 24.04 0/1/2
-
-
-# https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
-# https://forum.manjaro.org/t/autostart-doesnt-work/121929
-# https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
-# https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
     def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
         self.check_latest_version = check_latest_version
 
-#TODO Fix
-        # with open( self.desktop_file_user_home, 'r' ) as f:
-        #     for line in f:
-        #         if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
-        #             output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower()
-        #             #+ '\n' #TODO Need this?
-        #
-        #         elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-        #             parts = line.split( "sleep" )
-        #             right = parts[ 1 ].split( "&&" )[ 1 ]
-        #             output += parts[ 0 ] + "sleep" + str( delay ) + " && " + right
-        #
-        #         else:
-        #             output += line
-        #
-        # with open( self.desktop_file_user_home, 'w' ) as f:
-        #     f.write( output )
+#TODO Check/test.
+        output = ""
+        with open( self.desktop_file_user_home, 'r' ) as f:
+            for line in f:
+                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+                    output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower()
+                    #+ '\n' #TODO Need this?
+        
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                    parts = line.split( "sleep" )
+                    right = parts[ 1 ].split( "&&" )[ 1 ]
+                    output += parts[ 0 ] + "sleep" + str( delay ) + " && " + right
+        
+                else:
+                    output += line
+        
+        with open( self.desktop_file_user_home, 'w' ) as f:
+            f.write( output )
 
 
     @staticmethod
