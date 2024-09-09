@@ -16,6 +16,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO Try out
+#   PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
+# on the laptop (and desktop) to see if that will run an indicator
+# without having to copy indicatorbase.py to the indicator's directory
+# and all .desktop/.toml/etc/ files/data which have to be obtained
+# either from production or development still work!
+#
+# If all that works, document here or perhaps in the README.md
+#
+#   https://www.tutorialspoint.com/how-to-set-python-environment-variable-pythonpath-on-linux
+#   https://askubuntu.com/questions/688658/adding-directory-to-pythonpath-causes-my-home-directory-to-be-added-as-well
+
+
 #TODO Tidy up changelog.md for each indicator.
 # Perhaps mention currently supported os/distro/versions
 # not already listed.
@@ -244,11 +258,16 @@ class IndicatorBase( ABC ):
 
             if INDICATOR_NAME == Path( __file__ ).parent.stem: # Running installed under a virtual environment.
                 locale_directory = Path( __file__ ).parent / "locale"
+                print( f"Running under venv." ) #TODO Remove
 
             else:
                 # Running in development.
                 locale_directory = \
                     Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale"
+
+                print( f"Running under dev." ) #TODO Remove
+
+            print( f"locale_directory: { locale_directory }" ) #TODO Remove
 
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
@@ -384,8 +403,10 @@ class IndicatorBase( ABC ):
             # Obtain pyproject.toml information from pip.
             project_metadata = metadata.metadata( indicator_name )
             error_message = None
+            print( f"Running under venv." ) #TODO Remove
 
         except metadata.PackageNotFoundError:
+            print( f"Running under dev." ) #TODO Remove
             # No pip information found; assume running in development;
             # look for a .whl file in the release folder.
             wheel_in_release, error_message = IndicatorBase._get_wheel_in_release( indicator_name )
@@ -401,6 +422,7 @@ class IndicatorBase( ABC ):
                 else:
                     project_metadata = first_metadata.metadata
 
+        print( f"project_metadata: { project_metadata }" ) #TODO Remove
         return project_metadata, error_message
 
 
@@ -452,12 +474,15 @@ class IndicatorBase( ABC ):
                 # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
                 # from the original .desktop file (either production or development).
                 if desktop_file_virtual_environment.exists():
+                    print( f"Running under venv." ) #TODO Remove
                     desktop_file_original = desktop_file_virtual_environment
 
                 else:
-                    print( __file__ ) #TODO
+                    print( f"Running under dev." ) #TODO Remove
                     desktop_file_original = \
                         Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
+
+                print( f"desktop_file_original: { desktop_file_original }" ) #TODO Remove
 
                 with open( desktop_file_original, 'r' ) as f:
                     for line in f:
@@ -484,11 +509,13 @@ class IndicatorBase( ABC ):
             # so copy from the virtual environment (when running in production)
             # or a .whl from the release directory (when running in development).
             if desktop_file_virtual_environment.exists():
+                print( f"Running under venv." ) #TODO Remove
                 shutil.copy(
                     desktop_file_virtual_environment,
                     self.desktop_file_user_home )
 
             else:
+                print( f"Running under dev." ) #TODO Remove
                 wheel_in_release, error_message = \
                     IndicatorBase._get_wheel_in_release( self.indicator_name )
 
@@ -848,6 +875,7 @@ class IndicatorBase( ABC ):
                 self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
+#TODO If more functions are needed to handle autostart, might need a more generalised function?
     def _is_fedora_38( self ):
         '''
         When running under Debian 11 / 12, Fedora 38 / 39 / 40 and Ubuntu 24.04
@@ -1591,22 +1619,23 @@ class IndicatorBase( ABC ):
     def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
         self.check_latest_version = check_latest_version
 
-        with open( self.desktop_file_user_home, 'r' ) as f:
-            for line in f:
-                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
-                    output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower()
-                    #+ '\n' #TODO Need this?
-
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                    parts = line.split( "sleep" )
-                    right = parts[ 1 ].split( "&&" )[ 1 ]
-                    output += parts[ 0 ] + "sleep" + str( delay ) + " && " + right
-
-                else:
-                    output += line
-
-        with open( self.desktop_file_user_home, 'w' ) as f:
-            f.write( output )
+#TODO Fix
+        # with open( self.desktop_file_user_home, 'r' ) as f:
+        #     for line in f:
+        #         if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+        #             output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower()
+        #             #+ '\n' #TODO Need this?
+        #
+        #         elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+        #             parts = line.split( "sleep" )
+        #             right = parts[ 1 ].split( "&&" )[ 1 ]
+        #             output += parts[ 0 ] + "sleep" + str( delay ) + " && " + right
+        #
+        #         else:
+        #             output += line
+        #
+        # with open( self.desktop_file_user_home, 'w' ) as f:
+        #     f.write( output )
 
 
     @staticmethod
