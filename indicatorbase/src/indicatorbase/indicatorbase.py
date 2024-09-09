@@ -423,65 +423,73 @@ class IndicatorBase( ABC ):
             # Comment out unused tags and get the delay if present.
             output = ""
             delay = ""
+            autostart_enabled_present = False
             exec_with_sleep_present = False
             made_a_change = False
             with open( self.desktop_file_user_home, 'r' ) as f:
                 for line in f:
-                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
-                        output += '#' + line # Don't delete but comment.
-                        delay = line.split( '=' ).strip()
+                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
+                        output += line
+                        autostart_enabled_present = True
+
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
+                        # Does not work in Debian et al; capture delay and comment line.
+                        delay = line.split( '=' )[ 1 ].strip()
+                        output += '#' + line
                         made_a_change = True
 
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ):
                         if "sleep" in line:
+                            # Assume to be part of the install and not user created.
+                            output += line
                             exec_with_sleep_present = True
 
-                        if "sleep" not in line:
-                            output += '#' + line # Don't delete but comment.
+                        else:
+                            # Comment out and eventually replace with a sleep version.
+                            output += '#' + line
                             made_a_change = True
 
                     else:
                         output += line
 
-            if not exec_with_sleep_present:
-                pass
-            if desktop_file_virtual_environment.exists():
-                with open( desktop_file_virtual_environment, 'r' ) as f:
+            if not autostart_enabled_present or not exec_with_sleep_present:
+                # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
+                # from the original .desktop file (either production or development).
+                if desktop_file_virtual_environment.exists():
+                    desktop_file_original = desktop_file_virtual_environment
+
+                else:
+                    desktop_file_original = \
+                        Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
+
+                with open( desktop_file_original, 'r' ) as f:
                     for line in f:
+                        if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+                            if not autostart_enabled_present:
+                                output += line
+
                         if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                            break
+                            if not exec_with_sleep_present:
+                                if delay:
+                                    output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
 
-            else:
-                indicatorbase_desktop = \
-                    Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
+                                else:
+                                    output += line.replace( "{indicator_name}", self.indicator_name )
 
-                with open( indicatorbase_desktop, 'r' ) as f:
-                    for line in f:
-                        if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                            break
-
-            if IndicatorBase._DOT_DESKTOP_EXEC + "= sh -c sleep " not in output:
-                exec_from_indicatorbase_desktop = 'Exec=sh -c "sleep 0 && \\$HOME/.local/bin/{indicator_name}.sh"' #TODO Need a function.
-                exec_from_indicatorbase_desktop = exec_from_indicatorbase_desktop.replace( "{indicator_name}", self.indicator.name )
-                if delay and delay.isdigit():
-                    exec_from_indicatorbase_desktop = exec_from_indicatorbase_desktop.replace( '0', delay )
-
-                output += exec_from_indicatorbase_desktop #TODO Need a new line?
-                made_a_change = True
+                                made_a_change = True
 
             if made_a_change:
                 with open( self.desktop_file_user_home, 'w' ) as f:
                     f.write( output )
 
         else:
-            # The .desktop file is not present in $HOME/.config/autostart so copy
-            # from the virtual environment (when running in production)
-            # or a .whl (from the release directory when running in development).
-            # desktop_file_virtual_environment = \
-            #     Path( __file__ ).parent / "platform" / "linux" / desktop_file #TODO I think this can be removed as it is defined above the if/else.
-
+            # The .desktop file is not present in $HOME/.config/autostart
+            # so copy from the virtual environment (when running in production)
+            # or a .whl from the release directory (when running in development).
             if desktop_file_virtual_environment.exists():
-                shutil.copy( desktop_file_virtual_environment, self.desktop_file_user_home )
+                shutil.copy(
+                    desktop_file_virtual_environment,
+                    self.desktop_file_user_home )
 
             else:
                 wheel_in_release, error_message = \
@@ -496,7 +504,9 @@ class IndicatorBase( ABC ):
 
                         if desktop_file_in_wheel in z.namelist():
                             desktop_file_in_tmp = z.extract( desktop_file_in_wheel, path = "/tmp" )
-                            shutil.copy( desktop_file_in_tmp, self.desktop_file_user_home )
+                            shutil.copy(
+                                desktop_file_in_tmp,
+                                self.desktop_file_user_home )
 
                         else:
                             error_message = \
@@ -1009,17 +1019,8 @@ class IndicatorBase( ABC ):
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
                     autostart = True
 
-#TODO Remove this as does not work on Debian (and possible other distros).
-                # if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
-                #     delay = int( line.split( '=' )[ 1 ].strip() )
-
-                if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                    if "sleep" in line:
-                        pass
-                    else:
-                        pass
-                    
-                    delay = line.split( "sleep " )[ 1 ].split( "&&" )[ 0 ].strip()
+                if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and "sleep" in line:
+                    delay = int( line.split( "sleep " )[ 1 ].split( "&&" )[ 0 ].strip() )
 
         autostart_checkbox = \
             self.create_checkbutton(
@@ -1066,24 +1067,24 @@ class IndicatorBase( ABC ):
 
 
 #TODO Maybe combine with above function.
-    def _get_autostart_and_delay( self ):
-        autostart = False
-        delay = 0
-        try:
-            with open( self.desktop_file_user_home, 'r' ) as f:
-                for line in f:
-                    if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
-                        autostart = True
-
-                    if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
-                        delay = int( line.split( '=' )[ 1 ].strip() )
-
-        except Exception as e:
-            logging.exception( e )
-            autostart = False
-            delay = 0
-
-        return autostart, delay
+    # def _get_autostart_and_delay( self ):
+    #     autostart = False
+    #     delay = 0
+    #     try:
+    #         with open( self.desktop_file_user_home, 'r' ) as f:
+    #             for line in f:
+    #                 if IndicatorBase._X_GNOME_AUTOSTART_ENABLED + "=true" in line:
+    #                     autostart = True
+    #
+    #                 if IndicatorBase._X_GNOME_AUTOSTART_DELAY + '=' in line:
+    #                     delay = int( line.split( '=' )[ 1 ].strip() )
+    #
+    #     except Exception as e:
+    #         logging.exception( e )
+    #         autostart = False
+    #         delay = 0
+    #
+    #     return autostart, delay
 
 
     def create_and_append_menuitem(
