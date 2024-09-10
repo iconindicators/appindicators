@@ -16,6 +16,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO For installing multiple indicators as an end user,
+# is there some way to make things easier?
+# That is, a single apt-get (or equivalent) along with
+# a pip install listing desired indicators?
+#
+# Similarly for upgrading...
+# Is there a way to make it easier for an end user
+# to upgrade all in one go?
+
+
 #TODO Autostart with delay works on the following distros...
 # Note that the 0/1/2 refers to the number of slashes
 # used to escape $HOME that actually work.
@@ -202,7 +212,7 @@ class IndicatorBase( ABC ):
     _CONFIG_CHECK_LATEST_VERSION = "checklatestversion"
     _CONFIG_VERSION = "version"
 
-    # Recognised desktops; values are the result of calling
+    # Supported desktops; values are the result of calling
     #   echo $XDG_CURRENT_DESKTOP
     #
     # Different results come from calling
@@ -359,17 +369,22 @@ class IndicatorBase( ABC ):
 
         self._load_config()
 
+        self.new_version_available = False
+        self.new_version_summary = _( "New version of {0}..." ).format( self.indicator_name )
+        self.new_version_message = _( "See {0} for latest version." ).format( self.website )
         threading.Thread( target = self._check_for_newer_version ).start()
 
 
     def _check_for_newer_version( self ):
-        if self.check_latest_version:
+        if not self.check_latest_version:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
             try:
-                response = urlopen( url )
-                data_json = json.loads( response.read() )
-                version_latest = data_json[ "info" ][ "version" ]
+                # response = urlopen( url )
+                # data_json = json.loads( response.read() )
+                # version_latest = data_json[ "info" ][ "version" ]
+                version_latest = "1.0.16"
                 if version_latest != str( self.version ):
+                    self.new_version_available = True
                     self.show_notification(
                         _( "New version of {0}..." ).format( self.indicator_name ),
                         _( "See {0} for latest version." ).format( self.website ) )
@@ -1067,12 +1082,37 @@ class IndicatorBase( ABC ):
                 ( ( latest_version_checkbox, False ), ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP )
 
-        box = \
-            self.create_box(
-                (
-                    ( box_one, False ),
-                    ( box_two, False ) ),
-                orientation = Gtk.Orientation.VERTICAL )
+        if not self.new_version_available:
+            label = Gtk.Label.new()
+            url = f"https://pypi.org/project/{ self.indicator_name }"
+            label.set_markup( _(
+                "An update is available at <a href=\"{0}\">{1}</a>." ).format( url, url ) )
+
+            box_three = \
+                self.create_box(
+                    (
+                        ( label, False ), ),
+                    # margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                    orientation = Gtk.Orientation.VERTICAL )
+
+            boxes = \
+                ( ( box_one, False ),
+                  ( box_two, False ),
+                  ( box_three, False ) )
+
+        else:
+            boxes = \
+                ( ( box_one, False ),
+                  ( box_two, False ) )
+
+        box = self.create_box( boxes, orientation = Gtk.Orientation.VERTICAL )
+
+        # box = \
+        #     self.create_box(
+        #         (
+        #             ( box_one, False ),
+        #             ( box_two, False ) ),
+        #         orientation = Gtk.Orientation.VERTICAL )
 
         return autostart_checkbox, autostart_spinner, latest_version_checkbox, box
 
