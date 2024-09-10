@@ -92,11 +92,11 @@ Additional indicators may be appended.
 Various operating system packages will likely need to be installed; refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
 
 
-## Run an Indicator
+## Run an Indicator (Installed to a Virtual Environment)
 
 To run the indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out and log in.
 
-To run from a terminal (so that any errors or messages may be observed):
+To run from a terminal (any messages/errors may be observed):
 
 ```
     . $HOME/.local/venv_indicatortest/bin/activate && \
@@ -104,8 +104,18 @@ To run from a terminal (so that any errors or messages may be observed):
     deactivate
 ```
 
-Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` such that `Terminal=false` is changed to `Terminal=true` and then log out and log in.  Run the indicator as normal from the applications menu and a terminal window should display.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` such that `Terminal=false` is changed to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
+
+## Run an Indicator (Within the Development Environment)
+
+To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths etcetera.
+
+To run the indicator from a terminal, ensuring you are in the directory at the root of the project: 
+
+```
+    PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
+```
 
 ## Uninstall an Indicator
 
@@ -125,7 +135,6 @@ Additional indicators may be appended to the above command.
     python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
-
 
 ## License
 
