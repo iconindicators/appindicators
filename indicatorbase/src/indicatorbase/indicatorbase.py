@@ -25,11 +25,11 @@
 # Fedora 39  0/1/2
 # Fedora 40  0/2
 # Kubuntu 22.04 0/2
-# Kubuntu 24.04 does not autostart.
+    # Kubuntu 24.04 does not autostart.
 # Linux Mint 22 Cinnamon 0/2
 # Lubuntu 22.04 0/1/2
 # Lubuntu 24.04 0/1/2
-# Manjaro does not autostart.
+    # Manjaro does not autostart.
 # openSUSE 0/2
 # Ubuntu 20.04 0/1/2
 # Ubuntu 22.04 0/1/2
