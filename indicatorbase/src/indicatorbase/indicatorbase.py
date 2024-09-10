@@ -369,25 +369,25 @@ class IndicatorBase( ABC ):
 
         self._load_config()
 
-        self.new_version_available = False
-        self.new_version_summary = _( "New version of {0}..." ).format( self.indicator_name )
-        self.new_version_message = _( "See {0} for latest version." ).format( self.website )
         threading.Thread( target = self._check_for_newer_version ).start()
 
 
     def _check_for_newer_version( self ):
-        if not self.check_latest_version:
+        self.new_version_available = False
+        version_latest = "1.0.16" #TODO Testing
+        self.check_latest_version = True #TODO Testing
+        if self.check_latest_version:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
             try:
+#TODO Uncomment                
                 # response = urlopen( url )
                 # data_json = json.loads( response.read() )
                 # version_latest = data_json[ "info" ][ "version" ]
-                version_latest = "1.0.16"
                 if version_latest != str( self.version ):
                     self.new_version_available = True
                     self.show_notification(
-                        _( "New version of {0}..." ).format( self.indicator_name ),
-                        _( "See {0} for latest version." ).format( self.website ) )
+                        _( "New version of {0}" ).format( self.indicator_name ),
+                        _( "Refer to the Preferences for details." ) )
 
             except Exception as e:
                 logging.exception( e )
@@ -1064,7 +1064,7 @@ class IndicatorBase( ABC ):
 
         autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
 
-        box_one = \
+        box_autostart = \
             self.create_box(
                 (
                     ( autostart_checkbox, False ),
@@ -1077,42 +1077,37 @@ class IndicatorBase( ABC ):
                 tooltip_text = _( "Check for the latest version of the indicator on start up." ),
                 active = self.check_latest_version )
 
-        box_two = \
+        box_latest_version = \
             self.create_box(
                 ( ( latest_version_checkbox, False ), ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP )
 
-        if not self.new_version_available:
-            label = Gtk.Label.new()
+#TODO Check this (using an actual check at the website)...
+# Don't show the notification if the user turned it off.
+# Is this even possible?  Maybe I'm getting what looks like a strange result
+# because I'm spoofing the test...?
+        if self.new_version_available and self.check_latest_version:
             url = f"https://pypi.org/project/{ self.indicator_name }"
+            label = Gtk.Label.new()
             label.set_markup( _(
                 "An update is available at <a href=\"{0}\">{1}</a>." ).format( url, url ) )
 
-            box_three = \
+            box_new_version = \
                 self.create_box(
-                    (
-                        ( label, False ), ),
-                    # margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                    ( ( label, False ), ),
                     orientation = Gtk.Orientation.VERTICAL )
 
             boxes = \
-                ( ( box_one, False ),
-                  ( box_two, False ),
-                  ( box_three, False ) )
+                ( ( box_autostart, False ),
+                  ( box_latest_version, False ),
+                  ( box_new_version, False ) )
 
         else:
             boxes = \
-                ( ( box_one, False ),
-                  ( box_two, False ) )
+                ( ( box_autostart, False ),
+                  ( box_latest_version, False ) )
 
         box = self.create_box( boxes, orientation = Gtk.Orientation.VERTICAL )
-
-        # box = \
-        #     self.create_box(
-        #         (
-        #             ( box_one, False ),
-        #             ( box_two, False ) ),
-        #         orientation = Gtk.Orientation.VERTICAL )
 
         return autostart_checkbox, autostart_spinner, latest_version_checkbox, box
 
