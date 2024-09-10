@@ -279,16 +279,11 @@ class IndicatorBase( ABC ):
 
             if INDICATOR_NAME == Path( __file__ ).parent.stem: # Running installed under a virtual environment.
                 locale_directory = Path( __file__ ).parent / "locale"
-                print( f"Running under venv." ) #TODO Remove
 
             else:
                 # Running in development.
                 locale_directory = \
                     Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale"
-
-                print( f"Running under dev." ) #TODO Remove
-
-            print( f"locale_directory: { locale_directory }" ) #TODO Remove
 
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
@@ -424,10 +419,8 @@ class IndicatorBase( ABC ):
             # Obtain pyproject.toml information from pip.
             project_metadata = metadata.metadata( indicator_name )
             error_message = None
-            print( f"Running under venv." ) #TODO Remove
 
         except metadata.PackageNotFoundError:
-            print( f"Running under dev." ) #TODO Remove
             # No pip information found; assume running in development;
             # look for a .whl file in the release folder.
             wheel_in_release, error_message = IndicatorBase._get_wheel_in_release( indicator_name )
@@ -443,7 +436,6 @@ class IndicatorBase( ABC ):
                 else:
                     project_metadata = first_metadata.metadata
 
-        print( f"project_metadata: { project_metadata }" ) #TODO Remove
         return project_metadata, error_message
 
 
@@ -500,15 +492,11 @@ class IndicatorBase( ABC ):
                 # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
                 # from the original .desktop file (either production or development).
                 if desktop_file_virtual_environment.exists():
-                    print( f"Running under venv." ) #TODO Remove
                     desktop_file_original = desktop_file_virtual_environment
 
                 else:
-                    print( f"Running under dev." ) #TODO Remove
                     desktop_file_original = \
                         Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
-
-                print( f"desktop_file_original: { desktop_file_original }" ) #TODO Remove
 
                 with open( desktop_file_original, 'r' ) as f:
                     for line in f:
@@ -538,13 +526,11 @@ class IndicatorBase( ABC ):
             # so copy from the virtual environment (when running in production)
             # or a .whl from the release directory (when running in development).
             if desktop_file_virtual_environment.exists():
-                print( f"Running under venv." ) #TODO Remove
                 shutil.copy(
                     desktop_file_virtual_environment,
                     self.desktop_file_user_home )
 
             else:
-                print( f"Running under dev." ) #TODO Remove
                 wheel_in_release, error_message = \
                     IndicatorBase._get_wheel_in_release( self.indicator_name )
 
