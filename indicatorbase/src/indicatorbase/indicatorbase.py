@@ -16,20 +16,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check autostart works on the following:
+#TODO Autostart with delay works on the following distros...
 # Note that the 0/1/2 refers to the number of slashes
 # used to escape $HOME that actually work.
+# The number of slashes use is two to escape $HOME.
+#
 # Debian 11  0/1/2
 # Debian 12  0/1/2
 # Fedora 38 0/1/2
 # Fedora 39  0/1/2
 # Fedora 40  0/2
 # Kubuntu 22.04 0/2
-    # Kubuntu 24.04 does not autostart.
 # Linux Mint 22 Cinnamon 0/2
 # Lubuntu 22.04 0/1/2
 # Lubuntu 24.04 0/1/2
-    # Manjaro does not autostart.
 # openSUSE 0/2
 # Ubuntu 20.04 0/1/2
 # Ubuntu 22.04 0/1/2
@@ -40,34 +40,12 @@
 # Ubuntu Unity 0/2
 # Xubuntu 24.04 0/1/2
 #
+# Does not work on
+# Kubuntu 24.04 does not autostart.
+# Manjaro does not autostart.
+#
 # Need to figure out why Kubuntu 24.04 and Manjaro 24.0.x do not autostart.
 # Is it a KDE/plasma new thing?
-#
-#   https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
-#   https://forum.manjaro.org/t/autostart-doesnt-work/121929
-#   https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
-#   https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
-
-
-#TODO Tidy up changelog.md for each indicator.
-# Perhaps mention currently supported os/distro/versions
-# not already listed.
-
-
-#TODO
-# Why does the auto start delay on Debian appear to have no effect?
-#
-# Don't know why this does not work on Debian (others too?).
-#
-# Possible solutions:
-#   https://www.reddit.com/r/linuxquestions/comments/nmfkm3/how_to_make_an_application_start_with_a_delay_of/
-#
-#   https://forums.debian.net/viewtopic.php?t=149716
-#
-#   https://www.reddit.com/r/gnome/comments/oqh33f/setting_up_a_delay_for_autostart_applications/
-#
-# Need to test new solution of using bash and sleep on ALL Ubuntus,
-# Debians, Fedoras, Kubuntu, openSUSE, Manjaro, etc.
 #
 # Kubuntu 24.04 does not work.
 # Tried chmod to rw rw r but no go (works like that in Kubuntu 22.04).
@@ -86,12 +64,13 @@
 # https://forum.manjaro.org/t/bash-script-wont-load-on-start/114310
 # https://forum.manjaro.org/t/autostart-script-does-not-work/124754
 #
-# Try on other KDE/plasma OS (Manjaro?)
-#
-# All good on all distros except Kubuntu 24.04 and Manjaro 24.0.x
-#
 # If the autostart works (without delay) on Kubuntu 24.04 and Manjaro 24.0.x
 # then test for those if possible and only show autostart checkbox and not the delay.
+#
+#   https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
+#   https://forum.manjaro.org/t/autostart-doesnt-work/121929
+#   https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
+#   https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
 
 
 #TODO When finally released, or at least indicatortest is released,
