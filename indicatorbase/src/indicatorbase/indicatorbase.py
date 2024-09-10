@@ -1626,18 +1626,16 @@ class IndicatorBase( ABC ):
     def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
         self.check_latest_version = check_latest_version
 
-#TODO Check/test.
         output = ""
         with open( self.desktop_file_user_home, 'r' ) as f:
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
-                    output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower()
-                    #+ '\n' #TODO Need this?
+                    output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
         
                 elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                     parts = line.split( "sleep" )
                     right = parts[ 1 ].split( "&&" )[ 1 ]
-                    output += parts[ 0 ] + "sleep" + str( delay ) + " && " + right
+                    output += parts[ 0 ] + "sleep " + str( delay ) + " &&" + right + '\n'
         
                 else:
                     output += line
