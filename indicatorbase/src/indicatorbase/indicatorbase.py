@@ -49,19 +49,6 @@
 #   https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
 
 
-#TODO Try out
-#   PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
-# on the laptop (and desktop) to see if that will run an indicator
-# without having to copy indicatorbase.py to the indicator's directory
-# and all .desktop/.toml/etc/ files/data which have to be obtained
-# either from production or development still work!
-#
-# If all that works, document here or perhaps in the README.md
-#
-#   https://www.tutorialspoint.com/how-to-set-python-environment-variable-pythonpath-on-linux
-#   https://askubuntu.com/questions/688658/adding-directory-to-pythonpath-causes-my-home-directory-to-be-added-as-well
-
-
 #TODO Tidy up changelog.md for each indicator.
 # Perhaps mention currently supported os/distro/versions
 # not already listed.
