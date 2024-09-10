@@ -109,7 +109,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ## Run an Indicator (Within the Development Environment)
 
-To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths etcetera.
+To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths et cetera.
 
 To run the indicator from a terminal, ensuring you are in the directory at the root of the project: 
 
