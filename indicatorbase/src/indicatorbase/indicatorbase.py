@@ -241,6 +241,7 @@ class IndicatorBase( ABC ):
     _DOT_DESKTOP_AUTOSTART_DELAY = "X-GNOME-Autostart-Delay" # Not used by Debian (and possibly others).
     _DOT_DESKTOP_AUTOSTART_ENABLED = "X-GNOME-Autostart-enabled"
     _DOT_DESKTOP_EXEC = "Exec"
+    _DOT_DESKTOP_TERMINAL = "Terminal"
 
     _EXTENSION_JSON = ".json"
 
@@ -463,6 +464,7 @@ class IndicatorBase( ABC ):
             delay = ""
             autostart_enabled_present = False
             exec_with_sleep_present = False
+            terminal_present = False
             made_a_change = False
             with open( self.desktop_file_user_home, 'r' ) as f:
                 for line in f:
@@ -487,10 +489,14 @@ class IndicatorBase( ABC ):
                             output += '#' + line
                             made_a_change = True
 
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ):
+                        output += line
+                        terminal_present = True
+
                     else:
                         output += line
 
-            if not autostart_enabled_present or not exec_with_sleep_present:
+            if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
                 # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
                 # from the original .desktop file (either production or development).
                 if desktop_file_virtual_environment.exists():
@@ -506,19 +512,22 @@ class IndicatorBase( ABC ):
 
                 with open( desktop_file_original, 'r' ) as f:
                     for line in f:
-                        if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
-                            if not autostart_enabled_present:
-                                output += line
+                        if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
+                            output += line
+                            made_a_change = True
 
-                        if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                            if not exec_with_sleep_present:
-                                if delay:
-                                    output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
+                        elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and not exec_with_sleep_present:
+                            if delay:
+                                output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
 
-                                else:
-                                    output += line.replace( "{indicator_name}", self.indicator_name )
+                            else:
+                                output += line.replace( "{indicator_name}", self.indicator_name )
 
-                                made_a_change = True
+                            made_a_change = True
+
+                        elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ) and not terminal_present:
+                            output += line
+                            made_a_change = True
 
             if made_a_change:
                 with open( self.desktop_file_user_home, 'w' ) as f:
