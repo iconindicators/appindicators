@@ -47,7 +47,7 @@ A release involves building a `Python` wheel and uploading to `PyPI`.
 
 The build/upload creates a virtual environment in `venv` which may be deleted afterwards; otherwise, the virtual environment will be reused on subsequent builds/uploads.
 
-To install the indicator, refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
+To install the indicator, refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
@@ -76,7 +76,7 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
     $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/post_install.sh
 ```
 
-Various operating system packages will likely need to be installed; refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
 
 ## Installing a Wheel Directly
@@ -89,14 +89,14 @@ A wheel may be installed from the local file system.  For `indicatortest`, the `
 
 Additional indicators may be appended.
 
-Various operating system packages will likely need to be installed; refer to installation instructions at the indicator's `PyPI` page in the *Introduction*.
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
 
 ## Run an Indicator (Installed to a Virtual Environment)
 
-To run the indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out and log in.
+To run the indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
-To run from a terminal (any messages/errors may be observed):
+To run from a terminal (so that any messages/errors may be observed):
 
 ```
     . $HOME/.local/venv_indicatortest/bin/activate && \
@@ -104,14 +104,14 @@ To run from a terminal (any messages/errors may be observed):
     deactivate
 ```
 
-Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` such that `Terminal=false` is changed to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and modify `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
 
 ## Run an Indicator (Within the Development Environment)
 
 To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths et cetera.
 
-To run the indicator from a terminal, ensuring you are in the directory at the root of the project: 
+To run the indicator from a terminal, ensure you are in the directory at the root of the project and: 
 
 ```
     PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
