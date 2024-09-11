@@ -374,19 +374,16 @@ class IndicatorBase( ABC ):
 
     def _check_for_newer_version( self ):
         self.new_version_available = False
-        version_latest = "1.0.16" #TODO Testing
-        self.check_latest_version = True #TODO Testing
         if self.check_latest_version:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
             try:
-#TODO Uncomment                
-                # response = urlopen( url )
-                # data_json = json.loads( response.read() )
-                # version_latest = data_json[ "info" ][ "version" ]
+                response = urlopen( url )
+                data_json = json.loads( response.read() )
+                version_latest = data_json[ "info" ][ "version" ]
                 if version_latest != str( self.version ):
                     self.new_version_available = True
                     self.show_notification(
-                        _( "New version of {0}" ).format( self.indicator_name ),
+                        _( "New version of {0} available..." ).format( self.indicator_name ),
                         _( "Refer to the Preferences for details." ) )
 
             except Exception as e:
@@ -1082,10 +1079,6 @@ class IndicatorBase( ABC ):
                 ( ( latest_version_checkbox, False ), ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP )
 
-#TODO Check this (using an actual check at the website)...
-# Don't show the notification if the user turned it off.
-# Is this even possible?  Maybe I'm getting what looks like a strange result
-# because I'm spoofing the test...?
         if self.new_version_available and self.check_latest_version:
             url = f"https://pypi.org/project/{ self.indicator_name }"
             label = Gtk.Label.new()

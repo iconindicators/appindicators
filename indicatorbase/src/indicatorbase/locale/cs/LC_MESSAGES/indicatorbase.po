@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-08-11 10:05+1000\n"
+"POT-Creation-Date: 2024-09-11 11:20+1000\n"
 "PO-Revision-Date: 2020-11-13 07:21+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language-Team: Czech\n"
@@ -21,11 +21,10 @@ msgid "Initialising..."
 msgstr ""
 
 #, python-brace-format
-msgid "New version of {0}..."
+msgid "New version of {0} available..."
 msgstr ""
 
-#, python-brace-format
-msgid "See {0} for latest version."
+msgid "Refer to the Preferences for details."
 msgstr ""
 
 msgid "Preferences"
@@ -68,4 +67,8 @@ msgid "Check Latest Version"
 msgstr ""
 
 msgid "Check for the latest version of the indicator on start up."
+msgstr ""
+
+#, python-brace-format
+msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
