@@ -22,8 +22,30 @@
 # a pip install listing desired indicators?
 #
 # Similarly for upgrading...
-# Is there a way to make it easier for an end user
-# to upgrade all in one go?
+# Is there a way to make it easier for an end user to upgrade all in one go?
+#
+# Is it worthwhile also/instead lumping all indicators into one venv?
+# Still have a separate install (and upgrade and uninstall) command per indicator...
+# ...so what is the advantage?
+#
+# What is the size of a venv?
+# Around 20MB per.
+#
+# Have a wrapper indicator for all?
+#
+# At the very least look at defining a variable at the beginning of the
+# commands to create the venv and run pip, etc:
+#   indicator="indicatortest" && pip install $indicator
+# or similar.
+#
+#   https://stackoverflow.com/questions/10856129/setting-an-environment-variable-before-a-command-in-bash-is-not-working-for-the
+#   https://stackoverflow.com/questions/55912074/how-does-one-properly-assign-temporary-bash-variables-on-a-per-command-basis
+#   https://stackoverflow.com/questions/42658052/bash-variable-assignment-before-command
+#   https://stackoverflow.com/questions/48613400/bash-set-environment-variable-before-command-in-script
+#   https://stackoverflow.com/questions/58076931/setting-variables-before-command-in-bash
+#   https://unix.stackexchange.com/questions/126938/why-is-setting-a-variable-before-a-command-legal-in-bash
+#   
+#   https://www.shellcheck.net/
 
 
 #TODO Autostart with delay works on the following distros...
@@ -81,6 +103,10 @@
 #   https://forum.manjaro.org/t/autostart-doesnt-work/121929
 #   https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
 #   https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
+#
+# Create an example of a .destkop to autorun say a terminal
+# that works on on Kubuntu 22.04 but not Kubuntu 24.04 and Manjaro 24.0.x
+# and post about that to the Kubuntu forum and the Manjaro forum.
 
 
 #TODO When finally released, or at least indicatortest is released,

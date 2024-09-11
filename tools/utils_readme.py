@@ -338,6 +338,13 @@ def _get_installation_python_virtual_environment( indicator_name ):
         f"    python3 -m pip install --upgrade --force-reinstall pip { indicator_name } && \\\n"
         f"    deactivate && \\\n"
         f"    . $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/platform/linux/post_install.sh\n"
+        f"    \n\n\n"
+        f"    indicatorname={ indicator_name } && \\\n"
+        f"    if [ ! -d $HOME/.local/venv_${{indicatorname}} ]; then python3 -m venv $HOME/.local/venv_${{indicatorname}}; fi && \\\n"
+        f"    . $HOME/.local/venv_${{indicatorname}}/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade --force-reinstall pip ${{indicatorname}} && \\\n"
+        f"    deactivate && \\\n"
+        f"    . $(ls -d $HOME/.local/venv_${{indicatorname}}/lib/python3.* | head -1)/site-packages/${{indicatorname}}/platform/linux/post_install.sh\n"
         f"    ```\n" )
 
 
