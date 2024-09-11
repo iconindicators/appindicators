@@ -32,20 +32,6 @@
 # Around 20MB per.
 #
 # Have a wrapper indicator for all?
-#
-# At the very least look at defining a variable at the beginning of the
-# commands to create the venv and run pip, etc:
-#   indicator="indicatortest" && pip install $indicator
-# or similar.
-#
-#   https://stackoverflow.com/questions/10856129/setting-an-environment-variable-before-a-command-in-bash-is-not-working-for-the
-#   https://stackoverflow.com/questions/55912074/how-does-one-properly-assign-temporary-bash-variables-on-a-per-command-basis
-#   https://stackoverflow.com/questions/42658052/bash-variable-assignment-before-command
-#   https://stackoverflow.com/questions/48613400/bash-set-environment-variable-before-command-in-script
-#   https://stackoverflow.com/questions/58076931/setting-variables-before-command-in-bash
-#   https://unix.stackexchange.com/questions/126938/why-is-setting-a-variable-before-a-command-legal-in-bash
-#   
-#   https://www.shellcheck.net/
 
 
 #TODO Autostart with delay works on the following distros...
