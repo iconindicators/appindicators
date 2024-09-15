@@ -32,6 +32,95 @@
 # Around 20MB per.
 #
 # Have a wrapper indicator for all?
+#
+# Maybe have a file in the release called "upgradepath.txt" which contains
+# 
+#   16
+#   17
+#   the python venv create/install command 
+#
+# So the indicator knows it is version 16 and there is a new version 17
+# and only needs to run the command to upgrade.
+#
+# This could be done also for the OS package changes
+# (but needs to be per OS now) so
+#
+#   debian_11=sudo apt-get -y install new_package
+#   fedora_38=sudo dnf -y install new_package
+#
+# Maybe don't even need the 16, 17.
+# Rather if there is an entry say
+#
+#   debian_11=sudo...
+#   python venv/install command
+#
+# then if on Debian 11, the debian_11 command and python command
+# both apply so show the user.
+#
+# So how to create this list/file?
+#
+#
+# Perhaps instead have an update script...?
+# Not even sure how it works, but would live in the venv directory
+# and we popup a dialog to let the user know of an available update
+# rather than an OSD or Preferences message.
+# Still need to resolve when a user does no upgrade for a few versions
+# and perhaps needs an OS package installed (rather than just the pip upgrade).
+#
+# If somehow a script/wrapper can be written to install multiple indicators simultaneously,
+# might be best to also install all indicators to a single venv.
+# What to name the venv?
+# What to name the python/pip project that contains the script/wrapper?
+#
+#
+# How to update a single indicator in its own venv other than
+# the user manually running all commands from the PyPI page?
+#
+# An update requires two parts: OS updates which should be seldom
+# and Python (and venv) updates which are the typical update.
+#
+# For each release, need a text file which records any OS packages
+# which are new since the very first release.
+#
+# When an indicator checks...getting messy.
+#
+#
+# To think about...
+#  - Should all indicators be lumped into one venv?
+#  - Is there a way to make installing (multiple indicators) easier?
+#  - Is there a way to make updates easier (singular or multiple indicators?
+#
+# For updating, if an indicator contains in its .whl
+# a file containing the OS packages required for each distro
+# which comes from utils_readme.py,
+# the installed indicator can compare its own file with that
+# at PyPI (after downloading) and message the user (undecided how)
+# the OS install command.  This implies only need the latest version.
+# The PyPI command will always be required for updating,
+# so only need to check versions.
+# 
+# If installing all the indicators to a common venv, need to consider...
+#   What name to give this venv?
+#   What happens if there is a name clash?
+#   Need to check if the name exists and is a venv...how to do this?
+#   Maybe need to make a statement in the Installation section
+#   about the name/location of the venv which will be created.
+#   https://stackoverflow.com/questions/34948898/check-whether-directory-is-a-virtualenv
+#   https://stackoverflow.com/questions/47462591/python-how-do-you-check-what-is-in-virtualenv
+#
+# If installing more than one indicator simultaneously,
+# (unsure about the same venv or separate)
+# split the OS packages into those common to all indicators
+# (which appear as the first step in the install instructions)
+# and add a OS install line to the post_install.sh on a per-indicator
+# basis for the OS specific packages.  Does this make sense...?
+# How does this make it easier to install multiple indicators simultaneously?????
+#
+#
+# If a combined/shared virtual environment is used for all indicators,
+# need a note on the PyPI page about uninstalling, in that the virtual
+# environment directory will be deleted because a user might use that
+# virtual environment for other things.
 
 
 #TODO Autostart with delay works on the following distros...
