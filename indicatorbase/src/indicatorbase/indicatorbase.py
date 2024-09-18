@@ -123,6 +123,77 @@
 # virtual environment for other things.
 
 
+#TODO Installing...
+#
+# For OS packages, run relevant command to install packages.
+#
+# For one venv per indicator (assumes venv directory does not exist):
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_${indicator} && \
+#     python3 -m venv ${venv} && \
+#     . ${venv}/bin/activate && \
+#     python3 -m pip install ${indicator} && \
+#     deactivate && \
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+#
+# For a shared venv across all indicators:
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_indicators && \
+#     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+#     . ${venv}/bin/activate && \
+#     python3 -m pip install ${indicator} && \
+#     deactivate && \
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+
+
+#TODO Updating...
+#
+# For OS packages, run relevant command to install packages.
+#
+# For one venv per indicator:
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_${indicator} && \
+#     . ${venv}/bin/activate && \
+#     python3 -m pip install --upgrade ${indicator} && \
+#     deactivate && \
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+#
+# For a shared venv across all indicators:
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_indicators && \
+#     . ${venv}/bin/activate && \
+#     python3 -m pip install --upgrade ${indicator} && \
+#     deactivate && \
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+
+
+#TODO Removing...
+#
+# For OS packages, run relevant command to remove packages.
+#
+# For one venv per indicator:
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_${indicator} && \
+#     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/uninstall.sh && \
+#     rm -f -r ${venv}
+#
+#
+# For a shared venv across all indicators:
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_indicators && \
+#     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/uninstall.sh && \
+#     . ${venv}/bin/activate && \
+#     python3 -m pip uninstall --yes ${indicator} && \
+#     count=$(python3 -m pip --disable-pip-version-check list | grep -o "indicator" | wc -l) ; if [ "$count" -eq "0" ]; then rm -f -r ${venv}; fi && \
+#     deactivate
+
+
 #TODO Autostart with delay works on the following distros...
 # Note that the 0/1/2 refers to the number of slashes
 # used to escape $HOME that actually work.
