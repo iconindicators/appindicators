@@ -194,6 +194,20 @@
 #     deactivate
 
 
+#TODO Perhaps modify the run command to be
+#
+#     indicator=indicatortest && \
+#     venv=$HOME/.local/venv_indicators && \
+#     . ${venv}/bin/activate && \
+#     python3 $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/${indicator}.py && \
+#     deactivate
+#
+# Would mean that run.sh also has to change along with that published in the README.md
+#
+# Also look at post_install.sh
+# Also look at uninstall.sh
+
+
 #TODO Autostart with delay works on the following distros...
 # Note that the 0/1/2 refers to the number of slashes
 # used to escape $HOME that actually work.
