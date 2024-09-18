@@ -345,6 +345,7 @@ def _get_installation_python_virtual_environment( indicator_name ):
 def _get_installation_additional_python_modules( indicator_name ):
     message = ''
 
+#TODO Perhaps remove the --upgrade from below?
     common = (
             f"For example if your `Python` script requires the `requests` module:\n"
             f"    ```\n"

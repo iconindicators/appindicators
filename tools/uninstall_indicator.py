@@ -17,7 +17,7 @@
 
 
 # Uninstall one or more indicators, removing the virtual environment
-# within $HOME/.local and .desktop, run script and icons and .config/.cache.
+# $HOME/.local/venv_indicators and .desktop, run script and icons and .config/.cache.
 
 
 import subprocess
@@ -25,6 +25,8 @@ import subprocess
 import utils
 
 
+
+#TODO Need to fix this according to now using a single venv.
 if __name__ == "__main__":
     if utils.is_correct_directory( example_arguments = "indicatorfortune" ):
         args = \
