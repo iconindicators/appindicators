@@ -208,6 +208,13 @@
 # Also look at uninstall.sh
 
 
+#TODO Probably need to also modify the README.md for the project
+# in terms of install/run/uninstall.
+
+
+#TODO Need to update the tools scripts for run/install/etc.
+
+
 #TODO Autostart with delay works on the following distros...
 # Note that the 0/1/2 refers to the number of slashes
 # used to escape $HOME that actually work.
