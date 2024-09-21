@@ -112,7 +112,7 @@
 # (unsure about the same venv or separate)
 # split the OS packages into those common to all indicators
 # (which appear as the first step in the install instructions)
-# and add a OS install line to the post_install.sh on a per-indicator
+# and add a OS install line to the install.sh on a per-indicator
 # basis for the OS specific packages.  Does this make sense...?
 # How does this make it easier to install multiple indicators simultaneously?????
 #
@@ -135,7 +135,7 @@
 #     . ${venv}/bin/activate && \
 #     python3 -m pip install ${indicator} && \
 #     deactivate && \
-#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 #
 # For a shared venv across all indicators:
 #
@@ -145,7 +145,7 @@
 #     . ${venv}/bin/activate && \
 #     python3 -m pip install ${indicator} && \
 #     deactivate && \
-#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 
 
 #TODO Updating...
@@ -159,7 +159,7 @@
 #     . ${venv}/bin/activate && \
 #     python3 -m pip install --upgrade ${indicator} && \
 #     deactivate && \
-#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 #
 # For a shared venv across all indicators:
 #
@@ -168,7 +168,7 @@
 #     . ${venv}/bin/activate && \
 #     python3 -m pip install --upgrade ${indicator} && \
 #     deactivate && \
-#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+#     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 
 
 #TODO Removing...
@@ -194,7 +194,7 @@
 #     deactivate
 
 
-#TODO Perhaps modify the run command to be
+#TODO Check the run command...
 #
 #     indicator=indicatortest && \
 #     venv=$HOME/.local/venv_indicators && \
@@ -204,7 +204,7 @@
 #
 # Would mean that run.sh also has to change along with that published in the README.md
 #
-# Also look at post_install.sh
+# Also look at install.sh
 # Also look at uninstall.sh
 
 
@@ -213,6 +213,16 @@
 
 
 #TODO Need to update the tools scripts for run/install/etc.
+
+
+#TODO Should a list of indicators be included in the install/update/remove instructions?
+# Does this make it easier in reality...?
+#
+# Not sure how to make it easier for OS packages to be installed/updated/removed across indicators.
+#
+# For Python...
+#   Installing without a list, user must copy/paste each command which only differs by indicator name. 
+#   Installing with a list, user may append extra indicator names to the install command.
 
 
 #TODO Autostart with delay works on the following distros...

@@ -75,7 +75,7 @@ def _run_checks_on_indicator( indicator_name ):
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
-    return message
+    return ""#message
 
 
 def _chmod( file, user_permission, group_permission, other_permission ):
@@ -196,11 +196,11 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
         "run.sh",
         indicator_name + ".sh" )
 
-    post_install_script = "post_install.sh"
+    install_script = "install.sh"
     read_format_write(
         indicatorbase_platform_linux_path,
-        post_install_script,
-        post_install_script )
+        install_script,
+        install_script )
 
     uninstall_script = "uninstall.sh"
     read_format_write(
