@@ -107,11 +107,55 @@ To run from a terminal (so that any messages/errors may be observed):
 Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and modify `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
 
+#TOOO I suspect this needs to change somewhat...
+# I don't think indicatorlunar (which requires ephem) will work
+# unless a venv is created first and ephem et al are installed.
+# In Ubuntu 20.04 indicatorlunar runs under Eclipse because ephem is installed as an OS package.
+# But in Debian 12 (and presumably Ubuntu 24.04) must use a venv...
+# ...so need to figure out how to run
+# ......via a terminal, need to copy Python file being edited to the venv?
+# ......via an IDE, I guess need to tell the IDE about the venv...then what?
+https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment
+https://lists.geany.org/hyperkitty/list/users@lists.geany.org/thread/MHKCINVA3ZGSQNE5EV2QWSVUT7ZB35TF/
+#
+# For indicatorlunar
+# In the terminal at the project root,
+# create a venv (python3 -m venv) which should already be present after a build,
+# then install dependencies
+#      python3 -m pip install ephem requests sgp4
+# then can run the indicator using development files in place using the command below as normal.
+# For all other indicators, no need for the venv, just run in place.
+#
+#Under Geany,
+# https://stackoverflow.com/a/26366357/2156453
+# In short, Edit - Preferences - Tools - Terminal
+# prepend
+#    env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase
+# to the /bin/sh
+#
+# x-terminal-emulator -e "/bin/sh %c"
+#
+# x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
+#
+
+
 ## Run an Indicator (Within the Development Environment)
+
+
 
 To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths et cetera.
 
-To run the indicator from a terminal, ensure you are in the directory at the root of the project and: 
+To run the indicator from a terminal, ensure you are in the directory at the root of the project and:
+
+```
+    PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
+```
+
+## ORIGINAL Run an Indicator (Within the Development Environment)
+
+To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths et cetera.
+
+To run the indicator from a terminal, ensure you are in the directory at the root of the project and:
 
 ```
     PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
