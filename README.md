@@ -141,11 +141,22 @@ https://lists.geany.org/hyperkitty/list/users@lists.geany.org/thread/MHKCINVA3ZG
 
 ## Run an Indicator (Within the Development Environment)
 
+To run an indicator directly from source, a `virtual environment` must be used.  To create a `virtual environment` at the root of the development environment:
+
+```
+    python3 -m venv venv
+```
+
+which may already exist if a build has taken place.
 
 
-To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths et cetera.
 
-To run the indicator from a terminal, ensure you are in the directory at the root of the project and:
+# create a venv (python3 -m venv) which should already be present after a build,
+# then install dependencies
+#      python3 -m pip install ephem requests sgp4
+# then can run the indicator using development files in place using the command below as normal.
+# For all other indicators, no need for the venv, just run in place.
+
 
 ```
     PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
