@@ -1283,6 +1283,10 @@ class IndicatorBase( ABC ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP )
 
         if self.new_version_available and self.check_latest_version:
+#TODO Rather (or perhaps in addition to) the label
+# is it feasible to get the upgrade instructions?
+# Get from where?  Download the new .whl and extract from the README.md somehow?
+# Or make a machine readable README.md?            
             url = f"https://pypi.org/project/{ self.indicator_name }"
             label = Gtk.Label.new()
             label.set_markup( _(
