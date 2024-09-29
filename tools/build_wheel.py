@@ -168,6 +168,15 @@ def _get_name_categories_comments_from_indicator( indicator_name, directory_indi
 
 def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 
+    # If a shell script contains a variable (of the form ${}),
+    # the formatter views this as a missing key (unknown text to replace).
+    # In this case, ignore and return the key so the shell variable remains intact.
+    # https://stackoverflow.com/a/17215533/2156453
+    class SafeDict( dict ):
+        def __missing__( self, key ):
+            return '{' + key + '}'
+
+
     def read_format_write( 
             indicatorbase_platform_linux_path,
             source_script_name,
@@ -175,8 +184,8 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 
         with open( indicatorbase_platform_linux_path / source_script_name, 'r' ) as f:
             script_text = f.read()
-        
-        script_text = script_text.format( indicator_name = indicator_name )
+
+        script_text = script_text.format_map( SafeDict( indicator_name = indicator_name ) )
 
         with open( directory_platform_linux / destination_script_name, 'w' ) as f:
             f.write( script_text + '\n' )
@@ -424,7 +433,8 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
             subprocess.call( command, shell = True )
 
-            shutil.rmtree( directory_dist / indicator_name )
+#TODO Remove
+            # shutil.rmtree( directory_dist / indicator_name )
 
     return message
 
