@@ -333,24 +333,24 @@ def _get_installation_python_virtual_environment( indicator_name ):
     return (
         f"Install the indicator into a `Python` virtual environment:\n"
         f"    ```\n"
-        f"    indicatorname={ indicator_name } && \\\n"
-        f"    if [ ! -d $HOME/.local/venv_${{indicatorname}} ]; then python3 -m venv $HOME/.local/venv_${{indicatorname}}; fi && \\\n"
-        f"    . $HOME/.local/venv_${{indicatorname}}/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade --force-reinstall pip ${{indicatorname}} && \\\n"
+        f"    indicator={ indicator_name } && \\\n"
+        f"    venv=$HOME/.local/venv_indicators && \\\n"
+        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
+        f"    . ${{venv}}/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade ${{indicator}} && \\\n"
         f"    deactivate && \\\n"
-        f"    . $(ls -d $HOME/.local/venv_${{indicatorname}}/lib/python3.* | head -1)/site-packages/${{indicatorname}}/platform/linux/install.sh\n"
+        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/platform/linux/install.sh\n"
         f"    ```\n" )
 
 
 def _get_installation_additional_python_modules( indicator_name ):
     message = ''
 
-#TODO Perhaps remove the --upgrade from below?
     common = (
             f"For example if your `Python` script requires the `requests` module:\n"
             f"    ```\n"
             f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-            f"    python3 -m pip install --upgrade requests && \\\n"
+            f"    python3 -m pip install requests && \\\n"
             f"    deactivate\n" )
 
     if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
@@ -430,13 +430,12 @@ def _get_installation_for_operating_system(
 
 
 def _get_usage( indicator_name, indicator_name_human_readable ):
-    # Remove the '™' from the human readable name VirtualBox™ below.
     return (
         f"Usage\n"
         f"-----\n\n"
 
         f"To run `{ indicator_name }`, press the `Super` key to show the applications overlay or similar "
-        f"and type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` "
+        f"and type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Remove the ™ from VirtualBox™.
         f"into the search bar and the icon should be present for you to select.  "
         f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
@@ -471,6 +470,7 @@ def _get_limitations( indicator_name ):
         messages.append(
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
+#TODO Remove all the comments below about testing...maybe keep somewhere else?
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSTARDATE,
@@ -591,8 +591,14 @@ def _get_uninstall_for_operating_system(
 
             f"2. Uninstall `Python` virtual environment and files:\n"
             f"    ```\n"
-            f"    $(ls -d $HOME/.local/venv_{indicator_name}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && \\\n"
-            f"    rm -f -r $HOME/.local/venv_{indicator_name}\n"
+            f"    indicator={ indicator_name } && \\\n"
+            f"    venv=$HOME/.local/venv_indicators &\\\n"
+            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
+            f"    . ${{venv}}/bin/activate && \\\n"
+            f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
+            f"    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
+            f"    deactivate && \\\n"
+            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
             f"    ```\n\n"
 
             f"</details>\n\n" )
@@ -617,6 +623,9 @@ def _get_install_uninstall( indicator_name, install = True ):
             "Uninstall\n" + \
             "---------\n\n"
 
+
+#TODO Need a line about the upgrade...that the indicator will optionally check for upgrades
+# and give the upgrade command (so no need to revisit).
     return (
         title +
 
