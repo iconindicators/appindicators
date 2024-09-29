@@ -23,29 +23,100 @@ Each indicator shares the common code base `indicatorbase`.
 - `indicatorppadownloadstatistics` - requires updating approximately every six months with the latest `Ubuntu` series name.
 
 
-## Release Procedure
+## Run an Indicator (from Source)
 
-A release involves building a `Python` wheel and uploading to `PyPI`.
-1. To build a wheel for `indicatortest`:
+To run `indicatortest`, in a terminal at the source root:
+
+```
+    indicator=indicatortest && \
+    if [ ! -d venv ]; then python3 -m venv venv; fi && \
+    . venv/bin/activate && \
+    python3 -m pip install PyGObject && \
+    PYTHONPATH="indicatorbase/src/indicatorbase" python3 ${indicator}/src/${indicator}/${indicator}.py && \
+    deactivate
+```
+
+Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of `pyproject.toml`.  Include additional packages after `PyGObject` in the above command.
+
+
+## Development Under Geany
+
+Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
+#TODO See if $HOME can be used instead of /home/bernard
+
+```
+    Project > New
+        Name: Indicators
+        Filename: /home/bernard/Programming/Indicators/project.geany
+        Basepath: /home/bernard/Programming/Indicators
+
+    Build > Set Build Commands > Execute Commands
+        Execute: /home/bernard/Programming/Indicators/venv/bin/python3 "%f"
+
+    Edit > Preferences > Tools > Tool Paths > Terminal
+        x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
+```
+
+References:
+
+- [https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment](https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment)
+- [https://stackoverflow.com/a/26366357/2156453](https://stackoverflow.com/a/26366357/2156453)
+
+
+## Build a Wheel
+
+To build a wheel for `indicatortest`:
 
     `python3 tools/build_wheel.py release indicatortest`
 
-    which updates locale files (`.pot` and `.po`), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
+which updates locale files (`.pot` and `.po`), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
-2. Upload the wheel to `PyPI`:
+## Install a Wheel
 
-    ```
-    if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . ./venv/bin/activate && \
-    python3 -m pip install --upgrade pip twine && \
-    python3 -m twine upload --username __token__ release/wheel/dist_indicatortest/* && \
+To install the `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
+
+```
+    python3 tools/install_wheel.py release indicatortest
+```
+
+The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended.
+
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
+
+
+## Run an Indicator (installed to a Virtual Environment)
+
+To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
+
+To run from a terminal (so that any messages/errors may be observed):
+
+```
+    indicator=indicatortest && \
+    venv=$HOME/.local/venv_indicators && \
+    . ${venv}/bin/activate && \
+    python3 $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/${indicator}.py && \
     deactivate
-    ```
+```
+#TODO Check that the above run works because there is a nested shell variable (venv with ls -d).
 
-    which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and modify `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
-The build/upload creates a virtual environment in `venv` which may be deleted afterwards; otherwise, the virtual environment will be reused on subsequent builds/uploads.
+
+## Release to PyPI
+
+Build a `.whl` for `indicatortest` as above and then upload to `PyPI`:
+
+```
+    indicator=indicatortest && \
+    if [ ! -d venv ]; then python3 -m venv venv; fi && \
+    . venv/bin/activate && \
+    python3 -m pip install pip twine && \
+    python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
+    deactivate
+```
+
+which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
 
 To install the indicator, refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
@@ -56,121 +127,32 @@ References:
 
 ## Release to TestPyPI (and then Installing)
 
-For testing purposes, a wheel for `indicatortest` may be uploaded to `TestPyPI`:
+For testing purposes, a `.whl` for `indicatortest` may be uploaded to `TestPyPI`:
 
 ```
+    indicator=indicatortest && \
     if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . ./venv/bin/activate && \
-    python3 -m pip install --upgrade pip twine && \
-    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_indicatortest/* && \
+    . venv/bin/activate && \
+    python3 -m pip install pip twine && \
+    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
     deactivate
 ```
 
-To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicatortest`:
+To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`:
 
 ```
-    if [ ! -d $HOME/.local/venv_indicatortest ]; then python3 -m venv $HOME/.local/venv_indicatortest; fi && \
-    . $HOME/.local/venv_indicatortest/bin/activate && \
-    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple indicatortest && \
+    indicator=indicatortest && \
+    venv=$HOME/.local/venv_indicators && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
+    python3 -m pip install --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
     deactivate && \
-    $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/platform/linux/post_install.sh
+    $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
 ```
+#TODO Check that the above post install works because there is a nested shell variable (venv with ls -d).
 
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
-
-## Installing a Wheel Directly
-
-A wheel may be installed from the local file system.  For `indicatortest`, the `.whl` is assumed to be in `release/wheel/dist_indicatortest` and will be installed into a virtual environment at `$HOME/.local/venv_indicatortest`.
-
-```
-    python3 tools/install_wheel.py release indicatortest
-```
-
-Additional indicators may be appended.
-
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
-
-
-## Run an Indicator (Installed to a Virtual Environment)
-
-To run the indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
-
-To run from a terminal (so that any messages/errors may be observed):
-
-```
-    . $HOME/.local/venv_indicatortest/bin/activate && \
-    python3 $(ls -d $HOME/.local/venv_indicatortest/lib/python3.* | head -1)/site-packages/indicatortest/indicatortest.py && \
-    deactivate
-```
-
-Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and modify `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
-
-
-#TOOO I suspect this needs to change somewhat...
-# I don't think indicatorlunar (which requires ephem) will work
-# unless a venv is created first and ephem et al are installed.
-# In Ubuntu 20.04 indicatorlunar runs under Eclipse because ephem is installed as an OS package.
-# But in Debian 12 (and presumably Ubuntu 24.04) must use a venv...
-# ...so need to figure out how to run
-# ......via a terminal, need to copy Python file being edited to the venv?
-# ......via an IDE, I guess need to tell the IDE about the venv...then what?
-https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment
-https://lists.geany.org/hyperkitty/list/users@lists.geany.org/thread/MHKCINVA3ZGSQNE5EV2QWSVUT7ZB35TF/
-#
-# For indicatorlunar
-# In the terminal at the project root,
-# create a venv (python3 -m venv) which should already be present after a build,
-# then install dependencies
-#      python3 -m pip install ephem requests sgp4
-# then can run the indicator using development files in place using the command below as normal.
-# For all other indicators, no need for the venv, just run in place.
-#
-#Under Geany,
-# https://stackoverflow.com/a/26366357/2156453
-# In short, Edit - Preferences - Tools - Terminal
-# prepend
-#    env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase
-# to the /bin/sh
-#
-# x-terminal-emulator -e "/bin/sh %c"
-#
-# x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
-#
-
-
-## Run an Indicator (Within the Development Environment)
-
-To run an indicator directly from source, a `virtual environment` must be used.  To create a `virtual environment` at the root of the development environment:
-
-```
-    python3 -m venv venv
-```
-
-which may already exist if a build has taken place.
-
-
-
-# create a venv (python3 -m venv) which should already be present after a build,
-# then install dependencies
-#      python3 -m pip install ephem requests sgp4
-# then can run the indicator using development files in place using the command below as normal.
-# For all other indicators, no need for the venv, just run in place.
-
-
-```
-    PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
-```
-
-## ORIGINAL Run an Indicator (Within the Development Environment)
-
-To run the indicator from an Integrated Development Environment (IDE) such as `Eclipse`, the IDE should take care of all paths et cetera.
-
-To run the indicator from a terminal, ensure you are in the directory at the root of the project and:
-
-```
-    PYTHONPATH="indicatorbase/src/indicatorbase" python3 indicatortest/src/indicatortest/indicatortest.py
-```
 
 ## Uninstall an Indicator
 
@@ -185,8 +167,8 @@ Additional indicators may be appended to the above command.
 
 ```
     if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . ./venv/bin/activate && \
-    python3 -m pip install --upgrade readme_renderer[md] && \
+    . venv/bin/activate && \
+    python3 -m pip install readme_renderer[md] && \
     python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
